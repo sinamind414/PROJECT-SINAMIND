@@ -500,12 +500,12 @@ textarea {
     height: auto;
     z-index: 0;
     pointer-events: none;
-    filter: drop-shadow(0 0 15px rgba(212, 175, 55, 0.2));
+    filter: brightness(0) invert(1) drop-shadow(0 0 15px rgba(255, 255, 255, 0.3));
     transform-origin: center;
 }
 
 .logo-bg-1 {
-    width: 120px;
+    width: 240px;
     left: 10%;
     top: 15%;
     opacity: 0.15;
@@ -513,7 +513,7 @@ textarea {
 }
 
 .logo-bg-2 {
-    width: 80px;
+    width: 160px;
     right: 15%;
     top: 35%;
     opacity: 0.1;
@@ -522,7 +522,7 @@ textarea {
 }
 
 .logo-bg-3 {
-    width: 150px;
+    width: 300px;
     left: 20%;
     bottom: 10%;
     opacity: 0.08;
