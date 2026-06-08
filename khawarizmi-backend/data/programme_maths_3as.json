@@ -1,0 +1,1106 @@
+{
+  "matiere": "Mathématiques",
+  "niveau": "3AS",
+  "filieres": [
+    "Sciences Expérimentales",
+    "Mathématiques",
+    "Techniques Mathématiques"
+  ],
+  "chapitres": [
+    {
+      "id": "CHAP_MATH_01",
+      "titre": "Suites Numériques",
+      "titre_ar": "المتتاليات العددية",
+      "ordre": 1,
+      "description": "Étude des suites numériques, raisonnement par récurrence, limites et convergence.",
+      "micro_concepts": [
+        {
+          "id": "MC_SUITES_01",
+          "nom": "Raisonnement par récurrence",
+          "nom_ar": "الاستدلال بالتراجع",
+          "description": "Principe de démonstration par récurrence (initialisation, hérédité, conclusion).",
+          "error_autopsy": {
+            "concept": [
+              {
+                "id": "ERR_REC_CONC_01",
+                "description": "Confusion entre la proposition P(n) et le terme de la suite Un.",
+                "traitement_socratique": "Demander à l'élève : 'Est-ce que P(n) est un nombre qu'on peut calculer ou une phrase qui peut être Vraie/Fausse ?'"
+              },
+              {
+                "id": "ERR_REC_CONC_02",
+                "description": "L'élève suppose que P(n+1) est vraie dès le départ.",
+                "traitement_socratique": "Métaphore des dominos : 'Si tu veux prouver que le domino n+1 va tomber, quel domino dois-tu pousser en premier dans ton hypothèse ?'"
+              }
+            ],
+            "methode": [
+              {
+                "id": "ERR_REC_METH_01",
+                "description": "Oubli total de l'utilisation de l'hypothèse de récurrence (P(n)) dans la démonstration de l'hérédité.",
+                "traitement_socratique": "'Regarde ton calcul. À quel moment as-tu utilisé ce que tu as supposé vrai au début de l'hérédité ? Si tu ne l'utilises pas, la preuve est mathématiquement bloquée.'"
+              },
+              {
+                "id": "ERR_REC_METH_02",
+                "description": "Mauvaise construction de l'inégalité. L'élève n'applique pas la fonction pas-à-pas.",
+                "traitement_socratique": "Guider l'élève étape par étape : 'Si Un > 2, comment arrives-tu à 3Un - 1 ? Que fais-tu en premier, la multiplication ou la soustraction ?'"
+              }
+            ],
+            "execution": [
+              {
+                "id": "ERR_REC_EXEC_01",
+                "description": "Erreur de signe en multipliant l'inégalité par un nombre négatif (sans inverser le sens).",
+                "traitement_socratique": "'Que se passe-t-il quand on multiplie une inégalité par un nombre négatif ? Vérifie ton signe ici.'"
+              },
+              {
+                "id": "ERR_REC_EXEC_02",
+                "description": "Erreur de développement ou de mise au même dénominateur lors du calcul de Un+1 - a.",
+                "traitement_socratique": "'La logique est parfaite, mais il y a un bug de calcul. Recalcule le numérateur de ta fraction.'"
+              }
+            ],
+            "panique": [
+              {
+                "id": "ERR_REC_PAN_01",
+                "description": "Abandon face à une expression fractionnaire lourde.",
+                "traitement_socratique": "'L'expression a l'air effrayante, mais on n'a besoin que de son SIGNE. Le dénominateur est-il toujours positif ? Oui. Alors concentre-toi juste sur le numérateur.'"
+              }
+            ]
+          }
+        },
+        {
+          "id": "MC_SUITES_02",
+          "nom": "Suites majorées, minorées et bornées",
+          "nom_ar": "المتتالية المحدودة (من الأعلى، من الأسفل)",
+          "description": "Démontrer qu'une suite est majorée, minorée ou bornée, souvent via récurrence.",
+          "error_autopsy": {
+            "concept": [
+              {
+                "id": "ERR_BORN_CONC_01",
+                "description": "Confusion entre le fait d'être majoré par M et avoir M comme limite.",
+                "traitement_socratique": "'Si la suite ne dépasse jamais 5, est-ce qu'elle s'approche forcément de 5 ? Pense à une suite qui alterne entre 1 et 2.'"
+              }
+            ],
+            "methode": [
+              {
+                "id": "ERR_BORN_METH_01",
+                "description": "Ne sait pas par quoi commencer pour prouver Un < M sans récurrence.",
+                "traitement_socratique": "'Pour montrer que Un < M, il est souvent plus simple d'étudier le signe de la différence Un - M. Essaie de calculer ça.'"
+              }
+            ],
+            "execution": [
+              {
+                "id": "ERR_BORN_EXEC_01",
+                "description": "Erreurs dans l'étude du signe de Un - M (tableaux de signes ignorés).",
+                "traitement_socratique": "'Tu as le résultat de Un - M, mais as-tu justifié pourquoi c'est positif/négatif ? N'oublie pas le dénominateur.'"
+              }
+            ],
+            "panique": [
+              {
+                "id": "ERR_BORN_PAN_01",
+                "description": "Panique si M est une fraction complexe (ex: majorée par 3/2).",
+                "traitement_socratique": "'Le fait que ce soit 3/2 ne change rien à la méthode. Fais Un - 3/2 et mets tout au même dénominateur sans stresser.'"
+              }
+            ]
+          }
+        },
+        {
+          "id": "MC_SUITES_03",
+          "nom": "Sens de variation d'une suite",
+          "nom_ar": "اتجاه تغير متتالية",
+          "description": "Étude de la monotonie (croissante, décroissante).",
+          "error_autopsy": {
+            "concept": [
+              {
+                "id": "ERR_VAR_CONC_01",
+                "description": "Confusion entre 'suite positive' (Un > 0) et 'suite croissante' (Un+1 - Un > 0).",
+                "traitement_socratique": "'Une suite peut être positive mais décroissante (ex: 1/n). Que signifie vraiment le mot croissante en termes mathématiques ?'"
+              }
+            ],
+            "methode": [
+              {
+                "id": "ERR_VAR_METH_01",
+                "description": "Utilisation de la méthode du quotient (Un+1 / Un) sans vérifier que les termes sont strictement positifs.",
+                "traitement_socratique": "'Tu as divisé par Un. Est-ce que tu es absolument sûr que Un ne s'annule jamais et qu'il est toujours positif ? Si tu doutes, utilise la différence Un+1 - Un.'"
+              }
+            ],
+            "execution": [
+              {
+                "id": "ERR_VAR_EXEC_01",
+                "description": "Mauvais calcul de Un+1 en remplaçant mal n par n+1.",
+                "traitement_socratique": "'Quand tu remplaces n par n+1, attention aux parenthèses ! 2n devient 2(n+1) et non 2n+1.'"
+              }
+            ],
+            "panique": [
+              {
+                "id": "ERR_VAR_PAN_01",
+                "description": "Blocage si la suite contient des factorielles (n!).",
+                "traitement_socratique": "'Les factorielles font peur, mais rappelle-toi que (n+1)! = (n+1) * n! . Avec la méthode du quotient Un+1/Un, ça va se simplifier comme par magie.'"
+              }
+            ]
+          }
+        },
+        {
+          "id": "MC_SUITES_04",
+          "nom": "Suites arithmétiques",
+          "nom_ar": "المتتاليات الحسابية",
+          "description": "Définition, terme général, et somme.",
+          "error_autopsy": {
+            "concept": [
+              {
+                "id": "ERR_ARI_CONC_01",
+                "description": "Incapacité à lier le terme général à une équation de droite (affinité).",
+                "traitement_socratique": "'Une suite arithmétique, c'est comme grimper des marches. La raison 'r', c'est la hauteur de la marche. Si tu as monté 5 marches, de combien as-tu monté au total ?'"
+              }
+            ],
+            "methode": [
+              {
+                "id": "ERR_ARI_METH_01",
+                "description": "Mauvaise formule pour le nombre de termes dans la somme : 'n - p' au lieu de 'n - p + 1'.",
+                "traitement_socratique": "'De U0 à U10, combien y a-t-il de termes ? Compte sur tes doigts de 0 à 10... Surprise, il y en a 11 ! N'oublie pas le +1.'"
+              }
+            ],
+            "execution": [
+              {
+                "id": "ERR_ARI_EXEC_01",
+                "description": "Erreurs basiques dans la formule Un = Up + (n-p)r (inversion des signes).",
+                "traitement_socratique": "'Si tu pars de U3 pour aller à U10, tu avances de combien de marches ? Donc c'est +7r ou -7r ?'"
+              }
+            ],
+            "panique": [
+              {
+                "id": "ERR_ARI_PAN_01",
+                "description": "Panique si la raison est négative et la suite commence à U1 au lieu de U0.",
+                "traitement_socratique": "'Pas de panique, la formule marche avec U1. Un = U1 + (n-1)r. Remplace juste p par 1.'"
+              }
+            ]
+          }
+        },
+        {
+          "id": "MC_SUITES_05",
+          "nom": "Suites géométriques",
+          "nom_ar": "المتتاليات الهندسية",
+          "description": "Définition, terme général, et somme.",
+          "error_autopsy": {
+            "concept": [
+              {
+                "id": "ERR_GEO_CONC_01",
+                "description": "Croyance qu'une suite géométrique est toujours croissante (faux si q < 1 ou q négatif).",
+                "traitement_socratique": "'Que se passe-t-il si je multiplie par 0.5 à chaque fois ? L'argent diminue ! La croissance dépend de la raison q.'"
+              }
+            ],
+            "methode": [
+              {
+                "id": "ERR_GEO_METH_01",
+                "description": "Utilise la formule de la somme arithmétique pour une suite géométrique.",
+                "traitement_socratique": "'Attention, ici on MULTIPLIE pour passer au terme suivant, ce n'est pas une échelle, c'est un effet boule de neige. Quelle est la formule de somme pour les suites géométriques ?'"
+              }
+            ],
+            "execution": [
+              {
+                "id": "ERR_GEO_EXEC_01",
+                "description": "Erreur grave sur les puissances : q^(n+1) - 1 calculé comme q^n.",
+                "traitement_socratique": "'Rappelle-toi de la puissance dans la somme : c'est le NOMBRE DE TERMES de la somme. Combien y a-t-il de termes ?'"
+              }
+            ],
+            "panique": [
+              {
+                "id": "ERR_GEO_PAN_01",
+                "description": "Blocage total si la raison q comporte des fractions ou racines, type q = sqrt(2)/2.",
+                "traitement_socratique": "'Une racine ou une fraction se manipule comme un nombre normal. Laisse la racine sous sa forme exacte.'"
+              }
+            ]
+          }
+        },
+        {
+          "id": "MC_SUITES_06",
+          "nom": "Limite d'une suite et Convergence",
+          "nom_ar": "نهاية متتالية وتقاربها",
+          "description": "Calcul des limites, suites convergentes.",
+          "error_autopsy": {
+            "concept": [
+              {
+                "id": "ERR_LIM_CONC_01",
+                "description": "Croire qu'une limite +infini signifie que la suite converge.",
+                "traitement_socratique": "'Converger, c'est se rapprocher d'un point fixe (un nombre réel). Est-ce que l'infini est un point fixe atteignable ?'"
+              }
+            ],
+            "methode": [
+              {
+                "id": "ERR_LIM_METH_01",
+                "description": "Prendre la limite du numérateur et dénominateur séparément sans lever l'indétermination.",
+                "traitement_socratique": "'Infini sur Infini est une illusion mathématique. Tu dois factoriser par le terme le plus fort pour voir qui gagne la course.'"
+              }
+            ],
+            "execution": [
+              {
+                "id": "ERR_LIM_EXEC_01",
+                "description": "Erreur classique : 1 / +infini calculé comme +infini ou erreur de signe.",
+                "traitement_socratique": "'Imagine que tu partages 1 dinar avec toute la population de la Terre (l'infini). Combien reçoit chacun ? Pratiquement zéro.'"
+              }
+            ],
+            "panique": [
+              {
+                "id": "ERR_LIM_PAN_01",
+                "description": "Se bloque quand la variable 'n' est à la fois en exposant (q^n) et en coefficient polynomial.",
+                "traitement_socratique": "'Entre un polynôme et une suite exponentielle (q^n), qui l'emporte à l'infini ? Pense aux croissances comparées.'"
+              }
+            ]
+          }
+        },
+        {
+          "id": "MC_SUITES_07",
+          "nom": "Opérations sur les limites",
+          "nom_ar": "العمليات على النهايات",
+          "description": "Sommes, produits, quotients de suites.",
+          "error_autopsy": {
+            "concept": [
+              {
+                "id": "ERR_OPL_CONC_01",
+                "description": "Considérer 0 * Infini = 0 systématiquement.",
+                "traitement_socratique": "'L'infini est énorme, 0 est minuscule. C'est un duel. On ne peut pas savoir qui gagne sans lever l'indétermination.'"
+              }
+            ],
+            "methode": [
+              {
+                "id": "ERR_OPL_METH_01",
+                "description": "Ne sait pas quelle méthode utiliser pour lever l'indétermination (factorisation vs conjugué).",
+                "traitement_socratique": "'Si tu as des racines carrées, pense au conjugué. Si tu as des polynômes, factorise par le plus haut degré.'"
+              }
+            ],
+            "execution": [
+              {
+                "id": "ERR_OPL_EXEC_01",
+                "description": "Erreur de factorisation sous la racine : oublier que sqrt(n^2) = |n|.",
+                "traitement_socratique": "'En sortant n^2 de la racine carrée, il devient n. Mais attention aux signes si on travaillait vers -infini (bien que n soit positif pour les suites).'"
+              }
+            ],
+            "panique": [
+              {
+                "id": "ERR_OPL_PAN_01",
+                "description": "Fractions à plusieurs étages avec des limites infinies.",
+                "traitement_socratique": "'On y va étage par étage. Quelle est la limite du gros numérateur ?'"
+              }
+            ]
+          }
+        },
+        {
+          "id": "MC_SUITES_08",
+          "nom": "Théorèmes de comparaison et d'encadrement",
+          "nom_ar": "نهايات بالمقارنة والحصر",
+          "description": "Gendarmes et comparaison.",
+          "error_autopsy": {
+            "concept": [
+              {
+                "id": "ERR_COMP_CONC_01",
+                "description": "Penser qu'il faut toujours encadrer (Gendarmes) même si un seul côté suffit (Comparaison vers l'infini).",
+                "traitement_socratique": "'Si un camion (suite V_n) te pousse vers l'infini et que tu es plus grand que lui (U_n > V_n), as-tu besoin d'être encadré pour savoir où tu vas ?'"
+              }
+            ],
+            "methode": [
+              {
+                "id": "ERR_COMP_METH_01",
+                "description": "Ne sait pas d'où partir pour construire l'encadrement avec sin(n), cos(n) ou (-1)^n.",
+                "traitement_socratique": "'Quelle est la propriété fondamentale du cosinus, du sinus et de (-1)^n ? Ils sont toujours bloqués entre quelles valeurs ? Pars de -1 <= cos(n) <= 1.'"
+              }
+            ],
+            "execution": [
+              {
+                "id": "ERR_COMP_EXEC_01",
+                "description": "Oublier d'inverser le sens de l'inégalité lors de la multiplication par un coefficient négatif dans l'encadrement.",
+                "traitement_socratique": "'Alerte rouge : tu multiplies par un nombre négatif. Que doit faire l'inégalité ?'"
+              }
+            ],
+            "panique": [
+              {
+                "id": "ERR_COMP_PAN_01",
+                "description": "La vue de cos(n) ou sin(n) dans une suite paralyse complètement.",
+                "traitement_socratique": "'Le cosinus n'a pas de limite à l'infini, c'est pour ça qu'il te fait peur. Mais il est inoffensif car il est toujours emprisonné entre -1 et 1. Encadre-le !'"
+              }
+            ]
+          }
+        },
+        {
+          "id": "MC_SUITES_09",
+          "nom": "Convergence des suites monotones",
+          "nom_ar": "تقارب المتتاليات الرتيبة",
+          "description": "Toute suite croissante et majorée est convergente.",
+          "error_autopsy": {
+            "concept": [
+              {
+                "id": "ERR_MON_CONC_01",
+                "description": "Croire que la limite est égale au majorant M. (Ex: majorée par 5, donc la limite est 5).",
+                "traitement_socratique": "'Le plafond de la pièce est à 5m. Tu montes. Est-ce que tu vas forcément toucher le plafond, ou tu peux t'arrêter à 3m ? Le théorème dit juste qu'il y a une limite L <= M.'"
+              }
+            ],
+            "methode": [
+              {
+                "id": "ERR_MON_METH_01",
+                "description": "Chercher à calculer la limite explicitement au lieu de juste citer le théorème.",
+                "traitement_socratique": "'La question est \"En déduire que la suite est convergente\". On ne te demande pas COMBIEN vaut la limite. Cite le théorème magique avec les deux conditions.'"
+              }
+            ],
+            "execution": [
+              {
+                "id": "ERR_MON_EXEC_01",
+                "description": "Oublier de vérifier ou de mentionner l'une des deux conditions (ex: dit juste qu'elle est majorée).",
+                "traitement_socratique": "'Une suite majorée par 10 mais qui descend vers -infini converge-t-elle ? Non. Il manque un mot clé : Croissante.'"
+              }
+            ],
+            "panique": [
+              {
+                "id": "ERR_MON_PAN_01",
+                "description": "L'élève ne trouve pas le majorant et abandonne.",
+                "traitement_socratique": "'Regarde les questions précédentes ! Le majorant a forcément été prouvé par récurrence juste avant.'"
+              }
+            ]
+          }
+        },
+        {
+          "id": "MC_SUITES_10",
+          "nom": "Suites adjacentes",
+          "nom_ar": "المتتاليتان المتجاورتان",
+          "description": "Croissante/Décroissante avec lim(U-V)=0.",
+          "error_autopsy": {
+            "concept": [
+              {
+                "id": "ERR_ADJ_CONC_01",
+                "description": "Penser qu'elles doivent être égales au début pour être adjacentes.",
+                "traitement_socratique": "'Adjacentes veut dire qu'elles se rapprochent et finissent au même endroit à l'infini. D'où elles partent n'a aucune importance.'"
+              }
+            ],
+            "methode": [
+              {
+                "id": "ERR_ADJ_METH_01",
+                "description": "Oublier qu'il faut vérifier 3 conditions absolues (monotonie opposée, limite différence = 0).",
+                "traitement_socratique": "'Pour marier deux suites (adjacentes), il faut 3 preuves : une qui monte, une qui descend, et l'écart entre les deux tend vers zéro.'"
+              }
+            ],
+            "execution": [
+              {
+                "id": "ERR_ADJ_EXEC_01",
+                "description": "Erreur de calcul dans la limite de Un - Vn qui ne donne pas zéro.",
+                "traitement_socratique": "'Si ça ne donne pas zéro, soit elles ne sont pas adjacentes, soit tu as fait une erreur de calcul. Recalcule Un - Vn.'"
+              }
+            ],
+            "panique": [
+              {
+                "id": "ERR_ADJ_PAN_01",
+                "description": "Systèmes avec 2 suites emmêlées (U_n et V_n définies l'une par rapport à l'autre).",
+                "traitement_socratique": "'Prends-les une par une. Isole Un. Isole Vn. Pose la soustraction au propre.'"
+              }
+            ]
+          }
+        },
+        {
+          "id": "MC_SUITES_11",
+          "nom": "Suites définies par récurrence Un+1 = f(Un)",
+          "nom_ar": "المتتاليات المعرفة بالعلاقة Un+1 = f(Un)",
+          "description": "Représentation graphique, conjecture et équation f(l)=l.",
+          "error_autopsy": {
+            "concept": [
+              {
+                "id": "ERR_FUN_CONC_01",
+                "description": "Confusion : l'élève pense que la suite se comporte exactement comme la fonction f(x) tracée.",
+                "traitement_socratique": "'La courbe de f(x) est un toboggan, mais la suite ce sont juste les rebonds (escaliers ou escargots) entre la courbe et la droite y=x.'"
+              }
+            ],
+            "methode": [
+              {
+                "id": "ERR_FUN_METH_01",
+                "description": "Résolution de la limite en calculant lim Un directement au lieu de résoudre l'équation f(l) = l.",
+                "traitement_socratique": "'Quand une suite Un+1 = f(Un) converge vers un réel l, la limite est le point fixe de la fonction. Résous f(l) = l.'"
+              }
+            ],
+            "execution": [
+              {
+                "id": "ERR_FUN_EXEC_01",
+                "description": "Erreur algébrique en résolvant f(l) = l (équation du second degré).",
+                "traitement_socratique": "'Passe tous les termes du même côté pour avoir f(l) - l = 0 et calcule ton Delta tranquillement.'"
+              }
+            ],
+            "panique": [
+              {
+                "id": "ERR_FUN_PAN_01",
+                "description": "Panique totale face à la consigne 'Représenter les 4 premiers termes sur l'axe des abscisses'.",
+                "traitement_socratique": "'La droite y=x est ton miroir. Monte sur la courbe, rebondis sur le miroir pour revenir sur l'axe des abscisses. Répète.'"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "CHAP_MATH_02",
+      "titre": "Fonctions Numériques : Exponentielle et Logarithme",
+      "titre_ar": "الدوال العددية: الأسية واللوغاريتمية",
+      "ordre": 2,
+      "description": "Étude complète des fonctions Ln et Exp, croissances comparées, TVI, dérivées, asymptotes et tracés de courbes.",
+      "micro_concepts": [
+        {
+          "id": "MC_FONC_01",
+          "nom": "Propriétés algébriques de ln et exp",
+          "nom_ar": "الخواص الجبرية للدالة الأسية واللوغاريتمية",
+          "description": "Simplification d'expressions, ln(a*b) = ln(a)+ln(b), exp(a+b) = exp(a)*exp(b).",
+          "error_autopsy": {
+            "concept": [
+              {
+                "id": "ERR_ALG_CONC_01",
+                "description": "L'élève invente des règles comme ln(a+b) = ln(a)+ln(b).",
+                "traitement_socratique": "Si ln(a+b) = ln(a)+ln(b), essaie avec a=1 et b=1. Est-ce que ln(2) = ln(1) + ln(1) ? Sachant que ln(1) = 0... Le log transforme uniquement la MULTIPLICATION en ADDITION."
+              }
+            ],
+            "methode": [
+              {
+                "id": "ERR_ALG_METH_01",
+                "description": "N'utilise pas e^(ln(x)) = x ou ln(e^x) = x pour simplifier.",
+                "traitement_socratique": "L'exponentielle et le logarithme sont des ennemis jurés. Que se passe-t-il quand ils se rencontrent directement ? Ils s'annulent !"
+              }
+            ],
+            "execution": [
+              {
+                "id": "ERR_ALG_EXEC_01",
+                "description": "Erreur de signe avec les puissances et quotients : e^(a) / e^(b) devient e^(a/b) au lieu de e^(a-b).",
+                "traitement_socratique": "Rappelle-toi les règles du collège sur les puissances de 10. 10^5 / 10^2, ça fait 10^3, pas 10^(2.5). C'est la soustraction !"
+              }
+            ],
+            "panique": [
+              {
+                "id": "ERR_ALG_PAN_01",
+                "description": "Panique face à ln(sqrt(x)).",
+                "traitement_socratique": "Une racine carrée, c'est juste une puissance cachée. Quelle est la puissance équivalente à une racine carrée ? C'est 1/2. Utilise la règle ln(x^n)."
+              }
+            ]
+          }
+        },
+        {
+          "id": "MC_FONC_02",
+          "nom": "Équations et inéquations avec exp et ln",
+          "nom_ar": "المعادلات والمتراجحات الأسية واللوغاريتمية",
+          "description": "Résolution de e^a = b, ln(a) = b, changement de variable (X = e^x).",
+          "error_autopsy": {
+            "concept": [
+              {
+                "id": "ERR_EQ_CONC_01",
+                "description": "Applique ln des deux côtés mais sur des valeurs négatives (ex: e^x = -2 -> x = ln(-2)).",
+                "traitement_socratique": "L'exponentielle e^x est le résultat d'une puissance de nombre positif. Peut-elle produire un nombre négatif ? Que dit ta calculatrice pour ln(-2) ?"
+              }
+            ],
+            "methode": [
+              {
+                "id": "ERR_EQ_METH_01",
+                "description": "Ne reconnait pas l'équation du second degré cachée (X = e^x) dans e^(2x) - 3e^x + 2 = 0.",
+                "traitement_socratique": "Regarde bien e^(2x). C'est la même chose que (e^x)^2. Si tu remplaces e^x par la lettre majuscule X, que devient ton équation ?"
+              }
+            ],
+            "execution": [
+              {
+                "id": "ERR_EQ_EXEC_01",
+                "description": "Oublie de vérifier les conditions d'existence (domaine de définition) pour le ln avant de garder les solutions.",
+                "traitement_socratique": "Tu as trouvé x=-5. Mais regarde ton équation de départ : ln(x+2). Est-ce que tu as le droit de donner à manger -5 au logarithme ?"
+              }
+            ],
+            "panique": [
+              {
+                "id": "ERR_EQ_PAN_01",
+                "description": "Se bloque devant une inéquation avec un ln(x) au dénominateur.",
+                "traitement_socratique": "C'est juste un tableau de signes ! Trouve quand ln(x) s'annule. Quelle valeur de x donne ln(x)=0 ? (C'est 1). Place le dans le tableau."
+              }
+            ]
+          }
+        },
+        {
+          "id": "MC_FONC_03",
+          "nom": "Croissances comparées (Limites)",
+          "nom_ar": "التزايد المقارن (النهايات)",
+          "description": "Limites du type e^x/x, x*ln(x), etc.",
+          "error_autopsy": {
+            "concept": [
+              {
+                "id": "ERR_CC_CONC_01",
+                "description": "Confusion sur 'qui gagne' entre ln(x), x, et e^x à l'infini.",
+                "traitement_socratique": "Imagine une course vers l'infini. ln(x) avance en marchant, x court, e^x est dans une fusée. Si on divise la fusée par le coureur (e^x / x), qui impose sa limite ?"
+              }
+            ],
+            "methode": [
+              {
+                "id": "ERR_CC_METH_01",
+                "description": "Essayer d'appliquer la croissance comparée en un point fini (ex: x->0 pour e^x/x) au lieu de l'infini.",
+                "traitement_socratique": "La croissance comparée, c'est un duel de titans à l'INFINI. En x=0, e^0 / 0 n'est pas une forme indéterminée de ce type, c'est juste 1/0."
+              }
+            ],
+            "execution": [
+              {
+                "id": "ERR_CC_EXEC_01",
+                "description": "Erreur de signe lors du passage à la limite de x*e^x en -infini (répond +infini au lieu de 0).",
+                "traitement_socratique": "Attention, x tend vers -infini, mais x*e^x est une limite du cours. L'exponentielle écrase tout et impose le zéro. 0 n'a pas de signe absolu ici, mais il s'approche par valeurs négatives."
+              }
+            ],
+            "panique": [
+              {
+                "id": "ERR_CC_PAN_01",
+                "description": "Abandonne face à ln(x)/x^2 parce que le cours parle de ln(x)/x.",
+                "traitement_socratique": "Si le coureur x bat le marcheur ln(x), que penses-tu du coureur dopé x^2 ? Il l'écrase encore plus vite ! La limite est la même : zéro."
+              }
+            ]
+          }
+        },
+        {
+          "id": "MC_FONC_04",
+          "nom": "Théorème des Valeurs Intermédiaires (TVI)",
+          "nom_ar": "مبرهنة القيم المتوسطة",
+          "description": "Preuve de l'existence et de l'unicité de la solution alpha pour f(x)=k.",
+          "error_autopsy": {
+            "concept": [
+              {
+                "id": "ERR_TVI_CONC_01",
+                "description": "L'élève confond l'existence de la solution (f continue) et son unicité (f strictement monotone).",
+                "traitement_socratique": "Si la route monte et descend plusieurs fois, tu peux croiser la ligne d'altitude 100m plusieurs fois. Comment garantir que tu ne la croiseras qu'UNE SEULE fois ?"
+              }
+            ],
+            "methode": [
+              {
+                "id": "ERR_TVI_METH_01",
+                "description": "Oubli de citer l'une des 3 conditions : Continuité, Stricte Monotonie, k compris entre f(a) et f(b).",
+                "traitement_socratique": "Le correcteur du BAC a une grille de mots-clés. Il cherche 'Continue' et 'Strictement croissante/décroissante'. Les as-tu écrits noir sur blanc ?"
+              }
+            ],
+            "execution": [
+              {
+                "id": "ERR_TVI_EXEC_01",
+                "description": "Calcule mal f(a) et f(b) à la calculatrice et conclut que k n'est pas entre les deux.",
+                "traitement_socratique": "Vérifie le réglage de ta calculatrice (degrés/radians, parenthèses) et recalcule tes valeurs f(a) et f(b). Leur produit f(a)*f(b) doit être négatif si k=0."
+              }
+            ],
+            "panique": [
+              {
+                "id": "ERR_TVI_PAN_01",
+                "description": "Panique quand on lui demande 'Déduire un encadrement de alpha à 10^-2 près'.",
+                "traitement_socratique": "C'est un jeu de 'plus grand, plus petit' (le balayage à la calculatrice). Règle le pas (STEP) de la table sur 0.01 et cherche l'endroit où f(x) change de signe."
+              }
+            ]
+          }
+        },
+        {
+          "id": "MC_FONC_05",
+          "nom": "Dérivabilité et calcul de dérivées",
+          "nom_ar": "الاشتقاقية وحساب المشتقات",
+          "description": "Dérivées de fonctions composées exp(u) et ln(u) et des produits u*v.",
+          "error_autopsy": {
+            "concept": [
+              {
+                "id": "ERR_DERIV_CONC_01",
+                "description": "Dérive e^(u(x)) en donnant e^(u(x)) sans multiplier par u'(x).",
+                "traitement_socratique": "L'exponentielle est paresseuse, elle reste elle-même. Mais ce qu'il y a DANS sa puissance est sous pression : il doit sortir et se faire dériver en premier ! u'.e^u."
+              }
+            ],
+            "methode": [
+              {
+                "id": "ERR_DERIV_METH_01",
+                "description": "Dérive ln(u(x)) comme 1/u(x) au lieu de u'(x)/u(x).",
+                "traitement_socratique": "Le logarithme fonctionne comme un entonnoir : le bloc de l'intérieur passe au dénominateur tel quel, mais il laisse sa dérivée au numérateur."
+              }
+            ],
+            "execution": [
+              {
+                "id": "ERR_DERIV_EXEC_01",
+                "description": "Erreur dans la dérivée du produit u*v (fait u'*v' au lieu de u'v + uv').",
+                "traitement_socratique": "On ne dérive pas une multiplication en bloc. C'est un travail d'équipe : l'un travaille (dérive) pendant que l'autre se repose, puis on inverse. u'v + uv'."
+              }
+            ],
+            "panique": [
+              {
+                "id": "ERR_DERIV_PAN_01",
+                "description": "S'effondre devant la dérivée de (ax+b)e^(cx) qui est le grand classique du BAC.",
+                "traitement_socratique": "C'est un u*v tout à fait normal. Identifie u, identifie v, calcule u' et v' proprement sur un brouillon avant d'assembler le puzzle."
+              }
+            ]
+          }
+        },
+        {
+          "id": "MC_FONC_06",
+          "nom": "Sens de variation et Tableau",
+          "nom_ar": "اتجاه التغير وجدول التغيرات",
+          "description": "Lien entre le signe de la dérivée et les variations de f.",
+          "error_autopsy": {
+            "concept": [
+              {
+                "id": "ERR_TAB_CONC_01",
+                "description": "Oublie que le signe de f'(x) détermine si f monte ou descend.",
+                "traitement_socratique": "La dérivée f'(x), c'est la VITESSSE. Si la vitesse est positive, la voiture avance (monte). Si elle est négative, elle recule (descend)."
+              }
+            ],
+            "methode": [
+              {
+                "id": "ERR_TAB_METH_01",
+                "description": "Ne cherche pas à factoriser f'(x) pour trouver son signe, ou étudie le signe de termes toujours positifs (ex: e^x).",
+                "traitement_socratique": "L'exponentielle est TON AMIE. Elle est TOUJOURS positive. Tu peux complètement l'ignorer pour l'étude du signe et te concentrer sur l'autre facteur de la multiplication."
+              }
+            ],
+            "execution": [
+              {
+                "id": "ERR_TAB_EXEC_01",
+                "description": "Erreur de signe dans le tableau (règle du signe du trinôme non respectée).",
+                "traitement_socratique": "Pour un polynôme du second degré : signe de 'a' à l'extérieur des racines, signe contraire de 'a' à l'intérieur. Quel est le signe de 'a' ici ?"
+              }
+            ],
+            "panique": [
+              {
+                "id": "ERR_TAB_PAN_01",
+                "description": "Panique totale quand le tableau contient une valeur interdite (double barre).",
+                "traitement_socratique": "La double barre, c'est juste un mur. La courbe n'a pas le droit d'y toucher. Tire deux traits rouges et traite les côtés gauche et droit séparément."
+              }
+            ]
+          }
+        },
+        {
+          "id": "MC_FONC_07",
+          "nom": "Asymptotes et Position Relative",
+          "nom_ar": "المستقيمات المقاربة والوضع النسبي",
+          "description": "Montrer que lim [f(x) - (ax+b)] = 0 et étudier le signe de la différence.",
+          "error_autopsy": {
+            "concept": [
+              {
+                "id": "ERR_ASYMP_CONC_01",
+                "description": "Ne comprend pas la différence entre une asymptote horizontale (limite en l'infini) et verticale (limite au point).",
+                "traitement_socratique": "Si x part vers l'infini et f(x) donne un nombre, c'est un plafond horizontal. Si x s'approche d'un nombre et que f(x) explose vers l'infini, c'est un mur vertical."
+              }
+            ],
+            "methode": [
+              {
+                "id": "ERR_ASYMP_METH_01",
+                "description": "Étudie le signe de f(x) au lieu de f(x) - y pour la position relative.",
+                "traitement_socratique": "Pour savoir qui est le plus grand entre Toi et Ton frère, on vous met dos à dos (on soustrait vos tailles). Pour deux courbes, c'est pareil : on étudie le signe de la SOUSTRACTION (f(x) - y)."
+              }
+            ],
+            "execution": [
+              {
+                "id": "ERR_ASYMP_EXEC_01",
+                "description": "Oublie de distribuer le signe moins lors de la soustraction f(x) - (ax+b).",
+                "traitement_socratique": "Attention au tueur silencieux des mathématiques : le signe MOINS devant des parenthèses ! -(ax+b) devient -ax - b."
+              }
+            ],
+            "panique": [
+              {
+                "id": "ERR_ASYMP_PAN_01",
+                "description": "Ne sait plus quoi répondre quand on lui demande de déduire l'asymptote oblique.",
+                "traitement_socratique": "Regarde l'expression de f(x). N'a-t-elle pas la forme (ax+b) + (un reste qui tend vers 0) ? L'asymptote est là, juste sous tes yeux."
+              }
+            ]
+          }
+        },
+        {
+          "id": "MC_FONC_08",
+          "nom": "Représentation Graphique",
+          "nom_ar": "الرسم البياني",
+          "description": "Tracé de la courbe représentative C_f en utilisant tangentes, extremums et asymptotes.",
+          "error_autopsy": {
+            "concept": [
+              {
+                "id": "ERR_GRAPH_CONC_01",
+                "description": "Trace la courbe en traversant une asymptote verticale ou sans respecter les limites.",
+                "traitement_socratique": "Une asymptote verticale est un MUR INFRANCHISSABLE. Ta courbe ne doit jamais, au grand jamais, croiser la ligne pointillée verticale."
+              }
+            ],
+            "methode": [
+              {
+                "id": "ERR_GRAPH_METH_01",
+                "description": "Oublie de placer les tangentes horizontales (extremums locaux) ou les points d'intersection avec les axes.",
+                "traitement_socratique": "Avant de tracer la courbe à main levée, place tes clous : les asymptotes (en pointillés), les extremums (traits horizontaux), et les points d'intersection avec (Ox) et (Oy)."
+              }
+            ],
+            "execution": [
+              {
+                "id": "ERR_GRAPH_EXEC_01",
+                "description": "Mauvaise échelle sur le repère (ne lit pas l'énoncé qui dit 2cm pour l'unité).",
+                "traitement_socratique": "Le correcteur va mesurer avec sa règle. Si l'énoncé dit 1 unité = 2cm, tu dois prendre 2 carreaux (souvent 1cm/carreau) pour le 1 !"
+              }
+            ],
+            "panique": [
+              {
+                "id": "ERR_GRAPH_PAN_01",
+                "description": "La peur de mal dessiner fige l'élève à la fin de l'épreuve.",
+                "traitement_socratique": "Ta courbe ne sera jamais parfaite et on ne te demande pas d'être Picasso. On veut voir : asymptotes respectées, sommets au bon endroit, et courbure logique. Fais un brouillon, puis trace en une seule fois."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "CHAP_MATH_03",
+      "titre": "Les Nombres Complexes",
+      "titre_ar": "الأعداد المركبة",
+      "ordre": 3,
+      "description": "Étude des nombres complexes : formes algébrique, trigonométrique, exponentielle, géométrie du plan, équations du 2nd degré, et transformations complexes.",
+      "micro_concepts": [
+        {
+          "id": "MC_COMP_01",
+          "nom": "Forme algébrique et Conjugué",
+          "nom_ar": "الشكل الجبري والمرافق",
+          "description": "Opérations sur z = x + iy, calcul de puissances de i, utilisation du conjugué pour diviser.",
+          "error_autopsy": {
+            "concept": [
+              {
+                "id": "ERR_ALG_CONC_01",
+                "description": "L'élève pense que la partie imaginaire inclut le i (ex: y = 2i au lieu de y = 2).",
+                "traitement_socratique": "La partie imaginaire est un nombre réel. C'est le coefficient devant le i. Si z = 3 + 4i, la partie réelle est 3 et la partie imaginaire est 4, pas 4i !"
+              }
+            ],
+            "methode": [
+              {
+                "id": "ERR_ALG_METH_01",
+                "description": "Ne sait pas comment écrire une fraction 1/(a+ib) sous forme algébrique.",
+                "traitement_socratique": "On n'aime pas les i au dénominateur. Pour s'en débarrasser, on utilise l'arme absolue : on multiplie en haut et en bas par le conjugué du dénominateur."
+              }
+            ],
+            "execution": [
+              {
+                "id": "ERR_ALG_EXEC_01",
+                "description": "Oublie que i^2 = -1 lors du développement (ex: (2+i)^2 calculé comme 4 + i^2 au lieu de 4 + 4i - 1).",
+                "traitement_socratique": "Attention aux identités remarquables ! (a+b)^2 = a^2 + 2ab + b^2. Et n'oublie pas le super-pouvoir de i : dès qu'il est au carré, il se transforme en -1."
+              }
+            ],
+            "panique": [
+              {
+                "id": "ERR_ALG_PAN_01",
+                "description": "Panique face à i^2026.",
+                "traitement_socratique": "Les puissances de i tournent en rond par cycles de 4 : i, -1, -i, 1. Divise 2026 par 4, prends le reste, et tu auras ta réponse instantanément."
+              }
+            ]
+          }
+        },
+        {
+          "id": "MC_COMP_02",
+          "nom": "Forme Trigonométrique, Module et Argument",
+          "nom_ar": "الشكل المثلثي، الطويلة والعمدة",
+          "description": "Calcul de r = |z| et de l'argument theta, passage de la forme algébrique à trigonométrique.",
+          "error_autopsy": {
+            "concept": [
+              {
+                "id": "ERR_TRIG_CONC_01",
+                "description": "Confond l'argument (un angle en radians) avec le module (une distance positive).",
+                "traitement_socratique": "Imagine le nombre complexe comme un point sur un radar. Le module, c'est la distance jusqu'au centre (positive). L'argument, c'est l'angle de rotation pour pointer vers lui."
+              }
+            ],
+            "methode": [
+              {
+                "id": "ERR_TRIG_METH_01",
+                "description": "Ne sait pas placer l'angle dans le bon quadrant trigonométrique après avoir calculé cos et sin.",
+                "traitement_socratique": "Fais un petit dessin du cercle ! Si cos est négatif et sin est positif, tu es dans le quart en haut à gauche. L'angle sera donc pi - alpha."
+              }
+            ],
+            "execution": [
+              {
+                "id": "ERR_TRIG_EXEC_01",
+                "description": "Erreur de calcul du module |z| = sqrt(x^2 + y^2) en incluant le i (fait sqrt(x^2 - y^2)).",
+                "traitement_socratique": "Alerte rouge ! Le i n'entre JAMAIS dans le calcul du module. Le module c'est Pythagore avec des longueurs réelles : x au carré PLUS y au carré."
+              }
+            ],
+            "panique": [
+              {
+                "id": "ERR_TRIG_PAN_01",
+                "description": "Bloque quand on lui demande l'argument d'un nombre réel pur négatif (ex: z = -5).",
+                "traitement_socratique": "Pas besoin de calculs compliqués ! -5 est sur l'axe des réels, à gauche. Quel angle dois-tu faire depuis l'axe de droite pour regarder vers la gauche ? Un demi-tour exact : Pi !"
+              }
+            ]
+          }
+        },
+        {
+          "id": "MC_COMP_03",
+          "nom": "Forme Exponentielle et Formule de Moivre",
+          "nom_ar": "الشكل الأسي ودستور موافر",
+          "description": "Utilisation de z = r e^(i theta) pour simplifier les puissances (z^n).",
+          "error_autopsy": {
+            "concept": [
+              {
+                "id": "ERR_EXP_CONC_01",
+                "description": "Pense que r e^(i theta) + r' e^(i theta') = (r+r') e^(i(theta+theta')).",
+                "traitement_socratique": "L'exponentielle transforme les multiplications en additions d'angles, MAIS elle ne marche absolument pas pour les additions directes. Repasse par la forme algébrique si tu dois additionner !"
+              }
+            ],
+            "methode": [
+              {
+                "id": "ERR_EXP_METH_01",
+                "description": "Essaie de calculer (1+i)^10 en développant la forme algébrique.",
+                "traitement_socratique": "Développer à la puissance 10 te prendrait 3 heures. Passe le nombre sous forme exponentielle ! La puissance 10 va juste multiplier l'angle par 10 grâce à Moivre."
+              }
+            ],
+            "execution": [
+              {
+                "id": "ERR_EXP_EXEC_01",
+                "description": "Oublie de mettre le module r à la puissance n dans z^n = r^n e^(in theta).",
+                "traitement_socratique": "La puissance s'applique à tout le monde. L'angle est multiplié par n, mais le module r, qui est une distance, est bien mis à la puissance n !"
+              }
+            ],
+            "panique": [
+              {
+                "id": "ERR_EXP_PAN_01",
+                "description": "Fige devant la consigne \"Montrer que (z/z')^2024 est un réel\".",
+                "traitement_socratique": "Un nombre est réel si son argument est un multiple de Pi (k*Pi). Calcule juste l'argument de la fraction avec les propriétés de l'exponentielle, multiplie par 2024, et regarde si ça fait k*Pi."
+              }
+            ]
+          }
+        },
+        {
+          "id": "MC_COMP_04",
+          "nom": "Équations du second degré dans C",
+          "nom_ar": "معادلات الدرجة الثانية في مجموعة الأعداد المركبة",
+          "description": "Résolution de az^2 + bz + c = 0 avec Delta négatif.",
+          "error_autopsy": {
+            "concept": [
+              {
+                "id": "ERR_EQ2_CONC_01",
+                "description": "Arrête l'exercice car Delta est négatif et \"pas de solution\".",
+                "traitement_socratique": "Tu n'es plus chez les réels ! Chez les complexes, un Delta négatif est une excellente nouvelle. Il admet deux racines complexes conjuguées. Remplace le signe - par i^2."
+              }
+            ],
+            "methode": [
+              {
+                "id": "ERR_EQ2_METH_01",
+                "description": "Ne sait pas trouver les racines de Delta si Delta est lui-même complexe (ex: Delta = 3 + 4i).",
+                "traitement_socratique": "Si Delta n'est pas réel, pose w = x + iy tel que w^2 = Delta. Cela va te donner un petit système de 3 équations réelles (dont x^2+y^2 = |Delta|)."
+              }
+            ],
+            "execution": [
+              {
+                "id": "ERR_EQ2_EXEC_01",
+                "description": "Erreur de signe dans l'application de la formule (-b +/- i sqrt(-Delta)) / 2a.",
+                "traitement_socratique": "Attention à la formule ! C'est -b, pas b. Et on divise par 2a, pas juste 2. Prends le temps de poser a=..., b=..., c=... au brouillon."
+              }
+            ],
+            "panique": [
+              {
+                "id": "ERR_EQ2_PAN_01",
+                "description": "Se bloque devant z^3 + 8 = 0.",
+                "traitement_socratique": "C'est une équation de degré 3. L'énoncé te demande toujours de vérifier qu'une racine évidente (comme -2) marche, puis de factoriser par (z - racine) pour retomber sur un degré 2 !"
+              }
+            ]
+          }
+        },
+        {
+          "id": "MC_COMP_05",
+          "nom": "Ensembles de points",
+          "nom_ar": "مجموعة النقط",
+          "description": "Recherche du lieu géométrique de M(z) : cercles ou médiatrices.",
+          "error_autopsy": {
+            "concept": [
+              {
+                "id": "ERR_ENS_CONC_01",
+                "description": "Ne fait pas le lien géométrique : voit |z - zA| comme un calcul abstrait au lieu de la distance AM.",
+                "traitement_socratique": "Magie des complexes : le module d'une différence, c'est une DISTANCE. |z - zA|, c'est littéralement la distance AM avec ta règle ! Que signifie AM = 5 ?"
+              }
+            ],
+            "methode": [
+              {
+                "id": "ERR_ENS_METH_01",
+                "description": "Essaie de remplacer z par x+iy et de résoudre de longues équations cartésiennes pour |z-zA| = |z-zB|.",
+                "traitement_socratique": "Tu te noies dans les calculs (x, y) ! Traduis-le géométriquement. AM = BM. Où sont les points situés à égale distance de A et de B ? Sur la médiatrice de [AB] ! Terminé."
+              }
+            ],
+            "execution": [
+              {
+                "id": "ERR_ENS_EXEC_01",
+                "description": "Erreur dans l'identification du centre : lit |z + 3 - 2i| = r et dit que le centre est A(3; -2).",
+                "traitement_socratique": "Attention, la formule c'est |z - zA|. Il faut factoriser le signe MOINS. |z - (-3 + 2i)|. Donc le centre est A(-3; 2). Les signes sont inversés."
+              }
+            ],
+            "panique": [
+              {
+                "id": "ERR_ENS_PAN_01",
+                "description": "Panique face à arg(z - zA) = Pi/4.",
+                "traitement_socratique": "L'argument, c'est un angle. Cela veut dire que l'angle entre le vecteur unitaire horizontal et le vecteur AM est constant. C'est donc une demi-droite d'origine A !"
+              }
+            ]
+          }
+        },
+        {
+          "id": "MC_COMP_06",
+          "nom": "Interprétation géométrique du rapport (zC-zA)/(zB-zA)",
+          "nom_ar": "التفسير الهندسي للنسبة",
+          "description": "Utilisation du rapport pour trouver la nature d'un triangle ou l'alignement.",
+          "error_autopsy": {
+            "concept": [
+              {
+                "id": "ERR_RAP_CONC_01",
+                "description": "L'élève calcule le rapport mais ne sait pas interpréter le module et l'argument séparément.",
+                "traitement_socratique": "Ce rapport est une mine d'or. Son MODULE te donne le rapport des longueurs AC/AB. Son ARGUMENT te donne l'angle géométrique (AB, AC). Que se passe-t-il si l'angle est de Pi/2 ?"
+              }
+            ],
+            "methode": [
+              {
+                "id": "ERR_RAP_METH_01",
+                "description": "Conclut qu'un triangle est isocèle et rectangle juste parce que le rapport donne i, sans le prouver.",
+                "traitement_socratique": "Si le rapport vaut i, quel est son module ? |i| = 1, donc AC=AB (isocèle). Quel est son argument ? arg(i) = Pi/2, donc angle droit (rectangle). Écris ces deux étapes clairement !"
+              }
+            ],
+            "execution": [
+              {
+                "id": "ERR_RAP_EXEC_01",
+                "description": "Fait une erreur dans le calcul du rapport complexe (erreur de conjugué au dénominateur).",
+                "traitement_socratique": "Prends ton temps pour la division. Multiplie soigneusement par le conjugué du dénominateur, numérateur et dénominateur. Vérifie tes signes."
+              }
+            ],
+            "panique": [
+              {
+                "id": "ERR_RAP_PAN_01",
+                "description": "Le calcul du rapport donne une expression horrible et il ne trouve pas de forme trigonométrique.",
+                "traitement_socratique": "Si le résultat est très moche, 99% du temps tu as fait une erreur de calcul juste avant pour zA, zB ou zC. Au BAC algérien, ce rapport donne TOUJOURS quelque chose de propre (comme i, -1/2 + i sqrt(3)/2, etc.). Refais le calcul."
+              }
+            ]
+          }
+        },
+        {
+          "id": "MC_COMP_07",
+          "nom": "Transformations du plan complexe",
+          "nom_ar": "التحويلات النقطية في المستوي",
+          "description": "Translation, Homothétie, Rotation (z' = az + b).",
+          "error_autopsy": {
+            "concept": [
+              {
+                "id": "ERR_TRANS_CONC_01",
+                "description": "Ne comprend pas la différence entre l'écriture complexe (z' = az + b) et la nature géométrique.",
+                "traitement_socratique": "Tout dépend du nombre complexe \"a\". Si a=1, on glisse (translation). Si \"a\" est un réel différent de 1, on zoome (homothétie). Si \"a\" est complexe de module 1, on tourne (rotation)."
+              }
+            ],
+            "methode": [
+              {
+                "id": "ERR_TRANS_METH_01",
+                "description": "Ne sait pas trouver le centre Oméga d'une rotation ou homothétie.",
+                "traitement_socratique": "Le centre, c'est le point qui ne bouge pas pendant la transformation (point invariant). Remplace z' et z par z_omega et résous l'équation ! z_omega = a z_omega + b."
+              }
+            ],
+            "execution": [
+              {
+                "id": "ERR_TRANS_EXEC_01",
+                "description": "Erreur lors du calcul de l'image d'un point par une rotation : confond angle et module.",
+                "traitement_socratique": "Dans z' - w = e^(i theta) * (z - w), e^(i theta) est juste un nombre complexe. Remplace le par sa forme algébrique (cos theta + i sin theta) pour faire ton calcul."
+              }
+            ],
+            "panique": [
+              {
+                "id": "ERR_TRANS_PAN_01",
+                "description": "Se bloque sur \"Reconnaître la transformation f\".",
+                "traitement_socratique": "Regarde juste le nombre \"a\" collé à z. Est-ce qu'il vaut 1 ? Non. Est-ce qu'il est réel ? Non. Calcule son module. S'il vaut 1, c'est une rotation !"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "CHAP_MATH_04",
+      "titre": "Probabilités",
+      "titre_ar": "الاحتمالات",
+      "ordre": 4,
+      "description": "Dénombrement, calcul de probabilités, probabilités conditionnelles et variables aléatoires.",
+      "micro_concepts": [
+        {
+          "id": "MC_PROBA_01",
+          "nom": "Dénombrement (Combinaisons, Arrangements)",
+          "nom_ar": "العد (التوفيقات، الترتيبات)",
+          "description": "Choisir le bon outil (C_n^p pour tirage simultané, A_n^p pour tirage successif sans remise, n^p avec remise).",
+          "error_autopsy": {
+            "concept": [
+              {
+                "id": "ERR_DEN_CONC_01",
+                "description": "L'élève utilise les arrangements A_n^p au lieu des combinaisons C_n^p pour un tirage simultané.",
+                "traitement_socratique": "\"Dans un tirage simultané (on plonge la main et on tire 3 boules d'un coup), l'ordre a-t-il une importance ? Si non, quel outil mathématique ignore l'ordre ?\""
+              }
+            ],
+            "methode": [
+              {
+                "id": "ERR_DEN_METH_01",
+                "description": "Oublie de multiplier les cas dans \"tirer 2 rouges ET 1 verte\". Fait une addition au lieu d'une multiplication.",
+                "traitement_socratique": "\"En dénombrement, le mot ET se traduit par une multiplication. Le mot OU se traduit par une addition. As-tu dit ET ou OU dans ta tête ?\""
+              }
+            ],
+            "execution": [
+              {
+                "id": "ERR_DEN_EXEC_01",
+                "description": "Erreur de calcul de factorielle dans C_n^p.",
+                "traitement_socratique": "\"Tu as une calculatrice ! Utilise la touche nCr pour les combinaisons. Pas besoin de calculer les factorielles à la main et risquer une erreur.\""
+              }
+            ],
+            "panique": [
+              {
+                "id": "ERR_DEN_PAN_01",
+                "description": "Ne sait pas comment traiter \"Au moins une boule rouge\".",
+                "traitement_socratique": "\"Le contraire de 'au moins une', c'est 'aucune'. Il est beaucoup plus rapide de calculer la probabilité de ne tirer AUCUNE boule rouge et de faire 1 - P(Aucune). L'événement contraire est ton meilleur ami.\""
+              }
+            ]
+          }
+        },
+        {
+          "id": "MC_PROBA_02",
+          "nom": "Probabilités conditionnelles et Arbres",
+          "nom_ar": "الاحتمالات الشرطية وشجرة الاحتمالات",
+          "description": "Construction d'un arbre pondéré, formule des probabilités totales.",
+          "error_autopsy": {
+            "concept": [
+              {
+                "id": "ERR_COND_CONC_01",
+                "description": "Confond P(A inter B) et P_A(B) (probabilité de B sachant A).",
+                "traitement_socratique": "\"P(A inter B) c'est 'la probabilité qu'il pleuve ET que tu prennes un parapluie'. P_A(B) c'est 'SACHANT qu'il pleut, quelle est la proba que tu prennes ton parapluie ?'. Sur un arbre, P_A(B) est sur la branche, P(A inter B) est au bout du chemin.\""
+              }
+            ],
+            "methode": [
+              {
+                "id": "ERR_COND_METH_01",
+                "description": "La somme des branches issues d'un même nœud ne fait pas 1.",
+                "traitement_socratique": "\"Règle absolue de l'arbre pondéré : à chaque croisement (nœud), la somme de toutes les branches qui en partent DOIT être égale à 1. Vérifie ton nœud A.\""
+              }
+            ],
+            "execution": [
+              {
+                "id": "ERR_COND_EXEC_01",
+                "description": "Pour les probabilités totales, l'élève multiplie les chemins au lieu de les additionner.",
+                "traitement_socratique": "\"Pour trouver P(B), tu dois parcourir tous les chemins qui mènent à B. On MULTIPLIE le long d'un chemin, mais on ADDITIONNE les chemins entre eux.\""
+              }
+            ],
+            "panique": [
+              {
+                "id": "ERR_COND_PAN_01",
+                "description": "Panique quand on demande P_B(A) (remonter l'arbre).",
+                "traitement_socratique": "\"Pour remonter l'arbre, utilise la formule de Bayes : P_B(A) = P(A inter B) / P(B). Tu viens juste de calculer P(B) à la question précédente !\""
+              }
+            ]
+          }
+        },
+        {
+          "id": "MC_PROBA_03",
+          "nom": "Variable Aléatoire et Espérance",
+          "nom_ar": "المتغير العشوائي والأمل الرياضي",
+          "description": "Loi de probabilité X, E(X), V(X).",
+          "error_autopsy": {
+            "concept": [
+              {
+                "id": "ERR_VA_CONC_01",
+                "description": "Ne trouve pas toutes les valeurs possibles de X (ex: X = gain du jeu).",
+                "traitement_socratique": "\"Mets-toi à la place du joueur. Quels sont tous les scénarios possibles ? Gagner 10, perdre 5 (donc -5), ou match nul (0). Liste les valeurs avant de faire le tableau.\""
+              }
+            ],
+            "methode": [
+              {
+                "id": "ERR_VA_METH_01",
+                "description": "La somme des p_i dans le tableau ne vaut pas 1.",
+                "traitement_socratique": "\"Si tu additionnes toutes les probabilités de la ligne du bas de ton tableau, tu dois OBLIGATOIREMENT trouver 1 (ou 100%). Sinon, c'est qu'il manque une valeur de X ou qu'il y a une erreur de calcul.\""
+              }
+            ],
+            "execution": [
+              {
+                "id": "ERR_VA_EXEC_01",
+                "description": "Erreur de calcul de l'espérance (oublie de multiplier par X_i).",
+                "traitement_socratique": "\"L'espérance, c'est une moyenne pondérée. Tu dois multiplier la case du haut (la valeur) par la case du bas (la probabilité), et additionner toutes ces colonnes.\""
+              }
+            ],
+            "panique": [
+              {
+                "id": "ERR_VA_PAN_01",
+                "description": "Panique quand on demande si le jeu est \"équitable\".",
+                "traitement_socratique": "\"Un jeu est équitable si en moyenne, tu ne gagnes rien et tu ne perds rien. Quelle valeur doit donc prendre l'Espérance E(X) pour que ce soit le cas ? (C'est 0 !)\""
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
