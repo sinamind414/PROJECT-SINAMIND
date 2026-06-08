@@ -21,3 +21,4 @@ fsrs
 asyncpg
 pydantic-settings
 bcrypt
+email-validator
