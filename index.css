@@ -512,24 +512,6 @@ textarea {
     animation: logoPulseBg 6s ease-in-out infinite;
 }
 
-.logo-bg-2 {
-    width: 160px;
-    right: 15%;
-    top: 35%;
-    opacity: 0.1;
-    animation: logoPulseBg 7s ease-in-out infinite;
-    animation-delay: -2s;
-}
-
-.logo-bg-3 {
-    width: 300px;
-    left: 20%;
-    bottom: 10%;
-    opacity: 0.08;
-    animation: logoPulseBg 9s ease-in-out infinite;
-    animation-delay: -5s;
-}
-
 @media (max-width: 992px) {
     .logo-bg-1 { width: 80px; }
     .logo-bg-2 { width: 60px; right: 5%; }
