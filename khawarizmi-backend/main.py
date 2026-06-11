@@ -21,6 +21,7 @@ from typing import Optional, Dict, Any, List
 from pathlib import Path
 from contextlib import asynccontextmanager
 from functools import lru_cache
+import asyncio
 
 # FastAPI
 from fastapi import (
@@ -94,6 +95,9 @@ class Settings(BaseSettings):
     # ── Données BAC ───────────────────────────────────────
     data_dir:        str  = ""
 
+    # ── Chargily Pay ──────────────────────────────────────
+    chargily_secret_key: str = "test_sk_fake"
+
     # ── CORS ──────────────────────────────────────────────
     allowed_origins: List[str] = [
         "http://localhost:3000",
@@ -135,6 +139,7 @@ class AppState:
     redis:       Optional[aioredis.Redis]        = None
     db_engine:   Any                             = None
     db_session:  Any                             = None
+    reconciliation_task: Optional[asyncio.Task]  = None
 
 
 state = AppState()
@@ -261,11 +266,20 @@ async def lifespan(app: FastAPI):
         state.redis = None
 
     logger.info("✅ Khawarizmi API prête")
+    
+    from services.reconciliation_queue import process_review_queue
+    state.reconciliation_task = asyncio.create_task(process_review_queue())
 
     yield  # ← L'app tourne ici
 
     # ── Nettoyage ───────────────────────────────────────
     logger.info("🛑 Arrêt de l'API...")
+    if state.reconciliation_task:
+        state.reconciliation_task.cancel()
+        try:
+            await state.reconciliation_task
+        except asyncio.CancelledError:
+            pass
     if state.redis:
         await state.redis.aclose()
     if state.db_engine:
@@ -1125,15 +1139,20 @@ async def get_chapitres(
             for ch in chapitres
         ],
     }
+@app.get("/health", tags=["System"])
+async def health():
+    return {"status": "healthy"}
 
 
 # ═══════════════════════════════════════════════════════════════
-# EVALUATE & SESSION
+# EVALUATE, SESSION & PAYMENT
 # ═══════════════════════════════════════════════════════════════
 from routes.evaluate import router as evaluate_router
 from routes.session import router as session_router
+from routes.payment import router as payment_router
 app.include_router(evaluate_router)
 app.include_router(session_router)
+app.include_router(payment_router)
 
 # ═══════════════════════════════════════════════════════════════
 # GESTIONNAIRE D'ERREURS GLOBAL

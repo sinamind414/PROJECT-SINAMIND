@@ -20,18 +20,23 @@ No markdown. No code blocks. Raw JSON only.
 
 Required schema:
 {
-  "score": <integer 0-10>,
-  "statut": <"FAUX" | "PARTIEL" | "CORRECT">,
-  "feedback": <string, 2 sentences maximum>,
-  "manquant": <array of strings — missing key terms>
+  "global_score": <float 0.0 to 1.0 (overall quality of student response)>,
+  "concept_scores": {
+     "<concept_code_1>": <float 0.0 to 1.0 (mastery of this specific concept)>,
+     "<concept_code_2>": <float 0.0 to 1.0 (mastery of this specific concept)>
+  },
+  "feedback_fr": "<string socratique sans donner la solution, max 2 phrases>",
+  "feedback_ar": "<string socratique en arabe sans donner la solution, max 2 phrases>",
+  "missing_concepts": ["<missing_concept_code_1>", ...]
 }
 
 If you cannot parse the student input, return:
 {
-  "score": 0,
-  "statut": "FAUX",
-  "feedback": "Réponse illisible ou hors sujet.",
-  "manquant": []
+  "global_score": 0.0,
+  "concept_scores": {},
+  "feedback_fr": "Réponse illisible ou hors sujet.",
+  "feedback_ar": "الإجابة غير مقروءة أو خارج الموضوع.",
+  "missing_concepts": []
 }
 
 ═══════════════════════════════════════════════
@@ -40,7 +45,8 @@ EVALUATION CONTEXT (injected per request)
 You will receive:
 - QUESTION: the original question (may be Arabic, French, or both)
 - REPONSE_ATTENDUE: the canonical expected answer
-- CONCEPT_CLE: the scientific unit being tested
+- CONCEPT_CLE: the main scientific concept being tested
+- CONCEPTS_ATTENDUS: the list of micro-concepts to evaluate individually (these must match the keys in "concept_scores" output)
 - PATTERN_RECHERCHE: mandatory key terms (AND logic)
 - TENTATIVE: integer (1 = first attempt, 2+ = retry)
 - REPONSE_ELEVE: the student's answer
@@ -51,26 +57,23 @@ SCORING RULES — STRICT SCIENTIFIC TERMINOLOGY
 The Algerian Baccalauréat rewards exact scientific vocabulary.
 Apply these rules without exception:
 
-CORRECT (score 9-10):
+CORRECT (global_score >= 0.85):
 - All PATTERN_RECHERCHE terms are present (exact or valid 
   scientific synonym — see SYNONYM TABLE below)
 - Scientific meaning is accurate
 - No critical conceptual error
 
-PARTIEL (score 4-8):
+PARTIEL (global_score between 0.35 and 0.84):
 - At least 50% of PATTERN_RECHERCHE terms are present
 - Core concept is understood but incomplete
-- Score scales with percentage of key terms found:
-  50% terms → score 4-5
-  75% terms → score 6-7
-  90% terms → score 8
+- Score scales with percentage of key terms found.
 
-FAUX (score 0-3):
+FAUX (global_score < 0.35):
 - Less than 50% of PATTERN_RECHERCHE terms present
 - OR a critical conceptual error is present
 - Critical errors always override partial term matches
 
-CRITICAL ERRORS (always → FAUX, score 0-2):
+CRITICAL ERRORS (always -> global_score < 0.20):
 - "anticorps détruisent les antigènes" 
   (anticorps neutralize, they do NOT destroy)
 - "ADN se transcrit en ADN"
@@ -106,24 +109,16 @@ FEEDBACK RULES — SOCRATIC, NOT REVEALING
 IF TENTATIVE == 1 (first attempt):
 - Identify WHAT is wrong or missing — do NOT give the answer
 - Maximum 2 sentences
-- Example: "Le verbe utilisé est incorrect : les anticorps 
-  ne détruisent pas. Quel est le terme exact décrivant 
-  leur action sur l'antigène ?"
+- Example (FR): "Le verbe utilisé est incorrect : les anticorps ne détruisent pas. Quel est le terme exact décrivant leur action sur l'antigène ?"
+- Example (AR): "الفعل المستخدم غير صحيح: الأجسام المضادة لا تخرب المستضد. ما هو المصطلح الدقيق الذي يصف عملها؟"
 
 IF TENTATIVE >= 2 (retry):
 - You MAY reveal one missing key term per retry
 - Still maximum 2 sentences
-- Example: "Le terme manquant est 'neutralisation'. 
-  Complète ta réponse en précisant le rôle de l'ARN polymérase."
+- Example: "Le terme manquant est 'neutralisation'. Complète ta réponse en précisant le rôle de l'ARN polymérase."
 
 FEEDBACK LANGUAGE:
-- Match the language of the student's answer
-- If mixed, use French as default
-
-FORBIDDEN in feedback:
-- "Bien essayé", "Presque", "Bon effort" — no encouragement
-- Do not restate the full correct answer on attempt 1
-- Do not exceed 2 sentences under any circumstance
+- Provide BOTH feedback_fr and feedback_ar.
 """
 
 @retry(
@@ -137,9 +132,15 @@ async def call_gpt4o_evaluator(
     tentative: int
 ) -> dict:
     
+    concepts = question.get("concepts_requis", [])
+    if not concepts and question.get("concept_cle"):
+        concepts = [question["concept_cle"]]
+    concepts_str = ", ".join(concepts)
+
     user_message = f"""QUESTION: {question.get('texte', '')}
 REPONSE_ATTENDUE: {question.get('reponse_attendue', '')}
 CONCEPT_CLE: {question.get('concept_cle', '')}
+CONCEPTS_ATTENDUS: {concepts_str}
 PATTERN_RECHERCHE: {question.get('pattern_recherche', '')}
 TENTATIVE: {tentative}
 REPONSE_ELEVE: {reponse}"""
@@ -149,7 +150,7 @@ REPONSE_ELEVE: {reponse}"""
         model           = "gpt-4o",
         temperature     = 0,
         seed            = 42,
-        max_tokens      = 300,
+        max_tokens      = 400,
         timeout         = 8.0,
         response_format = {"type": "json_object"},
         messages        = [
@@ -164,14 +165,38 @@ REPONSE_ELEVE: {reponse}"""
 
     result = json.loads(content)
 
-    # Validation du schéma strict
-    if "score" not in result or not isinstance(result["score"], int):
-        result["score"] = 0
-    if "statut" not in result or result["statut"] not in ["FAUX", "PARTIEL", "CORRECT"]:
-        result["statut"] = "FAUX"
-    if "feedback" not in result:
-        result["feedback"] = "Erreur de format du feedback."
-    if "manquant" not in result or not isinstance(result["manquant"], list):
-        result["manquant"] = []
+    # Validation et mapping pour compatibilité avec l'ancienne structure de retour
+    global_score = float(result.get("global_score", 0.0))
+    score_10 = int(round(global_score * 10))
+    
+    if global_score >= 0.85:
+        statut = "CORRECT"
+    elif global_score >= 0.35:
+        statut = "PARTIEL"
+    else:
+        statut = "FAUX"
+        
+    # Choisir le feedback en fonction de la langue de la réponse
+    has_arabic = any(u'\u0600' <= c <= u'\u06FF' for c in reponse)
+    feedback = result.get("feedback_ar") if has_arabic and result.get("feedback_ar") else result.get("feedback_fr")
+    if not feedback:
+        feedback = result.get("feedback_fr") or result.get("feedback_ar") or "Pas de feedback disponible."
 
-    return result
+    mapped_result = {
+        "score": score_10,
+        "statut": statut,
+        "feedback": feedback,
+        "manquant": result.get("missing_concepts", []),
+        "scores_concepts": result.get("concept_scores", {}),
+        "feedback_fr": result.get("feedback_fr", ""),
+        "feedback_ar": result.get("feedback_ar", "")
+    }
+
+    # S'assurer que tous les concepts attendus ont au moins une note par défaut
+    for concept in concepts:
+        if concept not in mapped_result["scores_concepts"]:
+            # Si le concept est omis par le LLM (hallucination partielle), on lui assigne un score neutre (0.5)
+            # ce qui déclenchera needs_l1_review dans la file de réconciliation.
+            mapped_result["scores_concepts"][concept] = 0.5
+
+    return mapped_result

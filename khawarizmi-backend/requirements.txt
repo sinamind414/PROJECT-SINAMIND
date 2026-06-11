@@ -22,3 +22,5 @@ asyncpg
 pydantic-settings
 bcrypt
 email-validator
+sentence-transformers
+scikit-learn

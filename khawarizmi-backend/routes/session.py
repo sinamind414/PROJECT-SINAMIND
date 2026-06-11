@@ -34,7 +34,7 @@ async def get_next_session(
     # 1. PENDING (Cartes en attente de vraie évaluation)
     res_pending = await db.execute(
         text("""
-            SELECT micro_concept_id 
+            SELECT concept_id 
             FROM mastery_micro_concepts
             WHERE user_id = :uid 
               AND pending_real_evaluation = TRUE
@@ -57,17 +57,17 @@ async def get_next_session(
     remaining = max_cards - len(queue)
     if remaining <= 0:
         return {"session_queue": queue}
-
+ 
     # 2. DUE (Cartes FSRS échues)
     # Exclure celles déjà dans la queue (même si théoriquement pending_real_evaluation gère l'exclusivité)
     res_due = await db.execute(
         text("""
-            SELECT micro_concept_id
+            SELECT concept_id
             FROM mastery_micro_concepts
             WHERE user_id = :uid
               AND (pending_real_evaluation = FALSE OR pending_real_evaluation IS NULL)
-              AND prochaine_revision <= :now
-            ORDER BY prochaine_revision ASC
+              AND due_date <= :now
+            ORDER BY due_date ASC
             LIMIT :lim
         """),
         {"uid": user_id, "now": now, "lim": remaining}
@@ -90,12 +90,12 @@ async def get_next_session(
     remaining = max_cards - len(queue)
     if remaining <= 0:
         return {"session_queue": queue}
-
+ 
     # 3. NEW (Cartes jamais vues - Cold Start)
     # On récupère les IDs des cartes qu'on a en mémoire (dans le JSON) 
     # et on filtre celles que l'utilisateur a déjà dans mastery_micro_concepts
     res_seen = await db.execute(
-        text("SELECT micro_concept_id FROM mastery_micro_concepts WHERE user_id = :uid"),
+        text("SELECT concept_id FROM mastery_micro_concepts WHERE user_id = :uid"),
         {"uid": user_id}
     )
     seen_ids = set(row[0] for row in res_seen.fetchall())
@@ -115,3 +115,38 @@ async def get_next_session(
             })
 
     return {"session_queue": queue}
+
+
+@router.post("/api/session/next-question", tags=["Session"])
+async def get_next_question(
+    current_user: Dict         = Depends(get_current_user),
+    db:           AsyncSession = Depends(get_db)
+):
+    """
+    Retourne la prochaine question optimale basée sur le scoring FSRS
+    (poids_concept * 1 / stabilité) pour les concepts dus de l'élève.
+    """
+    from services.fsrs_scheduler import select_next_question
+    
+    user_id = current_user["id"]
+    result = await select_next_question(user_id, db)
+    if not result:
+        raise HTTPException(status_code=404, detail="Aucune question disponible")
+        
+    q_data = get_question(result["question_id"])
+    if not q_data:
+        # Fallback question standard
+        return {
+            "question_id": "q_test",
+            "texte": "Quel est le rôle de l'ARN polymérase ?",
+            "concept_id": "transcription",
+            "type": "FALLBACK"
+        }
+        
+    return {
+        "question_id": result["question_id"],
+        "texte": q_data.get("texte", ""),
+        "concept_id": result["concept_id"],
+        "type": result.get("type", "DUE")
+    }
+

@@ -18,3 +18,6 @@ import_pdf/
 # Generated questions
 generated_questions.json
 validated_questions.json
+
+# Large model files (exceeding 100MB limit)
+khawarizmi-backend/models/minilm_onnx_int8/model_quantized.onnx

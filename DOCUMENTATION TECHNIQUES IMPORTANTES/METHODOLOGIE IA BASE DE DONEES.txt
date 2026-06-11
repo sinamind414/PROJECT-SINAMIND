@@ -1797,3 +1797,11 @@ RÉSUMÉ FINAL — CE QUI REND KHAWARIZMI UNIQUE
 │                                                                             │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
+
+================================================================================
+NOTE DE VIGILANCE TECHNIQUE - GESTION DES MIGRATIONS & DES GRAPHES DE CONCEPTS
+================================================================================
+
+⚠️ **Vigilance importante sur l'évolution du graphe de concepts :**
+La migration `011_create_concept_graph.sql` initialise la table pivot `question_concept_map` en copiant les relations existantes de `question_concept_mapping`.
+Si de nouveaux chapitres, questions ou micro-concepts sont ajoutés au corpus (dans `annales_sciences_3as.json` ou en base de données) après l'application de cette migration, il est indispensable d'insérer les nouvelles relations manuellement (ou via un script d'ingestion) dans la table pivot `question_concept_map` afin que le FSRS Scheduler (`fsrs_scheduler.py`) puisse sélectionner et planifier les questions correspondantes.

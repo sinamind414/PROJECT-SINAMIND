@@ -6,11 +6,12 @@ from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import text
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 
 from main import get_current_user, get_db, get_openai, get_scheduler
 from services.llm import call_gpt4o_evaluator
-from services.fallback import fallback_evaluate, fallback_safe_json
+from services.fallback import fallback_safe_json
+from services.fallback_v2 import evaluate_l2
 
 logger = logging.getLogger("khawarizmi.evaluate")
 router = APIRouter()
@@ -18,7 +19,7 @@ router = APIRouter()
 from services.questions import get_question
 
 # ═══════════════════════════════
-# SCHMAS
+# SCHÉMAS
 # ═══════════════════════════════
 
 class EvaluateRequest(BaseModel):
@@ -30,7 +31,7 @@ class EvaluateResponse(BaseModel):
     score: int
     statut: str
     feedback: str
-    manquant: list[str]
+    manquant: List[str]
     next_review_date: Optional[str] = None
     source: str
 
@@ -52,102 +53,173 @@ async def evaluate(
     if not question:
         raise HTTPException(status_code=404, detail=f"Question {req.question_id} introuvable")
 
-    # 2. Charger l'tat FSRS (Cold Start gr : si inexistant, fsrs_state_db reste None)
-    result_card = await db.execute(
-        text("SELECT fsrs_state FROM mastery_micro_concepts WHERE user_id = :u AND micro_concept_id = :q"),
-        {"u": user_id, "q": req.question_id}
-    )
-    row = result_card.fetchone()
-    fsrs_state_dict = row[0] if row and row[0] else {}
+    # 2. Tentative d'évaluation (avec fallbacks)
+    eval_result = await evaluate_with_fallback(question, req, openai_client, user_id, db)
 
-    # 3. Tentative d'valuation GPT-4o (avec fallbacks)
-    eval_result = await evaluate_with_fallback(question, req, openai_client, user_id)
-
-    # 4. Mise  jour FSRS  OPTION B
+    # 3. Mise à jour FSRS par Graphe de Concepts
     next_review_date = None
 
-    if eval_result["source"] == "GPT4O":
-        scheduler = get_scheduler()
-        from fsrs import Card
-        card = Card()
-        
-        # Hydrater la carte si on a dj un tat
-        if fsrs_state_dict:
-            try:
-                card.stability = fsrs_state_dict.get("stability", card.stability)
-                card.difficulty = fsrs_state_dict.get("difficulty", card.difficulty)
-                card.scheduled_days = fsrs_state_dict.get("scheduled_days", card.scheduled_days)
-                card.reps = fsrs_state_dict.get("reps", card.reps)
-                card.lapses = fsrs_state_dict.get("lapses", card.lapses)
-                # Le state enum FSFS ncessite un parsing, mais on utilise calculer_prochain_intervalle de notre scheduler
-            except Exception as e:
-                logger.error(f"Erreur hydratation FSRS: {e}")
-
-        # Map Score (0-10) to FSRS Rating percentage (0-100)
-        score_percent = eval_result["score"] * 10
-        
-        fsrs_calc = scheduler.calculer_prochain_intervalle(card, score_percent)
-        new_card = fsrs_calc["card"]
-        
-        fsrs_json = json.dumps({
-            "stability":     new_card.stability,
-            "difficulty":    new_card.difficulty,
-            "scheduled_days":new_card.scheduled_days,
-            "reps":          new_card.reps,
-            "lapses":        new_card.lapses,
-            "state":         str(new_card.state),
-            "last_review":   datetime.now(timezone.utc).isoformat(),
-        })
-
-        # Sauvegarde DB
-        await db.execute(
-            text("""
-                INSERT INTO mastery_micro_concepts
-                    (user_id, micro_concept_id, prochaine_revision,
-                     interval_jours, difficulty, stability, fsrs_state, pending_real_evaluation)
-                VALUES
-                    (:user_id, :mc_id, :next_rev,
-                     :interval, :difficulty, :stability, :fsrs_state::jsonb, FALSE)
-                ON CONFLICT (user_id, micro_concept_id)
-                DO UPDATE SET
-                    prochaine_revision = EXCLUDED.prochaine_revision,
-                    interval_jours     = EXCLUDED.interval_jours,
-                    difficulty         = EXCLUDED.difficulty,
-                    stability          = EXCLUDED.stability,
-                    fsrs_state         = EXCLUDED.fsrs_state,
-                    pending_real_evaluation = FALSE,
-                    updated_at         = NOW()
-            """),
-            {
-                "user_id":    user_id,
-                "mc_id":      req.question_id,
-                "next_rev":   fsrs_calc["prochaine_revision"],
-                "interval":   fsrs_calc["interval_jours"],
-                "difficulty": fsrs_calc["difficulty"],
-                "stability":  fsrs_calc["stability"],
-                "fsrs_state": fsrs_json,
-            }
+    if eval_result["source"] in ["GPT4O", "FALLBACK_L2"]:
+        # Charger les mappings concepts pour cette question
+        res_mapping = await db.execute(
+            text("SELECT micro_concept AS concept_id, weight FROM question_concept_map WHERE question_id = :qid"),
+            {"qid": req.question_id}
         )
-        await db.commit()
-        next_review_date = fsrs_calc["prochaine_revision"].isoformat() if fsrs_calc["prochaine_revision"] else None
+        mapping_rows = res_mapping.fetchall()
+        
+        # Si aucun mapping n'existe encore en base, on crée un mapping par défaut sur le concept_cle
+        if not mapping_rows:
+            concept_cle = question.get("concept_cle", "concept_general")
+            concepts_dict = {concept_cle: 1.0}
+        else:
+            concepts_dict = {row[0]: row[1] for row in mapping_rows}
+            
+        from services.fsrs_graph import QuestionConceptMapping, update_concept_graph
+        mapping = QuestionConceptMapping(question_id=req.question_id, concepts=concepts_dict)
+        
+        # Charger l'état actuel de ces concepts pour l'utilisateur
+        concept_ids = list(concepts_dict.keys())
+        concept_states = {}
+        
+        if concept_ids:
+            # Safe tuple injection in query
+            cids_param = tuple(concept_ids) if len(concept_ids) > 1 else (concept_ids[0],)
+            res_states = await db.execute(
+                text("SELECT concept_id, fsrs_state FROM mastery_micro_concepts WHERE user_id = :uid AND concept_id IN :cids"),
+                {"uid": user_id, "cids": cids_param}
+            )
+            
+            from fsrs import Card
+            for row in res_states.fetchall():
+                c_id = row[0]
+                fsrs_state_dict = row[1] if row[1] else {}
+                card = Card()
+                if fsrs_state_dict:
+                    try:
+                        card.stability = fsrs_state_dict.get("stability", card.stability)
+                        card.difficulty = fsrs_state_dict.get("difficulty", card.difficulty)
+                        # Utiliser setattr pour les attributs facultatifs
+                        for attr in ["scheduled_days", "reps", "lapses"]:
+                            if hasattr(card, attr) and attr in fsrs_state_dict:
+                                setattr(card, attr, fsrs_state_dict[attr])
+                    except Exception as e:
+                        logger.error(f"Erreur hydratation FSRS: {e}")
+                concept_states[c_id] = card
+                
+        # Remplir par des cartes par défaut pour ceux non commencés
+        for c_id in concept_ids:
+            if c_id not in concept_states:
+                from fsrs import Card
+                concept_states[c_id] = Card()
+                
+        # Charger la configuration FSRS de l'élève
+        res_config = await db.execute(
+            text("SELECT fsrs_config FROM users WHERE id = :uid"),
+            {"uid": user_id}
+        )
+        config_row = res_config.fetchone()
+        user_fsrs_config = config_row[0] if config_row else None
 
+        # Mettre à jour le graphe
+        updates = update_concept_graph(
+            user_id=user_id,
+            question_id=req.question_id,
+            evaluation_result=eval_result,
+            mapping=mapping,
+            concept_states=concept_states,
+            now=datetime.now(timezone.utc),
+            user_fsrs_config=user_fsrs_config
+        )
+        
+        chapter = question.get("chapitre_id", "ch_inconnu")
+        for c_id, upd in updates.items():
+            new_card = upd["card"]
+            # Récupérer les jours planifiés de manière sécurisée ( scheduled_days ou calcul par rapport à due )
+            sched_days = getattr(new_card, "scheduled_days", 0)
+            if not sched_days and new_card.due and new_card.last_review:
+                sched_days = (new_card.due - new_card.last_review).days
+                
+            fsrs_json = json.dumps({
+                "stability":      new_card.stability,
+                "difficulty":     new_card.difficulty,
+                "scheduled_days": sched_days,
+                "reps":           getattr(new_card, "reps", 0),
+                "lapses":         getattr(new_card, "lapses", 0),
+                "state":          str(new_card.state),
+                "last_review":    new_card.last_review.isoformat() if new_card.last_review else None,
+            })
+            
+            # Sauvegarde DB
+            await db.execute(
+                text("""
+                    INSERT INTO mastery_micro_concepts
+                        (user_id, concept_id, chapter, due_date,
+                         interval_jours, difficulty, stability, fsrs_state, pending_real_evaluation, updated_at)
+                    VALUES
+                        (:user_id, :c_id, :chapter, :due,
+                         :interval, :difficulty, :stability, :fsrs_state::jsonb, :pending_eval, NOW())
+                    ON CONFLICT (user_id, concept_id)
+                    DO UPDATE SET
+                        due_date           = EXCLUDED.due_date,
+                        interval_jours     = EXCLUDED.interval_jours,
+                        difficulty         = EXCLUDED.difficulty,
+                        stability          = EXCLUDED.stability,
+                        fsrs_state         = EXCLUDED.fsrs_state,
+                        pending_real_evaluation = EXCLUDED.pending_real_evaluation,
+                        updated_at         = NOW()
+                """),
+                {
+                    "user_id":    user_id,
+                    "c_id":       c_id,
+                    "chapter":    chapter,
+                    "due":        upd["due"],
+                    "interval":   sched_days,
+                    "difficulty": new_card.difficulty,
+                    "stability":  new_card.stability,
+                    "fsrs_state": fsrs_json,
+                    "pending_eval": eval_result.get("needs_l1_review", False),
+                }
+            )
+            
+            # Utiliser la date du concept clé principal comme date de retour principale de l'API
+            if c_id == question.get("concept_cle"):
+                next_review_date = upd["due"].isoformat()
+                
+        await db.commit()
+        
+        # Enfiler pour réévaluation L1 si le score L2 est ambigu (dans la zone grise 0.40 - 0.70)
+        if eval_result.get("needs_l1_review"):
+            from services.reconciliation_queue import enque_for_l1_review, PendingReview
+            review = PendingReview(
+                student_id=str(user_id),
+                question_id=req.question_id,
+                answer=req.reponse_eleve,
+                l2_score=float(eval_result["score"]) / 10.0,
+                session_id="",
+                timestamp=datetime.now(timezone.utc)
+            )
+            await enque_for_l1_review(review)
+        
         logger.info(
             f"EVAL_OK | user={user_id} | q={req.question_id} | "
-            f"score={eval_result['score']} | "
+            f"score={eval_result['score']} | source={eval_result['source']} | "
             f"next_review={next_review_date}"
         )
 
     else:
-        # Fallback L2 ou L3  Option B : carte en attente (Tag)
-        # On insre ou on update juste la colonne pending_real_evaluation
+        # Fallback L3 ou erreur totale : carte en attente (Tag)
         await db.execute(
             text("""
-                INSERT INTO mastery_micro_concepts (user_id, micro_concept_id, pending_real_evaluation)
-                VALUES (:user_id, :mc_id, TRUE)
-                ON CONFLICT (user_id, micro_concept_id)
-                DO UPDATE SET pending_real_evaluation = TRUE
+                INSERT INTO mastery_micro_concepts (user_id, concept_id, chapter, pending_real_evaluation, updated_at)
+                VALUES (:user_id, :mc_id, :chapter, TRUE, NOW())
+                ON CONFLICT (user_id, concept_id)
+                DO UPDATE SET pending_real_evaluation = TRUE, updated_at = NOW()
             """),
-            {"user_id": user_id, "mc_id": req.question_id}
+            {
+                "user_id": user_id,
+                "mc_id": req.question_id,
+                "chapter": question.get("chapitre_id", "ch_inconnu")
+            }
         )
         await db.commit()
         
@@ -169,9 +241,9 @@ async def evaluate(
 # LOGIQUE DE FALLBACK
 # ═══════════════════════════════
 
-async def evaluate_with_fallback(question: dict, req: EvaluateRequest, openai_client, user_id: str) -> dict:
+async def evaluate_with_fallback(question: dict, req: EvaluateRequest, openai_client, user_id: str, db: AsyncSession) -> dict:
     
-    # NIVEAU 1  GPT-4o avec retry
+    # NIVEAU 1 — GPT-4o avec retry
     try:
         result = await call_gpt4o_evaluator(
             client      = openai_client,
@@ -185,19 +257,45 @@ async def evaluate_with_fallback(question: dict, req: EvaluateRequest, openai_cl
     except Exception as e:
         logger.warning(f"FALLBACK_L2 | user={user_id} | q={req.question_id} | reason={str(e)}")
 
-    # NIVEAU 2  Pattern matching local
+    # NIVEAU 2 — Pattern matching local composite
     try:
-        result = fallback_evaluate(
-            pattern  = question.get("pattern_recherche", ""),
-            reponse  = req.reponse_eleve
+        res_l2 = await evaluate_l2(
+            reponse_eleve = req.reponse_eleve,
+            question_data = question,
+            db = db
         )
-        result["source"] = "FALLBACK_L2"
-        return result
+        
+        # Déterminer les scores individuels par concept pour FSRS
+        scores_concepts = {}
+        concepts_requis = question.get("concepts_requis", [])
+        if not concepts_requis and question.get("concept_cle"):
+            concepts_requis = [question["concept_cle"]]
+            
+        for c_id in concepts_requis:
+            if c_id in res_l2.concepts_trouves:
+                scores_concepts[c_id] = 1.0
+            else:
+                scores_concepts[c_id] = 0.0
+                
+        if question.get("concept_cle") and question["concept_cle"] not in scores_concepts:
+            scores_concepts[question["concept_cle"]] = res_l2.score_final
+
+        return {
+            "score": int(round(res_l2.score_final * 10)),
+            "statut": res_l2.verdict.upper(),
+            "feedback": res_l2.feedback_fallback,
+            "manquant": res_l2.concepts_manquants,
+            "concepts_trouves": res_l2.concepts_trouves,
+            "scores_concepts": scores_concepts,
+            "needs_l1_review": res_l2.needs_l1_review,
+            "source": "FALLBACK_L2"
+        }
 
     except Exception as e:
         logger.error(f"FALLBACK_L3 | user={user_id} | q={req.question_id} | reason={str(e)}")
 
-    # NIVEAU 3  JSON de scurit
+    # NIVEAU 3 — JSON de sécurité absolu
     result = fallback_safe_json()
     result["source"] = "FALLBACK_L3"
     return result
+
