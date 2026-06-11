@@ -98,15 +98,6 @@ class Settings(BaseSettings):
     # ── Chargily Pay ──────────────────────────────────────
     chargily_secret_key: str = "test_sk_fake"
 
-    allowed_origins: List[str] = [
-        "http://localhost:3000",
-        "http://localhost:5500",
-        "http://127.0.0.1:5500",
-        "https://khawarizmi-ia.vercel.app",
-        "https://khawarizmi.vercel.app",
-        "https://ia-khawarizmi.dz",
-    ]
-
     model_config = ConfigDict(extra='ignore', env_file='.env', env_file_encoding='utf-8')
 
 
@@ -302,14 +293,30 @@ app = FastAPI(
 )
 
 # ── CORS ────────────────────────────────────────────────────────
-cfg_for_cors = get_settings()
-origins = cfg_for_cors.allowed_origins + [
-    "https://khawarizmi-ia.vercel.app",
-    "https://khawarizmi.vercel.app",
-]
+def get_allowed_origins() -> List[str]:
+    base_origins = [
+        "http://localhost:3000",
+        "http://localhost:5500",
+        "http://127.0.0.1:5500",
+        "http://127.0.0.1:3000",
+        "https://khawarizmi-ia.vercel.app",
+        "https://khawarizmi.vercel.app",
+        "https://ia-khawarizmi.dz",
+        "https://www.ia-khawarizmi.dz",
+    ]
+    env_value = os.getenv("ALLOWED_ORIGINS", "")
+    extra_origins = [
+        o.strip()
+        for o in env_value.split(",")
+        if o.strip() and o.strip().startswith("http")
+    ]
+    all_origins = list(set(base_origins + extra_origins))
+    print(f"CORS allowed origins: {all_origins}")
+    return all_origins
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins     = origins,
+    allow_origins     = get_allowed_origins(),
     allow_credentials = True,
     allow_methods     = ["GET", "POST", "PUT", "DELETE"],
     allow_headers     = ["*"],
