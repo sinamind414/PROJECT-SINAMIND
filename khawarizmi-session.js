@@ -45,9 +45,23 @@ async function apiPost(endpoint, body) {
         },
         body: JSON.stringify(body)
     });
+    
+    if (res.status === 401) {
+        localStorage.removeItem('khawarizmi_token');
+        const hero = document.querySelector('.hero');
+        if (hero) hero.style.display = 'block';
+        const betaArea = document.getElementById('betaSessionArea');
+        if (betaArea) betaArea.hidden = true;
+        if (typeof window.openWaitlistModal === 'function') {
+            window.openWaitlistModal();
+        }
+        throw new Error("401");
+    }
+
     if (!res.ok) throw new Error(`${res.status}`);
     return res.json();
 }
+
 
 // ═══════════════════════════════════════════════
 // LOGIQUE PRINCIPALE
