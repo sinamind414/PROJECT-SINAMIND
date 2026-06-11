@@ -104,5 +104,18 @@ class KhawarizmiEmbedder:
         
         return embeddings.numpy()
 
-# Singleton — initialisé une fois au démarrage de FastAPI / scripts
-embedder = KhawarizmiEmbedder()
+# Lazy singleton — chargé à la première utilisation, pas à l'import
+_embedder_instance = None
+
+def get_embedder() -> "KhawarizmiEmbedder":
+    global _embedder_instance
+    if _embedder_instance is None:
+        _embedder_instance = KhawarizmiEmbedder()
+    return _embedder_instance
+
+# Compatibilité backward : embedder.encode(...) continue de fonctionner
+class _LazyEmbedder:
+    def encode(self, texts):
+        return get_embedder().encode(texts)
+
+embedder = _LazyEmbedder()
