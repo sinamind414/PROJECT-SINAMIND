@@ -1,0 +1,3 @@
+[service]
+healthcheck_path = "/health"
+port = 8000
