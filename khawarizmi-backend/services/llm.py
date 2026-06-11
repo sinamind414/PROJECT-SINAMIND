@@ -1,5 +1,6 @@
 import json
 import logging
+import os
 from openai import AsyncOpenAI
 from tenacity import retry, stop_after_attempt, wait_exponential
 
@@ -146,8 +147,9 @@ TENTATIVE: {tentative}
 REPONSE_ELEVE: {reponse}"""
 
     # Timeout de 8 secondes passé directement à l'appel réseau
+    _model = os.getenv("OPENAI_MODEL", "gpt-4o")
     response = await client.chat.completions.create(
-        model           = "gpt-4o",
+        model           = _model,
         temperature     = 0,
         seed            = 42,
         max_tokens      = 400,
