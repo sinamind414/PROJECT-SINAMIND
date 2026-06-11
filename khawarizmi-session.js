@@ -4,7 +4,137 @@
 
 const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
     ? 'http://localhost:8000'
-    : 'https://khawarizmi-ia-production-7837.up.railway.app';
+    : 'https://khawarizmi-ia-production.up.railway.app';
+
+function isDemoMode() {
+    const token = localStorage.getItem('khawarizmi_token');
+    if (token === 'demo_local_token') return true;
+    if (token) return false;
+    if (localStorage.getItem('khawarizmi_demo') === 'true') return true;
+    return window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+}
+
+function getCurrentLang() {
+    return localStorage.getItem('khawarizmi-lang') || 'fr';
+}
+
+// ═══════════════════════════════════════════════
+// I18N SESSION
+// ═══════════════════════════════════════════════
+
+const SESSION_I18N = {
+    fr: {
+        spinner_text       : "Khawarizmi prepare ta question...",
+        verify_btn         : "Verifier ma reponse",
+        next_btn           : "Question suivante",
+        answer_label       : "✏️ Ta reponse",
+        answer_hint        : "Ctrl+Entree pour valider",
+        answer_placeholder : "Explique avec tes propres mots...",
+        concepts_manquants : "❌ Concepts manquants :",
+        session_complete   : "Session terminee !",
+        bar_correct        : "Correct",
+        bar_partiel        : "Partiel",
+        bar_faux           : "A revoir",
+        btn_continue       : "Continuer a reviser",
+        btn_progress       : "Voir mes progres",
+        fsrs_note          : "KHAWARIZMI planifie ta prochaine revision automatiquement 🧠",
+        feedback_correct   : "✓ Correct",
+        feedback_partiel   : "~ Partiel",
+        feedback_faux      : "✗ A revoir",
+        question_counter   : "Question",
+        xp_label           : "XP",
+        streak_label       : "jours",
+    },
+    ar: {
+        spinner_text       : "...يُحضِّر الخوارزمي سؤالك",
+        verify_btn         : "تحقق من إجابتي",
+        next_btn           : "السؤال التالي",
+        answer_label       : "✏️ إجابتك",
+        answer_hint        : "Ctrl+Enter للإرسال",
+        answer_placeholder : "...اشرح بكلماتك الخاصة",
+        concepts_manquants : "❌ المفاهيم الناقصة :",
+        session_complete   : "!انتهت الجلسة",
+        bar_correct        : "صحيح",
+        bar_partiel        : "جزئي",
+        bar_faux           : "يراجع",
+        btn_continue       : "مواصلة المراجعة",
+        btn_progress       : "رؤية تقدمي",
+        fsrs_note          : "يخطط الخوارزمي لمراجعتك القادمة تلقائياً 🧠",
+        feedback_correct   : "✓ صحيح",
+        feedback_partiel   : "~ جزئي",
+        feedback_faux      : "✗ يحتاج مراجعة",
+        question_counter   : "سؤال",
+        xp_label           : "نقطة",
+        streak_label       : "أيام",
+    }
+};
+
+function i18n(key) {
+    const lang = getCurrentLang();
+    return SESSION_I18N[lang]?.[key] || SESSION_I18N.fr[key] || key;
+}
+
+function applySessionLang() {
+    const spinnerText = document.querySelector('.spinner-text');
+    if (spinnerText) spinnerText.textContent = i18n('spinner_text');
+
+    const submitBtn = document.getElementById('submitAnswerBtn');
+    if (submitBtn) {
+        submitBtn.innerHTML = '<span>' + i18n('verify_btn') + '</span>' +
+            '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>';
+    }
+
+    const nextBtn = document.getElementById('nextQuestionBtn');
+    if (nextBtn) {
+        nextBtn.innerHTML = i18n('next_btn') +
+            '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>';
+    }
+
+    const answerLabel = document.querySelector('.session-answer-label');
+    if (answerLabel) {
+        answerLabel.innerHTML = i18n('answer_label') + ' <span class="session-hint">' + i18n('answer_hint') + '</span>';
+    }
+
+    const textarea = document.getElementById('studentAnswerInput');
+    if (textarea) textarea.placeholder = i18n('answer_placeholder');
+
+    const lc = document.querySelector('.legend-correct');
+    const lp = document.querySelector('.legend-partiel');
+    const lf = document.querySelector('.legend-faux');
+    if (lc) lc.textContent = i18n('bar_correct');
+    if (lp) lp.textContent = i18n('bar_partiel');
+    if (lf) lf.textContent = i18n('bar_faux');
+
+    const titleEl = document.getElementById('sessionCompleteTitle');
+    if (titleEl) titleEl.textContent = i18n('session_complete');
+
+    const restartBtn = document.getElementById('restartSessionBtn');
+    const progressBtn = document.getElementById('showLandingBtn');
+    if (restartBtn) restartBtn.textContent = i18n('btn_continue');
+    if (progressBtn) progressBtn.textContent = i18n('btn_progress');
+
+    const noteEl = document.querySelector('.session-complete-note');
+    if (noteEl) noteEl.textContent = i18n('fsrs_note');
+
+    const xpEl = document.getElementById('sessionXpValue');
+    if (xpEl) {
+        const xp = parseInt(localStorage.getItem('khawarizmi_xp')) || 0;
+        xpEl.textContent = xp + ' ' + i18n('xp_label');
+    }
+    const streakEl = document.getElementById('sessionStreakValue');
+    if (streakEl) {
+        const streak = parseInt(localStorage.getItem('khawarizmi_streak')) || 5;
+        streakEl.textContent = streak + ' ' + i18n('streak_label');
+    }
+
+    const counter = document.getElementById('questionCounter');
+    if (counter && window.sessionStats) {
+        counter.textContent = i18n('question_counter') + ' ' + (sessionStats.total + 1);
+    }
+
+    const manquantTitle = document.querySelector('.manquant-title');
+    if (manquantTitle) manquantTitle.textContent = i18n('concepts_manquants');
+}
 
 // ═══════════════════════════════════════════════
 // STATE MACHINE
@@ -19,9 +149,10 @@ const State = {
     ERROR            : 'error'
 };
 
-let currentState   = null;
-let currentCard    = null;  // { question_id, texte, tentative }
-let sessionStats   = { correct: 0, partiel: 0, faux: 0, total: 0 };
+let currentState    = null;
+let currentCard     = null;
+let sessionStats    = { correct: 0, partiel: 0, faux: 0, total: 0 };
+let _errorRetryCount = 0;
 
 function transition(newState) {
     currentState = newState;
@@ -37,6 +168,11 @@ function getToken() {
 }
 
 async function apiPost(endpoint, body) {
+    if (isDemoMode()) {
+        await new Promise(r => setTimeout(r, 600 + Math.random() * 400));
+        return getMockResponse(endpoint, body);
+    }
+
     const res = await fetch(`${API_BASE}${endpoint}`, {
         method  : 'POST',
         headers : {
@@ -62,30 +198,122 @@ async function apiPost(endpoint, body) {
     return res.json();
 }
 
+function getMockResponse(endpoint, body) {
+    const lang = body.lang || getCurrentLang();
+    if (endpoint === '/api/session/next') {
+        const isAr = lang === 'ar';
+        return {
+            session_queue: [{
+                question_id : 'mock_ch1_01',
+                texte       : isAr
+                    ? 'اشرح دور ARN بوليميراز أثناء عملية النسخ عند حقيقيات النوى.'
+                    : "Explique le role de l'ARN polymerase lors de la transcription chez les eucaryotes.",
+                texte_ar    : 'اشرح دور ARN بوليميراز أثناء عملية النسخ عند حقيقيات النوى.',
+                concept_cle : isAr
+                    ? 'علوم طبيعية — تركيب البروتين'
+                    : 'SVT — Synthese des proteines',
+                tentative   : 1
+            }]
+        };
+    }
+    if (endpoint === '/api/evaluate') {
+        const reponse = body.reponse_eleve || '';
+        const score = reponse.length > 80 ? 8 : reponse.length > 30 ? 5 : 2;
+        return {
+            score   : score,
+            statut  : score >= 7 ? 'CORRECT' : score >= 4 ? 'PARTIEL' : 'FAUX',
+            feedback: score >= 7
+                ? 'Excellent ! Tu as bien decrit le role de l\'ARN polymetase.'
+                : 'Pense a mentionner : l\'ouverture de la double helice, la lecture du brin transcrit (3\'->5\'), la synthese de l\'ARNm (5\'->3\').',
+            manquant: score < 7 ? ['ARN polymerase', 'brin transcrit 3\'->5\'', 'ARNm 5\'->3\''] : [],
+            source  : 'MOCK'
+        };
+    }
+    return {};
+}
+
 
 // ═══════════════════════════════════════════════
 // LOGIQUE PRINCIPALE
 // ═══════════════════════════════════════════════
 
+const SESSION_TARGET = 10;
+let _sessionQueue   = [];
+let _askedQuestions = [];
+
+function _showNextFromQueue() {
+    if (_sessionQueue.length === 0) {
+        transition(State.SESSION_COMPLETE);
+        return;
+    }
+
+    const q = _sessionQueue.shift();
+    _askedQuestions.push(q.question_id);
+
+    const lang = getCurrentLang();
+    currentCard = {
+        question_id : q.question_id,
+        texte       : lang === 'ar' && q.texte_ar ? q.texte_ar : (q.texte_fr || q.texte || ''),
+        concept_cle : lang === 'ar' && q.concept_cle_ar
+                      ? q.concept_cle_ar
+                      : (q.concept_cle_fr || q.concept_cle || "مفهوم أساسي"),
+        tentative   : q.tentative || 1
+    };
+
+    transition(State.QUESTION_READY);
+}
+
 async function loadNextQuestion() {
+    _errorRetryCount = 0;
+
+    if (_sessionQueue.length > 0) {
+        console.log(`Queue locale: ${_sessionQueue.length} restantes`);
+        _showNextFromQueue();
+        return;
+    }
+
+    sessionStats   = { correct: 0, partiel: 0, faux: 0, total: 0 };
+    _sessionQueue   = [];
+
     transition(State.LOADING_QUESTION);
     try {
-        const data = await apiPost('/api/session/next', { max_cards: 1 });
+        const lang = getCurrentLang();
+        console.log('>>> API /api/session/next with:', { max_cards: SESSION_TARGET, lang, exclude_count: _askedQuestions.length });
 
-        // Queue vide → session terminée
-        if (!data.session_queue || data.session_queue.length === 0) {
+        const data = await apiPost('/api/session/next', {
+            max_cards : SESSION_TARGET,
+            lang      : lang,
+            exclude   : _askedQuestions
+        });
+
+        console.log('<<< Reponse brute:', JSON.stringify(data).slice(0, 500));
+        console.log('<<< Cartes recues:', data?.session_queue?.length);
+
+        const queue = data?.session_queue || [];
+
+        if (queue.length === 0) {
+            console.warn('Queue FSRS vide — fallback random');
+            const fallback = await apiPost('/api/session/random', {
+                max_cards : 5,
+                lang      : lang,
+                exclude   : _askedQuestions
+            }).catch(() => null);
+
+            if (fallback?.session_queue?.length > 0) {
+                console.log('Fallback random:', fallback.session_queue.length, 'cartes');
+                _sessionQueue = fallback.session_queue;
+                _showNextFromQueue();
+                return;
+            }
+
+            console.warn('Fallback vide aussi — SESSION_COMPLETE');
             transition(State.SESSION_COMPLETE);
             return;
         }
 
-        currentCard = {
-            question_id : data.session_queue[0].question_id,
-            texte       : data.session_queue[0].texte,
-            concept_cle : data.session_queue[0].concept_cle || "Concept Clé",
-            tentative   : data.session_queue[0].tentative || 1
-        };
-
-        transition(State.QUESTION_READY);
+        _sessionQueue = queue;
+        console.log('_sessionQueue initialisee avec', _sessionQueue.length, 'cartes');
+        _showNextFromQueue();
 
     } catch (err) {
         console.error('loadNextQuestion:', err);
@@ -103,7 +331,8 @@ async function submitAnswer() {
         const result = await apiPost('/api/evaluate', {
             question_id   : currentCard.question_id,
             reponse_eleve : reponse,
-            tentative     : currentCard.tentative
+            tentative     : currentCard.tentative,
+            lang          : getCurrentLang()
         });
 
         // Mise à jour stats session
@@ -147,17 +376,22 @@ function render(state) {
             break;
 
         case State.QUESTION_READY:
-            // Injecter la question dans l'UI
-            document.getElementById('questionText').textContent = 
-                currentCard.texte;
-            document.getElementById('conceptLabel').textContent = 
-                currentCard.concept_cle;
-            document.getElementById('studentAnswerInput').value = '';
-            document.getElementById('studentAnswerInput').focus();
+            if (loadingSpinner) loadingSpinner.hidden = true;
+
+            document.getElementById('questionText').textContent = currentCard.texte;
+            document.getElementById('conceptLabel').textContent = currentCard.concept_cle;
+
+            applySessionLang();
+
+            const t = document.getElementById('studentAnswerInput');
+            if (t) { t.value = ''; t.focus(); }
+
+            if (nextBtn) nextBtn.hidden = true;
+
+            if (window.updateSessionProgress) window.updateSessionProgress();
 
             if (questionPanel) questionPanel.hidden = false;
             if (submitBtn)     submitBtn.hidden     = false;
-            if (nextBtn)       nextBtn.hidden       = true;
             break;
 
         case State.SHOWING_FEEDBACK:
@@ -174,50 +408,102 @@ function render(state) {
 
         case State.ERROR:
             if (loadingSpinner) loadingSpinner.hidden = true;
-            showToast("Connexion perdue. Réessaie dans quelques secondes.");
-            // Retry automatique après 3s
-            setTimeout(loadNextQuestion, 3000);
+            _errorRetryCount++;
+            if (_errorRetryCount >= 3) {
+                showToast(getCurrentLang() === 'ar'
+                    ? 'تعذر الاتصال بالخادم. حاول تحديث الصفحة.'
+                    : 'Connexion au serveur impossible. Rechargez la page.');
+                _errorRetryCount = 0;
+            } else {
+                showToast(getCurrentLang() === 'ar'
+                    ? 'انقطع الاتصال. إعادة محاولة...'
+                    : 'Connexion perdue. Réessaie...');
+                setTimeout(loadNextQuestion, 3000);
+            }
             break;
     }
 }
 
 function renderFeedback(result) {
-    const feedbackBox    = document.getElementById('feedbackBox');
-    const feedbackText   = document.getElementById('feedbackText');
-    const feedbackScore  = document.getElementById('feedbackScore');
-    const nextReviewInfo = document.getElementById('nextReviewInfo');
+    const feedbackBox  = document.getElementById('feedbackBox');
+    const feedbackText = document.getElementById('feedbackText');
+    const feedbackScore= document.getElementById('feedbackScore');
+    const feedbackSts  = document.getElementById('feedbackStatus');
+    const nextReview   = document.getElementById('nextReviewInfo');
 
-    const colors = {
-        'CORRECT' : 'var(--success, #10B981)',
-        'PARTIEL' : 'var(--warning, #F59E0B)',
-        'FAUX'    : 'var(--danger,  #EF4444)',
-        'ERREUR'  : 'var(--muted,   #6B7280)'
+    const borderColors = {
+        'CORRECT': 'var(--success)',
+        'PARTIEL': 'var(--amber)',
+        'FAUX':    'var(--danger)',
+        'ERREUR':  'var(--glass-border)'
     };
 
     if (feedbackBox) {
-        feedbackBox.style.borderColor = colors[result.statut] || colors['ERREUR'];
+        feedbackBox.style.borderColor =
+            borderColors[result.statut] || borderColors['ERREUR'];
     }
-    if (feedbackText)  feedbackText.textContent  = result.feedback;
-    if (feedbackScore) feedbackScore.textContent = `${result.score}/10`;
 
-    if (nextReviewInfo) {
-        if (result.next_review_date && result.source === 'GPT4O') {
+    if (feedbackScore) {
+        feedbackScore.textContent = `${result.score}/10`;
+        feedbackScore.style.color =
+            result.statut === 'CORRECT' ? 'var(--success-light)' :
+            result.statut === 'PARTIEL' ? 'var(--amber-light)' :
+            result.statut === 'FAUX'    ? 'var(--danger-light)' :
+            'var(--text-primary)';
+    }
+
+    if (feedbackSts) {
+        const statusKey = { CORRECT: 'feedback_correct', PARTIEL: 'feedback_partiel', FAUX: 'feedback_faux' };
+        feedbackSts.textContent = i18n(statusKey[result.statut] || 'feedback_faux');
+        feedbackSts.className =
+            'session-feedback-status ' + (result.statut || 'erreur').toLowerCase();
+    }
+
+    if (feedbackText) feedbackText.textContent = result.feedback;
+
+    if (nextReview) {
+        if (result.next_review_date) {
             const days = daysUntil(result.next_review_date);
-            nextReviewInfo.textContent = days === 0
-                ? "Prochaine révision : aujourd'hui"
-                : `Prochaine révision dans ${days} jour(s)`;
-            nextReviewInfo.hidden = false;
+            const lang = getCurrentLang();
+            nextReview.textContent = lang === 'ar'
+                ? (days === 0 ? 'المراجعة القادمة : اليوم' : `المراجعة القادمة خلال ${days} يوم`)
+                : (days === 0 ? "Prochaine revision : aujourd'hui" : `Prochaine revision dans ${days} jour(s)`);
+            nextReview.hidden = false;
         } else {
-            nextReviewInfo.hidden = true;
+            nextReview.hidden = true;
         }
     }
 
     const manquantContainer = document.getElementById('manquantList');
     if (manquantContainer) {
-        if (result.manquant && result.manquant.length > 0) {
-            manquantContainer.innerHTML = result.manquant
-                .map(m => `<span class="keyword-tag" style="background: rgba(239,68,68,0.2); color: #EF4444; padding: 4px 8px; border-radius: 4px; font-size: 0.9em; margin-right: 5px; display: inline-block; margin-bottom: 5px;">${m}</span>`)
-                .join('');
+        if (result.manquant?.length > 0) {
+            let titleEl = manquantContainer.querySelector('.manquant-title');
+            if (!titleEl) {
+                titleEl = document.createElement('p');
+                titleEl.className = 'manquant-title';
+                manquantContainer.insertAdjacentElement('afterbegin', titleEl);
+            }
+            titleEl.textContent = i18n('concepts_manquants');
+
+            manquantContainer.querySelectorAll('.keyword-tag').forEach(t => t.remove());
+
+            result.manquant.forEach(m => {
+                const tag = document.createElement('span');
+                tag.className = 'keyword-tag';
+                tag.style.cssText = `
+                    background: hsla(0,75%,60%,0.12);
+                    color: var(--danger-light);
+                    border: 1px solid hsla(0,75%,60%,0.2);
+                    padding: 3px 10px;
+                    border-radius: var(--radius-full);
+                    font-size: 0.82rem;
+                    font-weight: 600;
+                    display: inline-block;
+                    margin: 2px;
+                `;
+                tag.textContent = m;
+                manquantContainer.appendChild(tag);
+            });
             manquantContainer.hidden = false;
         } else {
             manquantContainer.hidden = true;
@@ -226,18 +512,65 @@ function renderFeedback(result) {
 }
 
 function renderSessionComplete() {
-    const pct = sessionStats.total > 0
-        ? Math.round((sessionStats.correct / sessionStats.total) * 100)
-        : 0;
+    _askedQuestions = []; // ← reset pour permettre de revoir les questions
 
+    applySessionLang();
+
+    // Fix explicite du bouton continuer (évite "✓" parasite)
+    const restartBtn = document.getElementById('restartSessionBtn');
+    if (restartBtn) restartBtn.textContent = i18n('btn_continue');
+
+    console.log('sessionStats:', { ...sessionStats });
+
+    const total = sessionStats.total;
+    const safeTotal   = total > 0 ? total   : 1;
+    const safeCorrect = total > 0 ? sessionStats.correct : 0;
+    const safePartiel = total > 0 ? sessionStats.partiel : 0;
+    const safeFaux    = total > 0 ? sessionStats.faux    : 0;
+    const pct = Math.round((safeCorrect / safeTotal) * 100);
+
+    console.log('Bars:', {
+        barC: document.getElementById('barCorrect'),
+        barP: document.getElementById('barPartiel'),
+        barF: document.getElementById('barFaux'),
+        panel: document.getElementById('sessionCompletePanel'),
+    });
+
+    const isAr = getCurrentLang() === 'ar';
     const summaryEl = document.getElementById('sessionSummary');
     if (summaryEl) {
-        summaryEl.innerHTML = `
-            <p>${sessionStats.correct} / ${sessionStats.total} correctes</p>
-            <p>Score de session : ${pct}%</p>
-            <p>Reviens demain pour continuer.</p>
-        `;
+        const emoji = pct >= 80 ? '🏆' : pct >= 60 ? '💪' : '📖';
+        summaryEl.innerHTML = isAr ? `
+            <p><strong>${safeCorrect}</strong> صحيحة —
+               <strong>${safePartiel}</strong> جزئية —
+               <strong>${safeFaux}</strong> تحتاج مراجعة</p>
+            <p style="font-size:1.2rem;font-weight:800;color:var(--text-primary)">
+                ${emoji} النتيجة : ${pct}%
+            </p>
+            <p>${pct >= 80 ? 'ممتاز ! الخوارزمي سيباعد مراجعاتك.' : 'واصل ! المفاهيم الصعبة ستعود غداً.'}</p>
+        ` : `
+            <p><strong>${safeCorrect}</strong> correctes —
+               <strong>${safePartiel}</strong> partielles —
+               <strong>${safeFaux}</strong> a revoir</p>
+            <p style="font-size:1.2rem;font-weight:800;color:var(--text-primary)">
+                ${emoji} Score : ${pct}%
+            </p>
+            <p>${pct >= 80 ? 'Excellent ! Khawarizmi espace tes revisions.' : 'Continue ! Les concepts difficiles reviendront demain.'}</p>`;
     }
+
+    setTimeout(() => {
+        const barC = document.getElementById('barCorrect');
+        const barP = document.getElementById('barPartiel');
+        const barF = document.getElementById('barFaux');
+        if (barC) barC.style.width = `${(safeCorrect / safeTotal) * 100}%`;
+        if (barP) barP.style.width = `${(safePartiel / safeTotal) * 100}%`;
+        if (barF) barF.style.width = `${(safeFaux    / safeTotal) * 100}%`;
+        console.log('Bar widths applied:', {
+            correct: barC?.style.width,
+            partiel: barP?.style.width,
+            faux:    barF?.style.width,
+        });
+    }, 500);
 }
 
 function daysUntil(isoDate) {
@@ -267,23 +600,102 @@ function showToast(message) {
 // ═══════════════════════════════════════════════
 
 document.addEventListener('DOMContentLoaded', () => {
+    applySessionLang();
+
     document.getElementById('submitAnswerBtn')
         ?.addEventListener('click', submitAnswer);
 
     document.getElementById('nextQuestionBtn')
-        ?.addEventListener('click', loadNextQuestion);
+        ?.addEventListener('click', _showNextFromQueue);
 
     document.getElementById('studentAnswerInput')
         ?.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' && e.ctrlKey) submitAnswer();
         });
 
-    // Check if token exists on load
-    if (getToken()) {
+    function persistHudState() {
+        if (typeof GameState !== 'undefined') {
+            localStorage.setItem('khawarizmi_xp', GameState.getXp());
+            localStorage.setItem('khawarizmi_streak', GameState.getStreak());
+        }
+    }
+
+    function restoreHudState() {
+        const xp = parseInt(localStorage.getItem('khawarizmi_xp')) || 0;
+        const streak = parseInt(localStorage.getItem('khawarizmi_streak')) || 5;
+        if (typeof GameState !== 'undefined') {
+            GameState.reset();
+            GameState.addXp(xp);
+        }
+        const xpEl     = document.getElementById('sessionXpValue');
+        const streakEl = document.getElementById('sessionStreakValue');
+        if (xpEl)     xpEl.textContent     = `${xp} XP`;
+        if (streakEl) streakEl.textContent  = `${streak} jours`;
+    }
+
+    // Check if token exists or demo mode on load
+    const hasToken = getToken();
+    if (hasToken || isDemoMode()) {
+        if (!hasToken) {
+            localStorage.setItem('khawarizmi_token', 'demo_local_token');
+        }
         const hero = document.querySelector('.hero');
         if(hero) hero.style.display = 'none';
         const betaArea = document.getElementById('betaSessionArea');
         if(betaArea) betaArea.hidden = false;
+        restoreHudState();
         loadNextQuestion();
+    } else {
+        syncSessionHud();
     }
+
+    // Logout
+    document.getElementById('sessionLogoutBtn')
+        ?.addEventListener('click', () => {
+            localStorage.removeItem('khawarizmi_token');
+            localStorage.removeItem('khawarizmi_xp');
+            localStorage.removeItem('khawarizmi_streak');
+            const hero = document.querySelector('.hero');
+            if (hero) hero.style.display = 'block';
+            const betaArea = document.getElementById('betaSessionArea');
+            if (betaArea) betaArea.hidden = true;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+    // Sync HUD session avec GameState de app.js
+    function syncSessionHud() {
+        const xpEl     = document.getElementById('sessionXpValue');
+        const streakEl = document.getElementById('sessionStreakValue');
+        if (xpEl && typeof GameState !== 'undefined') {
+            xpEl.textContent = `${GameState.getXp()} ${i18n('xp_label')}`;
+        }
+        if (streakEl && typeof GameState !== 'undefined') {
+            streakEl.textContent = `${GameState.getStreak()} ${i18n('streak_label')}`;
+        }
+        persistHudState();
+    }
+
+    // Sync après chaque évaluation
+    const origRenderFeedback = renderFeedback;
+    renderFeedback = (result) => {
+        origRenderFeedback(result);
+        syncSessionHud();
+    };
+
+    // Barre progression session
+    function updateSessionProgress() {
+        const fill = document.getElementById('sessionProgressFill');
+        const counter = document.getElementById('questionCounter');
+        if (fill && sessionStats.total > 0) {
+            const pct = Math.min(100, (sessionStats.total / 10) * 100);
+            fill.style.width = `${pct}%`;
+            fill.setAttribute('aria-valuenow', pct);
+        }
+        if (counter) {
+            counter.textContent = i18n('question_counter') + ' ' + (sessionStats.total + 1);
+        }
+    }
+
+    // Exposer pour render()
+    window.updateSessionProgress = updateSessionProgress;
 });
