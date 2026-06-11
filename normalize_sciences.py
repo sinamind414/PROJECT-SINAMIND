@@ -2,7 +2,15 @@
 
 import json
 import re
+import sys
 from pathlib import Path
+
+# Configure stdout and stderr to use UTF-8 to prevent UnicodeEncodeError on Windows
+if hasattr(sys.stdout, 'reconfigure'):
+    sys.stdout.reconfigure(encoding='utf-8')
+if hasattr(sys.stderr, 'reconfigure'):
+    sys.stderr.reconfigure(encoding='utf-8')
+
 
 # ─── CONSTANTES ───────────────────────────────────────────────
 

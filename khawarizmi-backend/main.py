@@ -15,6 +15,7 @@ import os
 import json
 import logging
 import hashlib
+import secrets
 from datetime import datetime, timedelta, timezone
 from typing import Optional, Dict, Any, List
 from pathlib import Path
@@ -97,7 +98,7 @@ class Settings(BaseSettings):
     allowed_origins: List[str] = [
         "http://localhost:3000",
         "http://localhost:5500",
-        "https://khawarizmi.vercel.app",
+        "https://khawarizmi-ia.vercel.app",
         "https://ia-khawarizmi.dz",
     ]
 
@@ -588,13 +589,41 @@ async def add_to_waitlist(entry: WaitlistEntry):
                     "source": entry.source,
                 }
             )
+            # 2. Auto-create user for beta
+            res_user = await session.execute(text("SELECT id FROM users WHERE email = :email"), {"email": entry.email})
+            user = res_user.fetchone()
+            if not user:
+                random_pwd = secrets.token_urlsafe(16)
+                hashed_pwd = hash_password(random_pwd)
+                res_insert = await session.execute(
+                    text("""
+                        INSERT INTO users (email, password_hash, prenom, wilaya, filiere)
+                        VALUES (:email, :pwd, :prenom, :wilaya, 'sciences')
+                        RETURNING id
+                    """),
+                    {
+                        "email": entry.email,
+                        "pwd": hashed_pwd,
+                        "prenom": entry.name,
+                        "wilaya": entry.wilaya
+                    }
+                )
+                user_id = res_insert.fetchone()[0]
+            else:
+                user_id = user[0]
+            
             await session.commit()
 
-        logger.info(f"✅ Waitlist : {entry.email} ({entry.wilaya or 'N/A'})")
+        # 3. Generate token
+        token = create_access_token({"sub": user_id})
+
+        logger.info(f"✅ Waitlist + AutoAuth : {entry.email} (user_id={user_id})")
         return {
             "status":  "success",
             "message": "Inscription réussie",
-            "email":   entry.email
+            "email":   entry.email,
+            "access_token": token,
+            "token_type": "bearer"
         }
 
     except Exception as e:
@@ -1058,47 +1087,7 @@ async def get_schema(
 
 
 # ═══════════════════════════════════════════════════════════════
-# ═══════════════════════════════════════════════════════════════
-# ROUTES — WAITLIST (sans auth requise)
-# ═══════════════════════════════════════════════════════════════
 
-@app.post("/api/waitlist", tags=["Marketing"], status_code=201)
-async def rejoindre_waitlist(
-    body: WaitlistRequest,
-    db:   AsyncSession = Depends(get_db),
-):
-    """
-    Sauvegarde une inscription à la waitlist.
-    Route publique — pas d'auth requise.
-    """
-    try:
-        await db.execute(
-            text("""
-                INSERT INTO waitlist (name, email, wilaya, lang, source, created_at)
-                VALUES (:name, :email, :wilaya, :lang, :source, NOW())
-                ON CONFLICT (email) DO UPDATE SET
-                    updated_at = NOW()
-            """),
-            {
-                "name":   body.name,
-                "email":  body.email,
-                "wilaya": body.wilaya,
-                "lang":   body.lang,
-                "source": body.source,
-            }
-        )
-
-        logger.info(f"Waitlist : {body.email} (wilaya={body.wilaya})")
-
-        return {
-            "message": "Inscription réussie ! On te contacte dès l'ouverture.",
-            "email":   body.email,
-        }
-
-    except Exception as e:
-        logger.error(f"Waitlist DB error : {e}")
-        # Ne pas exposer l'erreur DB au client
-        raise HTTPException(500, "Erreur lors de l'inscription. Réessaie.")
 
 
 # ═══════════════════════════════════════════════════════════════
@@ -1137,6 +1126,14 @@ async def get_chapitres(
         ],
     }
 
+
+# ═══════════════════════════════════════════════════════════════
+# EVALUATE & SESSION
+# ═══════════════════════════════════════════════════════════════
+from routes.evaluate import router as evaluate_router
+from routes.session import router as session_router
+app.include_router(evaluate_router)
+app.include_router(session_router)
 
 # ═══════════════════════════════════════════════════════════════
 # GESTIONNAIRE D'ERREURS GLOBAL

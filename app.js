@@ -412,7 +412,13 @@ function initWaitlistModal() {
                         headers: { 'Content-Type': 'application/json' },
                         body:    JSON.stringify(data)
                     });
-                    if (res.ok) saved = true;
+                    if (res.ok) {
+                        const jsonRes = await res.json();
+                        if (jsonRes.access_token) {
+                            localStorage.setItem('khawarizmi_token', jsonRes.access_token);
+                        }
+                        saved = true;
+                    }
                 } catch (err) {
                     console.warn('Webhook failed, falling back to localStorage:', err);
                 }
@@ -437,7 +443,21 @@ function initWaitlistModal() {
             if (saved) {
                 if (form)       form.style.display = 'none';
                 if (successMsg) successMsg.classList.add('show');
-                setTimeout(() => window.closeWaitlistModal(), 3000);
+                
+                // Lancer la session beta aprs 1.5s
+                setTimeout(() => {
+                    window.closeWaitlistModal();
+                    // Cacher le hero, afficher la beta session
+                    const hero = document.querySelector('.hero');
+                    if(hero) hero.style.display = 'none';
+                    const betaArea = document.getElementById('betaSessionArea');
+                    if(betaArea) betaArea.hidden = false;
+                    
+                    // Lancer la queue de questions !
+                    if (typeof loadNextQuestion === 'function') {
+                        loadNextQuestion();
+                    }
+                }, 1500);
             } else {
                 alert(currentLang === 'ar'
                     ? 'حدث خطأ. يرجى المحاولة مرة أخرى.'

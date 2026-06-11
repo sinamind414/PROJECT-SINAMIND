@@ -3,5 +3,18 @@ __pycache__/
 *.pyc
 .env
 .DS_Store
+*.bak
+*.backup_*
 
+# Pipeline intermediate directories
 LIVRES SCOLAIRES/
+images_extraites/
+output_pipeline/
+processed_pdf/
+temp_intro/
+temp_toc/
+import_pdf/
+
+# Generated questions
+generated_questions.json
+validated_questions.json
