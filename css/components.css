@@ -1,0 +1,346 @@
+/* ============================================
+   COMPONENTS CSS - Navbar, Buttons, Cards, Lang Switcher
+   ============================================ */
+
+/* ============ NAVBAR ============ */
+.navbar {
+  position: fixed;
+  top: 0; right: 0; left: 0;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  padding: 15px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 1000;
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s;
+}
+
+.logo {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.4rem;
+  color: var(--blue-deep);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo span { font-size: 1.8rem; }
+
+.nav-links {
+  display: flex;
+  gap: 25px;
+  list-style: none;
+  flex-wrap: wrap;
+}
+
+.nav-links a {
+  color: var(--dark);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s;
+  position: relative;
+  font-size: 0.95rem;
+}
+
+.nav-links a:hover { color: var(--blue-deep); }
+
+.nav-links a::after {
+  content: '';
+  position: absolute;
+  bottom: -5px; right: 0;
+  width: 0; height: 2px;
+  background: var(--green-fresh);
+  transition: width 0.3s;
+}
+
+.nav-links a:hover::after { width: 100%; }
+
+/* ============ MOBILE TOGGLE ============ */
+.mobile-toggle {
+  display: none;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  flex-direction: column;
+  gap: 5px;
+  width: 30px;
+  height: 20px;
+  justify-content: space-between;
+}
+
+.mobile-toggle span {
+  display: block;
+  height: 3px;
+  width: 100%;
+  background: var(--blue-deep);
+  border-radius: 3px;
+  transition: all 0.3s;
+}
+
+/* ============ LANGUAGE SWITCHER ============ */
+.lang-switcher {
+  display: flex;
+  gap: 5px;
+  background: var(--blue-soft);
+  padding: 5px;
+  border-radius: 30px;
+}
+
+.lang-btn {
+  background: transparent;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-family: var(--font-main);
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--dark);
+  transition: all 0.3s;
+}
+
+.lang-btn:hover {
+  background: rgba(44, 95, 141, 0.1);
+}
+
+.lang-btn.active {
+  background: var(--blue-deep);
+  color: white;
+}
+
+/* ============ BUTTONS ============ */
+.btn {
+  padding: 15px 35px;
+  border-radius: 50px;
+  border: none;
+  font-family: var(--font-main);
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+
+.btn-primary {
+  background: var(--blue-deep);
+  color: white;
+  box-shadow: var(--shadow);
+}
+
+.btn-primary:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-hover);
+  background: var(--green-fresh);
+}
+
+.btn-secondary {
+  background: white;
+  color: var(--blue-deep);
+  border: 2px solid var(--blue-deep);
+}
+
+.btn-secondary:hover {
+  background: var(--blue-deep);
+  color: white;
+  transform: translateY(-3px);
+}
+
+/* ============ CARDS ============ */
+.concept-box {
+  background: white;
+  border-radius: 20px;
+  padding: 35px;
+  box-shadow: var(--shadow);
+  transition: transform 0.3s;
+}
+
+.concept-box:hover { transform: translateY(-5px); }
+
+.concept-box h3 {
+  font-family: var(--font-display);
+  color: var(--blue-deep);
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.concept-box ul { list-style: none; }
+
+.concept-box ul li {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--blue-soft);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.concept-box ul li:last-child { border-bottom: none; }
+
+.concept-box ul li::before {
+  content: '✓';
+  width: 25px;
+  height: 25px;
+  background: var(--green-soft);
+  color: var(--green-fresh);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.concept-text {
+  font-size: 1.1rem;
+  line-height: 1.9;
+}
+
+/* ============ STAGE CARDS ============ */
+.stage-card {
+  background: white;
+  border-radius: 20px;
+  padding: 30px;
+  box-shadow: var(--shadow);
+  transition: all 0.4s;
+  position: relative;
+  border-right: 5px solid var(--green-fresh);
+}
+
+.stage-card:hover {
+  transform: translateY(-10px) scale(1.02);
+  box-shadow: var(--shadow-hover);
+}
+
+.stage-number {
+  position: absolute;
+  top: -20px; right: 20px;
+  width: 45px; height: 45px;
+  background: var(--green-fresh);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 1.2rem;
+  box-shadow: var(--shadow);
+}
+
+.stage-card h4 {
+  font-family: var(--font-display);
+  color: var(--blue-deep);
+  font-size: 1.3rem;
+  margin-bottom: 15px;
+  margin-top: 10px;
+}
+
+.stage-card p { color: #555; }
+
+/* ============ BAC BOX ============ */
+.bac-box {
+  background: linear-gradient(135deg, #fff5e6, #ffe8cc);
+  border-right: 6px solid var(--accent);
+  border-radius: 20px;
+  padding: 35px;
+  margin: 50px 0;
+  box-shadow: var(--shadow);
+}
+
+.bac-box h3 {
+  font-family: var(--font-display);
+  color: var(--accent);
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.bac-box ul { list-style: none; padding-right: 0; }
+
+.bac-box ul li {
+  padding: 10px 0;
+  display: flex;
+  align-items: start;
+  gap: 12px;
+}
+
+.bac-box ul li::before {
+  content: '🎯';
+  flex-shrink: 0;
+}
+
+/* ============ DID YOU KNOW ============ */
+.did-you-know {
+  background: var(--green-soft);
+  border-radius: 20px;
+  padding: 30px;
+  margin: 40px 0;
+  display: flex;
+  gap: 25px;
+  align-items: center;
+  border-right: 6px solid var(--green-fresh);
+}
+
+.did-you-know .bulb { font-size: 3rem; }
+
+.did-you-know h4 {
+  font-family: var(--font-display);
+  color: var(--blue-deep);
+  margin-bottom: 8px;
+}
+
+/* ============ ANIMATION BOX ============ */
+.animation-box {
+  background: linear-gradient(135deg, var(--blue-deep), #1a3d5c);
+  border-radius: 25px;
+  padding: 50px;
+  margin: 50px 0;
+  text-align: center;
+  color: white;
+  box-shadow: var(--shadow);
+}
+
+.animation-box h3 {
+  font-family: var(--font-display);
+  font-size: 1.8rem;
+  margin-bottom: 25px;
+}
+
+.dna-animation {
+  font-size: 5rem;
+  margin: 30px 0;
+  display: inline-block;
+  animation: pulse 2s infinite;
+}
+
+.big-icon {
+  font-size: 5rem;
+  margin: 20px 0;
+}
+
+.dna-sequence {
+  font-family: 'Courier New', monospace;
+  font-size: 1.4rem;
+  background: rgba(255,255,255,0.1);
+  padding: 20px;
+  border-radius: 15px;
+  margin: 20px 0;
+  letter-spacing: 3px;
+}
+
+.dna-sequence .codon {
+  display: inline-block;
+  padding: 5px 8px;
+  margin: 0 3px;
+  border-radius: 8px;
+  background: var(--green-fresh);
+}

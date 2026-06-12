@@ -1,0 +1,97 @@
+/* ============================================
+   RESPONSIVE CSS - Mobile & Tablet
+   ============================================ */
+
+/* ============ Tablets ============ */
+@media (max-width: 1024px) {
+  .hero h1 { font-size: 3rem; }
+  .stages-timeline { grid-template-columns: 1fr 1fr; }
+  .section { padding: 80px 30px; }
+}
+
+/* ============ Mobile ============ */
+@media (max-width: 768px) {
+  /* Hero */
+  .hero h1 { font-size: 2.5rem; }
+  .hero p { font-size: 1.1rem; }
+  
+  /* Navbar */
+  .navbar { padding: 12px 20px; }
+  .nav-links { 
+    display: none; 
+    width: 100%;
+  }
+  .nav-links.active {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 100%; left: 0; right: 0;
+    background: white;
+    box-shadow: var(--shadow);
+    padding: 20px;
+    gap: 15px;
+    animation: fadeInDown 0.3s;
+    border-bottom: 2px solid var(--blue-light);
+  }
+  [data-theme="dark"] .nav-links.active {
+    background: #161B22;
+    border-bottom-color: rgba(107, 163, 214, 0.2);
+  }
+  .mobile-toggle {
+    display: flex;
+  }
+  .logo { font-size: 1.1rem; }
+  .logo span { font-size: 1.5rem; }
+  
+  /* Sections */
+  .section { padding: 60px 20px; }
+  .roadmap { padding: 60px 20px; }
+  
+  /* Grids */
+  .concept-grid { grid-template-columns: 1fr; }
+  .stages-timeline { grid-template-columns: 1fr; }
+  .ribosome-sites { grid-template-columns: 1fr; }
+  
+  /* Titles */
+  .section-title h2 { font-size: 2rem; }
+  .section-header h2 { font-size: 1.8rem; }
+  .stages-title { font-size: 1.5rem; }
+  
+  /* Containers */
+  .code-table-container { padding: 20px; }
+  .animation-box { padding: 30px 20px; }
+  .simulator { padding: 25px 15px; }
+  
+  /* Inputs */
+  .sim-input input { width: 100%; }
+  .sim-input { flex-direction: column; }
+  
+  /* Did You Know */
+  .did-you-know { flex-direction: column; text-align: center; }
+  
+  /* Flow Diagram */
+  .flow-diagram { padding: 20px; }
+  .flow-step { padding: 12px 20px; margin: 5px; font-size: 0.9rem; }
+  .flow-arrow { display: block; transform: rotate(-90deg); margin: 5px auto; }
+}
+
+/* ============ Small Mobile ============ */
+@media (max-width: 480px) {
+  .hero h1 { font-size: 2rem; }
+  .hero-badge { font-size: 0.85rem; padding: 6px 15px; }
+  .btn { padding: 12px 25px; font-size: 1rem; }
+  
+  .section-header { flex-direction: column; text-align: center; }
+  .section-header .icon-box { margin: 0 auto; }
+  
+  .code-table { font-size: 0.85rem; }
+  .code-table th { padding: 8px 4px; font-size: 0.9rem; }
+  .code-table td { padding: 6px 4px; }
+}
+
+/* ============ Print ============ */
+@media print {
+  .navbar, .hero-buttons, .simulator, .footer { display: none; }
+  body { background: white; }
+  .section { page-break-inside: avoid; }
+}

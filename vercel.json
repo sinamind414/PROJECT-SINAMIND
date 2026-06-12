@@ -4,36 +4,7 @@
 
 
 
-  "routes": [
-    {
-      "src": "/",
-      "dest": "/index.html"
-    },
-    {
-      "src": "/app.js",
-      "dest": "/app.js"
-    },
-    {
-      "src": "/translations.js",
-      "dest": "/translations.js"
-    },
-    {
-      "src": "/main.css",
-      "dest": "/main.css"
-    },
-    {
-      "src": "/KHAWARIZMI.png",
-      "dest": "/KHAWARIZMI.png"
-    },
-    {
-      "src": "/(.*)\\.json",
-      "dest": "/$1.json"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
-    }
-  ],
+
 
   "headers": [
 

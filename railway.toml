@@ -1,9 +1,10 @@
 [build]
-builder = "nixpacks"
+builder = "dockerfile"
 
 [deploy]
-startCommand = "python main.py"
+startCommand = "python run_migrations.py && python scripts/precompute_embeddings.py && python main.py"
 healthcheckPath = "/health"
-healthcheckTimeout = 30
+healthcheckTimeout = 300
+healthcheckGracePeriod = 180
 restartPolicyType = "on_failure"
 restartPolicyMaxRetries = 3

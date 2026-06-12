@@ -1,0 +1,301 @@
+/* ============================================
+   UNIT PAGE - Page d'une Unité Spécifique
+   ============================================ */
+
+/* Breadcrumb */
+.breadcrumb {
+  background: var(--bg-cream);
+  padding: 14px 20px;
+  margin-top: 70px;
+  border-bottom: 1px solid rgba(201, 169, 97, 0.15);
+}
+
+.breadcrumb-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  flex-wrap: wrap;
+}
+
+.breadcrumb-item {
+  color: var(--text-medium);
+  text-decoration: none;
+  transition: var(--transition);
+}
+
+.breadcrumb-item:hover { color: var(--gold-dark); }
+
+.breadcrumb-separator { color: var(--text-light); }
+
+.breadcrumb-current {
+  color: var(--gold-dark);
+  font-weight: 700;
+}
+
+/* Unit Hero */
+.unit-hero {
+  padding: 50px 20px;
+  background: linear-gradient(135deg, var(--bg-cream), white);
+  position: relative;
+  overflow: hidden;
+}
+
+.unit-hero::before {
+  content: '';
+  position: absolute;
+  top: 0; right: 0;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, var(--gold-soft) 0%, transparent 70%);
+  opacity: 0.5;
+}
+
+.unit-hero-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.unit-domain-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 16px;
+  border-radius: 20px;
+  color: white;
+  font-weight: 700;
+  font-size: 0.85rem;
+  margin-bottom: 16px;
+}
+
+.unit-hero-title {
+  font-family: var(--font-calligraphy);
+  font-size: clamp(1.8rem, 4vw, 2.5rem);
+  color: var(--text-dark);
+  margin-bottom: 8px;
+}
+
+.unit-hero-title-fr {
+  font-size: 1.1rem;
+  color: var(--text-medium);
+  font-style: italic;
+  margin-bottom: 20px;
+}
+
+.unit-quick-stats {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.unit-quick-stat {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: white;
+  padding: 10px 18px;
+  border-radius: 30px;
+  box-shadow: var(--shadow-sm);
+  font-size: 0.9rem;
+  color: var(--text-dark);
+  font-weight: 600;
+}
+
+.unit-quick-stat .stat-icon {
+  font-size: 1.2rem;
+}
+
+/* Chapters Grid */
+.chapters-section {
+  padding: 60px 20px;
+  background: white;
+}
+
+.chapters-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.chapters-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+  margin-top: 30px;
+}
+
+.chapter-card {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid rgba(201, 169, 97, 0.15);
+  cursor: pointer;
+  transition: var(--transition);
+  position: relative;
+  overflow: hidden;
+}
+
+.chapter-card::before {
+  content: '';
+  position: absolute;
+  top: 0; right: 0;
+  width: 60px;
+  height: 60px;
+  background: var(--gold-soft);
+  border-radius: 0 0 0 60px;
+  opacity: 0.5;
+  transition: var(--transition);
+}
+
+.chapter-card:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--gold-primary);
+}
+
+.chapter-card:hover::before {
+  width: 100%;
+  height: 100%;
+  border-radius: 0;
+  opacity: 0.15;
+}
+
+.chapter-number-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: var(--gold-primary);
+  color: white;
+  border-radius: 12px;
+  font-family: var(--font-calligraphy);
+  font-weight: 800;
+  font-size: 1.1rem;
+  margin-bottom: 14px;
+  position: relative;
+  z-index: 1;
+}
+
+.chapter-card-title {
+  font-family: var(--font-calligraphy);
+  font-size: 1.1rem;
+  color: var(--text-dark);
+  margin-bottom: 6px;
+  font-weight: 700;
+  position: relative;
+  z-index: 1;
+}
+
+.chapter-card-title-fr {
+  font-size: 0.85rem;
+  color: var(--text-medium);
+  font-style: italic;
+  margin-bottom: 16px;
+  position: relative;
+  z-index: 1;
+}
+
+.chapter-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 14px;
+  border-top: 1px solid rgba(201, 169, 97, 0.15);
+  position: relative;
+  z-index: 1;
+}
+
+.chapter-page-info {
+  font-size: 0.8rem;
+  color: var(--text-light);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.chapter-action {
+  color: var(--gold-dark);
+  font-weight: 700;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: var(--transition);
+}
+
+.chapter-card:hover .chapter-action {
+  gap: 8px;
+}
+
+/* Navigation Between Units */
+.unit-navigation {
+  background: var(--bg-cream);
+  padding: 40px 20px;
+  border-top: 1px solid rgba(201, 169, 97, 0.15);
+}
+
+.unit-nav-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.unit-nav-link {
+  background: white;
+  padding: 20px 24px;
+  border-radius: 16px;
+  text-decoration: none;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  transition: var(--transition);
+  border: 1px solid rgba(201, 169, 97, 0.15);
+}
+
+.unit-nav-link:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--gold-primary);
+}
+
+.unit-nav-link.next {
+  flex-direction: row-reverse;
+  text-align: left;
+}
+
+.unit-nav-arrow {
+  font-size: 2rem;
+  color: var(--gold-dark);
+  flex-shrink: 0;
+}
+
+.unit-nav-info { flex: 1; }
+
+.unit-nav-label {
+  font-size: 0.75rem;
+  color: var(--text-light);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 4px;
+}
+
+.unit-nav-title {
+  font-weight: 700;
+  color: var(--text-dark);
+  font-size: 0.95rem;
+}
+
+@media (max-width: 768px) {
+  .breadcrumb { font-size: 0.75rem; }
+  .unit-hero { padding: 30px 16px; }
+  .chapters-section { padding: 40px 16px; }
+  .chapters-grid { grid-template-columns: 1fr; }
+  .unit-nav-container { grid-template-columns: 1fr; }
+}

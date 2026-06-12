@@ -1,0 +1,128 @@
+/* ============================================
+   KHAWARIZMI - RESPONSIVE MOBILE FIRST
+   ============================================ */
+
+/* Tablets & Medium Screens */
+@media (max-width: 1024px) {
+  .hero-container {
+    grid-template-columns: 1fr;
+    gap: 40px;
+    text-align: center;
+  }
+  
+  .hero-title { 
+    font-size: 3rem; 
+  }
+  
+  .hero-stats { 
+    justify-content: center; 
+  }
+  
+  .hero-features-quick { 
+    justify-content: center; 
+  }
+  
+  .hero-cta { 
+    justify-content: center; 
+  }
+  
+  .about-grid { 
+    grid-template-columns: 1fr; 
+    gap: 40px; 
+  }
+  
+  .footer-grid { 
+    grid-template-columns: 1fr 1fr; 
+    gap: 40px; 
+  }
+  
+  /* Mobile navbar toggle */
+  .nav-menu { 
+    display: none; 
+    flex-direction: column;
+    position: absolute;
+    top: 100%; left: 0; right: 0;
+    background: white;
+    padding: 24px;
+    gap: 16px;
+    border-bottom: 1px solid rgba(201, 169, 97, 0.15);
+    box-shadow: var(--shadow-md);
+    text-align: center;
+  }
+  
+  .nav-menu.active {
+    display: flex;
+  }
+  
+  .nav-menu a::after {
+    display: none;
+  }
+  
+  .menu-toggle { 
+    display: block; 
+  }
+  
+  .nav-actions {
+    gap: 8px;
+  }
+}
+
+/* Mobile Devices */
+@media (max-width: 768px) {
+  .hero-premium {
+    padding-top: 100px;
+    padding-bottom: 40px;
+  }
+  
+  .hero-title {
+    font-size: 2.4rem;
+  }
+  
+  .hero-subtitle {
+    font-size: 1.05rem;
+  }
+  
+  .hero-logo {
+    max-width: 260px;
+  }
+  
+  .logo-glow {
+    width: 320px;
+    height: 320px;
+  }
+  
+  .nav-actions .btn-signup {
+    display: none; /* Hide button on very small screens to prevent layout break */
+  }
+  
+  .features-grid-premium {
+    grid-template-columns: 1fr;
+  }
+  
+  .pricing-grid {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+  
+  .pricing-card.featured {
+    transform: none !important;
+  }
+  
+  .pricing-card.featured:hover {
+    transform: translateY(-8px) !important;
+  }
+  
+  .section-header-premium h2 {
+    font-size: 2.2rem;
+  }
+  
+  .footer-grid {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+  
+  .footer-bottom {
+    flex-direction: column;
+    text-align: center;
+  }
+}

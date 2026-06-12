@@ -10,10 +10,7 @@ tenacity
 numpy
 scikit-learn
 onnxruntime
-optimum[onnxruntime]
-transformers
-torch
-sentence-transformers
+tokenizers
 fsrs
 python-jose[cryptography]
 passlib[bcrypt]

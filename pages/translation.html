@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>عملية الترجمة | علوم وحياة BAC</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&family=Cairo:wght@600;800&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/sections.css">
+  <link rel="stylesheet" href="../css/responsive.css">
+  <link rel="stylesheet" href="../css/dark-mode.css">
+  <link rel="stylesheet" href="../css/quiz.css">
+  <link rel="stylesheet" href="../css/video.css">
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="logo" style="display: flex; align-items: center; gap: 10px;">
+    <img src="../KHAWARIZMI.png" alt="Logo" style="height: 35px; width: auto;">
+    <span style="font-family: var(--font-display); font-weight: 800; color: var(--gold-dark);">Khawarizmi IA</span>
+  </div>
+  <ul class="nav-links">
+    <li><a href="../index.html">🏠 الرئيسية</a></li>
+    <li><a href="transcription.html">✍️ الاستنساخ</a></li>
+    <li><a href="code.html">🔤 الشفرة</a></li>
+    <li><a href="translation.html" class="active">🔄 الترجمة</a></li>
+    <li><a href="fate.html">🎯 المصير</a></li>
+    <li><a href="dashboard.html">📊 لوحتي</a></li>
+  </ul>
+</nav>
+
+<section class="section alt" style="padding-top:120px;" id="translation">
+  <div class="section-container">
+    
+    <div class="section-header fade-in">
+      <div class="icon-box">🔄</div>
+      <div>
+        <h2>عملية الترجمة</h2>
+        <span>Translation — بناء البروتين في الريبوزومات</span>
+      </div>
+    </div>
+    
+    <!-- Concept -->
+    <div class="concept-grid">
+      <div class="concept-box fade-in">
+        <h3>💡 المفهوم العام</h3>
+        <p class="concept-text">الترجمة هي تحويل المعلومة المحمولة على <strong>ARNm</strong> إلى <strong>سلسلة ببتيدية</strong> (بروتين)، وتتم في <strong>الهيولى</strong> على مستوى <strong>الريبوزومات</strong>.</p>
+      </div>
+      <div class="concept-box fade-in">
+        <h3>🔬 المتطلبات</h3>
+        <ul>
+          <li>ARNm (الرسالة المشفرة)</li>
+          <li>الريبوزومات (مقر بناء السلسلة)</li>
+          <li>ARNt (الناقل ومطابق الرامزات)</li>
+          <li>الأحماض الأمينية الحرة</li>
+          <li>إنزيمات نوعية لتنشيط الأحماض + طاقة (ATP / GTP)</li>
+        </ul>
+      </div>
+    </div>
+    
+    <!-- Structure of Ribosome -->
+    <div class="animation-box fade-in">
+      <h3>⚙️ بنية الريبوزوم</h3>
+      <div class="big-icon">⚛️</div>
+      <p>الريبوزوم يتكون من <strong>وحدتين تحت ريبوزوميتين</strong> (صغيرة وكبيرة)، ويحتوي على موقعين أساسيين للـ ARNt:</p>
+      <div class="ribosome-sites">
+        <div class="site-card site-p">
+          <div class="site-letter">P</div>
+          <div>موقع الببتيد (Peptidyl)</div>
+          <p>يحمل السلسلة الببتيدية النامية</p>
+        </div>
+        <div class="site-card site-a">
+          <div class="site-letter">A</div>
+          <div>موقع الحمض (Aminoacyl)</div>
+          <p>يستقبل الـ ARNt الحامل للحمض الأميني الجديد</p>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Stages -->
+    <h3 class="stages-title fade-in">📊 مراحل الترجمة</h3>
+    <div class="stages-timeline">
+      <div class="stage-card fade-in">
+        <div class="stage-number">1</div>
+        <h4>الانطلاق</h4>
+        <p>تشكُّل <strong>معقد الانطلاق</strong>: ارتباط الوحدة الصغيرة بـ ARNm عند رامزة <strong>AUG</strong> وارتباط ARNt الأول الحامل للميثيونين بالموقع P.</p>
+      </div>
+      <div class="stage-card fade-in">
+        <div class="stage-number">2</div>
+        <h4>الاستطالة</h4>
+        <p>تشكُّل <strong>الروابط الببتيدية</strong> بين الأحماض المتتالية وانزلاق الريبوزوم بمقدار رامزة تلو الرامزة.</p>
+      </div>
+      <div class="stage-card fade-in">
+        <div class="stage-number">3</div>
+        <h4>النهاية</h4>
+        <p>وصول الريبوزوم لـ <strong>رامزة توقف</strong> (UAA, UAG, UGA) فينفصل البروتين وتتفكك عناصر المعقد.</p>
+      </div>
+    </div>
+    
+    <!-- Interactive Simulator -->
+    <div class="simulator fade-in">
+      <h3>🎮 محاكي الترجمة التفاعلي</h3>
+      <p class="instructions">أدخل تتابع ARNm (يجب أن يبدأ بـ AUG) وشاهد البروتين يتكون!</p>
+      
+      <div class="sim-input">
+        <input type="text" id="mrnaInput" placeholder="مثال: AUGGCUUACAAGUAA" value="AUGGCUUACAAGUAA">
+        <button onclick="translateMRNA()">▶️ ابدأ الترجمة</button>
+      </div>
+      
+      <div class="ribosome-visual">
+        <div class="ribosome" style="font-size: 3rem; margin-bottom: 15px;">⚛️</div>
+        <div class="mrna-strand" id="mrnaDisplay" style="font-family: monospace; font-size: 1.1rem; margin-bottom: 20px; color: var(--blue-deep);">ARNm: في انتظار الإدخال...</div>
+        <div class="protein-output" id="proteinOutput" style="min-height: 80px; padding: 15px; border: 2px dashed var(--blue-soft); border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; background: rgba(255,255,255,0.05);">
+          <div class="placeholder" style="color:#999;">البروتين سيظهر هنا 👇</div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Videos -->
+    <div class="video-section fade-in">
+      <h3>🎥 فيديوهات تعليمية</h3>
+      <div id="videos-translation"></div>
+    </div>
+    
+    <!-- Did You Know -->
+    <div class="did-you-know fade-in">
+      <div class="bulb">💡</div>
+      <div>
+        <h4>هل تعلم؟ — Polysome</h4>
+        <p>عدة ريبوزومات يمكنها قراءة نفس جزيئة <strong>ARNm</strong> في نفس الوقت، مكوّنةً <strong>متعدد الريبوزوم (Polysome)</strong>، مما يسمح بإنتاج كميات هائلة من نفس البروتين بسرعة فائقة!</p>
+      </div>
+    </div>
+    
+    <!-- BAC -->
+    <div class="bac-box fade-in">
+      <h3>🎯 ما يطلبه منهاج BAC</h3>
+      <ul>
+        <li>تفسير وثيقة المجهر الإلكتروني للـ Polysome وحساب اتجاه الترجمة</li>
+        <li>تحديد دور كل من ARNt و ARNm والريبوزومات في الترجمة</li>
+        <li>شرح آلية تنشيط الأحماض الأمينية ومعادلتها</li>
+        <li>رسم تخطيطي تفصيلي يوضح مراحل الترجمة بدقة</li>
+      </ul>
+    </div>
+    
+    <!-- Quiz -->
+    <div class="quiz-section fade-in">
+      <div class="quiz-header">
+        <h3>🧪 اختبر معلوماتك</h3>
+        <p>4 أسئلة حول عملية الترجمة</p>
+      </div>
+      <div id="quiz-translation">
+        <div style="text-align:center;padding:30px;">
+          <button class="btn btn-primary" onclick="startQuiz('translation')">🚀 ابدأ الاختبار</button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Actions -->
+    <div style="text-align:center;margin:40px 0;display:flex;gap:15px;justify-content:center;flex-wrap:wrap;">
+      <button class="btn btn-secondary" onclick="generatePDF('translation')">📄 تحميل الملخص PDF</button>
+      <a href="fate.html" class="btn btn-primary">القسم التالي: المصير ←</a>
+    </div>
+    
+  </div>
+</section>
+
+<button class="theme-switcher" onclick="toggleTheme()" title="تبديل الوضع">🌙</button>
+
+<script src="../js/storage.js"></script>
+<script src="../js/data.js"></script>
+<script src="../js/theme-switcher.js"></script>
+<script src="../js/translation-sim.js"></script>
+<script src="../js/quiz.js"></script>
+<script src="../js/videos.js"></script>
+<script src="../js/pdf-export.js"></script>
+<script src="../js/main.js"></script>
+
+<script>
+  // Mark section as visited
+  Storage.markSectionVisited('translation');
+  
+  // Load videos
+  document.addEventListener('DOMContentLoaded', () => {
+    renderVideos('translation');
+  });
+</script>
+
+</body>
+</html>

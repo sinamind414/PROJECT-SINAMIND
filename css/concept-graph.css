@@ -1,0 +1,288 @@
+/* ============================================
+   CONCEPT GRAPH - Knowledge Mind Map
+   ============================================ */
+
+.graph-section {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  border-radius: 24px;
+  padding: 40px;
+  margin: 50px 0;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+
+.graph-section::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-image: 
+    radial-gradient(circle at 20% 30%, rgba(201, 169, 97, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 70%, rgba(167, 139, 250, 0.1) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.graph-header {
+  text-align: center;
+  margin-bottom: 30px;
+  position: relative;
+  z-index: 1;
+}
+
+.graph-title {
+  font-family: var(--font-calligraphy);
+  font-size: 2.2rem;
+  color: var(--gold-primary);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.graph-subtitle {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 1rem;
+}
+
+/* Graph Container */
+.graph-container {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 20px;
+  padding: 20px;
+  position: relative;
+  height: 600px;
+  overflow: hidden;
+  border: 1px solid rgba(201, 169, 97, 0.2);
+}
+
+.graph-canvas {
+  width: 100%;
+  height: 100%;
+  cursor: grab;
+}
+
+.graph-canvas:active { cursor: grabbing; }
+
+/* Controls */
+.graph-controls {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 10;
+}
+
+.graph-control-btn {
+  width: 44px;
+  height: 44px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(201, 169, 97, 0.3);
+  color: white;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 1.1rem;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.graph-control-btn:hover {
+  background: rgba(201, 169, 97, 0.3);
+  border-color: var(--gold-primary);
+  transform: scale(1.1);
+}
+
+/* Legend */
+.graph-legend {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(201, 169, 97, 0.3);
+  padding: 16px;
+  border-radius: 12px;
+  z-index: 10;
+  max-width: 200px;
+}
+
+.legend-title {
+  font-size: 0.85rem;
+  color: var(--gold-primary);
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.legend-item-graph {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8rem;
+  margin-bottom: 6px;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.legend-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* Info Panel */
+.graph-info-panel {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(15px);
+  border: 1px solid rgba(201, 169, 97, 0.4);
+  padding: 20px;
+  border-radius: 16px;
+  z-index: 10;
+  max-width: 300px;
+  color: white;
+  display: none;
+  animation: slideInLeft 0.4s ease;
+}
+
+.graph-info-panel.active { display: block; }
+
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.info-panel-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: white;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+}
+
+.info-panel-close:hover {
+  background: rgba(229, 76, 76, 0.4);
+  transform: rotate(90deg);
+}
+
+.info-panel-tag {
+  display: inline-block;
+  background: var(--gold-primary);
+  color: var(--bg-dark);
+  padding: 3px 10px;
+  border-radius: 10px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.info-panel-title {
+  font-family: var(--font-calligraphy);
+  font-size: 1.4rem;
+  color: var(--gold-primary);
+  margin-bottom: 10px;
+  padding-right: 30px;
+}
+
+.info-panel-desc {
+  font-size: 0.9rem;
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.85);
+  margin-bottom: 14px;
+}
+
+.info-panel-links {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.6);
+  border-top: 1px solid rgba(201, 169, 97, 0.2);
+  padding-top: 10px;
+}
+
+.info-panel-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.info-action-btn {
+  flex: 1;
+  padding: 8px 12px;
+  background: var(--gold-primary);
+  color: var(--bg-dark);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: var(--font-ar);
+  font-weight: 700;
+  font-size: 0.8rem;
+  transition: var(--transition);
+}
+
+.info-action-btn:hover {
+  background: var(--gold-light);
+  transform: translateY(-2px);
+}
+
+.info-action-btn.secondary {
+  background: transparent;
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Search Bar */
+.graph-search {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  width: 90%;
+  max-width: 350px;
+}
+
+.graph-search input {
+  width: 100%;
+  padding: 12px 20px;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(201, 169, 97, 0.3);
+  border-radius: 50px;
+  color: white;
+  font-family: var(--font-ar);
+  font-size: 0.9rem;
+  outline: none;
+  transition: var(--transition);
+}
+
+.graph-search input::placeholder { color: rgba(255, 255, 255, 0.5); }
+
+.graph-search input:focus {
+  border-color: var(--gold-primary);
+  background: rgba(0, 0, 0, 0.7);
+  box-shadow: 0 0 20px rgba(201, 169, 97, 0.3);
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .graph-section { padding: 20px 12px; }
+  .graph-container { height: 450px; }
+  .graph-info-panel { max-width: calc(100% - 80px); }
+  .graph-legend { display: none; }
+}

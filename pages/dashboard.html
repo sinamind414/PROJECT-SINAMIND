@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>لوحة التحكم | علوم وحياة BAC</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&family=Cairo:wght@600;800&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/dark-mode.css">
+  <link rel="stylesheet" href="../css/dashboard.css">
+  <link rel="stylesheet" href="../css/responsive.css">
+  <link rel="stylesheet" href="../css/chatbot.css">
+  <link rel="stylesheet" href="../css/fsrs.css">
+  <link rel="stylesheet" href="../css/concept-graph.css">
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="logo" style="display: flex; align-items: center; gap: 10px;">
+    <img src="../KHAWARIZMI.png" alt="Logo" style="height: 35px; width: auto;">
+    <span style="font-family: var(--font-display); font-weight: 800; color: var(--gold-dark);">Khawarizmi IA</span>
+  </div>
+  <ul class="nav-links">
+    <li><a href="../index.html">🏠 الرئيسية</a></li>
+    <li><a href="transcription.html">✍️ الاستنساخ</a></li>
+    <li><a href="code.html">🔤 الشفرة</a></li>
+    <li><a href="translation.html">🔄 الترجمة</a></li>
+    <li><a href="fate.html">🎯 المصير</a></li>
+    <li><a href="dashboard.html" class="active">📊 لوحتي</a></li>
+  </ul>
+</nav>
+
+<div class="dashboard">
+  <div class="dashboard-container">
+    
+    <!-- Welcome Header -->
+    <div class="welcome-header">
+      <div class="welcome-avatar">🎓</div>
+      <div class="welcome-text">
+        <h1>مرحباً، <span id="welcomeName">طالب</span>! 👋</h1>
+        <p id="joinDate">عضو منذ اليوم</p>
+      </div>
+      <div class="welcome-actions">
+        <button class="edit-name-btn" onclick="editName()">✏️ تعديل الاسم</button>
+      </div>
+    </div>
+    
+    <!-- Dashboard Tabs -->
+    <div class="dashboard-tabs">
+      <button class="tab-btn active" data-tab="progress" onclick="switchTab('progress')">📊 تقدّمي</button>
+      <button class="tab-btn" data-tab="fsrs" onclick="switchTab('fsrs')">📅 المراجعة الذكية (FSRS)</button>
+      <button class="tab-btn" data-tab="graph" onclick="switchTab('graph')">🕸️ خريطة المفاهيم</button>
+    </div>
+
+    <!-- Tab 1: Progress -->
+    <div id="tabProgress" class="tab-content-panel active">
+      <!-- Stats -->
+      <div class="stats-row">
+        <div class="stat-box">
+          <div class="stat-icon">📚</div>
+          <div class="stat-value" id="statSections">0/4</div>
+          <div class="stat-label">أقسام مزارة</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-icon">🧪</div>
+          <div class="stat-value" id="statQuizzes">0/4</div>
+          <div class="stat-label">اختبارات مكتملة</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-icon">⭐</div>
+          <div class="stat-value" id="statAvg">0%</div>
+          <div class="stat-label">المعدل العام</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-icon">🔄</div>
+          <div class="stat-value" id="statAttempts">0</div>
+          <div class="stat-label">المحاولات</div>
+        </div>
+      </div>
+      
+      <!-- Progress Ring -->
+      <div class="progress-card">
+        <h2>📈 تقدمك العام</h2>
+        <div class="progress-ring">
+          <svg viewBox="0 0 200 200">
+            <defs>
+              <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#2C5F8D"/>
+                <stop offset="100%" stop-color="#7FBFA8"/>
+              </linearGradient>
+            </defs>
+            <circle class="progress-ring-bg" cx="100" cy="100" r="85"/>
+            <circle class="progress-ring-fill" id="progressRingFill" cx="100" cy="100" r="85"/>
+          </svg>
+          <div class="progress-percent" id="progressPercent">0%</div>
+        </div>
+        
+        <h3 style="margin-top:30px;color:var(--blue-deep);font-family:var(--font-display);">📊 تفاصيل الأقسام</h3>
+        <div class="sections-progress" id="sectionsProgress"></div>
+      </div>
+      
+      <!-- Achievements -->
+      <div class="achievements">
+        <h2>🏆 الإنجازات والشارات</h2>
+        <div class="badges-grid" id="badgesGrid"></div>
+      </div>
+      
+      <!-- Actions -->
+      <div class="dashboard-actions">
+        <button class="action-btn action-btn-pdf" onclick="exportDashboardPDF()">📄 تحميل التقرير PDF</button>
+        <button class="action-btn action-btn-primary" onclick="window.location.href='../index.html'">📚 متابعة الدراسة</button>
+        <button class="action-btn action-btn-danger" onclick="resetProgress()">🗑️ إعادة تعيين</button>
+      </div>
+    </div>
+
+    <!-- Tab 2: FSRS -->
+    <div id="tabFsrs" class="tab-content-panel">
+      <div id="fsrsContainer"></div>
+    </div>
+
+    <!-- Tab 3: Concept Graph -->
+    <div id="tabGraph" class="tab-content-panel">
+      <div id="conceptGraphContainer"></div>
+    </div>
+    
+  </div>
+</div>
+
+<button class="theme-switcher" onclick="toggleTheme()" title="تبديل الوضع">🌙</button>
+
+<script src="../js/storage.js"></script>
+<script src="../js/theme-switcher.js"></script>
+<script src="../js/gemini-api.js"></script>
+<script src="../js/chatbot.js"></script>
+<script src="../js/fsrs-system.js"></script>
+<script src="../js/concept-graph.js"></script>
+<script src="../js/dashboard.js"></script>
+<script src="../js/pdf-export.js"></script>
+
+</body>
+</html>

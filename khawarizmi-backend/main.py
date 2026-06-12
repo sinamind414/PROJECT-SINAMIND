@@ -7,11 +7,18 @@ Lancement :
     uvicorn main:app --reload --port 8000
 """
 
+import os
+# Configurer le multi-threading d'OpenMP pour éviter les verrous sur Docker/Railway
+os.environ["OMP_NUM_THREADS"] = "1"
+os.environ["MKL_NUM_THREADS"] = "1"
+os.environ["OPENBLAS_NUM_THREADS"] = "1"
+os.environ["VECLIB_MAXIMUM_THREADS"] = "1"
+os.environ["NUMEXPR_NUM_THREADS"] = "1"
+
 # ═══════════════════════════════════════════════════════════════
 # IMPORTS
 # ═══════════════════════════════════════════════════════════════
 
-import os
 import json
 import logging
 import hashlib
@@ -215,21 +222,98 @@ async def lifespan(app: FastAPI):
 
         # ── Auto-migration : exécute migrations/*.sql ──
         try:
+            def clean_sql_comments(sql_content):
+                cleaned_chars = []
+                in_line_comment = False
+                in_block_comment = False
+                i = 0
+                n = len(sql_content)
+                while i < n:
+                    char = sql_content[i]
+                    if in_line_comment:
+                        if char == '\n':
+                            in_line_comment = False
+                            cleaned_chars.append(char)
+                    elif in_block_comment:
+                        if char == '*' and i + 1 < n and sql_content[i+1] == '/':
+                            in_block_comment = False
+                            i += 1
+                    else:
+                        if char == '-' and i + 1 < n and sql_content[i+1] == '-':
+                            in_line_comment = True
+                            i += 1
+                        elif char == '/' and i + 1 < n and sql_content[i+1] == '*':
+                            in_block_comment = True
+                            i += 1
+                        else:
+                            cleaned_chars.append(char)
+                    i += 1
+                return ''.join(cleaned_chars)
+
+            def split_sql_statements(sql_content):
+                sql_content = clean_sql_comments(sql_content)
+                statements = []
+                current_stmt = []
+                in_dollar_block = False
+                in_single_quote = False
+                i = 0
+                n = len(sql_content)
+                while i < n:
+                    char = sql_content[i]
+                    if char == '$' and i + 1 < n and sql_content[i+1] == '$':
+                        in_dollar_block = not in_dollar_block
+                        current_stmt.append('$$')
+                        i += 2
+                        continue
+                    if char == "'" and not in_dollar_block:
+                        in_single_quote = not in_single_quote
+                    if char == ';' and not in_dollar_block and not in_single_quote:
+                        statements.append(''.join(current_stmt).strip())
+                        current_stmt = []
+                    else:
+                        current_stmt.append(char)
+                    i += 1
+                if current_stmt:
+                    remainder = ''.join(current_stmt).strip()
+                    if remainder:
+                        statements.append(remainder)
+                cleaned = []
+                for s in statements:
+                    lines = []
+                    for line in s.split('\n'):
+                        line_stripped = line.strip()
+                        if line_stripped:
+                            lines.append(line)
+                    cleaned_stmt = '\n'.join(lines).strip()
+                    if cleaned_stmt:
+                        upper_stmt = cleaned_stmt.upper().replace(';', '').strip()
+                        if upper_stmt in ("BEGIN", "COMMIT", "ROLLBACK", "BEGIN TRANSACTION", "COMMIT TRANSACTION"):
+                            continue
+                        cleaned.append(cleaned_stmt)
+                return cleaned
+
             migrations_dir = Path(__file__).parent / "migrations"
             if migrations_dir.exists():
                 sql_files = sorted(migrations_dir.glob("*.sql"))
-                async with state.db_engine.begin() as conn:
+                async with state.db_engine.connect() as conn:
+                    # S'assurer de créer l'extension vector
+                    try:
+                        async with conn.begin():
+                            await conn.execute(text("CREATE EXTENSION IF NOT EXISTS vector;"))
+                    except Exception as e:
+                        logger.warning(f"Vector extension create warning: {e}")
+                        
                     for sql_file in sql_files:
                         sql_content = sql_file.read_text(encoding="utf-8")
-                        # Split par ; pour exécuter chaque statement
-                        statements = [
-                            s.strip() for s in sql_content.split(";")
-                            if s.strip() and not s.strip().startswith("--")
-                        ]
+                        statements = split_sql_statements(sql_content)
                         for stmt in statements:
                             try:
-                                await conn.execute(text(stmt))
+                                async with conn.begin():
+                                    await conn.execute(text(stmt))
                             except Exception as e:
+                                err_str = str(e).lower()
+                                if "already exists" in err_str or "duplicate column" in err_str:
+                                    continue
                                 logger.warning(
                                     f"Migration {sql_file.name} stmt skipped: {e}"
                                 )

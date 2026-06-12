@@ -1,0 +1,33 @@
+# Ignore directories we don't need on Vercel
+khawarizmi-backend/
+khawarizmi-frontend/
+khawarizmi-app/
+node_modules/
+.next/
+.expo/
+
+# Ignore pipeline & documentation assets
+DOCUMENTATION TECHNIQUES IMPORTANTES/
+DOCUMENY NOUVEAU SITE KHAWARIZMI IA/
+LIVRES SCOLAIRES/
+images_extraites/
+output_pipeline/
+processed_pdf/
+temp_intro/
+temp_toc/
+import_pdf/
+archive/
+scratch/
+__pycache__/
+
+# Ignore backend databases and python scripts
+*.py
+*.pyc
+*.json
+*.bak
+*.backup_*
+*.txt
+.env
+
+# Keep only the essential web assets:
+# index.html, css/, js/, pages/, assets/, app.js, translations.js, khawarizmi-session.js, session.css, main.css, KHAWARIZMI.png, vercel.json

@@ -1,0 +1,29 @@
+# Exclude Python virtual environment and caches
+khawarizmi-backend/env/
+khawarizmi-backend/.pytest_cache/
+khawarizmi-backend/__pycache__/
+__pycache__/
+.pytest_cache/
+
+# Exclude Git folders
+.git/
+.gitignore
+
+# Exclude Frontend folders
+khawarizmi-frontend/
+khawarizmi-app/
+node_modules/
+**/node_modules/
+
+# Exclude large documentations, images and backups
+DOCUMENTATION TECHNIQUES IMPORTANTES/
+LIVRES SCOLAIRES/
+PLAYBOOK KHAWARIZMI*
+images_extraites/
+import_pdf/
+processed_pdf/
+output_pipeline/
+*.json.backup*
+*.bak
+*.png
+.gemini/

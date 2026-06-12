@@ -1,0 +1,242 @@
+/* ============================================
+   QUIZ CSS - Interactive Quiz Styling
+   ============================================ */
+
+.quiz-section {
+  background: linear-gradient(135deg, #fff5e6, #ffe8cc);
+  border-radius: 25px;
+  padding: 40px;
+  margin: 50px 0;
+  box-shadow: var(--shadow);
+  border: 3px dashed var(--accent);
+}
+
+[data-theme="dark"] .quiz-section {
+  background: linear-gradient(135deg, #2D2418, #3D2E1F);
+}
+
+.quiz-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.quiz-header h3 {
+  font-family: var(--font-display);
+  color: var(--accent);
+  font-size: 1.8rem;
+  margin-bottom: 10px;
+}
+
+.quiz-header p {
+  color: #666;
+  font-size: 1rem;
+}
+
+[data-theme="dark"] .quiz-header p {
+  color: #B8C5D6;
+}
+
+.quiz-progress {
+  background: rgba(232, 152, 90, 0.2);
+  border-radius: 20px;
+  height: 12px;
+  margin: 20px 0;
+  overflow: hidden;
+  position: relative;
+}
+
+.quiz-progress-bar {
+  background: linear-gradient(90deg, var(--accent), var(--green-fresh));
+  height: 100%;
+  width: 0%;
+  border-radius: 20px;
+  transition: width 0.5s ease;
+}
+
+.quiz-counter {
+  text-align: center;
+  font-weight: 700;
+  color: var(--blue-deep);
+  margin-bottom: 20px;
+}
+
+[data-theme="dark"] .quiz-counter {
+  color: var(--blue-deep);
+}
+
+.quiz-question {
+  background: white;
+  border-radius: 20px;
+  padding: 30px;
+  box-shadow: var(--shadow);
+  margin-bottom: 20px;
+  animation: fadeInUp 0.5s;
+}
+
+[data-theme="dark"] .quiz-question {
+  background: #1C2330;
+}
+
+.quiz-question h4 {
+  font-family: var(--font-display);
+  color: var(--blue-deep);
+  font-size: 1.3rem;
+  margin-bottom: 20px;
+  line-height: 1.6;
+}
+
+.quiz-options {
+  display: grid;
+  gap: 12px;
+}
+
+.quiz-option {
+  background: var(--blue-soft);
+  border: 2px solid transparent;
+  border-radius: 12px;
+  padding: 15px 20px;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-family: var(--font-main);
+  font-size: 1rem;
+  font-weight: 500;
+  text-align: right;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--dark);
+}
+
+[data-theme="dark"] .quiz-option {
+  background: #243044;
+}
+
+.quiz-option:hover {
+  background: var(--blue-light);
+  transform: translateX(-5px);
+}
+
+.quiz-option .option-letter {
+  width: 35px;
+  height: 35px;
+  background: var(--blue-deep);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.quiz-option.correct {
+  background: var(--green-soft);
+  border-color: var(--green-fresh);
+}
+
+.quiz-option.correct .option-letter {
+  background: var(--green-fresh);
+}
+
+.quiz-option.wrong {
+  background: rgba(229, 115, 115, 0.2);
+  border-color: var(--red-stop);
+}
+
+.quiz-option.wrong .option-letter {
+  background: var(--red-stop);
+}
+
+.quiz-option:disabled {
+  cursor: not-allowed;
+}
+
+.quiz-explanation {
+  background: var(--blue-soft);
+  border-right: 5px solid var(--blue-deep);
+  border-radius: 12px;
+  padding: 20px;
+  margin-top: 20px;
+  animation: fadeInUp 0.4s;
+}
+
+[data-theme="dark"] .quiz-explanation {
+  background: #1E2A3D;
+}
+
+.quiz-explanation strong {
+  color: var(--blue-deep);
+  font-family: var(--font-display);
+  display: block;
+  margin-bottom: 8px;
+}
+
+.quiz-controls {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 25px;
+  flex-wrap: wrap;
+}
+
+.quiz-btn {
+  padding: 12px 30px;
+  border-radius: 50px;
+  border: none;
+  font-family: var(--font-main);
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.quiz-btn-next {
+  background: var(--blue-deep);
+  color: white;
+}
+
+.quiz-btn-next:hover {
+  background: var(--green-fresh);
+  transform: translateY(-2px);
+}
+
+.quiz-btn-restart {
+  background: var(--accent);
+  color: white;
+}
+
+.quiz-btn-restart:hover {
+  background: #d17840;
+  transform: translateY(-2px);
+}
+
+.quiz-results {
+  text-align: center;
+  padding: 40px 20px;
+  animation: fadeInUp 0.6s;
+}
+
+.quiz-score {
+  font-family: var(--font-display);
+  font-size: 4rem;
+  font-weight: 800;
+  background: linear-gradient(120deg, var(--green-fresh), var(--blue-deep));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin: 20px 0;
+}
+
+.quiz-score-text {
+  font-size: 1.3rem;
+  color: var(--blue-deep);
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+[data-theme="dark"] .quiz-score-text { color: var(--dark); }
+
+.quiz-emoji {
+  font-size: 5rem;
+  margin: 20px 0;
+  animation: pulse 1.5s infinite;
+}

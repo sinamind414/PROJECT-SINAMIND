@@ -12,7 +12,7 @@ from services.questions import questions_db
 
 client = TestClient(app)
 
-from main import get_current_user, get_db, get_scheduler, get_openai
+from deps import get_current_user, get_db, get_scheduler, get_openai
 
 def override_get_current_user():
     return {"id": 1, "email": "test@test.com", "prenom": "Amina", "plan": "pro"}

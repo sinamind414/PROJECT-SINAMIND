@@ -4,6 +4,13 @@ scripts/precompute_embeddings.py - Pré-calcule et stocke les embeddings dans Po
 """
 
 import os
+# Configurer le multi-threading d'OpenMP pour éviter les verrous sur Docker/Railway
+os.environ["OMP_NUM_THREADS"] = "1"
+os.environ["MKL_NUM_THREADS"] = "1"
+os.environ["OPENBLAS_NUM_THREADS"] = "1"
+os.environ["VECLIB_MAXIMUM_THREADS"] = "1"
+os.environ["NUMEXPR_NUM_THREADS"] = "1"
+
 import sys
 import json
 import asyncio
@@ -94,7 +101,7 @@ async def precompute_and_store():
                     text("""
                         INSERT INTO reference_embeddings 
                             (question_id, variant_index, reference_text, embedding, source)
-                        VALUES (:qid, :vidx, :text, :emb::vector, 'annales')
+                        VALUES (:qid, :vidx, :text, CAST(:emb AS vector), 'annales')
                         ON CONFLICT (question_id, variant_index) 
                         DO UPDATE SET 
                             reference_text = EXCLUDED.reference_text,
@@ -142,7 +149,7 @@ async def precompute_and_store():
                         text("""
                             INSERT INTO reference_embeddings 
                                 (question_id, variant_index, reference_text, embedding, source)
-                            VALUES (:qid, 0, :text, :emb::vector, 'exercices')
+                            VALUES (:qid, 0, :text, CAST(:emb AS vector), 'exercices')
                             ON CONFLICT (question_id, variant_index)
                             DO UPDATE SET 
                                 reference_text = EXCLUDED.reference_text,

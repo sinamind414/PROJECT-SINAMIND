@@ -1,110 +1,98 @@
 # -*- coding: utf-8 -*-
 """
-services/embedder.py - Service d'embeddings unifié (Sentence-Transformers / ONNX quantizé).
+services/embedder.py - Service d'embeddings ultra-léger (pure ONNX + Tokenizers, sans PyTorch).
 """
 
 import os
 import logging
+import zipfile
 import numpy as np
 from typing import List
+import onnxruntime as ort
+from tokenizers import Tokenizer
 
 logger = logging.getLogger("khawarizmi.embedder")
 
 class KhawarizmiEmbedder:
     """
-    Abstraction unique : même interface, deux backends selon l'environnement.
-    Sélection automatique via variable d'environnement USE_ONNX=1
+    Service d'embeddings optimisé utilisant onnxruntime et tokenizers directement,
+    sans aucune dépendance à PyTorch, Optimum ou Transformers.
+    Ultra-léger en mémoire (< 30 MB) et rapide pour le CPU de production.
     """
     
     def __init__(self):
-        self.backend = os.getenv("USE_ONNX", "0") == "1"
-        
-        if self.backend:
-            try:
-                self._init_onnx()
-            except Exception as e:
-                logger.error(f"Impossible d'initialiser ONNX, repli vers sentence-transformers: {e}")
-                self.backend = False
-                self._init_sentence_transformers()
-        else:
-            self._init_sentence_transformers()
-        
-        logger.info(f"Embedder initialisé : {'ONNX INT8' if self.backend else 'sentence-transformers'}")
-    
-    def _init_onnx(self):
-        from optimum.onnxruntime import ORTModelForFeatureExtraction
-        from transformers import AutoTokenizer
-        
-        # On résout le chemin absolu du modèle ONNX
+        # Résoudre le chemin absolu du modèle ONNX
         model_path = os.getenv("ONNX_MODEL_PATH", "models/minilm_onnx_int8")
         if not os.path.isabs(model_path):
-            # Prendre relativement à la racine du projet
             base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
             model_path = os.path.join(base_dir, model_path)
             
-        logger.info(f"Initialisation ONNX avec le modèle à : {model_path}")
+        logger.info(f"Initialisation de l'embedder ONNX à : {model_path}")
         
         # Décompresser le modèle zip s'il n'existe pas en tant qu'onnx
         onnx_file = os.path.join(model_path, "model_quantized.onnx")
         zip_file = os.path.join(model_path, "model_quantized.zip")
         if not os.path.exists(onnx_file) and os.path.exists(zip_file):
             logger.info(f"Décompression du modèle ONNX depuis {zip_file}...")
-            import zipfile
             try:
                 with zipfile.ZipFile(zip_file, 'r') as zip_ref:
                     zip_ref.extractall(model_path)
-                logger.info("Décompression du modèle ONNX terminée.")
+                logger.info("Décompression terminée.")
             except Exception as e:
-                logger.error(f"Erreur lors de la décompression du modèle ONNX: {e}")
+                logger.error(f"Erreur décompression ONNX: {e}")
                 
-        self.tokenizer = AutoTokenizer.from_pretrained(model_path)
-        self.model = ORTModelForFeatureExtraction.from_pretrained(model_path, file_name="model_quantized.onnx")
-    
-    def _init_sentence_transformers(self):
-        from sentence_transformers import SentenceTransformer
-        logger.info("Initialisation de sentence-transformers (paraphrase-multilingual-MiniLM-L12-v2)...")
-        self.model = SentenceTransformer(
-            "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
-        )
-    
+        # 1. Charger le tokenizer via Hugging Face Tokenizers (Rust/C++ bindings)
+        tokenizer_file = os.path.join(model_path, "tokenizer.json")
+        self.tokenizer = Tokenizer.from_file(tokenizer_file)
+        self.tokenizer.enable_truncation(max_length=128)
+        self.tokenizer.enable_padding(direction="right", pad_id=0, pad_type_id=0, pad_token="[PAD]")
+        
+        # 2. Lancer la session ONNX Runtime
+        # Désactiver les threads excessifs pour économiser du CPU en prod
+        sess_options = ort.SessionOptions()
+        sess_options.intra_op_num_threads = 1
+        sess_options.inter_op_num_threads = 1
+        self.session = ort.InferenceSession(onnx_file, sess_options)
+        
+        logger.info("Embedder ONNX (sans PyTorch) initialisé avec succès.")
+        
     def encode(self, texts: List[str]) -> np.ndarray:
-        """Interface identique quel que soit le backend"""
         if not texts:
             return np.empty((0, 384))
             
-        if self.backend:
-            return self._encode_onnx(texts)
-        else:
-            return self.model.encode(texts, normalize_embeddings=True)
-    
-    def _encode_onnx(self, texts: List[str]) -> np.ndarray:
-        import torch
+        # Tokenisation
+        encodings = self.tokenizer.encode_batch(texts)
         
-        inputs = self.tokenizer(
-            texts,
-            padding=True,
-            truncation=True,
-            max_length=128,  # Suffisant pour les réponses SVT courtes
-            return_tensors="pt"
-        )
+        # Préparer les inputs pour l'infrerence ONNX en int64 (numpy)
+        input_ids = np.array([e.ids for e in encodings], dtype=np.int64)
+        attention_mask = np.array([e.attention_mask for e in encodings], dtype=np.int64)
+        token_type_ids = np.array([e.type_ids for e in encodings], dtype=np.int64)
         
-        with torch.no_grad():
-            outputs = self.model(**inputs)
+        inputs = {
+            "input_ids": input_ids,
+            "attention_mask": attention_mask,
+            "token_type_ids": token_type_ids
+        }
         
-        # Mean pooling (identique à sentence-transformers)
-        attention_mask = inputs["attention_mask"]
-        token_embeddings = outputs.last_hidden_state
-        input_mask_expanded = attention_mask.unsqueeze(-1).expand(token_embeddings.size()).float()
-        embeddings = torch.sum(token_embeddings * input_mask_expanded, 1)
-        embeddings = embeddings / torch.clamp(input_mask_expanded.sum(1), min=1e-9)
+        # Executer le modèle ONNX
+        outputs = self.session.run(None, inputs)
+        last_hidden_state = outputs[0]  # Shape: (batch_size, seq_len, 384)
         
-        # Normalisation L2
-        norms = torch.norm(embeddings, dim=1, keepdim=True)
+        # Mean Pooling en NumPy
+        input_mask_expanded = np.expand_dims(attention_mask, axis=-1).astype(float)
+        sum_embeddings = np.sum(last_hidden_state * input_mask_expanded, axis=1)
+        sum_mask = np.sum(input_mask_expanded, axis=1)
+        sum_mask = np.clip(sum_mask, 1e-9, None)
+        embeddings = sum_embeddings / sum_mask
+        
+        # Normalisation L2 en NumPy
+        norms = np.linalg.norm(embeddings, axis=1, keepdims=True)
+        norms = np.clip(norms, 1e-9, None)
         embeddings = embeddings / norms
         
-        return embeddings.numpy()
+        return embeddings
 
-# Lazy singleton — chargé à la première utilisation, pas à l'import
+# Lazy singleton
 _embedder_instance = None
 
 def get_embedder() -> "KhawarizmiEmbedder":
@@ -113,9 +101,9 @@ def get_embedder() -> "KhawarizmiEmbedder":
         _embedder_instance = KhawarizmiEmbedder()
     return _embedder_instance
 
-# Compatibilité backward : embedder.encode(...) continue de fonctionner
 class _LazyEmbedder:
     def encode(self, texts):
         return get_embedder().encode(texts)
 
 embedder = _LazyEmbedder()
+

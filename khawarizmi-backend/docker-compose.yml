@@ -1,4 +1,4 @@
-version: '3.8'
+
 
 services:
 
@@ -38,16 +38,18 @@ services:
   # ═══ BACKEND FASTAPI ════════════════════════════════
   backend:
     build:
-      context: .
+      context: ..
       dockerfile: Dockerfile
     container_name: khawarizmi_backend
     env_file:
       - .env
+    environment:
+      DATA_DIR: "/app"
     ports:
       - "8000:8000"
     volumes:
       - ./services:/app/services
-      - ../LIVRES SCOLAIRES:/app/data:ro
+      - "../LIVRES SCOLAIRES:/app/data:ro"
     depends_on:
       db:
         condition: service_healthy
@@ -55,21 +57,21 @@ services:
         condition: service_healthy
     restart: unless-stopped
 
-  # ═══ WORKER CELERY (notifications FSRS) ═════════════
-  worker:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: khawarizmi_worker
-    command: celery -A app.celery worker --loglevel=info
-    env_file:
-      - .env
-    depends_on:
-      db:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-    restart: unless-stopped
+  # ═══ WORKER CELERY (désactivé — la réconciliation tourne en asyncio dans le backend)
+  # worker:
+  #   build:
+  #     context: ..
+  #     dockerfile: Dockerfile
+  #   container_name: khawarizmi_worker
+  #   command: celery -A app.celery worker --loglevel=info
+  #   env_file:
+  #     - .env
+  #   depends_on:
+  #     db:
+  #       condition: service_healthy
+  #     redis:
+  #       condition: service_healthy
+  #   restart: unless-stopped
 
 volumes:
   postgres_data:

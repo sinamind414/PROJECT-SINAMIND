@@ -8,10 +8,21 @@ import os
 import json
 import time
 import logging
+import pytest
 from pathlib import Path
 from openai import AsyncOpenAI
 from dotenv import load_dotenv
 from services.khawarizmi_engine import KhawarizmiTutor
+
+@pytest.fixture
+def tutor():
+    """Create a KhawarizmiTutor instance for tests."""
+    # Determine data directory; default matches script's default
+    data_dir = os.getenv(
+        "DATA_DIR",
+        str(Path(__file__).parent.parent / "LIVRES SCOLAIRES")
+    )
+    return KhawarizmiTutor(data_dir=data_dir)
 
 # ═══ CONFIGURATION LOGGING ══════════════════════════════
 logging.basicConfig(
@@ -25,7 +36,7 @@ load_dotenv()
 
 API_KEY  = os.environ.get("GEMINI_API_KEY", "AIzaSy...COLLE_TA_CLE_ICI")
 BASE_URL = "https://generativelanguage.googleapis.com/v1beta/openai/"
-MODEL    = "gemini-2.0-flash"
+MODEL    = os.environ.get("OPENAI_MODEL", "gemini-2.5-flash")
 COUT_PAR_TOKEN = 0.0  # Gratuit pour tester
 
 client = AsyncOpenAI(api_key=API_KEY, base_url=BASE_URL)
@@ -49,7 +60,7 @@ SCENARIOS = [
     {
         "nom":         "Probabilités — Somme != 1 (TYPE_3)",
         "sujet_id":    "BAC_MATH_2024_SC_S1_EX2",
-        "question_id": "Q1",
+        "question_id": "Q1_a",
         "input":       "P(A)=1/4, P(B)=2/4, P(C)=1/4",
         "mode":        "RAPPEL_ACTIF",
         "erreur_attendue": "TYPE_3"
@@ -105,7 +116,6 @@ async def tester_scenario(tutor: KhawarizmiTutor, scenario: dict) -> dict:
                 {"role": "system", "content": system_prompt},
                 {"role": "user",   "content": scenario['input']}
             ],
-            response_format = {"type": "json_object"},
             temperature     = 0.3,
             max_tokens      = 500,
             timeout         = 30.0
@@ -114,11 +124,19 @@ async def tester_scenario(tutor: KhawarizmiTutor, scenario: dict) -> dict:
         elapsed = time.perf_counter() - start
         content = response.choices[0].message.content
 
+        content = content.strip()
+        if content.startswith("```"):
+            lines = content.splitlines()
+            if len(lines) >= 2 and lines[0].startswith("```") and lines[-1].startswith("```"):
+                content = "\n".join(lines[1:-1]).strip()
+
         # ── Étape 4 : Validation JSON ──────────────────────
         try:
             result = json.loads(content)
             json_valide = True
-        except json.JSONDecodeError:
+        except json.JSONDecodeError as jde:
+            print(f"   [JSONDecodeError] raw content: {repr(content)}")
+            print(f"   [JSONDecodeError] error message: {jde}")
             result      = {}
             json_valide = False
 

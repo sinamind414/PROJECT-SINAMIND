@@ -1,0 +1,72 @@
+<USER_REQUEST>
+# 🧪 4 Expériences Classiques à Ajouter aux Chapitres 4 et 5
+
+Je vais te livrer **les 4 sections complètes** à intégrer dans ton fichier `pages/unit-1-1.html`. Vu la quantité, je structure tout clairement avec instructions d'intégration.
+
+---
+
+# 📍 PARTIE 1 : Expérience de Nirenberg
+## À insérer dans le **Chapitre 4 (La Traduction)**
+
+**Où l'insérer ?** Après la section "Statistiques du code génétique" et avant les "Codons spéciaux".
+
+```html
+<!-- ═══════════════════════════════════════════ -->
+<!-- ███ EXPÉRIENCE DE NIRENBERG ███ -->
+<!-- ═══════════════════════════════════════════ -->
+
+<div class="definition-box" style="border-color: #DC2626; background: linear-gradient(135deg, #FEF2F2, #FEE2E2);">
+  <div class="definition-label" style="color: #DC2626;">🏆 تجربة Nirenberg | L'Expérience de Nirenberg (1961)</div>
+  <div class="definition-text">
+    تجربة <strong>تاريخية ثورية</strong> سمحت بـ <strong>فك أول رمز في الشفرة الوراثية</strong>! قام بها العالم الأمريكي <strong>Marshall Nirenberg</strong> عام 1961 مع زميله <strong>Heinrich Matthaei</strong>. حصل بفضلها على <strong>جائزة نوبل في الطب عام 1968</strong>.
+    <br><br>
+    <em>L'expérience historique de Nirenberg (1961) a permis de déchiffrer le premier codon du code génétique !</em>
+  </div>
+</div>
+
+<!-- Problématique -->
+<div class="definition-box" style="border-color: var(--neural-purple); background: linear-gradient(135deg, #F5F3FF, #EDE8FF);">
+  <div class="definition-label" style="color: #7C5FCD;">❓ الإشكالية المطروحة عام 1961 | Problématique en 1961</div>
+  <div class="definition-text">
+    في بداية الستينيات، كان العلماء يعرفون أن
+<truncated 45214 bytes>
+-activation-1')">
+      <span class="option-letter">أ</span>
+      <span>ARN polymérase</span>
+    </button>
+    <button class="quiz-inline-option" data-index="1" onclick="UnitPage.checkAnswer(this, 1, 'q-activation-1')">
+      <span class="option-letter">ب</span>
+      <span>Aminoacyl-ARNt Synthétase (20 إنزيم، واحد لكل حمض أميني)</span>
+    </button>
+    <button class="quiz-inline-option" data-index="2" onclick="UnitPage.checkAnswer(this, 1, 'q-activation-1')">
+      <span class="option-letter">ج</span>
+      <span>Peptidyl Transférase</span>
+    </button>
+    <button class="quiz-inline-option" data-index="3" onclick="UnitPage.checkAnswer(this, 1, 'q-activation-1')">
+      <span class="option-letter">د</span>
+      <span>Ribonucléase</span>
+    </button>
+  </div>
+  <div class="quiz-feedback correct">
+    <strong>✅ صحيح!</strong><br>
+    <strong>Aminoacyl-ARNt Synthétase</strong> هي العائلة الإنزيمية المسؤولة عن تنشيط الأحماض الأمينية. يوجد <strong>20 نوع مختلف</strong>، واحد لكل حمض أميني. كل إنزيم يتعرف على حمض أميني محدد و ARNt مناسب له (نوعية مزدوجة).
+  </div>
+  <div class="quiz-feedback wrong">
+    <strong>❌ خطأ</strong><br>
+    Aminoacyl-ARNt Synthétase هي المسؤولة (20 نوع، واحد لكل AA).
+  </div>
+</div>
+
+<div class="quiz-inline">
+  <div class="quiz-inline-header">
+    <span style="font-size: 1.5rem;">🧪</span>
+    <span class="quiz-inline-title">اختبار تنشيط AA | Quiz Activation AA</span>
+  </div>
+  <div class="quiz-inline-question">
+    ما مصدر الطاقة لعملية تنشيط الأحماض الأمينية؟<br>
+    <em>Quelle est la source d'énergie pour l'activation des AA ?</em>
+  </div>
+  <div class="qui
+<truncated 5331 bytes>
+
+NOTE: The output was truncated because it was too long. Use a more targeted query or a smaller range to get the information you need.

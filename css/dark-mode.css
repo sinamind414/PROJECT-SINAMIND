@@ -1,0 +1,143 @@
+/* ============================================
+   DARK MODE CSS - Night Theme
+   ============================================ */
+
+[data-theme="dark"] {
+  --blue-light:       var(--gold-light);
+  --blue-deep:        var(--gold-dark);
+  --blue-soft:        #1C2330;
+  --green-fresh:      var(--gold-primary);
+  --green-soft:       #1F3328;
+  --cream:            #1A1A2E;   /* Deep night blue */
+  --dark:             #E8EEF5;
+  --accent:           var(--gold-primary);
+  --purple:           var(--neural-purple);
+  --purple-soft:      #2A1F3D;
+  --red-stop:         var(--neural-red);
+  
+  --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  --shadow-hover: 0 16px 48px rgba(0, 0, 0, 0.6);
+}
+
+[data-theme="dark"] body {
+  background: var(--cream);
+  color: var(--dark);
+}
+
+[data-theme="dark"] .navbar {
+  background: rgba(26, 26, 46, 0.95);
+  border-bottom: 1px solid rgba(201, 169, 97, 0.2);
+}
+
+[data-theme="dark"] .nav-links a {
+  color: var(--dark);
+}
+
+[data-theme="dark"] .hero {
+  background: linear-gradient(135deg, #1A1A2E 0%, #16213E 100%);
+}
+
+[data-theme="dark"] .hero p { color: #B8C5D6; }
+
+[data-theme="dark"] .roadmap,
+[data-theme="dark"] .section.white-bg {
+  background: #161A29;
+}
+
+[data-theme="dark"] .section.alt {
+  background: #111420;
+}
+
+[data-theme="dark"] .section.purple-bg {
+  background: #1C1226;
+}
+
+[data-theme="dark"] .concept-box,
+[data-theme="dark"] .stage-card,
+[data-theme="dark"] .fate-card,
+[data-theme="dark"] .roadmap-card,
+[data-theme="dark"] .flow-diagram,
+[data-theme="dark"] .code-table-container,
+[data-theme="dark"] .codon-display,
+[data-theme="dark"] .ribosome-visual {
+  background: #1C2330;
+  color: var(--dark);
+}
+
+[data-theme="dark"] .concept-box ul li {
+  border-bottom-color: rgba(107, 163, 214, 0.15);
+}
+
+[data-theme="dark"] .stage-card p,
+[data-theme="dark"] .fate-card p,
+[data-theme="dark"] .roadmap-card p {
+  color: #B8C5D6;
+}
+
+[data-theme="dark"] .bac-box {
+  background: linear-gradient(135deg, #2D2418, #3D2E1F);
+  color: var(--dark);
+}
+
+[data-theme="dark"] .did-you-know {
+  background: #1F3328;
+  color: var(--dark);
+}
+
+[data-theme="dark"] .code-table td {
+  background: #243044;
+  color: var(--dark);
+}
+
+[data-theme="dark"] .flow-step {
+  background: #243044;
+  color: var(--dark);
+}
+
+[data-theme="dark"] .simulator {
+  background: linear-gradient(135deg, #2A1F3D, #1C2330);
+}
+
+[data-theme="dark"] .sim-input input {
+  background: #243044;
+  color: var(--dark);
+  border-color: var(--purple);
+}
+
+[data-theme="dark"] .mrna-strand {
+  background: #243044;
+}
+
+[data-theme="dark"] .protein-output {
+  background: #1F3328;
+}
+
+/* ============ THEME SWITCHER ============ */
+.theme-switcher {
+  position: fixed;
+  bottom: 30px;
+  left: 30px;
+  width: 55px;
+  height: 55px;
+  background: var(--blue-deep);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  font-size: 1.5rem;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  z-index: 999;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.theme-switcher:hover {
+  transform: scale(1.1) rotate(20deg);
+  background: var(--green-fresh);
+}
+
+[data-theme="dark"] .theme-switcher {
+  background: var(--accent);
+}
