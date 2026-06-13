@@ -211,7 +211,8 @@ const Chatbot = {
     this.state.isProcessing = false;
     
     if (response.success) {
-      this.addMessage(response.message, 'bot', response.isDemo);
+      const cleaned = this.validateBotResponse(response.message);
+      this.addMessage(cleaned, 'bot', response.isDemo);
       
       // Mettre à jour l'historique
       this.state.conversationHistory.push(
@@ -296,6 +297,18 @@ const Chatbot = {
     }
   },
   
+  validateBotResponse(text) {
+    const cjk = /[\u4e00-\u9fff\u3040-\u309f\u30a0-\u30ff\uac00-\ud7af]/g;
+    if (cjk.test(text)) {
+      console.warn('⚠️ Chatbot: CJK chars detected in response');
+      text = text.replace(cjk, '');
+      if (text.trim().length < 20) {
+        return '⚠️ عذراً، حدث خطأ في الإجابة. حاول مرة أخرى من فضلك.';
+      }
+    }
+    return text.trim();
+  },
+
   showLimitReached() {
     this.addMessage(`⚠️ لقد وصلت إلى الحد اليومي (${this.config.freeLimit} أسئلة).\n\n💎 **ترقّ إلى Premium بـ 2000 DA/سنة** للحصول على:\n✓ أسئلة غير محدودة\n✓ توليد اختبارات\n✓ تصحيح إجاباتك\n✓ وأكثر بكثير!\n\n[اشترك الآن](#pricing)`, 'bot');
   }

@@ -3,7 +3,7 @@
    ============================================ */
 
 const GeminiAPI = {
-  API_KEY: 'VOTRE_CLE_GROQ_ICI', // à remplacer ou à configurer via le backend
+  API_KEY: 'VOTRE_CLE_GROQ_ICI',
 
   API_URL: 'https://api.groq.com/openai/v1/chat/completions',
 
@@ -11,23 +11,31 @@ const GeminiAPI = {
 
   SYSTEM_PROMPT: `أنت "أستاذ خوارزمي"، مساعد ذكي متخصص في علوم الطبيعة والحياة لطلاب البكالوريا في الجزائر.
 
-قواعد مهمة:
-1. أجب باللغة العربية بشكل افتراضي، إلا إذا طُلب منك الإجابة بالفرنسية
-2. ركّز على المنهاج الجزائري للسنة الثالثة ثانوي - شعبة العلوم التجريبية
-3. المواضيع الرئيسية: تركيب البروتين، المناعة، الاتصال العصبي، علم الوراثة، التطور
-4. قدّم إجابات واضحة ومنظمة مع أمثلة
-5. استخدم الرموز التعبيرية باعتدال لجعل الشرح أكثر جاذبية
-6. عند الإمكان، اربط المفاهيم بأسئلة بكالوريا سابقة
-7. شجّع الطالب وكن إيجابياً
-8. إذا لم تعرف الإجابة، قل ذلك بصراحة ولا تخترع معلومات
+🔴 قاعدة أساسية - اللغة:
+1. أجب فقط وحصرياً باللغة العربية الفصحى
+2. ممنوع منعاً باتاً استخدام الحروف الصينية (Chinese characters) أو الكورية أو اليابانية أو أي حروف غير عربية أو لاتينية
+3. المصطلحات العلمية تكتب بالفرنسية بين قوسين فقط، مثال: "البروتين (Protéine)"
+4. إذا وجدت أي حروف صينية أو غير مفهومة في ردك، احذفها فوراً
 
-كن دائماً مهنياً، مفيداً ومحفزاً!`,
+📚 المحتوى العلمي:
+- المنهاج الجزائري للسنة الثالثة ثانوي - شعبة العلوم التجريبية
+- المواضيع: تركيب البروتين، المناعة، الاتصال العصبي، الوراثة، التطور
+- قدّم إجابات منظمة مع أمثلة وأسئلة بكالوريا سابقة
+
+💡 الأسلوب:
+- شجّع الطالب وكن إيجابياً ومهنياً
+- استخدم الرموز التعبيرية باعتدال
+- إذا لم تعرف، قل بصراحة
+
+⚠️ أبداً لا تستخدم: 告诉ني, 我的, 你是, 你好, 什么, 如何, 为什么 أو أي كلمات صينية`,
 
   async sendMessage(userMessage, conversationHistory = []) {
     try {
+      const langReinforcement = `[أجب بالعربية الفصحى فقط. ممنوع استخدام أي حروف صينية أو كورية أو يابانية.] سؤالي: ${userMessage}`;
+
       const messages = [
         { role: 'system', content: this.SYSTEM_PROMPT },
-        { role: 'assistant', content: 'فهمت! أنا أستاذ خوارزمي، جاهز لمساعدة طلاب البكالوريا الجزائريين. كيف يمكنني مساعدتك اليوم؟' }
+        { role: 'assistant', content: 'فهمت! أنا أستاذ خوارزمي، سأجيبك بالعربية الفصحى فقط. كيف يمكنني مساعدتك؟' }
       ];
 
       conversationHistory.forEach(msg => {
@@ -37,7 +45,7 @@ const GeminiAPI = {
         });
       });
 
-      messages.push({ role: 'user', content: userMessage });
+      messages.push({ role: 'user', content: langReinforcement });
 
       const response = await fetch(this.API_URL, {
         method: 'POST',
@@ -48,9 +56,9 @@ const GeminiAPI = {
         body: JSON.stringify({
           model: this.MODEL,
           messages: messages,
-          temperature: 0.7,
+          temperature: 0.5,
           max_tokens: 1024,
-          top_p: 0.95
+          top_p: 0.85
         })
       });
 
@@ -62,9 +70,10 @@ const GeminiAPI = {
       const data = await response.json();
 
       if (data.choices && data.choices[0]?.message?.content) {
+        const raw = data.choices[0].message.content;
         return {
           success: true,
-          message: data.choices[0].message.content
+          message: this.cleanResponse(raw)
         };
       } else {
         throw new Error('Réponse invalide de Groq');
@@ -74,6 +83,18 @@ const GeminiAPI = {
       console.error('Groq API Error:', error);
       return this.getFallbackResponse(userMessage);
     }
+  },
+
+  cleanResponse(text) {
+    const cjk = /[\u4e00-\u9fff\u3040-\u309f\u30a0-\u30ff\uac00-\ud7af]/g;
+    if (cjk.test(text)) {
+      console.warn('⚠️ CJK chars detected, cleaning...');
+      text = text.replace(cjk, '');
+      if (text.trim().length < 20) {
+        return 'عذراً، حدث خطأ في الإجابة. أعد صياغة سؤالك من فضلك 🙏';
+      }
+    }
+    return text.trim();
   },
 
   getFallbackResponse(userMessage) {
