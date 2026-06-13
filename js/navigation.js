@@ -18,6 +18,11 @@ const SiteNavigator = {
     container.innerHTML = `
       <section class="hero-program">
         <div class="hero-program-content">
+          <div class="logo-showcase">
+            <div class="logo-glow"></div>
+            <img src="assets/logo.png" alt="Khawarizmi IA" class="hero-logo">
+          </div>
+          
           <div class="hero-program-badge">
             <span>🇩🇿</span>
             <span>المنهاج الرسمي الجزائري</span>
