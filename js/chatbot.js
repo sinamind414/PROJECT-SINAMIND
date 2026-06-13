@@ -19,11 +19,14 @@ const Chatbot = {
   
   // Suggestions initiales
   suggestions: [
-    '🧬 اشرح لي عملية الاستنساخ',
-    '🔤 ما هي الشفرة الوراثية؟',
-    '🧪 أعطني سؤال اختبار',
-    '📚 ما هي مراحل الترجمة؟',
-    '💡 نصائح للنجاح في البكالوريا'
+    '🧬 ما هي عملية الاستنساخ؟',
+    '🔄 اشرح لي الترجمة',
+    '🛡️ كيف يعمل الجهاز المناعي؟',
+    '☀️ ما هو التركيب الضوئي؟',
+    '🔋 شرح التنفس الخلوي',
+    '🌍 كيف تتحرك الصفائح؟',
+    '⚗️ ما هي الإنزيمات؟',
+    '⚡ كيف يعمل العصبون؟'
   ],
   
   init() {
@@ -92,8 +95,15 @@ const Chatbot = {
           <div class="welcome-emoji">👋</div>
           <div class="welcome-title">مرحباً بك!</div>
           <div class="welcome-text">
-            أنا أستاذ خوارزمي، مساعدك الذكي للنجاح في البكالوريا.
-            اسألني عن أي موضوع في علوم الطبيعة والحياة!
+            مرحباً! أنا <strong>أستاذ خوارزمي</strong>، مساعدك المتخصص في
+            <strong>علوم الطبيعة والحياة</strong> لطلاب البكالوريا الجزائرية! 🎓
+            <br><br>
+            📚 <strong>اسألني عن:</strong><br>
+            🧬 البروتينات والوراثة<br>
+            🛡️ المناعة<br>
+            ⚡ الجهاز العصبي<br>
+            ☀️🔋 الطاقة الخلوية<br>
+            🌍 التكتونية والجيولوجيا
           </div>
           <div class="suggestions" id="suggestions">
             ${this.suggestions.map(s => `
@@ -184,29 +194,53 @@ const Chatbot = {
     
     if (!message || this.state.isProcessing) return;
     
-    // Vérifier la limite
     if (!this.config.isPremium && this.state.todayUsage >= this.config.freeLimit) {
       this.showLimitReached();
       return;
     }
     
-    // Cacher le welcome
     const welcome = document.querySelector('.welcome-message');
     if (welcome) welcome.style.display = 'none';
     
-    // Ajouter le message utilisateur
     this.addMessage(message, 'user');
     input.value = '';
     input.style.height = 'auto';
     
-    // Afficher typing
+    // Étape 1 : Vérifier si la question est SVT
+    if (typeof SVTKnowledgeBase !== 'undefined' && !SVTKnowledgeBase.isSVTQuestion(message)) {
+      this.addMessage(SVTKnowledgeBase.getRejectionMessage(), 'bot');
+      this.state.todayUsage++;
+      this.saveUsage();
+      this.updateUsageCounter();
+      return;
+    }
+    
+    // Étape 2 : Chercher dans la base de connaissances locale
+    if (typeof SVTKnowledgeBase !== 'undefined') {
+      const localAnswer = SVTKnowledgeBase.getBestAnswer(message);
+      if (localAnswer && localAnswer.score >= 15) {
+        let response = localAnswer.content;
+        if (localAnswer.relatedTopics.length > 0) {
+          response += '\n\n📚 **مواضيع ذات صلة:**\n';
+          localAnswer.relatedTopics.forEach(key => {
+            response += `• ${SVTKnowledgeBase.getTopicTitle(key)}\n`;
+          });
+        }
+        response += '\n\n💡 *هل تريد معرفة المزيد عن موضوع آخر؟*';
+        this.addMessage(response, 'bot');
+        this.state.todayUsage++;
+        this.saveUsage();
+        this.updateUsageCounter();
+        return;
+      }
+    }
+    
+    // Étape 3 : Envoyer à Groq si pas dans la base locale
     this.showTyping();
     this.state.isProcessing = true;
     
-    // Appel à Gemini
     const response = await GeminiAPI.sendMessage(message, this.state.conversationHistory);
     
-    // Cacher typing
     this.hideTyping();
     this.state.isProcessing = false;
     
@@ -214,18 +248,15 @@ const Chatbot = {
       const cleaned = this.validateBotResponse(response.message);
       this.addMessage(cleaned, 'bot', response.isDemo);
       
-      // Mettre à jour l'historique
       this.state.conversationHistory.push(
         { role: 'user', parts: [{ text: message }] },
         { role: 'model', parts: [{ text: response.message }] }
       );
       
-      // Limiter l'historique
       if (this.state.conversationHistory.length > 10) {
         this.state.conversationHistory = this.state.conversationHistory.slice(-10);
       }
       
-      // Incrémenter usage
       this.state.todayUsage++;
       this.saveUsage();
       this.updateUsageCounter();
