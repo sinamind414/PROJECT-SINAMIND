@@ -51,8 +51,8 @@ const SiteNavigator = {
           </div>
           
           <div style="display:flex; gap:16px; justify-content:center; flex-wrap:wrap; margin-top:30px;">
-            <a href="#domains" class="btn-gold">🚀 ابدأ الاستكشاف</a>
-            <a href="#program-toc" class="btn-outline-gold">📖 البرنامج الكامل</a>
+            <a href="inscription.html" class="btn-gold">🚀 إنشاء حساب مجاني</a>
+            <a href="#domains" class="btn-outline-gold">📖 استكشف البرنامج</a>
           </div>
         </div>
       </section>
