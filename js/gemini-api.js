@@ -159,11 +159,11 @@ const GeminiAPI = {
     }
 
     return { success: true, message: response, isDemo: true };
-  }
-};
+  },
 
   getAuthToken() {
     return localStorage.getItem('khawarizmi_token') || '';
-  },
+  }
+};
 
 if (typeof window !== 'undefined') window.GeminiAPI = GeminiAPI;
