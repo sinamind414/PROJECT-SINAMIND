@@ -217,20 +217,17 @@ const Chatbot = {
     input.value = '';
     input.style.height = 'auto';
     
-    // Détecter si c'est une question de suivi (pour laisser passer le filtre SVT)
-    const isFollowUp = this.isContinuationQuestion(message);
+    // Filtrage intelligent SVT
     const hasContext = this.state.conversationHistory.length > 0;
+    const filterResult = SVTFilter.checkQuestion(message, hasContext);
 
-    // Vérifier SVT uniquement si nouvelle conversation
-    if (!isFollowUp && !hasContext) {
-      if (typeof SVTKnowledgeBase !== 'undefined' && !SVTKnowledgeBase.isSVTQuestion(message)) {
-        this.addMessage(SVTKnowledgeBase.getRejectionMessage(), 'bot');
-        this.state.todayUsage++; this.saveUsage(); this.updateUsageCounter();
-        return;
-      }
+    if (!filterResult.accepted) {
+      this.addMessage(filterResult.redirect, 'bot');
+      this.state.todayUsage++; this.saveUsage(); this.updateUsageCounter();
+      return;
     }
 
-    if (isFollowUp || hasContext) {
+    if (hasContext) {
       this.state.explanationCount++;
     } else {
       this.state.explanationCount = 0;
