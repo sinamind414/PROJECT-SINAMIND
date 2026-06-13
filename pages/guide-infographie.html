@@ -4,24 +4,49 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>دليل مصور | خوارزمي IA</title>
-  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&family=Cairo:wght@800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&family=Cairo:wght@800&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/khawarizmi-main.css">
   <link rel="stylesheet" href="../css/bac-tools.css">
   <link rel="stylesheet" href="../css/print-styles.css">
   <link rel="stylesheet" href="../css/chatbot.css">
   <link rel="stylesheet" href="../css/chatbot-enhanced.css">
+  <style>
+    body { padding-top: 80px; }
+    .navbar-premium { background: rgba(255,255,255,0.98); }
+    .bac-sub-links {
+      display: flex; gap: 4px; list-style: none; flex-wrap: wrap; align-items: center;
+    }
+    .bac-sub-links a {
+      color: var(--text-dark, #2C2C3E); text-decoration: none; padding: 6px 12px;
+      border-radius: 20px; font-weight: 600; font-size: 0.82rem; transition: all 0.3s; white-space: nowrap;
+    }
+    .bac-sub-links a:hover, .bac-sub-links a.active { background: #C9A961; color: white; }
+  </style>
 </head>
 <body>
 
-<nav class="bac-navbar">
-  <a href="../index.html" class="bac-navbar-logo">🧠 خوارزمي IA</a>
-  <ul class="bac-navbar-links">
-    <li><a href="methodologie-bac.html">📝 المنهجية</a></li>
-    <li><a href="banque-questions.html">❓ بنك الأسئلة</a></li>
-    <li><a href="examen-simule.html">🎓 امتحان تجريبي</a></li>
-    <li><a href="statistiques.html">📊 إحصائياتي</a></li>
-    <li><a href="guide-infographie.html" class="active">🎬 دليل مصور</a></li>
-    <li><a href="glossaire.html">📖 القاموس</a></li>
-  </ul>
+<nav class="navbar-premium">
+  <div class="nav-container">
+    <a href="../index.html" class="nav-logo">
+      <img src="../assets/logo.png" alt="Khawarizmi IA" class="logo-img">
+      <div class="logo-text">
+        <span class="logo-ar">خوارزمي</span>
+        <span class="logo-en">KHAWARIZMI <span class="logo-ia">IA</span></span>
+      </div>
+    </a>
+    <ul class="bac-sub-links">
+      <li><a href="methodologie-bac.html">📝 المنهجية</a></li>
+      <li><a href="banque-questions.html">❓ بنك الأسئلة</a></li>
+      <li><a href="examen-simule.html">🎓 امتحان تجريبي</a></li>
+      <li><a href="statistiques.html">📊 إحصائياتي</a></li>
+      <li><a href="guide-infographie.html" class="active">🎬 دليل مصور</a></li>
+      <li><a href="glossaire.html">📖 القاموس</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="../connexion.html" class="btn-login">تسجيل الدخول</a>
+      <a href="../inscription.html" class="btn-signup">إنشاء حساب 🚀</a>
+    </div>
+  </div>
 </nav>
 
 <header class="page-hero green">
