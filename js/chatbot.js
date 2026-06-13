@@ -14,19 +14,21 @@ const Chatbot = {
     isOpen: false,
     conversationHistory: [],
     todayUsage: 0,
-    isProcessing: false
+    isProcessing: false,
+    currentTopic: null,
+    explanationCount: 0
   },
-  
+
   // Suggestions initiales
   suggestions: [
-    '🧬 ما هي عملية الاستنساخ؟',
-    '🔄 اشرح لي الترجمة',
-    '🛡️ كيف يعمل الجهاز المناعي؟',
-    '☀️ ما هو التركيب الضوئي؟',
-    '🔋 شرح التنفس الخلوي',
-    '🌍 كيف تتحرك الصفائح؟',
-    '⚗️ ما هي الإنزيمات؟',
-    '⚡ كيف يعمل العصبون؟'
+    '🤔 ما هو ADN؟ اشرح بطريقة بسيطة',
+    '🌱 لماذا الأوراق خضراء؟',
+    '🛡️ كيف يدافع جسمي عن نفسه؟',
+    '⚡ كيف يفكر الدماغ؟',
+    '🔋 كيف تحصل خلاياي على الطاقة؟',
+    '🧬 ما الفرق بين ADN و ARN؟',
+    '🤷 لم أفهم درس المناعة ساعدني',
+    '📚 اشرح لي التركيب الضوئي بمثال'
   ],
   
   init() {
@@ -95,15 +97,16 @@ const Chatbot = {
           <div class="welcome-emoji">👋</div>
           <div class="welcome-title">مرحباً بك!</div>
           <div class="welcome-text">
-            مرحباً! أنا <strong>أستاذ خوارزمي</strong>، مساعدك المتخصص في
-            <strong>علوم الطبيعة والحياة</strong> لطلاب البكالوريا الجزائرية! 🎓
+            <strong>أهلاً بك في خوارزمي IA!</strong> 🎓
             <br><br>
-            📚 <strong>اسألني عن:</strong><br>
-            🧬 البروتينات والوراثة<br>
-            🛡️ المناعة<br>
-            ⚡ الجهاز العصبي<br>
-            ☀️🔋 الطاقة الخلوية<br>
-            🌍 التكتونية والجيولوجيا
+            أستخدم <strong>طريقة فاينمان</strong> لشرح كل شيء بتشبيهات بسيطة!
+            <br><br>
+            ✨ <strong>كيف تستفيد مني؟</strong><br>
+            1️⃣ اطرح سؤالك بأي طريقة<br>
+            2️⃣ سأشرح بتشبيهات من الحياة اليومية<br>
+            3️⃣ إذا لم تفهم، قل "لم أفهم"<br>
+            4️⃣ سأعيد الشرح بطريقة مختلفة!<br><br>
+            💡 <strong>جرب:</strong> "اشرح لي ADN كأنني طفل صغير"
           </div>
           <div class="suggestions" id="suggestions">
             ${this.suggestions.map(s => `
@@ -206,16 +209,21 @@ const Chatbot = {
     input.value = '';
     input.style.height = 'auto';
     
-    // Étape 1 : Vérifier si la question est SVT
+    // Détecter si l'élève continue sur le même sujet
+    if (this.isContinuationQuestion(message)) {
+      this.state.explanationCount++;
+    } else {
+      this.state.explanationCount = 0;
+    }
+    
+    // Vérifier SVT
     if (typeof SVTKnowledgeBase !== 'undefined' && !SVTKnowledgeBase.isSVTQuestion(message)) {
       this.addMessage(SVTKnowledgeBase.getRejectionMessage(), 'bot');
-      this.state.todayUsage++;
-      this.saveUsage();
-      this.updateUsageCounter();
+      this.state.todayUsage++; this.saveUsage(); this.updateUsageCounter();
       return;
     }
     
-    // Étape 2 : Chercher dans la base de connaissances locale
+    // Chercher dans la base locale
     if (typeof SVTKnowledgeBase !== 'undefined') {
       const localAnswer = SVTKnowledgeBase.getBestAnswer(message);
       if (localAnswer && localAnswer.score >= 15) {
@@ -228,14 +236,18 @@ const Chatbot = {
         }
         response += '\n\n💡 *هل تريد معرفة المزيد عن موضوع آخر؟*';
         this.addMessage(response, 'bot');
-        this.state.todayUsage++;
-        this.saveUsage();
-        this.updateUsageCounter();
+        this.state.todayUsage++; this.saveUsage(); this.updateUsageCounter();
+        this.addFeedbackButtons();
         return;
       }
     }
     
-    // Étape 3 : Envoyer à Groq si pas dans la base locale
+    // Afficher message d'aide si 3+ tentatives
+    if (this.state.explanationCount >= 3) {
+      this.showReexplainTip();
+    }
+    
+    // Appel à Groq
     this.showTyping();
     this.state.isProcessing = true;
     
@@ -257,9 +269,8 @@ const Chatbot = {
         this.state.conversationHistory = this.state.conversationHistory.slice(-10);
       }
       
-      this.state.todayUsage++;
-      this.saveUsage();
-      this.updateUsageCounter();
+      this.state.todayUsage++; this.saveUsage(); this.updateUsageCounter();
+      this.addFeedbackButtons();
     } else {
       this.addMessage(response.message, 'bot');
     }
@@ -331,17 +342,67 @@ const Chatbot = {
   validateBotResponse(text) {
     const cjk = /[\u4e00-\u9fff\u3040-\u309f\u30a0-\u30ff\uac00-\ud7af]/g;
     if (cjk.test(text)) {
-      console.warn('⚠️ Chatbot: CJK chars detected in response');
       text = text.replace(cjk, '');
-      if (text.trim().length < 20) {
-        return '⚠️ عذراً، حدث خطأ في الإجابة. حاول مرة أخرى من فضلك.';
-      }
+      if (text.trim().length < 20) return '⚠️ عذراً، حدث خطأ. حاول مرة أخرى.';
     }
     return text.trim();
   },
 
+  isContinuationQuestion(message) {
+    const patterns = ['لم أفهم','لا أفهم','اشرح أكثر','أعد','مثال آخر','بسّط','وضح','مرة أخرى','صعب'];
+    return patterns.some(p => message.includes(p));
+  },
+
+  showReexplainTip() {
+    const messages = document.getElementById('chatbotMessages');
+    const div = document.createElement('div');
+    div.className = 'message bot';
+    div.innerHTML = `
+      <div class="message-bubble" style="background:#FEF3C7;border:2px solid #F59E0B;">
+        💡 <strong>نصيحة فاينمان:</strong><br><br>
+        جرب أن تقول:<br>
+        • "اشرح لي كأنني طفل صغير"<br>
+        • "أعطني مثالاً من الحياة اليومية"<br>
+        • "ما الفرق بين ... و ... ؟"<br><br>
+        💪 لا تستسلم! كل مفهوم يصبح سهلاً بالطريقة الصحيحة.
+      </div>`;
+    messages.appendChild(div);
+    messages.scrollTop = messages.scrollHeight;
+  },
+
+  addFeedbackButtons() {
+    const messages = document.getElementById('chatbotMessages');
+    const last = messages.querySelector('.message.bot:last-child');
+    if (!last) return;
+    const fb = document.createElement('div');
+    fb.style.cssText = 'display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;';
+    fb.innerHTML = `
+      <button onclick="Chatbot.handleFeedback('understood')" style="background:#10B981;color:white;border:none;padding:5px 12px;border-radius:20px;cursor:pointer;font-family:var(--font-ar);font-size:0.8rem;">✅ فهمت!</button>
+      <button onclick="Chatbot.handleFeedback('confused')" style="background:#DC2626;color:white;border:none;padding:5px 12px;border-radius:20px;cursor:pointer;font-family:var(--font-ar);font-size:0.8rem;">❌ لم أفهم</button>
+      <button onclick="Chatbot.handleFeedback('example')" style="background:#8B5CF6;color:white;border:none;padding:5px 12px;border-radius:20px;cursor:pointer;font-family:var(--font-ar);font-size:0.8rem;">💡 مثال آخر</button>`;
+    last.appendChild(fb);
+  },
+
+  handleFeedback(type) {
+    const input = document.getElementById('chatbotInput');
+    const msgs = {
+      understood: 'رائع! فهمت الفكرة شكراً 🌟',
+      confused: 'لم أفهم! هل يمكنك شرح بطريقة مختلفة تماماً؟ 😅',
+      example: 'هل يمكنك إعطائي مثالاً آخر من الحياة اليومية؟ 💡'
+    };
+    input.value = msgs[type];
+    if (type === 'understood') {
+      setTimeout(() => {
+        this.addMessage('🎉 ممتاز! هل تريد التعمق في موضوع آخر؟', 'bot');
+        input.value = '';
+      }, 500);
+    } else {
+      this.sendMessage();
+    }
+  },
+
   showLimitReached() {
-    this.addMessage(`⚠️ لقد وصلت إلى الحد اليومي (${this.config.freeLimit} أسئلة).\n\n💎 **ترقّ إلى Premium بـ 2000 DA/سنة** للحصول على:\n✓ أسئلة غير محدودة\n✓ توليد اختبارات\n✓ تصحيح إجاباتك\n✓ وأكثر بكثير!\n\n[اشترك الآن](#pricing)`, 'bot');
+    this.addMessage(`⚠️ لقد وصلت إلى الحد اليومي (${this.config.freeLimit} أسئلة).`, 'bot');
   }
 };
 
