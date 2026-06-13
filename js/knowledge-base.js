@@ -361,13 +361,29 @@ Protéine: Met-Ala-Tyr-STOP`
   },
 
   isSVTQuestion(question) {
-    const lower = question.toLowerCase();
-    let matchCount = 0;
+    if (!question || typeof question !== 'string') return false;
+    const lower = question.toLowerCase().trim();
+
+    // Laisser passer les réactions courtes et feedback
+    if (lower.length < 15) return true;
+
+    const feedbackPhrases = [
+      'لم أفهم','لا أفهم','ما فهمت','مش فاهم','فهمت',
+      'اشرح','وضح','أعد','بسّط','صعب','معقد',
+      'مثال','أمثلة','المزيد','أكثر','شكرا','مرحبا',
+      'نعم','لا','موافق','حسنا','كيف','لماذا',
+      'compris','pas compris','merci','exemple','plus'
+    ];
+    if (feedbackPhrases.some(p => lower.includes(p))) return true;
+
+    const generalScience = [
+      'علم','علوم','درس','مادة','باك','bac','مراجعة',
+      'فهم','تعلم','science','biologie','svt','وراثة'
+    ];
+    if (generalScience.some(t => lower.includes(t))) return true;
+
     for (const keyword of this.svtKeywords) {
-      if (lower.includes(keyword.toLowerCase())) {
-        matchCount++;
-        if (matchCount >= 1) return true;
-      }
+      if (lower.includes(keyword.toLowerCase())) return true;
     }
     return false;
   },

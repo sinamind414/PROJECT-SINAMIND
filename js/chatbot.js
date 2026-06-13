@@ -209,18 +209,23 @@ const Chatbot = {
     input.value = '';
     input.style.height = 'auto';
     
-    // Détecter si l'élève continue sur le même sujet
-    if (this.isContinuationQuestion(message)) {
+    // Détecter si c'est une question de suivi (pour laisser passer le filtre SVT)
+    const isFollowUp = this.isContinuationQuestion(message);
+    const hasContext = this.state.conversationHistory.length > 0;
+
+    // Vérifier SVT uniquement si nouvelle conversation
+    if (!isFollowUp && !hasContext) {
+      if (typeof SVTKnowledgeBase !== 'undefined' && !SVTKnowledgeBase.isSVTQuestion(message)) {
+        this.addMessage(SVTKnowledgeBase.getRejectionMessage(), 'bot');
+        this.state.todayUsage++; this.saveUsage(); this.updateUsageCounter();
+        return;
+      }
+    }
+
+    if (isFollowUp || hasContext) {
       this.state.explanationCount++;
     } else {
       this.state.explanationCount = 0;
-    }
-    
-    // Vérifier SVT
-    if (typeof SVTKnowledgeBase !== 'undefined' && !SVTKnowledgeBase.isSVTQuestion(message)) {
-      this.addMessage(SVTKnowledgeBase.getRejectionMessage(), 'bot');
-      this.state.todayUsage++; this.saveUsage(); this.updateUsageCounter();
-      return;
     }
     
     // Chercher dans la base locale
