@@ -73,9 +73,13 @@ const GeminiAPI = {
 
       messages.push({ role: 'user', content: reinforcedMessage });
 
+      const headers = { 'Content-Type': 'application/json' };
+      const token = this.getAuthToken();
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+
       const response = await fetch(this.API_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({
           model: this.MODEL,
           messages: messages,
@@ -157,5 +161,9 @@ const GeminiAPI = {
     return { success: true, message: response, isDemo: true };
   }
 };
+
+  getAuthToken() {
+    return localStorage.getItem('khawarizmi_token') || '';
+  },
 
 if (typeof window !== 'undefined') window.GeminiAPI = GeminiAPI;
