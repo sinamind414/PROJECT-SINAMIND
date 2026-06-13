@@ -203,101 +203,90 @@ const Chatbot = {
     const input = document.getElementById('chatbotInput');
     const message = input.value.trim();
     
+    // 1. Vérifications de base
     if (!message || this.state.isProcessing) return;
     
+    // 2. Vérification de la limite de messages (Premium/Free)
     if (!this.config.isPremium && this.state.todayUsage >= this.config.freeLimit) {
-      this.showLimitReached();
-      return;
+        this.showLimitReached();
+        return;
     }
     
+    // 3. Nettoyage de l'interface
     const welcome = document.querySelector('.welcome-message');
     if (welcome) welcome.style.display = 'none';
     
+    // 4. Affichage immédiat du message utilisateur
     this.addMessage(message, 'user');
     input.value = '';
     input.style.height = 'auto';
     
-    // Filtrage intelligent SVT
-    const hasContext = this.state.conversationHistory.length > 0;
-    const filterResult = SVTFilter.checkQuestion(message, hasContext);
-
-    if (!filterResult.accepted) {
-      this.addMessage(filterResult.redirect, 'bot');
-      this.state.todayUsage++; this.saveUsage(); this.updateUsageCounter();
-      return;
-    }
-
-    if (hasContext) {
-      this.state.explanationCount++;
-    } else {
-      this.state.explanationCount = 0;
-    }
+    // 5. Calcul du contexte réel (historique non vide)
+    const hasContext = Array.isArray(this.state.conversationHistory) && 
+                      this.state.conversationHistory.length >= 2;
     
-    // Chercher dans la base locale
-    if (typeof SVTKnowledgeBase !== 'undefined') {
-      const localAnswer = SVTKnowledgeBase.getBestAnswer(message);
-      if (localAnswer && localAnswer.score >= 15) {
-        let response = localAnswer.content;
-        if (localAnswer.relatedTopics.length > 0) {
-          response += '\n\n📚 **مواضيع ذات صلة:**\n';
-          localAnswer.relatedTopics.forEach(key => {
-            response += `• ${SVTKnowledgeBase.getTopicTitle(key)}\n`;
-          });
+    // 6. FILTRAGE INTELLIGENT
+    if (typeof SVTFilter !== 'undefined') {
+        const filterResult = SVTFilter.checkQuestion(message, hasContext);
+        
+        if (!filterResult.accepted) {
+            this.addMessage(filterResult.redirect, 'bot');
+            return;
         }
-        response += '\n\n💡 *هل تريد معرفة المزيد عن موضوع آخر؟*';
-        this.addMessage(response, 'bot');
-        this.state.todayUsage++; this.saveUsage(); this.updateUsageCounter();
-        this.addFeedbackButtons();
-        if (typeof LearningStats !== 'undefined') {
-          const topic = this.detectTopic(message) || null;
-          LearningStats.trackQuestion(topic);
-        }
-        return;
-      }
     }
     
-    // Afficher message d'aide si 3+ tentatives
-    if (this.state.explanationCount >= 3) {
-      this.showReexplainTip();
-    }
-    
-    // Appel à Groq
-    if (typeof GeminiAPI === 'undefined') {
-      this.addMessage('⚠️ عذراً، وحدة الذكاء الاصطناعي غير متوفرة. حاول تحديث الصفحة.', 'bot');
-      return;
-    }
-
+    // 7. PRÉPARATION DE L'APPEL API
     this.showTyping();
     this.state.isProcessing = true;
     
-    const response = await GeminiAPI.sendMessage(message, this.state.conversationHistory);
-    
-    this.hideTyping();
-    this.state.isProcessing = false;
-    
-    if (response.success) {
-      const cleaned = this.validateBotResponse(response.message);
-      this.addMessage(cleaned, 'bot', response.isDemo);
-      
-      this.state.conversationHistory.push(
-        { role: 'user', parts: [{ text: message }] },
-        { role: 'model', parts: [{ text: response.message }] }
-      );
-      
-      if (this.state.conversationHistory.length > 10) {
-        this.state.conversationHistory = this.state.conversationHistory.slice(-10);
-      }
-      
-      this.state.todayUsage++; this.saveUsage(); this.updateUsageCounter();
-      this.addFeedbackButtons();
-
-      if (typeof LearningStats !== 'undefined') {
-        const topic = this.detectTopic(message) || null;
-        if (topic) this.state.currentTopic = topic;
-        LearningStats.trackQuestion(topic);
-      }
-    } else {
-      this.addMessage(response.message, 'bot');
+    try {
+        if (typeof GeminiAPI === 'undefined') {
+            throw new Error('GeminiAPI non trouvée');
+        }
+        
+        // 8. APPEL À L'API
+        const response = await GeminiAPI.sendMessage(
+            message, 
+            this.state.conversationHistory
+        );
+        
+        this.hideTyping();
+        this.state.isProcessing = false;
+        
+        if (response.success) {
+            this.addMessage(response.message, 'bot', response.isDemo);
+            
+            this.state.conversationHistory.push(
+                { role: 'user', parts: [{ text: message }] },
+                { role: 'model', parts: [{ text: response.message }] }
+            );
+            
+            if (this.state.conversationHistory.length > 10) {
+                this.state.conversationHistory = this.state.conversationHistory.slice(-10);
+            }
+            
+            this.state.todayUsage++;
+            this.saveUsage();
+            this.updateUsageCounter();
+            
+            if (typeof this.addFeedbackButtons === 'function') {
+                this.addFeedbackButtons();
+            }
+            
+        } else {
+            this.addMessage(
+                response.message || 'عذراً، حدث خطأ ما. حاول مرة أخرى.',
+                'bot'
+            );
+        }
+    } catch (error) {
+        this.hideTyping();
+        this.state.isProcessing = false;
+        console.error('Erreur Chatbot:', error);
+        this.addMessage(
+            'عذراً، حدث خطأ في الاتصال. يرجى التحقق من الإنترنت والمحاولة ثانية. 🙏',
+            'bot'
+        );
     }
   },
   
