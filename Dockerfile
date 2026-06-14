@@ -15,8 +15,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY khawarizmi-backend/ .
 
-WORKDIR /app/khawarizmi-backend
-
 EXPOSE 8000
 
 CMD ["sh", "-c", \
