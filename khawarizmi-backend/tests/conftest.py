@@ -3,10 +3,14 @@
 
 import pytest
 import asyncio
+import sys
 import os
+from pathlib import Path
 from typing import AsyncGenerator
 from httpx import AsyncClient, ASGITransport
 from unittest.mock import AsyncMock, patch
+
+sys.path.insert(0, str(Path(__file__).parent.parent))
 
 os.environ.setdefault("SECRET_KEY", "test-secret-key-khawarizmi-2026")
 os.environ.setdefault("DATABASE_URL",
