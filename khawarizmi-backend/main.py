@@ -1,9 +1,7 @@
-# main.py — Khawarizmi Pro v2.0.0
-import os, asyncio, logging
-from pathlib import Path
+# main.py — Khawarizmi Pro v2.0.0 (max 100 lignes)
+import os, asyncio, logging, pathlib
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
-from typing import Optional
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -12,11 +10,11 @@ from slowapi.middleware import SlowAPIMiddleware
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
 from sqlalchemy import text
 from redis.asyncio import Redis as AsyncRedis
-from config import get_settings, get_allowed_origins, init_sentry
+from config import get_settings, get_allowed_origins
+from monitoring import setup_monitoring
 from rate_limit import limiter
 
-init_sentry()
-logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(name)s] %(levelname)s: %(message)s")
+setup_monitoring()
 logger = logging.getLogger("khawarizmi.api")
 
 
@@ -24,8 +22,8 @@ logger = logging.getLogger("khawarizmi.api")
 class AppState:
     tutor: object = None; scheduler: object = None; interleaving: object = None
     dual_coding: object = None; openai: object = None
-    redis: Optional[AsyncRedis] = None; db_engine: object = None
-    db_session: object = None; reconciliation_task: Optional[asyncio.Task] = None
+    redis: AsyncRedis | None = None; db_engine: object = None
+    db_session: object = None; reconciliation_task: asyncio.Task | None = None
 
 state = AppState()
 
@@ -35,7 +33,7 @@ async def lifespan(app: FastAPI):
     cfg = get_settings()
     if cfg.environment == "production" and cfg.secret_key == "changeme-use-strong-secret-in-production":
         raise RuntimeError("SECRET_KEY par défaut interdit en production")
-    data_dir = cfg.data_dir or str(Path(__file__).parent / "data")
+    data_dir = cfg.data_dir or str(pathlib.Path(__file__).parent / "data")
     from services.khawarizmi_engine import KhawarizmiTutor
     state.tutor = KhawarizmiTutor(data_dir=data_dir)
     from services.scheduler import KhawarizmiScheduler
@@ -77,29 +75,24 @@ async def lifespan(app: FastAPI):
 app = FastAPI(title="Khawarizmi API", version="2.0.0", lifespan=lifespan,
               docs_url="/docs" if os.getenv("ENVIRONMENT") != "production" else None)
 app.add_middleware(CORSMiddleware, allow_origins=get_allowed_origins(),
-                   allow_origin_regex=r"https://.*\.vercel\.app", allow_credentials=True,
-                   allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"], allow_headers=["*"])
+                   allow_origin_regex=r"https://.*\.vercel\.app",
+                   allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
 app.state.limiter = limiter
 app.add_exception_handler(429, _rate_limit_exceeded_handler)
 app.add_middleware(SlowAPIMiddleware)
 
 from routes import health, auth, chat, flashcards, sessions, mindmap, evaluate, session, payment
-for _r in [health.router, auth.router, chat.router, flashcards.router,
-           sessions.router, mindmap.router, evaluate.router, session.router, payment.router]:
-    app.include_router(_r)
+for r in [health,auth,chat,flashcards,sessions,mindmap,evaluate,session,payment]:
+    app.include_router(r.router)
 
 
 @app.exception_handler(HTTPException)
 async def http_exception_handler(request: Request, exc: HTTPException):
     return JSONResponse(status_code=exc.status_code, content={"erreur": exc.detail})
-
-
 @app.exception_handler(Exception)
 async def generic_exception_handler(request: Request, exc: Exception):
     logger.error(f"Erreur non gérée : {exc}", exc_info=True)
     return JSONResponse(status_code=500, content={"erreur": "Erreur serveur interne"})
-
-
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("main:app", host="0.0.0.0", port=int(os.environ.get("PORT", 8000)), log_level="info")
