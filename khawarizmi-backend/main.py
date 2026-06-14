@@ -49,7 +49,7 @@ async def lifespan(app: FastAPI):
         state.dual_coding = DualCodingService(state.openai)
     if cfg.database_url:
         try:
-            db_url = cfg.database_url.replace("postgres://", "postgresql+asyncpg://", 1)
+            db_url = cfg.database_url.replace("postgresql://", "postgresql+asyncpg://", 1).replace("postgres://", "postgresql+asyncpg://", 1)
             state.db_engine = create_async_engine(db_url, pool_size=10, max_overflow=20, pool_pre_ping=True)
             state.db_session = async_sessionmaker(state.db_engine, class_=AsyncSession, expire_on_commit=False)
         except Exception as e:
