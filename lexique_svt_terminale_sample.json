@@ -1,0 +1,848 @@
+{
+  "metadata": {
+    "matiere": "SVT",
+    "niveau": "Terminale",
+    "filiere": "Sciences Expérimentales",
+    "source": "Programme officiel ONEC Algérie + Lexique de référence",
+    "version": "1.0",
+    "date_creation": "2026-06-15",
+    "langue_source": "français",
+    "langues_cibles": ["arabe"],
+    "total_entrees": 18
+  },
+  "domaines": [
+    {
+      "id": "domaine-1",
+      "nom_fr": "Spécialisation fonctionnelle des protéines",
+      "nom_ar": "التخصص الوظيفي للبروتينات",
+      "categories": [
+        {
+          "id": "cat-1-1",
+          "nom_fr": "Génétique moléculaire",
+          "nom_ar": "الوراثة الجزيئية",
+          "termes": [
+            {
+              "id": "term-001",
+              "terme_fr": "ADN",
+              "terme_ar": "الحمض النووي ADN",
+              "abreviation": "ADN",
+              "type": "molecule",
+              "definition_fr": "Acide désoxyribonucléique, support de l'information génétique, constitué de deux chaînes complémentaires en double hélice",
+              "definition_ar": "الحمض النووي الريبي منقوص الأكسجين، حامل المعلومات الوراثية، يتكون من سلسلتين متكاملتين بشكل حلزوني مزدوج",
+              "synonymes_fr": ["acide désoxyribonucléique"],
+              "synonymes_ar": ["الدنا"],
+              "importance": "critique",
+              "bac_frequent": true,
+              "chapitre_principal": "Synthèse des protéines",
+              "exemples_contexte": [
+                "L'ADN est une molécule en double hélice située dans le noyau",
+                "La transcription utilise l'ADN comme matrice pour synthétiser l'ARNm"
+              ],
+              "termes_lies": ["term-002", "term-003"],
+              "tags": ["molecule", "genetique", "structure", "noyau"]
+            },
+            {
+              "id": "term-002",
+              "terme_fr": "ARN messager",
+              "terme_ar": "الحمض النووي الريبي الرسول",
+              "abreviation": "ARNm",
+              "type": "molecule",
+              "definition_fr": "Molécule d'ARN simple brin qui transmet l'information génétique de l'ADN du noyau aux ribosomes dans le cytoplasme",
+              "definition_ar": "جزيء ARN أحادي السلسلة ينقل المعلومات الوراثية من ADN النواة إلى الريبوزومات في الهيولى",
+              "synonymes_fr": ["messager", "ARN messager"],
+              "synonymes_ar": ["ARN الرسول"],
+              "importance": "critique",
+              "bac_frequent": true,
+              "chapitre_principal": "Synthèse des protéines",
+              "exemples_contexte": [
+                "L'ARNm est synthétisé lors de la transcription",
+                "La séquence des codons de l'ARNm détermine la séquence des acides aminés"
+              ],
+              "termes_lies": ["term-001", "term-003", "term-004"],
+              "tags": ["molecule", "transcription", "translation"]
+            },
+            {
+              "id": "term-003",
+              "terme_fr": "ARN polymérase",
+              "terme_ar": "ARN بوليميراز",
+              "abreviation": null,
+              "type": "enzyme",
+              "definition_fr": "Enzyme responsable de la transcription de l'ADN en ARNm en catalysant la liaison des ribonucléotides",
+              "definition_ar": "إنزيم مسؤول عن استنساخ ADN إلى ARNm عن طريق تحفيز ارتباط الريبونوكليوتيدات",
+              "synonymes_fr": ["ARN polymérase ADN-dépendante"],
+              "synonymes_ar": ["إنزيم الاستنساخ"],
+              "importance": "haute",
+              "bac_frequent": true,
+              "chapitre_principal": "Synthèse des protéines",
+              "exemples_contexte": [
+                "L'ARN polymérase se fixe au promoteur du gène pour initier la transcription",
+                "L'ARN polymérase se déplace le long du brin matrice d'ADN"
+              ],
+              "termes_lies": ["term-001", "term-002"],
+              "tags": ["enzyme", "transcription", "proteine"]
+            },
+            {
+              "id": "term-004",
+              "terme_fr": "Code génétique",
+              "terme_ar": "الشفرة الوراثية",
+              "abreviation": null,
+              "type": "concept",
+              "definition_fr": "Système de correspondance entre les codons (triplets de nucléotides) de l'ARNm et les acides aminés lors de la traduction",
+              "definition_ar": "نظام تطابق بين الرامزات (ثلاثيات النيوكليوتيدات) في ARNm والأحماض الأمينية أثناء الترجمة",
+              "synonymes_fr": ["code génétique standard"],
+              "synonymes_ar": ["الشفرة الوراثية القياسية"],
+              "importance": "critique",
+              "bac_frequent": true,
+              "chapitre_principal": "Synthèse des protéines",
+              "exemples_contexte": [
+                "Le codon AUG code pour la méthionine et sert de codon d'initiation",
+                "Le code génétique est universel et redondant (plusieurs codons pour un même acide aminé)"
+              ],
+              "termes_lies": ["term-002", "term-005"],
+              "tags": ["concept", "translation", "codon"]
+            }
+          ]
+        },
+        {
+          "id": "cat-1-2",
+          "nom_fr": "Structure des protéines",
+          "nom_ar": "بنية البروتينات",
+          "termes": [
+            {
+              "id": "term-005",
+              "terme_fr": "Acide aminé",
+              "terme_ar": "حمض أميني",
+              "abreviation": "AA",
+              "type": "molecule",
+              "definition_fr": "Molécule organique constituée d'une fonction amine (-NH2), d'une fonction carboxyle (-COOH) et d'une chaîne latérale R variable, liés à un carbone alpha",
+              "definition_ar": "جزيء عضوي يتكون من مجموعة أمين (-NH2) ومجموعة كربوكسيل (-COOH) وسلسلة جانبية R متغيرة، مرتبطة بذرة كربون ألفا",
+              "synonymes_fr": ["acide α-aminé"],
+              "synonymes_ar": ["الحمض الأميني"],
+              "importance": "critique",
+              "bac_frequent": true,
+              "chapitre_principal": "Structure-fonction des protéines",
+              "exemples_contexte": [
+                "Il existe 20 acides aminés standards chez les êtres vivants",
+                "Les acides aminés sont liés entre eux par des liaisons peptidiques"
+              ],
+              "termes_lies": ["term-004", "term-006", "term-007"],
+              "tags": ["molecule", "proteine", "structure"]
+            },
+            {
+              "id": "term-006",
+              "terme_fr": "Liaison peptidique",
+              "terme_ar": "الرابطة الببتيدية",
+              "abreviation": null,
+              "type": "concept",
+              "definition_fr": "Liaison covalente entre le groupement carboxyle (-COOH) d'un acide aminé et le groupement amine (-NH2) de l'acide aminé suivant, avec libération d'une molécule d'eau",
+              "definition_ar": "رابطة تساهمية بين مجموعة الكربوكسيل (-COOH) لحمض أميني ومجموعة الأمين (-NH2) للحمض الأميني التالي، مع تحرير جزيء ماء",
+              "synonymes_fr": ["liaison amide"],
+              "synonymes_ar": ["الرابطة الببتيدية"],
+              "importance": "haute",
+              "bac_frequent": true,
+              "chapitre_principal": "Structure-fonction des protéines",
+              "exemples_contexte": [
+                "La liaison peptidique se forme par une réaction de déshydratation",
+                "L'hydrolyse des liaisons peptidiques libère les acides aminés"
+              ],
+              "termes_lies": ["term-005", "term-007"],
+              "tags": ["concept", "liaison", "proteine"]
+            },
+            {
+              "id": "term-007",
+              "terme_fr": "Structure tertiaire",
+              "terme_ar": "البنية الثالثية",
+              "abreviation": null,
+              "type": "concept",
+              "definition_fr": "Repliement tridimensionnel d'une chaîne polypeptidique stabilisé par des liaisons hydrogène, ioniques, hydrophobes et des ponts disulfure entre les chaînes latérales R",
+              "definition_ar": "الطي ثلاثي الأبعاد لسلسلة بولي ببتيدية، يثبت بواسطة روابط هيدروجينية وأيونية وكارهة للماء وجسور كبريتية بين السلاسل الجانبية R",
+              "synonymes_fr": ["repliement tridimensionnel"],
+              "synonymes_ar": ["الطي الفراغي"],
+              "importance": "haute",
+              "bac_frequent": true,
+              "chapitre_principal": "Structure-fonction des protéines",
+              "exemples_contexte": [
+                "La structure tertiaire est essentielle à la fonction catalytique des enzymes",
+                "La dénaturation détruit la structure tertiaire et fait perdre la fonction"
+              ],
+              "termes_lies": ["term-005", "term-006", "term-008"],
+              "tags": ["concept", "structure", "proteine"]
+            },
+            {
+              "id": "term-008",
+              "terme_fr": "Site actif",
+              "terme_ar": "الموقع الفعال",
+              "abreviation": null,
+              "type": "concept",
+              "definition_fr": "Région spécifique de l'enzyme constituée d'acides aminés précis, responsable de la fixation du substrat et de la catalyse de la réaction",
+              "definition_ar": "منطقة نوعية في الإنزيم تتكون من أحماض أمينية محددة، مسؤولة عن تثبيت الركيزة وتحفيز التفاعل",
+              "synonymes_fr": ["site catalytique"],
+              "synonymes_ar": ["الموقع النشط"],
+              "importance": "critique",
+              "bac_frequent": true,
+              "chapitre_principal": "Activité enzymatique",
+              "exemples_contexte": [
+                "Le site actif est complémentaire à la forme du substrat (modèle clé-serrure)",
+                "Une mutation dans le site actif peut inactiver l'enzyme"
+              ],
+              "termes_lies": ["term-007", "term-009", "term-010"],
+              "tags": ["concept", "enzyme", "catalyse", "proteine"]
+            }
+          ]
+        },
+        {
+          "id": "cat-1-3",
+          "nom_fr": "Enzymologie",
+          "nom_ar": "علم الإنزيمات",
+          "termes": [
+            {
+              "id": "term-009",
+              "terme_fr": "Enzyme",
+              "terme_ar": "إنزيم",
+              "abreviation": null,
+              "type": "enzyme",
+              "definition_fr": "Protéine catalytique qui accélère une réaction biochimique spécifique sans être consommée, en abaissant l'énergie d'activation",
+              "definition_ar": "بروتين محفز يسرع تفاعل كيميائي حيوي نوعي دون أن يُستهلك، عن طريق خفض طاقة التنشيط",
+              "synonymes_fr": ["biocatalyseur", "catalyseur biologique"],
+              "synonymes_ar": ["الحفاز الحيوي"],
+              "importance": "critique",
+              "bac_frequent": true,
+              "chapitre_principal": "Activité enzymatique",
+              "exemples_contexte": [
+                "Le maltase hydrolyse le maltose en deux molécules de glucose",
+                "La catalase décompose le peroxyde d'hydrogène en eau et oxygène"
+              ],
+              "termes_lies": ["term-008", "term-010"],
+              "tags": ["enzyme", "proteine", "catalyse"]
+            },
+            {
+              "id": "term-010",
+              "terme_fr": "Substrat",
+              "terme_ar": "الركيزة",
+              "abreviation": "S",
+              "type": "concept",
+              "definition_fr": "Molécule sur laquelle agit une enzyme, se fixant au niveau du site actif pour être transformée en produit(s)",
+              "definition_ar": "الجزيء الذي يؤثر عليه الإنزيم، حيث يثبت في الموقع الفعال ليتحول إلى ناتج (منتجات)",
+              "synonymes_fr": ["réactif enzymatique"],
+              "synonymes_ar": ["مادة التفاعل"],
+              "importance": "haute",
+              "bac_frequent": true,
+              "chapitre_principal": "Activité enzymatique",
+              "exemples_contexte": [
+                "Le lactose est le substrat de la lactase",
+                "Plus la concentration en substrat augmente, plus la vitesse initiale augmente jusqu'à saturation"
+              ],
+              "termes_lies": ["term-008", "term-009"],
+              "tags": ["concept", "enzyme", "catalyse"]
+            }
+          ]
+        },
+        {
+          "id": "cat-1-4",
+          "nom_fr": "Immunologie",
+          "nom_ar": "علم المناعة",
+          "termes": [
+            {
+              "id": "term-011",
+              "terme_fr": "Anticorps",
+              "terme_ar": "جسم مضاد",
+              "abreviation": "Ac",
+              "type": "molecule",
+              "definition_fr": "Glycoprotéine de forme Y produite par les plasmocytes, capable de se lier spécifiquement à un antigène pour former un complexe immun",
+              "definition_ar": "بروتين سكري على شكل Y ينتجه البلازموسيت، قادر على الارتباط نوعياً بمستضد لتشكيل معقد مناعي",
+              "synonymes_fr": ["immunoglobuline", "Ig"],
+              "synonymes_ar": ["الغلوبولين المناعي"],
+              "importance": "critique",
+              "bac_frequent": true,
+              "chapitre_principal": "Immunologie",
+              "exemples_contexte": [
+                "Les anticorps neutralisent les toxines bactériennes et les virus",
+                "Chaque anticorps possède deux sites de fixation pour l'antigène"
+              ],
+              "termes_lies": ["term-012", "term-013", "term-014"],
+              "tags": ["molecule", "immunite", "proteine"]
+            },
+            {
+              "id": "term-012",
+              "terme_fr": "Antigène",
+              "terme_ar": "مستضد",
+              "abreviation": "Ag",
+              "type": "concept",
+              "definition_fr": "Toute substance étrangère à l'organisme capable de déclencher une réponse immunitaire en se liant spécifiquement à un anticorps ou un récepteur lymphocytaire",
+              "definition_ar": "كل مادة غريبة عن الجسم قادرة على إثارة استجابة مناعية بالارتباط النوعي مع جسم مضاد أو مستقبل لمفاوي",
+              "synonymes_fr": ["immunogène"],
+              "synonymes_ar": ["مولد الضد"],
+              "importance": "critique",
+              "bac_frequent": true,
+              "chapitre_principal": "Immunologie",
+              "exemples_contexte": [
+                "Un virus, une bactérie ou une toxine peuvent agir comme antigènes",
+                "Déterminant antigénique (épitope) est la partie reconnue par l'anticorps"
+              ],
+              "termes_lies": ["term-011", "term-013", "term-015"],
+              "tags": ["concept", "immunite"]
+            },
+            {
+              "id": "term-013",
+              "terme_fr": "Complexe majeur d'histocompatibilité",
+              "terme_ar": "معقد التوافق النسيجي الرئيسي",
+              "abreviation": "CMH",
+              "type": "molecule",
+              "definition_fr": "Ensemble de glycoprotéines membranaires présentant des peptides antigéniques aux lymphocytes T, permettant la distinction entre le soi et le non-soi",
+              "definition_ar": "مجموعة من البروتينات السكرية الغشائية تعرض الببتيدات المستضدية للخلايا اللمفاوية T، مما يسمح بالتمييز بين الذات واللاذات",
+              "synonymes_fr": ["HLA (chez l'homme)"],
+              "synonymes_ar": ["HLA"],
+              "importance": "critique",
+              "bac_frequent": true,
+              "chapitre_principal": "Immunologie",
+              "exemples_contexte": [
+                "Le CMH de classe I est présent sur toutes les cellules nucléées",
+                "Le CMH de classe II est présent sur les cellules présentatrices d'antigène"
+              ],
+              "termes_lies": ["term-014", "term-015"],
+              "tags": ["molecule", "immunite", "membrane"]
+            },
+            {
+              "id": "term-014",
+              "terme_fr": "Lymphocyte T cytotoxique",
+              "terme_ar": "الخلية اللمفاوية التائية السامة",
+              "abreviation": "LTc / CTL",
+              "type": "cellule",
+              "definition_fr": "Lymphocyte T portant le marqueur CD8, responsable de la destruction des cellules infectées par un virus ou des cellules tumorales via la sécrétion de perforine",
+              "definition_ar": "خلية لمفاوية T تحمل المؤشر CD8، مسؤولة عن تدمير الخلايا المصابة بفيروس أو الخلايا السرطانية عبر إفراز البرفورين",
+              "synonymes_fr": ["LT8", "cellule T CD8+", "CTL"],
+              "synonymes_ar": ["لمفاوية تائية سامة"],
+              "importance": "critique",
+              "bac_frequent": true,
+              "chapitre_principal": "Immunologie",
+              "exemples_contexte": [
+                "Les LTc reconnaissent les peptides viraux présentés par le CMH I",
+                "La perforine forme des pores dans la membrane de la cellule cible"
+              ],
+              "termes_lies": ["term-013", "term-015"],
+              "tags": ["cellule", "immunite", "lymphocyte"]
+            },
+            {
+              "id": "term-015",
+              "terme_fr": "Cellule présentatrice d'antigène",
+              "terme_ar": "خلية عارضة للمستضد",
+              "abreviation": "CPA",
+              "type": "cellule",
+              "definition_fr": "Cellule immunitaire (macrophage, cellule dendritique, LB) qui capture, dégrade et présente les peptides antigéniques via le CMH II aux lymphocytes T CD4+",
+              "definition_ar": "خلية مناعية (بالعة كبيرة، خلية شجيرية، LB) تلتقط المستضد وتحلله وتعرض الببتيدات المستضدية عبر CMH II للخلايا اللمفاوية T CD4+",
+              "synonymes_fr": ["cellule accessoire", "CPA professionnelle"],
+              "synonymes_ar": ["خلية عارضة"],
+              "importance": "haute",
+              "bac_frequent": true,
+              "chapitre_principal": "Immunologie",
+              "exemples_contexte": [
+                "Les macrophages présentent les antigènes aux lymphocytes T auxiliaires",
+                "Les CPA sécrètent l'interleukine 1 pour activer les LT4"
+              ],
+              "termes_lies": ["term-013", "term-014", "term-016"],
+              "tags": ["cellule", "immunite", "activation"]
+            },
+            {
+              "id": "term-016",
+              "terme_fr": "Interleukine 2",
+              "terme_ar": "إنترلوكين 2",
+              "abreviation": "IL-2",
+              "type": "molecule",
+              "definition_fr": "Cytokine (glycoprotéine) sécrétée par les lymphocytes Th activés, stimulant la prolifération et la différenciation des lymphocytes T et B spécifiques",
+              "definition_ar": "سيتوكين (بروتين سكري) تفرزه الخلايا اللمفاوية Th المنشطة، يحفز تكاثر وتمايز الخلايا اللمفاوية T و B النوعية",
+              "synonymes_fr": ["facteur de croissance des lymphocytes T"],
+              "synonymes_ar": ["عامل نمو الخلايا T"],
+              "importance": "haute",
+              "bac_frequent": false,
+              "chapitre_principal": "Immunologie",
+              "exemples_contexte": [
+                "L'IL-2 active les LTc et LB qui ont déjà reconnu l'antigène",
+                "L'IL-2 est produite par les LT4 activés (LTh)"
+              ],
+              "termes_lies": ["term-014", "term-015", "term-017"],
+              "tags": ["molecule", "cytokine", "immunite"]
+            }
+          ]
+        },
+        {
+          "id": "cat-1-5",
+          "nom_fr": "Neurobiologie",
+          "nom_ar": "علم الأعصاب",
+          "termes": [
+            {
+              "id": "term-017",
+              "terme_fr": "Potentiel d'action",
+              "terme_ar": "كمون العمل",
+              "abreviation": "PA",
+              "type": "concept",
+              "definition_fr": "Dépolarisation rapide et brève de la membrane neuronale due à l'entrée massive de Na+ suivie de la sortie de K+, permettant la propagation du message nerveux",
+              "definition_ar": "زوال استقطاب سريع وقصير للغشاء العصبي ناتج عن دخول جماعي لـ Na+ يتبعه خروج K+، مما يسمح بانتشار الرسالة العصبية",
+              "synonymes_fr": ["influx nerveux", "spike"],
+              "synonymes_ar": ["السيالة العصبية"],
+              "importance": "critique",
+              "bac_frequent": true,
+              "chapitre_principal": "Communication nerveuse",
+              "exemples_contexte": [
+                "Le potentiel d'action naît au niveau du cône d'émergence",
+                "La propagation du potentiel d'action est saltatoire dans les fibres myélinisées"
+              ],
+              "termes_lies": ["term-018", "term-019"],
+              "tags": ["concept", "nerveux", "membrane"]
+            },
+            {
+              "id": "term-018",
+              "terme_fr": "Neurotransmetteur",
+              "terme_ar": "الناقل العصبي",
+              "abreviation": "NT",
+              "type": "molecule",
+              "definition_fr": "Molécule chimique libérée dans la fente synaptique par le neurone présynaptique, qui se fixe sur des récepteurs postsynaptiques pour transmettre ou moduler le signal nerveux",
+              "definition_ar": "جزيء كيميائي يُحرر في الشق المشبكي من العصبون قبل المشبكي، يثبت على مستقبلات بعد مشبكية لنقل أو تعديل الإشارة العصبية",
+              "synonymes_fr": ["neuromédiateur", "messager chimique"],
+              "synonymes_ar": ["المرسل الكيميائي"],
+              "importance": "critique",
+              "bac_frequent": true,
+              "chapitre_principal": "Communication nerveuse",
+              "exemples_contexte": [
+                "L'acétylcholine est le neurotransmetteur de la jonction neuromusculaire",
+                "Le GABA est un neurotransmetteur inhibiteur"
+              ],
+              "termes_lies": ["term-017", "term-019"],
+              "tags": ["molecule", "synapse", "nerveux"]
+            },
+            {
+              "id": "term-019",
+              "terme_fr": "Synapse",
+              "terme_ar": "المشبك",
+              "abreviation": null,
+              "type": "concept",
+              "definition_fr": "Zone de jonction fonctionnelle entre deux neurones ou entre un neurone et une cellule effectrice, permettant la transmission du message nerveux",
+              "definition_ar": "منطقة التماس الوظيفي بين عصبونين أو بين عصبون وخلية منفذة، تسمح بنقل الرسالة العصبية",
+              "synonymes_fr": ["jonction synaptique"],
+              "synonymes_ar": ["التشابك العصبي"],
+              "importance": "critique",
+              "bac_frequent": true,
+              "chapitre_principal": "Communication nerveuse",
+              "exemples_contexte": [
+                "La synapse chimique utilise des neurotransmetteurs pour transmettre le signal",
+                "La fente synaptique mesure environ 20 nm de large"
+              ],
+              "termes_lies": ["term-017", "term-018"],
+              "tags": ["concept", "nerveux", "synapse"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "domaine-2",
+      "nom_fr": "Transformations énergétiques",
+      "nom_ar": "التحولات الطاقوية",
+      "categories": [
+        {
+          "id": "cat-2-1",
+          "nom_fr": "Photosynthèse",
+          "nom_ar": "التركيب الضوئي",
+          "termes": [
+            {
+              "id": "term-020",
+              "terme_fr": "Chloroplaste",
+              "terme_ar": "الصانعة الخضراء",
+              "abreviation": null,
+              "type": "organite",
+              "definition_fr": "Organite cellulaire végétal contenant la chlorophylle, siège de la photosynthèse, constitué de thylakoïdes (granums) et d'un stroma",
+              "definition_ar": "عضية خلوية نباتية تحتوي على اليخضور، مقر التركيب الضوئي، تتكون من تيلاكويدات (غرانا) وحشوة",
+              "synonymes_fr": ["plaste vert"],
+              "synonymes_ar": ["البلاستيدة الخضراء"],
+              "importance": "critique",
+              "bac_frequent": true,
+              "chapitre_principal": "Photosynthèse",
+              "exemples_contexte": [
+                "Le chloroplaste contient des thylakoïdes empilés en granum",
+                "La phase claire se déroule dans la membrane des thylakoïdes"
+              ],
+              "termes_lies": ["term-021", "term-022"],
+              "tags": ["organite", "photosynthese", "vegetal"]
+            },
+            {
+              "id": "term-021",
+              "terme_fr": "Cycle de Calvin",
+              "terme_ar": "دورة كالفن",
+              "abreviation": null,
+              "type": "processus",
+              "definition_fr": "Ensemble de réactions biochimiques se déroulant dans le stroma du chloroplaste, fixant le CO2 sur le ribulose bisphosphate (RuBP) pour synthétiser des glucides",
+              "definition_ar": "مجموعة من التفاعلات الكيميائية الحيوية تحدث في حشوة الصانعة الخضراء، تثبت CO2 على الريبولوز ثنائي الفوسفات (RuBP) لتخليق سكريات",
+              "synonymes_fr": ["cycle de Calvin-Benson", "phase sombre", "phase chimio-biotique"],
+              "synonymes_ar": ["حلقة كالفن-بنسون"],
+              "importance": "haute",
+              "bac_frequent": true,
+              "chapitre_principal": "Photosynthèse",
+              "exemples_contexte": [
+                "Le cycle de Calvin utilise l'ATP et le NADPH produits pendant la phase claire",
+                "L'enzyme Rubisco catalyse la fixation du CO2 sur le RuBP"
+              ],
+              "termes_lies": ["term-020", "term-022"],
+              "tags": ["processus", "photosynthese", "metabolisme"]
+            },
+            {
+              "id": "term-022",
+              "terme_fr": "ATP synthase",
+              "terme_ar": "ATP سنتاز",
+              "abreviation": null,
+              "type": "enzyme",
+              "definition_fr": "Complexe enzymatique présent dans les membranes des thylakoïdes (et de la mitochondrie) catalysant la synthèse d'ATP à partir d'ADP et Pi grâce à un flux de protons",
+              "definition_ar": "معقد إنزيمي موجود في أغشية التيلاكويدات (والميتوكوندري) يحفز تركيب ATP انطلاقاً من ADP و Pi بفضل تدفق البروتونات",
+              "synonymes_fr": ["ATPase", "complexe ATP-synthétique", "tête globulaire"],
+              "synonymes_ar": ["الكرات المذنبة"],
+              "importance": "haute",
+              "bac_frequent": true,
+              "chapitre_principal": "Photosynthèse",
+              "exemples_contexte": [
+                "L'ATP synthase utilise l'énergie du gradient de protons (chimiosmose)",
+                "L'ATP synthase fonctionne comme une turbine moléculaire"
+              ],
+              "termes_lies": ["term-020", "term-025"],
+              "tags": ["enzyme", "energie", "membrane"]
+            }
+          ]
+        },
+        {
+          "id": "cat-2-2",
+          "nom_fr": "Respiration cellulaire",
+          "nom_ar": "التنفس الخلوي",
+          "termes": [
+            {
+              "id": "term-023",
+              "terme_fr": "Mitochondrie",
+              "terme_ar": "الميتوكوندري",
+              "abreviation": null,
+              "type": "organite",
+              "definition_fr": "Organite cellulaire à double membrane, siège de la respiration cellulaire où se déroulent le cycle de Krebs et la phosphorylation oxydative pour produire de l'ATP",
+              "definition_ar": "عضية خلوية ذات غشاء مزدوج، مقر التنفس الخلوي حيث تحدث دورة كريبس والفسفرة التأكسدية لإنتاج ATP",
+              "synonymes_fr": ["chondriosome", "centrale énergétique"],
+              "synonymes_ar": ["متقدرة", "ميتوكوندريون"],
+              "importance": "critique",
+              "bac_frequent": true,
+              "chapitre_principal": "Respiration cellulaire",
+              "exemples_contexte": [
+                "La mitochondrie possède une membrane interne repliée en crêtes",
+                "La matrice mitochondriale contient les enzymes du cycle de Krebs"
+              ],
+              "termes_lies": ["term-024", "term-025"],
+              "tags": ["organite", "respiration", "energie"]
+            },
+            {
+              "id": "term-024",
+              "terme_fr": "Cycle de Krebs",
+              "terme_ar": "دورة كريبس",
+              "abreviation": null,
+              "type": "processus",
+              "definition_fr": "Série de réactions enzymatiques dans la matrice mitochondriale oxydant l'acétyl-CoA en CO2, produisant des coenzymes réduits (NADH, FADH2) et du GTP",
+              "definition_ar": "سلسلة من التفاعلات الإنزيمية في المادة الأساسية للميتوكوندري تؤكسد أسيتيل CoA إلى CO2، منتجة مرافقات أنزيمية مرجعة (NADH, FADH2) و GTP",
+              "synonymes_fr": ["cycle de l'acide citrique", "cycle tricarboxylique"],
+              "synonymes_ar": ["حلقة حمض الليمون"],
+              "importance": "haute",
+              "bac_frequent": true,
+              "chapitre_principal": "Respiration cellulaire",
+              "exemples_contexte": [
+                "Le cycle de Krebs est une étape clé du métabolisme aérobie",
+                "Le cycle de Krebs produit 2 CO2, 3 NADH, 1 FADH2 et 1 GTP par tour"
+              ],
+              "termes_lies": ["term-023", "term-025", "term-028"],
+              "tags": ["processus", "respiration", "metabolisme"]
+            },
+            {
+              "id": "term-025",
+              "terme_fr": "Phosphorylation oxydative",
+              "terme_ar": "الفسفرة التأكسدية",
+              "abreviation": null,
+              "type": "processus",
+              "definition_fr": "Processus de synthèse d'ATP couplé à la chaîne respiratoire mitochondriale où l'oxydation du NADH et FADH2 génère un gradient de protons utilisé par l'ATP synthase",
+              "definition_ar": "عملية تركيب ATP المقترنة بالسلسلة التنفسية الميتوكوندرية حيث تؤكسدة NADH و FADH2 تولد تدرجاً بروتونياً يستخدمه ATP سنتاز",
+              "synonymes_fr": ["chaîne respiratoire", "oxydation phosphorylante"],
+              "synonymes_ar": ["السلسلة التنفسية"],
+              "importance": "haute",
+              "bac_frequent": true,
+              "chapitre_principal": "Énergie cellulaire",
+              "exemples_contexte": [
+                "La phosphorylation oxydative produit la majorité de l'ATP cellulaire (36 ATP/glucose)",
+                "L'oxygène est l'accepteur final d'électrons dans la chaîne respiratoire"
+              ],
+              "termes_lies": ["term-023", "term-024"],
+              "tags": ["processus", "respiration", "energie", "membrane"]
+            }
+          ]
+        },
+        {
+          "id": "cat-2-3",
+          "nom_fr": "Fermentation",
+          "nom_ar": "التخمر",
+          "termes": [
+            {
+              "id": "term-026",
+              "terme_fr": "Fermentation alcoolique",
+              "terme_ar": "التخمر الكحولي",
+              "abreviation": null,
+              "type": "processus",
+              "definition_fr": "Processus anaérobie de dégradation partielle du glucose par les levures, produisant de l'éthanol, du CO2 et 2 ATP par molécule de glucose",
+              "definition_ar": "عملية لاهوائية للهدم الجزئي للغلوكوز بواسطة الخمائر، تنتج الإيثانول و CO2 و 2 ATP لكل جزيء غلوكوز",
+              "synonymes_fr": ["fermentation éthanolique"],
+              "synonymes_ar": ["التخمر الكحولي"],
+              "importance": "moyenne",
+              "bac_frequent": false,
+              "chapitre_principal": "Énergie cellulaire",
+              "exemples_contexte": [
+                "La fermentation alcoolique est utilisée dans la fabrication du pain et du vin",
+                "Le NADH est réoxydé en NAD+ lors de la réduction de l'acétaldéhyde en éthanol"
+              ],
+              "termes_lies": ["term-024", "term-025"],
+              "tags": ["processus", "fermentation", "anaerobie"]
+            },
+            {
+              "id": "term-027",
+              "terme_fr": "Glycolyse",
+              "terme_ar": "التحلل السكري",
+              "abreviation": null,
+              "type": "processus",
+              "definition_fr": "Voie métabolique cytoplasmique dégradant une molécule de glucose (C6) en deux molécules de pyruvate (C3), produisant 2 ATP et 2 NADH",
+              "definition_ar": "مسار أيضي هيولي يهدم جزيء غلوكوز (C6) إلى جزيئي بيروفات (C3)، منتجاً 2 ATP و 2 NADH",
+              "synonymes_fr": ["voie d'Embden-Meyerhof-Parnas", "dégradation du glucose"],
+              "synonymes_ar": ["الغلكزة", "تحلل السكر"],
+              "importance": "haute",
+              "bac_frequent": true,
+              "chapitre_principal": "Énergie cellulaire",
+              "exemples_contexte": [
+                "La glycolyse est la première étape de la respiration et de la fermentation",
+                "La glycolyse se déroule dans le cytoplasme sans consommation d'oxygène"
+              ],
+              "termes_lies": ["term-024", "term-026"],
+              "tags": ["processus", "metabolisme", "energie"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "domaine-3",
+      "nom_fr": "Tectonique globale",
+      "nom_ar": "التكتونية العامة",
+      "categories": [
+        {
+          "id": "cat-3-1",
+          "nom_fr": "Plaques tectoniques",
+          "nom_ar": "الصفائح التكتونية",
+          "termes": [
+            {
+              "id": "term-028",
+              "terme_fr": "Lithosphère",
+              "terme_ar": "الغلاف الصخري",
+              "abreviation": null,
+              "type": "concept",
+              "definition_fr": "Enveloppe rigide externe de la Terre composée de la croûte terrestre et du manteau supérieur, fragmentée en plaques tectoniques",
+              "definition_ar": "الغلاف الصلب الخارجي للأرض المكون من القشرة الأرضية والستار العلوي، مقسم إلى صفائح تكتونية",
+              "synonymes_fr": ["croûte lithosphérique"],
+              "synonymes_ar": ["الليتوسفير"],
+              "importance": "critique",
+              "bac_frequent": true,
+              "chapitre_principal": "Tectonique des plaques",
+              "exemples_contexte": [
+                "La lithosphère est découpée en une douzaine de plaques tectoniques",
+                "La lithosphère océanique est plus dense que la lithosphère continentale"
+              ],
+              "termes_lies": ["term-029", "term-030"],
+              "tags": ["concept", "tectonique", "geologie"]
+            },
+            {
+              "id": "term-029",
+              "terme_fr": "Dorsale océanique",
+              "terme_ar": "الظهرة المحيطية",
+              "abreviation": null,
+              "type": "concept",
+              "definition_fr": "Chaîne de montagnes sous-marine résultant de la divergence de plaques tectoniques, siège de l'accrétion océanique et de la formation de nouvelle croûte",
+              "definition_ar": "سلسلة جبلية تحت مائية ناتجة عن تباعد الصفائح التكتونية، مقر النمو المحيطي وتشكل قشرة جديدة",
+              "synonymes_fr": ["dorsale médio-océanique", "rift océanique"],
+              "synonymes_ar": ["الظهرة وسط محيطية"],
+              "importance": "haute",
+              "bac_frequent": true,
+              "chapitre_principal": "Tectonique des plaques",
+              "exemples_contexte": [
+                "L'Islande est émergée au niveau de la dorsale médio-atlantique",
+                "Les dorsales océaniques sont des zones de sismicité superficielle"
+              ],
+              "termes_lies": ["term-028", "term-030"],
+              "tags": ["concept", "tectonique", "geologie"]
+            },
+            {
+              "id": "term-030",
+              "terme_fr": "Subduction",
+              "terme_ar": "الغوص",
+              "abreviation": null,
+              "type": "processus",
+              "definition_fr": "Processus par lequel une plaque lithosphérique océanique plonge sous une autre plaque (océanique ou continentale) dans une zone de convergence, créant une fosse océanique",
+              "definition_ar": "عملية تغوص بموجبها صفيحة محيطية تحت صفيحة أخرى (محيطية أو قارية) في منطقة تقارب، مكونة خندقاً محيطياً",
+              "synonymes_fr": ["zone de subduction"],
+              "synonymes_ar": ["الاندساس", "منطقة الغوص"],
+              "importance": "critique",
+              "bac_frequent": true,
+              "chapitre_principal": "Tectonique des plaques",
+              "exemples_contexte": [
+                "La subduction de la plaque Pacifique sous la plaque nord-américaine crée la fosse du Japon",
+                "Les zones de subduction sont associées à un volcanisme explosif et des séismes profonds"
+              ],
+              "termes_lies": ["term-028", "term-029", "term-031"],
+              "tags": ["processus", "tectonique", "geologie"]
+            }
+          ]
+        },
+        {
+          "id": "cat-3-2",
+          "nom_fr": "Structure interne",
+          "nom_ar": "البنية الداخلية",
+          "termes": [
+            {
+              "id": "term-031",
+              "terme_fr": "Noyau terrestre",
+              "terme_ar": "النواة الأرضية",
+              "abreviation": null,
+              "type": "concept",
+              "definition_fr": "Partie centrale de la Terre constituée principalement de fer et de nickel, divisée en noyau interne solide et noyau externe liquide",
+              "definition_ar": "الجزء المركزي للأرض المكون أساساً من الحديد والنيكل، مقسم إلى نواة داخلية صلبة ونواة خارجية سائلة",
+              "synonymes_fr": ["centre de la Terre", "endogée"],
+              "synonymes_ar": ["لب الأرض"],
+              "importance": "moyenne",
+              "bac_frequent": false,
+              "chapitre_principal": "Structure du globe",
+              "exemples_contexte": [
+                "Le noyau externe liquide est responsable du champ magnétique terrestre",
+                "Le noyau interne solide a un rayon d'environ 1220 km"
+              ],
+              "termes_lies": ["term-028", "term-032"],
+              "tags": ["concept", "geologie", "structure"]
+            },
+            {
+              "id": "term-032",
+              "terme_fr": "Discontinuité sismique",
+              "terme_ar": "الانقطاع الزلزالي",
+              "abreviation": null,
+              "type": "concept",
+              "definition_fr": "Surface de séparation entre deux couches terrestres de compositions ou d'états physiques différents, où la vitesse des ondes sismiques change brusquement",
+              "definition_ar": "سطح فاصل بين طبقتين أرضيتين مختلفتين في التركيب أو الحالة الفيزيائية، حيث تتغير سرعة الموجات الزلزالية فجأة",
+              "synonymes_fr": ["frontière sismique"],
+              "synonymes_ar": ["عدم الاستمرارية الزلزالية"],
+              "importance": "moyenne",
+              "bac_frequent": false,
+              "chapitre_principal": "Structure du globe",
+              "exemples_contexte": [
+                "La discontinuité de Mohorovičić (Moho) sépare la croûte du manteau",
+                "La discontinuité de Gutenberg sépare le manteau du noyau externe"
+              ],
+              "termes_lies": ["term-031", "term-028"],
+              "tags": ["concept", "geologie", "sismologie"]
+            }
+          ]
+        },
+        {
+          "id": "cat-3-3",
+          "nom_fr": "Magmatisme",
+          "nom_ar": "المغماتية",
+          "termes": [
+            {
+              "id": "term-033",
+              "terme_fr": "Magma",
+              "terme_ar": "الماغما",
+              "abreviation": null,
+              "type": "concept",
+              "definition_fr": "Roche en fusion d'origine mantellique ou crustale contenant une phase liquide, des cristaux et des gaz dissous, dont le refroidissement donne des roches magmatiques",
+              "definition_ar": "صخر منصهر من أصل ستاري أو قشري يحتوي على طور سائل وبلورات وغازات مذابة، يبرد ليعطي صخوراً مغماتية",
+              "synonymes_fr": ["roche fondue", "lave (en surface)"],
+              "synonymes_ar": ["الصهارة"],
+              "importance": "haute",
+              "bac_frequent": true,
+              "chapitre_principal": "Magmatisme",
+              "exemples_contexte": [
+                "Le magma basaltique provient de la fusion partielle de la péridotite du manteau",
+                "La chambre magmatique alimente les volcans en magma"
+              ],
+              "termes_lies": ["term-030", "term-034"],
+              "tags": ["concept", "magmatisme", "roche"]
+            },
+            {
+              "id": "term-034",
+              "terme_fr": "Roche métamorphique",
+              "terme_ar": "صخر متحول",
+              "abreviation": null,
+              "type": "concept",
+              "definition_fr": "Roche issue de la transformation à l'état solide d'une roche préexistante sous l'effet de changements de pression et/ou de température (métamorphisme)",
+              "definition_ar": "صخر ناتج عن تحول صخر سابق في الحالة الصلبة تحت تأثير تغيرات في الضغط و/أو الحرارة (التحول)",
+              "synonymes_fr": ["roche métamorphique régionale", "roche métamorphique de contact"],
+              "synonymes_ar": ["الصخور المتحولة"],
+              "importance": "moyenne",
+              "bac_frequent": false,
+              "chapitre_principal": "Magmatisme",
+              "exemples_contexte": [
+                "Le basalte se transforme en schiste vert puis en amphibolite lors du métamorphisme",
+                "Le gabbro en subduction se transforme en schiste bleu puis en éclogite"
+              ],
+              "termes_lies": ["term-030", "term-033"],
+              "tags": ["concept", "geologie", "roche"]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "liens_transversaux": [
+    {
+      "source": "term-009",
+      "target": "term-008",
+      "relation": "structure-fonction",
+      "type": "dependance"
+    },
+    {
+      "source": "term-011",
+      "target": "term-012",
+      "relation": "reconnaissance-spécifique",
+      "type": "causal"
+    },
+    {
+      "source": "term-013",
+      "target": "term-014",
+      "relation": "présentation-antigénique",
+      "type": "causal"
+    },
+    {
+      "source": "term-017",
+      "target": "term-018",
+      "relation": "propagation-synaptique",
+      "type": "causal"
+    },
+    {
+      "source": "term-022",
+      "target": "term-025",
+      "relation": "synthèse-ATP",
+      "type": "dependance"
+    },
+    {
+      "source": "term-024",
+      "target": "term-025",
+      "relation": "fourniture-substrats",
+      "type": "dependance"
+    },
+    {
+      "source": "term-030",
+      "target": "term-033",
+      "relation": "fusion-crustale",
+      "type": "causal"
+    },
+    {
+      "source": "term-030",
+      "target": "term-034",
+      "relation": "métamorphisme-subduction",
+      "type": "causal"
+    }
+  ],
+  "metadata": {
+    "genere_le": "2026-06-15T12:00:00Z",
+    "version": "1.0-sample",
+    "source_rag": "programme_sciences_3as.json + AGENTS.md + programme officiel ONEC"
+  }
+}

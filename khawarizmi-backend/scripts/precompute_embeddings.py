@@ -28,7 +28,7 @@ from services.embedder import embedder
 async def precompute_and_store():
     # Charger la configuration
     cfg = get_settings()
-    db_url = cfg.database_url
+    db_url = cfg.DATABASE_URL
     if not db_url:
         db_url = os.getenv("DATABASE_URL")
         

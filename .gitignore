@@ -34,15 +34,11 @@ dist/
 *.swp
 *.swo
 
-# Modèles IA lourds (fichiers binaires uniquement)
-*.onnx
+# Modèles IA lourds
+models/
 *.zip
 *.tar.gz
 *.gguf
-*.bin
-
-# Vercel
-.vercel/
 
 # Logs
 *.log

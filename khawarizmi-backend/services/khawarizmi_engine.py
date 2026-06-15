@@ -95,13 +95,16 @@ class KhawarizmiTutor:
         self.programme_physique = self._charger_json(data_dir, 'programme_physique_3as.json', optional=True)
         self.programme_sciences = self._charger_json(data_dir, 'programme_sciences_3as.json', optional=True)
         self.annales_sciences   = self._charger_json(data_dir, 'annales_sciences_3as.json', optional=True)
+        self.lexique_complet    = self._charger_json(data_dir, 'lexique_svt_terminale_complet.json', optional=True)
 
         self._index_questions        = self._construire_index()
         self._index_micro_concepts   = self._construire_index_micro_concepts()
+        self._index_lexique          = self._construire_index_lexique()
 
         logger.info(f"KhawarizmiTutor initialisé : "
                    f"{len(self._index_questions)} sujets, "
-                   f"{len(self._index_micro_concepts)} micro-concepts")
+                   f"{len(self._index_micro_concepts)} micro-concepts, "
+                   f"{len(self._index_lexique)} termes lexique")
 
     def _charger_json(self, data_dir: str, filename: str, optional: bool = False) -> dict:
         filepath = os.path.join(data_dir, filename)
@@ -188,6 +191,97 @@ class KhawarizmiTutor:
                         index[mc_id] = {'micro_concept': mc, 'chapitre': chapitre}
         logger.info(f"Index MC : {len(index)} micro-concepts")
         return index
+
+    def _construire_index_lexique(self) -> dict:
+        index = {}
+        lexique = self.lexique_complet
+        if not lexique or not isinstance(lexique, dict):
+            return index
+
+        domaines = lexique.get('domaines', [])
+        for domaine in domaines:
+            for categorie in domaine.get('categories', []):
+                for terme in categorie.get('termes', []):
+                    tid = terme.get('id')
+                    if tid:
+                        # Indexer par ID
+                        index[tid] = {
+                            **terme,
+                            'domaine_fr': domaine.get('nom_fr', ''),
+                            'domaine_ar': domaine.get('nom_ar', ''),
+                            'categorie_fr': categorie.get('nom_fr', ''),
+                            'categorie_ar': categorie.get('nom_ar', ''),
+                        }
+                        # Indexer par terme_fr (lowercase)
+                        tf = terme.get('terme_fr', '').lower()
+                        if tf:
+                            index.setdefault(f'__nom__{tf}', []).append(tid)
+                        # Indexer par terme_ar
+                        ta = terme.get('terme_ar', '')
+                        if ta:
+                            index.setdefault(f'__ar__{ta}', []).append(tid)
+                        # Indexer par abreviation
+                        abv = terme.get('abreviation', '')
+                        if abv:
+                            index.setdefault(f'__abv__{abv.lower()}', []).append(tid)
+                        # Indexer par tags
+                        for tag in terme.get('tags', []):
+                            index.setdefault(f'__tag__{tag.lower()}', []).append(tid)
+
+        logger.info(f"Index lexique : {len(index)} entrées")
+        return index
+
+    def _enrichir_contexte_lexique(self, texte: str, mc_id: str = '') -> str:
+        if not self._index_lexique or not texte:
+            return ''
+
+        texte_lower = texte.lower()
+        termes_trouves = set()
+
+        # Chercher par micro_concept_id d'abord
+        if mc_id:
+            for tid, terme in self._index_lexique.items():
+                if tid.startswith('__'):
+                    continue
+                if terme.get('micro_concept_id') == mc_id and terme.get('importance') in ('critique', 'haute'):
+                    termes_trouves.add(tid)
+
+        # Chercher par correspondance textuelle
+        for tid, terme in self._index_lexique.items():
+            if tid.startswith('__'):
+                continue
+            nom_fr = terme.get('terme_fr', '').lower()
+            nom_ar = terme.get('terme_ar', '')
+            abv = terme.get('abreviation', '')
+            if nom_fr and nom_fr in texte_lower:
+                termes_trouves.add(tid)
+            if nom_ar and nom_ar in texte:
+                termes_trouves.add(tid)
+            if abv and abv.lower() in texte_lower:
+                termes_trouves.add(tid)
+
+        if not termes_trouves:
+            return ''
+
+        blocs = []
+        for tid in sorted(termes_trouves):
+            t = self._index_lexique.get(tid, {})
+            if not t:
+                continue
+            blocs.append(
+                f"- {t.get('terme_fr', '')} ({t.get('terme_ar', '')}) : "
+                f"{t.get('definition_fr', '')} — {t.get('definition_ar', '')} "
+                f"[{t.get('importance', '')}]"
+            )
+
+        if not blocs:
+            return ''
+
+        return (
+            "\n━━━ LEXIQUE DE RÉFÉRENCE (termes détectés) ━━━\n"
+            + "\n".join(blocs[:8])
+            + "\n"
+        )
 
     def _get_question(self, sujet_id: str, question_id: str) -> dict:
         if sujet_id not in self._index_questions:
@@ -402,6 +496,12 @@ class KhawarizmiTutor:
         if not hint_socratique and pre_analyse:
             hint_socratique = pre_analyse.get('hint_socratique', '')
 
+        # ─── Contexte lexique ───────────────────────────────────
+        texte_question = question.get('texte', question.get('question', ''))
+        contexte_lexique = self._enrichir_contexte_lexique(
+            f"{texte_question} {student_input}", mc_id
+        )
+
         # ─── Diagnostic pré-analyse ──────────────────────────────
         pre_analyse_str = (
             f"Diagnostic automatique : {pre_analyse.get('diagnostic', 'N/A')}"
@@ -483,7 +583,7 @@ Niveau Cognitif (Bloom) : {niveau_cognitif} ({bloom_info['code']})
 
 ━━━ RÉPONSE DE L'ÉLÈVE ━━━
 {student_input}
-
+{contexte_lexique}
 ━━━ DIAGNOSTIC ━━━
 Type d'erreur : {type_erreur}
 {pre_analyse_str}

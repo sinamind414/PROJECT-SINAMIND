@@ -177,7 +177,7 @@ CHAPTER1_CHUNKS = [
 async def ingest_chapter1():
     # Charger la configuration
     cfg = get_settings()
-    db_url = cfg.database_url
+    db_url = cfg.DATABASE_URL
     if not db_url:
         db_url = os.getenv("DATABASE_URL")
         

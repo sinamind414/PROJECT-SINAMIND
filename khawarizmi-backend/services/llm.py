@@ -1,9 +1,9 @@
 import json
 import logging
-import os
 import re
 from openai import AsyncOpenAI
 from tenacity import retry, stop_after_attempt, wait_exponential
+from config import get_settings
 
 logger = logging.getLogger("khawarizmi.llm")
 
@@ -240,7 +240,7 @@ TENTATIVE: {tentative}
 REPONSE_ELEVE: {reponse}"""
 
     # Timeout de 8 secondes passé directement à l'appel réseau
-    _model = os.getenv("OPENAI_MODEL", "gpt-4o")
+    _model = get_settings().openai_model
     
     try:
         response = await client.chat.completions.create(
@@ -258,7 +258,7 @@ REPONSE_ELEVE: {reponse}"""
         # Si c'est une erreur de quota / rate limit (429), on tente le fallback immédiat vers OpenAI gpt-4o-mini
         if "429" in str(e) or "quota" in str(e).lower():
             logger.warning("⚠️ Quota atteint ou 429 sur le client principal. Tentative de fallback OpenAI...")
-            fallback_key = os.getenv("OPENAI_FALLBACK_API_KEY") or os.getenv("REAL_OPENAI_API_KEY")
+            fallback_key = get_settings().OPENAI_FALLBACK_API_KEY or get_settings().REAL_OPENAI_API_KEY
             if fallback_key:
                 try:
                     fallback_client = AsyncOpenAI(

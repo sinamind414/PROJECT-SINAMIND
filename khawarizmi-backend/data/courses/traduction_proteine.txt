@@ -1,0 +1,17 @@
+La traduction de l'ARN messager est la deuxième grande étape de la synthèse des protéines. Elle consiste à traduire l'information codée sous forme de nucléotides dans l'ARN messager mature en une séquence d'acides aminés constituant une chaîne peptidique. Ce processus biologique complexe se déroule dans le cytoplasme de la cellule et fait intervenir plusieurs organites et molécules clés.
+
+Les acteurs majeurs de la traduction sont :
+
+1. Le Ribosome : C'est la machinerie cellulaire de lecture et d'assemblage. Il est constitué de deux sous-unités (une grande et une petite). Le ribosome possède deux sites de liaison importants pour les ARNt : le site A (aminoacyl) qui reçoit le nouvel acide aminé, et le site P (peptidyl) qui porte la chaîne peptidique en cours de croissance. Chez les bactéries et procaryotes, on parle de ribosome 70S.
+
+2. L'ARN de transfert (ARNt) : Chaque molécule d'ARNt possède un triplet de nucléotides appelé anticodon qui est complémentaire à un codon de l'ARNm, et porte à son autre extrémité l'acide aminé correspondant. L'activation des acides aminés (leur liaison à leur ARNt spécifique) nécessite une enzyme, l'aminoacyl-ARNt synthétase, et de l'énergie sous forme d'ATP.
+
+3. Le Code Génétique : Il établit la correspondance entre les codons (triplets de nucléotides sur l'ARNm) et les acides aminés. Le codon AUG est le codon initiateur universel et code pour la méthionine. Les codons UAA, UAG et UGA ne correspondent à aucun acide aminé et sont appelés des codons stop, signalant la fin de la traduction.
+
+Le déroulement de la traduction se fait également en trois phases majeures :
+
+1. L'Initiation : La petite sous-unité du ribosome se fixe à l'extrémité 5' de l'ARNm et glisse jusqu'à rencontrer le codon initiateur AUG. L'ARNt initiateur portant la méthionine se fixe sur ce codon AUG par son anticodon. La grande sous-unité ribosomique vient alors s'assembler avec la petite sous-unité pour former le ribosome fonctionnel. L'ARNt initiateur se positionne directement dans le site P du ribosome.
+
+2. L'Élongation : Le ribosome lit l'ARNm codon par codon dans le sens 5' vers 3' (translocation ou glissement vers l'extrémité 3'). Pour chaque nouveau codon exposé au site A, un ARNt complémentaire portant son acide aminé s'y fixe. Une enzyme (la peptidyl-transférase) forme une liaison peptidique entre l'acide aminé du site P et celui du site A. Le ribosome glisse ensuite d'un codon (translocation) : l'ARNt libre du site P est éjecté, et l'ARNt portant la chaîne peptidique passe du site A au site P, laissant le site A libre pour accueillir le codon suivant.
+
+3. La Terminaison : Le glissement du ribosome continue jusqu'à ce que le site A se retrouve en face de l'un des trois codons stop (UAA, UAG, UGA). Aucun ARNt ne correspond à ces codons. Des facteurs de libération s'y fixent, provoquant la rupture de la liaison entre le dernier acide aminé et son ARNt. La chaîne polypeptidique est libérée dans le cytoplasme, les deux sous-unités du ribosome se séparent et se détachent de l'ARNm. Très souvent, la méthionine initiale est éliminée pour finaliser la structure de la protéine mature.

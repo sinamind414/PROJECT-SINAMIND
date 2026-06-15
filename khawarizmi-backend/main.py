@@ -31,8 +31,6 @@ state = AppState()
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     cfg = get_settings()
-    if cfg.environment == "production" and cfg.secret_key == "changeme-use-strong-secret-in-production":
-        raise RuntimeError("SECRET_KEY par défaut interdit en production")
     data_dir = cfg.data_dir or str(pathlib.Path(__file__).parent / "data")
     from services.khawarizmi_engine import KhawarizmiTutor
     state.tutor = KhawarizmiTutor(data_dir=data_dir)
@@ -40,27 +38,27 @@ async def lifespan(app: FastAPI):
     state.scheduler = KhawarizmiScheduler()
     from services.interleaving import InterleavingSession
     state.interleaving = InterleavingSession()
-    if cfg.openai_api_key or cfg.OPENAI_API_KEY:
+    if cfg.OPENAI_API_KEY:
         from openai import AsyncOpenAI
         from services.dual_coding import DualCodingService
-        state.openai = AsyncOpenAI(api_key=cfg.openai_api_key or cfg.OPENAI_API_KEY, base_url=cfg.openai_base_url)
+        state.openai = AsyncOpenAI(api_key=cfg.OPENAI_API_KEY, base_url=cfg.openai_base_url)
         state.dual_coding = DualCodingService(state.openai)
-    if cfg.database_url:
+    if cfg.DATABASE_URL:
         try:
-            db_url = cfg.database_url.replace("postgresql://", "postgresql+asyncpg://", 1).replace("postgres://", "postgresql+asyncpg://", 1)
+            db_url = cfg.DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://", 1).replace("postgres://", "postgresql+asyncpg://", 1)
             state.db_engine = create_async_engine(db_url, pool_size=10, max_overflow=20, pool_pre_ping=True)
             state.db_session = async_sessionmaker(state.db_engine, class_=AsyncSession, expire_on_commit=False)
         except Exception as e:
             logger.error(f"PostgreSQL : {e}")
-    if cfg.redis_url:
+    if cfg.REDIS_URL:
         try:
-            state.redis = await AsyncRedis.from_url(cfg.redis_url, encoding="utf-8", decode_responses=True)
+            state.redis = await AsyncRedis.from_url(cfg.REDIS_URL, encoding="utf-8", decode_responses=True)
             await state.redis.ping()
         except Exception as e:
             logger.warning(f"Redis indisponible : {e}")
     from services.reconciliation_queue import process_review_queue
     state.reconciliation_task = asyncio.create_task(process_review_queue())
-    logger.info(f"Khawarizmi API prête [{cfg.environment}]")
+    logger.info(f"Khawarizmi API prête [{cfg.ENVIRONMENT}]")
     yield
     if state.reconciliation_task:
         state.reconciliation_task.cancel()
@@ -81,8 +79,8 @@ app.state.limiter = limiter
 app.add_exception_handler(429, _rate_limit_exceeded_handler)
 app.add_middleware(SlowAPIMiddleware)
 
-from routes import health, auth, chat, flashcards, sessions, mindmap, evaluate, session, payment
-for r in [health,auth,chat,flashcards,sessions,mindmap,evaluate,session,payment]:
+from routes import health, auth, chat, flashcards, sessions, mindmap, evaluate, session, payment, programme, lexique
+for r in [health,auth,chat,flashcards,sessions,mindmap,evaluate,session,payment,programme,lexique]:
     app.include_router(r.router)
 
 

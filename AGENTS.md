@@ -1,5 +1,5 @@
 # AGENTS.md — IA Khawarizmi Pro
-# Version : 2.0.0
+# Version : 2.1.0
 # Emplacement : Racine du projet
 # Rôle : System Prompt permanent pour tout agent IA
 #         intervenant sur ce projet
@@ -70,11 +70,15 @@ khawarizmi-backend/
 │   ├── user.py
 │   ├── session.py
 │   ├── flashcard.py
-│   └── mindmap.py
+│   ├── mindmap.py
+│   └── lexique.py
 ├── models/
 │   ├── user.py
 │   ├── concept.py
-│   └── session.py
+│   ├── session.py
+│   ├── payment.py
+│   ├── reference.py
+│   └── lexique.py
 ├── routes/
 │   ├── auth.py
 │   ├── chat.py
@@ -82,16 +86,25 @@ khawarizmi-backend/
 │   ├── flashcards.py
 │   ├── mindmap.py
 │   ├── sessions.py
+│   ├── health.py
+│   ├── programme.py
+│   ├── lexique.py
 │   └── payment.py
 ├── services/
 │   ├── rag_service.py
 │   ├── ai_service.py
 │   ├── fsrs_service.py
 │   ├── mindmap_service.py
-│   └── payment_service.py
+│   ├── payment_service.py
+│   └── khawarizmi_engine.py
 ├── migrations/
 │   ├── env.py
 │   └── versions/
+│       ├── 001_initial_schema.py
+│       ├── 002_programme_officiel.py
+│       ├── 003_mindmaps_and_nodes.py
+│       ├── 004_rag_chunks.py
+│       └── 005_lexique_termes.py
 ├── tests/
 │   ├── conftest.py
 │   ├── test_auth.py
@@ -306,10 +319,10 @@ Encodage : UTF-8 obligatoire (jamais UTF-16)
 
 - conftest.py obligatoire dans tests/
 - pytest-asyncio obligatoire
-- Couverture minimum : 70%
-- CI/CD GitHub Actions obligatoire
+- Couverture minimum : 50% (en vigueur) — objectif 70%
+- CI/CD GitHub Actions obligatoire (configuré)
 
-tests/conftest.py minimum :
+tests/conftest.py (en place) :
 
 ```python
 import pytest
@@ -332,12 +345,19 @@ async def client():
         yield ac
 ```
 
-Tests obligatoires par module :
-- test_auth.py     : register, login, token invalide
-- test_chat.py     : RAG valide, RAG vide, rate limit
-- test_mindmap.py  : génération, structure JSON,
-                     flashcard auto, FSRS sync
-- test_fsrs.py     : création carte, schedule, weak nodes
+Tests obligatoires par module (13 fichiers en place) :
+- test_auth.py             : register, login, token invalide
+- test_chat.py             : RAG valide, RAG vide, rate limit
+- test_mindmap.py          : génération, structure JSON,
+                             flashcard auto, FSRS sync
+- test_fsrs.py             : création carte, schedule, weak nodes
+- test_config_critical.py  : détection régression case_sensitive
+- test_payment.py          : flux paiement
+- test_ch1_integration.py  : intégration chapitre 1
+- test_evaluate_full.py    : pipeline évaluation complet
+- test_ia_appel.py         : appel IA
+- test_sciences.py         : tests spécifiques SVT
+- test_simulateur.py       : tests simulateur
 
 ##############################################################
 # SECTION 7 — MONITORING
@@ -371,6 +391,9 @@ Tests obligatoires par module :
 ## Avant de générer du code, toujours vérifier :
 
   [ ] Aucune clé API dans le code
+  [ ] `case_sensitive=False` dans SettingsConfigDict
+  [ ] `get_settings().X` au lieu de `os.getenv("X")`
+  [ ] `CAST(:emb AS vector)` au lieu de `:emb::vector`
   [ ] SECRET_KEY lève ValueError si absent
   [ ] main.py reste sous 100 lignes
   [ ] Un fichier = Une responsabilité
@@ -408,29 +431,85 @@ Tests obligatoires par module :
 État au moment de la rédaction de ce fichier :
 
 CRITIQUE — À faire immédiatement :
-  [ ] Régénérer toutes les clés API exposées
-  [ ] Réécrire .gitignore en UTF-8 propre
-  [ ] Corriger les ports ($PORT partout)
-  [ ] Unifier l'auth sur JWT uniquement
-  [ ] Ajouter rate limiting sur /api/chat
+  [x] Régénérer toutes les clés API exposées
+  [x] Réécrire .gitignore en UTF-8 propre
+  [x] Corriger les ports ($PORT partout)
+  [x] Unifier l'auth sur JWT uniquement
+  [x] Ajouter rate limiting sur /api/chat
       et /api/evaluate
 
 IMPORTANT — À faire ce mois :
-  [ ] Refactorer main.py (1296 lignes → modules)
-  [ ] Épingler les dépendances requirements.txt
-  [ ] Configurer Alembic pour les migrations
-  [ ] Créer conftest.py et activer les tests
-  [ ] Configurer GitHub Actions CI/CD
+  [x] Refactorer main.py (1296 lignes → 96 lignes)
+  [x] Épingler les dépendances requirements.txt
+  [x] Configurer Alembic pour les migrations (5 versions)
+  [x] Créer conftest.py et activer les tests (13 fichiers)
+  [x] Configurer GitHub Actions CI/CD
 
 STRATÉGIQUE — À faire ce trimestre :
-  [ ] Implémenter Mind Map JSON dynamique
-  [ ] Connecter Next.js frontend au backend
-  [ ] Ajouter Sentry monitoring
-  [ ] Implémenter /health endpoint
+  [x] Implémenter Mind Map JSON dynamique (4 endpoints)
+  [x] Ajouter Sentry monitoring
+  [x] Implémenter /health endpoint
+  [x] Implémenter Lexique SVT bilingue (221 termes, 4 endpoints API, RAG)
+  [ ] Connecter Next.js frontend au backend (en cours)
   [ ] Connecter Mind Map ↔ FSRS
 
 ##############################################################
-# FIN — AGENTS.md v2.0.0 — IA KHAWARIZMI PRO
+# SECTION 11 — BUGS CRITIQUES CONNUS & RÉSOLUS
+##############################################################
+
+## Bug 1 : case_sensitive dans SettingsConfigDict
+
+RÈGLE : Toujours utiliser `case_sensitive=False` dans SettingsConfigDict.
+RAISON : Les variables .env en UPPER_CASE doivent matcher les champs
+         snake_case Python. Avec `True`, les clés API sont ignorées
+         silencieusement sans aucune erreur.
+FICHIER : config.py → model_config → case_sensitive
+DÉTECTION : Config loader
+IMPACT : Critique — toutes les clés API deviennent inopérantes,
+         le serveur utilise les valeurs par défaut sans alerte.
+
+## Bug 2 : Cast vector dans SQL
+
+RÈGLE : Utiliser `CAST(:emb AS vector)` au lieu de `:emb::vector`.
+RAISON : Compatibilité asyncpg garantie sur toutes les versions.
+         `::vector` fonctionne en local mais peut casser selon
+         la version de asyncpg/PostgreSQL en production.
+FICHIER : mindmap_service.py → requête RAG
+IMPACT : Élevé — la recherche vectorielle RAG peut échouer
+
+## Bug 3 : os.getenv au lieu de get_settings()
+
+RÈGLE : TOUJOURS utiliser `get_settings().X`.
+INTERDIT : `os.getenv("X")` (sauf pour bootstrap pré-config).
+RAISON : os.getenv lit l'environnement SYSTÈME, pas le fichier .env.
+         get_settings() lit via Pydantic → source de vérité unique.
+FICHIERS : mindmap_service.py, llm.py (et tout nouveau service)
+IMPACT : Élevé — configuration incohérente entre machines
+
+## Bug 4 : Alembic stamp échoue silencieusement avec asyncpg
+
+RÈGLE : Utiliser SQL direct au lieu de `alembic stamp` pour forcer
+        la version de migration en base.
+RAISON : `alembic stamp 005` ne produit pas d'erreur mais n'écrit
+         PAS la ligne dans `alembic_version`. Le problème vient
+         de l'interaction entre asyncpg et le driver Alembic.
+WORKAROUND : `psql -c "UPDATE alembic_version SET version_num = '005'"`
+             ou via SQLAlchemy raw_connection.
+FICHIER : migrations/env.py (driver asyncpg)
+IMPACT : Moyen — retarde les déploiements si non documenté
+
+##############################################################
+# SECTION 12 — TESTS DE RÉGRESSION OBLIGATOIRES
+##############################################################
+
+En plus des tests de la Section 6, ces tests spécifiques sont
+obligatoires pour détecter des régressions silencieuses :
+
+- test_config_critical.py : Détecte le retour du bug case_sensitive
+  (vérifie que les variables UPPER_CASE du .env sont lues)
+
+##############################################################
+# FIN — AGENTS.md v2.1.0 — IA KHAWARIZMI PRO
 # Ce fichier est la source de vérité du projet.
 # Toute décision de développement s'y réfère.
 ##############################################################

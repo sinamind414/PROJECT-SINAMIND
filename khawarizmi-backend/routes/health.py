@@ -44,6 +44,6 @@ async def health_check():
         "redis": "connected" if redis_ok else "error",
         "ai_model": cfg.AI_MODEL_PRIMARY,
         "fallback_active": not db_ok or not redis_ok,
-        "environment": cfg.environment,
+        "environment": cfg.ENVIRONMENT,
         "timestamp": datetime.now(timezone.utc).isoformat()
     }

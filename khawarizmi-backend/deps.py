@@ -58,19 +58,19 @@ async def get_current_user(
         raise credentials_exception
 
     try:
-        payload = jwt.decode(token, cfg.secret_key, algorithms=[cfg.algorithm])
-        user_id: int = payload.get("sub")
+        payload = jwt.decode(token, cfg.SECRET_KEY, algorithms=[cfg.JWT_ALGORITHM], options={"verify_sub": False})
+        user_id: int = int(payload.get("sub"))
         if not user_id:
             raise credentials_exception
     except JWTError:
         raise credentials_exception
 
     result = await db.execute(
-        text("SELECT id, email, prenom, plan FROM users WHERE id = :id"),
+        text("SELECT id, email, prenom, plan, filiere FROM users WHERE id = :id"),
         {"id": user_id},
     )
     user = result.fetchone()
     if not user:
         raise credentials_exception
 
-    return {"id": user[0], "email": user[1], "prenom": user[2], "plan": user[3]}
+    return {"id": user[0], "email": user[1], "prenom": user[2], "plan": user[3], "filiere": user[4]}

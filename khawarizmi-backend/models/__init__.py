@@ -4,6 +4,7 @@ from models.concept import MicroConcept, ConceptPrerequisite, QuestionConceptMap
 from models.session import MasteryMicroConcept
 from models.payment import Payment
 from models.reference import ReferenceEmbedding, CommonMistake
+from models.lexique import LexiqueTerme
 
 __all__ = [
     "Base",
@@ -12,4 +13,5 @@ __all__ = [
     "MasteryMicroConcept",
     "Payment",
     "ReferenceEmbedding", "CommonMistake",
+    "LexiqueTerme",
 ]

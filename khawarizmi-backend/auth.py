@@ -17,6 +17,6 @@ def verify_password(plain: str, hashed: str) -> bool:
 def create_access_token(data: dict) -> str:
     cfg     = get_settings()
     payload = data.copy()
-    expire  = datetime.now(timezone.utc) + timedelta(minutes=cfg.token_expire_min)
+    expire  = datetime.now(timezone.utc) + timedelta(hours=cfg.JWT_EXPIRE_HOURS)
     payload.update({"exp": expire})
-    return jwt.encode(payload, cfg.secret_key, algorithm=cfg.algorithm)
+    return jwt.encode(payload, cfg.SECRET_KEY, algorithm=cfg.JWT_ALGORITHM)

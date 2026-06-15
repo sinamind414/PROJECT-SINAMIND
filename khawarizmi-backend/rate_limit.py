@@ -15,7 +15,7 @@ def _get_user_plan(request: Request):
         return None
     try:
         cfg = _get_cfg()
-        payload = jwt.decode(token, cfg.secret_key, algorithms=[cfg.algorithm])
+        payload = jwt.decode(token, cfg.SECRET_KEY, algorithms=[cfg.JWT_ALGORITHM])
         return payload.get("sub"), payload.get("plan", "free")
     except Exception:
         return None

@@ -18,7 +18,7 @@ target_metadata = Base.metadata
 
 def run_migrations_offline() -> None:
     cfg = get_settings()
-    db_url = cfg.database_url
+    db_url = cfg.DATABASE_URL
     if db_url.startswith("postgresql://"):
         db_url = db_url.replace("postgresql://", "postgresql+asyncpg://", 1)
     context.configure(
@@ -39,7 +39,7 @@ def do_run_migrations(connection):
 
 async def run_async_migrations() -> None:
     cfg = get_settings()
-    db_url = cfg.database_url
+    db_url = cfg.DATABASE_URL
     if not db_url:
         raise ValueError("DATABASE_URL non définie")
     db_url = db_url.replace("postgresql://", "postgresql+asyncpg://", 1)

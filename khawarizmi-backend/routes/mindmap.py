@@ -9,7 +9,7 @@ from sqlalchemy import text
 from pydantic import BaseModel, Field
 from typing import Literal
 
-from deps import get_db, get_current_user
+from deps import get_db, get_current_user, get_openai
 from services.mindmap_service import (
     generate_mindmap,
     update_node_maitrise,
@@ -35,7 +35,8 @@ class MaitriseUpdateRequest(BaseModel):
 async def generate_mindmap_endpoint(
     request: MindMapGenerateRequest,
     current_user: dict = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
+    openai_client = Depends(get_openai)
 ):
     result = await generate_mindmap(
         matiere=request.matiere,
@@ -43,7 +44,8 @@ async def generate_mindmap_endpoint(
         filiere=request.filiere,
         niveau_detail=request.niveau_detail,
         user_id=str(current_user["id"]),
-        db=db
+        db=db,
+        openai_client=openai_client
     )
 
     if result.get("status") == "no_context":
@@ -63,7 +65,7 @@ async def get_mindmap(
             SELECT data FROM mindmaps
             WHERE id = :id AND user_id = :user_id
         """),
-        {"id": mindmap_id, "user_id": str(current_user["id"])}
+        {"id": mindmap_id, "user_id": int(current_user["id"])}
     )
     row = result.fetchone()
 

@@ -1,0 +1,13 @@
+La transcription de l'ADN est la première étape de l'expression génétique chez tous les êtres vivants. Ce processus biologique consiste à copier l'information génétique contenue dans une séquence d'ADN en une molécule d'ARN pré-messager (ou directement ARN messager chez les procaryotes). La transcription se déroule dans le noyau chez les eucaryotes et dans le cytoplasme chez les procaryotes.
+
+L'acteur principal de ce processus est une enzyme appelée l'ARN polymérase. L'ARN polymérase est responsable de l'ouverture de la double hélice d'ADN et de la polymérisation des nucléotides ribiques (adénine, uracile, cytosine, guanine) pour former le brin d'ARN.
+
+Le mécanisme de la transcription se déroule en trois phases distinctes :
+
+1. L'Initiation : L'ARN polymérase reconnaît et se fixe sur une région spécifique de l'ADN située en amont du gène à transcrire, appelée le promoteur. Cette fixation déclenche l'ouverture locale de la double hélice d'ADN par rupture des liaisons hydrogène entre les bases azotées complémentaires, exposant ainsi les deux brins d'ADN.
+
+2. L'Élongation : L'ARN polymérase se déplace le long du brin d'ADN appelé "brin transcrit" (ou brin matrice) dans le sens 3' vers 5'. En lisant ce brin, elle incorpore et polymérise les nucléotides ribiques libres présents dans le milieu selon la règle de complémentarité des bases : l'adénine (A) de l'ADN s'apparie avec l'uracile (U) de l'ARN, la thymine (T) s'apparie avec l'adénine (A), la cytosine (C) s'apparie avec la guanine (G), et la guanine (G) s'apparie avec la cytosine (C). La synthèse du brin d'ARN pré-messager s'effectue ainsi dans le sens 5' vers 3'.
+
+3. La Terminaison : L'ARN polymérase continue sa progression jusqu'à ce qu'elle rencontre une séquence de nucléotides particulière appelée signal de terminaison (ou terminateur). À ce stade, l'enzyme libère le brin d'ARN pré-messager nouvellement synthétisé et se détache de la molécule d'ADN double brin, qui se referme derrière elle.
+
+Chez les eucaryotes, l'ARN pré-messager ainsi produit est dit "immature" car il contient des séquences non codantes. Il doit subir une étape supplémentaire de maturation appelée l'épissage. L'épissage se déroule dans le noyau et consiste à éliminer les introns (séquences non codantes) et à souder entre eux les exons (séquences codantes) pour former un ARN messager mature (ARNm mature), prêt à être exporté vers le cytoplasme pour l'étape de la traduction.
