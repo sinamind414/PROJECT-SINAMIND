@@ -1,6 +1,7 @@
 // src/components/programme/DomainSection.tsx
 
 import { Domain } from "@/lib/types"
+import { UI_AR } from "@/lib/translations"
 import { UnitAccordion } from "./UnitAccordion"
 
 interface DomainSectionProps {
@@ -47,14 +48,14 @@ export function DomainSection({
             </h2>
             <div className="flex flex-wrap items-center gap-3
                             mt-1 text-sm text-slate-400">
-              <span>{domain.units.length} unités</span>
+              <span>{domain.units.length} {UI_AR.unites}</span>
               <span>•</span>
-              <span>{totalChapters} chapitres</span>
+              <span>{totalChapters} {UI_AR.chapitres}</span>
               {criticalCount > 0 && (
                 <>
                   <span>•</span>
                   <span className="text-red-400">
-                    🔴 {criticalCount} critique{criticalCount > 1 ? "s" : ""}
+                    🔴 {criticalCount} {UI_AR.critiques_bac}
                   </span>
                 </>
               )}

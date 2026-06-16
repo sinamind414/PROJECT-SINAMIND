@@ -22,12 +22,12 @@ import "@xyflow/react/dist/style.css"
 import apiClient from "@/lib/api-client"
 import { useAuth } from "@/lib/auth-context"
 import { AuthGuard } from "@/components/auth/AuthGuard"
+import { UI_AR, traduireChapitre } from "@/lib/translations"
 import {
   MindMap as MindMapType,
   MindMapNode,
   Chapter,
   Programme,
-  MAITRISE_LABELS,
   MAITRISE_COLORS
 } from "@/lib/types"
 import CustomMindMapNode from "@/components/mindmap/CustomMindMapNode"
@@ -184,7 +184,7 @@ function MindMapContent() {
       }
 
       if (!foundChapter) {
-        throw new Error("Chapitre introuvable dans le programme officiel.")
+        throw new Error(UI_AR.chapitre_introuvable)
       }
       setChapter(foundChapter)
 
@@ -198,7 +198,7 @@ function MindMapContent() {
       })
 
       if (res.status === "no_context") {
-        throw new Error(res.message || "Aucun contenu disponible pour générer ce Mind Map.")
+        throw new Error(res.message || UI_AR.aucun_contenu_mindmap)
       }
 
       setMindmap(res.mindmap)
@@ -225,7 +225,7 @@ function MindMapContent() {
       setSelectedNode(res.mindmap.racine)
 
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "Erreur de chargement du Mind Map"
+      const msg = err instanceof Error ? err.message : UI_AR.erreur_chargement_mindmap
       setError(msg)
     } finally {
       setLoading(false)
@@ -276,8 +276,22 @@ function MindMapContent() {
       setEdges([...layout.edges, ...transversalEdges])
 
     } catch (err) {
-      alert("Erreur lors de la mise à jour de la maîtrise.")
+      alert(UI_AR.erreur_mise_a_jour_maitrise)
     }
+  }
+
+  const importanceLabels: Record<string, string> = {
+    critique: UI_AR.critique,
+    haute: "مهم",
+    moyenne: "متوسط"
+  }
+
+  const typeLabels: Record<string, string> = {
+    concept: UI_AR.concept,
+    processus: "عملية",
+    definition: "تعريف",
+    formule: "صيغة",
+    exception: "استثناء"
   }
 
   // Compute weak nodes from the current mindmap structure dynamically
@@ -297,7 +311,7 @@ function MindMapContent() {
       <div className="flex flex-col items-center justify-center min-h-screen bg-slate-950 text-white space-y-4">
         <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
         <p className="text-slate-400 text-sm font-medium">
-          {generating ? "Génération IA de ton Mind Map officiel..." : "Chargement en cours..."}
+          {generating ? UI_AR.generation_mindmap_ia : UI_AR.chargement}
         </p>
       </div>
     )
@@ -308,20 +322,20 @@ function MindMapContent() {
       <div className="flex flex-col items-center justify-center min-h-screen bg-slate-950 p-6">
         <div className="bg-red-500/10 border border-red-500/30 rounded-2xl p-8 max-w-md text-center space-y-4">
           <p className="text-4xl">⚠️</p>
-          <h3 className="text-red-300 font-bold text-lg">Erreur de chargement</h3>
-          <p className="text-slate-300 text-sm leading-relaxed">{error || "Impossible de charger les données."}</p>
+          <h3 className="text-red-300 font-bold text-lg">{UI_AR.erreur_chargement}</h3>
+          <p className="text-slate-300 text-sm leading-relaxed">{error || UI_AR.impossible_charger_donnees}</p>
           <div className="flex justify-center gap-3">
             <Link
               href="/dashboard"
               className="px-4 py-2 bg-slate-800 text-slate-300 border border-slate-700 rounded-lg hover:bg-slate-700 text-sm transition"
             >
-              Retour Dashboard
+              {UI_AR.retour_dashboard}
             </Link>
             <button
               onClick={loadChapterAndMindmap}
               className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 text-sm transition"
             >
-              Réessayer
+              {UI_AR.reessayer}
             </button>
           </div>
         </div>
@@ -336,15 +350,15 @@ function MindMapContent() {
       <header className="border-b border-slate-900 bg-slate-950/80 backdrop-blur px-6 py-4 flex justify-between items-center z-10">
         <div className="flex items-center gap-4">
           <Link href="/dashboard" className="text-slate-400 hover:text-white transition">
-            ← Dashboard
+            {UI_AR.retour_dashboard}
           </Link>
           <div className="h-4 w-px bg-slate-800" />
           <div>
             <h1 className="text-base sm:text-lg font-bold text-white leading-tight">
-              {chapter.titre_fr}
+              {traduireChapitre(chapter.titre_fr)}
             </h1>
             <p className="text-xs text-slate-400">
-              Chapitre {chapter.numero} • SVT Terminale
+              {UI_AR.chapitre_label} {chapter.numero} • {UI_AR.svt_terminale}
             </p>
           </div>
         </div>
@@ -387,33 +401,33 @@ function MindMapContent() {
             {selectedNode ? (
               <section className="space-y-4">
                 <div className="flex items-start justify-between gap-3">
-                  <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">
-                    Détails du Nœud
+                    <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">
+                    {UI_AR.details_noeud}
                   </h3>
                   {selectedNode.bac_frequent && (
                     <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/25">
-                      Fréquent BAC
+                      {UI_AR.frequent_bac}
                     </span>
                   )}
                 </div>
 
                 <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-4 space-y-3">
                   <h4 className="text-base font-bold text-white leading-snug">
-                    {selectedNode.label}
+                    {traduireChapitre(selectedNode.label)}
                   </h4>
                   
                   <div className="grid grid-cols-2 gap-2 text-xs">
                     <div className="bg-slate-900/80 p-2.5 rounded-lg border border-slate-800/40">
-                      <span className="text-[10px] text-slate-500 block mb-0.5">Type</span>
+                      <span className="text-[10px] text-slate-500 block mb-0.5">{UI_AR.type}</span>
                       <span className="font-semibold text-slate-300 capitalize">
-                        {selectedNode.type}
+                        {typeLabels[selectedNode.type] || selectedNode.type}
                       </span>
                     </div>
 
                     <div className="bg-slate-900/80 p-2.5 rounded-lg border border-slate-800/40">
-                      <span className="text-[10px] text-slate-500 block mb-0.5">Importance</span>
+                      <span className="text-[10px] text-slate-500 block mb-0.5">{UI_AR.importance}</span>
                       <span className="font-semibold capitalize" style={{ color: selectedNode.couleur }}>
-                        {selectedNode.importance}
+                        {importanceLabels[selectedNode.importance] || selectedNode.importance}
                       </span>
                     </div>
                   </div>
@@ -422,14 +436,15 @@ function MindMapContent() {
                 {/* 2. Mastery Controls */}
                 <div className="space-y-2.5">
                   <label className="text-xs font-semibold text-slate-400 block">
-                    Niveau de maîtrise actuel :
+                    {UI_AR.niveau_maitrise}
                   </label>
 
                   <div className="grid grid-cols-3 gap-2">
                     {([0, 1, 2] as const).map((level) => {
                       const isActive = selectedNode.maitrise_eleve === level
                       const activeColor = MAITRISE_COLORS[level]
-                      const label = MAITRISE_LABELS[level]
+                      const labels = [UI_AR.non, UI_AR.en_cours, UI_AR.maitrisee]
+                      const label = labels[level]
 
                       return (
                         <button
@@ -447,7 +462,7 @@ function MindMapContent() {
                             className="w-1.5 h-1.5 rounded-full inline-block mr-1"
                             style={{ backgroundColor: activeColor }}
                           />
-                          {label.split(" ")[0]}
+                          {label}
                         </button>
                       )
                     })}
@@ -456,14 +471,14 @@ function MindMapContent() {
               </section>
             ) : (
               <div className="bg-slate-900/40 border border-slate-800/50 rounded-xl p-4 text-center text-sm text-slate-500">
-                Sélectionne un nœud sur le canvas pour voir ses détails et ajuster ta maîtrise.
+                {UI_AR.selectionne_noeud}
               </div>
             )}
 
             {/* 3. Weak Nodes Panel */}
             <section className="space-y-3 pt-4 border-t border-slate-900">
               <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center justify-between">
-                <span>Nœuds Faibles</span>
+                <span>{UI_AR.noeuds_faibles}</span>
                 <span className="bg-red-500/15 text-red-400 text-[10px] px-2 py-0.5 rounded-full font-bold">
                   {weakNodes.length}
                 </span>
@@ -481,7 +496,7 @@ function MindMapContent() {
                       className="w-full text-left p-2.5 rounded-lg bg-slate-900/30 border border-slate-900 hover:border-slate-800 transition flex items-center justify-between gap-2 cursor-pointer group"
                     >
                       <span className="text-slate-300 text-xs font-medium truncate group-hover:text-white transition-colors">
-                        {n.label}
+                        {traduireChapitre(n.label)}
                       </span>
                       <span
                         className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded"
@@ -491,14 +506,14 @@ function MindMapContent() {
                           border: `1px solid ${n.couleur}25`
                         }}
                       >
-                        {n.importance}
+                        {importanceLabels[n.importance] || n.importance}
                       </span>
                     </button>
                   ))}
                 </div>
               ) : (
                 <div className="bg-green-500/10 border border-green-500/20 rounded-xl p-4 text-center text-xs text-green-400">
-                  🎉 Tous les concepts sont maîtrisés ou en cours ! Excellent travail !
+                  {UI_AR.tous_maitrises}
                 </div>
               )}
             </section>
@@ -511,7 +526,7 @@ function MindMapContent() {
               href="/drill"
               className="w-full py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white text-center rounded-xl font-semibold text-sm hover:opacity-95 transition block cursor-pointer shadow-lg hover:shadow-indigo-500/10"
             >
-              Lancer une session de révision 🎯
+              {UI_AR.lancer_session_revision}
             </Link>
           </div>
 

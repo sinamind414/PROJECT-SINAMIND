@@ -1,6 +1,7 @@
 // src/lib/api-client.ts
 // Client HTTP centralisé — Khawarizmi Pro
 
+import { UI_AR } from "./translations"
 import {
   AuthResponse,
   ChatMessage,
@@ -77,7 +78,7 @@ class KhawarizmiApiClient {
       if (typeof window !== "undefined") {
         window.location.href = "/auth/login"
       }
-      throw new Error("Session expirée. Reconnecte-toi.")
+      throw new Error(UI_AR.session_expiree)
     }
 
     // Rate limit
@@ -85,7 +86,7 @@ class KhawarizmiApiClient {
       const data = await response.json().catch(() => ({}))
       throw new Error(
         data.detail ||
-        "Limite de requêtes atteinte. Réessaie plus tard."
+        UI_AR.limite_atteinte
       )
     }
 
@@ -93,7 +94,7 @@ class KhawarizmiApiClient {
       const error = await response.json().catch(() => ({}))
       throw new Error(
         error.detail ||
-        `Erreur ${response.status}`
+        `${UI_AR.erreur_http_prefix} ${response.status}`
       )
     }
 

@@ -30,10 +30,12 @@ Attends la réponse de l'élève avant de corriger.
     'MIND_MAP': {
         'instruction': """
 Génère un plan structuré du concept en Markdown UNIQUEMENT.
+TOUS les titres et labels en ARABE.
+Termes scientifiques universels entre parenthèses en FR.
 Format strict :
-# Titre Principal
-## Sous-concept 1
-- Point clé 1
+# Titre Principal (en arabe)
+## Sous-concept 1 (en arabe)
+- Point clé 1 (en arabe, terme FR si nécessaire)
 - Point clé 2
 ## Sous-concept 2
 ...
@@ -562,6 +564,11 @@ Génère UNIQUEMENT du JSON valide. Aucun texte en dehors du JSON.
             format_output = f"━━━ FORMAT ATTENDU : {mode_config['output_format'].upper()} ━━━"
 
         prompt = f"""
+🚨 INSTRUCTIONS DE LANGUE — Le programme BAC est enseigné en ARABE.
+TOUS les labels, titres et descriptions générés doivent être en arabe.
+Termes scientifiques universels gardés entre parenthèses en FR.
+Format : "النص بالعربية (terme FR)"
+
 Tu es KHAWARIZMI, tuteur expert du BAC algérien en {nom_matiere}.
 
 ━━━ PHILOSOPHIE ABSOLUE ━━━

@@ -5,6 +5,7 @@
 
 import { useEffect } from "react"
 import { useRouter } from "next/navigation"
+import { UI_AR } from "@/lib/translations"
 import { useAuth } from "@/lib/auth-context"
 
 interface AuthGuardProps {
@@ -31,7 +32,7 @@ export function AuthGuard({ children }: AuthGuardProps) {
                           border-t-transparent rounded-full
                           animate-spin mx-auto" />
           <p className="text-slate-400 text-sm">
-            Vérification...
+            {UI_AR.verification}
           </p>
         </div>
       </main>

@@ -1,7 +1,6 @@
-// src/components/mindmap/CustomMindMapNode.tsx
-
 import { Handle, Position } from "@xyflow/react"
-import { MindMapNode, TYPE_EMOJI, MAITRISE_COLORS, MAITRISE_LABELS } from "@/lib/types"
+import { MindMapNode, TYPE_EMOJI, MAITRISE_COLORS } from "@/lib/types"
+import { UI_AR, traduireChapitre } from "@/lib/translations"
 
 interface CustomMindMapNodeProps {
   data: {
@@ -16,7 +15,8 @@ export function CustomMindMapNode({ data }: CustomMindMapNodeProps) {
 
   const typeEmoji = node.type ? TYPE_EMOJI[node.type as keyof typeof TYPE_EMOJI] || "💡" : "💡"
   const masteryColor = MAITRISE_COLORS[node.maitrise_eleve] || "#64748b"
-  const masteryLabel = MAITRISE_LABELS[node.maitrise_eleve] || "Non commencé"
+  const masteryLabels = [UI_AR.non, UI_AR.en_cours, UI_AR.maitrisee]
+  const masteryLabel = masteryLabels[node.maitrise_eleve] || UI_AR.non
 
   return (
     <div
@@ -27,7 +27,6 @@ export function CustomMindMapNode({ data }: CustomMindMapNodeProps) {
         borderLeft: `4px solid ${node.couleur || "#475569"}`
       }}
     >
-      {/* Target handle on the left (except for root) */}
       {node.niveau > 0 && (
         <Handle
           type="target"
@@ -36,10 +35,8 @@ export function CustomMindMapNode({ data }: CustomMindMapNodeProps) {
         />
       )}
 
-      {/* Node content */}
       <div className="flex flex-col gap-2">
         <div className="flex items-center justify-between gap-2">
-          {/* Node Type and Label */}
           <span className="text-lg flex-shrink-0" title={node.type}>
             {typeEmoji}
           </span>
@@ -48,19 +45,17 @@ export function CustomMindMapNode({ data }: CustomMindMapNodeProps) {
             <span className="text-[10px] font-bold uppercase tracking-wider
                              px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-400
                              border border-amber-500/20"
-                  title="Très fréquent au BAC">
-              BAC
+                  title={UI_AR.frequent_bac}>
+              {UI_AR.bac_label}
             </span>
           )}
         </div>
 
-        {/* Node Label */}
         <h4 className="text-sm font-semibold text-slate-200 group-hover:text-white
                        leading-snug transition-colors line-clamp-2">
-          {node.label}
+          {traduireChapitre(node.label)}
         </h4>
 
-        {/* Mastery indicator */}
         <div className="flex items-center gap-2 mt-1 border-t border-slate-800/60 pt-2 text-[10px] text-slate-400">
           <span
             className="w-2 h-2 rounded-full inline-block animate-pulse"
@@ -75,7 +70,6 @@ export function CustomMindMapNode({ data }: CustomMindMapNodeProps) {
         </div>
       </div>
 
-      {/* Source handle on the right (except if no children, but always safe to render) */}
       {node.enfants && node.enfants.length > 0 && (
         <Handle
           type="source"

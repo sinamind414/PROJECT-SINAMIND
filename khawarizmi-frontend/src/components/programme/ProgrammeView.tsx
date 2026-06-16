@@ -6,6 +6,7 @@ import { useEffect, useState } from "react"
 
 import apiClient from "@/lib/api-client"
 import { Programme } from "@/lib/types"
+import { UI_AR } from "@/lib/translations"
 import { DomainSection } from "./DomainSection"
 
 interface ProgrammeViewProps {
@@ -37,7 +38,7 @@ export function ProgrammeView({
     } catch (err) {
       const msg = err instanceof Error
         ? err.message
-        : "Erreur de chargement"
+        : UI_AR.erreur_chargement
       setError(msg)
     } finally {
       setLoading(false)
@@ -52,7 +53,7 @@ export function ProgrammeView({
                           border-t-transparent rounded-full
                           animate-spin mx-auto" />
           <p className="text-slate-400 text-sm">
-            Chargement de ton programme...
+            {UI_AR.chargement_programme}
           </p>
         </div>
       </div>
@@ -65,7 +66,7 @@ export function ProgrammeView({
                        rounded-xl p-6 text-center">
         <p className="text-2xl mb-2">⚠️</p>
         <h3 className="text-red-300 font-semibold mb-1">
-          Erreur de chargement
+          {UI_AR.erreur_chargement}
         </h3>
         <p className="text-red-200/70 text-sm mb-4">
           {error}
@@ -76,7 +77,7 @@ export function ProgrammeView({
                      border border-red-500/30 rounded-lg
                      hover:bg-red-500/30 transition text-sm"
         >
-          Réessayer
+          {UI_AR.reessayer}
         </button>
       </div>
     )
@@ -108,7 +109,7 @@ export function ProgrammeView({
             {programme.domains.length}
           </div>
           <div className="text-xs text-slate-400">
-            Domaines
+            {UI_AR.domaines}
           </div>
         </div>
 
@@ -118,7 +119,7 @@ export function ProgrammeView({
             {programme.total_chapters}
           </div>
           <div className="text-xs text-slate-400">
-            Chapitres
+            {UI_AR.chapitres}
           </div>
         </div>
 
@@ -128,7 +129,7 @@ export function ProgrammeView({
             {criticalTotal}
           </div>
           <div className="text-xs text-red-300">
-            Critiques BAC
+            {UI_AR.critiques_bac}
           </div>
         </div>
       </div>

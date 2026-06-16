@@ -5,6 +5,7 @@
 import { useState } from "react"
 
 import { Unit } from "@/lib/types"
+import { UI_AR } from "@/lib/translations"
 import { ChapterItem } from "./ChapterItem"
 
 interface UnitAccordionProps {
@@ -49,10 +50,10 @@ export function UnitAccordion({
             </h3>
             <div className="flex items-center gap-3 mt-0.5
                             text-xs text-slate-400">
-              <span>{unit.chapters.length} chapitres</span>
+              <span>{unit.chapters.length} {UI_AR.chapitres}</span>
               {criticalCount > 0 && (
                 <span className="text-red-400">
-                  🔴 {criticalCount} critique{criticalCount > 1 ? "s" : ""}
+                  🔴 {criticalCount} {UI_AR.critiques_bac}
                 </span>
               )}
             </div>

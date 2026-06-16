@@ -1,6 +1,7 @@
 // src/components/programme/ChapterItem.tsx
 
 import { Chapter, TYPE_EMOJI } from "@/lib/types"
+import { UI_AR } from "@/lib/translations"
 import { ChapterBadge } from "./ChapterBadge"
 
 interface ChapterItemProps {
@@ -34,11 +35,11 @@ export function ChapterItem({ chapter, onClick }: ChapterItemProps) {
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
               <span className="text-slate-500 text-xs font-mono">
-                Ch. {chapter.numero}
+                {UI_AR.ch_abreviation} {chapter.numero}
               </span>
               {chapter.page && (
                 <span className="text-slate-600 text-xs">
-                  p. {chapter.page}
+                  {UI_AR.p_abreviation} {chapter.page}
                 </span>
               )}
             </div>
