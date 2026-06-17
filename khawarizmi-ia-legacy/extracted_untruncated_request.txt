@@ -1,1 +1,0 @@
-I will create a Python script to search the entire `transcript.jsonl` file of the current conversation for any step that contains `Nirenberg` without being truncated, to extract the complete HTML block of the 4 experiences.
