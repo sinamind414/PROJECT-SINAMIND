@@ -1,13 +1,16 @@
 import json
 import logging
-from datetime import datetime, timezone
-from typing import Dict
-from fastapi import APIRouter, Depends
+from datetime import datetime, timezone, timedelta
+from typing import Dict, List
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 from deps import get_current_user, get_db, get_scheduler
-from schemas.flashcard import DrillRequest, ScheduleRequest
-from fsrs import Card
+from schemas.flashcard import (
+    DrillRequest, ScheduleRequest,
+    FlashcardCreateRequest, FlashcardReviewRequest
+)
+from fsrs import Card, Rating as FsrsRating, Scheduler as CardScheduler
 
 logger = logging.getLogger("khawarizmi.api")
 router = APIRouter()
@@ -110,4 +113,176 @@ async def soumettre_resultat_drill(
         "interval_jours":     result["interval_jours"],
         "retrievability":     result["retrievability"],
         "rating":             result["rating"],
+    }
+
+
+# ── Frontend API — Flashcards ──────────────────────
+
+
+@router.get("/api/flashcards/due", tags=["Flashcards"])
+async def get_due_cards(
+    current_user: Dict         = Depends(get_current_user),
+    db:           AsyncSession = Depends(get_db),
+):
+    now = datetime.now(timezone.utc)
+    result = await db.execute(
+        text("""
+            SELECT id, micro_concept_id, concept_id, chapter,
+                   difficulty, stability, state, due_date,
+                   prochaine_revision, interval_jours
+            FROM mastery_micro_concepts
+            WHERE user_id = :uid
+              AND due_date <= :now
+              AND (state IS NULL OR state IN (0, 1))
+            ORDER BY due_date ASC, stability ASC
+            LIMIT 20
+        """),
+        {"uid": current_user["id"], "now": now}
+    )
+    rows = result.fetchall()
+
+    cards = []
+    for r in rows:
+        cards.append({
+            "id": str(r[0]),
+            "micro_concept_id": r[1],
+            "concept_id": r[2],
+            "chapter": r[3],
+            "difficulty": r[4],
+            "stability": r[5],
+            "state": r[6],
+            "due_date": r[7].isoformat() if r[7] else None,
+            "next_review": r[8].isoformat() if r[8] else None,
+            "interval_jours": r[9],
+        })
+
+    return {"cards": cards, "total": len(cards)}
+
+
+@router.post("/api/flashcards", tags=["Flashcards"])
+async def create_flashcard(
+    body:         FlashcardCreateRequest,
+    current_user: Dict               = Depends(get_current_user),
+    db:           AsyncSession       = Depends(get_db),
+):
+    card_id = f"fc_{current_user['id']}_{datetime.now(timezone.utc).timestamp()}"
+    mc_id = card_id
+
+    await db.execute(
+        text("""
+            INSERT INTO mastery_micro_concepts
+                (user_id, micro_concept_id, concept_id, chapter,
+                 difficulty, stability, state, due_date,
+                 prochaine_revision, interval_jours)
+            VALUES
+                (:uid, :mc_id, :concept_id, :chapter,
+                 :difficulty, :stability, :state, :now,
+                 :next_rev, :interval)
+            ON CONFLICT (user_id, micro_concept_id)
+            DO UPDATE SET
+                chapter = EXCLUDED.chapter,
+                difficulty = EXCLUDED.difficulty,
+                updated_at = NOW()
+        """),
+        {
+            "uid": current_user["id"],
+            "mc_id": mc_id,
+            "concept_id": card_id,
+            "chapter": body.chapitre or "",
+            "difficulty": {"critique": 7.0, "haute": 5.0, "moyenne": 3.0}[body.importance],
+            "stability": 0.0,
+            "state": 0,
+            "now": datetime.now(timezone.utc),
+            "next_rev": datetime.now(timezone.utc),
+            "interval": 1,
+        }
+    )
+    await db.commit()
+
+    logger.info(f"Flashcard creee: {mc_id} user={current_user['id']}")
+
+    return {
+        "id": card_id,
+        "micro_concept_id": mc_id,
+        "recto": body.recto,
+        "verso": body.verso,
+        "type": body.type,
+        "importance": body.importance,
+        "matiere": body.matiere,
+        "chapitre": body.chapitre,
+    }
+
+
+@router.post("/api/flashcards/{card_id}/review", tags=["Flashcards"])
+async def review_flashcard(
+    card_id:      str,
+    body:         FlashcardReviewRequest,
+    current_user: Dict                   = Depends(get_current_user),
+    db:           AsyncSession           = Depends(get_db),
+):
+    rating_map = {1: FsrsRating.Again, 2: FsrsRating.Hard,
+                  3: FsrsRating.Good, 4: FsrsRating.Easy}
+    fsrs_rating = rating_map[body.rating]
+
+    card = Card()
+    now = datetime.now(timezone.utc)
+    scheduler = CardScheduler()
+    scheduling_cards = scheduler.repeat(card, now)
+    new_card = scheduling_cards[fsrs_rating].card
+
+    due_date = new_card.due if hasattr(new_card, 'due') else now + timedelta(days=1)
+    interval = new_card.scheduled_days if hasattr(new_card, 'scheduled_days') else 1
+
+    fsrs_json = json.dumps({
+        "stability": new_card.stability,
+        "difficulty": new_card.difficulty,
+        "scheduled_days": new_card.scheduled_days,
+        "reps": new_card.reps,
+        "lapses": new_card.lapses,
+        "state": str(new_card.state),
+        "last_review": now.isoformat(),
+    })
+
+    await db.execute(
+        text("""
+            INSERT INTO mastery_micro_concepts
+                (user_id, micro_concept_id, prochaine_revision,
+                 interval_jours, difficulty, stability, fsrs_state,
+                 due_date, last_review)
+            VALUES
+                (:uid, :mc_id, :next_rev,
+                 :interval, :difficulty, :stability, :fsrs_state::jsonb,
+                 :due_date, :last_review)
+            ON CONFLICT (user_id, micro_concept_id)
+            DO UPDATE SET
+                prochaine_revision = EXCLUDED.prochaine_revision,
+                interval_jours = EXCLUDED.interval_jours,
+                difficulty = EXCLUDED.difficulty,
+                stability = EXCLUDED.stability,
+                fsrs_state = EXCLUDED.fsrs_state,
+                due_date = EXCLUDED.due_date,
+                last_review = EXCLUDED.last_review,
+                updated_at = NOW()
+        """),
+        {
+            "uid": current_user["id"],
+            "mc_id": card_id,
+            "next_rev": due_date,
+            "interval": interval,
+            "difficulty": new_card.difficulty,
+            "stability": new_card.stability,
+            "fsrs_state": fsrs_json,
+            "due_date": due_date,
+            "last_review": now,
+        }
+    )
+    await db.commit()
+
+    return {
+        "id": card_id,
+        "stability": new_card.stability,
+        "difficulty": new_card.difficulty,
+        "due_date": due_date.isoformat() if hasattr(due_date, 'isoformat') else str(due_date),
+        "interval_jours": interval,
+        "rating": body.rating,
     }

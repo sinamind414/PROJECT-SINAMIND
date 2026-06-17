@@ -1,0 +1,1545 @@
+{
+  "Rappel des acquis": {
+    "keywords": [
+      "Rappel",
+      "تذكير"
+    ],
+    "top_matches": [
+      {
+        "chapitre": "1.3 — الشفرة الوراثية (Code Génétique)",
+        "score": 1,
+        "matched_keywords": [
+          "تذكير"
+        ]
+      },
+      {
+        "chapitre": "1.3 — تسمية السلاسل الببتيدية",
+        "score": 1,
+        "matched_keywords": [
+          "تذكير"
+        ]
+      },
+      {
+        "chapitre": "1.2 — أعضاء الجهاز المناعي",
+        "score": 1,
+        "matched_keywords": [
+          "تذكير"
+        ]
+      },
+      {
+        "chapitre": "1.3 — الأصباغ الضوئية (Pigments Photosynthétiques)",
+        "score": 1,
+        "matched_keywords": [
+          "تذكير"
+        ]
+      },
+      {
+        "chapitre": "1.2 — مفهومان أساسيان: الصفيحة والغلاف الصخري",
+        "score": 1,
+        "matched_keywords": [
+          "تذكير"
+        ]
+      }
+    ]
+  },
+  "Rappel des acquis (conditions et manifestations de la photosynthese)": {
+    "keywords": [
+      "Rappel",
+      "photosynth"
+    ],
+    "top_matches": [
+      {
+        "chapitre": "1.3 — الأصباغ الضوئية (Pigments Photosynthétiques)",
+        "score": 1,
+        "matched_keywords": [
+          "photosynth"
+        ]
+      }
+    ]
+  },
+  "Siege de la synthese des proteines": {
+    "keywords": [
+      "ribosome",
+      "synthèse des protéines"
+    ],
+    "top_matches": [
+      {
+        "chapitre": "2.2 — مسار المعلومة الوراثية (Dogme Central)",
+        "score": 1,
+        "matched_keywords": [
+          "ribosome"
+        ]
+      },
+      {
+        "chapitre": "5.5 — مصير البروتين بعد تركيبه (Post-traduction)",
+        "score": 1,
+        "matched_keywords": [
+          "ribosome"
+        ]
+      },
+      {
+        "chapitre": "جدول مقارنة شامل: الاستنساخ مقابل الترجمة",
+        "score": 1,
+        "matched_keywords": [
+          "ribosome"
+        ]
+      }
+    ]
+  },
+  "Transcription de l'information genetique au niveau de l'ADN": {
+    "keywords": [
+      "transcription",
+      "arn polymérase"
+    ],
+    "top_matches": [
+      {
+        "chapitre": "3.3 — ما بعد الاستنساخ (Maturation de l'ARNm) — في حقيقيات النوى",
+        "score": 2,
+        "matched_keywords": [
+          "transcription",
+          "arn polymérase"
+        ]
+      },
+      {
+        "chapitre": "2.2 — مسار المعلومة الوراثية (Dogme Central)",
+        "score": 1,
+        "matched_keywords": [
+          "transcription"
+        ]
+      },
+      {
+        "chapitre": "جدول مقارنة شامل: الاستنساخ مقابل الترجمة",
+        "score": 1,
+        "matched_keywords": [
+          "transcription"
+        ]
+      },
+      {
+        "chapitre": "8.3 — تطوّر مرض الإيدز (SIDA)",
+        "score": 1,
+        "matched_keywords": [
+          "transcription"
+        ]
+      }
+    ]
+  },
+  "La traduction": {
+    "keywords": [
+      "traduction",
+      "arn messager",
+      "ribosome"
+    ],
+    "top_matches": [
+      {
+        "chapitre": "5.5 — مصير البروتين بعد تركيبه (Post-traduction)",
+        "score": 2,
+        "matched_keywords": [
+          "traduction",
+          "ribosome"
+        ]
+      },
+      {
+        "chapitre": "4.3 — بنية الـ ARNt (ARN de Transfert)",
+        "score": 1,
+        "matched_keywords": [
+          "traduction"
+        ]
+      },
+      {
+        "chapitre": "2.2 — مسار المعلومة الوراثية (Dogme Central)",
+        "score": 1,
+        "matched_keywords": [
+          "ribosome"
+        ]
+      },
+      {
+        "chapitre": "جدول مقارنة شامل: الاستنساخ مقابل الترجمة",
+        "score": 1,
+        "matched_keywords": [
+          "ribosome"
+        ]
+      }
+    ]
+  },
+  "Les etapes de la traduction": {
+    "keywords": [
+      "traduction",
+      "initiation",
+      "élongation"
+    ],
+    "top_matches": [
+      {
+        "chapitre": "4.3 — بنية الـ ARNt (ARN de Transfert)",
+        "score": 2,
+        "matched_keywords": [
+          "traduction",
+          "initiation"
+        ]
+      },
+      {
+        "chapitre": "3.3 — ما بعد الاستنساخ (Maturation de l'ARNm) — في حقيقيات النوى",
+        "score": 2,
+        "matched_keywords": [
+          "initiation",
+          "élongation"
+        ]
+      },
+      {
+        "chapitre": "5.3 — المرحلة الثالثة: الإنهاء (Terminaison)",
+        "score": 2,
+        "matched_keywords": [
+          "initiation",
+          "élongation"
+        ]
+      },
+      {
+        "chapitre": "5.5 — مصير البروتين بعد تركيبه (Post-traduction)",
+        "score": 1,
+        "matched_keywords": [
+          "traduction"
+        ]
+      }
+    ]
+  },
+  "Notion d'enzyme et son importance": {
+    "keywords": [
+      "enzyme",
+      "notion",
+      "catalyseur"
+    ],
+    "top_matches": [
+      {
+        "chapitre": "1.3 — خصائص الإنزيمات",
+        "score": 2,
+        "matched_keywords": [
+          "enzyme",
+          "catalyseur"
+        ]
+      },
+      {
+        "chapitre": "1.5 — الموقع الفعّال (Site Actif)",
+        "score": 2,
+        "matched_keywords": [
+          "enzyme",
+          "catalyseur"
+        ]
+      },
+      {
+        "chapitre": "2.4 — النوعية الإنزيمية (Spécificité Enzymatique)",
+        "score": 1,
+        "matched_keywords": [
+          "enzyme"
+        ]
+      }
+    ]
+  },
+  "L'activite enzymatique et sa relation avec la structure de l'enzyme": {
+    "keywords": [
+      "activité enzymatique",
+      "site actif"
+    ],
+    "top_matches": [
+      {
+        "chapitre": "1.3 — خصائص الإنزيمات",
+        "score": 1,
+        "matched_keywords": [
+          "site actif"
+        ]
+      },
+      {
+        "chapitre": "1.5 — الموقع الفعّال (Site Actif)",
+        "score": 1,
+        "matched_keywords": [
+          "site actif"
+        ]
+      }
+    ]
+  },
+  "Etude de l'influence de la temperature sur l'activite enzymatique": {
+    "keywords": [
+      "température",
+      "enzyme",
+      "dénaturation"
+    ],
+    "top_matches": [
+      {
+        "chapitre": "2.5 — التحوّل المتري عند الغوص (Métamorphisme)",
+        "score": 1,
+        "matched_keywords": [
+          "température"
+        ]
+      },
+      {
+        "chapitre": "1.3 — خصائص الإنزيمات",
+        "score": 1,
+        "matched_keywords": [
+          "enzyme"
+        ]
+      },
+      {
+        "chapitre": "1.5 — الموقع الفعّال (Site Actif)",
+        "score": 1,
+        "matched_keywords": [
+          "enzyme"
+        ]
+      },
+      {
+        "chapitre": "2.4 — النوعية الإنزيمية (Spécificité Enzymatique)",
+        "score": 1,
+        "matched_keywords": [
+          "enzyme"
+        ]
+      },
+      {
+        "chapitre": "3.4 — تفسير تأثير pH",
+        "score": 1,
+        "matched_keywords": [
+          "dénaturation"
+        ]
+      }
+    ]
+  },
+  "Etude de l'influence du pH du milieu sur l'activite enzymatique": {
+    "keywords": [
+      "ph",
+      "enzyme",
+      "activité"
+    ],
+    "top_matches": [
+      {
+        "chapitre": "1.5 — الموقع الفعّال (Site Actif)",
+        "score": 2,
+        "matched_keywords": [
+          "ph",
+          "enzyme"
+        ]
+      },
+      {
+        "chapitre": "1.4 — أنواع الـ ARN (Acide RiboNucléique)",
+        "score": 1,
+        "matched_keywords": [
+          "ph"
+        ]
+      },
+      {
+        "chapitre": "4.3 — بنية الـ ARNt (ARN de Transfert)",
+        "score": 1,
+        "matched_keywords": [
+          "ph"
+        ]
+      },
+      {
+        "chapitre": "5.5 — مصير البروتين بعد تركيبه (Post-traduction)",
+        "score": 1,
+        "matched_keywords": [
+          "ph"
+        ]
+      },
+      {
+        "chapitre": "2.3 — البنية الثالثية (Structure Tertiaire)",
+        "score": 1,
+        "matched_keywords": [
+          "ph"
+        ]
+      }
+    ]
+  },
+  "Niveaux de la structure spatiale des proteines": {
+    "keywords": [
+      "structure spatiale",
+      "primaire",
+      "secondaire",
+      "tertiaire"
+    ],
+    "top_matches": [
+      {
+        "chapitre": "2.2 — البنية الثانوية (Structure Secondaire)",
+        "score": 3,
+        "matched_keywords": [
+          "primaire",
+          "secondaire",
+          "tertiaire"
+        ]
+      },
+      {
+        "chapitre": "2.6 — جدول مقارنة الموجات الزلزالية",
+        "score": 2,
+        "matched_keywords": [
+          "primaire",
+          "secondaire"
+        ]
+      },
+      {
+        "chapitre": "2.3 — البنية الثالثية (Structure Tertiaire)",
+        "score": 2,
+        "matched_keywords": [
+          "secondaire",
+          "tertiaire"
+        ]
+      }
+    ]
+  },
+  "Relation entre structure et fonction de la proteine": {
+    "keywords": [
+      "structure",
+      "fonction",
+      "protéine"
+    ],
+    "top_matches": [
+      {
+        "chapitre": "2.2 — البنية الثانوية (Structure Secondaire)",
+        "score": 1,
+        "matched_keywords": [
+          "structure"
+        ]
+      },
+      {
+        "chapitre": "2.3 — البنية الثالثية (Structure Tertiaire)",
+        "score": 1,
+        "matched_keywords": [
+          "structure"
+        ]
+      },
+      {
+        "chapitre": "2.2 — مسار المعلومة الوراثية (Dogme Central)",
+        "score": 1,
+        "matched_keywords": [
+          "protéine"
+        ]
+      },
+      {
+        "chapitre": "1.3 — تسمية السلاسل الببتيدية",
+        "score": 1,
+        "matched_keywords": [
+          "protéine"
+        ]
+      },
+      {
+        "chapitre": "1.3 — المصادر الطاقوية للخلية",
+        "score": 1,
+        "matched_keywords": [
+          "protéine"
+        ]
+      }
+    ]
+  },
+  "Representation de la structure tridimensionnelle de la proteine": {
+    "keywords": [
+      "tridimensionnelle",
+      "3d",
+      "protéine"
+    ],
+    "top_matches": [
+      {
+        "chapitre": "2.2 — مسار المعلومة الوراثية (Dogme Central)",
+        "score": 1,
+        "matched_keywords": [
+          "protéine"
+        ]
+      },
+      {
+        "chapitre": "1.3 — تسمية السلاسل الببتيدية",
+        "score": 1,
+        "matched_keywords": [
+          "protéine"
+        ]
+      },
+      {
+        "chapitre": "1.3 — المصادر الطاقوية للخلية",
+        "score": 1,
+        "matched_keywords": [
+          "protéine"
+        ]
+      }
+    ]
+  },
+  "Le soi et le non-soi": {
+    "keywords": [
+      "soi",
+      "non-soi",
+      "immun"
+    ],
+    "top_matches": [
+      {
+        "chapitre": "2.4 — المستضد (Antigène)",
+        "score": 2,
+        "matched_keywords": [
+          "soi",
+          "non-soi"
+        ]
+      },
+      {
+        "chapitre": "2.3 — البنية الثالثية (Structure Tertiaire)",
+        "score": 1,
+        "matched_keywords": [
+          "soi"
+        ]
+      },
+      {
+        "chapitre": "3.4 — مثال 3: الأجسام المضادة (Anticorps / Immunoglobulines)",
+        "score": 1,
+        "matched_keywords": [
+          "immun"
+        ]
+      },
+      {
+        "chapitre": "3.2 — البلعمة (Phagocytose)",
+        "score": 1,
+        "matched_keywords": [
+          "immun"
+        ]
+      },
+      {
+        "chapitre": "4.4 — المعقد المناعي (Complexe Immun)",
+        "score": 1,
+        "matched_keywords": [
+          "immun"
+        ]
+      }
+    ]
+  },
+  "Les elements de defense dans le deuxieme cas (immunite specifique)": {
+    "keywords": [
+      "spécifique",
+      "immunité spécifique"
+    ],
+    "top_matches": [
+      {
+        "chapitre": "3.2 — البلعمة (Phagocytose)",
+        "score": 1,
+        "matched_keywords": [
+          "spécifique"
+        ]
+      }
+    ]
+  },
+  "Les molecules de defense dans le premier cas (immunite non specifique)": {
+    "keywords": [
+      "non spécifique",
+      "immunité innée"
+    ],
+    "top_matches": [
+      {
+        "chapitre": "3.2 — البلعمة (Phagocytose)",
+        "score": 1,
+        "matched_keywords": [
+          "non spécifique"
+        ]
+      }
+    ]
+  },
+  "Origine des anticorps": {
+    "keywords": [
+      "anticorps",
+      "lymphocyte b"
+    ],
+    "top_matches": [
+      {
+        "chapitre": "3.4 — مثال 3: الأجسام المضادة (Anticorps / Immunoglobulines)",
+        "score": 1,
+        "matched_keywords": [
+          "anticorps"
+        ]
+      },
+      {
+        "chapitre": "4.4 — المعقد المناعي (Complexe Immun)",
+        "score": 1,
+        "matched_keywords": [
+          "anticorps"
+        ]
+      }
+    ]
+  },
+  "Origine des lymphocytes LTc": {
+    "keywords": [
+      "ltc",
+      "lymphocyte t cytotoxique"
+    ],
+    "top_matches": [
+      {
+        "chapitre": "1.2 — أعضاء الجهاز المناعي",
+        "score": 1,
+        "matched_keywords": [
+          "ltc"
+        ]
+      },
+      {
+        "chapitre": "2.4 — المستضد (Antigène)",
+        "score": 1,
+        "matched_keywords": [
+          "ltc"
+        ]
+      },
+      {
+        "chapitre": "5.2 — اللمفاويات T وأنواعها",
+        "score": 1,
+        "matched_keywords": [
+          "ltc"
+        ]
+      },
+      {
+        "chapitre": "5.4 — مصدر اللمفاويات LTc",
+        "score": 1,
+        "matched_keywords": [
+          "ltc"
+        ]
+      },
+      {
+        "chapitre": "6.2 — مخطط شامل للاستجابة المناعية التكيّفية",
+        "score": 1,
+        "matched_keywords": [
+          "ltc"
+        ]
+      }
+    ]
+  },
+  "Modes d'action des lymphocytes LTc": {
+    "keywords": [
+      "ltc",
+      "cytotoxique",
+      "perforine"
+    ],
+    "top_matches": [
+      {
+        "chapitre": "5.4 — مصدر اللمفاويات LTc",
+        "score": 3,
+        "matched_keywords": [
+          "ltc",
+          "cytotoxique",
+          "perforine"
+        ]
+      },
+      {
+        "chapitre": "1.2 — أعضاء الجهاز المناعي",
+        "score": 1,
+        "matched_keywords": [
+          "ltc"
+        ]
+      },
+      {
+        "chapitre": "2.4 — المستضد (Antigène)",
+        "score": 1,
+        "matched_keywords": [
+          "ltc"
+        ]
+      },
+      {
+        "chapitre": "5.2 — اللمفاويات T وأنواعها",
+        "score": 1,
+        "matched_keywords": [
+          "ltc"
+        ]
+      },
+      {
+        "chapitre": "6.2 — مخطط شامل للاستجابة المناعية التكيّفية",
+        "score": 1,
+        "matched_keywords": [
+          "ltc"
+        ]
+      }
+    ]
+  },
+  "Le complexe immun": {
+    "keywords": [
+      "complexe immun",
+      "antigène",
+      "anticorps"
+    ],
+    "top_matches": [
+      {
+        "chapitre": "4.5 — مصدر الأجسام المضادة",
+        "score": 1,
+        "matched_keywords": [
+          "complexe immun"
+        ]
+      },
+      {
+        "chapitre": "2.4 — المستضد (Antigène)",
+        "score": 1,
+        "matched_keywords": [
+          "antigène"
+        ]
+      },
+      {
+        "chapitre": "3.4 — مثال 3: الأجسام المضادة (Anticorps / Immunoglobulines)",
+        "score": 1,
+        "matched_keywords": [
+          "anticorps"
+        ]
+      },
+      {
+        "chapitre": "4.4 — المعقد المناعي (Complexe Immun)",
+        "score": 1,
+        "matched_keywords": [
+          "anticorps"
+        ]
+      }
+    ]
+  },
+  "Choix du type de reponse immunitaire": {
+    "keywords": [
+      "réponse immunitaire",
+      "cellulaire",
+      "humorale"
+    ],
+    "top_matches": [
+      {
+        "chapitre": "5.2 — اللمفاويات T وأنواعها",
+        "score": 1,
+        "matched_keywords": [
+          "cellulaire"
+        ]
+      },
+      {
+        "chapitre": "1.3 — البروتينات الغشائية المشاركة في التوصيل العصبي",
+        "score": 1,
+        "matched_keywords": [
+          "cellulaire"
+        ]
+      },
+      {
+        "chapitre": "4.4 — المعقد المناعي (Complexe Immun)",
+        "score": 1,
+        "matched_keywords": [
+          "humorale"
+        ]
+      }
+    ]
+  },
+  "Activation des cellules LB et LT": {
+    "keywords": [
+      "lb",
+      "lt",
+      "lymphocyte",
+      "activation"
+    ],
+    "top_matches": [
+      {
+        "chapitre": "1.2 — أعضاء الجهاز المناعي",
+        "score": 3,
+        "matched_keywords": [
+          "lb",
+          "lt",
+          "lymphocyte"
+        ]
+      },
+      {
+        "chapitre": "2.4 — المستضد (Antigène)",
+        "score": 2,
+        "matched_keywords": [
+          "lb",
+          "lt"
+        ]
+      },
+      {
+        "chapitre": "4.6 — الاستجابة المناعية الأولية والثانوية",
+        "score": 2,
+        "matched_keywords": [
+          "lb",
+          "lt"
+        ]
+      },
+      {
+        "chapitre": "5.4 — مصدر اللمفاويات LTc",
+        "score": 2,
+        "matched_keywords": [
+          "lb",
+          "lt"
+        ]
+      },
+      {
+        "chapitre": "6.2 — مخطط شامل للاستجابة المناعية التكيّفية",
+        "score": 2,
+        "matched_keywords": [
+          "lb",
+          "lt"
+        ]
+      }
+    ]
+  },
+  "Cause de la perte de l'immunite acquise (SIDA)": {
+    "keywords": [
+      "vih",
+      "sida",
+      "immunité acquise"
+    ],
+    "top_matches": [
+      {
+        "chapitre": "8.4 — لماذا يُفقد VIH المناعة المكتسبة؟",
+        "score": 2,
+        "matched_keywords": [
+          "vih",
+          "sida"
+        ]
+      },
+      {
+        "chapitre": "8.5 — علاجات VIH",
+        "score": 2,
+        "matched_keywords": [
+          "vih",
+          "sida"
+        ]
+      },
+      {
+        "chapitre": "8.3 — تطوّر مرض الإيدز (SIDA)",
+        "score": 1,
+        "matched_keywords": [
+          "vih"
+        ]
+      }
+    ]
+  },
+  "La transmission synaptique (potentiel membranaire)": {
+    "keywords": [
+      "synaptique",
+      "membranaire",
+      "potentiel"
+    ],
+    "top_matches": [
+      {
+        "chapitre": "5.5 — أنواع المشابك من حيث التأثير",
+        "score": 2,
+        "matched_keywords": [
+          "synaptique",
+          "potentiel"
+        ]
+      },
+      {
+        "chapitre": "5.2 — بنية المشبك الكيميائي",
+        "score": 1,
+        "matched_keywords": [
+          "synaptique"
+        ]
+      },
+      {
+        "chapitre": "2.3 — مضخة Na⁺/K⁺ (Pompe Na⁺/K⁺ ATPase)",
+        "score": 1,
+        "matched_keywords": [
+          "potentiel"
+        ]
+      },
+      {
+        "chapitre": "3.3 — مراحل كمون العمل",
+        "score": 1,
+        "matched_keywords": [
+          "potentiel"
+        ]
+      }
+    ]
+  },
+  "Le potentiel de repos": {
+    "keywords": [
+      "potentiel de repos",
+      "membranaire"
+    ],
+    "top_matches": [
+      {
+        "chapitre": "2.3 — مضخة Na⁺/K⁺ (Pompe Na⁺/K⁺ ATPase)",
+        "score": 1,
+        "matched_keywords": [
+          "potentiel de repos"
+        ]
+      }
+    ]
+  },
+  "Le potentiel d'action": {
+    "keywords": [
+      "potentiel d'action",
+      "dépolarisation"
+    ],
+    "top_matches": [
+      {
+        "chapitre": "3.3 — مراحل كمون العمل",
+        "score": 1,
+        "matched_keywords": [
+          "potentiel d'action"
+        ]
+      },
+      {
+        "chapitre": "3.4 — الأساس الأيوني لكمون العمل",
+        "score": 1,
+        "matched_keywords": [
+          "dépolarisation"
+        ]
+      }
+    ]
+  },
+  "Mecanisme de la transmission synaptique": {
+    "keywords": [
+      "transmission synaptique",
+      "neurotransmetteur"
+    ],
+    "top_matches": [
+      {
+        "chapitre": "5.2 — بنية المشبك الكيميائي",
+        "score": 1,
+        "matched_keywords": [
+          "transmission synaptique"
+        ]
+      }
+    ]
+  },
+  "Mecanisme de l'integration nerveuse": {
+    "keywords": [
+      "intégration nerveuse",
+      "sommation"
+    ],
+    "top_matches": [
+      {
+        "chapitre": "6.4 — مثال تطبيقي للإدماج",
+        "score": 2,
+        "matched_keywords": [
+          "intégration nerveuse",
+          "sommation"
+        ]
+      }
+    ]
+  },
+  "Effet des drogues au niveau des synapses": {
+    "keywords": [
+      "drogue",
+      "synapse",
+      "toxic"
+    ],
+    "top_matches": [
+      {
+        "chapitre": "1.3 — البروتينات الغشائية المشاركة في التوصيل العصبي",
+        "score": 1,
+        "matched_keywords": [
+          "synapse"
+        ]
+      },
+      {
+        "chapitre": "5.2 — بنية المشبك الكيميائي",
+        "score": 1,
+        "matched_keywords": [
+          "synapse"
+        ]
+      },
+      {
+        "chapitre": "5.5 — أنواع المشابك من حيث التأثير",
+        "score": 1,
+        "matched_keywords": [
+          "synapse"
+        ]
+      }
+    ]
+  },
+  "Siege de la photosynthese - Ultrastructure du chloroplaste": {
+    "keywords": [
+      "chloroplaste",
+      "photosynthèse",
+      "thylakoïde"
+    ],
+    "top_matches": [
+      {
+        "chapitre": "1.3 — الأصباغ الضوئية (Pigments Photosynthétiques)",
+        "score": 1,
+        "matched_keywords": [
+          "chloroplaste"
+        ]
+      }
+    ]
+  },
+  "Reactions de la phase photochimique (phase claire)": {
+    "keywords": [
+      "phase photochimique",
+      "photophosphorylation"
+    ],
+    "top_matches": [
+      {
+        "chapitre": "3.3 — مراحل المرحلة الكيموضوئية بالتفصيل",
+        "score": 1,
+        "matched_keywords": [
+          "phase photochimique"
+        ]
+      },
+      {
+        "chapitre": "3.5 — حصيلة المرحلة الكيموضوئية",
+        "score": 1,
+        "matched_keywords": [
+          "photophosphorylation"
+        ]
+      }
+    ]
+  },
+  "Reactions de la phase chimique (cycle de Calvin - phase sombre)": {
+    "keywords": [
+      "calvin",
+      "phase sombre",
+      "carbone"
+    ],
+    "top_matches": [
+      {
+        "chapitre": "4.3 — مراحل حلقة كالفن",
+        "score": 2,
+        "matched_keywords": [
+          "calvin",
+          "phase sombre"
+        ]
+      },
+      {
+        "chapitre": "5.5 — نقطة التعويض الضوئي (Point de Compensation Lumineux)",
+        "score": 1,
+        "matched_keywords": [
+          "phase sombre"
+        ]
+      }
+    ]
+  },
+  "La glycolyse": {
+    "keywords": [
+      "glycolyse",
+      "glucose",
+      "pyruvate"
+    ],
+    "top_matches": [
+      {
+        "chapitre": "3.3 — مخطط تدفق الإلكترونات والطاقة",
+        "score": 2,
+        "matched_keywords": [
+          "glycolyse",
+          "pyruvate"
+        ]
+      },
+      {
+        "chapitre": "5.5 — نقطة التعويض الضوئي (Point de Compensation Lumineux)",
+        "score": 1,
+        "matched_keywords": [
+          "glucose"
+        ]
+      }
+    ]
+  },
+  "Siege de l'oxydation respiratoire": {
+    "keywords": [
+      "mitochondrie",
+      "oxydation",
+      "respiration"
+    ],
+    "top_matches": [
+      {
+        "chapitre": "4.6 — حصيلة حلقة كالفن (لإنتاج جزيء غلوكوز واحد)",
+        "score": 1,
+        "matched_keywords": [
+          "respiration"
+        ]
+      }
+    ]
+  },
+  "Etapes de degradation de l'acide pyruvique (reactions du cycle de Krebs)": {
+    "keywords": [
+      "krebs",
+      "pyruvique",
+      "cycle"
+    ],
+    "top_matches": [
+      {
+        "chapitre": "4.3 — مراحل حلقة كالفن",
+        "score": 1,
+        "matched_keywords": [
+          "cycle"
+        ]
+      },
+      {
+        "chapitre": "5.2 — مراحل دورة ويلسون",
+        "score": 1,
+        "matched_keywords": [
+          "cycle"
+        ]
+      }
+    ]
+  },
+  "La phosphorylation oxydative": {
+    "keywords": [
+      "phosphorylation oxydative",
+      "atp synthase"
+    ],
+    "top_matches": [
+      {
+        "chapitre": "3.5 — حصيلة المرحلة الكيموضوئية",
+        "score": 1,
+        "matched_keywords": [
+          "atp synthase"
+        ]
+      },
+      {
+        "chapitre": "5.5 — نقطة التعويض الضوئي (Point de Compensation Lumineux)",
+        "score": 1,
+        "matched_keywords": [
+          "atp synthase"
+        ]
+      }
+    ]
+  },
+  "Les transformations energetiques au niveau cellulaire": {
+    "keywords": [
+      "énergétique",
+      "cellulaire",
+      "atp"
+    ],
+    "top_matches": [
+      {
+        "chapitre": "1.3 — البروتينات الغشائية المشاركة في التوصيل العصبي",
+        "score": 2,
+        "matched_keywords": [
+          "cellulaire",
+          "atp"
+        ]
+      },
+      {
+        "chapitre": "5.2 — اللمفاويات T وأنواعها",
+        "score": 1,
+        "matched_keywords": [
+          "cellulaire"
+        ]
+      },
+      {
+        "chapitre": "4.3 — بنية الـ ARNt (ARN de Transfert)",
+        "score": 1,
+        "matched_keywords": [
+          "atp"
+        ]
+      },
+      {
+        "chapitre": "2.3 — مضخة Na⁺/K⁺ (Pompe Na⁺/K⁺ ATPase)",
+        "score": 1,
+        "matched_keywords": [
+          "atp"
+        ]
+      },
+      {
+        "chapitre": "4.4 — مخطط حلقة كالفن الكامل",
+        "score": 1,
+        "matched_keywords": [
+          "atp"
+        ]
+      }
+    ]
+  },
+  "Mecanismes de conversion en milieu anaerobie (fermentation)": {
+    "keywords": [
+      "fermentation",
+      "anaérobie",
+      "lactique"
+    ],
+    "fallback": true,
+    "top_matches": [
+      {
+        "source": "programme_national_svt_claude_opus.md",
+        "chapitre": "دور البروتينات في الاتصال العصبي",
+        "score": 3,
+        "matched_keywords": [
+          "fermentation",
+          "anaérobie",
+          "lactique"
+        ]
+      },
+      {
+        "source": "programme_national_svt_claude_opus.md",
+        "chapitre": "Unite 1: آليات تحويل الطاقة الضوئية إلى طاقة كيميائية كامنة",
+        "score": 3,
+        "matched_keywords": [
+          "fermentation",
+          "anaérobie",
+          "lactique"
+        ]
+      }
+    ]
+  },
+  "Identification des plaques tectoniques": {
+    "keywords": [
+      "plaque tectonique",
+      "lithosphère"
+    ],
+    "top_matches": [
+      {
+        "chapitre": "1.2 — مفهومان أساسيان: الصفيحة والغلاف الصخري",
+        "score": 2,
+        "matched_keywords": [
+          "plaque tectonique",
+          "lithosphère"
+        ]
+      }
+    ]
+  },
+  "Mouvements des plaques tectoniques": {
+    "keywords": [
+      "plaque tectonique",
+      "mouvement",
+      "dérive"
+    ],
+    "top_matches": [
+      {
+        "chapitre": "1.2 — مفهومان أساسيان: الصفيحة والغلاف الصخري",
+        "score": 1,
+        "matched_keywords": [
+          "plaque tectonique"
+        ]
+      }
+    ]
+  },
+  "Les ondes sismiques": {
+    "keywords": [
+      "onde sismique",
+      "séisme",
+      "magnitude"
+    ],
+    "top_matches": [
+      {
+        "chapitre": "2.3 — كيف نُحدّد حدود الصفائح؟",
+        "score": 1,
+        "matched_keywords": [
+          "séisme"
+        ]
+      },
+      {
+        "chapitre": "1.2 — مصطلحات زلزالية أساسية",
+        "score": 1,
+        "matched_keywords": [
+          "séisme"
+        ]
+      }
+    ]
+  },
+  "Indices d'un ancien ocean (ophiolites)": {
+    "keywords": [
+      "ophiolite",
+      "ancien océan",
+      "croûte océanique"
+    ],
+    "top_matches": [
+      {
+        "chapitre": "4.2 — كيف وصلت الأوفيوليت إلى القارة؟",
+        "score": 1,
+        "matched_keywords": [
+          "ophiolite"
+        ]
+      },
+      {
+        "chapitre": "1.2 — مفهومان أساسيان: الصفيحة والغلاف الصخري",
+        "score": 1,
+        "matched_keywords": [
+          "croûte océanique"
+        ]
+      }
+    ]
+  },
+  "Indices du raccourcissement": {
+    "keywords": [
+      "raccourcissement",
+      "plis",
+      "failles"
+    ],
+    "top_matches": [
+      {
+        "chapitre": "3.3 — التحوّل المتري في جبال الطيّ (Métamorphisme de collision)",
+        "score": 2,
+        "matched_keywords": [
+          "plis",
+          "failles"
+        ]
+      },
+      {
+        "chapitre": "3.7 — جدول مقارنة أنواع حدود الصفائح",
+        "score": 1,
+        "matched_keywords": [
+          "failles"
+        ]
+      }
+    ]
+  },
+  "Phenomenes lies a la subduction": {
+    "keywords": [
+      "subduction",
+      "plongement",
+      "fosse"
+    ],
+    "top_matches": [
+      {
+        "chapitre": "3.5 — حدود التقارب (Convergence / Subduction)",
+        "score": 2,
+        "matched_keywords": [
+          "subduction",
+          "fosse"
+        ]
+      },
+      {
+        "chapitre": "3.6 — حدود الانزلاق (Transform / Failles transformantes)",
+        "score": 1,
+        "matched_keywords": [
+          "subduction"
+        ]
+      },
+      {
+        "chapitre": "5.3 — جدول ملخّص دورة ويلسون",
+        "score": 1,
+        "matched_keywords": [
+          "subduction"
+        ]
+      },
+      {
+        "chapitre": "3.7 — جدول مقارنة أنواع حدود الصفائح",
+        "score": 1,
+        "matched_keywords": [
+          "fosse"
+        ]
+      },
+      {
+        "chapitre": "2.5 — التحوّل المتري عند الغوص (Métamorphisme)",
+        "score": 1,
+        "matched_keywords": [
+          "fosse"
+        ]
+      }
+    ]
+  },
+  "Disparition de la plaque oceanique et phenomenes lies a la subduction": {
+    "keywords": [
+      "subduction",
+      "plaque océanique",
+      "disparition"
+    ],
+    "top_matches": [
+      {
+        "chapitre": "3.5 — حدود التقارب (Convergence / Subduction)",
+        "score": 1,
+        "matched_keywords": [
+          "subduction"
+        ]
+      },
+      {
+        "chapitre": "3.6 — حدود الانزلاق (Transform / Failles transformantes)",
+        "score": 1,
+        "matched_keywords": [
+          "subduction"
+        ]
+      },
+      {
+        "chapitre": "5.3 — جدول ملخّص دورة ويلسون",
+        "score": 1,
+        "matched_keywords": [
+          "subduction"
+        ]
+      }
+    ]
+  },
+  "Le magmatisme et la formation de la plaque oceanique": {
+    "keywords": [
+      "magmatisme",
+      "plaque océanique",
+      "dorsale"
+    ],
+    "top_matches": [
+      {
+        "chapitre": "3.3 — الأدلة على التباعد: أعمار قاع المحيط",
+        "score": 1,
+        "matched_keywords": [
+          "dorsale"
+        ]
+      },
+      {
+        "chapitre": "3.5 — حدود التقارب (Convergence / Subduction)",
+        "score": 1,
+        "matched_keywords": [
+          "dorsale"
+        ]
+      },
+      {
+        "chapitre": "3.7 — جدول مقارنة أنواع حدود الصفائح",
+        "score": 1,
+        "matched_keywords": [
+          "dorsale"
+        ]
+      },
+      {
+        "chapitre": "6.1 — جدول شامل للبنيات وأسبابها",
+        "score": 1,
+        "matched_keywords": [
+          "dorsale"
+        ]
+      }
+    ]
+  },
+  "Caracteristiques des dorsales medio-oceaniques": {
+    "keywords": [
+      "dorsale médio-océanique",
+      "dorsale"
+    ],
+    "top_matches": [
+      {
+        "chapitre": "3.5 — حدود التقارب (Convergence / Subduction)",
+        "score": 2,
+        "matched_keywords": [
+          "dorsale médio-océanique",
+          "dorsale"
+        ]
+      },
+      {
+        "chapitre": "3.3 — الأدلة على التباعد: أعمار قاع المحيط",
+        "score": 1,
+        "matched_keywords": [
+          "dorsale"
+        ]
+      },
+      {
+        "chapitre": "3.7 — جدول مقارنة أنواع حدود الصفائح",
+        "score": 1,
+        "matched_keywords": [
+          "dorsale"
+        ]
+      },
+      {
+        "chapitre": "6.1 — جدول شامل للبنيات وأسبابها",
+        "score": 1,
+        "matched_keywords": [
+          "dorsale"
+        ]
+      }
+    ]
+  },
+  "Formation des roches caracteristiques de la dorsale medio-oceanique": {
+    "keywords": [
+      "dorsale",
+      "roche",
+      "basalte"
+    ],
+    "top_matches": [
+      {
+        "chapitre": "3.7 — جدول مقارنة أنواع حدود الصفائح",
+        "score": 2,
+        "matched_keywords": [
+          "dorsale",
+          "basalte"
+        ]
+      },
+      {
+        "chapitre": "3.3 — الأدلة على التباعد: أعمار قاع المحيط",
+        "score": 1,
+        "matched_keywords": [
+          "dorsale"
+        ]
+      },
+      {
+        "chapitre": "3.5 — حدود التقارب (Convergence / Subduction)",
+        "score": 1,
+        "matched_keywords": [
+          "dorsale"
+        ]
+      },
+      {
+        "chapitre": "6.1 — جدول شامل للبنيات وأسبابها",
+        "score": 1,
+        "matched_keywords": [
+          "dorsale"
+        ]
+      },
+      {
+        "chapitre": "5.4 — تركيب اللب (Noyau)",
+        "score": 1,
+        "matched_keywords": [
+          "basalte"
+        ]
+      }
+    ]
+  },
+  "Modelisation de la structure interne du globe terrestre": {
+    "keywords": [
+      "structure interne",
+      "globe terrestre",
+      "manteau"
+    ],
+    "top_matches": [
+      {
+        "chapitre": "1.2 — مفهومان أساسيان: الصفيحة والغلاف الصخري",
+        "score": 1,
+        "matched_keywords": [
+          "manteau"
+        ]
+      },
+      {
+        "chapitre": "5.4 — تركيب اللب (Noyau)",
+        "score": 1,
+        "matched_keywords": [
+          "manteau"
+        ]
+      }
+    ]
+  },
+  "L'energie interne du globe terrestre": {
+    "keywords": [
+      "énergie interne",
+      "chaleur",
+      "terrestre"
+    ],
+    "top_matches": [
+      {
+        "chapitre": "5.6 — الطاقة الجيوحرارية (Géothermie)",
+        "score": 1,
+        "matched_keywords": [
+          "chaleur"
+        ]
+      }
+    ]
+  },
+  "Reliefs resultant de la collision": {
+    "keywords": [
+      "collision",
+      "relief",
+      "chaîne de montagnes"
+    ],
+    "top_matches": [
+      {
+        "chapitre": "3.5 — حدود التقارب (Convergence / Subduction)",
+        "score": 1,
+        "matched_keywords": [
+          "collision"
+        ]
+      },
+      {
+        "chapitre": "3.6 — حدود الانزلاق (Transform / Failles transformantes)",
+        "score": 1,
+        "matched_keywords": [
+          "collision"
+        ]
+      },
+      {
+        "chapitre": "3.3 — التحوّل المتري في جبال الطيّ (Métamorphisme de collision)",
+        "score": 1,
+        "matched_keywords": [
+          "collision"
+        ]
+      },
+      {
+        "chapitre": "5.3 — جدول ملخّص دورة ويلسون",
+        "score": 1,
+        "matched_keywords": [
+          "collision"
+        ]
+      }
+    ]
+  },
+  "Composition chimique des roches de la croute terrestre et du manteau": {
+    "keywords": [
+      "croute terrestre",
+      "manteau",
+      "composition"
+    ],
+    "top_matches": [
+      {
+        "chapitre": "1.2 — مفهومان أساسيان: الصفيحة والغلاف الصخري",
+        "score": 1,
+        "matched_keywords": [
+          "manteau"
+        ]
+      },
+      {
+        "chapitre": "5.4 — تركيب اللب (Noyau)",
+        "score": 1,
+        "matched_keywords": [
+          "manteau"
+        ]
+      }
+    ]
+  }
+}

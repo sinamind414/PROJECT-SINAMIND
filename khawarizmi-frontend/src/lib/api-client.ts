@@ -6,6 +6,8 @@ import {
   AuthResponse,
   ChatMessage,
   ChatResponse,
+  CoursResponse,
+  ExercicesResponse,
   Flashcard,
   HealthCheck,
   LoginPayload,
@@ -230,8 +232,10 @@ class KhawarizmiApiClient {
     matiere: string,
     filiere: string
   ): Promise<Programme> {
+    const safeFiliere = filiere || "Sciences Experimentales";
+    const filiereToUse = safeFiliere.toLowerCase().includes("naturelles") ? "Sciences Experimentales" : safeFiliere;
     const matEnc = encodeURIComponent(matiere)
-    const filEnc = encodeURIComponent(filiere)
+    const filEnc = encodeURIComponent(filiereToUse)
     return this.request<Programme>(
       `/api/programme/${matEnc}/${filEnc}`
     )
@@ -241,11 +245,53 @@ class KhawarizmiApiClient {
     matiere: string,
     filiere: string
   ): Promise<CriticalChaptersResponse> {
+    const safeFiliere = filiere || "Sciences Experimentales";
+    const filiereToUse = safeFiliere.toLowerCase().includes("naturelles") ? "Sciences Experimentales" : safeFiliere;
     const matEnc = encodeURIComponent(matiere)
-    const filEnc = encodeURIComponent(filiere)
+    const filEnc = encodeURIComponent(filiereToUse)
     return this.request<CriticalChaptersResponse>(
       `/api/programme/${matEnc}/${filEnc}/chapters/critical`
     )
+  }
+
+  // ── Cours ──────────────────────────────────────
+
+  async getCours(chapitre: string): Promise<CoursResponse> {
+    const encoded = encodeURIComponent(chapitre)
+    return this.request<CoursResponse>(`/api/cours/${encoded}`)
+  }
+
+  async getExercices(chapitre: string): Promise<ExercicesResponse> {
+    const encoded = encodeURIComponent(chapitre)
+    return this.request<ExercicesResponse>(`/api/exercices/${encoded}`)
+  }
+
+  // ── Session / Drill ────────────────────────────
+
+  async getNextSession(maxCards = 5): Promise<{ session_queue: Record<string, unknown>[] }> {
+    return this.request<{ session_queue: Record<string, unknown>[] }>("/api/session/next", {
+      method: "POST",
+      body: JSON.stringify({ max_cards: maxCards })
+    })
+  }
+
+  async getNextQuestion(): Promise<Record<string, unknown>> {
+    return this.request<Record<string, unknown>>("/api/session/next-question", {
+      method: "POST"
+    })
+  }
+
+  async submitDrillResult(
+    microConceptId: string,
+    scorePercent: number
+  ): Promise<Record<string, unknown>> {
+    return this.request<Record<string, unknown>>("/api/drill/result", {
+      method: "POST",
+      body: JSON.stringify({
+        micro_concept_id: microConceptId,
+        score_percent: scorePercent
+      })
+    })
   }
 
   // ── Health Check ───────────────────────────────

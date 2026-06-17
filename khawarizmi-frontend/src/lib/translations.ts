@@ -85,8 +85,8 @@ export const UI_AR: Record<string, string> = {
   selectionne_chapitre: "اختر فصلا لبدء شرحه بطريقة فاينمان",
   session_drill: "جلسة تمرين",
   rappel_actif: "التذكر النشط",
-  description_rappel: "اختبر ذاكرتك بأسئلة متنوعة من جميع الفصول",
-  effort_recup: "مجهود الاسترجاع يعزز الحفظ على المدى الطويل",
+  description_rappel: "اختبر ذاكرتك بأسئلة متنوعة",
+  effort_recup: "مجهود الاسترجاع يعزز الحفظ",
   commencer_session: "بدء الجلسة",
   chargement_programme: "جاري تحميل البرنامج...",
   domaines: "المجالات",
@@ -106,6 +106,17 @@ export const UI_AR: Record<string, string> = {
   session_expiree: "انتهت الجلسة. يرجى إعادة تسجيل الدخول.",
   limite_atteinte: "تم تجاوز حد الطلبات. حاول مرة أخرى لاحقا.",
   erreur_http_prefix: "خطأ",
+  bac_2026: "BAC 2026",
+  jours_restants: "باقي {n} يوم",
+  progression_programme: "{n}% من البرنامج",
+  pret_session: "جاهز لجلسة المراجعة اليوم؟",
+  decouvrir: "اكتشف ←",
+  domaine_1_emoji: "🧬",
+  domaine_2_emoji: "⚡",
+  domaine_3_emoji: "🌍",
+  mon_programme: "برنامجي",
+  critique_bac_count: "حاسم BAC",
+  total_chapitres: "إجمالي الفصول",
 }
 
 export const filieres: Record<string, string> = {
@@ -118,66 +129,87 @@ export const filieres: Record<string, string> = {
   "Langues Étrangères": "لغات أجنبية",
 }
 
-export const CHAPITRES_TRADUCTION: Record<string, string> = {
+export const CHAPITRES_AR: Record<string, string> = {
   "Rappel des acquis": "تذكير بالمكتسبات",
   "Siege de la synthese des proteines": "مقر تركيب البروتين",
-  "Synthese des proteines": "تركيب البروتين",
-  "Transcription de l'information genetique au niveau de l'ADN": "استنساخ المعلومة الوراثية على مستوى ADN",
+  "Transcription de l'information genetique au niveau de l'ADN": "استنساخ المعلومة الوراثية",
   "La traduction": "الترجمة",
   "Les etapes de la traduction": "مراحل الترجمة",
   "Representation de la structure tridimensionnelle de la proteine": "تمثيل البنية الفراغية للبروتين",
-  "Niveaux de la structure spatiale des proteines": "مستويات البنية الفراغية للبروتينات",
+  "Niveaux de la structure spatiale des proteines": "مستويات البنية الفراغية",
   "Relation entre structure et fonction de la proteine": "العلاقة بين بنية ووظيفة البروتين",
   "Notion d'enzyme et son importance": "مفهوم الإنزيم وأهميته",
-  "L'activite enzymatique et sa relation avec la structure de l'enzyme": "النشاط الإنزيمي وعلاقته ببنية الإنزيم",
-  "Etude de l'influence du pH du milieu sur l'activite enzymatique": "دراسة تأثير pH على النشاط الإنزيمي",
-  "Etude de l'influence de la temperature sur l'activite enzymatique": "دراسة تأثير الحرارة على النشاط الإنزيمي",
+  "L'activite enzymatique et sa relation avec la structure de l'enzyme": "النشاط الإنزيمي وبنية الإنزيم",
   "Le soi et le non-soi": "الذات واللاذات",
-  "Les molecules de defense dans le premier cas (immunite non specifique)": "جزيئات الدفاع في الاستجابة المناعية غير النوعية",
   "Le complexe immun": "المعقد المناعي",
   "Origine des anticorps": "منشأ الأجسام المضادة",
-  "Les elements de defense dans le deuxieme cas (immunite specifique)": "عناصر الدفاع في الاستجابة المناعية النوعية",
   "Modes d'action des lymphocytes LTc": "آليات عمل اللمفاويات LTc",
   "Origine des lymphocytes LTc": "منشأ اللمفاويات LTc",
   "Activation des cellules LB et LT": "تنشيط الخلايا LB و LT",
   "Choix du type de reponse immunitaire": "اختيار نوع الاستجابة المناعية",
-  "Cause de la perte de l'immunite acquise (SIDA)": "أسباب فقدان المناعة المكتسبة (SIDA)",
-  "La transmission synaptique (potentiel membranaire)": "النقل المشبكي (الكمون الغشائي)",
+  "Cause de la perte de l'immunite acquise (SIDA)": "أسباب فقدان المناعة (SIDA)",
+  "La transmission synaptique (potentiel membranaire)": "النقل المشبكي",
   "Mecanisme de la transmission synaptique": "آلية النقل المشبكي",
   "Le potentiel de repos": "كمون الراحة",
   "Le potentiel d'action": "كمون العمل",
-  "Mecanisme de l'integration nerveuse": "آلية التكامل العصبي",
-  "Effet des drogues au niveau des synapses": "تأثير المخدرات على مستوى المشابك",
-  "Siege de la photosynthese - Ultrastructure du chloroplaste": "مقر التركيب الضوئي — البنية التحتية للصانعة الخضراء",
-  "Reactions de la phase photochimique (phase claire)": "تفاعلات المرحلة الكيموضوئية",
-  "Reactions de la phase chimique (cycle de Calvin - phase sombre)": "تفاعلات المرحلة الكيميائية (دورة كالفن)",
-  "Siege de l'oxydation respiratoire": "مقر الأكسدة التنفسية",
-  "La glycolyse": "تحلل السكر",
-  "Etapes de degradation de l'acide pyruvique (reactions du cycle de Krebs)": "مراحل تفكك حمض البيروفيك (دورة كريبس)",
-  "La phosphorylation oxydative": "الفسفرة التأكسدية",
-  "Mecanismes de conversion en milieu anaerobie (fermentation)": "آليات التحويل في الوسط اللاهوائي (التخمر)",
-  "Les transformations energetiques au niveau cellulaire": "التحولات الطاقوية على المستوى الخلوي",
   "Identification des plaques tectoniques": "تحديد الصفائح التكتونية",
   "Mouvements des plaques tectoniques": "حركات الصفائح التكتونية",
-  "L'energie interne du globe terrestre": "الطاقة الداخلية للكرة الأرضية",
-  "Les ondes sismiques": "الموجات الزلزالية",
-  "Composition chimique des roches de la croute terrestre et du manteau": "التركيب الكيميائي لصخور القشرة والوشاح",
-  "Modelisation de la structure interne du globe terrestre": "نمذجة البنية الداخلية للكرة الأرضية",
-  "Caracteristiques des dorsales medio-oceaniques": "خصائص الظهرات وسط محيطية",
-  "Le magmatisme et la formation de la plaque oceanique": "الماغماتية وتشكل اللوح المحيطي",
-  "Formation des roches caracteristiques de la dorsale medio-oceanique": "تشكل الصخور المميزة للظهرة وسط محيطية",
-  "Phenomenes lies a la subduction": "الظواهر المرتبطة بالغوص",
-  "Disparition de la plaque oceanique et phenomenes lies a la subduction": "اختفاء اللوح المحيطي والظواهر المرتبطة بالغوص",
-  "Reliefs resultant de la collision": "التضاريس الناتجة عن التصادم",
-  "Indices du raccourcissement": "مؤشرات التقصير",
-  "Indices d'un ancien ocean (ophiolites)": "مؤشرات محيط قديم (الأوفيوليت)",
+  "Les ondes sismiques": "الموجات الزلزالية"
 }
 
-export function traduireChapitre(label: string): string {
+export const DOMAIN_COLORS: Record<number, {
+  name: string
+  emoji: string
+  accent: string
+  accentLight: string
+  accentSoft: string
+  glassBg: string
+  border: string
+  textAccent: string
+}> = {
+  1: {
+    name: "البروتينات",
+    emoji: "🧬",
+    accent: "#A78BFA",
+    accentLight: "#C4B5FD",
+    accentSoft: "rgba(167, 139, 250, 0.08)",
+    glassBg: "bg-white/[0.03]",
+    border: "border-white/[0.08]",
+    textAccent: "text-violet-300"
+  },
+  2: {
+    name: "الطاقة",
+    emoji: "⚡",
+    accent: "#FB923C",
+    accentLight: "#FDBA74",
+    accentSoft: "rgba(251, 146, 60, 0.08)",
+    glassBg: "bg-white/[0.03]",
+    border: "border-white/[0.08]",
+    textAccent: "text-orange-300"
+  },
+  3: {
+    name: "التكتونية",
+    emoji: "🌍",
+    accent: "#5EEAD4",
+    accentLight: "#99F6E4",
+    accentSoft: "rgba(94, 234, 212, 0.08)",
+    glassBg: "bg-white/[0.03]",
+    border: "border-white/[0.08]",
+    textAccent: "text-teal-300"
+  }
+}
+
+export function getDomainColors(domainNum: number | string) {
+  const num = Number(domainNum) || 1
+  return DOMAIN_COLORS[num] || DOMAIN_COLORS[1]
+}
+
+export function trAr(label: string): string {
+  if (!label) return ""
   if (/[\u0600-\u06FF]/.test(label)) return label
-  if (CHAPITRES_TRADUCTION[label]) return CHAPITRES_TRADUCTION[label]
-  for (const [fr, ar] of Object.entries(CHAPITRES_TRADUCTION)) {
-    if (label.includes(fr) || fr.includes(label)) return ar
+  if (CHAPITRES_AR[label]) return CHAPITRES_AR[label]
+  for (const [fr, ar] of Object.entries(CHAPITRES_AR)) {
+    if (label.includes(fr)) return ar
   }
   return label
 }

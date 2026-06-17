@@ -3,7 +3,7 @@ import uuid
 import json
 import re
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import text
@@ -12,29 +12,15 @@ logger = logging.getLogger("khawarizmi.mindmap_service")
 
 
 MINDMAP_SYSTEM_PROMPT = """
-🚨 INSTRUCTIONS CRITIQUES DE LANGUE — RESPECTER ABSOLUMENT 🚨
-Tu es un expert pédagogique algérien spécialisé en SVT.
-Le programme BAC est enseigné en ARABE.
+INSTRUCTIONS LANGUE OBLIGATOIRES :
 
-RÈGLE 1 — TOUS les labels (champ "label") en ARABE
-  ✅ "تركيب البروتين"
-  ✅ "استنساخ المعلومة الوراثية"
-  ❌ "Synthèse des protéines" (INTERDIT)
-
-RÈGLE 2 — Termes scientifiques universels en FR
-  Garder UNIQUEMENT entre parenthèses :
-  ADN, ARN, ARNm, ARNt, ARNr, ATP, NADPH, NADH, FADH2
-  polymérase, ribosome, mitochondrie, chloroplaste, thylakoïde, stroma
-
-RÈGLE 3 — Format bilingue obligatoire
-  Format : "النص بالعربية (terme FR si nécessaire)"
-  Exemples :
-  ✅ "الانزيم بوليمراز (ARN polymérase)"
-  ✅ "الميتوكوندري (mitochondrie)"
-  ❌ "ARN polymérase" seul (INTERDIT)
-
-RÈGLE 4 — Descriptions en arabe
-  Tous les champs descriptifs, notes, explications en arabe.
+1. TOUS les labels en ARABE.
+2. Termes scientifiques universels en FR entre parenthèses :
+   ADN, ARN, ATP, polymérase, ribosome.
+3. Exemples corrects :
+   "تركيب البروتين"
+   "الانزيم بوليمراز (ARN polymérase)"
+4. INTERDIT : labels entièrement en français.
 
 ═══════════════════════════════════════════
 
@@ -100,6 +86,10 @@ async def generate_mindmap(
             user_id,
             db
         )
+        if flashcards:
+            await persist_flashcards_to_fsrs(
+                flashcards, matiere, chapitre, user_id, db
+            )
         return {
             "status": "success",
             "mindmap": mindmap_data,
@@ -247,6 +237,12 @@ async def generate_mindmap(
         db
     )
 
+    # 8. Persister les flashcards dans FSRS (Mind Map ↔ FSRS)
+    if flashcards:
+        await persist_flashcards_to_fsrs(
+            flashcards, matiere, chapitre, user_id, db
+        )
+
     return {
         "status": "success",
         "mindmap": mindmap_data,
@@ -298,6 +294,69 @@ async def _generate_auto_flashcards(
         )
 
     return flashcards
+
+
+async def persist_flashcards_to_fsrs(
+    flashcards: list,
+    matiere: str,
+    chapitre: str,
+    user_id: str,
+    db: AsyncSession
+) -> list:
+    u_id = int(user_id)
+    saved = []
+
+    for card in flashcards:
+        card_id = f"mm_{card['node_id']}"
+        result = await db.execute(
+            text("""
+                INSERT INTO mastery_micro_concepts
+                    (user_id, micro_concept_id, concept_id, chapter,
+                     difficulty, stability, state, due_date,
+                     prochaine_revision, interval_jours)
+                VALUES
+                    (:user_id, :mc_id, :concept_id, :chapter,
+                     :difficulty, :stability, :state, :due_date,
+                     :next_rev, :interval)
+                ON CONFLICT (user_id, micro_concept_id)
+                DO UPDATE SET
+                    chapter = EXCLUDED.chapter
+                RETURNING id
+            """),
+            {
+                "user_id": u_id,
+                "mc_id": card_id,
+                "concept_id": card["node_id"],
+                "chapter": chapitre,
+                "difficulty": 5.0,
+                "stability": 0.0,
+                "state": 0,
+                "due_date": datetime.utcnow(),
+                "next_rev": datetime.utcnow(),
+                "interval": 1,
+            }
+        )
+        row = result.fetchone()
+        saved.append({**card, "fsrs_id": row[0] if row else None})
+
+        await db.execute(
+            text("""
+                UPDATE mindmap_nodes
+                SET fsrs_card_id = :fsrs_id,
+                    updated_at = :updated_at
+                WHERE id = :node_id AND user_id = :user_id
+            """),
+            {
+                "fsrs_id": card_id,
+                "node_id": card["node_id"],
+                "user_id": u_id,
+                "updated_at": datetime.utcnow()
+            }
+        )
+
+    await db.commit()
+    logger.info(f"FSRS: {len(saved)} flashcards persistees pour user={user_id} chapitre={chapitre}")
+    return saved
 
 
 async def save_mindmap(
@@ -376,6 +435,17 @@ async def update_node_maitrise(
         raise ValueError("maitrise doit être 0, 1 ou 2")
 
     u_id = int(user_id)
+
+    # Récupérer le fsrs_card_id avant mise à jour
+    node_result = await db.execute(
+        text("SELECT id, fsrs_card_id, chapitre FROM mindmap_nodes mn "
+             "JOIN mindmaps m ON m.id = mn.mindmap_id "
+             "WHERE mn.id = :node_id AND mn.user_id = :user_id"),
+        {"node_id": node_id, "user_id": u_id}
+    )
+    node_row = node_result.fetchone()
+
+    # Mettre à jour le niveau de maîtrise
     result = await db.execute(
         text("""
             UPDATE mindmap_nodes
@@ -392,12 +462,57 @@ async def update_node_maitrise(
             "updated_at": datetime.utcnow()
         }
     )
-    await db.commit()
     row = result.fetchone()
 
     if not row:
         raise ValueError(f"Nœud {node_id} non trouvé")
 
+    # Mettre à jour l'état FSRS en fonction de la maîtrise
+    fsrs_card_id = f"mm_{node_id}"
+    fsrs_params = {
+        0: {"difficulty": 8.0, "stability": 0.0, "state": 0,
+            "interval": 1, "due_delta": 0},
+        1: {"difficulty": 5.0, "stability": 3.0, "state": 1,
+            "interval": 1, "due_delta": 1},
+        2: {"difficulty": 3.0, "stability": 15.0, "state": 2,
+            "interval": 7, "due_delta": 7},
+    }[maitrise]
+
+    await db.execute(
+        text("""
+            INSERT INTO mastery_micro_concepts
+                (user_id, micro_concept_id, concept_id, chapter,
+                 difficulty, stability, state, due_date,
+                 prochaine_revision, interval_jours)
+            VALUES
+                (:user_id, :mc_id, :concept_id, :chapter,
+                 :difficulty, :stability, :state,
+                 :due_date, :next_rev, :interval)
+            ON CONFLICT (user_id, micro_concept_id)
+            DO UPDATE SET
+                difficulty = EXCLUDED.difficulty,
+                stability = EXCLUDED.stability,
+                state = EXCLUDED.state,
+                due_date = EXCLUDED.due_date,
+                prochaine_revision = EXCLUDED.prochaine_revision,
+                interval_jours = EXCLUDED.interval_jours,
+                updated_at = NOW()
+        """),
+        {
+            "user_id": u_id,
+            "mc_id": fsrs_card_id,
+            "concept_id": node_id,
+            "chapter": node_row[2] if node_row else "",
+            "difficulty": fsrs_params["difficulty"],
+            "stability": fsrs_params["stability"],
+            "state": fsrs_params["state"],
+            "due_date": datetime.utcnow(),
+            "next_rev": datetime.utcnow() + timedelta(days=fsrs_params["due_delta"]),
+            "interval": fsrs_params["interval"],
+        }
+    )
+
+    await db.commit()
     return {"id": row[0], "maitrise_eleve": row[1]}
 
 

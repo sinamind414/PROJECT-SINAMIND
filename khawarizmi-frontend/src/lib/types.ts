@@ -186,6 +186,26 @@ export const IMPORTANCE_COLORS: Record<Importance, string> = {
 }
 
 // ═══════════════════════════════════════════════
+// Cours
+// ═══════════════════════════════════════════════
+
+export interface CoursResponse {
+  chapitre: string
+  contenu: string
+  sources: string[]
+  total_chunks: number
+  importance: string
+}
+
+export interface ExercicesResponse {
+  chapitre: string
+  contenu: string
+  nb_exercices: number
+  nb_corrections: number
+  nb_sections: number
+}
+
+// ═══════════════════════════════════════════════
 // Programme officiel
 // ═══════════════════════════════════════════════
 

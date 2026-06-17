@@ -22,7 +22,7 @@ import "@xyflow/react/dist/style.css"
 import apiClient from "@/lib/api-client"
 import { useAuth } from "@/lib/auth-context"
 import { AuthGuard } from "@/components/auth/AuthGuard"
-import { UI_AR, traduireChapitre } from "@/lib/translations"
+import { UI_AR, trAr } from "@/lib/translations"
 import {
   MindMap as MindMapType,
   MindMapNode,
@@ -355,7 +355,7 @@ function MindMapContent() {
           <div className="h-4 w-px bg-slate-800" />
           <div>
             <h1 className="text-base sm:text-lg font-bold text-white leading-tight">
-              {traduireChapitre(chapter.titre_fr)}
+              {trAr(chapter.titre_fr)}
             </h1>
             <p className="text-xs text-slate-400">
               {UI_AR.chapitre_label} {chapter.numero} • {UI_AR.svt_terminale}
@@ -413,7 +413,7 @@ function MindMapContent() {
 
                 <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-4 space-y-3">
                   <h4 className="text-base font-bold text-white leading-snug">
-                    {traduireChapitre(selectedNode.label)}
+                    {trAr(selectedNode.label)}
                   </h4>
                   
                   <div className="grid grid-cols-2 gap-2 text-xs">
@@ -496,7 +496,7 @@ function MindMapContent() {
                       className="w-full text-left p-2.5 rounded-lg bg-slate-900/30 border border-slate-900 hover:border-slate-800 transition flex items-center justify-between gap-2 cursor-pointer group"
                     >
                       <span className="text-slate-300 text-xs font-medium truncate group-hover:text-white transition-colors">
-                        {traduireChapitre(n.label)}
+                        {trAr(n.label)}
                       </span>
                       <span
                         className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded"

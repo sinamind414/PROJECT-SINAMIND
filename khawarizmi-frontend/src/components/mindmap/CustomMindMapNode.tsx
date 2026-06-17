@@ -1,6 +1,6 @@
 import { Handle, Position } from "@xyflow/react"
 import { MindMapNode, TYPE_EMOJI, MAITRISE_COLORS } from "@/lib/types"
-import { UI_AR, traduireChapitre } from "@/lib/translations"
+import { UI_AR, trAr } from "@/lib/translations"
 
 interface CustomMindMapNodeProps {
   data: {
@@ -53,7 +53,7 @@ export function CustomMindMapNode({ data }: CustomMindMapNodeProps) {
 
         <h4 className="text-sm font-semibold text-slate-200 group-hover:text-white
                        leading-snug transition-colors line-clamp-2">
-          {traduireChapitre(node.label)}
+          {trAr(node.label)}
         </h4>
 
         <div className="flex items-center gap-2 mt-1 border-t border-slate-800/60 pt-2 text-[10px] text-slate-400">

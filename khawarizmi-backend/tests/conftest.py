@@ -161,7 +161,7 @@ async def client() -> AsyncGenerator:
 
 
 @pytest.fixture
-async def auth_headers() -> dict:
+def auth_headers() -> dict:
     from auth import create_access_token
     token = create_access_token({"sub": 1, "email": "eleve@bac.dz", "plan": "free"})
     return {"Authorization": f"Bearer {token}"}

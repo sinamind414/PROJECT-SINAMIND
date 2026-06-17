@@ -15,7 +15,10 @@ router = APIRouter(prefix="/api/programme", tags=["Programme"])
 def normalize_filiere(filiere: str) -> str:
     """Normalise la filière pour matcher la DB."""
     # NFC garantit cohérence des accents
-    return unicodedata.normalize("NFC", filiere).strip()
+    f = unicodedata.normalize("NFC", filiere).strip()
+    if f.lower() == "sciences naturelles":
+        return "Sciences Experimentales"
+    return f
 
 
 @router.get("/{matiere}/{filiere}")

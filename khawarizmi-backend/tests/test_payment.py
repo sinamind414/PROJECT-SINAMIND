@@ -33,16 +33,17 @@ class MockSettings:
 def override_get_settings():
     return MockSettings()
 
-# Overrides
-app.dependency_overrides[get_settings] = override_get_settings
-
 global_mock_db = MagicMock()
 global_mock_db.execute = AsyncMock()
 
 async def global_override_get_db():
     yield global_mock_db
 
-app.dependency_overrides[get_db] = global_override_get_db
+@pytest.fixture(autouse=True)
+def setup_payment_overrides():
+    app.dependency_overrides[get_settings] = override_get_settings
+    app.dependency_overrides[get_db] = global_override_get_db
+    yield
 
 
 def test_verify_signature():
@@ -98,7 +99,9 @@ async def test_webhook_paid_success():
     app.dependency_overrides[get_db] = override_get_db
     
     # Mock background tasks / AppState sessionmaker
-    with patch("routes.payment.state") as mock_state:
+    with patch("routes.payment.get_state") as mock_get_state:
+        mock_state = MagicMock()
+        mock_get_state.return_value = mock_state
         mock_result_session = MagicMock()
         mock_result_session.fetchone.return_value = (42,) # user_id = 42
         

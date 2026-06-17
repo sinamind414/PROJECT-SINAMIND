@@ -1,4 +1,4 @@
-from typing import Optional, Dict
+from typing import Optional, Dict, Literal
 from pydantic import BaseModel, Field
 
 
@@ -11,3 +11,16 @@ class ScheduleRequest(BaseModel):
     micro_concept_id: str
     score_percent:    float = Field(ge=0.0, le=100.0)
     fsrs_state:       Optional[Dict] = None
+
+
+class FlashcardCreateRequest(BaseModel):
+    recto: str = Field(..., min_length=1, max_length=200)
+    verso: str = Field(..., min_length=1, max_length=500)
+    type: Literal["definition", "formule", "processus", "exception"] = "definition"
+    importance: Literal["critique", "haute", "moyenne"] = "moyenne"
+    matiere: Optional[str] = None
+    chapitre: Optional[str] = None
+
+
+class FlashcardReviewRequest(BaseModel):
+    rating: Literal[1, 2, 3, 4]

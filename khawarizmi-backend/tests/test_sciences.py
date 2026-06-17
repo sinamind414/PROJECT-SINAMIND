@@ -7,7 +7,7 @@ def safe_print(text):
     sys.stdout.buffer.write((text + '\n').encode('utf-8', errors='replace'))
 
 def tester_sciences():
-    data_dir = os.path.dirname(os.path.dirname(__file__))
+    data_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data")
     tutor = KhawarizmiTutor(data_dir=data_dir)
     
     # Sujet et question issus de l'annale Sciences
