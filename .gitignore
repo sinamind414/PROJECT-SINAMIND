@@ -1,4 +1,4 @@
-# Environnement — CRITIQUE
+﻿# Environnement â€” CRITIQUE
 **/.env
 **/.env.*
 !**/.env.example
@@ -9,7 +9,7 @@
 *.p12
 secrets/
 
-# Backups et données lourdes
+# Backups et donnÃ©es lourdes
 *.backup_*
 *.backup_inject_*
 *.bak
@@ -34,7 +34,7 @@ dist/
 *.swp
 *.swo
 
-# Modèles IA lourds
+# ModÃ¨les IA lourds
 models/
 *.zip
 *.tar.gz
@@ -44,5 +44,5 @@ models/
 *.log
 logs/
 
-# Model files
-khawarizmi-backend/models/
+# Model quantized
+khawarizmi-backend/models/minilm_onnx_int8/model_quantized.zip
