@@ -43,3 +43,6 @@ models/
 # Logs
 *.log
 logs/
+
+# Model files
+khawarizmi-backend/models/
