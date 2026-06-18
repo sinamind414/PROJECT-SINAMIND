@@ -3,6 +3,8 @@
 
 import { UI_AR } from "./translations"
 import {
+  Annale,
+  AnnalesResponse,
   AuthResponse,
   ChatMessage,
   ChatResponse,
@@ -292,6 +294,32 @@ class KhawarizmiApiClient {
         score_percent: scorePercent
       })
     })
+  }
+
+  // ── Annales ────────────────────────────────────
+
+  async getAnnales(params?: {
+    page?: number
+    taille?: number
+    matiere?: string
+    annee?: number
+    type?: string
+    recherche?: string
+  }): Promise<AnnalesResponse> {
+    const searchParams = new URLSearchParams()
+    if (params) {
+      Object.entries(params).forEach(([k, v]) => {
+        if (v !== undefined && v !== null) searchParams.set(k, String(v))
+      })
+    }
+    const qs = searchParams.toString()
+    return this.request<AnnalesResponse>(
+      `/api/annales/${qs ? `?${qs}` : ""}`
+    )
+  }
+
+  async getAnnale(id: number): Promise<Annale> {
+    return this.request<Annale>(`/api/annales/${id}`)
   }
 
   // ── Health Check ───────────────────────────────

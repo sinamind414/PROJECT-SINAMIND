@@ -7,6 +7,7 @@ import { useAuth } from "@/lib/auth-context"
 const MENU = [
   { href: "/dashboard", icon: "📊", labelAr: "لوحة التحكم", labelFr: "Dashboard" },
   { href: "/diagnostic", icon: "🎯", labelAr: "التشخيص", labelFr: "Diagnostic" },
+  { href: "/annales", icon: "📝", labelAr: "المواضيع", labelFr: "Annales" },
   { href: "/action-verbs", icon: "🧭", labelAr: "الأفعال الأدائية", labelFr: "Verbes d’action" },
   { href: "/document-analysis", icon: "📄", labelAr: "استغلال الوثائق", labelFr: "Exploitation" },
   { href: "/exercises", icon: "✏️", labelAr: "التمارين", labelFr: "Exercices" },

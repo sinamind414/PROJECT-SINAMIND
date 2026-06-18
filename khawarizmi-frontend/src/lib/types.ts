@@ -271,6 +271,33 @@ export interface CriticalChaptersResponse {
 }
 
 // ═══════════════════════════════════════════════
+// Annales BAC
+// ═══════════════════════════════════════════════
+
+export interface Annale {
+  id: number
+  titre: string
+  slug: string
+  matiere: string
+  niveau: string
+  filiere: string
+  annee: number
+  type: "examen" | "concours"
+  fichier_sujet: string | null
+  fichier_correction: string | null
+  tags: string[]
+  difficulte: number
+  created_at: string
+}
+
+export interface AnnalesResponse {
+  total: number
+  page: number
+  taille: number
+  items: Annale[]
+}
+
+// ═══════════════════════════════════════════════
 // Couleurs pour le programme
 // ═══════════════════════════════════════════════
 

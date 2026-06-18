@@ -46,3 +46,6 @@ logs/
 
 # Model quantized
 khawarizmi-backend/models/minilm_onnx_int8/model_quantized.zip
+
+# Large model files
+*.zip
