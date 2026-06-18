@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import { useState, useEffect, useCallback } from "react"
 import Link from "next/link"
@@ -15,6 +15,9 @@ type DrillCard = {
   state: number
   next_review: string | null
   interval_jours: number
+  texte?: string
+  texte_ar?: string
+  type?: string
 }
 
 type Rating = 1 | 2 | 3 | 4

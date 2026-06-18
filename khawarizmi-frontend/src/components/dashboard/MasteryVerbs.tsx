@@ -1,20 +1,12 @@
 "use client"
 
-const VERBS = [
-  { ar: "سمّ", fr: "Nommer", level: 85, color: "#34D399" },
-  { ar: "عرّف", fr: "Définir", level: 90, color: "#34D399" },
-  { ar: "صف", fr: "Caractériser", level: 70, color: "#FBBF24" },
-  { ar: "اذكر", fr: "Citer", level: 75, color: "#FBBF24" },
-  { ar: "حلّل", fr: "Analyser", level: 50, color: "#F87171" },
-  { ar: "ناقش", fr: "Discuter", level: 30, color: "#EF4444" },
-  { ar: "أثبت", fr: "Démontrer", level: 20, color: "#EF4444" },
-  { ar: "فسّر", fr: "Interpréter", level: 55, color: "#FBBF24" }
-]
+import Link from "next/link"
+import { actionVerbs } from "@/lib/methodology-v1"
 
 function getStatus(level: number) {
-  if (level >= 75) return { icon: "✓", label: "متقن", color: "text-emerald-400" }
-  if (level >= 50) return { icon: "⚠", label: "متوسط", color: "text-amber-400" }
-  return { icon: "🔴", label: "ضعيف", color: "text-red-400" }
+  if (level >= 75) return { icon: "✓", label: "متقن", color: "text-emerald-400", bar: "#34D399" }
+  if (level >= 50) return { icon: "⚠", label: "متوسط", color: "text-amber-400", bar: "#FBBF24" }
+  return { icon: "🔴", label: "ضعيف", color: "text-red-400", bar: "#F87171" }
 }
 
 export function MasteryVerbs() {
@@ -29,20 +21,20 @@ export function MasteryVerbs() {
             🎯 إتقان الأفعال الأدائية
           </h2>
           <p className="text-gray-400 text-sm">
-            حسب منهجية بكالوريا الجزائرية
+            كل فعل يفرض طريقة إجابة مختلفة حسب منهجية البكالوريا الجزائرية.
           </p>
         </div>
-        <button className="text-violet-400 text-sm hover:underline">
-          عرض الكل (21) ←
-        </button>
+        <Link href="/action-verbs" className="text-violet-400 text-sm hover:underline">
+          عرض الكل ({actionVerbs.length}) ←
+        </Link>
       </div>
 
       <div className="space-y-4">
-        {VERBS.map((verb) => {
+        {actionVerbs.slice(0, 8).map((verb) => {
           const status = getStatus(verb.level)
           return (
-            <div key={verb.ar} className="flex items-center gap-4">
-              <div className="w-32 flex-shrink-0">
+            <Link key={verb.slug} href={`/action-verbs/${verb.slug}`} className="flex items-center gap-4 rounded-xl hover:bg-white/[0.03] p-2 -m-2 transition">
+              <div className="w-36 flex-shrink-0">
                 <p className="text-white font-bold text-base">{verb.ar}</p>
                 <p className="text-gray-500 text-xs" dir="ltr">{verb.fr}</p>
               </div>
@@ -51,33 +43,25 @@ export function MasteryVerbs() {
                 <div className="h-2.5 bg-white/[0.05] rounded-full overflow-hidden">
                   <div
                     className="h-full rounded-full transition-all duration-500"
-                    style={{
-                      width: `${verb.level}%`,
-                      background: verb.color
-                    }}
+                    style={{ width: `${verb.level}%`, background: status.bar }}
                   />
                 </div>
+                <p className="text-gray-500 text-[11px] mt-1">آخر خطأ: {verb.lastError}</p>
               </div>
 
               <div className="w-24 flex items-center gap-2 flex-shrink-0">
-                <span className="text-white font-bold text-sm">
-                  {verb.level}%
-                </span>
-                <span className={`text-xs ${status.color}`}>
-                  {status.icon} {status.label}
-                </span>
+                <span className="text-white font-bold text-sm">{verb.level}%</span>
+                <span className={`text-xs ${status.color}`}>{status.icon} {status.label}</span>
               </div>
-            </div>
+            </Link>
           )
         })}
       </div>
 
       <div className="mt-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20">
-        <p className="text-red-400 text-sm font-semibold mb-1">
-          💡 يوصي بالعمل على :
-        </p>
+        <p className="text-red-400 text-sm font-semibold mb-1">💡 الأولوية ليست حفظ الدرس الآن</p>
         <p className="text-red-300 text-xs">
-          ناقش (Discuter) و أثبت (Démontrer) — أهم نقاط الضعف
+          ابدأ بـ حلّل و اقترح فرضية: هنا تضيع أكبر النقاط بسبب الخلط وغياب القيم العددية.
         </p>
       </div>
     </div>

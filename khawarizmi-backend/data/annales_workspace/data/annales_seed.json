@@ -1,0 +1,92 @@
+{
+  "matieres": [
+    {"nom": "Mathématiques", "slug": "mathematiques", "description": "Algèbre, analyse, géométrie, probabilités"},
+    {"nom": "Physique-Chimie", "slug": "physique-chimie", "description": "Mécanique, optique, chimie organique"},
+    {"nom": "SVT", "slug": "svt", "description": "Sciences de la Vie et de la Terre"},
+    {"nom": "Histoire-Géographie", "slug": "histoire-geographie", "description": "Histoire et géographie"},
+    {"nom": "Philosophie", "slug": "philosophie", "description": "Dissertations et commentaires"},
+    {"nom": "Anglais", "slug": "anglais", "description": "Compréhension et expression"},
+    {"nom": "Français", "slug": "francais", "description": "Littérature et langue"},
+    {"nom": "Arabe", "slug": "arabe", "description": "Langue arabe"}
+  ],
+  "annales": [
+    {
+      "titre": "Bac S 2024 – Mathématiques (Sujet)",
+      "slug": "bac-s-2024-maths-sujet",
+      "matiere_id": 1,
+      "niveau": "3ème année",
+      "filiere": "S",
+      "annee": 2024,
+      "type": "examen",
+      "fichier_sujet": "/uploads/annales/bac-s-2024-maths-sujet.pdf",
+      "fichier_correction": "/uploads/annales/bac-s-2024-maths-corrige.pdf",
+      "tags": ["bac", "fonctions", "probabilités", "suites"],
+      "difficulté": 3
+    },
+    {
+      "titre": "Bac S 2023 – Physique-Chimie",
+      "slug": "bac-s-2023-physique-chimie",
+      "matiere_id": 2,
+      "niveau": "3ème année",
+      "filiere": "S",
+      "annee": 2023,
+      "type": "examen",
+      "fichier_sujet": "/uploads/annales/bac-s-2023-pc-sujet.pdf",
+      "fichier_correction": "/uploads/annales/bac-s-2023-pc-corrige.pdf",
+      "tags": ["bac", "mécanique", "chimie", "ondes"],
+      "difficulté": 4
+    },
+    {
+      "titre": "Concours CPGE 2024 – Maths MPSI",
+      "slug": "concours-cpge-2024-maths-mpsi",
+      "matiere_id": 1,
+      "niveau": "4ème année",
+      "filiere": "S",
+      "annee": 2024,
+      "type": "concours",
+      "fichier_sujet": "/uploads/annales/concours-cpge-2024-mpsi.pdf",
+      "fichier_correction": null,
+      "tags": ["cpge", "algèbre", "analyse", "concours"],
+      "difficulté": 5
+    },
+    {
+      "titre": "Bac ES 2024 – Histoire-Géographie",
+      "slug": "bac-es-2024-histoire-geo",
+      "matiere_id": 4,
+      "niveau": "3ème année",
+      "filiere": "ES",
+      "annee": 2024,
+      "type": "examen",
+      "fichier_sujet": "/uploads/annales/bac-es-2024-hg-sujet.pdf",
+      "fichier_correction": "/uploads/annales/bac-es-2024-hg-corrige.pdf",
+      "tags": ["bac", "composition", "croquis"],
+      "difficulté": 3
+    },
+    {
+      "titre": "Bac Général 2024 – Philosophie",
+      "slug": "bac-general-2024-philosophie",
+      "matiere_id": 5,
+      "niveau": "3ème année",
+      "filiere": "L",
+      "annee": 2024,
+      "type": "examen",
+      "fichier_sujet": "/uploads/annales/bac-2024-philo-sujet.pdf",
+      "fichier_correction": null,
+      "tags": ["bac", "dissertation", "commentaire"],
+      "difficulté": 3
+    },
+    {
+      "titre": "Bac S 2022 – SVT (Spécialité)",
+      "slug": "bac-s-2022-svt-spe",
+      "matiere_id": 3,
+      "niveau": "3ème année",
+      "filiere": "S",
+      "annee": 2022,
+      "type": "examen",
+      "fichier_sujet": "/uploads/annales/bac-s-2022-svt-sujet.pdf",
+      "fichier_correction": "/uploads/annales/bac-s-2022-svt-corrige.pdf",
+      "tags": ["bac", "génétique", "géologie"],
+      "difficulté": 2
+    }
+  ]
+}

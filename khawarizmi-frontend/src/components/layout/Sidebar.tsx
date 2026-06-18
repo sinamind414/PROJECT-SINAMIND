@@ -5,15 +5,12 @@ import { usePathname } from "next/navigation"
 import { useAuth } from "@/lib/auth-context"
 
 const MENU = [
-  { href: "/dashboard", icon: "📊", label: "لوحة التحكم", active: true },
-  { href: "/videos", icon: "🎥", label: "الفيديوهات", active: true },
-  { href: "#", icon: "📅", label: "الجدول", active: false },
-  { href: "/cours", icon: "📖", label: "الدروس", active: true },
-  { href: "/dashboard", icon: "✏️", label: "التمارين", active: true, note: "متاحة عبر لوحة التحكم" },
-  { href: "/dashboard", icon: "🗺️", label: "الخرائط", active: true, note: "متاحة عبر لوحة التحكم" },
-  { href: "#", icon: "💬", label: "الرسائل", active: false },
-  { href: "#", icon: "🎯", label: "التذكر", active: false },
-  { href: "#", icon: "📈", label: "التقدم", active: false }
+  { href: "/dashboard", icon: "📊", labelAr: "لوحة التحكم", labelFr: "Dashboard" },
+  { href: "/diagnostic", icon: "🎯", labelAr: "التشخيص", labelFr: "Diagnostic" },
+  { href: "/action-verbs", icon: "🧭", labelAr: "الأفعال الأدائية", labelFr: "Verbes d’action" },
+  { href: "/document-analysis", icon: "📄", labelAr: "استغلال الوثائق", labelFr: "Exploitation" },
+  { href: "/exercises", icon: "✏️", labelAr: "التمارين", labelFr: "Exercices" },
+  { href: "/progress", icon: "📈", labelAr: "تقدمي", labelFr: "Progression" },
 ]
 
 export function Sidebar() {
@@ -22,67 +19,57 @@ export function Sidebar() {
 
   return (
     <aside
-      className="w-56 min-h-screen flex flex-col py-6 px-4 hidden md:flex"
+      className="w-60 min-h-screen flex-col py-6 px-4 hidden md:flex"
       style={{ background: "#1E1B2E" }}
     >
-      {/* Profil */}
       <div className="flex items-center gap-3 mb-8 px-2">
         <div className="w-11 h-11 rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center text-white font-bold">
-          {user?.nom?.charAt(0) || "U"}
+          {user?.nom?.charAt(0) || "S"}
         </div>
         <div>
           <p className="text-white font-semibold text-sm">
-            {user?.nom || "المستخدم"}
+            {user?.nom || "SINAMIND"}
           </p>
-          <p className="text-gray-500 text-xs">BAC 2026</p>
+          <p className="text-gray-500 text-xs">BAC 2026 · SNV</p>
         </div>
       </div>
 
-      {/* Menu */}
       <nav className="flex-1 space-y-1">
         {MENU.map((item) => {
-          if (!item.active) {
-            return (
-              <div
-                key={item.label}
-                className="flex items-center justify-between gap-3 px-4 py-3 rounded-xl text-sm font-medium opacity-40 cursor-not-allowed"
-              >
-                <div className="flex items-center gap-3">
-                  <span className="text-lg">{item.icon}</span>
-                  <span className="text-gray-500">{item.label}</span>
-                </div>
-                <span className="text-[10px] bg-violet-500/20 text-violet-400 px-2 py-0.5 rounded-full">
-                  قريباً
-                </span>
-              </div>
-            )
-          }
-
-          const isActive = pathname === item.href
+          const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`)
           return (
             <Link
-              key={item.href + item.label}
+              key={item.href}
               href={item.href}
               className={`
                 flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium
                 transition-all duration-200
                 ${isActive
-                  ? "bg-violet-500/20 text-white"
+                  ? "bg-violet-500/25 text-white shadow-lg shadow-violet-950/20"
                   : "text-gray-400 hover:text-white hover:bg-white/5"
                 }
               `}
             >
               <span className="text-lg">{item.icon}</span>
-              <span>{item.label}</span>
+              <span className="flex flex-col leading-tight">
+                <span>{item.labelAr}</span>
+                <span className="text-[10px] text-gray-500" dir="ltr">{item.labelFr}</span>
+              </span>
             </Link>
           )
         })}
       </nav>
 
-      {/* Logout */}
+      <div className="rounded-2xl bg-white/[0.03] border border-white/[0.06] p-3 mb-3">
+        <p className="text-violet-300 text-xs font-bold mb-1">وعد V1</p>
+        <p className="text-gray-400 text-[11px] leading-relaxed">
+          لا يكفي أن تحفظ الدرس. تعلّم كيف تربح النقاط بالمنهجية.
+        </p>
+      </div>
+
       <button
         onClick={logout}
-        className="flex items-center gap-3 px-4 py-3 text-gray-500 hover:text-red-400 text-sm transition-colors mt-4"
+        className="flex items-center gap-3 px-4 py-3 text-gray-500 hover:text-red-400 text-sm transition-colors mt-2"
       >
         <span>🚪</span>
         <span>تسجيل الخروج</span>

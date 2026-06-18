@@ -1,6 +1,5 @@
 "use client"
 
-import { useAuth } from "@/lib/auth-context"
 import { AuthGuard } from "@/components/auth/AuthGuard"
 import { Sidebar } from "@/components/layout/Sidebar"
 import { MasteryHero } from "@/components/dashboard/MasteryHero"

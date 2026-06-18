@@ -79,8 +79,8 @@ app.state.limiter = limiter
 app.add_exception_handler(429, _rate_limit_exceeded_handler)
 app.add_middleware(SlowAPIMiddleware)
 
-from routes import health, auth, chat, cours, exercices, flashcards, sessions, mindmap, evaluate, session, payment, programme, lexique, videos
-for r in [health,auth,chat,cours,exercices,flashcards,sessions,mindmap,evaluate,session,payment,programme,lexique,videos]:
+from routes import health, auth, chat, cours, exercices, flashcards, sessions, mindmap, evaluate, session, payment, programme, lexique, videos, annales
+for r in [health,auth,chat,cours,exercices,flashcards,sessions,mindmap,evaluate,session,payment,programme,lexique,videos,annales]:
     app.include_router(r.router)
 
 
