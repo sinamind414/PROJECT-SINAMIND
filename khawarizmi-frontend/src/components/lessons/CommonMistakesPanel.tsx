@@ -4,7 +4,7 @@ export function CommonMistakesPanel({ mistakes }: { mistakes: string[] }) {
   return (
     <section>
       <h2 className="text-2xl font-bold text-white mb-4">أخطاء شائعة</h2>
-      <div className="rounded-3xl p-6 border border-red-500/20" style={{ background: "#2A2540" }}>
+      <div className="rounded-3xl p-6 border border-red-500/20" style={{ background: "#182730" }}>
         <div className="space-y-3">
           {mistakes.map((m, i) => (
             <div key={i} className="flex items-start gap-3">

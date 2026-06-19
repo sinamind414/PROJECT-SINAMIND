@@ -13,7 +13,7 @@ export function ActiveLessonHero({ lesson }: { lesson: ActiveLesson }) {
   const badge = IMPORTANCE_BADGES[lesson.chapterImportance] || IMPORTANCE_BADGES.moyenne
 
   return (
-    <header className="rounded-3xl p-7 bg-gradient-to-l from-violet-600 to-fuchsia-600">
+    <header className="rounded-3xl p-7 bg-gradient-to-l from-mint to-orange">
       <div className="flex flex-wrap items-center gap-2 mb-2">
         <span className="text-white/50 text-xs">{lesson.domainAr}</span>
         <span className="text-white/30">·</span>

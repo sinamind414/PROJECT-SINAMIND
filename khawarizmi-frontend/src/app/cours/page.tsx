@@ -3,14 +3,14 @@
 import { useMemo, useState } from "react"
 import Link from "next/link"
 import { AuthGuard } from "@/components/auth/AuthGuard"
-import { Sidebar } from "@/components/layout/Sidebar"
+import { AppShell } from "@/components/layout/AppShell"
 import { activeLessons, groupLessonsByDomain, type ActiveLesson } from "@/lib/active-lessons"
 import { methodologyChapterLinks } from "@/lib/methodology-chapters"
 
 const IMPORTANCE_COLORS: Record<string, string> = {
   critique: "bg-red-500/15 text-red-200 border-red-500/30",
   haute: "bg-amber-500/15 text-amber-200 border-amber-500/30",
-  moyenne: "bg-blue-500/15 text-blue-200 border-blue-500/30",
+  moyenne: "bg-slate-500/15 text-slate-300 border-slate-500/30",
 }
 
 const DOMAIN_EMOJIS: Record<number, string> = {
@@ -85,15 +85,11 @@ export default function CoursHubPage() {
 
   return (
     <AuthGuard>
-      <div className="flex min-h-screen" dir="rtl" style={{ background: "#1E1B2E" }}>
-        <div className="order-1">
-          <Sidebar />
-        </div>
-
-        <main className="flex-1 p-6 lg:p-8 overflow-auto order-2">
+      <AppShell>
+        <main className="flex-1 p-6 lg:p-8 overflow-auto">
           <div className="max-w-7xl mx-auto space-y-6">
-            <header className="rounded-3xl p-7 bg-gradient-to-l from-violet-600 to-fuchsia-600">
-              <p className="text-white/70 text-sm mb-2">SINAMIND · التعلم النشط</p>
+            <header className="rounded-3xl p-7 glass border border-mint/10">
+              <p className="text-mint text-sm mb-2 font-semibold">SINAMIND · التعلم النشط</p>
               <h1 className="text-3xl font-bold text-white mb-2">الدروس النشطة</h1>
               <p className="text-white/80 max-w-3xl leading-relaxed">
                 {totalChapters} درسا نشطا موزعين على {totalUnits} وحدة و 3 مجالات. كل درس يحتوي على
@@ -107,7 +103,7 @@ export default function CoursHubPage() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="ابحث عن فصل أو وحدة..."
-                className="w-full px-4 py-3 rounded-xl bg-white/[0.04] border border-white/[0.08] text-white placeholder-gray-500 focus:outline-none focus:border-violet-500/50 text-sm"
+                className="w-full px-4 py-3 rounded-xl bg-white/[0.04] border border-white/[0.08] text-white placeholder-gray-500 focus:outline-none focus:border-mint/50 text-sm"
               />
             </div>
 
@@ -129,9 +125,9 @@ export default function CoursHubPage() {
                         unitMap.get(lesson.unitAr)!.push(lesson)
                       }
                       return Array.from(unitMap.entries()).map(([unitAr, lessons]) => (
-                        <div key={unitAr} className="rounded-3xl p-5" style={{ background: "#2A2540" }}>
-                          <div className="flex items-center gap-3 mb-4">
-                            <span className="text-lg font-bold text-violet-300">الوحدة {lessons[0].unitNumero}</span>
+                          <div key={unitAr} className="rounded-3xl p-5 glass border border-mint/10">
+                            <div className="flex items-center gap-3 mb-4">
+                              <span className="text-lg font-bold text-mint">الوحدة {lessons[0].unitNumero}</span>
                             <span className="text-gray-300 text-sm">{unitAr}</span>
                             <span className="text-gray-500 text-xs">({lessons.length} دروس)</span>
                           </div>
@@ -142,8 +138,7 @@ export default function CoursHubPage() {
                                 <Link
                                   key={lesson.chapterSlug}
                                   href={`/cours/${lesson.chapterSlug}`}
-                                  className="rounded-2xl p-4 transition-all hover:scale-[1.03] hover:shadow-lg hover:shadow-violet-950/20 border border-white/[0.04]"
-                                  style={{ background: "#1E1B2E" }}
+                                  className="rounded-2xl p-4 transition-all hover:scale-[1.03] hover:shadow-lg hover:shadow-mint/5 border border-mint/10 glass-soft"
                                 >
                                   <div className="flex items-center justify-between mb-2">
                                     <span className="text-gray-500 text-xs">الدرس {lesson.chapterNumero}</span>
@@ -155,10 +150,10 @@ export default function CoursHubPage() {
                                   <p className="text-gray-500 text-xs mb-2 line-clamp-1" dir="ltr">{lesson.chapterFr}</p>
                                   <div className="flex flex-wrap gap-1 mt-2">
                                     {lesson.linkedVerbs.slice(0, 3).map((v) => (
-                                      <span key={v} className="px-1.5 py-0.5 rounded-md bg-violet-500/10 text-violet-300 text-[10px]">{v}</span>
+                                      <span key={v} className="px-1.5 py-0.5 rounded-md bg-mint/10 text-mint text-[10px]">{v}</span>
                                     ))}
                                   </div>
-                                  <div className="mt-2 text-xs text-violet-400 font-bold">
+                                  <div className="mt-2 text-xs text-mint font-bold">
                                     افتح الدرس النشط ←
                                   </div>
                                 </Link>
@@ -175,14 +170,14 @@ export default function CoursHubPage() {
             {filteredDomainGroups.length === 0 && (
               <div className="text-center py-16">
                 <p className="text-gray-500 text-lg">لا توجد نتائج لبحثك</p>
-                <button onClick={() => setSearch("")} className="mt-3 px-4 py-2 rounded-xl bg-violet-600 text-white text-sm font-bold hover:bg-violet-500 transition">
+                <button onClick={() => setSearch("")} className="mt-3 px-4 py-2 rounded-xl bg-mint text-slate-deep text-sm font-bold hover:bg-mint-soft transition">
                   عرض الكل
                 </button>
               </div>
             )}
           </div>
         </main>
-      </div>
+      </AppShell>
     </AuthGuard>
   )
 }

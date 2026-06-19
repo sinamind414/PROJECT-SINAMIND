@@ -11,13 +11,13 @@ function getStatus(level: number) {
 
 export function MasteryVerbs() {
   return (
-    <div className="rounded-2xl p-5" style={{ background: "#1E2030" }}>
+    <div className="rounded-2xl p-5" style={{ background: "#131E24" }}>
       <div className="flex items-center justify-between mb-4">
         <div>
           <h2 className="text-white font-bold text-base">🎯 الأفعال الأدائية</h2>
           <p className="text-gray-500 text-xs mt-0.5">كل فعل يفرض طريقة إجابة مختلفة</p>
         </div>
-        <Link href="/action-verbs" className="text-violet-400 text-xs font-medium hover:underline">
+        <Link href="/action-verbs" className="text-mint text-xs font-medium hover:underline">
           عرض الكل ({actionVerbs.length})
         </Link>
       </div>

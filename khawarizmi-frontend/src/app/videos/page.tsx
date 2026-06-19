@@ -70,7 +70,7 @@ function VideosContent() {
           placeholder="ابحث عن فصل..."
           className="w-full px-4 py-2.5 rounded-xl text-sm transition-colors"
           style={{
-            background: "#1E2030",
+            background: "#131E24",
             border: "1px solid rgba(255,255,255,0.08)",
             color: "#F8FAFC",
           }}

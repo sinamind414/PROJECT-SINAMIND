@@ -7,7 +7,7 @@ export function WeakPointCard({ state }: { state: DailyDashboardState }) {
   if (!state.dominantError) return null
 
   return (
-    <div className="rounded-2xl p-5" style={{ background: "#1E2030" }}>
+    <div className="rounded-2xl p-5" style={{ background: "#131E24" }}>
       <div className="flex items-center gap-2 mb-3">
         <span className="text-lg">🔴</span>
         <h2 className="text-white font-bold text-base">أكبر خطأ الآن</h2>

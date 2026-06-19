@@ -16,7 +16,7 @@ export function TomorrowPlan({ tasks }: { tasks: DailyTask[] }) {
   if (tasks.length === 0) return null
 
   return (
-    <div className="rounded-2xl p-5" style={{ background: "#1E2030" }}>
+    <div className="rounded-2xl p-5" style={{ background: "#131E24" }}>
       <div className="flex items-center gap-2 mb-4">
         <span className="text-lg">🔮</span>
         <h2 className="text-white font-bold text-base">غداً</h2>

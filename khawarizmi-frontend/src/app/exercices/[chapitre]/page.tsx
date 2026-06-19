@@ -26,7 +26,7 @@ export default function ExercicesPage() {
   }, [chapitreTitle])
 
   return (
-    <div className="min-h-screen bg-[#0A0A0F] text-white" dir="rtl">
+    <div className="min-h-screen bg-slate-deep text-white" dir="rtl">
       <header className="sticky top-0 z-50 bg-slate-950/80 backdrop-blur border-b border-slate-800/50 px-6 py-4 flex items-center justify-between">
         <button
           onClick={() => router.back()}
@@ -34,7 +34,7 @@ export default function ExercicesPage() {
         >
           {UI_AR.retour || "→ رجوع"}
         </button>
-        <h1 className="text-xl font-bold bg-gradient-to-r from-orange-400 to-red-400 bg-clip-text text-transparent truncate max-w-[60%] text-center">
+        <h1 className="text-xl font-bold bg-gradient-to-r from-orange to-mint bg-clip-text text-transparent truncate max-w-[60%] text-center">
           {UI_AR.exercices} : {chapitreTitle}
         </h1>
         <div className="w-10"></div>
@@ -67,7 +67,7 @@ export default function ExercicesPage() {
               <span className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
                 {data.nb_corrections} تصحيحات
               </span>
-              <span className="px-3 py-1 rounded-full bg-blue-500/20 text-blue-400 border border-blue-500/30">
+              <span className="px-3 py-1 rounded-full bg-mint/20 text-mint border border-mint/30">
                 {data.nb_sections} أقسام
               </span>
             </div>
@@ -82,7 +82,7 @@ export default function ExercicesPage() {
                     </h1>
                   ),
                   h2: ({ children }) => (
-                    <h2 className="text-2xl font-bold text-orange-400 mb-3 mt-6">
+                    <h2 className="text-2xl font-bold text-orange mb-3 mt-6">
                       {children}
                     </h2>
                   ),

@@ -15,7 +15,7 @@ export function SectionHeader({
     <div className="flex items-center justify-between mb-4">
       <h2 className="text-white font-bold text-base">{title}</h2>
       {href && linkLabel && (
-        <Link href={href} className="text-violet-400 text-xs font-medium hover:underline">
+        <Link href={href} className="text-mint text-xs font-medium hover:underline">
           {linkLabel}
         </Link>
       )}

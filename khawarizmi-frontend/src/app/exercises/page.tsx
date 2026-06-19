@@ -10,10 +10,10 @@ import { PillChip } from "@/components/ui/PillChip"
 import { AlertBanner } from "@/components/ui/AlertBanner"
 
 const MODES = [
-  { title: "تدريب قصير", subtitle: "Entraînement court", duration: "3–7 دقائق", description: "مهارة واحدة فقط: قيم عددية، ملاحظة، مقارنة، أو استنتاج.", href: "/document-analysis", accent: "rgba(52,211,153,0.2)" },
-  { title: "تدريب موجه", subtitle: "Exercice guidé", duration: "10–15 دقيقة", description: "الواجهة تفصل التحليل ثم التفسير ثم الاستنتاج حتى لا تخلط بينها.", href: "/document-analysis", accent: "rgba(139,92,246,0.2)" },
-  { title: "وضعية بكالوريا", subtitle: "Mode Bac", duration: "20–30 دقيقة", description: "تمرين كامل بعد أن تتقن المهارات الصغيرة. لا تبدأ به مبكرا.", href: "/exercices/sciences", accent: "rgba(251,191,36,0.2)" },
-  { title: "أخطائي السابقة", subtitle: "Refaire mes erreurs", duration: "حسب الحاجة", description: "أعد التمارين التي فقدت فيها نقاطا بسبب نفس الخطأ المنهجي.", href: "/progress", accent: "rgba(248,113,113,0.2)" },
+  { title: "تدريب قصير", subtitle: "مهارة واحدة", duration: "3–7 دقائق", description: "مهارة واحدة فقط: قيم عددية، ملاحظة، مقارنة، أو استنتاج.", href: "/document-analysis", accent: "rgba(52,211,153,0.2)" },
+  { title: "تدريب موجه", subtitle: "توجيه كامل", duration: "10–15 دقيقة", description: "الواجهة تفصل التحليل ثم التفسير ثم الاستنتاج حتى لا تخلط بينها.", href: "/document-analysis", accent: "rgba(45,212,191,0.15)" },
+  { title: "وضعية بكالوريا", subtitle: "محاكاة الامتحان", duration: "20–30 دقيقة", description: "تمرين كامل بعد أن تتقن المهارات الصغيرة. لا تبدأ به مبكرا.", href: "/exercices/sciences", accent: "rgba(251,191,36,0.2)" },
+  { title: "أخطائي السابقة", subtitle: "إصلاح الأخطاء", duration: "حسب الحاجة", description: "أعد التمارين التي فقدت فيها نقاطا بسبب نفس الخطأ المنهجي.", href: "/retry-errors", accent: "rgba(248,113,113,0.2)" },
 ]
 
 const FILTERS = ["تحليل", "تفسير", "استنتاج", "فرضية", "نص علمي", "قيم عددية"]

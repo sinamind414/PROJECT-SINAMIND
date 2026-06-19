@@ -18,7 +18,7 @@ const DAYS = [
 const PLANNING: Record<number, { time: string; subject: string; detail: string; color: string; action: string }[]> = {
   17: [
     { time: "10:00", subject: "المناعة (Immunité)", detail: "الفصل 1", color: "#FBBF24", action: "lu" },
-    { time: "15:00", subject: "خريطة ذهنية", detail: "الأجسام المضادة", color: "#A78BFA", action: "mindmap" }
+    { time: "15:00", subject: "خريطة ذهنية", detail: "الأجسام المضادة", color: "#5EEAD4", action: "mindmap" }
   ],
   18: [
     { time: "09:00", subject: "تركيب البروتين", detail: "الاستنساخ", color: "#F472B6", action: "lu" },
@@ -28,7 +28,7 @@ const PLANNING: Record<number, { time: string; subject: string; detail: string; 
   19: [
     { time: "09:00", subject: "الترجمة (Translation)", detail: "الفصل 4", color: "#F472B6", action: "todo" },
     { time: "14:00", subject: "التركيب الضوئي", detail: "الوحدة 6", color: "#34D399", action: "todo" },
-    { time: "18:00", subject: "مراجعة Flashcards", detail: "20 بطاقة", color: "#A78BFA", action: "todo" }
+    { time: "18:00", subject: "مراجعة Flashcards", detail: "20 بطاقة", color: "#5EEAD4", action: "todo" }
   ],
   21: [
     { time: "10:00", subject: "اختبار تجريبي BAC", detail: "الوحدات 1-3", color: "#EF4444", action: "exam" }
@@ -37,7 +37,7 @@ const PLANNING: Record<number, { time: string; subject: string; detail: string; 
 
 const STATUS_STYLES: Record<string, { bg: string; text: string; icon: string }> = {
   done: { bg: "bg-emerald-500/20", text: "text-emerald-400", icon: "✓" },
-  active: { bg: "bg-violet-500", text: "text-white", icon: "•" },
+  active: { bg: "bg-mint", text: "text-white", icon: "•" },
   missed: { bg: "bg-red-500/20", text: "text-red-400", icon: "✗" },
   exam: { bg: "bg-amber-500/20", text: "text-amber-400", icon: "⭐" },
   future: { bg: "bg-white/5", text: "text-gray-500", icon: "" }
@@ -47,7 +47,7 @@ const ACTION_LABELS: Record<string, { label: string; color: string }> = {
   lu: { label: "تمت القراءة", color: "text-emerald-400" },
   exo: { label: "تمرين منجز", color: "text-blue-400" },
   quiz: { label: "اختبار", color: "text-amber-400" },
-  mindmap: { label: "خريطة ذهنية", color: "text-violet-400" },
+  mindmap: { label: "خريطة ذهنية", color: "text-mint" },
   todo: { label: "للقيام به", color: "text-gray-400" },
   exam: { label: "امتحان", color: "text-red-400" }
 }
@@ -71,7 +71,7 @@ export function WeekSchedule() {
       {/* ── Calendrier Semaine ────────── */}
       <div
         className="rounded-3xl p-6"
-        style={{ background: "#2A2540" }}
+        style={{ background: "#182730" }}
       >
         {/* En-tête */}
         <div className="flex items-center justify-between mb-6">
@@ -89,7 +89,7 @@ export function WeekSchedule() {
               <p className="text-xs text-gray-500">أيام متتالية</p>
             </div>
             <div className="text-center">
-              <p className="text-2xl font-bold text-violet-400">12h</p>
+              <p className="text-2xl font-bold text-mint">12h</p>
               <p className="text-xs text-gray-500">هذا الأسبوع</p>
             </div>
           </div>
@@ -108,7 +108,7 @@ export function WeekSchedule() {
                 className={`
                   py-3 px-2 rounded-xl transition-all relative
                   ${isActive
-                    ? "bg-violet-500 text-white scale-105 shadow-lg shadow-violet-500/30"
+                    ? "bg-mint text-white scale-105 shadow-lg shadow-mint/30"
                     : "bg-white/[0.03] hover:bg-white/[0.06]"
                   }
                 `}
@@ -150,7 +150,7 @@ export function WeekSchedule() {
               {!isToday && !isPast && "🔮 مخطط"}
             </h3>
             {isToday && (
-              <span className="text-xs text-violet-400 bg-violet-500/10 px-3 py-1 rounded-full">
+              <span className="text-xs text-mint bg-mint/10 px-3 py-1 rounded-full">
                 اليوم نشط
               </span>
             )}
@@ -161,7 +161,7 @@ export function WeekSchedule() {
               <div className="text-center py-8">
                 <p className="text-gray-500 text-sm mb-2">لا توجد جلسات لهذا اليوم</p>
                 {!isPast && !isToday && (
-                  <button className="text-violet-400 text-xs hover:underline">
+                  <button className="text-mint text-xs hover:underline">
                     + إضافة جلسة مراجعة
                   </button>
                 )}
@@ -212,7 +212,7 @@ export function WeekSchedule() {
                           </Link>
                           <Link
                             href={`/mindmap/${encodeURIComponent(course.subject)}`}
-                            className="px-2 py-1.5 bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 border border-purple-500/30 rounded-lg text-xs font-medium text-center transition-all"
+                            className="px-2 py-1.5 bg-mint/10 hover:bg-mint/20 text-mint border border-mint/30 rounded-lg text-xs font-medium text-center transition-all"
                           >
                             🗺️ خريطة
                           </Link>
@@ -230,13 +230,13 @@ export function WeekSchedule() {
       {/* ── Historique (Hier + Avant-hier) ── */}
       <div
         className="rounded-3xl p-6"
-        style={{ background: "#2A2540" }}
+        style={{ background: "#182730" }}
       >
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-white font-bold text-lg">
             📊 الأرشيف الأخير
           </h3>
-          <button className="text-violet-400 text-xs hover:underline">
+          <button className="text-mint text-xs hover:underline">
             عرض الكل ←
           </button>
         </div>

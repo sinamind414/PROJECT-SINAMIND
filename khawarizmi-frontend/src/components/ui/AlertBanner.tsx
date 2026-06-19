@@ -3,7 +3,7 @@
 const VARIANTS = {
   warning: { bg: "rgba(251,191,36,0.08)", border: "rgba(251,191,36,0.2)", titleColor: "#FBBF24" },
   error: { bg: "rgba(248,113,113,0.08)", border: "rgba(248,113,113,0.2)", titleColor: "#F87171" },
-  info: { bg: "rgba(139,92,246,0.08)", border: "rgba(139,92,246,0.2)", titleColor: "#A78BFA" },
+  info: { bg: "rgba(45,212,191,0.08)", border: "rgba(45,212,191,0.2)", titleColor: "#2DD4BF" },
 }
 
 export function AlertBanner({

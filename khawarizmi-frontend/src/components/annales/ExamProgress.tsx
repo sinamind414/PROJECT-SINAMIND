@@ -33,7 +33,7 @@ export function ExamProgress({
 
       {/* Pages */}
       <div className="flex items-center justify-between text-xs text-slate-500">
-        <span>📄 Pages traitées</span>
+        <span>📄 الصفحات المعالجة</span>
         <span>~{estimatedPages}</span>
       </div>
 

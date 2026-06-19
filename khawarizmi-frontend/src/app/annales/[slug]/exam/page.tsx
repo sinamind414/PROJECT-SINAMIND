@@ -4,7 +4,7 @@ import { useState, useMemo, useCallback, useEffect, useRef } from "react"
 import { useParams } from "next/navigation"
 import Link from "next/link"
 import { AuthGuard } from "@/components/auth/AuthGuard"
-import { Sidebar } from "@/components/layout/Sidebar"
+import { AppShell } from "@/components/layout/AppShell"
 import { getSujetBySlug } from "@/lib/annales-bac"
 
 function ExamContent() {
@@ -39,12 +39,11 @@ function ExamContent() {
 
   if (!sujet) {
     return (
-      <div className="flex min-h-screen" style={{ background: "#141522" }}>
-        <Sidebar />
+      <AppShell>
         <main className="flex-1 flex items-center justify-center">
-          <p className="text-slate-400">Sujet introuvable</p>
+          <p className="text-slate-400">الموضوع غير موجود</p>
         </main>
-      </div>
+      </AppShell>
     )
   }
 
@@ -68,8 +67,7 @@ function ExamContent() {
   // Intro screen
   if (phase === "intro") {
     return (
-      <div className="flex min-h-screen" dir="rtl" style={{ background: "#141522" }}>
-        <Sidebar />
+      <AppShell>
         <main className="flex-1 flex items-center justify-center p-6">
           <div className="max-w-lg w-full space-y-6">
             <div className="bg-slate-900/70 border border-slate-800 rounded-2xl p-8 text-center space-y-6">
@@ -90,13 +88,13 @@ function ExamContent() {
                   <p className="text-white font-bold">{totalQ}</p>
                 </div>
                 <div className="bg-slate-950/50 rounded-xl p-3">
-                  <p className="text-slate-400">المدة</p>
-                  <p className="text-white font-bold">{sujet.difficulte}</p>
+                  <p className="text-slate-400">المستوى</p>
+                  <p className="text-white font-bold">{sujet.difficulte === "facile" ? "سهل" : sujet.difficulte === "moyen" ? "متوسط" : "صعب"}</p>
                 </div>
               </div>
               <div className="flex flex-wrap justify-center gap-1.5">
                 {sujet.chapitres.map((ch) => (
-                  <span key={ch} className="text-[10px] px-2 py-0.5 rounded-full bg-violet-500/10 text-violet-300 border border-violet-500/20">
+                  <span key={ch} className="text-[10px] px-2 py-0.5 rounded-full bg-mint/10 text-mint border border-mint/20">
                     {ch}
                   </span>
                 ))}
@@ -112,22 +110,21 @@ function ExamContent() {
               </div>
               <button
                 onClick={startTimer}
-                className="w-full py-3 bg-blue-500 text-white rounded-xl font-bold text-base hover:bg-blue-600 transition shadow-lg shadow-blue-500/20"
+                className="w-full py-3 bg-mint text-slate-deep rounded-xl font-bold text-base hover:bg-mint-soft transition shadow-lg shadow-mint/20"
               >
                 🎯 ابدأ المحاكاة الآن
               </button>
             </div>
           </div>
         </main>
-      </div>
+      </AppShell>
     )
   }
 
   // Submitted
   if (phase === "submitted") {
     return (
-      <div className="flex min-h-screen" style={{ background: "#141522" }}>
-        <Sidebar />
+      <AppShell>
         <main className="flex-1 flex items-center justify-center p-6">
           <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-8 max-w-md w-full text-center space-y-6">
             <p className="text-6xl">
@@ -156,14 +153,13 @@ function ExamContent() {
             </div>
           </div>
         </main>
-      </div>
+      </AppShell>
     )
   }
 
   // Running
   return (
-    <div className="flex min-h-screen" dir="rtl" style={{ background: "#141522" }}>
-      <Sidebar />
+    <AppShell>
       <main className="flex-1 flex flex-col overflow-hidden">
         {/* Top bar */}
         <header className="px-6 py-3 border-b border-slate-800 flex items-center justify-between bg-slate-950/80 backdrop-blur shrink-0">
@@ -178,7 +174,7 @@ function ExamContent() {
             <span className="text-slate-400">💡 {answeredQ}/{totalQ}</span>
             <button
               onClick={() => setPhase("submitted")}
-              className="px-4 py-1.5 bg-blue-500 text-white rounded-lg text-xs font-semibold hover:bg-blue-600 transition"
+              className="px-4 py-1.5 bg-mint text-slate-deep rounded-lg text-xs font-semibold hover:bg-mint-soft transition"
             >
               تسليم
             </button>
@@ -187,7 +183,7 @@ function ExamContent() {
 
         {/* Progress */}
         <div className="h-1 bg-slate-800 shrink-0">
-          <div className="h-full bg-gradient-to-l from-blue-500 to-emerald-400 transition-all" style={{ width: `${progressPct}%` }} />
+          <div className="h-full bg-gradient-to-l from-mint to-emerald-300 transition-all" style={{ width: `${progressPct}%` }} />
         </div>
 
         {/* Content */}
@@ -200,7 +196,7 @@ function ExamContent() {
               </div>
               <div className="flex gap-1.5 mt-2">
                 {exo.documents.map((d, i) => (
-                  <span key={i} className="text-[10px] px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-300 border border-blue-500/20">
+                  <span key={i} className="text-[10px] px-2 py-0.5 rounded-full bg-mint/10 text-mint border border-mint/20">
                     📄 {d.titre}
                   </span>
                 ))}
@@ -215,7 +211,7 @@ function ExamContent() {
                       <span className="text-xs text-slate-500 ml-1">({q.points} pts)</span>
                       {q.texte}
                     </p>
-                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-violet-500/10 text-violet-300 border border-violet-500/20 shrink-0">
+                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-mint/10 text-mint border border-mint/20 shrink-0">
                       {q.verb}
                     </span>
                   </div>
@@ -242,7 +238,7 @@ function ExamContent() {
               {exoIdx < totalExos - 1 ? (
                 <button
                   onClick={() => setExoIdx((i) => i + 1)}
-                  className="px-4 py-2 bg-blue-500 text-white rounded-lg text-sm hover:bg-blue-600 transition"
+                  className="px-4 py-2 bg-mint text-slate-deep rounded-lg text-sm hover:bg-mint-soft transition"
                 >
                   التالي →
                 </button>
@@ -258,7 +254,7 @@ function ExamContent() {
           </div>
         </div>
       </main>
-    </div>
+    </AppShell>
   )
 }
 

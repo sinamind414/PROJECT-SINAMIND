@@ -4,7 +4,7 @@ import { useMemo } from "react"
 import { useParams } from "next/navigation"
 import Link from "next/link"
 import { AuthGuard } from "@/components/auth/AuthGuard"
-import { Sidebar } from "@/components/layout/Sidebar"
+import { AppShell } from "@/components/layout/AppShell"
 import { getSujetBySlug } from "@/lib/annales-bac"
 
 const DIFFICULTE_COLORS: Record<string, string> = {
@@ -19,16 +19,15 @@ function DetailContent() {
 
   if (!sujet) {
     return (
-      <div className="flex min-h-screen" style={{ background: "#141522" }}>
-        <Sidebar />
+      <AppShell>
         <main className="flex-1 flex items-center justify-center">
           <div className="text-center space-y-3">
             <p className="text-5xl">🔍</p>
-            <h2 className="text-xl font-bold text-white">سujet introuvable</h2>
-            <Link href="/annales" className="text-blue-400 hover:text-blue-300 text-sm">← العودة إلى القائمة</Link>
+            <h2 className="text-xl font-bold text-white">الموضوع غير موجود</h2>
+            <Link href="/annales" className="text-mint hover:text-mint-soft text-sm">← العودة إلى القائمة</Link>
           </div>
         </main>
-      </div>
+      </AppShell>
     )
   }
 
@@ -36,8 +35,7 @@ function DetailContent() {
   const totalPoints = sujet.exercices.reduce((a, e) => a + e.points, 0)
 
   return (
-    <div className="flex min-h-screen" dir="rtl" style={{ background: "#141522" }}>
-      <Sidebar />
+    <AppShell>
       <main className="flex-1 p-6 overflow-auto">
         <div className="max-w-4xl mx-auto space-y-6">
           <div className="text-xs text-slate-500 flex items-center gap-2">
@@ -61,7 +59,7 @@ function DetailContent() {
             <div className="flex flex-wrap gap-3 text-sm text-slate-400">
               <span>📅 {sujet.annee}</span>
               <span>⏱ {sujet.duree} min</span>
-              <span>📄 {sujet.exercices.length} exercices</span>
+              <span>📄 {sujet.exercices.length} تمارين</span>
               <span>💡 {totalQuestions} questions</span>
               <span>🏆 {totalPoints} points</span>
               <span>📁 {sujet.session === "normale" ? "دورة عادية" : "دورة استدراكية"}</span>
@@ -69,7 +67,7 @@ function DetailContent() {
 
             <div className="flex flex-wrap gap-1.5">
               {sujet.chapitres.map((ch) => (
-                <span key={ch} className="text-[11px] px-2.5 py-0.5 rounded-full bg-violet-500/10 text-violet-300 border border-violet-500/20">
+                <span key={ch} className="text-[11px] px-2.5 py-0.5 rounded-full bg-mint/10 text-mint border border-mint/20">
                   {ch}
                 </span>
               ))}
@@ -77,7 +75,7 @@ function DetailContent() {
 
             <Link
               href={`/annales/${sujet.slug}/exam`}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-blue-500 text-white rounded-xl font-bold text-sm hover:bg-blue-600 transition shadow-lg shadow-blue-500/20"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-mint text-slate-deep rounded-xl font-bold text-sm hover:bg-mint-soft transition shadow-lg shadow-mint/20"
             >
               🎯 ابدأ هذا الموضوع
             </Link>
@@ -87,12 +85,12 @@ function DetailContent() {
           <div className="grid gap-4 sm:grid-cols-3">
             <Link
               href={`/annales/${sujet.slug}/read`}
-              className="bg-slate-900/60 border border-slate-800 hover:border-blue-500/50 rounded-2xl p-5 space-y-3 card-hover group"
+              className="bg-slate-900/60 border border-slate-800 hover:border-mint/50 rounded-2xl p-5 space-y-3 card-hover group"
             >
               <p className="text-3xl">📖</p>
-              <h3 className="text-white font-bold text-base group-hover:text-blue-300 transition-colors">قراءة</h3>
+              <h3 className="text-white font-bold text-base group-hover:text-mint transition-colors">قراءة</h3>
               <p className="text-sm text-slate-400">تصفح الموضوع وتحميله</p>
-              <span className="inline-block text-xs text-blue-400 font-semibold group-hover:underline">فتح ←</span>
+              <span className="inline-block text-xs text-mint font-semibold group-hover:underline">فتح ←</span>
             </Link>
             <Link
               href={`/annales/${sujet.slug}/exam`}
@@ -100,7 +98,7 @@ function DetailContent() {
             >
               <p className="text-3xl">🎯</p>
               <h3 className="text-white font-bold text-base group-hover:text-amber-300 transition-colors">امتحان</h3>
-              <p className="text-sm text-slate-400">Bac blanc immersif avec chrono</p>
+              <p className="text-sm text-slate-400">امتحان كامل مع مؤقت زمني</p>
               <span className="inline-block text-xs text-amber-400 font-semibold group-hover:underline">المحاكاة ←</span>
             </Link>
             <Link
@@ -109,7 +107,7 @@ function DetailContent() {
             >
               <p className="text-3xl">🧭</p>
               <h3 className="text-white font-bold text-base group-hover:text-emerald-300 transition-colors">موجه</h3>
-              <p className="text-sm text-slate-400">Avec indices et correction guidée</p>
+              <p className="text-sm text-slate-400">مع مؤشرات وتصحيح موجه</p>
               <span className="inline-block text-xs text-emerald-400 font-semibold group-hover:underline">الحل ←</span>
             </Link>
           </div>
@@ -129,7 +127,7 @@ function DetailContent() {
           </div>
         </div>
       </main>
-    </div>
+    </AppShell>
   )
 }
 

@@ -4,7 +4,7 @@ import { useState, useMemo } from "react"
 import { useParams } from "next/navigation"
 import Link from "next/link"
 import { AuthGuard } from "@/components/auth/AuthGuard"
-import { Sidebar } from "@/components/layout/Sidebar"
+import { AppShell } from "@/components/layout/AppShell"
 import { getSujetBySlug } from "@/lib/annales-bac"
 
 function GuidedContent() {
@@ -18,12 +18,11 @@ function GuidedContent() {
 
   if (!sujet) {
     return (
-      <div className="flex min-h-screen" style={{ background: "#141522" }}>
-        <Sidebar />
+      <AppShell>
         <main className="flex-1 flex items-center justify-center">
-          <p className="text-slate-400">Sujet introuvable</p>
+          <p className="text-slate-400">الموضوع غير موجود</p>
         </main>
-      </div>
+      </AppShell>
     )
   }
 
@@ -48,8 +47,7 @@ function GuidedContent() {
   }
 
   return (
-    <div className="flex min-h-screen" dir="rtl" style={{ background: "#141522" }}>
-      <Sidebar />
+    <AppShell>
       <main className="flex-1 flex flex-col overflow-hidden">
         {/* Top bar */}
         <header className="px-6 py-3 border-b border-slate-800 flex items-center justify-between bg-slate-950/80 backdrop-blur">
@@ -86,10 +84,10 @@ function GuidedContent() {
               {/* Documents */}
               {exo.documents.length > 0 && (
                 <div className="bg-slate-950/50 border border-slate-800 rounded-xl p-4 space-y-2">
-                  <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">📄 Documents</p>
+                  <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">📄 الوثائق</p>
                   {exo.documents.map((d, i) => (
                     <div key={i} className="text-sm text-slate-300">
-                      <span className="font-semibold text-blue-300">{d.titre}</span> — {d.nature} : {d.description}
+                      <span className="font-semibold text-mint">{d.titre}</span> — {d.nature} : {d.description}
                     </div>
                   ))}
                 </div>
@@ -105,7 +103,7 @@ function GuidedContent() {
                       <span className="text-xs text-slate-500 ml-1">({q.points} pts)</span>
                       {qi + 1}. {q.texte}
                     </p>
-                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-violet-500/10 text-violet-300 border border-violet-500/20 shrink-0">
+                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-mint/10 text-mint border border-mint/20 shrink-0">
                       {q.verb}
                     </span>
                   </div>
@@ -191,7 +189,7 @@ function GuidedContent() {
               ) : (
                 <Link
                   href={`/annales/${sujet.slug}`}
-                  className="px-4 py-2 bg-blue-500 text-white rounded-lg text-sm font-semibold hover:bg-blue-600 transition"
+                  className="px-4 py-2 bg-mint text-slate-deep rounded-lg text-sm font-semibold hover:bg-mint-soft transition"
                 >
                   ✅ إنهاء — العودة إلى الملخص
                 </Link>
@@ -200,7 +198,7 @@ function GuidedContent() {
           </div>
         </div>
       </main>
-    </div>
+    </AppShell>
   )
 }
 

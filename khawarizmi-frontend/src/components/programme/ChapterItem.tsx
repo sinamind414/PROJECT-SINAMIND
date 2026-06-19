@@ -105,8 +105,8 @@ export function ChapterItem({ chapter, onClick }: ChapterItemProps) {
         
         <Link
           href={`/mindmap/${chapter.id}`}
-          className="px-3 py-2 bg-purple-500/10 hover:bg-purple-500/20 
-                     text-purple-400 border border-purple-500/30 
+          className="px-3 py-2 bg-mint/10 hover:bg-mint/20 
+                     text-mint-soft border border-mint/30 
                      rounded-lg text-xs font-medium text-center 
                      transition-all"
         >

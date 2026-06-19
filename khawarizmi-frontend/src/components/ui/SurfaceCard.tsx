@@ -12,7 +12,7 @@ export function SurfaceCard({
   padding?: boolean
 }) {
   return (
-    <div className={`rounded-2xl ${padding ? "p-5" : ""} ${className}`} style={{ background: "#1E2030" }}>
+    <div className={`glass rounded-2xl ${padding ? "p-5" : ""} ${className}`}>
       {children}
     </div>
   )

@@ -51,7 +51,7 @@ export function VideosWidget({ chapitre }: { chapitre: string }) {
         </div>
         <Link
           href="/videos"
-          className="text-violet-400 text-sm hover:underline"
+          className="text-mint-soft text-sm hover:underline"
         >
           عرض الكل ←
         </Link>

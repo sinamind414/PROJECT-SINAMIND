@@ -1,33 +1,154 @@
 @import "tailwindcss";
 
-body {
-  background: #141522 !important;
+@theme {
+  --color-slate-bg: #131E24;
+  --color-slate-deep: #0C151A;
+  --color-slate-panel: #182730;
+  --color-mint: #2DD4BF;
+  --color-mint-soft: #5EEAD4;
+  --color-orange: #F59E0B;
+  --color-orange-soft: #FBBF24;
+  --font-arabic: 'Cairo', 'Tajawal', sans-serif;
 }
 
-@theme inline {
-  --color-bg-deep: #141522;
-  --color-bg-surface: #1E2030;
-  --color-bg-card: #23263A;
-  --color-bg-sidebar: #181928;
+:root {
+  color-scheme: dark;
+}
 
-  --color-accent: #8B5CF6;
-  --color-success: #34D399;
-  --color-warning: #FBBF24;
-  --color-error: #F87171;
-
-  --color-text-primary: #F8FAFC;
-  --color-text-secondary: #CBD5E1;
-  --color-text-muted: #94A3B8;
-
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+html { 
+  direction: rtl; 
+  height: 100%;
 }
 
 body {
-  background-color: #141522;
-  color: #F8FAFC;
-  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+  margin: 0;
+  background-color: #0C151A;
+  color: #E6F2EF;
+  font-family: 'Cairo', 'Tajawal', sans-serif;
+  direction: rtl;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+  height: 100%;
 }
+
+/* Animated bio-tech background */
+.bio-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background:
+    radial-gradient(900px 600px at 85% -10%, rgba(45, 212, 191, 0.12), transparent 60%),
+    radial-gradient(700px 500px at 10% 110%, rgba(245, 158, 11, 0.10), transparent 60%),
+    linear-gradient(160deg, #0C151A 0%, #131E24 45%, #0C151A 100%);
+}
+
+.bio-grid {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-image:
+    linear-gradient(rgba(45, 212, 191, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(45, 212, 191, 0.04) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: radial-gradient(circle at 50% 40%, black 30%, transparent 85%);
+}
+
+/* Glass panel */
+.glass {
+  background: linear-gradient(160deg, rgba(24, 39, 48, 0.85), rgba(19, 30, 36, 0.7));
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(45, 212, 191, 0.14);
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.glass-soft {
+  background: rgba(24, 39, 48, 0.55);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* DNA helix animation */
+@keyframes dna-rotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+.dna-spin { animation: dna-rotate 24s linear infinite; }
+
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.6; filter: blur(8px); }
+  50% { opacity: 1; filter: blur(14px); }
+}
+.pulse-glow { animation: pulse-glow 3s ease-in-out infinite; }
+
+@keyframes float-y {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+.float-y { animation: float-y 5s ease-in-out infinite; }
+
+@keyframes flame-flicker {
+  0%, 100% { transform: scale(1) rotate(-2deg); filter: drop-shadow(0 0 6px rgba(245,158,11,0.7)); }
+  50% { transform: scale(1.12) rotate(2deg); filter: drop-shadow(0 0 14px rgba(245,158,11,0.95)); }
+}
+.flame-flicker { animation: flame-flicker 1.6s ease-in-out infinite; }
+
+/* Custom scrollbar */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(45, 212, 191, 0.25); border-radius: 8px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(45, 212, 191, 0.45); }
+
+/* Buttons */
+.btn-mint {
+  background: linear-gradient(135deg, #2DD4BF, #14B8A6);
+  color: #06231F;
+  font-weight: 800;
+  box-shadow: 0 6px 22px rgba(45, 212, 191, 0.35), inset 0 1px 0 rgba(255,255,255,0.25);
+  transition: all 0.25s ease;
+}
+.btn-mint:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(45, 212, 191, 0.55), inset 0 1px 0 rgba(255,255,255,0.35);
+}
+.btn-mint:active { transform: translateY(0); }
+
+.btn-ghost {
+  background: rgba(45, 212, 191, 0.08);
+  color: #5EEAD4;
+  border: 1px solid rgba(45, 212, 191, 0.3);
+  font-weight: 700;
+  transition: all 0.25s ease;
+}
+.btn-ghost:hover {
+  background: rgba(45, 212, 191, 0.16);
+  border-color: rgba(45, 212, 191, 0.6);
+  transform: translateY(-2px);
+}
+
+.btn-orange {
+  background: linear-gradient(135deg, #F59E0B, #D97706);
+  color: #2A1700;
+  font-weight: 800;
+  box-shadow: 0 6px 22px rgba(245, 158, 11, 0.35), inset 0 1px 0 rgba(255,255,255,0.25);
+  transition: all 0.25s ease;
+}
+.btn-orange:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(245, 158, 11, 0.55);
+}
+
+.text-glow-mint { text-shadow: 0 0 18px rgba(45, 212, 191, 0.55); }
+.text-glow-orange { text-shadow: 0 0 18px rgba(245, 158, 11, 0.55); }
+
+.divider-glow {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(45,212,191,0.4), transparent);
+}
+
+/* number font tabular */
+.tnum { font-variant-numeric: tabular-nums; }
 
 /* === FORCER RTL POUR TOUT LE CONTENU COURS === */
 article .prose,
@@ -63,7 +184,7 @@ article .prose li {
 
 article .prose ol li::marker,
 article .prose ul li::marker {
-  color: rgb(96, 165, 250);
+  color: #2DD4BF;
   font-weight: bold;
 }
 
@@ -78,11 +199,11 @@ article .prose th,
 article .prose td {
   text-align: right !important;
   padding: 0.75rem 1rem !important;
-  border: 1px solid rgb(51, 65, 85) !important;
+  border: 1px solid rgba(45, 212, 191, 0.2) !important;
 }
 
 article .prose thead {
-  background: rgba(59, 130, 246, 0.2) !important;
+  background: rgba(45, 212, 191, 0.1) !important;
 }
 
 article .prose th {
@@ -90,51 +211,47 @@ article .prose th {
   font-weight: bold !important;
 }
 
-article .prose pre:empty,
-article .prose code:empty {
-  display: none !important;
-}
-
 article .prose h1 {
   color: #FFFFFF !important;
   font-size: 2.25rem !important;
   font-weight: 800 !important;
-  border-bottom: 2px solid #6366F1 !important;
+  border-bottom: 2px solid #2DD4BF !important;
   padding-bottom: 0.75rem !important;
   margin-top: 2.5rem !important;
   margin-bottom: 1.5rem !important;
 }
 
 article .prose h2 {
-  color: #60A5FA !important;
+  color: #2DD4BF !important;
   font-size: 1.875rem !important;
   font-weight: 700 !important;
-  border-right: 4px solid #60A5FA !important;
+  border-right: 4px solid #2DD4BF !important;
   padding-right: 1rem !important;
   margin-top: 2rem !important;
   margin-bottom: 1rem !important;
-  background: linear-gradient(to left, rgba(96, 165, 250, 0.08), transparent);
+  background: linear-gradient(to left, rgba(45, 212, 191, 0.08), transparent);
   padding-top: 0.5rem;
   padding-bottom: 0.5rem;
 }
 
 article .prose h3 {
-  color: #A78BFA !important;
+  color: #5EEAD4 !important;
   font-size: 1.5rem !important;
   font-weight: 600 !important;
-  border-right: 3px solid #A78BFA !important;
+  border-right: 3px solid #5EEAD4 !important;
   padding-right: 0.75rem !important;
   margin-top: 1.75rem !important;
   margin-bottom: 0.875rem !important;
 }
 
 article .prose h4 {
-  color: #67E8F9 !important;
+  color: #F59E0B !important;
   font-size: 1.25rem !important;
   font-weight: 600 !important;
   margin-top: 1.5rem !important;
   margin-bottom: 0.75rem !important;
 }
+
 
 article .prose h5 {
   color: #FCD34D !important;
@@ -236,40 +353,17 @@ a, button {
 
 .card-hover:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(167, 139, 250, 0.15);
+  box-shadow: 0 8px 24px rgba(45, 212, 191, 0.15);
 }
 
-/* === SCROLLBAR ÉLÉGANTE === */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
+/* Scrollbar already defined above — removed duplicate */
 
-::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.02);
-}
-
-::-webkit-scrollbar-thumb {
-  background: rgba(167, 139, 250, 0.3);
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(167, 139, 250, 0.5);
-}
-
-/* === GLASSMORPHISM === */
-.glass {
-  background: rgba(42, 37, 64, 0.6);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-}
+/* Glass already defined above with bio-tech colors — removed duplicate violet version */
 
 /* === FOCUS PROPRE === */
 button:focus-visible,
 a:focus-visible {
-  outline: 2px solid rgba(167, 139, 250, 0.5);
+  outline: 2px solid rgba(45, 212, 191, 0.5);
   outline-offset: 2px;
   border-radius: 8px;
 }
@@ -279,3 +373,71 @@ a:focus-visible {
   from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+/* === PAGE HELPERS — BIO-TECH === */
+.sinamind-page-bg { background: #0C151A; }
+.sinamind-card {
+  background: linear-gradient(160deg, rgba(24, 39, 48, 0.85), rgba(19, 30, 36, 0.7));
+  backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(45, 212, 191, 0.14);
+  box-shadow: 0 8px 40px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.04);
+  border-radius: 1.5rem;
+}
+.sinamind-hero {
+  background: linear-gradient(135deg, rgba(45,212,191,0.12), rgba(45,212,191,0.08));
+  border: 1px solid rgba(45,212,191,0.14); border-radius: 1.5rem; padding: 1.75rem;
+}
+
+/* ════════════════════════════════════════
+   DRIVE AGENT — SVT Dashboard Classes
+   ════════════════════════════════════════ */
+.svt-bg {
+  position: fixed; inset: 0; z-index: -2;
+  background: radial-gradient(900px 600px at 85% -10%, rgba(45,212,191,0.12), transparent 60%),
+              radial-gradient(700px 500px at 10% 110%, rgba(245,158,11,0.10), transparent 60%),
+              linear-gradient(160deg, #0C151A 0%, #131E24 45%, #0C151A 100%);
+}
+.svt-grid {
+  position: fixed; inset: 0; z-index: -1;
+  background-image: linear-gradient(rgba(45,212,191,0.04) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(45,212,191,0.04) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: radial-gradient(circle at 50% 40%, black 30%, transparent 85%);
+}
+.svt-glass {
+  background: linear-gradient(160deg, rgba(24,39,48,0.85), rgba(19,30,36,0.7));
+  backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(45,212,191,0.14);
+  box-shadow: 0 8px 40px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.04);
+}
+.svt-glass-soft {
+  background: rgba(24,39,48,0.55); backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.05);
+}
+@keyframes svt-dna-rotate { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+.svt-dna-spin { animation: svt-dna-rotate 24s linear infinite; }
+@keyframes svt-pulse-glow { 0%,100% { opacity:0.6; filter:blur(8px); } 50% { opacity:1; filter:blur(14px); } }
+.svt-pulse-glow { animation: svt-pulse-glow 3s ease-in-out infinite; }
+@keyframes svt-flame-flicker { 0%,100% { transform:scale(1) rotate(-2deg); filter:drop-shadow(0 0 6px rgba(245,158,11,0.7)); } 50% { transform:scale(1.12) rotate(2deg); filter:drop-shadow(0 0 14px rgba(245,158,11,0.95)); } }
+.svt-flame-flicker { animation: svt-flame-flicker 1.6s ease-in-out infinite; }
+.svt-btn-mint {
+  background: linear-gradient(135deg, #2DD4BF, #14B8A6); color: #06231F; font-weight: 800;
+  box-shadow: 0 6px 22px rgba(45,212,191,0.35), inset 0 1px 0 rgba(255,255,255,0.25);
+  transition: all 0.25s ease;
+}
+.svt-btn-mint:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(45,212,191,0.55), inset 0 1px 0 rgba(255,255,255,0.35); }
+.svt-btn-ghost {
+  background: rgba(45,212,191,0.08); color: #5EEAD4; border: 1px solid rgba(45,212,191,0.3); font-weight: 700;
+  transition: all 0.25s ease;
+}
+.svt-btn-ghost:hover { background: rgba(45,212,191,0.16); border-color: rgba(45,212,191,0.6); transform: translateY(-2px); }
+.svt-btn-orange {
+  background: linear-gradient(135deg, #F59E0B, #D97706); color: #2A1700; font-weight: 800;
+  box-shadow: 0 6px 22px rgba(245,158,11,0.35), inset 0 1px 0 rgba(255,255,255,0.25);
+  transition: all 0.25s ease;
+}
+.svt-btn-orange:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(245,158,11,0.55); }
+.svt-text-glow-mint { text-shadow: 0 0 18px rgba(45,212,191,0.55); }
+.svt-text-glow-orange { text-shadow: 0 0 18px rgba(245,158,11,0.55); }
+.svt-divider-glow { height: 1px; background: linear-gradient(90deg, transparent, rgba(45,212,191,0.4), transparent); }
+.svt-tnum { font-variant-numeric: tabular-nums; }

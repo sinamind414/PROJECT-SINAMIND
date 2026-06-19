@@ -26,7 +26,7 @@ export function AIRecommendations() {
 
   return (
     <div className="space-y-5">
-      <div className="rounded-2xl p-5" style={{ background: "#1E2030" }}>
+      <div className="rounded-2xl p-5" style={{ background: "#131E24" }}>
         <div className="flex items-center gap-2 mb-1">
           <span className="text-lg">🧠</span>
           <h3 className="text-white font-bold text-sm">توصية اليوم</h3>
@@ -47,12 +47,12 @@ export function AIRecommendations() {
         )}
       </div>
 
-      <div className="rounded-2xl p-5" style={{ background: "#1E2030" }}>
+      <div className="rounded-2xl p-5" style={{ background: "#131E24" }}>
         <h3 className="text-white font-bold text-sm mb-4">📈 تقدم سريع</h3>
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             <span className="text-gray-400 text-xs">أضعف مهارة</span>
-            <span className="text-violet-400 font-bold text-xs">{weakestSkill}</span>
+            <span className="text-mint font-bold text-xs">{weakestSkill}</span>
           </div>
           <div className="flex items-center justify-between">
             <span className="text-gray-400 text-xs">أقوى مهارة</span>

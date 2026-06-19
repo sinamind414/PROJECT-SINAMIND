@@ -2,8 +2,8 @@
 import Link from "next/link"
 
 const MESSAGES = [
-  { name: "أحمد بن علي", message: "هل راجعت درس البروتينات؟", time: "12:06", avatar: "👨‍🎓", color: "bg-violet-500/30" },
-  { name: "مجموعة BAC SVT", message: "أنا : متى الامتحان التجريبي؟", time: "11:23", avatar: "👥", color: "bg-purple-500/30" },
+  { name: "أحمد بن علي", message: "هل راجعت درس البروتينات؟", time: "12:06", avatar: "👨‍🎓", color: "bg-mint/30" },
+  { name: "مجموعة BAC SVT", message: "أنا : متى الامتحان التجريبي؟", time: "11:23", avatar: "👥", color: "bg-mint/30" },
   { name: "أ. كريم", message: "أهلاً، عندي سؤال حول...", time: "09:01", avatar: "👨‍🏫", color: "bg-blue-500/30" },
   { name: "فاطمة", message: "ما هي إجابة التمرين 3؟", time: "08:45", avatar: "👩‍🎓", color: "bg-pink-500/30" }
 ]
@@ -12,11 +12,11 @@ export function MessagesWidget() {
   return (
     <div
       className="rounded-3xl p-5"
-      style={{ background: "#2A2540" }}
+      style={{ background: "#182730" }}
     >
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-white font-bold text-lg">الرسائل</h3>
-        <button className="text-violet-400 text-xs hover:underline">
+        <button className="text-mint text-xs hover:underline">
           عرض الكل ←
         </button>
       </div>

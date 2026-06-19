@@ -38,13 +38,13 @@ export function MasteryChapters() {
   const data = snapshot || getProgressSnapshot()
 
   return (
-    <div className="rounded-2xl p-5" style={{ background: "#1E2030" }}>
+    <div className="rounded-2xl p-5" style={{ background: "#131E24" }}>
       <div className="flex items-center justify-between mb-4">
         <div>
           <h2 className="text-white font-bold text-base">📌 المهارات المنهجية</h2>
           <p className="text-gray-500 text-xs mt-0.5">تتغير بعد التشخيص والتمارين</p>
         </div>
-        <Link href="/progress" className="text-violet-400 text-xs font-medium hover:underline">
+        <Link href="/progress" className="text-mint text-xs font-medium hover:underline">
           التفاصيل
         </Link>
       </div>
@@ -70,7 +70,7 @@ export function MasteryChapters() {
                 <span className="text-white text-xs font-bold w-8 text-left">{skill.level}%</span>
               </div>
 
-              <span className="hidden lg:inline text-violet-300 text-[11px] w-32 text-left">{target.action}</span>
+              <span className="hidden lg:inline text-mint-soft text-[11px] w-32 text-left">{target.action}</span>
             </Link>
           )
         })}

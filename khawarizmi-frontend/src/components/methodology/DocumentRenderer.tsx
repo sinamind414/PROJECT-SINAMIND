@@ -97,7 +97,7 @@ function toneClass(tone?: string) {
   if (tone === "success") return "bg-emerald-500/10 border-emerald-500/20 text-emerald-200"
   if (tone === "danger") return "bg-red-500/10 border-red-500/20 text-red-200"
   if (tone === "warning") return "bg-amber-500/10 border-amber-500/20 text-amber-100"
-  if (tone === "violet") return "bg-violet-500/10 border-violet-500/20 text-violet-200"
+  if (tone === "violet") return "bg-mint/10 border-mint/20 text-mint-soft"
   return "bg-white/[0.03] border-white/[0.06] text-gray-200"
 }
 
@@ -116,12 +116,12 @@ function BarChart({ doc }: { doc: BarChartDocument }) {
 
   return (
     <DocumentFrame title={doc.title} caption={doc.caption}>
-      <div className="rounded-2xl bg-[#1E1B2E] border border-white/[0.06] p-5">
+      <div className="rounded-2xl bg-[#0C151A] border border-white/[0.06] p-5">
         <div className="h-56 flex items-end gap-4" dir="ltr">
           {doc.points.map((point) => (
             <div key={point.label} className="flex-1 flex flex-col items-center gap-2">
               <div
-                className="w-full rounded-t-xl bg-gradient-to-t from-emerald-500 to-violet-400 relative min-h-2"
+                className="w-full rounded-t-xl bg-gradient-to-t from-emerald-500 to-mint-soft relative min-h-2"
                 style={{ height: `${(point.value / max) * 180}px` }}
               >
                 <span className="absolute -top-6 left-1/2 -translate-x-1/2 text-white text-xs font-bold">
@@ -165,14 +165,14 @@ function LineChart({ doc }: { doc: LineChartDocument }) {
 
   return (
     <DocumentFrame title={doc.title} caption={doc.caption}>
-      <div className="rounded-2xl bg-[#1E1B2E] border border-white/[0.06] p-4 overflow-x-auto" dir="ltr">
+      <div className="rounded-2xl bg-[#0C151A] border border-white/[0.06] p-4 overflow-x-auto" dir="ltr">
         <svg viewBox={`0 0 ${width} ${height}`} className="w-full min-w-[420px] h-64">
           <line x1={padding} y1={height - padding} x2={width - padding} y2={height - padding} stroke="rgba(255,255,255,.22)" />
           <line x1={padding} y1={padding} x2={padding} y2={height - padding} stroke="rgba(255,255,255,.22)" />
           {min < 0 && (
             <line x1={padding} y1={yZero} x2={width - padding} y2={yZero} stroke="rgba(255,255,255,.12)" strokeDasharray="4" />
           )}
-          <path d={path} fill="none" stroke="#A78BFA" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+          <path d={path} fill="none" stroke="#5EEAD4" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
           {coords.map((coord) => (
             <g key={coord.point.label}>
               <circle cx={coord.x} cy={coord.y} r="6" fill="#34D399" />
@@ -210,7 +210,7 @@ function MultiLineChart({ doc }: { doc: MultiLineChartDocument }) {
 
   return (
     <DocumentFrame title={doc.title} caption={doc.caption}>
-      <div className="rounded-2xl bg-[#1E1B2E] border border-white/[0.06] p-4 overflow-x-auto" dir="ltr">
+      <div className="rounded-2xl bg-[#0C151A] border border-white/[0.06] p-4 overflow-x-auto" dir="ltr">
         <svg viewBox={`0 0 ${width} ${height}`} className="w-full min-w-[420px] h-64">
           <line x1={padding} y1={height - padding} x2={width - padding} y2={height - padding} stroke="rgba(255,255,255,.22)" />
           <line x1={padding} y1={padding} x2={padding} y2={height - padding} stroke="rgba(255,255,255,.22)" />
@@ -288,7 +288,7 @@ function FlowDoc({ doc }: { doc: FlowDocument }) {
               {step}
             </div>
             {index < doc.steps.length - 1 && (
-              <div className="text-center text-violet-300 py-1">
+              <div className="text-center text-mint-soft py-1">
                 ↓ {doc.arrows?.[index] || ""}
               </div>
             )}
@@ -302,7 +302,7 @@ function FlowDoc({ doc }: { doc: FlowDocument }) {
 function ImageDoc({ doc }: { doc: ImageDocument }) {
   return (
     <DocumentFrame title={doc.title} caption={doc.caption}>
-      <div className="relative rounded-2xl bg-[#1E1B2E] border border-white/[0.06] overflow-hidden min-h-[260px] flex items-center justify-center">
+      <div className="relative rounded-2xl bg-[#0C151A] border border-white/[0.06] overflow-hidden min-h-[260px] flex items-center justify-center">
         {doc.src ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={doc.src} alt={doc.alt} className="w-full h-auto object-contain" />

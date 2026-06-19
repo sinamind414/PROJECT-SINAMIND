@@ -98,7 +98,7 @@ export default function DocumentAnalysisHubPage() {
               key={scenario.id}
               href={href}
               className="rounded-2xl p-5 transition-all duration-200 hover:-translate-y-0.5"
-              style={{ background: "#1E2030" }}
+              style={{ background: "#131E24" }}
             >
               <div className="text-3xl mb-3">{emoji}</div>
               <h3 className="text-white font-bold text-sm mb-1">{scenario.title}</h3>
@@ -108,7 +108,7 @@ export default function DocumentAnalysisHubPage() {
                 <span>📄 {scenario.documents.length} وثائق</span>
                 <span>❓ {scenario.questions.length} أسئلة</span>
                 {isDiagnostic && (
-                  <PillChip label="تشخيص" color="#A78BFA" bg="rgba(139,92,246,0.1)" />
+                  <PillChip label="تشخيص" color="#5EEAD4" bg="rgba(45,212,191,0.12)" />
                 )}
               </div>
             </Link>
@@ -118,7 +118,7 @@ export default function DocumentAnalysisHubPage() {
 
       <section>
         <SurfaceCard padding={false}>
-          <div className="rounded-2xl p-5" style={{ background: "linear-gradient(135deg, rgba(139,92,246,0.12), rgba(79,70,229,0.08))" }}>
+          <div className="rounded-2xl p-5" style={{ background: "linear-gradient(135deg, rgba(45,212,191,0.14), rgba(245,158,11,0.08))" }}>
             <p className="text-gray-500 text-xs mb-1">البرنامج الوطني SVT</p>
             <h2 className="text-lg font-bold text-white">الفصول الـ 55 مرتبطة بالمنهجية</h2>
             <p className="text-gray-400 text-sm mt-1 max-w-3xl leading-relaxed">
@@ -139,7 +139,7 @@ export default function DocumentAnalysisHubPage() {
               {domain.units.map((unit) => (
                 <SurfaceCard key={unit.unitNumero}>
                   <div className="flex items-center gap-2 mb-3">
-                    <span className="text-sm font-bold text-violet-400">الوحدة {unit.unitNumero}</span>
+                    <span className="text-sm font-bold text-mint">الوحدة {unit.unitNumero}</span>
                     <span className="text-gray-300 text-sm">{unit.unitAr}</span>
                   </div>
 
@@ -168,7 +168,7 @@ export default function DocumentAnalysisHubPage() {
                             bg="rgba(255,255,255,0.04)"
                           />
                         )}
-                        <div className="mt-2 text-xs font-bold" style={{ color: "#A78BFA" }}>
+                        <div className="mt-2 text-xs font-bold" style={{ color: "#5EEAD4" }}>
                           افتح المسار المنهجي ←
                         </div>
                       </Link>

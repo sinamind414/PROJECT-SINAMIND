@@ -10,11 +10,11 @@ export function DiagnosticUnitCard({ unit }: { unit: UnitConfig }) {
   return (
     <Link
       href={`/diagnostic/units/${unit.slug}`}
-      className="rounded-2xl p-5 transition-all hover:scale-[1.02] hover:shadow-xl hover:shadow-violet-950/30 border border-white/[0.04]"
-      style={{ background: "#2A2540" }}
+      className="rounded-2xl p-5 transition-all hover:scale-[1.02] hover:shadow-xl hover:shadow-mint/20 border border-white/[0.04]"
+      style={{ background: "#182730" }}
     >
       <div className="flex items-start gap-4">
-        <div className="text-3xl flex-shrink-0 w-12 h-12 flex items-center justify-center rounded-xl bg-violet-500/15">
+        <div className="text-3xl flex-shrink-0 w-12 h-12 flex items-center justify-center rounded-xl bg-mint/15">
           {unit.emoji}
         </div>
         <div className="flex-1 min-w-0">
@@ -30,14 +30,14 @@ export function DiagnosticUnitCard({ unit }: { unit: UnitConfig }) {
                 <Link
                   href={`/diagnostic/chapters/${firstSlug}`}
                   onClick={(e) => e.stopPropagation()}
-                  className="text-violet-400 hover:text-violet-300"
+                  className="text-mint-soft hover:text-mint-soft"
                 >
                   أول فصل
                 </Link>
               </>
             )}
           </div>
-          <div className="mt-3 text-xs text-violet-400 font-bold">
+          <div className="mt-3 text-xs text-mint-soft font-bold">
             افتح المسار المنهجي للوحدة ←
           </div>
         </div>

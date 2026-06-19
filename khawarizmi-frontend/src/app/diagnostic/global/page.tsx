@@ -2,11 +2,11 @@
 
 import { useMemo, useState } from "react"
 import { AuthGuard } from "@/components/auth/AuthGuard"
-import { Sidebar } from "@/components/layout/Sidebar"
+import { AppShell } from "@/components/layout/AppShell"
 import { DocumentSetRenderer } from "@/components/methodology/DocumentRenderer"
 import { diagnosticScenario, type MethodologyQuestion } from "@/lib/methodology-documents"
 import { evaluateMethodologyAnswer, type MethodologyEvaluation } from "@/lib/methodology-evaluator"
-import { saveMethodologyEvaluations } from "@/lib/progress-store"
+import { awardXP, claimBadge, saveMethodologyEvaluations, type GamificationAward } from "@/lib/progress-store"
 
 const QUESTIONS = diagnosticScenario.questions
 
@@ -26,7 +26,7 @@ type DiagnosticResult = {
 
 function getSeverityLabel(percentage: number) {
   if (percentage >= 85) return { label: "متقن", color: "text-emerald-300", bg: "bg-emerald-500/10 border-emerald-500/20" }
-  if (percentage >= 70) return { label: "مقبول", color: "text-blue-300", bg: "bg-blue-500/10 border-blue-500/20" }
+  if (percentage >= 70) return { label: "مقبول", color: "text-mint", bg: "bg-mint/10 border-mint/20" }
   if (percentage >= 50) return { label: "متوسط", color: "text-amber-300", bg: "bg-amber-500/10 border-amber-500/20" }
   return { label: "ضعيف", color: "text-red-300", bg: "bg-red-500/10 border-red-500/20" }
 }
@@ -81,7 +81,7 @@ function CorrectionCard({ item }: { item: DiagnosticResult["evaluations"][number
   const status = getSeverityLabel(item.evaluation.percentage)
 
   return (
-    <div className="rounded-3xl p-5 bg-[#2A2540] border border-white/[0.06] space-y-4">
+    <div className="rounded-3xl p-5 glass border border-mint/10 space-y-4">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h3 className="text-white font-bold text-lg">{item.question.n}. تصحيح: {item.question.title}</h3>
@@ -117,7 +117,7 @@ function CorrectionCard({ item }: { item: DiagnosticResult["evaluations"][number
 
       {item.evaluation.criteria.length > 0 && (
         <div>
-          <p className="text-violet-300 font-bold text-sm mb-2">تفصيل النقاط</p>
+                  <p className="text-mint font-bold text-sm mb-2">تفصيل النقاط</p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
             {item.evaluation.criteria.map((criterion) => (
               <div key={criterion.code} className="flex items-center justify-between gap-3 rounded-xl bg-white/[0.03] px-3 py-2">
@@ -144,8 +144,8 @@ function CorrectionCard({ item }: { item: DiagnosticResult["evaluations"][number
         </div>
       )}
 
-      <div className="rounded-2xl p-4 bg-violet-500/10 border border-violet-500/20">
-        <p className="text-violet-200 text-sm font-bold mb-1">ماذا تتعلم من هذا الخطأ؟</p>
+      <div className="rounded-2xl p-4 bg-mint/10 border border-mint/20">
+        <p className="text-mint text-sm font-bold mb-1">ماذا تتعلم من هذا الخطأ؟</p>
         <p className="text-gray-200 text-sm leading-relaxed">{item.question.learningFocus}</p>
         <p className="text-gray-400 text-xs leading-relaxed mt-2">نصيحة المحرك: {item.evaluation.advice}</p>
       </div>
@@ -157,6 +157,7 @@ export default function DiagnosticGlobalPage() {
   const [answers, setAnswers] = useState<Record<string, string>>({})
   const [result, setResult] = useState<DiagnosticResult | null>(null)
   const [saved, setSaved] = useState(false)
+  const [award, setAward] = useState<GamificationAward | null>(null)
 
   const completedCount = useMemo(() => QUESTIONS.filter((q) => (answers[q.id] || "").trim().length > 0).length, [answers])
 
@@ -175,27 +176,27 @@ export default function DiagnosticGlobalPage() {
       evaluation: item.evaluation,
     })))
     setSaved(true)
+    const xp = awardXP("تشخيص منهجي كامل", 150)
+    claimBadge("first_diagnostic")
+    setAward(xp)
   }
 
   return (
     <AuthGuard>
-      <div className="flex min-h-screen" dir="rtl" style={{ background: "#1E1B2E" }}>
-        <div className="order-1">
-          <Sidebar />
-        </div>
-        <main className="flex-1 p-6 lg:p-8 overflow-auto order-2">
+      <AppShell>
+        <main className="flex-1 p-6 lg:p-8 overflow-auto">
           <div className="max-w-6xl mx-auto space-y-6">
-            <header className="rounded-3xl p-7 bg-gradient-to-l from-violet-600 to-fuchsia-600">
-              <p className="text-white/70 text-sm mb-2">تشخيص مبني على وضعية ووثائق</p>
+            <header className="rounded-3xl p-7 glass border border-mint/10">
+              <p className="text-mint text-sm mb-2 font-semibold">تشخيص مبني على وضعية ووثائق</p>
               <h1 className="text-3xl font-bold text-white mb-2">اختبار تشخيصي V1</h1>
               <p className="text-white/80 max-w-3xl leading-relaxed">
                 هذا التشخيص يستعمل محرك وثائق V1: graphe + tableau + image + schéma fonctionnel. كل سؤال مرتبط بسند مثل البكالوريا.
               </p>
             </header>
 
-            <section className="rounded-3xl p-6 bg-[#2A2540] border border-white/[0.06] space-y-5">
+            <section className="rounded-3xl p-6 glass border border-mint/10 space-y-5">
               <div>
-                <p className="text-violet-300 text-sm font-bold mb-1">{diagnosticScenario.subtitle}</p>
+                <p className="text-mint text-sm font-bold mb-1">{diagnosticScenario.subtitle}</p>
                 <h2 className="text-2xl font-bold text-white mb-2">{diagnosticScenario.title}</h2>
                 <p className="text-gray-300 text-sm leading-relaxed">{diagnosticScenario.contextAr}</p>
               </div>
@@ -203,13 +204,13 @@ export default function DiagnosticGlobalPage() {
             </section>
 
             <div className="grid grid-cols-1 xl:grid-cols-[1fr_380px] gap-6">
-              <section className="rounded-3xl p-6 bg-[#2A2540] border border-white/[0.06]">
+              <section className="rounded-3xl p-6 glass border border-mint/10">
                 <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
                   <div>
                     <h2 className="text-2xl font-bold text-white">أسئلة التشخيص المرتبطة بالوثائق</h2>
                     <p className="text-gray-500 text-sm mt-1">المدة: 10–15 دقيقة · {completedCount}/5 إجابات مكتملة</p>
                   </div>
-                  <span className="px-3 py-1 rounded-full bg-violet-500/10 text-violet-300 text-xs font-bold">
+                  <span className="px-3 py-1 rounded-full bg-mint/10 text-mint text-xs font-bold">
                     وضعية واحدة · وثائق متعددة · بدون IA حاليا
                   </span>
                 </div>
@@ -218,13 +219,13 @@ export default function DiagnosticGlobalPage() {
                   {QUESTIONS.map((q) => (
                     <div key={q.id} className="rounded-2xl p-4 bg-white/[0.03] border border-white/[0.05]">
                       <div className="flex gap-4 mb-3">
-                        <div className="w-10 h-10 rounded-xl bg-violet-500/20 text-violet-200 flex items-center justify-center font-bold flex-shrink-0">{q.n}</div>
+                        <div className="w-10 h-10 rounded-xl bg-mint/20 text-mint flex items-center justify-center font-bold flex-shrink-0">{q.n}</div>
                         <div>
                           <div className="flex flex-wrap items-center gap-2">
                             <h3 className="text-white font-bold">{q.title}</h3>
-                            <span className="px-2 py-0.5 rounded-full bg-white/[0.05] text-violet-200 text-[10px]">{q.docRef}</span>
+                            <span className="px-2 py-0.5 rounded-full bg-white/[0.05] text-mint text-[10px]">{q.docRef}</span>
                           </div>
-                          <p className="text-violet-300 text-xs mt-1">المهارة: {q.skill}</p>
+                          <p className="text-mint text-xs mt-1">المهارة: {q.skill}</p>
                           <p className="text-gray-300 text-sm mt-2 leading-relaxed">{q.prompt}</p>
                         </div>
                       </div>
@@ -232,7 +233,7 @@ export default function DiagnosticGlobalPage() {
                         value={answers[q.id] || ""}
                         onChange={(e) => updateAnswer(q.id, e.target.value)}
                         rows={4}
-                        className="w-full rounded-xl bg-[#1E1B2E] border border-white/[0.08] text-white p-4 outline-none focus:border-violet-400"
+                        className="w-full rounded-xl bg-slate-panel border border-white/[0.08] text-white p-4 outline-none focus:border-mint"
                         placeholder={q.placeholder}
                       />
                     </div>
@@ -240,7 +241,7 @@ export default function DiagnosticGlobalPage() {
                 </div>
 
                 <div className="mt-6 flex flex-wrap gap-3">
-                  <button onClick={submitDiagnostic} className="px-5 py-3 rounded-xl bg-violet-600 text-white font-bold hover:bg-violet-500 transition">
+                  <button onClick={submitDiagnostic} className="px-5 py-3 rounded-xl bg-mint text-slate-deep font-bold hover:bg-mint-soft transition">
                     صحح التشخيص وسجل الأخطاء
                   </button>
                   <button onClick={() => { setAnswers({}); setResult(null); setSaved(false) }} className="px-5 py-3 rounded-xl bg-white/[0.05] text-gray-200 font-bold hover:bg-white/[0.08] transition">
@@ -258,15 +259,22 @@ export default function DiagnosticGlobalPage() {
                 </div>
 
                 {result ? (
-                  <div className="rounded-3xl p-5 bg-[#2A2540] border border-white/[0.06] space-y-5">
+                  <div className="rounded-3xl p-5 glass border border-mint/10 space-y-5">
                     <div className="flex items-center justify-between">
                       <h3 className="text-white font-bold">نتيجة التشخيص</h3>
                       <span className="text-3xl font-bold text-white">{result.readiness}%</span>
                     </div>
                     {saved && <p className="text-emerald-300 text-xs font-bold">✓ تم تسجيل الأخطاء في التقدم والتوصيات</p>}
+                    {award && (
+                      <div className="rounded-2xl bg-emerald-500/10 border border-emerald-400/20 p-4 animate-fadeIn">
+                        <p className="text-emerald-200 text-xs font-bold">🎉 أنهيت التشخيص</p>
+                        <p className="text-white text-3xl font-black mt-1">+{award.amount} XP</p>
+                        <p className="text-emerald-100/80 text-xs mt-1">وحصلت على شارة أول تشخيص 🎯</p>
+                      </div>
+                    )}
 
                     <div>
-                      <p className="text-violet-300 font-bold mb-2">ملفك المنهجي:</p>
+                      <p className="text-mint font-bold mb-2">ملفك المنهجي:</p>
                       <p className="text-gray-300 text-sm leading-relaxed">{result.profileAr}</p>
                     </div>
 
@@ -274,6 +282,10 @@ export default function DiagnosticGlobalPage() {
                       <p className="text-red-300 font-bold mb-2">أولويات الإصلاح</p>
                       {result.priorityFixes.length ? result.priorityFixes.map((fix) => <p key={fix} className="text-gray-300 text-sm leading-relaxed">→ {fix}</p>) : <p className="text-gray-500 text-sm">لا توجد أولوية حادة. انتقل إلى وضعية بكالوريا.</p>}
                     </div>
+
+                    <a href="/document-analysis" className="block text-center px-5 py-3 rounded-xl bg-mint text-slate-deep font-black hover:bg-mint-soft transition">
+                      أصلح أكبر خطأ الآن ➜
+                    </a>
 
                     <div className="space-y-2">
                       <p className="text-white font-bold mb-2">تفصيل سريع</p>
@@ -286,7 +298,7 @@ export default function DiagnosticGlobalPage() {
                     </div>
                   </div>
                 ) : (
-                  <div className="rounded-3xl p-5 bg-[#2A2540] border border-white/[0.06]">
+                  <div className="rounded-3xl p-5 glass border border-mint/10">
                     <h3 className="text-white font-bold mb-4">ما الذي سيخرجه التشخيص؟</h3>
                     <ul className="space-y-2 text-gray-300 text-sm">
                       <li>✓ استغلال وثائق مثل البكالوريا</li>
@@ -302,7 +314,7 @@ export default function DiagnosticGlobalPage() {
 
             {result && (
               <section className="space-y-5">
-                <div className="rounded-3xl p-6 bg-[#2A2540] border border-white/[0.06]">
+                <div className="rounded-3xl p-6 glass border border-mint/10">
                   <h2 className="text-2xl font-bold text-white mb-2">التصحيح المفصل</h2>
                   <p className="text-gray-400 text-sm leading-relaxed">
                     التصحيح مرتبط بالوثائق. الطالب يرى هل استغل المنحنى والجدول والصورة والمخطط، وليس فقط هل كتب كلاما عاما.
@@ -317,7 +329,7 @@ export default function DiagnosticGlobalPage() {
             )}
           </div>
         </main>
-      </div>
+      </AppShell>
     </AuthGuard>
   )
 }

@@ -15,8 +15,7 @@ export function PageHero({
 }) {
   return (
     <div
-      className="rounded-2xl p-5 flex items-center justify-between gap-4"
-      style={{ background: "#1E2030", border: "1px solid rgba(139,92,246,0.12)" }}
+      className="glass rounded-2xl p-5 flex items-center justify-between gap-4"
     >
       <div className="flex-1">
         {subtitle && <p className="text-gray-500 text-xs mb-0.5">{subtitle}</p>}

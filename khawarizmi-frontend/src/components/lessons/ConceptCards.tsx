@@ -11,10 +11,10 @@ export function ConceptCards({ concepts }: { concepts: ActiveLessonConcept[] }) 
           <div
             key={i}
             className="rounded-2xl p-5 border border-white/[0.06] transition-all hover:scale-[1.01]"
-            style={{ background: "#2A2540" }}
+            style={{ background: "#182730" }}
           >
             <div className="flex items-start gap-3">
-              <span className="w-8 h-8 rounded-xl bg-violet-500/20 text-violet-200 flex items-center justify-center font-bold flex-shrink-0 text-sm">
+              <span className="w-8 h-8 rounded-xl bg-mint/20 text-mint-soft flex items-center justify-center font-bold flex-shrink-0 text-sm">
                 {i + 1}
               </span>
               <div className="flex-1 min-w-0">

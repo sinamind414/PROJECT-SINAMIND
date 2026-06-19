@@ -45,7 +45,7 @@ export function QuickChecks({ checks }: { checks: QuickCheck[] }) {
           }
 
           return (
-            <div key={q.id} className="rounded-3xl p-5 border border-white/[0.06]" style={{ background: "#2A2540" }}>
+            <div key={q.id} className="rounded-3xl p-5 border border-white/[0.06]" style={{ background: "#182730" }}>
               <div className="flex items-center gap-3 mb-3">
                 <div className="w-8 h-8 rounded-xl bg-cyan-500/20 text-cyan-200 flex items-center justify-center font-bold text-sm flex-shrink-0">
                   {i + 1}
@@ -93,8 +93,8 @@ export function QuickChecks({ checks }: { checks: QuickCheck[] }) {
                   >
                     ✗ خطأ
                   </button>
-                  {!done && (
-                    <button onClick={() => handleSubmit(q.id)} className="px-4 py-2 rounded-xl bg-violet-600 text-white text-sm font-bold hover:bg-violet-500 transition">
+                    {!done && (
+                    <button onClick={() => handleSubmit(q.id)} className="px-4 py-2 rounded-xl bg-mint text-white text-sm font-bold hover:bg-mint-soft transition">
                       تحقق
                     </button>
                   )}
@@ -116,7 +116,7 @@ export function QuickChecks({ checks }: { checks: QuickCheck[] }) {
                             ? idx === q.correctIndex
                               ? "bg-emerald-600/20 border-emerald-500/40 text-emerald-200"
                               : "bg-red-600/20 border-red-500/40 text-red-200"
-                            : "bg-violet-500/20 border-violet-500/40 text-violet-200"
+                            : "bg-mint/20 border-mint/40 text-mint-soft"
                           : "bg-white/[0.03] border-white/[0.06] text-gray-300 hover:bg-white/[0.06]"
                       }`}
                       disabled={done}
@@ -124,8 +124,8 @@ export function QuickChecks({ checks }: { checks: QuickCheck[] }) {
                       {opt}
                     </button>
                   ))}
-                  {!done && (
-                    <button onClick={() => handleSubmit(q.id)} className="px-4 py-2 rounded-xl bg-violet-600 text-white text-sm font-bold hover:bg-violet-500 transition mt-2">
+                    {!done && (
+                    <button onClick={() => handleSubmit(q.id)} className="px-4 py-2 rounded-xl bg-mint text-white text-sm font-bold hover:bg-mint-soft transition mt-2">
                       تحقق
                     </button>
                   )}
@@ -140,11 +140,11 @@ export function QuickChecks({ checks }: { checks: QuickCheck[] }) {
                     onChange={(e) => setAnswers((a) => ({ ...a, [q.id]: e.target.value }))}
                     rows={2}
                     disabled={done}
-                    className="w-full rounded-xl bg-[#1E1B2E] border border-white/[0.08] text-white p-3 text-sm outline-none focus:border-violet-400 disabled:opacity-50"
+                    className="w-full rounded-xl bg-[#0C151A] border border-white/[0.08] text-white p-3 text-sm outline-none focus:border-mint disabled:opacity-50"
                     placeholder={q.placeholderAr}
                   />
-                  {!done && (
-                    <button onClick={() => handleSubmit(q.id)} className="px-4 py-2 rounded-xl bg-violet-600 text-white text-sm font-bold hover:bg-violet-500 transition">
+                    {!done && (
+                    <button onClick={() => handleSubmit(q.id)} className="px-4 py-2 rounded-xl bg-mint text-white text-sm font-bold hover:bg-mint-soft transition">
                       تحقق
                     </button>
                   )}
@@ -166,7 +166,7 @@ export function QuickChecks({ checks }: { checks: QuickCheck[] }) {
                       <>
                         {(q as ShortAnswerCheck).sampleAnswerAr}
                         <br />
-                        <span className="text-violet-300">الكلمات المفتاحية: {(q as ShortAnswerCheck).expectedKeywords.join("، ")}</span>
+                        <span className="text-mint-soft">الكلمات المفتاحية: {(q as ShortAnswerCheck).expectedKeywords.join("، ")}</span>
                       </>
                     )}
                   </p>

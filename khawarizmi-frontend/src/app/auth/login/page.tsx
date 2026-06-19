@@ -30,8 +30,8 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4" dir="rtl">
-      <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-2xl p-8">
+    <div className="min-h-screen bg-slate-deep flex items-center justify-center p-4" dir="rtl">
+      <div className="w-full max-w-md glass border border-mint/10 rounded-2xl p-8">
         <div className="text-center mb-8">
           <h1 className="text-2xl font-bold text-white">{UI_AR.titre_principal}</h1>
           <p className="text-slate-400 text-sm mt-1">{UI_AR.sous_titre}</p>
@@ -50,7 +50,7 @@ export default function LoginPage() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full bg-slate-800 border border-slate-700 rounded-lg p-3 text-white text-sm focus:outline-none focus:border-blue-500"
+              className="w-full bg-slate-800 border border-slate-700 rounded-lg p-3 text-white text-sm focus:outline-none focus:border-mint"
               required
               dir="ltr"
             />
@@ -62,7 +62,7 @@ export default function LoginPage() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full bg-slate-800 border border-slate-700 rounded-lg p-3 text-white text-sm focus:outline-none focus:border-blue-500"
+              className="w-full bg-slate-800 border border-slate-700 rounded-lg p-3 text-white text-sm focus:outline-none focus:border-mint"
               required
               dir="ltr"
             />
@@ -71,7 +71,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition disabled:opacity-50"
+            className="w-full py-3 bg-mint text-slate-deep rounded-lg font-semibold hover:bg-mint-soft transition disabled:opacity-50"
           >
             {loading ? UI_AR.chargement : UI_AR.se_connecter}
           </button>
@@ -79,7 +79,7 @@ export default function LoginPage() {
 
         <p className="text-center text-sm text-slate-400 mt-6">
           {UI_AR.pas_de_compte}{" "}
-          <Link href="/auth/register" className="text-blue-400 hover:underline">
+          <Link href="/auth/register" className="text-mint hover:underline">
             {UI_AR.creer_compte}
           </Link>
         </p>

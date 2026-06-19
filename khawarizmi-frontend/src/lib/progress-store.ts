@@ -41,6 +41,43 @@ export type Recommendation = {
   errorCode?: string
 }
 
+export type Bar = string
+
+export type GamificationEvent = {
+  id: string
+  reason: string
+  amount: number
+  createdAt: string
+}
+
+export type Badge = {
+  id: string
+  titleAr: string
+  descriptionAr: string
+  icon: string
+  earnedAt: string
+}
+
+export type GamificationSnapshot = {
+  xp: number
+  level: number
+  levelTitleAr: string
+  xpCurrentLevel: number
+  xpNextLevel: number
+  xpProgress: number
+  streak: number
+  lastVisit?: string
+  badges: Badge[]
+  recentEvents: GamificationEvent[]
+}
+
+export type GamificationAward = {
+  amount: number
+  reason: string
+  totalXP: number
+  level: number
+}
+
 export type ProgressSnapshot = {
   readiness: number
   totalAttempts: number
@@ -55,6 +92,52 @@ export type ProgressSnapshot = {
 }
 
 const STORAGE_KEY = "sinamind.methodology.answers.v1"
+
+const GAMIFICATION_KEY = "sinamind.gamification.v1"
+const STREAK_KEY = "sinamind.streak.count"
+const LAST_VISIT_KEY = "sinamind.streak.lastVisit"
+
+const LEVELS = [
+  { level: 1, titleAr: "مبتدئ — Observateur", xp: 0 },
+  { level: 2, titleAr: "متدرب — Apprenti méthodologue", xp: 500 },
+  { level: 3, titleAr: "محلل — Analyste", xp: 1200 },
+  { level: 4, titleAr: "باحث — Chercheur", xp: 2400 },
+  { level: 5, titleAr: "خبير — Expert Manhadjiya", xp: 4200 },
+  { level: 6, titleAr: "أستاذ — Maître de la méthode", xp: 7000 },
+]
+
+const BADGE_CATALOG: Record<string, Omit<Badge, "earnedAt">> = {
+  first_diagnostic: {
+    id: "first_diagnostic",
+    icon: "🎯",
+    titleAr: "أول تشخيص",
+    descriptionAr: "أنهيت أول اختبار منهجي وحددت أخطاءك الحقيقية.",
+  },
+  no_because_analysis: {
+    id: "no_because_analysis",
+    icon: "🕵️",
+    titleAr: "تحليل بلا تفسير",
+    descriptionAr: "حللت وثيقة دون استعمال ألفاظ التفسير مثل لأن / بسبب.",
+  },
+  streak_3: {
+    id: "streak_3",
+    icon: "🔥",
+    titleAr: "سلسلة 3 أيام",
+    descriptionAr: "رجعت للتدريب 3 أيام متتالية.",
+  },
+  streak_7: {
+    id: "streak_7",
+    icon: "🔥",
+    titleAr: "سلسلة أسبوع",
+    descriptionAr: "حافظت على تدريبك لمدة 7 أيام.",
+  },
+  level_3: {
+    id: "level_3",
+    icon: "📈",
+    titleAr: "محلل منهجي",
+    descriptionAr: "وصلت إلى مستوى محلل في رحلة المنهجية.",
+  },
+}
 
 const VERB_TO_SKILL: Record<string, string> = {
   analyse: "document_analysis",
@@ -79,6 +162,123 @@ const FALLBACK_ERROR_BY_VERB: Record<string, string> = {
 
 function isBrowser() {
   return typeof window !== "undefined" && typeof window.localStorage !== "undefined"
+}
+
+type StoredGamification = {
+  xp: number
+  badges: Badge[]
+  events: GamificationEvent[]
+}
+
+function safeParseGamification(value: string | null): StoredGamification {
+  if (!value) return { xp: 0, badges: [], events: [] }
+  try {
+    const parsed = JSON.parse(value)
+    return {
+      xp: Number(parsed?.xp || 0),
+      badges: Array.isArray(parsed?.badges) ? parsed.badges : [],
+      events: Array.isArray(parsed?.events) ? parsed.events : [],
+    }
+  } catch {
+    return { xp: 0, badges: [], events: [] }
+  }
+}
+
+function getStoredGamification(): StoredGamification {
+  if (!isBrowser()) return { xp: 0, badges: [], events: [] }
+  return safeParseGamification(window.localStorage.getItem(GAMIFICATION_KEY))
+}
+
+function saveStoredGamification(next: StoredGamification) {
+  if (!isBrowser()) return
+  window.localStorage.setItem(GAMIFICATION_KEY, JSON.stringify(next))
+  window.dispatchEvent(new Event("sinamind-gamification-updated"))
+  window.dispatchEvent(new Event("sinamind-progress-updated"))
+}
+
+function getLevelInfo(xp: number) {
+  const current = [...LEVELS].reverse().find((level) => xp >= level.xp) || LEVELS[0]
+  const next = LEVELS.find((level) => level.xp > xp)
+  const currentBase = current.xp
+  const nextBase = next?.xp || current.xp + 2500
+  const xpCurrentLevel = Math.max(0, xp - currentBase)
+  const xpNextLevel = Math.max(1, nextBase - currentBase)
+  return {
+    level: current.level,
+    levelTitleAr: current.titleAr,
+    xpCurrentLevel,
+    xpNextLevel,
+    xpProgress: Math.min(100, Math.round((xpCurrentLevel / xpNextLevel) * 100)),
+  }
+}
+
+export function getGamificationSnapshot(): GamificationSnapshot {
+  const stored = getStoredGamification()
+  const streak = isBrowser() ? Number(window.localStorage.getItem(STREAK_KEY) || 0) : 0
+  const lastVisit = isBrowser() ? window.localStorage.getItem(LAST_VISIT_KEY) || undefined : undefined
+  return {
+    xp: stored.xp,
+    ...getLevelInfo(stored.xp),
+    streak,
+    lastVisit,
+    badges: stored.badges,
+    recentEvents: stored.events.slice(0, 8),
+  }
+}
+
+export function awardXP(reason: string, amount: number): GamificationAward | null {
+  if (!isBrowser() || amount <= 0) return null
+  const current = getStoredGamification()
+  const nextXP = current.xp + amount
+  const event: GamificationEvent = {
+    id: `${Date.now()}_${Math.random().toString(16).slice(2)}`,
+    reason,
+    amount,
+    createdAt: new Date().toISOString(),
+  }
+  const next = { ...current, xp: nextXP, events: [event, ...current.events].slice(0, 80) }
+  saveStoredGamification(next)
+
+  const levelInfo = getLevelInfo(nextXP)
+  if (levelInfo.level >= 3) claimBadge("level_3")
+
+  return { amount, reason, totalXP: nextXP, level: levelInfo.level }
+}
+
+export function claimBadge(id: string): Badge | null {
+  if (!isBrowser()) return null
+  const template = BADGE_CATALOG[id]
+  if (!template) return null
+  const current = getStoredGamification()
+  if (current.badges.some((badge) => badge.id === id)) return null
+  const badge: Badge = { ...template, earnedAt: new Date().toISOString() }
+  saveStoredGamification({ ...current, badges: [badge, ...current.badges] })
+  return badge
+}
+
+export function updateDailyStreak() {
+  if (!isBrowser()) return 0
+  const today = new Date().toDateString()
+  const yesterday = new Date()
+  yesterday.setDate(yesterday.getDate() - 1)
+
+  const lastVisit = window.localStorage.getItem(LAST_VISIT_KEY)
+  let streak = Number(window.localStorage.getItem(STREAK_KEY) || 0)
+
+  if (lastVisit === today) return streak
+
+  if (lastVisit === yesterday.toDateString()) streak += 1
+  else streak = 1
+
+  window.localStorage.setItem(STREAK_KEY, String(streak))
+  window.localStorage.setItem(LAST_VISIT_KEY, today)
+
+  awardXP("تسجيل حضور يومي", 25)
+  if (streak >= 3) claimBadge("streak_3")
+  if (streak >= 7) claimBadge("streak_7")
+
+  window.dispatchEvent(new Event("sinamind-gamification-updated"))
+  return streak
 }
 
 function safeParse(value: string | null): StoredMethodologyAnswer[] {

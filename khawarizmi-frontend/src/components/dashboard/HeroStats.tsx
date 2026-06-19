@@ -10,7 +10,7 @@ export function HeroStats() {
   return (
     <div
       className="relative overflow-hidden rounded-3xl p-8"
-      style={{ background: "linear-gradient(135deg, #7C3AED 0%, #A855F7 50%, #D946EF 100%)" }}
+      style={{ background: "linear-gradient(135deg, #2DD4BF 0%, #14B8A6 50%, #F59E0B 100%)" }}
     >
       {/* Cercles décoratifs */}
       <div className="absolute top-0 right-0 w-40 h-40 rounded-full bg-white/10 translate-x-12 -translate-y-12" />

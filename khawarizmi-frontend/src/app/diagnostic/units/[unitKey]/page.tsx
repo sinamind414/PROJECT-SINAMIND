@@ -4,7 +4,7 @@ import { useParams } from "next/navigation"
 import Link from "next/link"
 import { notFound } from "next/navigation"
 import { AuthGuard } from "@/components/auth/AuthGuard"
-import { Sidebar } from "@/components/layout/Sidebar"
+import { AppShell } from "@/components/layout/AppShell"
 import { ScenarioRunner } from "@/components/methodology/ScenarioRunner"
 import { getUnitConfig } from "@/lib/methodology-chapters"
 import { getMethodologyScenario } from "@/lib/methodology-documents"
@@ -12,15 +12,15 @@ import { getMethodologyScenario } from "@/lib/methodology-documents"
 const IMPORTANCE_COLORS: Record<string, string> = {
   critique: "bg-red-500/15 text-red-200 border-red-500/30",
   haute: "bg-amber-500/15 text-amber-200 border-amber-500/30",
-  moyenne: "bg-blue-500/15 text-blue-200 border-blue-500/30",
+  moyenne: "bg-slate-500/15 text-slate-300 border-slate-500/30",
 }
 
 const CHAPTER_TYPE_COLORS: Record<string, string> = {
-  concept: "bg-violet-500/15 text-violet-200",
+  concept: "bg-mint/15 text-mint",
   processus: "bg-emerald-500/15 text-emerald-200",
   experience: "bg-cyan-500/15 text-cyan-200",
   rappel: "bg-amber-500/15 text-amber-200",
-  synthese: "bg-fuchsia-500/15 text-fuchsia-200",
+  synthese: "bg-orange/15 text-orange",
 }
 
 const VERB_LABELS: Record<string, string> = {
@@ -49,22 +49,18 @@ export default function DiagnosticUnitPage() {
 
   return (
     <AuthGuard>
-      <div className="flex min-h-screen" dir="rtl" style={{ background: "#1E1B2E" }}>
-        <div className="order-1">
-          <Sidebar />
-        </div>
-
-        <main className="flex-1 p-6 lg:p-8 overflow-auto order-2">
+      <AppShell>
+        <main className="flex-1 p-6 lg:p-8 overflow-auto">
           <div className="max-w-7xl mx-auto space-y-6">
             {/* Breadcrumb */}
             <div className="flex items-center gap-2 text-xs text-gray-500">
-              <Link href="/diagnostic" className="hover:text-violet-400 transition">التشخيص</Link>
+              <Link href="/diagnostic" className="hover:text-mint transition">التشخيص</Link>
               <span>/</span>
               <span className="text-gray-300">{unitConfig.unitAr}</span>
             </div>
 
             {/* Header */}
-            <header className="rounded-3xl p-7 bg-gradient-to-l from-violet-600 to-fuchsia-600">
+            <header className="rounded-3xl p-7 glass border border-mint/10">
               <p className="text-white/60 text-xs mb-2">المجال {unitConfig.domainNumero} · {unitConfig.domainAr}</p>
               <div className="flex items-center gap-3 mb-2">
                 <span className="text-3xl">{unitConfig.emoji}</span>
@@ -78,7 +74,7 @@ export default function DiagnosticUnitPage() {
 
             {/* Main scenario */}
             {scenario && (
-              <div className="rounded-3xl p-5 border border-white/[0.06]" style={{ background: "#2A2540" }}>
+              <div className="rounded-3xl p-5 glass border border-mint/10">
                 <div className="flex items-center justify-between">
                   <div>
                     <h2 className="text-white font-bold mb-1">السيناريو المنهجي للوحدة</h2>
@@ -86,7 +82,7 @@ export default function DiagnosticUnitPage() {
                   </div>
                   <Link
                     href={`/document-analysis/${scenario.id}`}
-                    className="px-4 py-2 rounded-xl bg-violet-600 text-white text-sm font-bold hover:bg-violet-500 transition"
+                    className="px-4 py-2 rounded-xl bg-mint text-slate-deep text-sm font-bold hover:bg-mint-soft transition"
                   >
                     افتح السيناريو ←
                   </Link>
@@ -102,8 +98,7 @@ export default function DiagnosticUnitPage() {
                 {unitConfig.chapters.map((ch) => (
                   <div
                     key={ch.slug}
-                    className="rounded-2xl p-5 border border-white/[0.04] transition-all hover:scale-[1.01] hover:shadow-lg hover:shadow-violet-950/20"
-                    style={{ background: "#1E1B2E" }}
+                    className="rounded-2xl p-5 glass-soft border border-mint/10 transition-all hover:scale-[1.01] hover:shadow-lg hover:shadow-mint/5"
                   >
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex-1 min-w-0">
@@ -125,7 +120,7 @@ export default function DiagnosticUnitPage() {
                         {ch.recommendedVerbs && ch.recommendedVerbs.length > 0 && (
                           <div className="flex flex-wrap gap-1.5 mt-2">
                             {ch.recommendedVerbs.map((verb) => (
-                              <span key={verb} className="px-1.5 py-0.5 rounded-md bg-violet-500/10 text-violet-300 text-[10px]">
+                              <span key={verb} className="px-1.5 py-0.5 rounded-md bg-mint/10 text-mint text-[10px]">
                                 {VERB_LABELS[verb] || verb}
                               </span>
                             ))}
@@ -135,7 +130,7 @@ export default function DiagnosticUnitPage() {
 
                       <Link
                         href={`/diagnostic/chapters/${ch.slug}`}
-                        className="flex-shrink-0 px-4 py-2 rounded-xl bg-violet-600 text-white text-xs font-bold hover:bg-violet-500 transition whitespace-nowrap"
+                        className="flex-shrink-0 px-4 py-2 rounded-xl bg-mint text-slate-deep text-xs font-bold hover:bg-mint-soft transition whitespace-nowrap"
                       >
                         افتح المسار المنهجي ←
                       </Link>
@@ -146,7 +141,7 @@ export default function DiagnosticUnitPage() {
             </section>
           </div>
         </main>
-      </div>
+      </AppShell>
     </AuthGuard>
   )
 }

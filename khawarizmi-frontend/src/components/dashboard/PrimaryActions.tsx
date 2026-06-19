@@ -8,21 +8,21 @@ const ACTIONS = [
     icon: "📚",
     title: "الدروس النشطة",
     desc: "55 درساً تفاعلياً",
-    accent: "#8B5CF6",
+    accent: "#2DD4BF",
   },
   {
     href: "/diagnostic",
     icon: "🎯",
     title: "التشخيص",
     desc: "حدد ضعفك الحقيقي",
-    accent: "#34D399",
+    accent: "#F59E0B",
   },
   {
     href: "/exercises",
     icon: "✏️",
     title: "التمارين",
     desc: "طبّق ما تعلمته",
-    accent: "#FBBF24",
+    accent: "#34D399",
   },
 ]
 
@@ -33,8 +33,7 @@ export function PrimaryActions() {
         <Link
           key={action.href}
           href={action.href}
-          className="group rounded-2xl p-5 transition-all duration-200 hover:-translate-y-0.5"
-          style={{ background: "#1E2030" }}
+          className="group rounded-2xl p-5 glass-soft border border-mint/10 transition-all duration-200 hover:-translate-y-0.5"
         >
           <div className="flex items-center gap-3 mb-3">
             <div

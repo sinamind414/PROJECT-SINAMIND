@@ -7,7 +7,7 @@ const FAKE_MESSAGES = [
     id: 1,
     name: "أحمد بن علي",
     avatar: "👨‍🎓",
-    color: "bg-violet-500/30",
+    color: "bg-mint/30",
     lastMsg: "هل راجعت درس البروتينات؟",
     time: "12:06",
     unread: true
@@ -16,7 +16,7 @@ const FAKE_MESSAGES = [
     id: 2,
     name: "مجموعة BAC SVT",
     avatar: "👥",
-    color: "bg-purple-500/30",
+    color: "bg-mint/30",
     lastMsg: "متى الامتحان التجريبي؟",
     time: "11:23",
     unread: true
@@ -51,14 +51,14 @@ export function ChatBubble() {
         <div
           className="fixed bottom-24 left-6 w-80 max-w-[calc(100vw-3rem)] z-50 rounded-2xl shadow-2xl overflow-hidden"
           style={{
-            background: "#2A2540",
+            background: "#182730",
             border: "1px solid rgba(255,255,255,0.08)",
             animation: "slideUp 0.3s ease-out"
           }}
         >
           <div
             className="p-4 flex items-center justify-between"
-            style={{ background: "linear-gradient(135deg, #7C3AED, #A855F7)" }}
+            style={{ background: "linear-gradient(135deg, #2DD4BF, #14B8A6)" }}
           >
             <div className="flex items-center gap-3">
               <span className="text-2xl">💬</span>
@@ -100,14 +100,14 @@ export function ChatBubble() {
                   </p>
                 </div>
                 {msg.unread && (
-                  <div className="w-2 h-2 rounded-full bg-violet-500 flex-shrink-0 mt-2" />
+                  <div className="w-2 h-2 rounded-full bg-mint flex-shrink-0 mt-2" />
                 )}
               </button>
             ))}
           </div>
 
           <div className="p-3 border-t border-white/[0.06]">
-            <button className="w-full py-2 rounded-xl bg-violet-500/10 hover:bg-violet-500/20 text-violet-400 text-sm font-semibold transition-colors">
+            <button className="w-full py-2 rounded-xl bg-mint/10 hover:bg-mint/20 text-mint text-sm font-semibold transition-colors">
               💬 محادثة جديدة
             </button>
           </div>
@@ -118,14 +118,14 @@ export function ChatBubble() {
         onClick={() => setIsOpen(!isOpen)}
         className="fixed bottom-6 left-6 w-14 h-14 rounded-full shadow-2xl flex items-center justify-center z-50 transition-all hover:scale-110"
         style={{
-          background: "linear-gradient(135deg, #7C3AED, #A855F7, #D946EF)",
-          boxShadow: "0 8px 24px rgba(168, 85, 247, 0.4)"
+          background: "linear-gradient(135deg, #2DD4BF, #14B8A6, #F59E0B)",
+          boxShadow: "0 8px 24px rgba(45,212,191,0.4)"
         }}
       >
         <span className="text-2xl">{isOpen ? "✕" : "💬"}</span>
 
         {!isOpen && unreadCount > 0 && (
-          <div className="absolute -top-1 -right-1 min-w-[20px] h-5 rounded-full bg-red-500 border-2 border-[#1E1B2E] flex items-center justify-center px-1">
+          <div className="absolute -top-1 -right-1 min-w-[20px] h-5 rounded-full bg-red-500 border-2 border-[#0C151A] flex items-center justify-center px-1">
             <span className="text-white text-xs font-bold">
               {unreadCount}
             </span>
@@ -133,7 +133,7 @@ export function ChatBubble() {
         )}
 
         {!isOpen && unreadCount > 0 && (
-          <span className="absolute inset-0 rounded-full bg-violet-400 opacity-30 animate-ping" />
+          <span className="absolute inset-0 rounded-full bg-mint-soft opacity-30 animate-ping" />
         )}
       </button>
     </>

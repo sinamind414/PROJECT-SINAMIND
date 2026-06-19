@@ -309,7 +309,7 @@ function MindMapContent() {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-slate-950 text-white space-y-4">
-        <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
+        <div className="w-12 h-12 border-4 border-mint border-t-transparent rounded-full animate-spin" />
         <p className="text-slate-400 text-sm font-medium">
           {generating ? UI_AR.generation_mindmap_ia : UI_AR.chargement}
         </p>
@@ -333,7 +333,7 @@ function MindMapContent() {
             </Link>
             <button
               onClick={loadChapterAndMindmap}
-              className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 text-sm transition"
+              className="px-4 py-2 bg-mint text-slate-deep rounded-lg hover:bg-mint-soft text-sm transition"
             >
               {UI_AR.reessayer}
             </button>
@@ -524,7 +524,7 @@ function MindMapContent() {
           <div className="pt-4 border-t border-slate-900">
             <Link
               href="/drill"
-              className="w-full py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white text-center rounded-xl font-semibold text-sm hover:opacity-95 transition block cursor-pointer shadow-lg hover:shadow-indigo-500/10"
+              className="w-full py-3 bg-gradient-to-r from-mint to-emerald-400 text-slate-deep text-center rounded-xl font-semibold text-sm hover:opacity-95 transition block cursor-pointer shadow-lg hover:shadow-mint/20"
             >
               {UI_AR.lancer_session_revision}
             </Link>

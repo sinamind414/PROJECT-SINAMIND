@@ -3,7 +3,7 @@
 import { useState, useMemo } from "react"
 import Link from "next/link"
 import { AuthGuard } from "@/components/auth/AuthGuard"
-import { Sidebar } from "@/components/layout/Sidebar"
+import { AppShell } from "@/components/layout/AppShell"
 import { getAllSujets } from "@/lib/annales-bac"
 import type { SujetBac } from "@/lib/annales-bac"
 
@@ -11,6 +11,12 @@ const DIFFICULTE_COLORS: Record<string, string> = {
   facile: "bg-emerald-500/15 text-emerald-400 border-emerald-500/25",
   moyen: "bg-amber-500/15 text-amber-400 border-amber-500/25",
   difficile: "bg-red-500/15 text-red-400 border-red-500/25",
+}
+
+const DIFFICULTE_AR: Record<string, string> = {
+  facile: "سهل",
+  moyen: "متوسط",
+  difficile: "صعب",
 }
 
 function AnnalesContent() {
@@ -30,15 +36,14 @@ function AnnalesContent() {
   }, [search, sujets])
 
   return (
-    <div className="flex min-h-screen" dir="rtl" style={{ background: "#141522" }}>
-      <Sidebar />
+    <AppShell>
       <main className="flex-1 p-6 overflow-auto">
         <div className="max-w-5xl mx-auto space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <h1 className="text-2xl font-bold text-white">المواضيع — Annales Bac</h1>
+              <h1 className="text-2xl font-bold text-white">مواضيع البكالوريا</h1>
               <p className="text-sm text-slate-400 mt-1">
-                {sujets.length} sujets Bac SVT disponibles — 3 modes par sujet
+                {sujets.length} مواضيع بكالوريا علوم الطبيعة والحياة — 3 طرق للمراجعة
               </p>
             </div>
             <input
@@ -46,7 +51,7 @@ function AnnalesContent() {
               placeholder="بحث..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white placeholder:text-slate-500 w-full sm:w-56"
+              className="bg-slate-900/50 border border-mint/15 rounded-xl px-4 py-2.5 text-sm text-white placeholder:text-slate-500 w-full sm:w-56 focus:border-mint/40 focus:outline-none"
             />
           </div>
 
@@ -57,24 +62,24 @@ function AnnalesContent() {
           </div>
 
           {filtered.length === 0 && (
-            <div className="text-center py-20 text-slate-500 text-sm">aucun sujet trouvé</div>
+            <div className="text-center py-20 text-slate-500 text-sm">لم يتم العثور على موضوع</div>
           )}
         </div>
       </main>
-    </div>
+    </AppShell>
   )
 }
 
 function SujetCard({ sujet }: { sujet: SujetBac }) {
   return (
-    <div className="card-hover bg-slate-900/60 border border-slate-800 rounded-2xl overflow-hidden group">
+    <div className="card-hover glass-soft border border-mint/10 rounded-2xl overflow-hidden group">
       <Link
         href={`/annales/${sujet.slug}`}
         className="block p-5 space-y-4"
       >
         <div className="flex items-start justify-between gap-3">
           <div>
-            <h3 className="text-white font-bold text-base group-hover:text-violet-300 transition-colors">
+            <h3 className="text-white font-bold text-base group-hover:text-mint-soft transition-colors">
               {sujet.titre}
             </h3>
             <p className="text-xs text-slate-500 mt-0.5">
@@ -84,7 +89,7 @@ function SujetCard({ sujet }: { sujet: SujetBac }) {
           <span
             className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${DIFFICULTE_COLORS[sujet.difficulte]}`}
           >
-            {sujet.difficulte}
+            {DIFFICULTE_AR[sujet.difficulte] || sujet.difficulte}
           </span>
         </div>
 
@@ -92,7 +97,7 @@ function SujetCard({ sujet }: { sujet: SujetBac }) {
           {sujet.chapitres.map((ch) => (
             <span
               key={ch}
-              className="text-[10px] px-2 py-0.5 rounded-full bg-violet-500/10 text-violet-300 border border-violet-500/20"
+              className="text-[10px] px-2 py-0.5 rounded-full bg-mint/10 text-mint-soft border border-mint/20"
             >
               {ch}
             </span>
@@ -100,17 +105,17 @@ function SujetCard({ sujet }: { sujet: SujetBac }) {
         </div>
 
         <div className="flex items-center gap-4 text-xs text-slate-400">
-          <span>⏱ {sujet.duree} min</span>
-          <span>📄 {sujet.exercices.length} exercices</span>
-          <span>💡 {sujet.exercices.reduce((a, e) => a + e.questions.length, 0)} questions</span>
+          <span>⏱ {sujet.duree} دقيقة</span>
+          <span>📄 {sujet.exercices.length} تمارين</span>
+          <span>💡 {sujet.exercices.reduce((a, e) => a + e.questions.length, 0)} أسئلة</span>
         </div>
 
         <div className="flex items-center justify-between pt-2 border-t border-slate-800/50">
-          <span className="text-[11px] text-violet-400 font-semibold group-hover:underline">
+          <span className="text-[11px] text-mint font-semibold group-hover:underline">
             ابدأ هذا الموضوع ←
           </span>
           <div className="flex gap-1.5">
-            <span className="text-[10px] px-2 py-0.5 rounded bg-blue-500/10 text-blue-300">📖 قراءة</span>
+            <span className="text-[10px] px-2 py-0.5 rounded bg-mint/10 text-mint">📖 قراءة</span>
             <span className="text-[10px] px-2 py-0.5 rounded bg-amber-500/10 text-amber-300">🎯 امتحان</span>
             <span className="text-[10px] px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-300">🧭 موجه</span>
           </div>

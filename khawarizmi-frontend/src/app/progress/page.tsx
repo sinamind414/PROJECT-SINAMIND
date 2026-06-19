@@ -37,7 +37,7 @@ export default function ProgressPage() {
         subtitle="ليس معدل حفظ. هذا مؤشر فقدان وربح النقاط."
         description="هذه الصفحة تقرأ الأخطاء المخزنة من التشخيص والتمارين، ثم تحولها إلى مهارات وتوصيات."
       >
-        <div className="text-center rounded-xl p-3 min-w-28" style={{ background: "rgba(139,92,246,0.1)" }}>
+        <div className="text-center rounded-xl p-3 min-w-28" style={{ background: "rgba(45,212,191,0.12)" }}>
           <p className="text-gray-400 text-[10px] mb-0.5">جاهزية المنهجية</p>
           <p className="text-2xl font-bold text-white">{data.readiness}%</p>
           <p className="text-gray-500 text-[10px] mt-0.5">{data.totalAttempts} محاولة</p>
@@ -122,7 +122,7 @@ export default function ProgressPage() {
               className="grid grid-cols-1 lg:grid-cols-[100px_1fr_70px] gap-3 items-center rounded-xl p-3"
               style={{ background: "rgba(255,255,255,0.02)" }}
             >
-              <p className="text-violet-400 text-sm font-bold" dir="ltr">{item.verbSlug}</p>
+              <p className="text-mint text-sm font-bold" dir="ltr">{item.verbSlug}</p>
               <p className="text-gray-300 text-sm line-clamp-2">{item.answer || "إجابة فارغة"}</p>
               <p className="text-white font-bold text-left">{item.percentage}%</p>
             </div>

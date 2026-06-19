@@ -94,9 +94,9 @@ function DrillContent() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-[#0A0A0F]">
+      <div className="flex items-center justify-center min-h-screen bg-slate-deep">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-10 h-10 border-2 border-blue-400 border-t-transparent rounded-full animate-spin" />
+          <div className="w-10 h-10 border-2 border-mint border-t-transparent rounded-full animate-spin" />
           <p className="text-slate-400 text-sm">{UI_AR.chargement_programme}</p>
         </div>
       </div>
@@ -105,7 +105,7 @@ function DrillContent() {
 
   if (done || cards.length === 0) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-[#0A0A0F] p-6">
+      <div className="flex items-center justify-center min-h-screen bg-slate-deep p-6">
         <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-8 max-w-md w-full text-center space-y-6">
           <div className="text-6xl">🎉</div>
           <h2 className="text-2xl font-bold text-white">{
@@ -156,7 +156,7 @@ function DrillContent() {
                   .catch(() => setCards([]))
                   .finally(() => setLoading(false))
               }}
-              className="px-6 py-3 bg-blue-500 text-white rounded-xl font-semibold hover:bg-blue-600 transition"
+              className="px-6 py-3 bg-mint text-slate-deep rounded-xl font-semibold hover:bg-mint-soft transition"
             >
               إعادة الجلسة
             </button>
@@ -173,15 +173,15 @@ function DrillContent() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0A0A0F] text-white" dir="rtl">
+    <div className="min-h-screen bg-slate-deep text-white" dir="rtl">
       <header className="sticky top-0 z-50 bg-slate-950/80 backdrop-blur border-b border-slate-800/50 px-6 py-4 flex items-center justify-between">
         <Link
           href="/dashboard"
-          className="text-blue-400 hover:text-blue-300 transition text-sm"
+          className="text-mint hover:text-mint-soft transition text-sm"
         >
           {UI_AR.retour_dashboard}
         </Link>
-        <h1 className="text-lg font-bold bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent">
+        <h1 className="text-lg font-bold bg-gradient-to-r from-mint to-emerald-400 bg-clip-text text-transparent">
           {UI_AR.session_drill}
         </h1>
         <div className="flex items-center gap-2 text-sm text-slate-400">
@@ -195,7 +195,7 @@ function DrillContent() {
         {/* Progress bar */}
         <div className="w-full h-1.5 bg-slate-800 rounded-full mb-8 overflow-hidden">
           <div
-            className="h-full bg-gradient-to-r from-blue-500 to-emerald-400 rounded-full transition-all duration-500"
+            className="h-full bg-gradient-to-r from-mint to-emerald-300 rounded-full transition-all duration-500"
             style={{ width: `${((currentIdx + 1) / cards.length) * 100}%` }}
           />
         </div>

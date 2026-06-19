@@ -66,15 +66,15 @@ export function UnitAccordion({
           <span
             className="w-8 h-8 rounded-xl flex items-center justify-center text-sm font-medium"
             style={{
-              background: domainColors?.accentSoft || "rgba(167, 139, 250, 0.08)",
-              color: domainColors?.accent || "#A78BFA"
+              background: domainColors?.accentSoft || "rgba(94, 234, 212, 0.08)",
+              color: domainColors?.accent || "#5EEAD4"
             }}
           >
             {unit.numero}
           </span>
           <div className="text-right">
             <h3 className={`
-              text-base font-medium ${domainColors?.textAccent || "text-violet-300"}
+              text-base font-medium ${domainColors?.textAccent || "text-mint-soft"}
               tracking-tight
             `}>
               {unit.titre_ar || trAr(unit.titre_fr)}

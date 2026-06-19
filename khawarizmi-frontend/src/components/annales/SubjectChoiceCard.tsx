@@ -8,13 +8,13 @@ interface SubjectChoiceCardProps {
 
 export function SubjectChoiceCard({ subject, index, onChoose }: SubjectChoiceCardProps) {
   return (
-    <div className="bg-slate-900/60 border border-slate-800 hover:border-blue-500/50 rounded-2xl p-6 space-y-4 transition group">
+    <div className="glass-soft border border-mint/10 hover:border-mint/50 rounded-2xl p-6 space-y-4 transition group">
       <div className="flex items-center justify-between">
-        <p className="text-xs font-bold text-blue-400 uppercase tracking-wider">
-          Sujet {index}
+        <p className="text-xs font-bold text-mint uppercase tracking-wider">
+          الموضوع {index}
         </p>
-        <span className="text-[10px] px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-300 border border-blue-500/20">
-          ~{subject.estimatedPages} pages
+        <span className="text-[10px] px-2 py-0.5 rounded-full bg-mint/10 text-mint-soft border border-mint/20">
+          ~{subject.estimatedPages} صفحات
         </span>
       </div>
 
@@ -26,7 +26,7 @@ export function SubjectChoiceCard({ subject, index, onChoose }: SubjectChoiceCar
         {subject.linkedChapters.map((ch) => (
           <span
             key={ch}
-            className="text-[10px] px-2 py-0.5 rounded-full bg-violet-500/10 text-violet-300 border border-violet-500/20"
+            className="text-[10px] px-2 py-0.5 rounded-full bg-mint/10 text-mint-soft border border-mint/20"
           >
             {ch}
           </span>
@@ -34,7 +34,7 @@ export function SubjectChoiceCard({ subject, index, onChoose }: SubjectChoiceCar
       </div>
 
       <div className="text-xs text-slate-400 space-y-1">
-        <p>⏱ {subject.estimatedMinutes} min · {subject.exercises.length} exercices</p>
+        <p>⏱ {subject.estimatedMinutes} دقيقة · {subject.exercises.length} تمارين</p>
         <p>📄 {subject.exercises.reduce((a, e) => a + e.questions.length, 0)} questions</p>
         <p>🎯 Verbes : {subject.linkedVerbs.join(" · ")}</p>
       </div>
@@ -52,7 +52,7 @@ export function SubjectChoiceCard({ subject, index, onChoose }: SubjectChoiceCar
 
       <button
         onClick={onChoose}
-        className="w-full py-3 bg-blue-500 text-white rounded-xl font-bold text-sm hover:bg-blue-600 transition shadow-lg shadow-blue-500/20"
+        className="w-full py-3 bg-mint text-slate-deep rounded-xl font-bold text-sm hover:bg-mint-soft transition shadow-lg shadow-mint/20"
       >
         اختيار الموضوع {index === 1 ? "الأول" : "الثاني"}
       </button>

@@ -74,7 +74,7 @@ export function CustomMindMapNode({ data }: CustomMindMapNodeProps) {
         <Handle
           type="source"
           position={Position.Right}
-          className="!w-2.5 !h-2.5 !bg-purple-400 !border-slate-900"
+          className="!w-2.5 !h-2.5 !bg-mint-soft !border-slate-900"
         />
       )}
     </div>

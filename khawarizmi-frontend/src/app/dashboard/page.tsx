@@ -1,66 +1,80 @@
 "use client"
 
-import { useEffect, useState } from "react"
 import { AuthGuard } from "@/components/auth/AuthGuard"
-import { Sidebar } from "@/components/layout/Sidebar"
-import { DailyHero } from "@/components/dashboard/DailyHero"
-import { DailyPlan } from "@/components/dashboard/DailyPlan"
-import { TomorrowPlan } from "@/components/dashboard/TomorrowPlan"
-import { RecentActivity } from "@/components/dashboard/RecentActivity"
-import { WeekCalendar } from "@/components/dashboard/WeekCalendar"
-import { WeakPointCard } from "@/components/dashboard/WeakPointCard"
+import { AppShell } from "@/components/layout/AppShell"
+import { MasteryHero } from "@/components/dashboard/MasteryHero"
 import { PrimaryActions } from "@/components/dashboard/PrimaryActions"
-import { ChatBubble } from "@/components/dashboard/ChatBubble"
+import { AIRecommendations } from "@/components/dashboard/AIRecommendations"
+import { MasteryChapters } from "@/components/dashboard/MasteryChapters"
+import { MasteryVerbs } from "@/components/dashboard/MasteryVerbs"
+import { WeakPointCard } from "@/components/dashboard/WeakPointCard"
+import { RecentActivity } from "@/components/dashboard/RecentActivity"
+import { TodoWidget } from "@/components/dashboard/TodoWidget"
+import { useEffect, useState } from "react"
 import { buildDashboardState, type DailyDashboardState } from "@/lib/daily-dashboard/selectors"
 
 export default function DashboardPage() {
-  return (
-    <AuthGuard>
-      <DashboardContent />
-    </AuthGuard>
-  )
-}
-
-function DashboardContent() {
-  const [state, setState] = useState<DailyDashboardState | null>(null)
+  const [dashboardState, setDashboardState] = useState<DailyDashboardState | null>(null)
 
   useEffect(() => {
-    const refresh = () => setState(buildDashboardState())
+    const refresh = () => setDashboardState(buildDashboardState())
     refresh()
     window.addEventListener("sinamind-progress-updated", refresh)
+    window.addEventListener("sinamind-gamification-updated", refresh)
     window.addEventListener("storage", refresh)
     return () => {
       window.removeEventListener("sinamind-progress-updated", refresh)
+      window.removeEventListener("sinamind-gamification-updated", refresh)
       window.removeEventListener("storage", refresh)
     }
   }, [])
 
-  const ds = state || buildDashboardState()
+  const state = dashboardState || buildDashboardState()
 
   return (
-    <div className="flex min-h-screen" dir="rtl" style={{ background: "#141522" }}>
-      <div>
-        <Sidebar />
-      </div>
+    <AuthGuard>
+      <AppShell>
+        <main className="flex-1 p-3 md:p-5 overflow-x-hidden">
+          <div className="max-w-7xl mx-auto space-y-5">
+            {/* HERO — Stats globales, XP, Streak */}
+            <MasteryHero />
 
-      <main className="flex-1 p-5 overflow-auto space-y-5">
-        <DailyHero state={ds} />
-
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-5">
-          <div className="xl:col-span-2 space-y-5">
-            <DailyPlan tasks={ds.todayTasks} />
-            <TomorrowPlan tasks={ds.tomorrowTasks} />
-            <RecentActivity actions={ds.recentActions} />
-          </div>
-          <div className="xl:col-span-1 space-y-5">
-            <WeekCalendar days={ds.weekActivity} />
-            <WeakPointCard state={ds} />
+            {/* PRIMARY ACTIONS — الدروس النشطة / التشخيص / التمارين */}
             <PrimaryActions />
-          </div>
-        </div>
-      </main>
 
-      <ChatBubble />
-    </div>
+            {/* GRID PRINCIPAL */}
+            <div className="grid lg:grid-cols-3 gap-5">
+              {/* COLONNE GAUCHE — 2/3 */}
+              <div className="lg:col-span-2 space-y-5">
+                {/* المهارات المنهجية */}
+                <MasteryChapters />
+
+                {/* الأفعال الأدائية */}
+                <MasteryVerbs />
+              </div>
+
+              {/* COLONNE DROITE — 1/3 */}
+              <div className="space-y-5">
+                {/* توصية اليوم */}
+                <AIRecommendations />
+
+                {/* أصغر خطأ */}
+                <WeakPointCard state={state} />
+
+                {/* آخر النشاطات */}
+                <RecentActivity actions={state.recentActions} />
+
+                {/* للمراجعة — Flashcards */}
+                <TodoWidget />
+              </div>
+            </div>
+          </div>
+
+          <footer className="mt-6 text-center text-xs text-slate-500 font-semibold py-4 font-arabic">
+            منصة مراجعة البكالوريا — علوم الطبيعة والحياة · 2026 · صُممت بكل عناية
+          </footer>
+        </main>
+      </AppShell>
+    </AuthGuard>
   )
 }

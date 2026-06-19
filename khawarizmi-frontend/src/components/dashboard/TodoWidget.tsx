@@ -11,11 +11,11 @@ export function TodoWidget() {
   return (
     <div
       className="rounded-3xl p-5"
-      style={{ background: "#2A2540" }}
+      style={{ background: "#182730" }}
     >
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-white font-bold text-lg">للمراجعة</h3>
-        <button className="text-violet-400 text-xs hover:underline">
+        <button className="text-mint text-xs hover:underline">
           عرض الكل ←
         </button>
       </div>
@@ -27,7 +27,7 @@ export function TodoWidget() {
               <div className={`
                 w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-1
                 ${todo.done
-                  ? "bg-violet-500 border-violet-500"
+                  ? "bg-mint border-mint"
                   : "border-gray-600"
                 }
               `}>
@@ -39,7 +39,7 @@ export function TodoWidget() {
                 </p>
                 <p className="text-xs text-gray-500 mt-1">{todo.detail}</p>
                 <div className="flex items-center justify-between mt-2">
-                  <span className="text-xs text-violet-400">{todo.subject}</span>
+                  <span className="text-xs text-mint">{todo.subject}</span>
                   <span className="text-xs text-gray-600">{todo.date}</span>
                 </div>
               </div>

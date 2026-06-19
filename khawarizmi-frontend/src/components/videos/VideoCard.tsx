@@ -21,7 +21,7 @@ export function VideoCard({ video }: { video: Video }) {
   return (
     <div
       className="rounded-2xl overflow-hidden transition-all hover:scale-[1.02]"
-      style={{ background: "#2A2540" }}
+      style={{ background: "#182730" }}
     >
       <div className="relative aspect-video bg-black">
         {isPlaying ? (
@@ -62,7 +62,7 @@ export function VideoCard({ video }: { video: Video }) {
         </h3>
 
         <div className="flex items-center gap-2 mb-2">
-          <div className="w-6 h-6 rounded-full bg-violet-500/20 flex items-center justify-center text-xs">
+          <div className="w-6 h-6 rounded-full bg-mint/20 flex items-center justify-center text-xs">
             📺
           </div>
           <span className="text-gray-400 text-xs">{video.chaine}</span>
@@ -73,7 +73,7 @@ export function VideoCard({ video }: { video: Video }) {
         </p>
 
         <div className="mt-3 flex items-center justify-between">
-          <span className="px-2 py-1 rounded-full bg-violet-500/10 text-violet-400 text-xs">
+          <span className="px-2 py-1 rounded-full bg-mint/10 text-mint-soft text-xs">
             {video.chapitre}
           </span>
           <button

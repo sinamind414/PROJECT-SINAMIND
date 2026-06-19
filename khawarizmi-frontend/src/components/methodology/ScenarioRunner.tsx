@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react"
 import { DocumentSetRenderer } from "@/components/methodology/DocumentRenderer"
 import { evaluateMethodologyAnswer, type MethodologyEvaluation } from "@/lib/methodology-evaluator"
-import { saveMethodologyEvaluations } from "@/lib/progress-store"
+import { awardXP, claimBadge, saveMethodologyEvaluations, type GamificationAward } from "@/lib/progress-store"
 import type { MethodologyScenario, MethodologyQuestion } from "@/lib/methodology-documents"
 import type { MethodologyChapterLink } from "@/lib/methodology-chapters"
 
@@ -55,7 +55,7 @@ function CorrectionCard({
   const status = getSeverityLabel(item.evaluation.percentage)
 
   return (
-    <div className="rounded-3xl p-5 bg-[#2A2540] border border-white/[0.06] space-y-4">
+    <div className="rounded-3xl p-5 bg-[#182730] border border-white/[0.06] space-y-4">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h3 className="text-white font-bold text-lg">{item.question.n}. تصحيح: {item.question.title}</h3>
@@ -91,7 +91,7 @@ function CorrectionCard({
 
       {item.evaluation.criteria.length > 0 && (
         <div>
-          <p className="text-violet-300 font-bold text-sm mb-2">تفصيل النقاط</p>
+          <p className="text-mint-soft font-bold text-sm mb-2">تفصيل النقاط</p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
             {item.evaluation.criteria.map((criterion) => (
               <div key={criterion.code} className="flex items-center justify-between gap-3 rounded-xl bg-white/[0.03] px-3 py-2">
@@ -118,8 +118,8 @@ function CorrectionCard({
         </div>
       )}
 
-      <div className="rounded-2xl p-4 bg-violet-500/10 border border-violet-500/20">
-        <p className="text-violet-200 text-sm font-bold mb-1">ماذا تتعلم من هذا الخطأ؟</p>
+      <div className="rounded-2xl p-4 bg-mint/10 border border-mint/20">
+        <p className="text-mint-soft text-sm font-bold mb-1">ماذا تتعلم من هذا الخطأ؟</p>
         <p className="text-gray-200 text-sm leading-relaxed">{item.question.learningFocus}</p>
         <p className="text-gray-400 text-xs leading-relaxed mt-2">نصيحة المحرك: {item.evaluation.advice}</p>
       </div>
@@ -137,6 +137,7 @@ export function ScenarioRunner({
   const [answers, setAnswers] = useState<Record<string, string>>({})
   const [result, setResult] = useState<ScenarioResult | null>(null)
   const [saved, setSaved] = useState(false)
+  const [award, setAward] = useState<GamificationAward | null>(null)
 
   const questions = getActiveQuestions(scenario, chapterLink)
 
@@ -173,17 +174,20 @@ export function ScenarioRunner({
       })),
     )
     setSaved(true)
+    const baseAward = awardXP("مهمة استغلال وثيقة", 60)
+    setAward(baseAward)
   }
 
   function reset() {
     setAnswers({})
     setResult(null)
     setSaved(false)
+    setAward(null)
   }
 
   return (
     <div dir="rtl" className="space-y-6">
-      <header className="rounded-3xl p-7 bg-gradient-to-l from-violet-600 to-fuchsia-600">
+      <header className="rounded-3xl p-7 bg-gradient-to-l from-mint to-orange">
         {chapterLink ? (
           <>
             <p className="text-white/60 text-xs mb-2">
@@ -213,12 +217,12 @@ export function ScenarioRunner({
         )}
       </header>
 
-      <section className="rounded-3xl p-6 bg-[#2A2540] border border-white/[0.06] space-y-5">
+      <section className="rounded-3xl p-6 bg-[#182730] border border-white/[0.06] space-y-5">
         <DocumentSetRenderer documents={scenario.documents} />
       </section>
 
       <div className="grid grid-cols-1 xl:grid-cols-[1fr_380px] gap-6">
-        <section className="rounded-3xl p-6 bg-[#2A2540] border border-white/[0.06]">
+        <section className="rounded-3xl p-6 bg-[#182730] border border-white/[0.06]">
           <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
             <div>
               <h2 className="text-2xl font-bold text-white">أسئلة السيناريو</h2>
@@ -230,15 +234,15 @@ export function ScenarioRunner({
             {questions.map((q) => (
               <div key={q.id} className="rounded-2xl p-4 bg-white/[0.03] border border-white/[0.05]">
                 <div className="flex gap-4 mb-3">
-                  <div className="w-10 h-10 rounded-xl bg-violet-500/20 text-violet-200 flex items-center justify-center font-bold flex-shrink-0">
+                  <div className="w-10 h-10 rounded-xl bg-mint/20 text-mint-soft flex items-center justify-center font-bold flex-shrink-0">
                     {q.n}
                   </div>
                   <div>
                     <div className="flex flex-wrap items-center gap-2">
                       <h3 className="text-white font-bold">{q.title}</h3>
-                      <span className="px-2 py-0.5 rounded-full bg-white/[0.05] text-violet-200 text-[10px]">{q.docRef}</span>
+                      <span className="px-2 py-0.5 rounded-full bg-white/[0.05] text-mint-soft text-[10px]">{q.docRef}</span>
                     </div>
-                    <p className="text-violet-300 text-xs mt-1">المهارة: {q.skill}</p>
+                    <p className="text-mint-soft text-xs mt-1">المهارة: {q.skill}</p>
                     <p className="text-gray-300 text-sm mt-2 leading-relaxed">{q.prompt}</p>
                   </div>
                 </div>
@@ -246,7 +250,7 @@ export function ScenarioRunner({
                   value={answers[q.id] || ""}
                   onChange={(e) => updateAnswer(q.id, e.target.value)}
                   rows={4}
-                  className="w-full rounded-xl bg-[#1E1B2E] border border-white/[0.08] text-white p-4 outline-none focus:border-violet-400"
+                  className="w-full rounded-xl bg-[#0C151A] border border-white/[0.08] text-white p-4 outline-none focus:border-mint"
                   placeholder={q.placeholder}
                 />
               </div>
@@ -256,7 +260,7 @@ export function ScenarioRunner({
           <div className="mt-6 flex flex-wrap gap-3">
             <button
               onClick={submit}
-              className="px-5 py-3 rounded-xl bg-violet-600 text-white font-bold hover:bg-violet-500 transition"
+              className="px-5 py-3 rounded-xl bg-mint text-white font-bold hover:bg-mint-soft transition"
             >
               تحقق من المنهجية وسجل الخطأ
             </button>
@@ -271,14 +275,14 @@ export function ScenarioRunner({
 
         <aside className="space-y-4">
           {chapterLink && (
-            <div className="rounded-3xl p-5 bg-[#2A2540] border border-white/[0.06] space-y-4">
+<div className="rounded-3xl p-5 bg-[#182730] border border-white/[0.06] space-y-4">
               <h3 className="text-white font-bold text-sm">السياق المنهجي</h3>
               <p className="text-gray-400 text-xs leading-relaxed">{chapterLink.chapterAr}</p>
               <div className="pt-2 border-t border-white/[0.06]">
-                <p className="text-violet-300 text-xs font-bold mb-2">الأنشطة المنهجية المقترحة</p>
+                <p className="text-mint-soft text-xs font-bold mb-2">الأنشطة المنهجية المقترحة</p>
                 <div className="flex flex-wrap gap-2">
                   {chapterLink.recommendedVerbs.map((verb) => (
-                    <span key={verb} className="px-2 py-1 rounded-lg bg-violet-500/15 text-violet-200 text-xs">
+                    <span key={verb} className="px-2 py-1 rounded-lg bg-mint/15 text-mint-soft text-xs">
                       {VERB_LABELS[verb] || verb}
                     </span>
                   ))}
@@ -290,13 +294,19 @@ export function ScenarioRunner({
             </div>
           )}
           {result && (
-            <div className="rounded-3xl p-5 bg-[#2A2540] border border-white/[0.06] space-y-5">
+            <div className="rounded-3xl p-5 bg-[#182730] border border-white/[0.06] space-y-5">
               <div className="flex items-center justify-between">
                 <h3 className="text-white font-bold">النتيجة الإجمالية</h3>
                 <span className="text-3xl font-bold text-white">{result.readiness}%</span>
               </div>
               {saved && (
                 <p className="text-emerald-300 text-xs font-bold">✓ تم تسجيل الأخطاء في التقدم</p>
+              )}
+              {award && (
+                <div className="rounded-3xl p-4 bg-emerald-500/10 border border-emerald-400/20 animate-fadeIn">
+                  <p className="text-emerald-200 text-sm font-bold mb-1">🎉 ممتاز! تقدمت في رحلتك</p>
+                  <p className="text-white text-3xl font-black">+{award.amount} XP</p>
+                </div>
               )}
 
               <div className="space-y-2">
@@ -322,12 +332,15 @@ export function ScenarioRunner({
 
       {result && (
         <section className="space-y-5">
-          <div className="rounded-3xl p-6 bg-[#2A2540] border border-white/[0.06]">
+          <div className="rounded-3xl p-6 bg-[#182730] border border-white/[0.06]">
             <h2 className="text-2xl font-bold text-white mb-2">التصحيح المفصل</h2>
             <p className="text-gray-400 text-sm leading-relaxed">
               التصحيح مرتبط بالوثائق والمهارات المنهجية لكل سؤال.
             </p>
           </div>
+          <a href="/diagnostic" className="block text-center px-5 py-3 rounded-xl bg-white text-slate-deep font-black hover:bg-mint-soft transition">
+            المهمة التالية ➜
+          </a>
           {result.evaluations.map((item) => (
             <div key={item.question.id} id={`scenario-correction-${item.question.id}`}>
               <CorrectionCard item={item} />
