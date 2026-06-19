@@ -53,15 +53,14 @@ export default function DashboardPage() {
             <div className="grid lg:grid-cols-3 gap-4">
               <div className="lg:col-span-2 space-y-4">
                 <WeeklyPlan days={state.weekly} onToggleAction={updateWeek} />
-                <div className="grid md:grid-cols-2 gap-4">
-                  <LevelXp profile={state.profile} />
-                  <DailyMission mission={dailyMission} onDoneAction={updateMission} />
-                </div>
+                <DailyMission mission={dailyMission} onDoneAction={updateMission} />
               </div>
               <div className="space-y-4">
                 <TopicsPanel topics={state.topics} />
               </div>
             </div>
+
+            <LevelXp profile={state.profile} />
 
             <div className="grid md:grid-cols-2 gap-4">
               <ExercisesPanel exercises={state.exercises} onToggleAction={updateExercise} />

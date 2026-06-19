@@ -26,10 +26,10 @@ export default function CircularGauge({ percent, size = 168, stroke = 14 }: { pe
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
         <motion.span
-          className="text-4xl font-black tnum text-glow-mint"
+          className="text-3xl font-black tnum text-glow-mint"
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }}
-        >{percent}<span className="text-xl">%</span></motion.span>
-        <span className="text-[11px] text-mint-soft/70 mt-0.5 font-semibold">إتمام المنهج</span>
+        >{percent}<span className="text-base">%</span></motion.span>
+        <span className="text-[10px] text-mint-soft/70 mt-0.5 font-semibold">إتمام المنهج</span>
       </div>
     </div>
   );
