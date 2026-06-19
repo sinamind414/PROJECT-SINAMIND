@@ -11,58 +11,45 @@ function getStatus(level: number) {
 
 export function MasteryVerbs() {
   return (
-    <div
-      className="rounded-3xl p-6"
-      style={{ background: "#2A2540" }}
-    >
-      <div className="flex items-center justify-between mb-6">
+    <div className="rounded-2xl p-5" style={{ background: "#1E2030" }}>
+      <div className="flex items-center justify-between mb-4">
         <div>
-          <h2 className="text-2xl font-bold text-white mb-1">
-            🎯 إتقان الأفعال الأدائية
-          </h2>
-          <p className="text-gray-400 text-sm">
-            كل فعل يفرض طريقة إجابة مختلفة حسب منهجية البكالوريا الجزائرية.
-          </p>
+          <h2 className="text-white font-bold text-base">🎯 الأفعال الأدائية</h2>
+          <p className="text-gray-500 text-xs mt-0.5">كل فعل يفرض طريقة إجابة مختلفة</p>
         </div>
-        <Link href="/action-verbs" className="text-violet-400 text-sm hover:underline">
-          عرض الكل ({actionVerbs.length}) ←
+        <Link href="/action-verbs" className="text-violet-400 text-xs font-medium hover:underline">
+          عرض الكل ({actionVerbs.length})
         </Link>
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-2">
         {actionVerbs.slice(0, 8).map((verb) => {
           const status = getStatus(verb.level)
           return (
-            <Link key={verb.slug} href={`/action-verbs/${verb.slug}`} className="flex items-center gap-4 rounded-xl hover:bg-white/[0.03] p-2 -m-2 transition">
-              <div className="w-36 flex-shrink-0">
-                <p className="text-white font-bold text-base">{verb.ar}</p>
-                <p className="text-gray-500 text-xs" dir="ltr">{verb.fr}</p>
+            <Link
+              key={verb.slug}
+              href={`/action-verbs/${verb.slug}`}
+              className="flex items-center gap-3 rounded-xl p-2.5 transition-colors"
+              style={{ background: "rgba(255,255,255,0.02)" }}
+            >
+              <div className="w-28 flex-shrink-0">
+                <p className="text-white font-bold text-sm">{verb.ar}</p>
+                <p className="text-gray-500 text-[10px]" dir="ltr">{verb.fr}</p>
               </div>
 
-              <div className="flex-1 relative">
-                <div className="h-2.5 bg-white/[0.05] rounded-full overflow-hidden">
-                  <div
-                    className="h-full rounded-full transition-all duration-500"
-                    style={{ width: `${verb.level}%`, background: status.bar }}
-                  />
+              <div className="flex-1">
+                <div className="h-2 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.05)" }}>
+                  <div className="h-full rounded-full transition-all duration-500" style={{ width: `${verb.level}%`, background: status.bar }} />
                 </div>
-                <p className="text-gray-500 text-[11px] mt-1">آخر خطأ: {verb.lastError}</p>
               </div>
 
-              <div className="w-24 flex items-center gap-2 flex-shrink-0">
-                <span className="text-white font-bold text-sm">{verb.level}%</span>
-                <span className={`text-xs ${status.color}`}>{status.icon} {status.label}</span>
+              <div className="w-20 flex items-center gap-1.5 flex-shrink-0">
+                <span className="text-white font-bold text-xs w-8 text-left">{verb.level}%</span>
+                <span className={`text-[10px] ${status.color}`}>{status.label}</span>
               </div>
             </Link>
           )
         })}
-      </div>
-
-      <div className="mt-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20">
-        <p className="text-red-400 text-sm font-semibold mb-1">💡 الأولوية ليست حفظ الدرس الآن</p>
-        <p className="text-red-300 text-xs">
-          ابدأ بـ حلّل و اقترح فرضية: هنا تضيع أكبر النقاط بسبب الخلط وغياب القيم العددية.
-        </p>
       </div>
     </div>
   )

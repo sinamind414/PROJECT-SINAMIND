@@ -1,26 +1,123 @@
 "use client"
 
-import { useEffect, useState, useCallback } from "react"
+import { useState, useMemo } from "react"
 import Link from "next/link"
 import { AuthGuard } from "@/components/auth/AuthGuard"
 import { Sidebar } from "@/components/layout/Sidebar"
-import { apiClient } from "@/lib/api-client"
-import type { Annale } from "@/lib/types"
+import { getAllSujets } from "@/lib/annales-bac"
+import type { SujetBac } from "@/lib/annales-bac"
 
-const DIFFICULTE_COLORS: Record<number, string> = {
-  1: "bg-green-500/20 text-green-400",
-  2: "bg-emerald-500/20 text-emerald-400",
-  3: "bg-yellow-500/20 text-yellow-400",
-  4: "bg-orange-500/20 text-orange-400",
-  5: "bg-red-500/20 text-red-400",
+const DIFFICULTE_COLORS: Record<string, string> = {
+  facile: "bg-emerald-500/15 text-emerald-400 border-emerald-500/25",
+  moyen: "bg-amber-500/15 text-amber-400 border-amber-500/25",
+  difficile: "bg-red-500/15 text-red-400 border-red-500/25",
 }
 
-const DIFFICULTE_LABELS: Record<number, string> = {
-  1: "سهل",
-  2: "متوسط",
-  3: "صعب",
-  4: "صعب جداً",
-  5: "خارق",
+function AnnalesContent() {
+  const [search, setSearch] = useState("")
+
+  const sujets = useMemo(() => getAllSujets(), [])
+
+  const filtered = useMemo(() => {
+    if (!search.trim()) return sujets
+    const q = search.toLowerCase()
+    return sujets.filter(
+      (s) =>
+        s.titre.toLowerCase().includes(q) ||
+        s.chapitres.some((c) => c.toLowerCase().includes(q)) ||
+        String(s.annee).includes(q)
+    )
+  }, [search, sujets])
+
+  return (
+    <div className="flex min-h-screen" dir="rtl" style={{ background: "#141522" }}>
+      <Sidebar />
+      <main className="flex-1 p-6 overflow-auto">
+        <div className="max-w-5xl mx-auto space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h1 className="text-2xl font-bold text-white">المواضيع — Annales Bac</h1>
+              <p className="text-sm text-slate-400 mt-1">
+                {sujets.length} sujets Bac SVT disponibles — 3 modes par sujet
+              </p>
+            </div>
+            <input
+              type="text"
+              placeholder="بحث..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white placeholder:text-slate-500 w-full sm:w-56"
+            />
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            {filtered.map((sujet) => (
+              <SujetCard key={sujet.slug} sujet={sujet} />
+            ))}
+          </div>
+
+          {filtered.length === 0 && (
+            <div className="text-center py-20 text-slate-500 text-sm">aucun sujet trouvé</div>
+          )}
+        </div>
+      </main>
+    </div>
+  )
+}
+
+function SujetCard({ sujet }: { sujet: SujetBac }) {
+  return (
+    <div className="card-hover bg-slate-900/60 border border-slate-800 rounded-2xl overflow-hidden group">
+      <Link
+        href={`/annales/${sujet.slug}`}
+        className="block p-5 space-y-4"
+      >
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <h3 className="text-white font-bold text-base group-hover:text-violet-300 transition-colors">
+              {sujet.titre}
+            </h3>
+            <p className="text-xs text-slate-500 mt-0.5">
+              {sujet.annee} · {sujet.session === "normale" ? "دورة عادية" : "دورة استدراكية"}
+            </p>
+          </div>
+          <span
+            className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${DIFFICULTE_COLORS[sujet.difficulte]}`}
+          >
+            {sujet.difficulte}
+          </span>
+        </div>
+
+        <div className="flex flex-wrap gap-1.5">
+          {sujet.chapitres.map((ch) => (
+            <span
+              key={ch}
+              className="text-[10px] px-2 py-0.5 rounded-full bg-violet-500/10 text-violet-300 border border-violet-500/20"
+            >
+              {ch}
+            </span>
+          ))}
+        </div>
+
+        <div className="flex items-center gap-4 text-xs text-slate-400">
+          <span>⏱ {sujet.duree} min</span>
+          <span>📄 {sujet.exercices.length} exercices</span>
+          <span>💡 {sujet.exercices.reduce((a, e) => a + e.questions.length, 0)} questions</span>
+        </div>
+
+        <div className="flex items-center justify-between pt-2 border-t border-slate-800/50">
+          <span className="text-[11px] text-violet-400 font-semibold group-hover:underline">
+            ابدأ هذا الموضوع ←
+          </span>
+          <div className="flex gap-1.5">
+            <span className="text-[10px] px-2 py-0.5 rounded bg-blue-500/10 text-blue-300">📖 قراءة</span>
+            <span className="text-[10px] px-2 py-0.5 rounded bg-amber-500/10 text-amber-300">🎯 امتحان</span>
+            <span className="text-[10px] px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-300">🧭 موجه</span>
+          </div>
+        </div>
+      </Link>
+    </div>
+  )
 }
 
 export default function AnnalesPage() {
@@ -28,154 +125,5 @@ export default function AnnalesPage() {
     <AuthGuard>
       <AnnalesContent />
     </AuthGuard>
-  )
-}
-
-function AnnalesContent() {
-  const [annales, setAnnales] = useState<Annale[]>([])
-  const [loading, setLoading] = useState(true)
-  const [search, setSearch] = useState("")
-  const [yearFilter, setYearFilter] = useState<number | "">("")
-  const [typeFilter, setTypeFilter] = useState<string>("")
-
-  const loadAnnales = useCallback(async () => {
-    setLoading(true)
-    try {
-      const data = await apiClient.getAnnales({
-        recherche: search || undefined,
-        annee: yearFilter || undefined,
-        type: typeFilter || undefined,
-        taille: 50,
-      })
-      setAnnales(data.items)
-    } catch (err) {
-      console.error(err)
-    } finally {
-      setLoading(false)
-    }
-  }, [search, yearFilter, typeFilter])
-
-  useEffect(() => {
-    loadAnnales()
-  }, [loadAnnales])
-
-  const years = Array.from({ length: 7 }, (_, i) => 2025 - i)
-
-  const grouped = annales.reduce<Record<string, Annale[]>>((acc, a) => {
-    const key = `${a.annee}`
-    if (!acc[key]) acc[key] = []
-    acc[key].push(a)
-    return acc
-  }, {})
-
-  return (
-    <div className="flex min-h-screen" dir="rtl" style={{ background: "#1E1B2E" }}>
-      <div className="order-1">
-        <Sidebar />
-      </div>
-
-      <main className="flex-1 p-6 overflow-auto order-2">
-        <div className="max-w-7xl mx-auto">
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-white mb-2">
-              📝 المواضيع والامتحانات
-            </h1>
-            <p className="text-gray-400">
-              تدرب على مواضيع BAC السابقة + سلسلة KHELIFA و FINAL BAC و MORAFIK
-            </p>
-          </div>
-
-          <div className="flex flex-wrap gap-3 mb-8">
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="بحث..."
-              className="flex-1 min-w-[200px] px-4 py-3 rounded-xl bg-white/[0.04] border border-white/[0.08] text-white placeholder-gray-500 focus:outline-none focus:border-violet-500/50"
-            />
-
-            <select
-              value={yearFilter}
-              onChange={(e) => setYearFilter(e.target.value ? Number(e.target.value) : "")}
-              className="px-4 py-3 rounded-xl bg-white/[0.04] border border-white/[0.08] text-white focus:outline-none focus:border-violet-500/50"
-            >
-              <option value="">كل السنوات</option>
-              {years.map((y) => (
-                <option key={y} value={y}>{y}</option>
-              ))}
-            </select>
-
-            <select
-              value={typeFilter}
-              onChange={(e) => setTypeFilter(e.target.value)}
-              className="px-4 py-3 rounded-xl bg-white/[0.04] border border-white/[0.08] text-white focus:outline-none focus:border-violet-500/50"
-            >
-              <option value="">كل الأنواع</option>
-              <option value="examen">امتحان BAC</option>
-              <option value="concours">مسابقة</option>
-            </select>
-          </div>
-
-          {loading ? (
-            <p className="text-gray-400 text-center py-12">جاري التحميل...</p>
-          ) : Object.keys(grouped).length === 0 ? (
-            <p className="text-gray-500 text-center py-12">لا توجد مواضيع تطابق بحثك</p>
-          ) : (
-            <div className="space-y-8">
-              {Object.entries(grouped).sort(([a], [b]) => Number(b) - Number(a)).map(([year, items]) => (
-                <section key={year}>
-                  <h2 className="text-xl font-bold text-white mb-4 border-b border-white/[0.06] pb-2">
-                    {year}
-                  </h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {items.map((annale) => (
-                      <Link
-                        key={annale.id}
-                        href={`/annales/${annale.id}`}
-                        className="rounded-2xl p-5 transition-all hover:scale-[1.02] hover:shadow-xl hover:shadow-violet-950/30"
-                        style={{ background: "#2A2540" }}
-                      >
-                        <div className="flex items-start justify-between mb-3">
-                          <span className="text-xs px-2 py-1 rounded-full bg-violet-500/10 text-violet-400">
-                            {annale.type === "examen" ? "BAC" : "مسابقة"}
-                          </span>
-                          <span
-                            className={`text-xs px-2 py-1 rounded-full ${
-                              DIFFICULTE_COLORS[annale.difficulte] || "bg-gray-500/20 text-gray-400"
-                            }`}
-                          >
-                            {DIFFICULTE_LABELS[annale.difficulte] || annale.difficulte}
-                          </span>
-                        </div>
-
-                        <h3 className="text-white font-bold text-sm mb-3 line-clamp-2">
-                          {annale.titre}
-                        </h3>
-
-                        <div className="flex flex-wrap gap-2">
-                          {annale.tags.slice(0, 3).map((tag) => (
-                            <span
-                              key={tag}
-                              className="text-[10px] px-2 py-0.5 rounded-full bg-white/[0.04] text-gray-400"
-                            >
-                              {tag}
-                            </span>
-                          ))}
-                        </div>
-
-                        <div className="mt-4 flex items-center gap-3 text-xs text-gray-500">
-                          {annale.fichier_sujet && <span>📄 الموضوع</span>}
-                          {annale.fichier_correction && <span>✅ التصحيح</span>}
-                        </div>
-                      </Link>
-                    ))}
-                  </div>
-                </section>
-              ))}
-            </div>
-          )}
-        </div>
-      </main>
-    </div>
   )
 }

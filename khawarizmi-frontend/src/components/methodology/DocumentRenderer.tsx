@@ -42,6 +42,23 @@ export type LineChartDocument = {
   points: ChartPoint[]
 }
 
+export type MultiLineChartSeries = {
+  label: string
+  color: string
+  points: ChartPoint[]
+}
+
+export type MultiLineChartDocument = {
+  type: "multi-line-chart"
+  id: string
+  title: string
+  caption?: string
+  xLabel?: string
+  yLabel?: string
+  unit?: string
+  series: MultiLineChartSeries[]
+}
+
 export type FlowDocument = {
   type: "flow"
   id: string
@@ -72,6 +89,7 @@ export type MethodologyDocument =
   | TableDocument
   | BarChartDocument
   | LineChartDocument
+  | MultiLineChartDocument
   | FlowDocument
   | ImageDocument
 
@@ -123,18 +141,27 @@ function BarChart({ doc }: { doc: BarChartDocument }) {
   )
 }
 
+function computeChartBounds(points: ChartPoint[]) {
+  const values = points.map((p) => p.value)
+  const min = Math.min(...values, 0)
+  const max = Math.max(...values, 1)
+  const range = max - min || 1
+  return { min, max, range }
+}
+
 function LineChart({ doc }: { doc: LineChartDocument }) {
-  const max = Math.max(...doc.points.map((point) => point.value), 1)
   const width = 520
   const height = 220
   const padding = 34
+  const { min, max, range } = computeChartBounds(doc.points)
   const stepX = doc.points.length > 1 ? (width - padding * 2) / (doc.points.length - 1) : 0
   const coords = doc.points.map((point, index) => ({
     x: padding + index * stepX,
-    y: height - padding - (point.value / max) * (height - padding * 2),
+    y: height - padding - ((point.value - min) / range) * (height - padding * 2),
     point,
   }))
   const path = coords.map((coord, index) => `${index === 0 ? "M" : "L"} ${coord.x} ${coord.y}`).join(" ")
+  const yZero = height - padding - ((-min) / range) * (height - padding * 2)
 
   return (
     <DocumentFrame title={doc.title} caption={doc.caption}>
@@ -142,6 +169,9 @@ function LineChart({ doc }: { doc: LineChartDocument }) {
         <svg viewBox={`0 0 ${width} ${height}`} className="w-full min-w-[420px] h-64">
           <line x1={padding} y1={height - padding} x2={width - padding} y2={height - padding} stroke="rgba(255,255,255,.22)" />
           <line x1={padding} y1={padding} x2={padding} y2={height - padding} stroke="rgba(255,255,255,.22)" />
+          {min < 0 && (
+            <line x1={padding} y1={yZero} x2={width - padding} y2={yZero} stroke="rgba(255,255,255,.12)" strokeDasharray="4" />
+          )}
           <path d={path} fill="none" stroke="#A78BFA" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
           {coords.map((coord) => (
             <g key={coord.point.label}>
@@ -153,6 +183,64 @@ function LineChart({ doc }: { doc: LineChartDocument }) {
           <text x={width - padding} y={height - 4} fill="rgb(107,114,128)" fontSize="12" textAnchor="end">{doc.xLabel}</text>
           <text x={padding + 4} y={18} fill="rgb(107,114,128)" fontSize="12">{doc.yLabel}</text>
         </svg>
+      </div>
+    </DocumentFrame>
+  )
+}
+
+function MultiLineChart({ doc }: { doc: MultiLineChartDocument }) {
+  const width = 520
+  const height = 220
+  const padding = 34
+  const allPoints = doc.series.flatMap((s) => s.points)
+  const { min, max, range } = computeChartBounds(allPoints)
+
+  const seriesPaths = doc.series.map((series) => {
+    const stepX = series.points.length > 1 ? (width - padding * 2) / (series.points.length - 1) : 0
+    const coords = series.points.map((point, index) => ({
+      x: padding + index * stepX,
+      y: height - padding - ((point.value - min) / range) * (height - padding * 2),
+      point,
+    }))
+    const path = coords.map((coord, index) => `${index === 0 ? "M" : "L"} ${coord.x} ${coord.y}`).join(" ")
+    return { label: series.label, color: series.color, coords, path }
+  })
+
+  const yZero = height - padding - ((-min) / range) * (height - padding * 2)
+
+  return (
+    <DocumentFrame title={doc.title} caption={doc.caption}>
+      <div className="rounded-2xl bg-[#1E1B2E] border border-white/[0.06] p-4 overflow-x-auto" dir="ltr">
+        <svg viewBox={`0 0 ${width} ${height}`} className="w-full min-w-[420px] h-64">
+          <line x1={padding} y1={height - padding} x2={width - padding} y2={height - padding} stroke="rgba(255,255,255,.22)" />
+          <line x1={padding} y1={padding} x2={padding} y2={height - padding} stroke="rgba(255,255,255,.22)" />
+          {min < 0 && (
+            <line x1={padding} y1={yZero} x2={width - padding} y2={yZero} stroke="rgba(255,255,255,.12)" strokeDasharray="4" />
+          )}
+          {seriesPaths.map((sp) => (
+            <g key={sp.label}>
+              <path d={sp.path} fill="none" stroke={sp.color} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+              {sp.coords.map((coord) => (
+                <circle key={`${sp.label}-${coord.point.label}`} cx={coord.x} cy={coord.y} r="4" fill={sp.color} />
+              ))}
+            </g>
+          ))}
+          {seriesPaths[0]?.coords.map((coord) => (
+            <g key={coord.point.label}>
+              <text x={coord.x} y={height - 10} fill="rgb(107,114,128)" fontSize="12" textAnchor="middle">{coord.point.label}</text>
+            </g>
+          ))}
+          <text x={width - padding} y={height - 4} fill="rgb(107,114,128)" fontSize="12" textAnchor="end">{doc.xLabel}</text>
+          <text x={padding + 4} y={18} fill="rgb(107,114,128)" fontSize="12">{doc.yLabel}</text>
+        </svg>
+        <div className="flex flex-wrap gap-4 mt-3 justify-center">
+          {doc.series.map((s) => (
+            <div key={s.label} className="flex items-center gap-2 text-xs text-gray-400">
+              <span className="w-3 h-3 rounded-full" style={{ background: s.color }} />
+              {s.label}
+            </div>
+          ))}
+        </div>
       </div>
     </DocumentFrame>
   )
@@ -243,6 +331,7 @@ function ImageDoc({ doc }: { doc: ImageDocument }) {
 export function DocumentRenderer({ doc }: { doc: MethodologyDocument }) {
   if (doc.type === "bar-chart") return <BarChart doc={doc} />
   if (doc.type === "line-chart") return <LineChart doc={doc} />
+  if (doc.type === "multi-line-chart") return <MultiLineChart doc={doc} />
   if (doc.type === "table") return <TableDoc doc={doc} />
   if (doc.type === "flow") return <FlowDoc doc={doc} />
   if (doc.type === "image") return <ImageDoc doc={doc} />

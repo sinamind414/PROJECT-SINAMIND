@@ -1,158 +1,189 @@
 "use client"
 
-import { useMemo, useState } from "react"
-import { AuthGuard } from "@/components/auth/AuthGuard"
-import { Sidebar } from "@/components/layout/Sidebar"
-import { evaluateMethodologyAnswer } from "@/lib/methodology-evaluator"
-import { saveMethodologyEvaluation } from "@/lib/progress-store"
+import Link from "next/link"
+import { PageShell } from "@/components/ui/PageShell"
+import { PageHero } from "@/components/ui/PageHero"
+import { SurfaceCard } from "@/components/ui/SurfaceCard"
+import { PillChip } from "@/components/ui/PillChip"
+import { methodologyScenarios } from "@/lib/methodology-documents"
+import { methodologyChapterLinks } from "@/lib/methodology-chapters"
 
-export default function DocumentAnalysisPage() {
-  const [step1, setStep1] = useState("")
-  const [step2, setStep2] = useState("")
-  const [step3, setStep3] = useState("")
-  const [finalAnswer, setFinalAnswer] = useState("")
-  const [submitted, setSubmitted] = useState(false)
+const UNIT_EMOJIS: Record<string, string> = {
+  "تركيب البروتين": "🧬",
+  "العلاقة بين بنية ووظيفة البروتين": "🔬",
+  "النشاط الإنزيمي للبروتينات": "⚡",
+  "دور البروتينات في الدفاع عن الذات": "🛡️",
+  "دور البروتينات في الاتصال العصبي": "🧠",
+  "آليات تحويل الطاقة الضوئية إلى طاقة كيميائية كامنة": "☀️",
+  "آليات تحويل الطاقة الكيميائية الكامنة في الجزيئات العضوية إلى ATP": "⚡",
+  "تحويل الطاقة على المستوى ما فوق البنية الخلوية": "🔋",
+  "بنية الكرة الأرضية": "🌍",
+  "النشاط التكتوني للصفائح": "🌋",
+  "النشاط التكتوني والبنيات الجيولوجية المرتبطة به": "🏔️",
+}
 
-  const feedback = useMemo(() => evaluateMethodologyAnswer({
-    verbSlug: "analyse",
-    answer: finalAnswer,
-    guidedFields: {
-      documentType: step1,
-      variables: step2,
-      numericalValues: step3,
-    },
-  }), [finalAnswer, step1, step2, step3])
+const IMPORTANCE_COLORS: Record<string, string> = {
+  critique: "rgba(248,113,113,0.15)",
+  haute: "rgba(251,191,36,0.15)",
+  moyenne: "rgba(59,130,246,0.15)",
+}
+
+const IMPORTANCE_TEXT: Record<string, string> = {
+  critique: "#F87171",
+  haute: "#FBBF24",
+  moyenne: "#60A5FA",
+}
+
+const CHAPTER_TYPE_LABELS: Record<string, string> = {
+  concept: "مفهوم",
+  processus: "عملية",
+  experience: "تجربة",
+  rappel: "تذكير",
+  synthese: "تركيب",
+}
+
+function groupChaptersByDomainAndUnit() {
+  const domains: Array<{
+    domainNumero: number
+    domainAr: string
+    domainFr: string
+    units: Array<{
+      unitNumero: number
+      unitAr: string
+      unitFr: string
+      chapters: typeof methodologyChapterLinks
+    }>
+  }> = []
+
+  for (const ch of methodologyChapterLinks) {
+    let domain = domains.find((d) => d.domainNumero === ch.domainNumero)
+    if (!domain) {
+      domain = { domainNumero: ch.domainNumero, domainAr: ch.domainAr, domainFr: ch.domainFr, units: [] }
+      domains.push(domain)
+    }
+    let unit = domain.units.find((u) => u.unitNumero === ch.unitNumero)
+    if (!unit) {
+      unit = { unitNumero: ch.unitNumero, unitAr: ch.unitAr, unitFr: ch.unitFr, chapters: [] }
+      domain.units.push(unit)
+    }
+    unit.chapters.push(ch)
+  }
+
+  return domains
+}
+
+export default function DocumentAnalysisHubPage() {
+  const domainGroups = groupChaptersByDomainAndUnit()
 
   return (
-    <AuthGuard>
-      <div className="flex min-h-screen" dir="rtl" style={{ background: "#1E1B2E" }}>
-        <main className="flex-1 p-6 lg:p-8 overflow-auto">
-          <div className="max-w-6xl mx-auto space-y-6">
-            <header className="rounded-3xl p-7 bg-gradient-to-l from-violet-600 to-fuchsia-600">
-              <p className="text-white/70 text-sm mb-2">القلب الحقيقي لـ SINAMIND</p>
-              <h1 className="text-3xl font-bold text-white mb-2">استغلال الوثائق</h1>
-              <p className="text-white/80 max-w-3xl leading-relaxed">
-                هنا لا نترك الطالب يكتب فقرة عشوائية. الواجهة تجبره على فصل التحليل عن التفسير والاستنتاج.
-              </p>
-            </header>
+    <PageShell wide>
+      <PageHero
+        title="بنك السيناريوهات المنهجية"
+        subtitle="القلب الحقيقي لـ SINAMIND"
+        description="كل وحدة من وحدات SVT الـ 11 لها سيناريو خاص: وثائق + أسئلة منهجية + تصحيح مفصل + تسجيل الأخطاء."
+      />
 
-            <div className="grid grid-cols-1 xl:grid-cols-[1fr_420px] gap-6">
-              <section className="rounded-3xl p-6 bg-[#2A2540] border border-white/[0.06] space-y-5">
-                <div className="rounded-2xl p-5 bg-white/[0.04] border border-white/[0.06]">
-                  <p className="text-violet-300 text-sm font-bold mb-3">وثيقة تدريبية — تحليل منحنى</p>
-                  <div className="h-64 rounded-2xl bg-[#1E1B2E] border border-white/[0.06] p-5 flex items-end gap-3" dir="ltr">
-                    {[20, 34, 45, 58, 72, 86].map((h, i) => (
-                      <div key={i} className="flex-1 flex flex-col items-center gap-2">
-                        <div className="w-full rounded-t-lg bg-gradient-to-t from-emerald-500 to-violet-400" style={{ height: `${h * 2}px` }} />
-                        <span className="text-gray-500 text-xs">{i * 5}د</span>
-                      </div>
+      <p className="text-gray-400 text-sm">
+        اختر وحدة للبدء. كل سيناريو يحتوي على 4 وثائق و 5 أسئلة منهجية على نمط البكالوريا.
+      </p>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {methodologyScenarios.map((scenario) => {
+          const isDiagnostic = scenario.id === "gene-expression-protein-disorder-v1"
+          const href = isDiagnostic ? "/diagnostic/global" : `/document-analysis/${scenario.id}`
+          const emoji = UNIT_EMOJIS[scenario.unitKey] || "📚"
+
+          return (
+            <Link
+              key={scenario.id}
+              href={href}
+              className="rounded-2xl p-5 transition-all duration-200 hover:-translate-y-0.5"
+              style={{ background: "#1E2030" }}
+            >
+              <div className="text-3xl mb-3">{emoji}</div>
+              <h3 className="text-white font-bold text-sm mb-1">{scenario.title}</h3>
+              <p className="text-gray-500 text-xs mb-2">{scenario.unitKey}</p>
+              <p className="text-gray-400 text-xs leading-relaxed line-clamp-2">{scenario.contextAr}</p>
+              <div className="mt-3 flex items-center gap-3 text-xs text-gray-500">
+                <span>📄 {scenario.documents.length} وثائق</span>
+                <span>❓ {scenario.questions.length} أسئلة</span>
+                {isDiagnostic && (
+                  <PillChip label="تشخيص" color="#A78BFA" bg="rgba(139,92,246,0.1)" />
+                )}
+              </div>
+            </Link>
+          )
+        })}
+      </div>
+
+      <section>
+        <SurfaceCard padding={false}>
+          <div className="rounded-2xl p-5" style={{ background: "linear-gradient(135deg, rgba(139,92,246,0.12), rgba(79,70,229,0.08))" }}>
+            <p className="text-gray-500 text-xs mb-1">البرنامج الوطني SVT</p>
+            <h2 className="text-lg font-bold text-white">الفصول الـ 55 مرتبطة بالمنهجية</h2>
+            <p className="text-gray-400 text-sm mt-1 max-w-3xl leading-relaxed">
+              كل فصل من فصول البرنامج الوطني الـ 55 موصول بمسار منهجي يستهدف المهارات والمفاهيم الأساسية.
+              تصفّح حسب المجال والوحدة، واختر فصلا لبدء التمرين.
+            </p>
+          </div>
+        </SurfaceCard>
+
+        {domainGroups.map((domain) => (
+          <div key={domain.domainNumero} className="mt-6">
+            <div className="flex items-center gap-2 mb-3">
+              <span className="text-lg font-bold text-white">المجال {domain.domainNumero}</span>
+              <span className="text-gray-400 text-sm">{domain.domainAr}</span>
+            </div>
+
+            <div className="space-y-4">
+              {domain.units.map((unit) => (
+                <SurfaceCard key={unit.unitNumero}>
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="text-sm font-bold text-violet-400">الوحدة {unit.unitNumero}</span>
+                    <span className="text-gray-300 text-sm">{unit.unitAr}</span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3">
+                    {unit.chapters.map((ch) => (
+                      <Link
+                        key={ch.slug}
+                        href={`/document-analysis/chapters/${ch.slug}`}
+                        className="rounded-xl p-4 transition-all hover:-translate-y-0.5"
+                        style={{ background: "#141522" }}
+                      >
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-gray-500 text-xs">الفصل {ch.chapterNumero}</span>
+                          <PillChip
+                            label={ch.chapterImportance === "critique" ? "قصوى" : ch.chapterImportance === "haute" ? "عالية" : "متوسطة"}
+                            color={IMPORTANCE_TEXT[ch.chapterImportance] || "#94A3B8"}
+                            bg={IMPORTANCE_COLORS[ch.chapterImportance] || "rgba(255,255,255,0.06)"}
+                          />
+                        </div>
+                        <h4 className="text-white font-bold text-sm leading-relaxed mb-1">{ch.chapterAr}</h4>
+                        <p className="text-gray-500 text-xs mb-2 line-clamp-1" dir="ltr">{ch.chapterFr}</p>
+                        {ch.chapterType && (
+                          <PillChip
+                            label={CHAPTER_TYPE_LABELS[ch.chapterType] || ch.chapterType}
+                            color="#CBD5E1"
+                            bg="rgba(255,255,255,0.04)"
+                          />
+                        )}
+                        <div className="mt-2 text-xs font-bold" style={{ color: "#A78BFA" }}>
+                          افتح المسار المنهجي ←
+                        </div>
+                      </Link>
                     ))}
                   </div>
-                  <p className="text-gray-400 text-xs mt-3">
-                    تمثل الوثيقة تغير كمية البروتين المركب داخل الخلية خلال الزمن.
-                  </p>
-                </div>
-
-                <div>
-                  <h2 className="text-xl font-bold text-white mb-1">السؤال</h2>
-                  <p className="text-gray-300">حلّل نتائج الوثيقة.</p>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <label className="space-y-2">
-                    <span className="text-gray-300 text-sm">1. نوع الوثيقة</span>
-                    <input value={step1} onChange={(e) => setStep1(e.target.value)} className="w-full rounded-xl bg-white/[0.04] border border-white/[0.08] text-white p-3 outline-none focus:border-violet-400" placeholder="منحنى / جدول / تجربة..." />
-                  </label>
-                  <label className="space-y-2">
-                    <span className="text-gray-300 text-sm">2. المتغيرات</span>
-                    <input value={step2} onChange={(e) => setStep2(e.target.value)} className="w-full rounded-xl bg-white/[0.04] border border-white/[0.08] text-white p-3 outline-none focus:border-violet-400" placeholder="الزمن، كمية البروتين..." />
-                  </label>
-                  <label className="space-y-2">
-                    <span className="text-gray-300 text-sm">3. القيم العددية</span>
-                    <input value={step3} onChange={(e) => setStep3(e.target.value)} className="w-full rounded-xl bg-white/[0.04] border border-white/[0.08] text-white p-3 outline-none focus:border-violet-400" placeholder="من ... إلى ..." />
-                  </label>
-                </div>
-
-                <label className="space-y-2 block">
-                  <span className="text-gray-300 text-sm">4. الصياغة النهائية للتحليل</span>
-                  <textarea
-                    value={finalAnswer}
-                    onChange={(e) => setFinalAnswer(e.target.value)}
-                    rows={5}
-                    className="w-full rounded-xl bg-white/[0.04] border border-white/[0.08] text-white p-4 outline-none focus:border-violet-400"
-                    placeholder="تمثل الوثيقة... نلاحظ أن... حيث تنتقل القيمة من... إلى..."
-                  />
-                </label>
-
-                <button
-                  onClick={() => {
-                    setSubmitted(true)
-                    saveMethodologyEvaluation({
-                      source: "document-analysis",
-                      verbSlug: "analyse",
-                      answer: finalAnswer,
-                      evaluation: feedback,
-                    })
-                  }}
-                  className="px-5 py-3 rounded-xl bg-violet-600 text-white font-bold hover:bg-violet-500 transition"
-                >
-                  تحقق من المنهجية وسجل الخطأ
-                </button>
-              </section>
-
-              <aside className="space-y-4">
-                <div className="rounded-3xl p-5 bg-red-500/10 border border-red-500/20">
-                  <h3 className="text-red-300 font-bold mb-2">قيد منهجي صارم</h3>
-                  <p className="text-gray-300 text-sm leading-relaxed">
-                    في التحليل ممنوع استعمال: لأن، بسبب، راجع إلى. هذه ألفاظ تفسير وليست تحليل.
-                  </p>
-                </div>
-
-                {submitted && (
-                  <div className="rounded-3xl p-5 bg-[#2A2540] border border-white/[0.06]">
-                    <div className="flex items-center justify-between mb-4">
-                      <h3 className="text-white font-bold">التصحيح المنهجي</h3>
-                      <span className="text-2xl font-bold text-white">{feedback.score.toFixed(2)} / {feedback.scoreMax}</span>
-                    </div>
-                    <div className="space-y-4">
-                      <div>
-                        <p className="text-emerald-300 font-bold text-sm mb-2">ما نجحت فيه</p>
-                        {feedback.success.length ? feedback.success.map((s) => <p key={s} className="text-gray-300 text-sm">✓ {s}</p>) : <p className="text-gray-500 text-sm">لا شيء واضح بعد.</p>}
-                      </div>
-                      <div>
-                        <p className="text-red-300 font-bold text-sm mb-2">ما أخطأت فيه</p>
-                        {feedback.errors.length ? feedback.errors.map((e) => <p key={e} className="text-gray-300 text-sm">✗ {e}</p>) : <p className="text-gray-500 text-sm">لا توجد أخطاء منهجية واضحة.</p>}
-                      </div>
-                      {feedback.criteria.length > 0 && (
-                        <div>
-                          <p className="text-violet-300 font-bold text-sm mb-2">تفصيل النقاط</p>
-                          <div className="space-y-2">
-                            {feedback.criteria.map((criterion) => (
-                              <div key={criterion.code} className="flex items-center justify-between gap-3 rounded-xl bg-white/[0.03] px-3 py-2">
-                                <span className="text-gray-300 text-xs">{criterion.passed ? "✓" : "✗"} {criterion.labelAr}</span>
-                                <span className="text-white text-xs font-bold">{criterion.earned} / {criterion.points}</span>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                      {feedback.forbiddenMarkersFound.length > 0 && (
-                        <div className="rounded-2xl p-3 bg-red-500/10 border border-red-500/20">
-                          <p className="text-red-200 text-xs">المؤشرات الخاطئة المكتشفة: {feedback.forbiddenMarkersFound.join("، ")}</p>
-                        </div>
-                      )}
-                      <div className="rounded-2xl p-4 bg-violet-500/10 border border-violet-500/20">
-                        <p className="text-violet-200 text-sm leading-relaxed">{feedback.advice}</p>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </aside>
+                </SurfaceCard>
+              ))}
             </div>
           </div>
-        </main>
-        <Sidebar />
-      </div>
-    </AuthGuard>
+        ))}
+
+        <p className="text-gray-500 text-xs mt-6 text-center">
+          {methodologyChapterLinks.length} فصلا موصولا بالمنهجية عبر {methodologyScenarios.length} سيناريو وحدة
+        </p>
+      </section>
+    </PageShell>
   )
 }
