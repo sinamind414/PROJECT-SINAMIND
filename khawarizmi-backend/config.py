@@ -36,11 +36,7 @@ class Settings(BaseSettings):
 
     SENTRY_DSN: str = ""
 
-    ALLOWED_ORIGINS: List[str] = [
-        "https://khawarizmi.dz",
-        "https://www.khawarizmi.dz",
-        "http://localhost:3000"
-    ]
+    ALLOWED_ORIGINS: str = ""
 
     data_dir: str = ""
 
@@ -102,7 +98,7 @@ def get_allowed_origins() -> List[str]:
         "https://ia-khawarizmi.dz",
         "https://www.ia-khawarizmi.dz",
     ]
-    env_value = os.getenv("ALLOWED_ORIGINS", "")
+    env_value = settings.ALLOWED_ORIGINS
     extra_origins = [
         o.strip()
         for o in env_value.split(",")

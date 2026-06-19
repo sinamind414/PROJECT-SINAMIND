@@ -102,3 +102,59 @@ async def get_exercices(
         "nb_corrections": nb_corrections,
         "nb_sections": len(rows),
     }
+
+from pydantic import BaseModel
+from models.exercise import Exercise, UserExerciseResponse
+from services.language_service import ensure_arabic_version
+from services.correction_service import correct_student_answer
+
+class CorrectionRequest(BaseModel):
+    answer: str
+    language: str = "ar"
+
+@router.post("/{exercise_id}/correct")
+async def correct_exercise(
+    exercise_id: int,
+    request: CorrectionRequest,
+    current_user: dict = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    exercise = await db.get(Exercise, exercise_id)
+    if not exercise:
+        raise HTTPException(status_code=404, detail="Exercice non trouvé")
+
+    question = exercise.get_question(request.language)
+
+    result = await correct_student_answer(
+        question=question,
+        student_answer=request.answer,
+        points=exercise.points,
+        language=request.language
+    )
+
+    user_response = UserExerciseResponse(
+        exercise_id=exercise_id,
+        user_id=current_user["id"],
+        answer=request.answer,
+        language=request.language,
+        score=result["score"],
+        feedback=result["explication"],
+        corrected_answer=result["reponse_correcte"]
+    )
+    db.add(user_response)
+    await db.commit()
+
+    return result
+
+
+@router.post("/{exercise_id}/ensure-arabic")
+async def ensure_arabic(
+    exercise_id: int,
+    db: AsyncSession = Depends(get_db)
+):
+    exercise = await db.get(Exercise, exercise_id)
+    if not exercise:
+        raise HTTPException(status_code=404, detail="Exercice non trouvé")
+
+    success = await ensure_arabic_version(exercise, db)
+    return {"generated_arabic": success}

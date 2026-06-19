@@ -5,6 +5,7 @@ from models.session import MasteryMicroConcept
 from models.payment import Payment
 from models.reference import ReferenceEmbedding, CommonMistake
 from models.lexique import LexiqueTerme
+from models.exercise import Exercise, ExerciseDocument, UserExerciseResponse
 
 __all__ = [
     "Base",
@@ -14,4 +15,7 @@ __all__ = [
     "Payment",
     "ReferenceEmbedding", "CommonMistake",
     "LexiqueTerme",
+    "Exercise",
+    "ExerciseDocument",
+    "UserExerciseResponse"
 ]
