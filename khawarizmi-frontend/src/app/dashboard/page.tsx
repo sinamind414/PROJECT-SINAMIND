@@ -48,6 +48,7 @@ export default function DashboardPage() {
         <main className="flex-1 p-3 md:p-5 overflow-x-hidden">
           <div className="max-w-7xl mx-auto space-y-4">
             <Header profile={state.profile} onContinueAction={() => {}} />
+            <LevelXp profile={state.profile} />
             <ProgressCluster profile={state.profile} />
 
             <div className="grid lg:grid-cols-3 gap-4">
@@ -59,8 +60,6 @@ export default function DashboardPage() {
                 <TopicsPanel topics={state.topics} />
               </div>
             </div>
-
-            <LevelXp profile={state.profile} />
 
             <div className="grid md:grid-cols-2 gap-4">
               <ExercisesPanel exercises={state.exercises} onToggleAction={updateExercise} />
