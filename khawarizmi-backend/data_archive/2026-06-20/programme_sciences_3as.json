@@ -1,0 +1,1650 @@
+{
+  "matiere": "Sciences Naturelles",
+  "niveau": "3AS",
+  "sujets": [
+    {
+      "id": "revision_605_questions__ex_revision_proteines",
+      "source": "605 Questions de Révision",
+      "annee": 2019,
+      "filiere": "Sciences Expérimentales",
+      "session": "Principale",
+      "theme_principal": "ch3_immunite",
+      "points": 20,
+      "enonce": "Synthèse et Structure des Protéines",
+      "questions": [
+        {
+          "id": "q_46",
+          "texte": "- أ ذهص زالث متثَالت ٌَػػ ARN",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "( رمس ختعَعي ثس َط فصصاة ), تًِة زالزَة ال تـاد مصفL ملَوب ( , تًِة زيائَة ال تـاد وركة اًيفي ) ARNt",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_47",
+          "texte": "- ثـصف ؿىل امل كؽ او املوحودة يف اًػػ",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "موكـني : ال ول لرثحاط محغ أ مين مًضط و اًثاين ميثي اًصامزة املضادة",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_48",
+          "texte": "- اس خًذج هدِج ة معََة ثًض َط ال مٌلض الامِيَة و جضلك مـلس وػَفي رضوري حلسوث اًرتمجةARNt",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "رتط امحلغ الامين ابًػػ",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_49",
+          "texte": "- حسد ًملص ث ض َط ال مٌلض الامٌَة",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "يف اًَِوىل",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_51",
+          "texte": "- أ ذهص مصاحي ثًض َط ال مٌلض الامِيَة",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "0- جتمؽ ؾيارص جضلك املـلس ,9- ,جضلك املـلس3- حتصٍص اًيواجت",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_50",
+          "texte": "- تني أ ن معََة ثًض َط ال مٌلض الامِيَة جس هتكل اًعاكة ATP حىون ُشٍ اًصاتعة قيَة ابًعاكة أ ي محغ أ مِين وضط قين ابًعاكةARNt",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "ثدضلك راتعة زيائَة اًفوسفوأ سرت تني امحلغ الامِين و اًػػ",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_59",
+          "texte": "- أ ذهص مصاحي اًرتمجة, كسم جسمَة دكِلة ًِا مؽ اًخـََي",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "اًحساًة, الاس خعاةل و اٍهناًة, حصمجة مذـسد ة ل هَ ًمت حصهَة ؿس ة جصوثٌُات تواسعة اًحوًزيوم",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_53",
+          "texte": "- ما يه اًـالكة تني الاس خًساخ و اًرتمجة",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "هواجت الاس خًساخ املمتثةل يف اًًسزة اًورازَةARNm رشط رضوري حلسوث اًرتمجة( و حصهَة اًربوثني وس َط تُهنٌل)",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_54",
+          "texte": "- حسد اًرشوط اًرضورًة ٌَرتمجة , اًعاكة ARNt",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "اًًسزة اًورازَة , ال مٌلض الامٌَة, أ ىزمي اًخًض َط, اًػػ",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_55",
+          "texte": "- َحسد معري اًربوثني تـس حصهَح",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "( ًخزش اًحًِة اًفصاقَة املـلسة يف ملـة اًض حىة اًَِوًَة اًفـاةل, ٍىمتي هضجَ ابضافَ اًسىص هل و ًلَف يف موًعالت قوجلَة اإفصازًة ) يف هجاز قوجلي, ًعصح ذارج اخلََة ابلظصاح اخلَوي ؾن ظصًق احلوًعالت الإفصازًة",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_56",
+          "texte": "- مباذا ٌسمح اًيفق املضلك من ارثحاط حتت وحسيت اًصًحوزوم ؟",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "ٌسمح ابىزلق و ثيلي اًصًحوزوم ؿىل ظول اًًسزة اًورازَةARNm",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_57",
+          "texte": "- اذهص مذعَحات اًرتمجة معََة ثًض َط ال مٌلض الامِيَة",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "أ ىزمي هوؾي ذاص ابًخًض َط أ مِيو أ س َي س يدِخاز و ظاكة كاتةل ًالس خـٌلل ًدضىِي اًصاتعة اًفوسفورًةATP ARNr اًربوثٌُات",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_58",
+          "texte": "- كارن حصهَة اًربوثني تني اخلالاي ملِلِة و تسائَة اًيواة يف خسول",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "ذالاي تسائَة اًيواة ذالاي ملِلِة اًيواة مزتامٌة كري مزتامٌة ًوحود قضاء فاظي تني اًيواة و اًَِوىل) اًزتامن ( اس خًساخ و حصمجة ARNm انجض مدارشة حسوث هضج ًٌَسزة اًورازَةARNm اًيضج أ نرب أ ٌكي هكَة اًربوثني أ نرب أ كي رسؿة حصهَة اًربوثني",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_61",
+          "texte": "– أ ذهص دعائط اًػػ",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "ٌس هتكل و مسة تلائَ كعرية يف اًَِوىل و ًيلي وسزة ٌَمـَومات ورازَة ًيوع من اًربوثني",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_60",
+          "texte": "- تني اًلعس من امليعلة اًصامزة",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "و يه امليعلة املضفصة ًل مٌلض الامِيَة حمسودة تثالزَة تسء و زالزَة ثوكف و يه حزء من املورزة",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_69",
+          "texte": "- تني اًلعس من ابملورزة",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "و يه ثخاتؽ هَلكَوثَسي ٌَمـَوماتًا ورازَة ًِا مٌعلذني ال وىل كري رامزة و اًثاهَة رامزة اًوحسة9 ( : اًـالكة تني تًِة و وػَفة اًربوثني56 ) سؤال و حواب",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_0",
+          "texte": ") هَف ًمت متثَي اجلزًئات اًخس َعة ( ال مٌلض الامِيَة ؟",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "تػػ3 مناذج ؾصض و يه اًـود, اًىصة و اًىصة و اًـود",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_9",
+          "texte": ") هَف ًمت متثَي اجلزًئات اًىدرية ( اًربوثني ؟",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "تػػ5 مناذج ؾصض و يه اًـود, اًىصة و اًىصة و اًـود , اًرشًط و اًرشًط اًسمَم",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_3",
+          "texte": "هَف ثؼِص اًحًِةα تامنذج اًـصض يف اًصاس خوب ؟",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "ثؼِص ؿىل صلك رشًط حَزوين جمنوذج اًرشًعي و اًرشًعي اًسمَم تَون أ محص",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_4",
+          "texte": "هَف ثؼِص اًحًِةβ تامنذج اًـصض يف اًصاس خوب ؟",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "ثؼِص ثضلك مسعح و ثضلك سِم ًخحسًس الاجتاٍ و متَزي اًحًِاتβ املخوازًة و املخـاهسة تَون أ ظفص أ و أ زرق",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_5",
+          "texte": "وحضًاًفائسة من دراسة ا ربوثٌُات ابًوكحَوحص ) ( راس خوب",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "( ثلَري ظصًلة متثَي اًربوثني مناذج اًـصض ), اإحصاء دراسة مفعةل ًحًِة اًربوثني, حتسًس مواكػػػػػػؽ ال مٌلض الامٌَة داذي اًحًِة اًفصاقَة, رتط اًـالكة تني موكؽ امحلغ الامِين و اًحًِة اًفصاقَة, ثػػػحسًس امل وكؽ اًفـال, ظصًلة ارثحاط اًربوثني أ و الإىزمي مبادة اًخفاؿي",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_6",
+          "texte": "حسد مس خوايت اًحًِة اًفصاقَة ٌَربوثني",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "اًحًِة ال وًَة, اًحًِة اًثاهوًة, اًحًِة اًثاًثَة و اًحًِة اًصاتـَة",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_7",
+          "texte": "ؾصف اًحًِة ال وًَة",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "يه ثخاتؽ ال مٌلض الامِيَة مصثحعة جصواتط تَخذَسًة ًخىوٍن سَسةل تَخذَسًة",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_8",
+          "texte": "ؾصف اًحًِة اًثاهوًة",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "يه اًخفاف اًسَسةل اًحَخذَسًة ذات اًحًِة الاوًَة ًخىوٍن تًِات اثهوًة يف مٌاظق حمسدة من اًسَسةل اًحَخذَسًة و منزي هوؿني من اًحًِات اًثاهوًة و يهα ؾحارة ؾن اًخفاف اًسَسةل اًحَخذَسًة يف مٌاظق حمسدة ًخب ذش اًضلك احلَزوين وβ و يه اهعواء اًسَسةل اًحَخذَسًة يف مٌاظق حمسدة ًخب ذش صلك ورًلات معوًة",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_01",
+          "texte": "- ثـصف ؿىل اًحًِات اًيت جسمح ٌَحًِة اًثاهو ًة أ ن ثب ذش صلك اًحًِة اًثاًثَة",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "املياظق اًحًَِة اًيت ًُس ًِا أ صاكل فصاقَة حمسدة و اًيت ثخواخس تني اًحًِات اًثاهوًة",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_00",
+          "texte": "- ؾصف اًحًِة اًثاًثَة",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "يه اهعواء اًسَسةل اًحَخذَسًة احملخوًة ؿىل ؿسد من اًحًِات اًثاهوًة و املياظق اًحًَِة",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_09",
+          "texte": "- أ ٍن حيسث الاهعواء ٌَسَسةل ا ًحَخذَسًة ذات اًحًِات اًثاهوًة ؟",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "يف مس خوى املياظق اًحًَِة فِعَق ؿَهيا امس مٌاظق الاهـعاف",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_03",
+          "texte": "- تني ًهَف حتافغ اًحًِة ا ثاًثَة ؿىل متاسىِا و اس خلصارُا",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "تفضي اًصوات ( ط اًَِسروحِيَة تني اًوػائف اًىميَائَة ٌَجشور الاًىََِة, اًصواتط املَحَة اًضاردًة ,), جتاذب اجلشور اًاكرُة ٌٌَلء اجلسور اًثيائَة اًىربًت S-S",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_04",
+          "texte": "- تني هَف ثدضلك اًصواتط ا ًَِسروحِيَة يف اًحًِة اًثاًثَة",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "تني خشور ال مٌلض الامِيَة اًىحوًَة و اًىصتوهس َََة مثال",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_05",
+          "texte": "- تني هَف ثدضلك اًصو اتط املَحَة )(اًضاردًة يف اًحًِة اًثاًثَة",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "تني خشور ال مٌلض الامٌَة احل ا مضَة و اًلاؿسًة",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_06",
+          "texte": "- تني هَف ثدضلك اجلسور اًثيا ئَة اًىربًت يف اًحًِة اًثاًثَة",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "تني ال مٌلض الامِيَة ذات اجلشور اًىربًدِة",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_07",
+          "texte": "- تني هَف ثدضلك اجلشور اًاكرُة ٌٌَلء يف اًح ًِة اًثاًثَة",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "تني ال مٌلض الامِيَة ذات اجلشورCH3 أ و اًـعصًة مثال",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_08",
+          "texte": "- ؾصف اًحًِة اًصاتـَة",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": ".يه جتمؽ سَسَخني تَخذَسثني أ و أ نرث ًلك مهنٌل تًِة اثًثَة",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_91",
+          "texte": "- تني هَف حتافغ اًحًِة اًصاتـَة ؿىل متاسىِا",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "ثامتسم جصواتط ضـَفة اكًصواتط اًَِسروحِيَة,اًضاردًة و اًاكرُة ٌٌَلء",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_90",
+          "texte": "- حسد أ دىن و أ كىص ؿسد ًخحت اًوحسات يف اًحًِة اًصاتـَة",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "أ دىن ؿسد ُو19 و أ كعاٍ كري حمسود ( اًلٌوات اًفوًعَة ًِا5 ) حتت وحسات",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_99",
+          "texte": "- حسد معسر الادذالف يف اًحًِة اًفصاقَة ٌَربوثٌُات و ؿالكذَ ابًوػَفة ؟",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "ًـود الادذالف يف اًحًِة اًفصاقَة ٌَربوثٌُات اإىل هوع ؿسد و حصثُة الامٌلض الامِيَة و ًؤدي اإىل ثيوع يف وػَفة اًربوثني",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_93",
+          "texte": "- ثـصف ؿىل اًوحسات اًحيائَة ٌَربوثني ؟",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "ال مٌلض الامِيَة",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_94",
+          "texte": "- ؾصف امحلغ الامِين",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "مصهة ؾضوي حيخوي ؿىل اًىصتون, اًَِسروخني, ال هسجني و اًيَرتوخني هل حزئني أ حسُــٌل مذلري ميثي اجلشر الاًىًِل ختخَف فَِ مجَؽ ال مٌلض الامِيَة و ال دص اثتت جضرتك فَِ مجَؽ ال محػػػػػػػػػػػاض الامِيَة ؾحارة ؾن هصتون َُلكي حيمي َُسروخني و وػَفذني هصتوهس َََة و كاؿسًة",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_95",
+          "texte": "- اس خًذج كاؿسة ًخعيَف الامٌلض الامِية",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "ثعيف الامٌلض الامِيَة اىل كاؿسًة خشرُا حيخوي ؿىل وػَفة كاؿسًة و أ محػػػػػػػػػػػػاض أ مِيَة محضَة خشرُا حيخوي ؿىل وػَفة هصتوهس َََة و مـخسةل خشرُا ل حيخوي ل ؿىل وػَفة كاؾػػػػػػسًة و ل ؿىل وػَفة هصتوهس َََة( ثعيَف وِصابيئ)",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_96",
+          "texte": "- ظيف ال مٌلض الامِيَة يف خسول)(ًوخس ثعيَف هميَايئ ًـمتس ؿىل صلك اجلشر و اجملموؿات اًىميَائَة",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "حا مضَة مـخسةل كاؿسًة محغ اًلَواتمِم محغ الاس حارثَم املَثََِة أ مِسات الامٌلض الامِيَة اًىحوًَة اًىربًدِة احلَلِة , أ رحٌني ,ًزيٍن ُُسدِسٍن ,الاهني, فاًني ,ًوسني ,كَُسني ,اٍزوًوسني الاس حارخني و اًلَواتمني سريٍن ثصًوهني مثَوهني سُس خُئني احلَلِة اًـعصًة جصوًني ثريوزٍن حصتخوفان فٌَي أ لهني",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_97",
+          "texte": "- ثـصف ؿىل أ ثسط محغ أ مِين",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "اًلال ٌسني",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_98",
+          "texte": "- ثـصف ؿىل أ ؾلس محغ أ مِين",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "اً رتخوفان",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_31",
+          "texte": "- حسد سَوك امحلغ الامِين يف وسط مـخسل",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "سَوك مذـادل وِصابئَا",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_30",
+          "texte": "- حسد َس وك امحلغ الامِين يف وسط كاؿسي",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "سَوك ح ا ميض",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_39",
+          "texte": "- حسد سَوك امحلغ الامِين يف و سط محيض",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "سَوك كاؿسي",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_33",
+          "texte": "- ثـصف ؿىل اخلاظَة اًفزيايئَة ا ًيت حمتزي هبا الامٌلض الامِيَة",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "( اخلاظَة الامفوثريًة امحللََة )",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_34",
+          "texte": "- ًتني ا لعس من اخلاظَة امحللََة",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "َِسَوك امحلغ الامِين ُو ؾىس اًوسط املوحود ف سَوك كواؿس ابندسابH+ يف وسط محيض و سَوك أ مٌلض يف وسط كاؿسي تفلسH+",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_35",
+          "texte": "- فرس سَوك امحلغ الا َِمِين اجتاٍ اًوسط املوحود ف",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "ًفرس مسة ظحَـة اًضحية اًىِصابئَة املىدس حة و مبلارهةPH اًوسط مؽPHi امحلغ الامِين",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_36",
+          "texte": "- تني اًلعس من أ ًون زيايئ اًلعة",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "أ ًون أ ندسة هوؿني من ا ًضحيات اًىِصابئَة موحدة و ساًحة تـسد مدساوي",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_37",
+          "texte": "- فرس املسافة اًيت ًلعـِا امحلغ الامِين اجتاٍ ا ل كعاب اهعالكا من هلعة اًحساًة",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "تلوة اًضحية املىدس حة من ظصف امحلغ الامِين",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_38",
+          "texte": "- فرس اندساب ش ية موحدة من ظصف امحلغ الامِين",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "ابندساب جصوثون و فلس اإًىرتون أ ي ثب ٍن اًوػَفة اًلاؿسًة",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_41",
+          "texte": "- حسد سَوك امحلغ الامِين اذلي حيمي شية موحدة",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "سَوك كاؿسي يف وسط حاميض",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_40",
+          "texte": "- حسد سَوك امحل غ الامِين اذلي حيمي شية ساًحة",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "سَوك محيض يف وسط كاؿسي",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_43",
+          "texte": "- مك ثًذج حزًئة ماء و راتعة تَخ ذَسًة من احتاد01 أ مٌلض أ مِيَة",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "9 حزًئات ماء و9 رواتط تَخذَسًة",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_44",
+          "texte": "- ثـصف ؿىل اًوػائف اًىميَائَة املضارنة يف جضىِي رواتط تَخِخَسًة",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "اًىصتوهس َََة ٌَحمغ الامِين الاول و اًلاؿسًة ٌَحمغ الامِين اًثاين",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_45",
+          "texte": "- ُي ًخب ثص ؿسد اًوػائف اًىصتوهس َََة و اًلاؿسًة احل صة ( اجلاهخِة ) تعول اًربوثني ؟",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "ل ثحلى اثتخة همٌل ثلري ظول اًسَسةل اًحَخذَسًة",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_63",
+          "texte": "- حسد مًضب اٌَمفاوايت LB",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "املًضب يف خناع اًـؼام ال محص",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_64",
+          "texte": "- حسد ملص اندساب اًىفاءة املياؾَة ٌَمفاوايتLB",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "يف اًيزاع اًـؼام ال محص ترتهَة مس خلدالت قضائَة ؾحارة ؾن أ حسام مضادة BCR",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_65",
+          "texte": "- تني سخة ثـصف اٌَمفاوايت اًحائَةLB ؿىل املس خضس و هدِجة ذكل",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "اىل اهخزاب ملة من اٌَمفاوايت اًحائَة ثعحح حمسسة مِر متخكل مس خلدالت قضائَة مذاكمةل تًِواي مؽ حمسدات املس خضس",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_66",
+          "texte": "- تني سخة اهخزاب ملة من اٌَمفاواي) ت اًحائَة ( الاهخلاء اًًس ًَل",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "ؿىل اًخاكمي اًحًِوي تني املس خلدي اًلضايئ ٌَمفاوًة اًحائَة و حمسدات املس خضس و وسمهيا خب اظَة اًيوؾَة",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_67",
+          "texte": "- ثـصف ؿىل املزية الاساس َة ٌَمفاوايت اًحائَة LB اجتاٍ املس خضسات",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "حمتزي ابًيوؾَة اجتاٍ املس خضس لمذالوِا مس خلدالت قضائَة هوؾَةBCR",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_68",
+          "texte": "- تني سخة ٌَ ثواخس مس خلدالت قضائَة ( أ حسام مضادة ) ؿىل اًسعح اخلاريج لضاء اًَِويل ٌَمفاوايت اًحائَة",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "ًسل ؿىل هضجِا أ ي اندساهبا نفاءة مٌاؾَة",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_71",
+          "texte": "- ثـصف ؿىل اخلعائط اًحًِوًة اًيت متىن من أ داء اًحالزموسُت ًوػَفهتا املمتثةل يف اهخاج الاحسام املضادة",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "قزارة اًَِوةل و منووثعور ًـغ اًـضَات املمتػػػػػػػػػػػػػػػثةل يف ( اًضـــحىة الاهسوتالزمِة اًفـاةل- هجاز هوجلي- املَخوهوهسرايت- )موًعالت الإفصاز",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_70",
+          "texte": "- ؿَي ثـصًغ اًفب ر ًل صـة اًس ًَِة",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "( اإًلاء مجَؽ اًخفاؿالت املياؾَة ثوكف الاهلسامات اخلَوًة ) تخرصًة ذالاي هلي اًـؼػػػػػػام",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_79",
+          "texte": "- ؿَي ملن اًفب ر تَمفاوايت مب دوذة من فب ر من هفس اًسالةل",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "( من أ خي اس خـادة ؾضوًة اًفب ر اًلسرة ؿىل ادلفاع املياؾي اسرتخاع اًخفاؿالت املياؾَة )",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_73",
+          "texte": "- ؿَي ملن اًفب ر تب انثوهسني نزازي تـس94 سا من اخلعوة اًساتلة ( اًسؤال79 )",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "املسة اًزمٌَة اكفِة لإؿادة مل ال ؾضاء اٌَمفاوًة ابخلالاي اٌَمفاوًة, و ملن املس خضس اًىزازي املـسل من أ حــي اإهساب اًف ب ر مٌاؿة أ و معاهة هوؾَة ضس اًخوهسني اًىزازي",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_74",
+          "texte": "- ؿَي ملن اًفب ر تخاميَسٍن مضؽ",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "احللن ابًخاميَسٍن املضؽ و يه وحسة أ ساس َة ٌٌَلدة اًورازَة من أ خي كِاس صسة الاهلسام اخلَوي و ثددؽ ملص حاكثص و متاٍز اخلالاي اٌَمفاوًة",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_75",
+          "texte": "- ارشح مفِوم اًورًسات",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "ًُست مبـلسات مٌاؾَة تي يه ارثحاط ؿسة مس خضسات هصايت محصاء قصًحة مؽ املس خلدالت اًلضائَة اًيوؾَة ٌَمفاوايت اًحائَة ٌسمح ذكل ابهخزاب ملة",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_76",
+          "texte": "- وحض اًلعس من ظََـة اٌَمفاوًة اًحائَة Pro-LB ؟",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "( يه ملفاوًة ابئَة ل حتمي مس خلدالت قضائَة هوؾَة ل حتمي أ حسام مضادة قضائَة )",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_77",
+          "texte": "- وحض اًلعس من اٌَمفاوًة اًحائَة اًيادصةLB أ ي ذات اًىفا ءة املياؾَة",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "اًيت حتمي مس خلدالت قضائَة( هوؾَة حتمي أ حسام مضادة قضائَة )",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_78",
+          "texte": "- حسد هدِجة اهخزاب اٌَمة من اٌَمفاوايت اًحائَة تـس ثـصفِا ؿىل املس خضس",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "( ًؤدي اإىل حاكثص مث متاٍز اٌَمة امليخلاة اإىل ٌَمفاوايت ابئَة ذاهصة ل ثامتٍز الا تـس ددول هفس املس خضس ٌَمصة اًثاهَة ) و تالمسوسُت مٌخجة ًل حسام مضادة",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_81",
+          "texte": "- وحض مصاحي الاهخلاء اًًس ًَل ٌَمفاوايت اًحائَةLB يف فلصة",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "أ- : الاهخلاء اًًس ًَل ال ول ,ًمت ؿىل مس خوى هلي اًـؼام مِر ثخاكثص ظََـة من اٌَمفاوايت اًدػػػػػػػػػػائَة91 ( مهنا ثخالىش% لحتمي مس خلدالت قضائَة ؿىل سعح قضاهئا ) تُامن01 مهنا ثيضج ترتهَدػػػػػػػػػػِا ملػػػػػػس خلـــحالت قضائَة ذاظة مِر ثعحح ذات نفاءة% ( مٌاؾَة ختضؽ لهخلاء وس ًَل من ظص ف ذالاي هلي اًـؼام ) ب- : الاهخلاء اًًس ًَل اًثاين ( هتاحص اٌَمفاوايت اًحائَة اًيادصة ذات اًىفاءة املياؾَة من هلي اًـؼام اإىل اًـػػػػػػػلسة اٌَمفاوًة ػػػ ؾض و حمَعي ) مِر ًمت ختزٍهنا ًفرتة كدي اًخـصف ؿىل املس خضس فِخالىش مؽ مصور اًزمن حػػػػػػزء مهنا91 تُامن% ثحلى01 مِة يف وحود% مس خضس هوؾي ( ًمت اهخلاء01 ) م% ً ِر خاكثص حزء مهنا ل ًذػػػػػٌلٍز ٌضلك ملفاوايت ذاهصة تُامن اجلزء ال دص ًامتٍز مضالك تالمسوس ــــ َت",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_80",
+          "texte": "- وحض دعوات الاهخلاء اًًس ًَل اًثاين ٌَػػLB يف فلصة",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "( اخلعوة0) : ًمت اهخلاء وس َةل من ملفاوًة ابئَة ؿىل مسة اًخاكمي اًحًِوي تني حمسد املس خضس و املسػػػػػػػػػػػػخلدي اًلضايئ اًيوؾي املوحود ( يف اًسعح اخلاريج ٌَلضاء اًَِويل ٌَمفاوًة اًحائَة املوافلة فِمت احلعول ؿىل وسػػػػػَةل من ملفاوًة ابئَة مًضعة اهخزاب هوؾي ٌَمة من ا ٌَمفاوايت ) ( اخلعوة9) : ثخاكثص اًًس َةل اٌَمفاوًة املًضعة امليخلاة فِمت احلعول ؿىل ملة من اٌَمفاوًة اًحائَة اًػػػػػػػػػػػمًضعة ( اخلعوة3) : حزء من اٌَمة ل ًامتٍز تي ٌضلك ملفاوايت ابئَة ذاهصة رسًـة الاس خجاتة حاةل ددول اثين ًٌػػػػػػفس املس خضس, تُامن اجلزء ا ل دص من اٌَمة ًامتٍز مضالك ملة من اخلالاي اًحالزمِةLBP مٌخجة و مفصزة ًل حسام مػػػػػػضادة BCG",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_89",
+          "texte": "- تني اًلعس من اًػػ",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "و ظصًلة اس خـٌلل الاانثوهسنيBCG",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_83",
+          "texte": "- كارن تني ظصًلة اس خـٌلل اًػػ",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "ال مهَة املسة اًزمٌَة ٌَفـاًَة املادة احمللوهة )اًعصًلة اًوكائَة ( اًخَلِح حتعني ؾضوًة اًاكئن احلي و اإهســـاتَ ذاهصة مٌاؾَة هوؾَة ٌَـعَات هوخ ) ظوًةل ( ذَوًة ؾعَات هوخ مـ ػػػػػػ سةل ذَػػػػػػػػػػَة BCG حتعني ؾضوًة اًاكئن احلي و اإهســـاتَ ذاهصة مٌاؾَة هوؾَة ٌَخوهسني ) ظوًةل ( ذَعَة ثوهسني مـسل حزًئة مٌحةل Anatoxine",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_84",
+          "texte": "- حسد دعائط امليا ؿة اًيوؾَة ذات اًوساظة اخلَعَة",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "مىدس حة, هوؾَة, كاتةل ٌَيلي, كاتةل ٌَرتص َح, ذَعَة",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_85",
+          "texte": "- حسد دعائط امليا ؿة اًيوؾَة ذات اًوساظة اخلَوًة",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "مىدس حة, هوؾَة , كاتةل ٌَيلي ( حاةل ثوافق وس َجي تني املـعي و املس خلدي ), ذَوًة",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_86",
+          "texte": "- ) حسد رشوط ختصًة اخلالاي اًـعحَة املعاتة من ظصف اٌَمفاوايت اًخائَة اًسمَة ( رشوط اًخـصف املزدوج",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "أ- ( َاإظاتة اخلالاي اًـعحَة ابًفريوس مِر حىون حامةل حملسداث تَخذَسات مس خضسًة قضائَة ) ب- جية أ ن حىون اخلالاي اًـعحَة املعاتة و اٌَمفاوًة اًخائَة اًسمَة من هفس اًسالةل",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_87",
+          "texte": "- حسد رش وط حسوث اًخـصف املزدوج من اًيامِة اجلزًئِة",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "أ- حاكمي تًِوي تني اًحَخذَس املس خضسي وTCR و حاكمي تًِوي تنيCMH وTCR من هجة اثهَة (الاهخلاء اًًس ًَل) ب- ( ثـصف مؤرش هضج8) CD8 ٌَمفاوًةLT8 ( ؿىل حزًئة اًخوافق اًًس َجي0) HLA1 ؾعَات هوخ مـسةل فلست فـاًَهتا مؽ امذفاػِا خباظَة اإاثرة الاس خجاتة املياؾَة BCG",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_88",
+          "texte": "- اهعالكا من املالمؼة اجملِصًة اًيت ثوحض ختصًة اخلالاي املعاتة من ظصف اٌَمفاواي ت اًسمَة LTC وحض امل صاحي اًيت أ دت اإىل حسوث ُشٍ اًؼاُصة و ُشا يف فلصة",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": ") مصحةل (أ : مصحةل اًخـصف املزدوج أ و اًامتس و اًيت ثمت تني اٌَمفاوًة اًخائَة اًسمَة LTC و اخلََة املس هتسفة اًـارضــة ٌَحَخذَس املس خضسي مِر ثمت وفق ثـصف املس خلدي اًلضايئ اًيوؾي ٌَمفاوًة اًخائَة اًسمَة LTC ؿىل اًحَدػػػػػػػػخَس املس خضسي امل ـصوض من ظصف اخلََة املس هتسفة و ُشا وفق اًخاكم ػػػػػػػػػػًِي اًح وي )مصحةل (ب ( : مصحةل اًخيفِش اًفاؿةل ) ًمت فهيا ختصًة اخلََة املس هتسفة ابًسموم اٌَمفاوًة اًخائَة اًسمـــَة ابًخايل موت املس خضسات املوحودة تساذَِا مالمؼة : ٌس حق مصحةل اًخـصف مصحةل الاكرتاب و الاجنشاب",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_14",
+          "texte": "مصاحي ًخرصًة اخلََة املعاتة من ظصف اٌَمفاوايت اًسمَة",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": ": هي املصحةل (0) : حسوث ثـصف مزدوج تني اٌَمفاوًة cTL و اخلََة املعاتة و ُشا تدضلك مـلس زالزػػػػػػػػي املصحةل (9 : ) : ثمت ؿىل ؿسة مؼاُص يه أ- حصهَة اًربفورٍن و ُو جصوثني تـمََيت الاس خًساخ و اًرتمجة ب- ختزٍن اًربفورٍن يف موًعالت اإفصازًة",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_011",
+          "texte": "- حسد ممزيات اٌَمفاوايت اًخائَة اًسمَة",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "ممزيات اخلالاي اٌَمفاوًةcTL : متخاز تلسرهتا ؿىل اًخـصف اًيوؾي ؿىل اخلالاي املعاتة و ختصًـهبا , اهخاج اًربفورٍن و الاىزميات احلاةل من هوع قصاىزمي",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_010",
+          "texte": "- تني يف فلصة هَفِة اه خلاء اٌَمفاوايت8 cT و جضلكcTL",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "اخلعوة (0 ) : ًمت اهخلاء وس َةل من اٌَمفاوايت8 cT ( هوؾَا تفضي اًخـصف املزدوج وفق حاكمي تًِوي ) تني8 cT و اخلََة املعاتة اخلعوة (9 ) : ثعحح8 cT امليخلاة مًضعة فذخاكثص مث ثامتٍز اإىلcTL مسؤوةل ؾن حتَي اخلََة املعاتة",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_015",
+          "texte": "- حسد معسر اًػػػ احملسسةLt4",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "معسرُا من حاكثص مث متاٍز اًػػػ",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_016",
+          "texte": "- حسد احلاةل اًيت ًؤثص فهيا الاهرتًونني9",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "ًؤثص يف حاةل اخلالاي اٌَمفاوًة املًضعة و احملسسة و احلامةل ٌَمس خلدالت ًا يوؾَة هل ثربز تـس اًخًض َط ابلهرتًونني0 ٍاذلي ثفصز اخلالاي اًـارضة و ُشا تـس الثعال ابملس خضس َََو اًخـصف ؿ",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_017",
+          "texte": "- حسد اًعحَـة اًىميَائَة ًالهرتًونني",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "( كََىوجصوثًَِة جصوثني سىصي )",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_018",
+          "texte": "- ٍصثحط منط الاس خجاتة املياؾَة تيوع املس خضس تني ذكل يف فلصة ؿَمَة",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "ٍصثحط منط الاس خجاتة املياؾَة تيوع ( املس خضس, حبَر اًحَخذَسات اًياجتة ؾن اًربوثٌُات داذََة املٌػػػػػػػضب ,جصوثٌُات فريوس َة ...جصوثٌُات اخلََة اًرسظاهَة ( ) ثلسم ؿىل سعح أ قض َة اخلالاي املسذػػػِسفة املعاتة) (اس خجاتة مٌاؾَة ذَوًة ) اىل اٌَمفاوايت LT8 مصثحعا جبزًئات اًػػػ HLA1 اًحَخذَسات اًياجتة ؾن اًربوثٌُات ذارحِة املٌػػػػػػػضب ثلسم ؿىل سعح أ قض َة ( اخلالاي اًـارضة كري املعاتة) (اس خجاتة مٌاؾَة ذَعَة ثًض َط ملفاوايت ابئَة ) اىل اٌَمفاوايت LT4مصثحعا جبزًئات اًػػػHLA2 يف خسولT8-T4-LB",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_001",
+          "texte": "- حسد اًـالكة اًوػَفِة املوحودة تني اٌَمفاوايت و املىصوفاج",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "ؿالكة ثـاون مٌاؾي ذَوي T4-T8-LB",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        },
+        {
+          "id": "q_000",
+          "texte": "- حسد اًـالكة اًوػَفِة املوحودة تني",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "حتفزي هميَايئ تواسعةIL2 اًخحسُس هوع املس خضس اًخًض َط اًثاين اًخًض َط ال ول هوع اًخًض َط كري مدارش تَخذَس مس خضسيTCR مس خسذي و كري مس خسذي IL2-Lth IL1-CPA مضاؾف T4 كري مدارش تَخذَس مس خضسيTCR كري مس خسذي IL2-Lth IL1-CPA مضاؾف T8 مدارش حمسد مس خضسBCR مس خسذي IL2-Lth ----------- كري مضاؾف LB",
+            "concept_cle": "Révision Globale"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Synthèse et Structure des Protéines. Concept clé : Révision Globale."
+        }
+      ]
+    },
+    {
+      "id": "sujet_1_bac_blanc__ex1_lait",
+      "source": "Sujet 1 - Protéines et pH",
+      "annee": 2023,
+      "filiere": "Sciences Expérimentales",
+      "session": "Principale",
+      "theme_principal": "ch1_proteines",
+      "points": 5,
+      "enonce": "Composants organiques (Protéines)",
+      "questions": [
+        {
+          "id": "q1_tableau",
+          "texte": "أكمل الجدول الخاص بالكواشف المستعملة للتعرف على مكونات الحليب (مثلا: الكاشف عن السكريات المرجعة، البروتينات، إلخ).",
+          "points": 0,
+          "micro_concept_id": "ch1_proteines",
+          "diagnostic_erreur_cible": "ERR_BIO_METH_01",
+          "solution": {
+            "reponse": "محلول فهلنج يكشف عن السكريات (أحمر آجري)، حمض الآزوت يكشف عن البروتينات (أصفر)، تفاعل بيوري للبروتينات (بنفسجي).",
+            "concept_cle": "الكواشف اللونية"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Composants organiques (Protéines). Concept clé : الكواشف اللونية."
+        },
+        {
+          "id": "q1_reaction",
+          "texte": "تضاف المادة (أ) إلى قليل من الماء مع قطرات من HCl ويعرض الخليط إلى الحرارة. كيف يسمى هذا التفاعل؟ ما هي نتائجه؟",
+          "points": 0,
+          "micro_concept_id": "ch1_proteines",
+          "diagnostic_erreur_cible": "ERR_BIO_METH_01",
+          "solution": {
+            "reponse": "تفاعل إماهة (تحلل مائي). نتيجته تفكيك جزيئات السكر المعقد (أو البروتين) إلى جزيئات بسيطة.",
+            "concept_cle": "الإماهة"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Composants organiques (Protéines). Concept clé : الإماهة."
+        }
+      ]
+    },
+    {
+      "id": "sujet_1_bac_blanc__ex2_phi",
+      "source": "Sujet 1 - Protéines et pH",
+      "annee": 2023,
+      "filiere": "Sciences Expérimentales",
+      "session": "Principale",
+      "theme_principal": "ch1_proteines",
+      "points": 7,
+      "enonce": "سلوك الأحماض الأمينية والبروتينات في أوساط مختلفة الـ pH",
+      "questions": [
+        {
+          "id": "q2_analyse",
+          "texte": "حلل المنحنى البياني لتشرد الوظائف الحامضية والقاعدية بدلالة الـ pH.",
+          "points": 0,
+          "micro_concept_id": "ch1_proteines",
+          "diagnostic_erreur_cible": "ERR_BIO_METH_01",
+          "solution": {
+            "reponse": "نلاحظ أنه في الأوساط الحامضية (pH < pHi) تتشرد الوظائف القاعدية (NH3+)، وفي الأوساط القاعدية (pH > pHi) تتشرد الوظائف الحامضية (COO-)، وعند pH معين تتساوى نسبة التشردين (الوظائف الحامضية والقاعدية).",
+            "concept_cle": "تحليل منحنى التشرد"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : سلوك الأحماض الأمينية والبروتينات في أوساط مختلفة الـ pH. Concept clé : تحليل منحنى التشرد."
+        },
+        {
+          "id": "q2_phi_value",
+          "texte": "أوجد قيمة الـ pHi للبروتين المستعمل من خلال النتائج.",
+          "points": 0,
+          "micro_concept_id": "ch1_proteines",
+          "diagnostic_erreur_cible": "ERR_BIO_METH_01",
+          "solution": {
+            "reponse": "قيمة الـ pHi هي 6 (حيث تتساوى نسبة المجموعتين المتشردتين 50% لكل منهما).",
+            "concept_cle": "تحديد الـ pHi"
+          },
+          "reponse_numerique_attendue": 6.0,
+          "pattern_recherche": "6|ستة",
+          "note_pedagogique": "Thématique : سلوك الأحماض الأمينية والبروتينات في أوساط مختلفة الـ pH. Concept clé : تحديد الـ pHi."
+        }
+      ]
+    },
+    {
+      "id": "sujet_3_bac_blanc__ex1_adn_cycle",
+      "source": "Sujet 3 - ADN et Perméabilité Cellulaire",
+      "annee": 2023,
+      "filiere": "Sciences Expérimentales",
+      "session": "Principale",
+      "theme_principal": "ch1_proteines",
+      "points": 6,
+      "enonce": "Information Génétique (ADN)",
+      "questions": [
+        {
+          "id": "q1_cycle_cellulaire",
+          "texte": "أنجز منحنى تطور كمية الـ ADN بدلالة الزمن ثم حدّد على هذا المنحنى المراحل المختلفة التي يمثلها، واذكر ماذا تمثل كل منها؟",
+          "points": 0,
+          "micro_concept_id": "ch1_proteines",
+          "diagnostic_erreur_cible": "ERR_BIO_METH_01",
+          "solution": {
+            "reponse": "يمثل المنحنى دورة خلوية تتكون من مرحلة بينية (تتضمن G1, S للتضاعف، و G2) ومرحلة انقسام خيطي متساوي (M) حيث تتنصف كمية الـ ADN.",
+            "concept_cle": "الدورة الخلوية وتضاعف الـ ADN"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Information Génétique (ADN). Concept clé : الدورة الخلوية وتضاعف الـ ADN."
+        },
+        {
+          "id": "q2_interpretation_adn",
+          "texte": "فسر التغيرات الملاحظة على المستوى الجزيئي مبرزاً أهمية الظاهرة على المستوى الوراثي.",
+          "points": 0,
+          "micro_concept_id": "ch1_proteines",
+          "diagnostic_erreur_cible": "ERR_BIO_METH_01",
+          "solution": {
+            "reponse": "تتضاعف كمية الـ ADN خلال المرحلة S بفضل التضاعف نصف المحافظ لضمان انتقال نفس المعلومة الوراثية للخلايا البنات، وتنخفض إلى النصف خلال الانقسام بسبب انفصال الكروماتيدات.",
+            "concept_cle": "التضاعف نصف المحافظ"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : Information Génétique (ADN). Concept clé : التضاعف نصف المحافظ."
+        }
+      ]
+    },
+    {
+      "id": "sujet_3_bac_blanc__ex2_permeabilite",
+      "source": "Sujet 3 - ADN et Perméabilité Cellulaire",
+      "annee": 2023,
+      "filiere": "Sciences Expérimentales",
+      "session": "Principale",
+      "theme_principal": "ch4_nerveux",
+      "points": 7,
+      "enonce": "نفاذية الغشاء الهيولي",
+      "questions": [
+        {
+          "id": "q1_interpretation_osmose",
+          "texte": "وضعت خلايا نباتية في محلول مخفف للأحمر المعتدل فتلوّنت الفجوة. عند وضعها في ماء عادي بقيت ملونة والماء الخارجي صاف. وعند وضعها في محلول البولة بتركيز 4.8% انكمشت الخلية ثم بعد 60 دقيقة أصبحت في حالة توازن. فسر النتائج التجريبية.",
+          "points": 0,
+          "micro_concept_id": "ch4_nerveux",
+          "diagnostic_erreur_cible": "ERR_NERV_METH_01",
+          "solution": {
+            "reponse": "تلوّن الفجوة يدل على دخول الملون (نفاذية). بقاؤها ملونة في الماء العادي يدل على أن الغشاء لا يسمح بخروجه (نفاذية اصطفائية/ميزية). الانكماش الأولي في البولة سببه خروج الماء بالحلول (وسط خارجي عالي التركيز). والعودة للتوازن بعد 60 دقيقة سببه دخول البولة تدريجياً عبر الغشاء فتبعتها جزيئات الماء.",
+            "concept_cle": "النفاذية الميزية والحلول"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : نفاذية الغشاء الهيولي. Concept clé : النفاذية الميزية والحلول."
+        },
+        {
+          "id": "q2_proprietes_membrane",
+          "texte": "ما هي خصائص الغشاء الهيولي التي أظهرتها هذه الدراسة ؟",
+          "points": 0,
+          "micro_concept_id": "ch4_nerveux",
+          "diagnostic_erreur_cible": "ERR_NERV_METH_01",
+          "solution": {
+            "reponse": "أظهرت الدراسة أن الغشاء الهيولي يمتاز بالنفاذية الميزية (الاصطفائية) ونفاذيته للماء (الظاهرة الحلولية).",
+            "concept_cle": "خصائص الغشاء الهيولي"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : نفاذية الغشاء الهيولي. Concept clé : خصائص الغشاء الهيولي."
+        }
+      ]
+    },
+    {
+      "id": "ahmed_amin_khelifa_v2_part1__khelifa_immunite_1",
+      "source": "Ahmed Amin Khelifa V2 - Partie 1",
+      "annee": 2024,
+      "filiere": "Sciences Expérimentales",
+      "session": "Principale",
+      "theme_principal": "ch3_immunite",
+      "points": 8,
+      "enonce": "المناعة (دور البروتينات في الدفاع عن الذات)",
+      "questions": [
+        {
+          "id": "q1_khelifa_vih",
+          "texte": "تمثل الوثيقة 1 مراحل تطور فيروس السيدا (VIH) داخل الخلية اللمفاوية LT4. حلل الوثيقة وماذا تستنتج حول دور الـ LT4 في الاستجابة المناعية؟",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "يمثل المنحنى تزايد شحنة الفيروس وتناقص عدد الـ LT4 مع مرور الزمن. الاستنتاج: الخلية LT4 هي الخلية المستهدفة من طرف الفيروس، وهي محور الاستجابة المناعية (الخلطية والخلوية).",
+            "concept_cle": "فيروس السيدا و LT4"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : المناعة (دور البروتينات في الدفاع عن الذات). Concept clé : فيروس السيدا و LT4."
+        },
+        {
+          "id": "q2_khelifa_cmh",
+          "texte": "فسر لماذا يتم رفض الطعم عند اختلاف معقد التوافق النسيجي (CMH) بين المعطي والمستقبل.",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "يعود رفض الطعم إلى أن خلايا المستقبل تتعرف على الـ CMH الخاص بالطعم كـ (لا ذات)، مما يحفز استجابة مناعية خلوية بتدخل الـ LTc التي تدمر خلايا الطعم.",
+            "concept_cle": "نظام الـ CMH ورفض الطعم"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : المناعة (دور البروتينات في الدفاع عن الذات). Concept clé : نظام الـ CMH ورفض الطعم."
+        }
+      ]
+    },
+    {
+      "id": "ahmed_amin_khelifa_v2_part1__khelifa_nerveux_1",
+      "source": "Ahmed Amin Khelifa V2 - Partie 1",
+      "annee": 2024,
+      "filiere": "Sciences Expérimentales",
+      "session": "Principale",
+      "theme_principal": "ch4_nerveux",
+      "points": 7,
+      "enonce": "الاتصال العصبي",
+      "questions": [
+        {
+          "id": "q1_khelifa_synapse",
+          "texte": "صف آلية انتقال الرسالة العصبية على مستوى المشبك الكيميائي إثر وصول كمون عمل.",
+          "points": 0,
+          "micro_concept_id": "ch4_nerveux",
+          "diagnostic_erreur_cible": "ERR_NERV_METH_01",
+          "solution": {
+            "reponse": "وصول كمون العمل يؤدي إلى انفتاح قنوات Ca2+ المرتبطة بالفولطية، دخول الكالسيوم يحفز هجرة الحويصلات المشبكية وتحرير المبلغ العصبي (كالأسيتيل كولين) في الشق المشبكي، ليتثبت على مستقبلاته القنوية في الغشاء بعد المشبكي.",
+            "concept_cle": "النقل المشبكي الكيميائي"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : الاتصال العصبي. Concept clé : النقل المشبكي الكيميائي."
+        }
+      ]
+    },
+    {
+      "id": "tafawok_2024__tafawok_immunite_grippe",
+      "source": "Tafawok 2024 - Mohammedi",
+      "annee": 2024,
+      "filiere": "Sciences Expérimentales",
+      "session": "Principale",
+      "theme_principal": "ch3_immunite",
+      "points": 7,
+      "enonce": "المناعة (التلقيح وفيروس الأنفلونزا)",
+      "questions": [
+        {
+          "id": "q1_tafawok_vaccin",
+          "texte": "أبرز باستغلالك لشكلي الوثيقة 1 العلاقة بين أهمية التلقيح والعدوى بفيروس الأنفلونزا.",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "الشخص الملقح يمتلك نسبة عالية من الأجسام المضادة النوعية التي ترتبط بمحددات الفيروس (HA و NA) وتمنع تكاثره، بينما الشخص غير الملقح يشهد تزايدا في شحنة الفيروس (ARNv) لغياب الأجسام المضادة وضعف الاستجابة الأولية.",
+            "concept_cle": "أهمية التلقيح والاستجابة الثانوية"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : المناعة (التلقيح وفيروس الأنفلونزا). Concept clé : أهمية التلقيح والاستجابة الثانوية."
+        },
+        {
+          "id": "q2_tafawok_mutation",
+          "texte": "أثبت أن التلقيح ضد السلالة الأولى لا يحمي من خطر الإصابة بالسلالة الثانية مبرزا صعوبة التصدي للفيروسات.",
+          "points": 0,
+          "micro_concept_id": "ch3_immunite",
+          "diagnostic_erreur_cible": "ERR_IMM_METH_01",
+          "solution": {
+            "reponse": "تغير النمط الوراثي (طفرة) يؤدي لتغير في البنية الفراغية لمحددات المستضد الفيروسي. الأجسام المضادة المنتجة ضد السلالة الأولى نوعية ولا تتكامل بنيويا مع محددات السلالة الثانية، مما يفسر صعوبة التصدي لتغير السلالات المستمر.",
+            "concept_cle": "النوعية والطفرات الفيروسية"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : المناعة (التلقيح وفيروس الأنفلونزا). Concept clé : النوعية والطفرات الفيروسية."
+        }
+      ]
+    },
+    {
+      "id": "tafawok_2024__tafawok_enzymes_ache",
+      "source": "Tafawok 2024 - Mohammedi",
+      "annee": 2024,
+      "filiere": "Sciences Expérimentales",
+      "session": "Principale",
+      "theme_principal": "ch2_enzymes",
+      "points": 7,
+      "enonce": "النشاط الإنزيمي (AChE)",
+      "questions": [
+        {
+          "id": "q1_tafawok_ache_desc",
+          "texte": "قدم وصفا لإنزيم أستيل كولين استراز (AChE) انطلاقا من الشكلين (أ و ب).",
+          "points": 0,
+          "micro_concept_id": "ch2_enzymes",
+          "diagnostic_erreur_cible": "ERR_ENZ_METH_01",
+          "solution": {
+            "reponse": "إنزيم AChE ذو بنية فراغية معقدة (ثالثية أو رابعية) يحتوي على موقع فعال يتكون من أحماض أمينية محددة بدقة في الفراغ تتكامل مع مادة التفاعل (ACh).",
+            "concept_cle": "وصف البنية الفراغية للإنزيم"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : النشاط الإنزيمي (AChE). Concept clé : وصف البنية الفراغية للإنزيم."
+        },
+        {
+          "id": "q2_tafawok_ache_meca",
+          "texte": "بيّن آلية عمل انزيم الاستيل كولين استراز.",
+          "points": 0,
+          "micro_concept_id": "ch2_enzymes",
+          "diagnostic_erreur_cible": "ERR_ENZ_METH_01",
+          "solution": {
+            "reponse": "يتكامل الموقع الفعال للإنزيم بنيويا مع الأستيل كولين مشكلا معقد (ES). يتم تحفيز التفاعل (إماهة) ليتحرر الكولين وحمض الخليك، ويسترجع الإنزيم بنيته الأصلية.",
+            "concept_cle": "آلية التأثير الإنزيمي"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : النشاط الإنزيمي (AChE). Concept clé : آلية التأثير الإنزيمي."
+        }
+      ]
+    },
+    {
+      "id": "morafik_brahimi__morafik_proteines_structure",
+      "source": "Le Morafik - Brahimi",
+      "annee": 2023,
+      "filiere": "Sciences Expérimentales",
+      "session": "Principale",
+      "theme_principal": "ch1_proteines",
+      "points": 6,
+      "enonce": "العلاقة بين بنية ووظيفة البروتين",
+      "questions": [
+        {
+          "id": "q1_morafik_niveaux",
+          "texte": "ما هي المستويات البنيوية التي تميز البروتينات الوظيفية مثل الإنزيمات والأجسام المضادة؟",
+          "points": 0,
+          "micro_concept_id": "ch1_proteines",
+          "diagnostic_erreur_cible": "ERR_BIO_METH_01",
+          "solution": {
+            "reponse": "المستوى البنيوي الثالثي والمستوى البنيوي الرابعي.",
+            "concept_cle": "المستويات البنيوية للبروتينات"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : العلاقة بين بنية ووظيفة البروتين. Concept clé : المستويات البنيوية للبروتينات."
+        },
+        {
+          "id": "q2_morafik_stablilite",
+          "texte": "كيف تتشكل البنيات الفراغية للبروتينات الوظيفية وما الذي يضمن استقرارها؟",
+          "points": 0,
+          "micro_concept_id": "ch1_proteines",
+          "diagnostic_erreur_cible": "ERR_BIO_METH_01",
+          "solution": {
+            "reponse": "عدد وطبيعة وتتالي الأحماض الأمينية هي التي تتحكم في البنية الفراغية. استقرارها يضمنه نشوء روابط (هيدروجينية، شاردية، كبريتية، كارهة للماء) بين السلاسل الجانبية R لأحماض أمينية محددة.",
+            "concept_cle": "استقرار البنية الفراغية"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : العلاقة بين بنية ووظيفة البروتين. Concept clé : استقرار البنية الفراغية."
+        }
+      ]
+    },
+    {
+      "id": "el_mojtahid_3as__mojtahid_synthese_proteines",
+      "source": "El Mojtahid en Sciences (5 Étoiles)",
+      "annee": 2023,
+      "filiere": "Sciences Expérimentales",
+      "session": "Principale",
+      "theme_principal": "ch1_proteines",
+      "points": 8,
+      "enonce": "تركيب البروتين والطفرات الوراثية",
+      "questions": [
+        {
+          "id": "q1_mojtahid_transcription",
+          "texte": "تمثل الوثيقة 1 آلية الاستنساخ. حدد شروط هذه الظاهرة مع إبراز دور إنزيم الـ ARN بوليميراز.",
+          "points": 0,
+          "micro_concept_id": "ch1_proteines",
+          "diagnostic_erreur_cible": "ERR_BIO_METH_01",
+          "solution": {
+            "reponse": "الشروط: مورثة (ADN)، إنزيم الـ ARN بوليميراز، نيوكليوتيدات ريبية حرة، وطاقة (ATP). دور الإنزيم: التعرف على بداية المورثة، فتح سلسلتي الـ ADN بكسر الروابط الهيدروجينية، وقراءة التتابع النيوكليوتيدي لربط النيوكليوتيدات الحرة وتشكيل سلسلة ARNm.",
+            "concept_cle": "آلية الاستنساخ ودور إنزيم الـ ARN بوليميراز"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : تركيب البروتين والطفرات الوراثية. Concept clé : آلية الاستنساخ ودور إنزيم الـ ARN بوليميراز."
+        },
+        {
+          "id": "q2_mojtahid_mutation",
+          "texte": "فسر كيف يمكن لطفرة استبدال نيوكليوتيدة واحدة في الـ ADN أن تؤدي إلى فقدان الإنزيم لوظيفته (مستعينا بجدول الشفرة الوراثية).",
+          "points": 0,
+          "micro_concept_id": "ch1_proteines",
+          "diagnostic_erreur_cible": "ERR_BIO_METH_01",
+          "solution": {
+            "reponse": "استبدال نيوكليوتيدة يؤدي إلى تغير في رامزة الـ ARNm. إذا تحولت إلى رامزة حمض أميني آخر يقع ضمن الموقع الفعال (أو يساهم في البنية الفراغية)، سيتغير شكل الموقع الفعال ولن يتكامل مع مادة التفاعل، فيفقد الإنزيم وظيفته.",
+            "concept_cle": "الطفرات والعلاقة بين البنية والوظيفة"
+          },
+          "reponse_numerique_attendue": null,
+          "pattern_recherche": null,
+          "note_pedagogique": "Thématique : تركيب البروتين والطفرات الوراثية. Concept clé : الطفرات والعلاقة بين البنية والوظيفة."
+        }
+      ]
+    }
+  ]
+}

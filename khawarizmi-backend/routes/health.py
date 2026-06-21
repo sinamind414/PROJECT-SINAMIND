@@ -47,3 +47,19 @@ async def health_check():
         "environment": cfg.ENVIRONMENT,
         "timestamp": datetime.now(timezone.utc).isoformat()
     }
+
+
+@router.get("/debug/data-foundation", tags=["Debug"])
+async def data_foundation_debug():
+    """Endpoint de debug pour voir l'état des données canoniques vs legacy."""
+    s = _get_state()
+    foundation = {"timestamp": "2026-06-20"}
+    try:
+        if s.tutor and hasattr(s.tutor, "loader"):
+            foundation["data"] = s.tutor.loader.get_data_foundation_report()
+            foundation["tutor"] = {
+                "micro_concepts": len(getattr(s.tutor, "_index_micro_concepts", {})),
+            }
+    except Exception as e:
+        foundation["error"] = str(e)
+    return foundation

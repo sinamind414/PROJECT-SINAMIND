@@ -92,21 +92,32 @@ class KhawarizmiTutor:
 
     def __init__(self, data_dir: str):
         self.data_dir = data_dir
+
+        # === NEW: Single Source of Truth ===
+        from services.data_loader import get_data_loader
+        self.loader = get_data_loader(data_dir)
+
+        self.programme_canonical = self.loader.load_canonical_programme()
+        self.annales_clean = {}
+        self.lexique = {}
+
+        # Temporary compatibility layer
+        self.programme_sciences = self.programme_canonical
+        self.annales_sciences = self.annales_clean
+        self.lexique_complet = self.lexique
+
+        # Legacy subjects
         self.programme_maths    = self._charger_json(data_dir, 'programme_maths_3as.json', optional=True)
         self.annales_maths      = self._charger_json(data_dir, 'annales_maths_3as.json', optional=True)
         self.programme_physique = self._charger_json(data_dir, 'programme_physique_3as.json', optional=True)
-        self.programme_sciences = self._charger_json(data_dir, 'programme_sciences_3as.json', optional=True)
-        self.annales_sciences   = self._charger_json(data_dir, 'annales_sciences_3as.json', optional=True)
-        self.lexique_complet    = self._charger_json(data_dir, 'lexique_svt_terminale_complet.json', optional=True)
 
         self._index_questions        = self._construire_index()
         self._index_micro_concepts   = self._construire_index_micro_concepts()
         self._index_lexique          = self._construire_index_lexique()
 
-        logger.info(f"KhawarizmiTutor initialisé : "
-                   f"{len(self._index_questions)} sujets, "
-                   f"{len(self._index_micro_concepts)} micro-concepts, "
-                   f"{len(self._index_lexique)} termes lexique")
+        report = self.loader.get_loading_report()
+        logger.info("KhawarizmiTutor initialisé avec DataLoader (deep migration)")
+        logger.info(f"  Programme: {report['loaded_from'].get('programme')}")
 
     def _charger_json(self, data_dir: str, filename: str, optional: bool = False) -> dict:
         filepath = os.path.join(data_dir, filename)

@@ -1,0 +1,17 @@
+{
+  "id": "TEMPLATE_001",
+  "source": {
+    "pdf": "KHELIFA_2023_Vol3.pdf",
+    "volume": "KHELIFA 2023",
+    "page": 47
+  },
+  "type": "analyse_document",
+  "texte": "أكمل الجدول الخاص بالكواشف المستعملة للتعرف على مكونات الحليب",
+  "micro_concept_id": "mc_prot_01",
+  "secondary_concepts": ["mc_prot_04"],
+  "points": 3,
+  "difficulte": "moyenne",
+  "annee": 2023,
+  "session": "Principale",
+  "notes": "Question classique sur la transcription."
+}

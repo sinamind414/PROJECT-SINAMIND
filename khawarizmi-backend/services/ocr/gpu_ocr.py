@@ -1,11 +1,22 @@
 import logging
 from typing import List, Optional, Tuple
 
+import cv2
 import numpy as np
 
 logger = logging.getLogger(__name__)
 
 _reader_instance = None
+_MAX_DIM = 1200
+
+
+def _resize_if_needed(image: np.ndarray) -> np.ndarray:
+    h, w = image.shape[:2]
+    if max(h, w) <= _MAX_DIM:
+        return image
+    scale = _MAX_DIM / max(h, w)
+    new_w, new_h = int(w * scale), int(h * scale)
+    return cv2.resize(image, (new_w, new_h), interpolation=cv2.INTER_AREA)
 
 
 def _get_reader():
@@ -27,6 +38,7 @@ class GpuOCR:
         self, image: np.ndarray, return_hocr: bool = False
     ) -> Tuple[str, float, List[dict]]:
         reader = _get_reader()
+        image = _resize_if_needed(image)
         results = reader.readtext(image, paragraph=False, width_ths=0.7)
 
         words = []

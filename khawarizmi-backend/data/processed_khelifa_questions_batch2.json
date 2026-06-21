@@ -1,0 +1,205 @@
+[
+  {
+    "id": "q_revision_50",
+    "texte_corrige": "بين أن عملية ربط الحمض الأميني بالـ ARNt تحتاج إلى طاقة ATP",
+    "micro_concept_id": "mc_prot_07",
+    "secondary_concepts": [
+      "mc_prot_05"
+    ],
+    "source": "605 Questions de Revision - Synthese des Proteines",
+    "type": "question_explicative",
+    "difficulte": "moyenne",
+    "bac_frequent": true,
+    "notes": "Activation de l'acide amine par aminoacyl-ARNt synthetase avec hydrolyse ATP."
+  },
+  {
+    "id": "q_revision_55",
+    "texte_corrige": "حدد مصير البروتين بعد ترجمته (تصنيعه)",
+    "micro_concept_id": "mc_struc_05",
+    "secondary_concepts": [
+      "mc_prot_02"
+    ],
+    "source": "605 Questions de Revision - Synthese des Proteines",
+    "type": "question_courte",
+    "difficulte": "moyenne",
+    "bac_frequent": true,
+    "notes": "Repliement dans RER, maturation Golgi, secretion ou destination cellulaire."
+  },
+  {
+    "id": "q_revision_57",
+    "texte_corrige": "أذكر متطلبات الترجمة (عوامل الترجمة)",
+    "micro_concept_id": "mc_prot_02",
+    "secondary_concepts": [
+      "mc_prot_06",
+      "mc_prot_04",
+      "mc_prot_05"
+    ],
+    "source": "605 Questions de Revision - Synthese des Proteines",
+    "type": "question_courte",
+    "difficulte": "moyenne",
+    "bac_frequent": true,
+    "notes": "ARNm, ribosome, ARNt charges, facteurs d'initiation/elongation, GTP."
+  },
+  {
+    "id": "q_revision_58",
+    "texte_corrige": "قارن بين تصنيع البروتين في خلايا مفرزة وخلايا غير مفرزة",
+    "micro_concept_id": "mc_struc_05",
+    "secondary_concepts": [
+      "mc_prot_02"
+    ],
+    "source": "605 Questions de Revision - Synthese des Proteines",
+    "type": "question_comparative",
+    "difficulte": "moyenne",
+    "bac_frequent": true,
+    "notes": "Cellules secretrices: RER developpe, Golgi actif. Cellules non secretrices: peu de RER."
+  },
+  {
+    "id": "q_revision_61",
+    "texte_corrige": "أذكر خصائص الـ ARNt",
+    "micro_concept_id": "mc_prot_05",
+    "secondary_concepts": [],
+    "source": "605 Questions de Revision - Synthese des Proteines",
+    "type": "question_courte",
+    "difficulte": "facile",
+    "bac_frequent": true,
+    "notes": "ARNt: structure en trefle, bras anticodon, bras accepteur."
+  },
+  {
+    "id": "q_revision_60",
+    "texte_corrige": "بين المقصود بالرامزة (الكودون)",
+    "micro_concept_id": "mc_prot_03",
+    "secondary_concepts": [
+      "mc_prot_04"
+    ],
+    "source": "605 Questions de Revision - Synthese des Proteines",
+    "type": "question_courte",
+    "difficulte": "facile",
+    "bac_frequent": true,
+    "notes": "Codon = triplet de nucleotides sur ARNm codant pour un acide amine."
+  },
+  {
+    "id": "q_revision_69",
+    "texte_corrige": "بين المقصود بالمورثة (الجين)",
+    "micro_concept_id": "mc_prot_01",
+    "secondary_concepts": [],
+    "source": "605 Questions de Revision - Synthese des Proteines",
+    "type": "question_courte",
+    "difficulte": "facile",
+    "bac_frequent": true,
+    "notes": "Gene = sequence d'ADN transcrit en ARN, codant pour une proteine."
+  },
+  {
+    "id": "q_revision_3",
+    "texte_corrige": "ما هو تمثيل البنية alpha-helice (حلزون ألفا) في النماذج الجزيئية",
+    "micro_concept_id": "mc_struc_02",
+    "secondary_concepts": [
+      "mc_struc_01"
+    ],
+    "source": "605 Questions de Revision - Structure des Proteines",
+    "type": "question_courte",
+    "difficulte": "facile",
+    "bac_frequent": true,
+    "notes": "Helice alpha: structure secondaire, liaisons H entre CO et NH."
+  },
+  {
+    "id": "q_revision_4",
+    "texte_corrige": "ما هو تمثيل البنية beta (feuillet beta) في النماذج الجزيئية",
+    "micro_concept_id": "mc_struc_02",
+    "secondary_concepts": [
+      "mc_struc_01"
+    ],
+    "source": "605 Questions de Revision - Structure des Proteines",
+    "type": "question_courte",
+    "difficulte": "facile",
+    "bac_frequent": true,
+    "notes": "Feuillet beta: structure secondaire, brins paralleles/antiparalleles."
+  },
+  {
+    "id": "q_revision_03",
+    "texte_corrige": "بين كيف تستقر (تثبت) البنية الثالثية للبروتين",
+    "micro_concept_id": "mc_struc_03",
+    "secondary_concepts": [
+      "mc_struc_02"
+    ],
+    "source": "605 Questions de Revision - Structure des Proteines",
+    "type": "question_explicative",
+    "difficulte": "moyenne",
+    "bac_frequent": true,
+    "notes": "Stabilisation: ponts disulfure, interactions hydrophobes, liaisons H, ioniques."
+  },
+  {
+    "id": "q_revision_04",
+    "texte_corrige": "بين دور الروابط الهيدروجينية في البنية الثالثية",
+    "micro_concept_id": "mc_struc_03",
+    "secondary_concepts": [
+      "mc_struc_02"
+    ],
+    "source": "605 Questions de Revision - Structure des Proteines",
+    "type": "question_courte",
+    "difficulte": "moyenne",
+    "bac_frequent": true,
+    "notes": "Liaisons H entre chaines laterales polaires et groupes CO/NH."
+  },
+  {
+    "id": "q_revision_06",
+    "texte_corrige": "بين دور الجسور ثنائية الكبريت (S-S) في البنية الثالثية",
+    "micro_concept_id": "mc_struc_03",
+    "secondary_concepts": [],
+    "source": "605 Questions de Revision - Structure des Proteines",
+    "type": "question_courte",
+    "difficulte": "moyenne",
+    "bac_frequent": true,
+    "notes": "Ponts disulfure entre cysteines, stabilisent conformation 3D."
+  },
+  {
+    "id": "q_revision_07",
+    "texte_corrige": "بين دور التجاذبات الكارهة للماء في البنية الثالثية",
+    "micro_concept_id": "mc_struc_03",
+    "secondary_concepts": [],
+    "source": "605 Questions de Revision - Structure des Proteines",
+    "type": "question_courte",
+    "difficulte": "moyenne",
+    "bac_frequent": true,
+    "notes": "Interactions hydrophobes: chaines laterales non-polaires se regroupent au centre."
+  },
+  {
+    "id": "q_revision_66",
+    "texte_corrige": "بين كيف يتم انتقاء (اختيار) اللمفاويات B (الاختيار النسيلي)",
+    "micro_concept_id": "mc_imm_04",
+    "secondary_concepts": [
+      "mc_imm_01",
+      "mc_imm_03"
+    ],
+    "source": "605 Questions de Revision - Immunologie",
+    "type": "question_explicative",
+    "difficulte": "moyenne",
+    "bac_frequent": true,
+    "notes": "Selection clonale: reconnaissance antigene via BCR, activation proliferation."
+  },
+  {
+    "id": "q_revision_67",
+    "texte_corrige": "ما هي الخاصية الأساسية للخلايا اللمفاوية B الحية تجاه المستضدات",
+    "micro_concept_id": "mc_imm_01",
+    "secondary_concepts": [
+      "mc_imm_04"
+    ],
+    "source": "605 Questions de Revision - Immunologie",
+    "type": "question_courte",
+    "difficulte": "moyenne",
+    "bac_frequent": true,
+    "notes": "LB: possede BCR (immunoglobuline de surface) pour reconnaissance specifique."
+  },
+  {
+    "id": "q_revision_68",
+    "texte_corrige": "بين كيف تظهر الأجسام المضادة على سطح اللمفاويات B",
+    "micro_concept_id": "mc_imm_01",
+    "secondary_concepts": [
+      "mc_imm_03"
+    ],
+    "source": "605 Questions de Revision - Immunologie",
+    "type": "question_explicative",
+    "difficulte": "difficile",
+    "bac_frequent": true,
+    "notes": "BCR = immunoglobuline membranaire. IgM puis IgD exprimees sur LB mature."
+  }
+]

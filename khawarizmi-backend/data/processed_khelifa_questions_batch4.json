@@ -1,0 +1,501 @@
+[
+  {
+    "id": "q_revision_0",
+    "texte_corrige": "ما هي نماذج تمثيل الجزيئات (الأحماض الأمينية)؟",
+    "micro_concept_id": "mc_struc_01",
+    "secondary_concepts": [],
+    "a_verifier": true,
+    "source": "605 Questions de Revision - Acides Amines",
+    "type": "question_courte",
+    "difficulte": "facile",
+    "bac_frequent": true,
+    "notes": "Modeles molecules. Hors liste precise."
+  },
+  {
+    "id": "q_revision_9",
+    "texte_corrige": "ما هي نماذج تمثيل الجزيئات الذرية (البروتين)؟",
+    "micro_concept_id": "mc_struc_01",
+    "secondary_concepts": [],
+    "a_verifier": true,
+    "source": "605 Questions de Revision - Acides Amines",
+    "type": "question_courte",
+    "difficulte": "facile",
+    "bac_frequent": true,
+    "notes": "5 modeles atomiques."
+  },
+  {
+    "id": "q_revision_01",
+    "texte_corrige": "صف المناطق التي تسمح بالبنية الثانوية ثم الثالثية",
+    "micro_concept_id": "mc_struc_03",
+    "secondary_concepts": [
+      "mc_struc_02"
+    ],
+    "source": "605 Questions de Revision - Structure Proteines",
+    "type": "question_explicative",
+    "difficulte": "moyenne",
+    "bac_frequent": true,
+    "notes": "Regions helicoidales puis repliement."
+  },
+  {
+    "id": "q_revision_09",
+    "texte_corrige": "أين يحدث الطي للسلسلة الببتيدية ذات البنية الثانوية؟",
+    "micro_concept_id": "mc_struc_03",
+    "secondary_concepts": [
+      "mc_struc_02"
+    ],
+    "source": "605 Questions de Revision - Structure Proteines",
+    "type": "question_courte",
+    "difficulte": "moyenne",
+    "bac_frequent": true,
+    "notes": "Repliement regions charnieres."
+  },
+  {
+    "id": "q_revision_05",
+    "texte_corrige": "بين دور الروابط الأيونية في البنية الثالثية",
+    "micro_concept_id": "mc_struc_03",
+    "secondary_concepts": [],
+    "source": "605 Questions de Revision - Structure Proteines",
+    "type": "question_courte",
+    "difficulte": "moyenne",
+    "bac_frequent": true,
+    "notes": "Ponts salins entre chaines chargees."
+  },
+  {
+    "id": "q_revision_90",
+    "texte_corrige": "حدد أدنى وأقصى عدد للوحدات في البنية الرباعية",
+    "micro_concept_id": "mc_struc_04",
+    "secondary_concepts": [],
+    "source": "605 Questions de Revision - Structure Proteines",
+    "type": "question_courte",
+    "difficulte": "moyenne",
+    "bac_frequent": false,
+    "notes": "Min 2 sous-unites."
+  },
+  {
+    "id": "q_revision_93",
+    "texte_corrige": "صف الوحدة الأساسية للبروتين",
+    "micro_concept_id": "mc_struc_01",
+    "secondary_concepts": [],
+    "source": "605 Questions de Revision - Acides Amines",
+    "type": "question_courte",
+    "difficulte": "facile",
+    "bac_frequent": true,
+    "notes": "Acide amine = unite de base."
+  },
+  {
+    "id": "q_revision_94",
+    "texte_corrige": "صف الحمض الأميني (البنية العامة)",
+    "micro_concept_id": "mc_struc_01",
+    "secondary_concepts": [],
+    "a_verifier": true,
+    "source": "605 Questions de Revision - Acides Amines",
+    "type": "question_courte",
+    "difficulte": "facile",
+    "bac_frequent": true,
+    "notes": "Structure NH2-COOH-R. Hors liste."
+  },
+  {
+    "id": "q_revision_95",
+    "texte_corrige": "استخدم قاعدة لتصنيف الأحماض الأمينية",
+    "micro_concept_id": "mc_struc_01",
+    "secondary_concepts": [],
+    "a_verifier": true,
+    "source": "605 Questions de Revision - Acides Amines",
+    "type": "question_courte",
+    "difficulte": "moyenne",
+    "bac_frequent": true,
+    "notes": "Classification AA. Hors liste."
+  },
+  {
+    "id": "q_revision_96",
+    "texte_corrige": "صنف الأحماض الأمينية حسب خواصها الكيميائية",
+    "micro_concept_id": "mc_struc_01",
+    "secondary_concepts": [],
+    "a_verifier": true,
+    "source": "605 Questions de Revision - Acides Amines",
+    "type": "question_courte",
+    "difficulte": "moyenne",
+    "bac_frequent": true,
+    "notes": "Polaires/non-polaires. Hors liste."
+  },
+  {
+    "id": "q_revision_97",
+    "texte_corrige": "صف أبسط حمض أميني",
+    "micro_concept_id": "mc_struc_01",
+    "secondary_concepts": [],
+    "a_verifier": true,
+    "source": "605 Questions de Revision - Acides Amines",
+    "type": "question_courte",
+    "difficulte": "facile",
+    "bac_frequent": false,
+    "notes": "Glycine R=H. Hors liste."
+  },
+  {
+    "id": "q_revision_98",
+    "texte_corrige": "صف أطول (أكبر) حمض أميني",
+    "micro_concept_id": "mc_struc_01",
+    "secondary_concepts": [],
+    "a_verifier": true,
+    "source": "605 Questions de Revision - Acides Amines",
+    "type": "question_courte",
+    "difficulte": "facile",
+    "bac_frequent": false,
+    "notes": "Tryptophane. Hors liste."
+  },
+  {
+    "id": "q_revision_31",
+    "texte_corrige": "حدد سلوك الحمض الأميني في وسط معتدل",
+    "micro_concept_id": "mc_struc_01",
+    "secondary_concepts": [],
+    "a_verifier": true,
+    "source": "605 Questions de Revision - Acides Amines",
+    "type": "question_courte",
+    "difficulte": "moyenne",
+    "bac_frequent": false,
+    "notes": "Comportement amphotere. Hors liste."
+  },
+  {
+    "id": "q_revision_30",
+    "texte_corrige": "حدد سلوك الحمض الأميني في وسط قاعدي",
+    "micro_concept_id": "mc_struc_01",
+    "secondary_concepts": [],
+    "a_verifier": true,
+    "source": "605 Questions de Revision - Acides Amines",
+    "type": "question_courte",
+    "difficulte": "moyenne",
+    "bac_frequent": false,
+    "notes": "Comportement acide. Hors liste."
+  },
+  {
+    "id": "q_revision_39",
+    "texte_corrige": "حدد سلوك الحمض الأميني في وسط حمضي",
+    "micro_concept_id": "mc_struc_01",
+    "secondary_concepts": [],
+    "a_verifier": true,
+    "source": "605 Questions de Revision - Acides Amines",
+    "type": "question_courte",
+    "difficulte": "moyenne",
+    "bac_frequent": false,
+    "notes": "Comportement basique. Hors liste."
+  },
+  {
+    "id": "q_revision_33",
+    "texte_corrige": "صف الخاصية الفيزيائية للأحماض الأمينية",
+    "micro_concept_id": "mc_struc_01",
+    "secondary_concepts": [],
+    "a_verifier": true,
+    "source": "605 Questions de Revision - Acides Amines",
+    "type": "question_courte",
+    "difficulte": "moyenne",
+    "bac_frequent": false,
+    "notes": "Propriete amphotere. Hors liste."
+  },
+  {
+    "id": "q_revision_34",
+    "texte_corrige": "بين المقصود بالخاصية الأمفوتيرية",
+    "micro_concept_id": "mc_struc_01",
+    "secondary_concepts": [],
+    "a_verifier": true,
+    "source": "605 Questions de Revision - Acides Amines",
+    "type": "question_courte",
+    "difficulte": "moyenne",
+    "bac_frequent": false,
+    "notes": "Zwitterion. Hors liste."
+  },
+  {
+    "id": "q_revision_35",
+    "texte_corrige": "فسر سلوك الحمض الأميني تجاه الوسط",
+    "micro_concept_id": "mc_struc_01",
+    "secondary_concepts": [],
+    "a_verifier": true,
+    "source": "605 Questions de Revision - Acides Amines",
+    "type": "question_explicative",
+    "difficulte": "moyenne",
+    "bac_frequent": false,
+    "notes": "Influence pH. Hors liste."
+  },
+  {
+    "id": "q_revision_36",
+    "texte_corrige": "بين المقصود بأيون ثنائي القطب",
+    "micro_concept_id": "mc_struc_01",
+    "secondary_concepts": [],
+    "a_verifier": true,
+    "source": "605 Questions de Revision - Acides Amines",
+    "type": "question_courte",
+    "difficulte": "moyenne",
+    "bac_frequent": false,
+    "notes": "Zwitterion. Hors liste."
+  },
+  {
+    "id": "q_revision_37",
+    "texte_corrige": "فسر المسافة التي يقطعها الحمض الأميني في الإلكتروفوريز",
+    "micro_concept_id": "mc_struc_01",
+    "secondary_concepts": [],
+    "a_verifier": true,
+    "source": "605 Questions de Revision - Acides Amines",
+    "type": "question_explicative",
+    "difficulte": "difficile",
+    "bac_frequent": false,
+    "notes": "Migration electrophoretique. Hors liste."
+  },
+  {
+    "id": "q_revision_38",
+    "texte_corrige": "فسر منحني معايرة الحمض الأميني",
+    "micro_concept_id": "mc_struc_01",
+    "secondary_concepts": [],
+    "a_verifier": true,
+    "source": "605 Questions de Revision - Acides Amines",
+    "type": "question_explicative",
+    "difficulte": "difficile",
+    "bac_frequent": false,
+    "notes": "Courbe titration pK. Hors liste."
+  },
+  {
+    "id": "q_revision_41",
+    "texte_corrige": "حدد سلوك الحمض الأميني ذي الشحنة الموجبة",
+    "micro_concept_id": "mc_struc_01",
+    "secondary_concepts": [],
+    "a_verifier": true,
+    "source": "605 Questions de Revision - Acides Amines",
+    "type": "question_courte",
+    "difficulte": "moyenne",
+    "bac_frequent": false,
+    "notes": "Comportement acide. Hors liste."
+  },
+  {
+    "id": "q_revision_40",
+    "texte_corrige": "حدد سلوك الحمض الأميني ذي الشحنة السالبة",
+    "micro_concept_id": "mc_struc_01",
+    "secondary_concepts": [],
+    "a_verifier": true,
+    "source": "605 Questions de Revision - Acides Amines",
+    "type": "question_courte",
+    "difficulte": "moyenne",
+    "bac_frequent": false,
+    "notes": "Comportement basique. Hors liste."
+  },
+  {
+    "id": "q_revision_43",
+    "texte_corrige": "كم جزيء ماء ورابطة ببتيدية من 10 أحماض أمينية؟",
+    "micro_concept_id": "mc_struc_01",
+    "secondary_concepts": [],
+    "source": "605 Questions de Revision - Acides Amines",
+    "type": "question_calcul",
+    "difficulte": "facile",
+    "bac_frequent": true,
+    "notes": "9 H2O, 9 liaisons peptidiques."
+  },
+  {
+    "id": "q_revision_44",
+    "texte_corrige": "صف الوظائف الكيميائية المميزة في طرفي رابطتين ببتيديتين",
+    "micro_concept_id": "mc_struc_01",
+    "secondary_concepts": [],
+    "source": "605 Questions de Revision - Acides Amines",
+    "type": "question_courte",
+    "difficulte": "moyenne",
+    "bac_frequent": true,
+    "notes": "NH2 N-terminal, COOH C-terminal."
+  },
+  {
+    "id": "q_revision_45",
+    "texte_corrige": "لماذا لا تظهر وظيفتا الكحول والحامض على طرفي البروتين؟",
+    "micro_concept_id": "mc_struc_01",
+    "secondary_concepts": [],
+    "source": "605 Questions de Revision - Acides Amines",
+    "type": "question_courte",
+    "difficulte": "moyenne",
+    "bac_frequent": false,
+    "notes": "Groupes impliques dans liaisons peptidiques."
+  },
+  {
+    "id": "q_revision_76",
+    "texte_corrige": "وضح المقصود بالخلية اللمفاوية B غير الناضجة",
+    "micro_concept_id": "mc_imm_01",
+    "secondary_concepts": [],
+    "source": "605 Questions de Revision - Immunologie",
+    "type": "question_courte",
+    "difficulte": "moyenne",
+    "bac_frequent": true,
+    "notes": "Pro-LB sans BCR."
+  },
+  {
+    "id": "q_revision_77",
+    "texte_corrige": "وضح المقصود بالخلية اللمفاوية B الناضجة",
+    "micro_concept_id": "mc_imm_01",
+    "secondary_concepts": [
+      "mc_imm_04"
+    ],
+    "source": "605 Questions de Revision - Immunologie",
+    "type": "question_courte",
+    "difficulte": "moyenne",
+    "bac_frequent": true,
+    "notes": "LB mature exprime BCR."
+  },
+  {
+    "id": "q_revision_81",
+    "texte_corrige": "وضح مراحل الاختيار النسيلي للخلايا اللمفاوية B",
+    "micro_concept_id": "mc_imm_04",
+    "secondary_concepts": [
+      "mc_imm_01",
+      "mc_imm_06"
+    ],
+    "source": "605 Questions de Revision - Immunologie",
+    "type": "question_explicative",
+    "difficulte": "moyenne",
+    "bac_frequent": true,
+    "notes": "Selection clonale."
+  },
+  {
+    "id": "q_revision_80",
+    "texte_corrige": "وضح خطوات الاختيار النسيلي الثاني للـ LB",
+    "micro_concept_id": "mc_imm_06",
+    "secondary_concepts": [
+      "mc_imm_04"
+    ],
+    "source": "605 Questions de Revision - Immunologie",
+    "type": "question_explicative",
+    "difficulte": "moyenne",
+    "bac_frequent": true,
+    "notes": "Reponse memoire."
+  },
+  {
+    "id": "q_revision_70",
+    "texte_corrige": "علق على صورة جراب فابريسيوس",
+    "micro_concept_id": "mc_imm_01",
+    "secondary_concepts": [],
+    "source": "605 Questions de Revision - Immunologie",
+    "type": "question_analyse",
+    "difficulte": "moyenne",
+    "bac_frequent": true,
+    "notes": "Bourse de Fabricius: maturation LB."
+  },
+  {
+    "id": "q_revision_79",
+    "texte_corrige": "علل رفض الطعم اللمفاوي من فرد من نفس السلالة",
+    "micro_concept_id": "mc_imm_05",
+    "secondary_concepts": [
+      "mc_imm_02"
+    ],
+    "source": "605 Questions de Revision - Immunologie",
+    "type": "question_explicative",
+    "difficulte": "moyenne",
+    "bac_frequent": true,
+    "notes": "Rejet greffe: CMH."
+  },
+  {
+    "id": "q_revision_74",
+    "texte_corrige": "علل رفض الطعم مع حقن هيدروكورتيزون",
+    "micro_concept_id": "mc_imm_05",
+    "secondary_concepts": [
+      "mc_imm_06"
+    ],
+    "source": "605 Questions de Revision - Immunologie",
+    "type": "question_explicative",
+    "difficulte": "difficile",
+    "bac_frequent": false,
+    "notes": "Hydrocortisone = immunosuppresseur."
+  },
+  {
+    "id": "q_revision_015",
+    "texte_corrige": "حدد مصدر اللمفاويات LT4 المحسسة",
+    "micro_concept_id": "mc_imm_02",
+    "secondary_concepts": [],
+    "source": "605 Questions de Revision - Immunologie",
+    "type": "question_courte",
+    "difficulte": "moyenne",
+    "bac_frequent": true,
+    "notes": "LT4: origine thymus."
+  },
+  {
+    "id": "q_revision_016",
+    "texte_corrige": "حدد الحالة التي يؤثر فيها الانترلوكين 2",
+    "micro_concept_id": "mc_imm_04",
+    "secondary_concepts": [
+      "mc_imm_02"
+    ],
+    "source": "605 Questions de Revision - Immunologie",
+    "type": "question_courte",
+    "difficulte": "moyenne",
+    "bac_frequent": true,
+    "notes": "IL2 active LT4 et LT8."
+  },
+  {
+    "id": "q_revision_017",
+    "texte_corrige": "حدد الطبيعة الكيميائية للانترلوكين",
+    "micro_concept_id": "mc_imm_04",
+    "secondary_concepts": [],
+    "a_verifier": true,
+    "source": "605 Questions de Revision - Immunologie",
+    "type": "question_courte",
+    "difficulte": "facile",
+    "bac_frequent": false,
+    "notes": "Glycoproteines. Hors liste."
+  },
+  {
+    "id": "q_revision_018",
+    "texte_corrige": "اربط نمط الاستجابة المناعية بنوع المستضد",
+    "micro_concept_id": "mc_imm_06",
+    "secondary_concepts": [
+      "mc_imm_04",
+      "mc_imm_05"
+    ],
+    "source": "605 Questions de Revision - Immunologie",
+    "type": "question_conceptuelle",
+    "difficulte": "difficile",
+    "bac_frequent": true,
+    "notes": "Type antigene -> type reponse."
+  },
+  {
+    "id": "q_revision_83",
+    "texte_corrige": "قارن بين طرق التلقيح (vaccination) المختلفة",
+    "micro_concept_id": "mc_imm_06",
+    "secondary_concepts": [],
+    "a_verifier": true,
+    "source": "605 Questions de Revision - Immunologie",
+    "type": "question_comparative",
+    "difficulte": "moyenne",
+    "bac_frequent": true,
+    "notes": "BCG, vaccination. Hors liste precise."
+  },
+  {
+    "id": "q_revision_84",
+    "texte_corrige": "حدد خصائص الاستجابة الخلطية ذات الوساطة الخلوية (T-dependante)",
+    "micro_concept_id": "mc_imm_04",
+    "secondary_concepts": [
+      "mc_imm_01",
+      "mc_imm_02"
+    ],
+    "source": "605 Questions de Revision - Immunologie",
+    "type": "question_courte",
+    "difficulte": "moyenne",
+    "bac_frequent": true,
+    "notes": "Reponse T-dependante: cooperation LB-LT4."
+  },
+  {
+    "id": "q_revision_85",
+    "texte_corrige": "حدد خصائص الاستجابة الخلطية ذات الوساطة الخلوية (T-independante)",
+    "micro_concept_id": "mc_imm_04",
+    "secondary_concepts": [
+      "mc_imm_01"
+    ],
+    "source": "605 Questions de Revision - Immunologie",
+    "type": "question_courte",
+    "difficulte": "moyenne",
+    "bac_frequent": false,
+    "notes": "Reponse T-independante: IgM seulement."
+  },
+  {
+    "id": "q_revision_001",
+    "texte_corrige": "حدد العلاقة الوظيفية بين اللمفاويات والبلاعم",
+    "micro_concept_id": "mc_imm_04",
+    "secondary_concepts": [
+      "mc_imm_01",
+      "mc_imm_02"
+    ],
+    "source": "605 Questions de Revision - Immunologie",
+    "type": "question_conceptuelle",
+    "difficulte": "moyenne",
+    "bac_frequent": true,
+    "notes": "Cooperation CPA-LT4-LB."
+  }
+]

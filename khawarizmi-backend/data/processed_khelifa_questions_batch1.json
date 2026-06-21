@@ -1,0 +1,213 @@
+[
+  {
+    "id": "q_revision_46",
+    "texte_corrige": "أذكر ثلاث متتاليات في الـ ARNt",
+    "micro_concept_id": "mc_prot_05",
+    "secondary_concepts": [
+      "mc_prot_02"
+    ],
+    "source": "605 Questions de Révision - Synthèse des Protéines",
+    "type": "question_courte",
+    "difficulte": "facile",
+    "bac_frequent": true,
+    "notes": "Structure de l'ARNt : trois boucles (anticodon, bras T, bras D)."
+  },
+  {
+    "id": "q_revision_47",
+    "texte_corrige": "صف الموضعين في الـ ARNt",
+    "micro_concept_id": "mc_prot_05",
+    "secondary_concepts": [],
+    "source": "605 Questions de Révision - Synthèse des Protéines",
+    "type": "question_courte",
+    "difficulte": "facile",
+    "bac_frequent": true,
+    "notes": "Les 2 sites : attachement de l'acide amine et anticodon."
+  },
+  {
+    "id": "q_revision_48",
+    "texte_corrige": "اشرح كيفية ارتباط الحمض الأميني بالـ ARNt ودور ذلك في الترجمة",
+    "micro_concept_id": "mc_prot_05",
+    "secondary_concepts": [
+      "mc_prot_07",
+      "mc_prot_02"
+    ],
+    "source": "605 Questions de Révision - Synthèse des Protéines",
+    "type": "question_explicative",
+    "difficulte": "moyenne",
+    "bac_frequent": true,
+    "notes": "Aminoacyl-ARNt synthetase, activation avant initiation."
+  },
+  {
+    "id": "q_revision_53",
+    "texte_corrige": "ما هي العلاقة بين الاستنساخ والترجمة",
+    "micro_concept_id": "mc_prot_04",
+    "secondary_concepts": [
+      "mc_prot_01",
+      "mc_prot_02"
+    ],
+    "source": "605 Questions de Révision - Synthèse des Protéines",
+    "type": "question_conceptuelle",
+    "difficulte": "moyenne",
+    "bac_frequent": true,
+    "notes": "ARNm = produit transcription, matrice traduction."
+  },
+  {
+    "id": "q_revision_54",
+    "texte_corrige": "حدد الشروط الضرورية للترجمة",
+    "micro_concept_id": "mc_prot_02",
+    "secondary_concepts": [
+      "mc_prot_04",
+      "mc_prot_05",
+      "mc_prot_06"
+    ],
+    "source": "605 Questions de Révision - Synthèse des Protéines",
+    "type": "question_courte",
+    "difficulte": "moyenne",
+    "bac_frequent": true,
+    "notes": "ARNm, ARNt, acides amines, aminoacyl-ARNt synthetase, ribosome."
+  },
+  {
+    "id": "q_revision_59",
+    "texte_corrige": "أذكر مراحل الترجمة",
+    "micro_concept_id": "mc_prot_02",
+    "secondary_concepts": [
+      "mc_prot_07",
+      "mc_prot_08"
+    ],
+    "source": "605 Questions de Révision - Synthèse des Protéines",
+    "type": "question_courte",
+    "difficulte": "facile",
+    "bac_frequent": true,
+    "notes": "3 etapes : initiation, elongation, terminaison."
+  },
+  {
+    "id": "q_revision_56",
+    "texte_corrige": "بماذا يسمح الشق في تحت الوحدة الصغرى للريبوزوم",
+    "micro_concept_id": "mc_prot_06",
+    "secondary_concepts": [
+      "mc_prot_08"
+    ],
+    "source": "605 Questions de Révision - Synthèse des Protéines",
+    "type": "question_courte",
+    "difficulte": "difficile",
+    "bac_frequent": false,
+    "notes": "Sillon de la petite sous-unite ribosomale = coulissement sur ARNm."
+  },
+  {
+    "id": "q_revision_7",
+    "texte_corrige": "صف البنية الأولية للبروتين",
+    "micro_concept_id": "mc_struc_01",
+    "secondary_concepts": [],
+    "source": "605 Questions de Révision - Structure des Protéines",
+    "type": "question_courte",
+    "difficulte": "facile",
+    "bac_frequent": true,
+    "notes": "Sequence lineaire d'acides amines, liaisons peptidiques."
+  },
+  {
+    "id": "q_revision_8",
+    "texte_corrige": "صف البنية الثانوية للبروتين",
+    "micro_concept_id": "mc_struc_02",
+    "secondary_concepts": [
+      "mc_struc_01"
+    ],
+    "source": "605 Questions de Révision - Structure des Protéines",
+    "type": "question_courte",
+    "difficulte": "facile",
+    "bac_frequent": true,
+    "notes": "Helice alpha et feuillet beta, liaisons hydrogene."
+  },
+  {
+    "id": "q_revision_00",
+    "texte_corrige": "صف البنية الثالثية للبروتين",
+    "micro_concept_id": "mc_struc_03",
+    "secondary_concepts": [
+      "mc_struc_02"
+    ],
+    "source": "605 Questions de Révision - Structure des Protéines",
+    "type": "question_courte",
+    "difficulte": "moyenne",
+    "bac_frequent": true,
+    "notes": "Repliement global, interactions chaines laterales."
+  },
+  {
+    "id": "q_revision_08",
+    "texte_corrige": "صف البنية الرباعية للبروتين",
+    "micro_concept_id": "mc_struc_04",
+    "secondary_concepts": [
+      "mc_struc_03"
+    ],
+    "source": "605 Questions de Révision - Structure des Protéines",
+    "type": "question_courte",
+    "difficulte": "moyenne",
+    "bac_frequent": false,
+    "notes": "Assemblage de plusieurs sous-unites (ex: hemoglobine)."
+  },
+  {
+    "id": "q_revision_6",
+    "texte_corrige": "حدد مستويات البنية الفراغية للبروتين",
+    "micro_concept_id": "mc_struc_05",
+    "secondary_concepts": [
+      "mc_struc_01",
+      "mc_struc_02",
+      "mc_struc_03",
+      "mc_struc_04"
+    ],
+    "source": "605 Questions de Révision - Structure des Protéines",
+    "type": "question_courte",
+    "difficulte": "facile",
+    "bac_frequent": true,
+    "notes": "4 niveaux : primaire, secondaire, tertiaire, quaternaire."
+  },
+  {
+    "id": "q_revision_63",
+    "texte_corrige": "حدد مصدر اللمفاويات B",
+    "micro_concept_id": "mc_imm_01",
+    "secondary_concepts": [],
+    "source": "605 Questions de Révision - Immunologie",
+    "type": "question_courte",
+    "difficulte": "facile",
+    "bac_frequent": true,
+    "notes": "Lymphocytes B : origine moelle osseuse rouge."
+  },
+  {
+    "id": "q_revision_64",
+    "texte_corrige": "حدد موقع اكتساب اللمفاويات B لكفاءتها المناعية",
+    "micro_concept_id": "mc_imm_01",
+    "secondary_concepts": [
+      "mc_imm_04"
+    ],
+    "source": "605 Questions de Révision - Immunologie",
+    "type": "question_courte",
+    "difficulte": "moyenne",
+    "bac_frequent": true,
+    "notes": "Competence immunitaire : organes lymphoides secondaires."
+  },
+  {
+    "id": "q_revision_65",
+    "texte_corrige": "بيّن كيفية تفاعل اللمفاويات B الحية مع المستضد ونتيجة ذلك",
+    "micro_concept_id": "mc_imm_01",
+    "secondary_concepts": [
+      "mc_imm_04",
+      "mc_imm_03"
+    ],
+    "source": "605 Questions de Révision - Immunologie",
+    "type": "question_explicative",
+    "difficulte": "moyenne",
+    "bac_frequent": true,
+    "notes": "Selection clonale, reconnaissance BCR, activation, anticorps."
+  },
+  {
+    "id": "q_revision_99",
+    "texte_corrige": "حدد أثر الاختلاف في البنية الفراغية للبروتينات وعلاقته بالوظيفة",
+    "micro_concept_id": "mc_struc_05",
+    "secondary_concepts": [
+      "mc_enz_01"
+    ],
+    "source": "605 Questions de Révision - Structure des Protéines",
+    "type": "question_conceptuelle",
+    "difficulte": "moyenne",
+    "bac_frequent": true,
+    "notes": "Changement conformation -> perte/modification fonction (enzyme)."
+  }
+]

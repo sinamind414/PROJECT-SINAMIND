@@ -49,3 +49,6 @@ khawarizmi-backend/models/minilm_onnx_int8/model_quantized.zip
 
 # Large model files
 *.zip
+
+# Archive - non-project files
+ARCHIVE_SINAMIND/

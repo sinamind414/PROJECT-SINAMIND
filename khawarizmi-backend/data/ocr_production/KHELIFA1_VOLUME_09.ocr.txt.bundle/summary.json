@@ -1,0 +1,288 @@
+{
+  "generated_at": "2026-06-20T16:03:31Z",
+  "source": "C:\\Users\\zakaria\\Documents\\PROJET KHAWARIZMI IA\\khawarizmi-backend\\data\\ANNALES_SVT_BAC_ALGERIE\\KHELIFA_1\\VOLUMES_KHELIFA1\\KHELIFA1_VOLUME_09.pdf",
+  "text_output": "C:\\Users\\zakaria\\Documents\\PROJET KHAWARIZMI IA\\khawarizmi-backend\\data\\ocr_production\\KHELIFA1_VOLUME_09.ocr.txt",
+  "searchable_pdf_output": null,
+  "page_count": 28,
+  "method_counts": {
+    "ocr": 28
+  },
+  "error_pages": 0,
+  "total_chars": 72852,
+  "avg_confidence_mean": null,
+  "total_duration_ms": 2161975.97,
+  "bundle": "C:\\Users\\zakaria\\Documents\\PROJET KHAWARIZMI IA\\khawarizmi-backend\\data\\ocr_production\\KHELIFA1_VOLUME_09.ocr.txt.bundle",
+  "csv_report": "C:\\Users\\zakaria\\Documents\\PROJET KHAWARIZMI IA\\khawarizmi-backend\\data\\ocr_production\\KHELIFA1_VOLUME_09.ocr.txt.bundle\\pages.csv",
+  "state_file": "C:\\Users\\zakaria\\Documents\\PROJET KHAWARIZMI IA\\khawarizmi-backend\\data\\ocr_production\\KHELIFA1_VOLUME_09.ocr.txt.bundle\\run.state.json",
+  "config": {
+    "dpi": 150,
+    "lang": "ara+fra",
+    "psm": 3,
+    "oem": 1,
+    "workers": 2,
+    "timeout": 120,
+    "pdf_mode": "ocr",
+    "text_threshold": 25,
+    "no_preprocess": false,
+    "min_chars": 10,
+    "retries": 2,
+    "searchable_pdf": false,
+    "tsv_metrics": true
+  },
+  "state_snapshot": {
+    "version": 2,
+    "created_at": "2026-06-20T15:45:28Z",
+    "updated_at": "2026-06-20T16:03:30Z",
+    "identity": {
+      "source": "C:\\Users\\zakaria\\Documents\\PROJET KHAWARIZMI IA\\khawarizmi-backend\\data\\ANNALES_SVT_BAC_ALGERIE\\KHELIFA_1\\VOLUMES_KHELIFA1\\KHELIFA1_VOLUME_09.pdf",
+      "dpi": 150,
+      "lang": "ara+fra",
+      "psm": 3,
+      "oem": 1,
+      "pdf_mode": "ocr",
+      "text_threshold": 25,
+      "no_preprocess": false,
+      "min_chars": 10,
+      "retries": 2,
+      "tsv_metrics": true,
+      "searchable_pdf": false,
+      "start": 1,
+      "end": null
+    },
+    "output_txt": "C:\\Users\\zakaria\\Documents\\PROJET KHAWARIZMI IA\\khawarizmi-backend\\data\\ocr_production\\KHELIFA1_VOLUME_09.ocr.txt",
+    "output_searchable_pdf": null,
+    "page_count": 28,
+    "pages": {
+      "1": {
+        "status": "done",
+        "method": "ocr",
+        "chars": 1348,
+        "error": null,
+        "duration_ms": 43866.26,
+        "processed_at": "2026-06-20T15:46:12Z"
+      },
+      "2": {
+        "status": "done",
+        "method": "ocr",
+        "chars": 1844,
+        "error": null,
+        "duration_ms": 58373.65,
+        "processed_at": "2026-06-20T15:46:26Z"
+      },
+      "3": {
+        "status": "done",
+        "method": "ocr",
+        "chars": 671,
+        "error": null,
+        "duration_ms": 38960.16,
+        "processed_at": "2026-06-20T15:46:51Z"
+      },
+      "4": {
+        "status": "done",
+        "method": "ocr",
+        "chars": 587,
+        "error": null,
+        "duration_ms": 45662.39,
+        "processed_at": "2026-06-20T15:47:12Z"
+      },
+      "5": {
+        "status": "done",
+        "method": "ocr",
+        "chars": 458,
+        "error": null,
+        "duration_ms": 42312.25,
+        "processed_at": "2026-06-20T15:47:33Z"
+      },
+      "6": {
+        "status": "done",
+        "method": "ocr",
+        "chars": 913,
+        "error": null,
+        "duration_ms": 42124.35,
+        "processed_at": "2026-06-20T15:47:54Z"
+      },
+      "7": {
+        "status": "done",
+        "method": "ocr",
+        "chars": 1293,
+        "error": null,
+        "duration_ms": 46085.73,
+        "processed_at": "2026-06-20T15:48:19Z"
+      },
+      "8": {
+        "status": "done",
+        "method": "ocr",
+        "chars": 521,
+        "error": null,
+        "duration_ms": 33144.07,
+        "processed_at": "2026-06-20T15:48:27Z"
+      },
+      "10": {
+        "status": "done",
+        "method": "ocr",
+        "chars": 2990,
+        "error": null,
+        "duration_ms": 56606.07,
+        "processed_at": "2026-06-20T15:49:24Z"
+      },
+      "11": {
+        "status": "done",
+        "method": "ocr",
+        "chars": 4924,
+        "error": null,
+        "duration_ms": 54080.44,
+        "processed_at": "2026-06-20T15:50:18Z"
+      },
+      "12": {
+        "status": "done",
+        "method": "ocr",
+        "chars": 1357,
+        "error": null,
+        "duration_ms": 38419.95,
+        "processed_at": "2026-06-20T15:50:56Z"
+      },
+      "13": {
+        "status": "done",
+        "method": "ocr",
+        "chars": 824,
+        "error": null,
+        "duration_ms": 54254.72,
+        "processed_at": "2026-06-20T15:51:51Z"
+      },
+      "9": {
+        "status": "done",
+        "method": "ocr",
+        "chars": 13175,
+        "error": null,
+        "duration_ms": 221794.81,
+        "processed_at": "2026-06-20T15:52:01Z"
+      },
+      "14": {
+        "status": "done",
+        "method": "ocr",
+        "chars": 1429,
+        "error": null,
+        "duration_ms": 65520.6,
+        "processed_at": "2026-06-20T15:52:56Z"
+      },
+      "15": {
+        "status": "done",
+        "method": "ocr",
+        "chars": 1883,
+        "error": null,
+        "duration_ms": 62664.22,
+        "processed_at": "2026-06-20T15:53:04Z"
+      },
+      "16": {
+        "status": "done",
+        "method": "ocr",
+        "chars": 1595,
+        "error": null,
+        "duration_ms": 88609.04,
+        "processed_at": "2026-06-20T15:54:25Z"
+      },
+      "17": {
+        "status": "done",
+        "method": "ocr",
+        "chars": 1174,
+        "error": null,
+        "duration_ms": 84084.91,
+        "processed_at": "2026-06-20T15:54:28Z"
+      },
+      "19": {
+        "status": "done",
+        "method": "ocr",
+        "chars": 2189,
+        "error": null,
+        "duration_ms": 102490.3,
+        "processed_at": "2026-06-20T15:56:10Z"
+      },
+      "18": {
+        "status": "done",
+        "method": "ocr",
+        "chars": 752,
+        "error": null,
+        "duration_ms": 140398.16,
+        "processed_at": "2026-06-20T15:56:45Z"
+      },
+      "21": {
+        "status": "done",
+        "method": "ocr",
+        "chars": 2060,
+        "error": null,
+        "duration_ms": 88978.73,
+        "processed_at": "2026-06-20T15:58:14Z"
+      },
+      "20": {
+        "status": "done",
+        "method": "ocr",
+        "chars": 8581,
+        "error": null,
+        "duration_ms": 166626.62,
+        "processed_at": "2026-06-20T15:58:57Z"
+      },
+      "22": {
+        "status": "done",
+        "method": "ocr",
+        "chars": 937,
+        "error": null,
+        "duration_ms": 96451.49,
+        "processed_at": "2026-06-20T15:59:51Z"
+      },
+      "23": {
+        "status": "done",
+        "method": "ocr",
+        "chars": 8148,
+        "error": null,
+        "duration_ms": 112373.56,
+        "processed_at": "2026-06-20T16:00:49Z"
+      },
+      "24": {
+        "status": "done",
+        "method": "ocr",
+        "chars": 1942,
+        "error": null,
+        "duration_ms": 68313.92,
+        "processed_at": "2026-06-20T16:00:59Z"
+      },
+      "25": {
+        "status": "done",
+        "method": "ocr",
+        "chars": 2653,
+        "error": null,
+        "duration_ms": 83774.96,
+        "processed_at": "2026-06-20T16:02:13Z"
+      },
+      "26": {
+        "status": "done",
+        "method": "ocr",
+        "chars": 2769,
+        "error": null,
+        "duration_ms": 76507.19,
+        "processed_at": "2026-06-20T16:02:16Z"
+      },
+      "28": {
+        "status": "done",
+        "method": "ocr",
+        "chars": 1552,
+        "error": null,
+        "duration_ms": 72380.68,
+        "processed_at": "2026-06-20T16:03:28Z"
+      },
+      "27": {
+        "status": "done",
+        "method": "ocr",
+        "chars": 4283,
+        "error": null,
+        "duration_ms": 77116.74,
+        "processed_at": "2026-06-20T16:03:30Z"
+      }
+    },
+    "run_config": {
+      "workers": 2,
+      "timeout": 120,
+      "verbose": false
+    },
+    "assembled_at": "2026-06-20T16:03:30Z"
+  }
+}

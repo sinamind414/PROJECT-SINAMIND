@@ -65,6 +65,7 @@ export default function DashboardPage() {
               <ExercisesPanel exercises={state.exercises} onToggleAction={updateExercise} />
               <MistakesPanel mistakes={state.mistakes} onToggleAction={updateMistake} />
             </div>
+
           </div>
 
           <footer className="mt-6 text-center text-xs text-slate-500 font-semibold py-4 font-arabic">

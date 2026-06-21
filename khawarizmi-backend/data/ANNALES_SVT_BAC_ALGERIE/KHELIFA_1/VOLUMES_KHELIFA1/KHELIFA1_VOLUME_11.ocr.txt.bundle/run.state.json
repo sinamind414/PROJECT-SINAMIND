@@ -1,0 +1,30 @@
+{
+  "version": 3,
+  "created_at": "2026-06-20T17:17:35Z",
+  "updated_at": "2026-06-20T17:17:35Z",
+  "identity": {
+    "source": "C:\\Users\\zakaria\\Documents\\PROJET KHAWARIZMI IA\\khawarizmi-backend\\data\\ANNALES_SVT_BAC_ALGERIE\\KHELIFA_1\\VOLUMES_KHELIFA1\\KHELIFA1_VOLUME_11.pdf",
+    "dpi": 300,
+    "lang": "ara+fra",
+    "psm": 3,
+    "oem": 1,
+    "pdf_mode": "auto",
+    "text_threshold": 25,
+    "no_preprocess": false,
+    "min_chars": 10,
+    "retries": 2,
+    "tsv_metrics": true,
+    "searchable_pdf": true,
+    "start": 1,
+    "end": null
+  },
+  "output_txt": "C:\\Users\\zakaria\\Documents\\PROJET KHAWARIZMI IA\\khawarizmi-backend\\data\\ANNALES_SVT_BAC_ALGERIE\\KHELIFA_1\\VOLUMES_KHELIFA1\\KHELIFA1_VOLUME_11.ocr.txt",
+  "output_searchable_pdf": "C:\\Users\\zakaria\\Documents\\PROJET KHAWARIZMI IA\\khawarizmi-backend\\data\\ANNALES_SVT_BAC_ALGERIE\\KHELIFA_1\\VOLUMES_KHELIFA1\\KHELIFA1_VOLUME_11.searchable.pdf",
+  "page_count": 28,
+  "pages": {},
+  "run_config": {
+    "workers": 4,
+    "timeout": 120,
+    "verbose": false
+  }
+}

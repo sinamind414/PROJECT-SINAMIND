@@ -1,0 +1,256 @@
+{
+  "version": 2,
+  "created_at": "2026-06-20T15:24:51Z",
+  "updated_at": "2026-06-20T15:34:48Z",
+  "identity": {
+    "source": "C:\\Users\\zakaria\\Documents\\PROJET KHAWARIZMI IA\\khawarizmi-backend\\data\\ANNALES_SVT_BAC_ALGERIE\\KHELIFA_1\\VOLUMES_KHELIFA1\\KHELIFA1_VOLUME_07.pdf",
+    "dpi": 150,
+    "lang": "ara+fra",
+    "psm": 3,
+    "oem": 1,
+    "pdf_mode": "ocr",
+    "text_threshold": 25,
+    "no_preprocess": false,
+    "min_chars": 10,
+    "retries": 2,
+    "tsv_metrics": true,
+    "searchable_pdf": false,
+    "start": 1,
+    "end": null
+  },
+  "output_txt": "C:\\Users\\zakaria\\Documents\\PROJET KHAWARIZMI IA\\khawarizmi-backend\\data\\ocr_production\\KHELIFA1_VOLUME_07.ocr.txt",
+  "output_searchable_pdf": null,
+  "page_count": 28,
+  "pages": {
+    "2": {
+      "status": "done",
+      "method": "ocr",
+      "chars": 1783,
+      "error": null,
+      "duration_ms": 38827.18,
+      "processed_at": "2026-06-20T15:25:30Z"
+    },
+    "1": {
+      "status": "done",
+      "method": "ocr",
+      "chars": 2106,
+      "error": null,
+      "duration_ms": 45540.24,
+      "processed_at": "2026-06-20T15:25:36Z"
+    },
+    "4": {
+      "status": "done",
+      "method": "ocr",
+      "chars": 3132,
+      "error": null,
+      "duration_ms": 35445.21,
+      "processed_at": "2026-06-20T15:26:12Z"
+    },
+    "3": {
+      "status": "done",
+      "method": "ocr",
+      "chars": 2496,
+      "error": null,
+      "duration_ms": 43779.38,
+      "processed_at": "2026-06-20T15:26:13Z"
+    },
+    "5": {
+      "status": "done",
+      "method": "ocr",
+      "chars": 1779,
+      "error": null,
+      "duration_ms": 39633.78,
+      "processed_at": "2026-06-20T15:26:51Z"
+    },
+    "6": {
+      "status": "done",
+      "method": "ocr",
+      "chars": 2131,
+      "error": null,
+      "duration_ms": 39347.48,
+      "processed_at": "2026-06-20T15:26:53Z"
+    },
+    "8": {
+      "status": "done",
+      "method": "ocr",
+      "chars": 1076,
+      "error": null,
+      "duration_ms": 38486.52,
+      "processed_at": "2026-06-20T15:27:31Z"
+    },
+    "7": {
+      "status": "done",
+      "method": "ocr",
+      "chars": 2238,
+      "error": null,
+      "duration_ms": 41061.04,
+      "processed_at": "2026-06-20T15:27:32Z"
+    },
+    "9": {
+      "status": "done",
+      "method": "ocr",
+      "chars": 2002,
+      "error": null,
+      "duration_ms": 41231.17,
+      "processed_at": "2026-06-20T15:28:12Z"
+    },
+    "10": {
+      "status": "done",
+      "method": "ocr",
+      "chars": 2315,
+      "error": null,
+      "duration_ms": 42085.74,
+      "processed_at": "2026-06-20T15:28:15Z"
+    },
+    "11": {
+      "status": "done",
+      "method": "ocr",
+      "chars": 3257,
+      "error": null,
+      "duration_ms": 45020.95,
+      "processed_at": "2026-06-20T15:28:58Z"
+    },
+    "12": {
+      "status": "done",
+      "method": "ocr",
+      "chars": 2420,
+      "error": null,
+      "duration_ms": 43483.91,
+      "processed_at": "2026-06-20T15:28:58Z"
+    },
+    "14": {
+      "status": "done",
+      "method": "ocr",
+      "chars": 2375,
+      "error": null,
+      "duration_ms": 43502.2,
+      "processed_at": "2026-06-20T15:29:42Z"
+    },
+    "13": {
+      "status": "done",
+      "method": "ocr",
+      "chars": 2155,
+      "error": null,
+      "duration_ms": 66356.79,
+      "processed_at": "2026-06-20T15:30:04Z"
+    },
+    "15": {
+      "status": "done",
+      "method": "ocr",
+      "chars": 1467,
+      "error": null,
+      "duration_ms": 38878.92,
+      "processed_at": "2026-06-20T15:30:20Z"
+    },
+    "16": {
+      "status": "done",
+      "method": "ocr",
+      "chars": 2374,
+      "error": null,
+      "duration_ms": 40075.34,
+      "processed_at": "2026-06-20T15:30:44Z"
+    },
+    "17": {
+      "status": "done",
+      "method": "ocr",
+      "chars": 1994,
+      "error": null,
+      "duration_ms": 43591.35,
+      "processed_at": "2026-06-20T15:31:04Z"
+    },
+    "18": {
+      "status": "done",
+      "method": "ocr",
+      "chars": 1600,
+      "error": null,
+      "duration_ms": 39315.21,
+      "processed_at": "2026-06-20T15:31:23Z"
+    },
+    "19": {
+      "status": "done",
+      "method": "ocr",
+      "chars": 4197,
+      "error": null,
+      "duration_ms": 43120.33,
+      "processed_at": "2026-06-20T15:31:47Z"
+    },
+    "20": {
+      "status": "done",
+      "method": "ocr",
+      "chars": 2022,
+      "error": null,
+      "duration_ms": 33990.6,
+      "processed_at": "2026-06-20T15:31:57Z"
+    },
+    "21": {
+      "status": "done",
+      "method": "ocr",
+      "chars": 876,
+      "error": null,
+      "duration_ms": 38171.11,
+      "processed_at": "2026-06-20T15:32:25Z"
+    },
+    "22": {
+      "status": "done",
+      "method": "ocr",
+      "chars": 1651,
+      "error": null,
+      "duration_ms": 40982.05,
+      "processed_at": "2026-06-20T15:32:38Z"
+    },
+    "23": {
+      "status": "done",
+      "method": "ocr",
+      "chars": 1829,
+      "error": null,
+      "duration_ms": 40183.95,
+      "processed_at": "2026-06-20T15:33:06Z"
+    },
+    "24": {
+      "status": "done",
+      "method": "ocr",
+      "chars": 15755,
+      "error": null,
+      "duration_ms": 61693.24,
+      "processed_at": "2026-06-20T15:33:40Z"
+    },
+    "25": {
+      "status": "done",
+      "method": "ocr",
+      "chars": 3157,
+      "error": null,
+      "duration_ms": 34618.37,
+      "processed_at": "2026-06-20T15:33:40Z"
+    },
+    "26": {
+      "status": "done",
+      "method": "ocr",
+      "chars": 1963,
+      "error": null,
+      "duration_ms": 43450.32,
+      "processed_at": "2026-06-20T15:34:23Z"
+    },
+    "27": {
+      "status": "done",
+      "method": "ocr",
+      "chars": 2054,
+      "error": null,
+      "duration_ms": 44928.91,
+      "processed_at": "2026-06-20T15:34:25Z"
+    },
+    "28": {
+      "status": "done",
+      "method": "ocr",
+      "chars": 2063,
+      "error": null,
+      "duration_ms": 24368.23,
+      "processed_at": "2026-06-20T15:34:48Z"
+    }
+  },
+  "run_config": {
+    "workers": 2,
+    "timeout": 120,
+    "verbose": false
+  },
+  "assembled_at": "2026-06-20T15:34:48Z"
+}

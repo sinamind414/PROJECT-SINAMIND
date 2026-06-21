@@ -1,0 +1,31 @@
+{
+  "page_no": 3,
+  "status": "done",
+  "source_kind": "pdf",
+  "source_path": "C:\\Users\\zakaria\\Documents\\PROJET KHAWARIZMI IA\\khawarizmi-backend\\data\\ANNALES_SVT_BAC_ALGERIE\\KHELIFA_1\\VOLUMES_KHELIFA1\\KHELIFA1_VOLUME_06.pdf",
+  "pdf_index": 2,
+  "method": "ocr",
+  "chars": 411,
+  "non_ws_chars": 235,
+  "attempt_count": 1,
+  "attempts": [
+    {
+      "variant": "adaptive",
+      "psm": 3,
+      "chars": 411,
+      "non_ws_chars": 235,
+      "error": null
+    }
+  ],
+  "selected_attempt": {
+    "variant": "adaptive",
+    "psm": 3
+  },
+  "confidence_mean": null,
+  "confidence_words": 0,
+  "error": null,
+  "pdf_page_error": null,
+  "searchable_pdf_page": null,
+  "duration_ms": 39850.19,
+  "processed_at": "2026-06-20T15:13:53Z"
+}

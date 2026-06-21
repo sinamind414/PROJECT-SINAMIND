@@ -1,0 +1,231 @@
+{
+  "version": 2,
+  "created_at": "2026-06-20T16:25:38Z",
+  "updated_at": "2026-06-20T16:42:47Z",
+  "identity": {
+    "source": "C:\\Users\\zakaria\\Documents\\PROJET KHAWARIZMI IA\\khawarizmi-backend\\data\\ANNALES_SVT_BAC_ALGERIE\\KHELIFA_1\\VOLUMES_KHELIFA1\\KHELIFA1_VOLUME_11.pdf",
+    "dpi": 150,
+    "lang": "ara+fra",
+    "psm": 3,
+    "oem": 1,
+    "pdf_mode": "ocr",
+    "text_threshold": 25,
+    "no_preprocess": false,
+    "min_chars": 10,
+    "retries": 2,
+    "tsv_metrics": true,
+    "searchable_pdf": false,
+    "start": 1,
+    "end": null
+  },
+  "output_txt": "C:\\Users\\zakaria\\Documents\\PROJET KHAWARIZMI IA\\khawarizmi-backend\\data\\ocr_production\\KHELIFA1_VOLUME_11.ocr.txt",
+  "output_searchable_pdf": null,
+  "page_count": 28,
+  "pages": {
+    "2": {
+      "status": "done",
+      "method": "ocr",
+      "chars": 1806,
+      "error": null,
+      "duration_ms": 68399.21,
+      "processed_at": "2026-06-20T16:26:47Z"
+    },
+    "1": {
+      "status": "done",
+      "method": "ocr",
+      "chars": 10184,
+      "error": null,
+      "duration_ms": 100168.17,
+      "processed_at": "2026-06-20T16:27:19Z"
+    },
+    "3": {
+      "status": "done",
+      "method": "ocr",
+      "chars": 3351,
+      "error": null,
+      "duration_ms": 48507.24,
+      "processed_at": "2026-06-20T16:27:36Z"
+    },
+    "4": {
+      "status": "done",
+      "method": "ocr",
+      "chars": 2435,
+      "error": null,
+      "duration_ms": 48174.44,
+      "processed_at": "2026-06-20T16:28:07Z"
+    },
+    "5": {
+      "status": "done",
+      "method": "ocr",
+      "chars": 1703,
+      "error": null,
+      "duration_ms": 46630.39,
+      "processed_at": "2026-06-20T16:28:23Z"
+    },
+    "7": {
+      "status": "done",
+      "method": "ocr",
+      "chars": 1485,
+      "error": null,
+      "duration_ms": 48451.31,
+      "processed_at": "2026-06-20T16:29:11Z"
+    },
+    "6": {
+      "status": "done",
+      "method": "ocr",
+      "chars": 732,
+      "error": null,
+      "duration_ms": 64165.24,
+      "processed_at": "2026-06-20T16:29:11Z"
+    },
+    "8": {
+      "status": "done",
+      "method": "ocr",
+      "chars": 1551,
+      "error": null,
+      "duration_ms": 57352.29,
+      "processed_at": "2026-06-20T16:30:08Z"
+    },
+    "9": {
+      "status": "done",
+      "method": "ocr",
+      "chars": 1893,
+      "error": null,
+      "duration_ms": 58415.24,
+      "processed_at": "2026-06-20T16:30:10Z"
+    },
+    "11": {
+      "status": "done",
+      "method": "ocr",
+      "chars": 1263,
+      "error": null,
+      "duration_ms": 53304.62,
+      "processed_at": "2026-06-20T16:31:03Z"
+    },
+    "10": {
+      "status": "done",
+      "method": "ocr",
+      "chars": 1895,
+      "error": null,
+      "duration_ms": 60736.82,
+      "processed_at": "2026-06-20T16:31:09Z"
+    },
+    "13": {
+      "status": "done",
+      "method": "ocr",
+      "chars": 1455,
+      "error": null,
+      "duration_ms": 61714.32,
+      "processed_at": "2026-06-20T16:32:11Z"
+    },
+    "12": {
+      "status": "done",
+      "method": "ocr",
+      "chars": 1527,
+      "error": null,
+      "duration_ms": 75297.46,
+      "processed_at": "2026-06-20T16:32:19Z"
+    },
+    "15": {
+      "status": "done",
+      "method": "ocr",
+      "chars": 947,
+      "error": null,
+      "duration_ms": 116132.84,
+      "processed_at": "2026-06-20T16:34:15Z"
+    },
+    "16": {
+      "status": "done",
+      "method": "ocr",
+      "chars": 2026,
+      "error": null,
+      "duration_ms": 78754.63,
+      "processed_at": "2026-06-20T16:35:33Z"
+    },
+    "14": {
+      "status": "done",
+      "method": "ocr",
+      "chars": 4331,
+      "error": null,
+      "duration_ms": 206535.4,
+      "processed_at": "2026-06-20T16:35:37Z"
+    },
+    "17": {
+      "status": "done",
+      "method": "ocr",
+      "chars": 627,
+      "error": null,
+      "duration_ms": 92431.58,
+      "processed_at": "2026-06-20T16:37:06Z"
+    },
+    "18": {
+      "status": "done",
+      "method": "ocr",
+      "chars": 2646,
+      "error": null,
+      "duration_ms": 137845.52,
+      "processed_at": "2026-06-20T16:37:55Z"
+    },
+    "19": {
+      "status": "done",
+      "method": "ocr",
+      "chars": 600,
+      "error": null,
+      "duration_ms": 84091.77,
+      "processed_at": "2026-06-20T16:38:30Z"
+    },
+    "20": {
+      "status": "done",
+      "method": "ocr",
+      "chars": 2003,
+      "error": null,
+      "duration_ms": 96261.08,
+      "processed_at": "2026-06-20T16:39:32Z"
+    },
+    "21": {
+      "status": "done",
+      "method": "ocr",
+      "chars": 1741,
+      "error": null,
+      "duration_ms": 120622.48,
+      "processed_at": "2026-06-20T16:40:31Z"
+    },
+    "22": {
+      "status": "done",
+      "method": "ocr",
+      "chars": 1787,
+      "error": null,
+      "duration_ms": 113241.37,
+      "processed_at": "2026-06-20T16:41:25Z"
+    },
+    "23": {
+      "status": "done",
+      "method": "ocr",
+      "chars": 1339,
+      "error": null,
+      "duration_ms": 72910.75,
+      "processed_at": "2026-06-20T16:41:44Z"
+    },
+    "24": {
+      "status": "done",
+      "method": "ocr",
+      "chars": 1555,
+      "error": null,
+      "duration_ms": 57969.91,
+      "processed_at": "2026-06-20T16:42:23Z"
+    },
+    "25": {
+      "status": "done",
+      "method": "ocr",
+      "chars": 1418,
+      "error": null,
+      "duration_ms": 63420.52,
+      "processed_at": "2026-06-20T16:42:47Z"
+    }
+  },
+  "run_config": {
+    "workers": 2,
+    "timeout": 120,
+    "verbose": false
+  }
+}

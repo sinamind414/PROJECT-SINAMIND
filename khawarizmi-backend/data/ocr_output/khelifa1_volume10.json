@@ -1,0 +1,148 @@
+{
+  "source": "KHELIFA 1 - Volume 10",
+  "fichier": "KHELIFA1_VOLUME_10.ocr.txt",
+  "total_pages": 28,
+  "processed_pages": 28,
+  "pages": [
+    {
+      "page": 1,
+      "chars": 2064,
+      "questions": 3
+    },
+    {
+      "page": 2,
+      "chars": 1400,
+      "questions": 10
+    },
+    {
+      "page": 3,
+      "chars": 1411,
+      "questions": 7
+    },
+    {
+      "page": 4,
+      "chars": 1115,
+      "questions": 3
+    },
+    {
+      "page": 5,
+      "chars": 250,
+      "questions": 0
+    },
+    {
+      "page": 6,
+      "chars": 1745,
+      "questions": 2
+    },
+    {
+      "page": 7,
+      "chars": 7992,
+      "questions": 0
+    },
+    {
+      "page": 8,
+      "chars": 1383,
+      "questions": 1
+    },
+    {
+      "page": 9,
+      "chars": 2249,
+      "questions": 10
+    },
+    {
+      "page": 10,
+      "chars": 1161,
+      "questions": 3
+    },
+    {
+      "page": 11,
+      "chars": 5972,
+      "questions": 0
+    },
+    {
+      "page": 12,
+      "chars": 2346,
+      "questions": 0
+    },
+    {
+      "page": 13,
+      "chars": 4267,
+      "questions": 2
+    },
+    {
+      "page": 14,
+      "chars": 1941,
+      "questions": 3
+    },
+    {
+      "page": 15,
+      "chars": 1586,
+      "questions": 0
+    },
+    {
+      "page": 16,
+      "chars": 1556,
+      "questions": 3
+    },
+    {
+      "page": 17,
+      "chars": 7246,
+      "questions": 3
+    },
+    {
+      "page": 18,
+      "chars": 355,
+      "questions": 1
+    },
+    {
+      "page": 19,
+      "chars": 896,
+      "questions": 3
+    },
+    {
+      "page": 20,
+      "chars": 1542,
+      "questions": 3
+    },
+    {
+      "page": 21,
+      "chars": 7734,
+      "questions": 1
+    },
+    {
+      "page": 22,
+      "chars": 931,
+      "questions": 2
+    },
+    {
+      "page": 23,
+      "chars": 3113,
+      "questions": 1
+    },
+    {
+      "page": 24,
+      "chars": 1673,
+      "questions": 5
+    },
+    {
+      "page": 25,
+      "chars": 635,
+      "questions": 2
+    },
+    {
+      "page": 26,
+      "chars": 1531,
+      "questions": 9
+    },
+    {
+      "page": 27,
+      "chars": 4433,
+      "questions": 1
+    },
+    {
+      "page": 28,
+      "chars": 1640,
+      "questions": 4
+    }
+  ]
+}

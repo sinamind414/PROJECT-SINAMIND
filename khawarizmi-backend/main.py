@@ -34,6 +34,17 @@ async def lifespan(app: FastAPI):
     data_dir = cfg.data_dir or str(pathlib.Path(__file__).parent / "data")
     from services.khawarizmi_engine import KhawarizmiTutor
     state.tutor = KhawarizmiTutor(data_dir=data_dir)
+    # === DEEP DATA FOUNDATION REPORT ===
+    try:
+        loader = state.tutor.loader
+        report = loader.get_data_foundation_report()
+        logger.warning("═══════════════════════════════════════════════")
+        logger.warning("DATA FOUNDATION STATUS (DEEP MIGRATION)")
+        logger.warning(f"  Programme source : {report['programme']['source']}")
+        logger.warning(f"  Micro-concepts   : {report['programme']['total_micro_concepts']}")
+        logger.warning("═══════════════════════════════════════════════")
+    except Exception as e:
+        logger.error(f"Failed to report data foundation: {e}")
     from services.scheduler import KhawarizmiScheduler
     state.scheduler = KhawarizmiScheduler()
     from services.interleaving import InterleavingSession

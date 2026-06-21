@@ -112,11 +112,14 @@ async def get_chapitres(
     current_user: Dict = Depends(get_current_user),
     tutor:        KhawarizmiTutor = Depends(get_tutor),
 ):
-    programme = {
-        "maths":    tutor.programme_maths,
-        "physique": tutor.programme_physique,
-        "sciences": tutor.programme_sciences,
-    }.get(matiere)
+    if hasattr(tutor, 'programme_canonical') and tutor.programme_canonical:
+        programme = tutor.programme_canonical
+    else:
+        programme = {
+            "maths":    tutor.programme_maths,
+            "physique": tutor.programme_physique,
+            "sciences": tutor.programme_sciences,
+        }.get(matiere)
 
     if not programme:
         raise HTTPException(404, f"Matière '{matiere}' introuvable")

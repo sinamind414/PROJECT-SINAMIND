@@ -1,0 +1,2537 @@
+{
+  "source": "KHELIFA 1 - Volume 3",
+  "fichier": "KHELIFA1_VOLUME_03.pdf",
+  "total_pages": 28,
+  "processed_pages": 28,
+  "pages": [
+    {
+      "page": 1,
+      "blocks": 132,
+      "questions": [
+        {
+          "id": "q_khelifa1_v03_p01_01",
+          "texte_brut": "الدراسات الحديثة تهدف إلى تحديد العلاقة بين المورثة والبروتين ودورهما في الخلية حيث تمكن الباحثون من اكتشاف عدة",
+          "texte_corrige": "الدراسات الحديثه تهدف الا تحديد العلاقه بين المورثه والبروتين ودورهما في الخليه حيث تمكن الباحثون من اكتشاف عده",
+          "micro_concept_id": "mc_xxx_xx",
+          "secondary_concepts": [],
+          "a_verifier": true,
+          "confidence": 0.49,
+          "source": "KHELIFA 1 - Volume 3 - Page 1",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": false,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p01_02",
+          "texte_brut": "دصيل والوثيقة )1( توضح إحدى مراحل هذه العلاقة.",
+          "texte_corrige": "دصيل والوثيقه )1( توضح احدا مراحل هذه العلاقه.",
+          "micro_concept_id": "mc_xxx_xx",
+          "secondary_concepts": [],
+          "a_verifier": true,
+          "confidence": 0.46,
+          "source": "KHELIFA 1 - Volume 3 - Page 1",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": false,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p01_03",
+          "texte_brut": "الوثيقة )1( تمثل مرحلة من ظاهرة ADN",
+          "texte_corrige": "الوثيقه )1( تمثل مرحله من ظاهره ADN",
+          "micro_concept_id": "mc_prot_01",
+          "secondary_concepts": [],
+          "a_verifier": false,
+          "confidence": 0.9,
+          "source": "KHELIFA 1 - Volume 3 - Page 1",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": true,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p01_04",
+          "texte_brut": "أ- حددالمرحلة والظاهرة المعنيتين  بعدكتابة البيانات من 1 إلى 4. 3 الخلايا .",
+          "texte_corrige": "ا- حددالمرحله والظاهره المعنيتين بعدكتابه البيانات من 1 الا 4. 3 الخلايا .",
+          "micro_concept_id": "mc_xxx_xx",
+          "secondary_concepts": [],
+          "a_verifier": true,
+          "confidence": 0.66,
+          "source": "KHELIFA 1 - Volume 3 - Page 1",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": false,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p01_05",
+          "texte_brut": "ب - حدد مقرحدوث السمرحلة فيكل _كليوتدات ج - هل تتم هذه السمرحلة على كل السموجودة فيالسمورثة مع التعليل. _ \"3\" في المرحلة الموالية لهذه الظاهرة لإظهار دور",
+          "texte_corrige": "ب - حدد مقرحدوث السمرحله فيكل _كليوتدات ج - هل تتم هذه السمرحله علا كل السموجوده فيالسمورثه مع التعليل. _ \"3\" في المرحله المواليه لهذه الظاهره لاظهار دور",
+          "micro_concept_id": "mc_xxx_xx",
+          "secondary_concepts": [],
+          "a_verifier": true,
+          "confidence": 0.59,
+          "source": "KHELIFA 1 - Volume 3 - Page 1",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": false,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p01_06",
+          "texte_brut": "الوثيقة )1( المعنية نستخلص من عصيات بكتيرية خلاصة بكتيرية يحتوي قيم اعتباديت % ARNm السمكونات الهيولية وخالية من ا ADN وال ARN ثم نضيف إلى ARNm جديد تناقص الأحماض مشعة وARN مستخلص من الهيولى. بعد ذلك الوسط",
+          "texte_corrige": "الوثيقه )1( المعنيه نستخلص من عصيات بكتيريه خلاصه بكتيريه يحتوي قيم اعتباديت % ARNm السمكونات الهيوليه وخاليه من ا ADN وال ARN ثم نضيف الا ARNm جديد تناقص الاحماض مشعه وARN مستخلص من الهيولا. بعد ذلك الوسط",
+          "micro_concept_id": "mc_prot_01",
+          "secondary_concepts": [
+            "mc_prot_04"
+          ],
+          "a_verifier": false,
+          "confidence": 0.73,
+          "source": "KHELIFA 1 - Volume 3 - Page 1",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": true,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p01_07",
+          "texte_brut": "موضحة في منحنى الوثيقة 2(.",
+          "texte_corrige": "موضحه في منحنا الوثيقه 2(.",
+          "micro_concept_id": "mc_xxx_xx",
+          "secondary_concepts": [],
+          "a_verifier": true,
+          "confidence": 0.72,
+          "source": "KHELIFA 1 - Volume 3 - Page 1",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": false,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p01_08",
+          "texte_brut": "تحليلا مقارنا ماذا تستنتج هذه أ - حلل ,",
+          "texte_corrige": "تحليلا مقارنا ماذا تستنتج هذه ا - حلل ,",
+          "micro_concept_id": "mc_xxx_xx",
+          "secondary_concepts": [],
+          "a_verifier": true,
+          "confidence": 0.77,
+          "source": "KHELIFA 1 - Volume 3 - Page 1",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": false,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p01_09",
+          "texte_brut": "ماذا تمثل هذه السمرحلة؟ وما مقرها؟ ب ٥ 10 20 30 !0 50 60 70",
+          "texte_corrige": "ماذا تمثل هذه السمرحله؟ وما مقرها؟ ب 5 10 20 30 !0 50 60 70",
+          "micro_concept_id": "mc_xxx_xx",
+          "secondary_concepts": [],
+          "a_verifier": true,
+          "confidence": 0.81,
+          "source": "KHELIFA 1 - Volume 3 - Page 1",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": false,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p01_10",
+          "texte_brut": "الوثيقة )2( فقط . تتدخل في السمرحلة الثانية هناك عناصر ة 73 ققرين الشكل ) ب ( الشكل ) أ (",
+          "texte_corrige": "الوثيقه )2( فقط . تتدخل في السمرحله الثانيه هناك عناصر ه 73 ققرين الشكل ) ب ( الشكل ) ا (",
+          "micro_concept_id": "mc_xxx_xx",
+          "secondary_concepts": [],
+          "a_verifier": true,
+          "confidence": 0.65,
+          "source": "KHELIFA 1 - Volume 3 - Page 1",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": false,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p01_11",
+          "texte_brut": "تمثل الوثيقة )1( صورتين بالمجهر 7 ظاهرة من الالكتروني   لمرحلتين هامة تحدث عند حقيقيات",
+          "texte_corrige": "تمثل الوثيقه )1( صورتين بالمجهر 7 ظاهره من الالكتروني لمرحلتين هامه تحدث عند حقيقيات",
+          "micro_concept_id": "mc_xxx_xx",
+          "secondary_concepts": [],
+          "a_verifier": true,
+          "confidence": 0.72,
+          "source": "KHELIFA 1 - Volume 3 - Page 1",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": false,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p01_12",
+          "texte_brut": "1 - كيف تسمى هذه الظاهرة؟",
+          "texte_corrige": "1 - كيف تسما هذه الظاهره؟",
+          "micro_concept_id": "mc_xxx_xx",
+          "secondary_concepts": [],
+          "a_verifier": true,
+          "confidence": 0.39,
+          "source": "KHELIFA 1 - Volume 3 - Page 1",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": false,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p01_13",
+          "texte_brut": "الوثيقة )1( 2 - سم المرحلة اخاصة بكل شكل",
+          "texte_corrige": "الوثيقه )1( 2 - سم المرحله اخاصه بكل شكل",
+          "micro_concept_id": "mc_xxx_xx",
+          "secondary_concepts": [],
+          "a_verifier": true,
+          "confidence": 0.68,
+          "source": "KHELIFA 1 - Volume 3 - Page 1",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": false,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p01_14",
+          "texte_brut": "من الوثيقة )1( مع التعليل . من 1 إلى 6. اكتب البيانات المشار إليها بالأرقام , 3 من ADN من ترتيب ثلاثيات إحسدى",
+          "texte_corrige": "من الوثيقه )1( مع التعليل . من 1 الا 6. اكتب البيانات المشار اليها بالارقام , 3 من ADN من ترتيب ثلاثيات احسدا",
+          "micro_concept_id": "mc_prot_01",
+          "secondary_concepts": [],
+          "a_verifier": false,
+          "confidence": 0.76,
+          "source": "KHELIFA 1 - Volume 3 - Page 1",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": true,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p01_15",
+          "texte_brut": "لدراسة العلاقة بين مرحلتي الظاهرة المدروسة نقترح",
+          "texte_corrige": "لدراسه العلاقه بين مرحلتي الظاهره المدروسه نقترح",
+          "micro_concept_id": "mc_xxx_xx",
+          "secondary_concepts": [],
+          "a_verifier": true,
+          "confidence": 0.69,
+          "source": "KHELIFA 1 - Volume 3 - Page 1",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": false,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p01_16",
+          "texte_brut": "سلسلة ARNm )الرسول  المستنسخةمن إحدى هاتين السلسلتين الوثيقة )2(. السلسلتان ) س ( واص (؟",
+          "texte_corrige": "سلسله ARNm )الرسول المستنسخهمن احدا هاتين السلسلتين الوثيقه )2(. السلسلتان ) س ( واص (؟",
+          "micro_concept_id": "mc_prot_01",
+          "secondary_concepts": [
+            "mc_prot_04"
+          ],
+          "a_verifier": false,
+          "confidence": 0.42,
+          "source": "KHELIFA 1 - Volume 3 - Page 1",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": true,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p01_17",
+          "texte_brut": "كيف ٦ السلسلة ) ص ( . _ 2 السلسلة الببتيدية السمركبة. - 3 4 _ مثل بواسطة رسم تخطيطي ATG CAA TTC",
+          "texte_corrige": "كيف 6 السلسله ) ص ( . _ 2 السلسله الببتيديه السمركبه. - 3 4 _ مثل بواسطه رسم تخطيطي ATG CAA TTC",
+          "micro_concept_id": "mc_xxx_xx",
+          "secondary_concepts": [],
+          "a_verifier": true,
+          "confidence": 0.72,
+          "source": "KHELIFA 1 - Volume 3 - Page 1",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": false,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p01_18",
+          "texte_brut": "من الوثيقة )1(.",
+          "texte_corrige": "من الوثيقه )1(.",
+          "micro_concept_id": "mc_xxx_xx",
+          "secondary_concepts": [],
+          "a_verifier": true,
+          "confidence": 0.75,
+          "source": "KHELIFA 1 - Volume 3 - Page 1",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": false,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p01_19",
+          "texte_brut": "الوثيقة )2( 57 by: moo تجربتي مهمة . أنواع النيو العنصر على",
+          "texte_corrige": "الوثيقه )2( 57 by: moo تجربتي مهمه . انواع النيو العنصر علا",
+          "micro_concept_id": "mc_xxx_xx",
+          "secondary_concepts": [],
+          "a_verifier": true,
+          "confidence": 0.8,
+          "source": "KHELIFA 1 - Volume 3 - Page 1",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": false,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p01_20",
+          "texte_brut": "لتوضح التي الظاهرة حقذ",
+          "texte_corrige": "لتوضح التي الظاهره حقذ",
+          "micro_concept_id": "mc_xxx_xx",
+          "secondary_concepts": [],
+          "a_verifier": true,
+          "confidence": 0.9,
+          "source": "KHELIFA 1 - Volume 3 - Page 1",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": false,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p01_21",
+          "texte_brut": "أذكرها أخرى _ النوى . سلسلتي وجزءا جزءا تسمي أكمل",
+          "texte_corrige": "اذكرها اخرا _ النوا . سلسلتي وجزءا جزءا تسمي اكمل",
+          "micro_concept_id": "mc_xxx_xx",
+          "secondary_concepts": [],
+          "a_verifier": true,
+          "confidence": 0.86,
+          "source": "KHELIFA 1 - Volume 3 - Page 1",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": false,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p01_22",
+          "texte_brut": "استخرج",
+          "texte_corrige": "استخرج",
+          "micro_concept_id": "mc_xxx_xx",
+          "secondary_concepts": [],
+          "a_verifier": true,
+          "confidence": 0.61,
+          "source": "KHELIFA 1 - Volume 3 - Page 1",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": false,
+          "notes": "OCR auto - verifier"
+        }
+      ]
+    },
+    {
+      "page": 2,
+      "blocks": 176,
+      "questions": [
+        {
+          "id": "q_khelifa1_v03_p02_01",
+          "texte_brut": "لإظهارأهم العناصر المتدخلة خلال مرحلتي الظاهرة الممثلة في الوثيقة )1( نقترح التجارب التالية سام بسبب قدرته على الارتباط بإنزيم ARN بوليميراز . له ARN كليوتيدات ريبية وإنزيم ADN خلويا اختبار مستخلصا في",
+          "texte_corrige": "لاظهاراهم العناصر المتدخله خلال مرحلتي الظاهره الممثله في الوثيقه )1( نقترح التجارب التاليه سام بسبب قدرته علا الارتباط بانزيم ARN بوليميراز . له ARN كليوتيدات ريبيه وانزيم ADN خلويا اختبار مستخلصا في",
+          "micro_concept_id": "mc_prot_01",
+          "secondary_concepts": [],
+          "a_verifier": false,
+          "confidence": 0.71,
+          "source": "KHELIFA 1 - Volume 3 - Page 2",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": true,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p02_02",
+          "texte_brut": "المسجلة مبينة في الوثيقة )3(. % ARNm تركيب",
+          "texte_corrige": "المسجله مبينه في الوثيقه )3(. % ARNm تركيب",
+          "micro_concept_id": "mc_prot_04",
+          "secondary_concepts": [],
+          "a_verifier": false,
+          "confidence": 0.6,
+          "source": "KHELIFA 1 - Volume 3 - Page 2",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": true,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p02_03",
+          "texte_brut": "الوثيقة )3(. 1 - حلل 100 ARN بوليميراز . دور 2 نستعمل فيالتجسارب التاليةمستخلصابكتيي ا يحتوي كل ب مستلزمات الترجمة بالإضافة إلى متعدد الريبوزوم . 25",
+          "texte_corrige": "الوثيقه )3(. 1 - حلل 100 ARN بوليميراز . دور 2 نستعمل فيالتجسارب التاليهمستخلصابكتيي ا يحتوي كل ب مستلزمات الترجمه بالاضافه الا متعدد الريبوزوم . 25",
+          "micro_concept_id": "mc_prot_06",
+          "secondary_concepts": [],
+          "a_verifier": false,
+          "confidence": 0.82,
+          "source": "KHELIFA 1 - Volume 3 - Page 2",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": true,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p02_04",
+          "texte_brut": "الوثيقة )3( توقف تركيب الروتين . Tetracycline + مستخلص بكتيري (3) ملا حظة ARNm ريبونيوكليازله القدرة على تفكيك .A Tetracycline التتراسكلين مضاد حيوي بإمكانه الارتباط بسهولة بالريبوزوم في",
+          "texte_corrige": "الوثيقه )3( توقف تركيب الروتين . Tetracycline + مستخلص بكتيري (3) ملا حظه ARNm ريبونيوكليازله القدره علا تفكيك .A Tetracycline التتراسكلين مضاد حيوي بامكانه الارتباط بسهوله بالريبوزوم في",
+          "micro_concept_id": "mc_prot_06",
+          "secondary_concepts": [
+            "mc_prot_04"
+          ],
+          "a_verifier": false,
+          "confidence": 0.71,
+          "source": "KHELIFA 1 - Volume 3 - Page 2",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": true,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p02_05",
+          "texte_brut": "تمرين مسببة الليفة الكيسية مرض وراثي خطير يتمثل في لزوجة مفرطة في إفرازات الغدد ذات الإفراز أمرا",
+          "texte_corrige": "تمرين مسببه الليفه الكيسيه مرض وراثي خطير يتمثل في لزوجه مفرطه في افرازات الغدد ذات الافراز امرا",
+          "micro_concept_id": "mc_xxx_xx",
+          "secondary_concepts": [],
+          "a_verifier": true,
+          "confidence": 0.73,
+          "source": "KHELIFA 1 - Volume 3 - Page 2",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": false,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p02_06",
+          "texte_brut": "المصابين . اضطرابات هضمية وتنفسية CF مسؤولة عن صنع بروت: رقم 7 يتمثل المرض في حدوث طفرة في مورثة توجدعلى الذراع الطويل يدعى CFTR وهويتكون من AAA GAA ATT ATC",
+          "texte_corrige": "المصابين . اضطرابات هضميه وتنفسيه CF مسؤوله عن صنع بروت: رقم 7 يتمثل المرض في حدوث طفره في مورثه توجدعلا الذراع الطويل يدعا CFTR وهويتكون من AAA GAA ATT ATC",
+          "micro_concept_id": "mc_xxx_xx",
+          "secondary_concepts": [],
+          "a_verifier": true,
+          "confidence": 0.81,
+          "source": "KHELIFA 1 - Volume 3 - Page 2",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": false,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p02_07",
+          "texte_brut": "الوثيقة )1( كليوتيدات أ - قسارن تجربتى .58 by: moo تجربتي Stop TrP",
+          "texte_corrige": "الوثيقه )1( كليوتيدات ا - قسارن تجربتا .58 by: moo تجربتي Stop TrP",
+          "micro_concept_id": "mc_xxx_xx",
+          "secondary_concepts": [],
+          "a_verifier": true,
+          "confidence": 0.76,
+          "source": "KHELIFA 1 - Volume 3 - Page 2",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": false,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p02_08",
+          "texte_brut": "استخرج إنزيم النتائج ٤ ٧ إنزيم الإنزيم الموقع _ النتائج",
+          "texte_corrige": "استخرج انزيم النتائج 4 7 انزيم الانزيم الموقع _ النتائج",
+          "micro_concept_id": "mc_xxx_xx",
+          "secondary_concepts": [],
+          "a_verifier": true,
+          "confidence": 0.85,
+          "source": "KHELIFA 1 - Volume 3 - Page 2",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": false,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p02_09",
+          "texte_brut": "فسر العناصر",
+          "texte_corrige": "فسر العناصر",
+          "micro_concept_id": "mc_xxx_xx",
+          "secondary_concepts": [],
+          "a_verifier": true,
+          "confidence": 0.58,
+          "source": "KHELIFA 1 - Volume 3 - Page 2",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": false,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p02_10",
+          "texte_brut": "استخرج اض الخارجي لدى للصبغي تدعى غشائي أميني . أليل عادي",
+          "texte_corrige": "استخرج اض الخارجي لدا للصبغي تدعا غشائي اميني . اليل عادي",
+          "micro_concept_id": "mc_xxx_xx",
+          "secondary_concepts": [],
+          "a_verifier": true,
+          "confidence": 0.97,
+          "source": "KHELIFA 1 - Volume 3 - Page 2",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": false,
+          "notes": "OCR auto - verifier"
+        }
+      ]
+    },
+    {
+      "page": 3,
+      "blocks": 158,
+      "questions": [
+        {
+          "id": "q_khelifa1_v03_p03_01",
+          "texte_brut": "والسمريض . ماذا تستنتج؟. الشخصين من المورثة على مستوى هذا الشخصين وذلك باستعمال جدول الشفرات",
+          "texte_corrige": "والسمريض . ماذا تستنتج؟. الشخصين من المورثه علا مستوا هذا الشخصين وذلك باستعمال جدول الشفرات",
+          "micro_concept_id": "mc_xxx_xx",
+          "secondary_concepts": [],
+          "a_verifier": true,
+          "confidence": 0.73,
+          "source": "KHELIFA 1 - Volume 3 - Page 3",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": false,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p03_02",
+          "texte_brut": "الأحماض الأمينية فيهذا الجزء من البروتين",
+          "texte_corrige": "الاحماض الامينيه فيهذا الجزء من البروتين",
+          "micro_concept_id": "mc_xxx_xx",
+          "secondary_concepts": [],
+          "a_verifier": true,
+          "confidence": 0.7,
+          "source": "KHELIFA 1 - Volume 3 - Page 3",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": false,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p03_03",
+          "texte_brut": "ب - حدد ؟",
+          "texte_corrige": "ب - حدد ؟",
+          "micro_concept_id": "mc_xxx_xx",
+          "secondary_concepts": [],
+          "a_verifier": true,
+          "confidence": 0.92,
+          "source": "KHELIFA 1 - Volume 3 - Page 3",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": false,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p03_04",
+          "texte_brut": "الوراثية . ماذا تستنتج",
+          "texte_corrige": "الوراثيه . ماذا تستنتج",
+          "micro_concept_id": "mc_xxx_xx",
+          "secondary_concepts": [],
+          "a_verifier": true,
+          "confidence": 0.65,
+          "source": "KHELIFA 1 - Volume 3 - Page 3",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": false,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p03_05",
+          "texte_brut": "إلى تغييرفي البروتين ؟ وضح ذلك . ADN ج - هلكل تغييرعلى مستوى ال 2 - إن البروتين CFTR يدخل في بناء الغشاء الهيولي للخلايا المخاطية في الرئتين والأمعاء ممثل فيخمسة قطع تشكل .ATP Jالمنظمةمن قبل ا قناة المرض ؟ سبب أ_ هل يمكنك الآن تعقيدها وخطورتها . من الطفرات وتختلف من",
+          "texte_corrige": "الا تغييرفي البروتين ؟ وضح ذلك . ADN ج - هلكل تغييرعلا مستوا ال 2 - ان البروتين CFTR يدخل في بناء الغشاء الهيولي للخلايا المخاطيه في الرئتين والامعاء ممثل فيخمسه قطع تشكل .ATP Jالمنظمهمن قبل ا قناه المرض ؟ سبب ا_ هل يمكنك الان تعقيدها وخطورتها . من الطفرات وتختلف من",
+          "micro_concept_id": "mc_prot_01",
+          "secondary_concepts": [],
+          "a_verifier": false,
+          "confidence": 0.59,
+          "source": "KHELIFA 1 - Volume 3 - Page 3",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": true,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p03_06",
+          "texte_brut": "مانوع الطفرة السمدروسة في السؤال 1. 0 3 - اذكر الأنواع الأخر من الطفرات . 75",
+          "texte_corrige": "مانوع الطفره السمدروسه في السؤال 1. 0 3 - اذكر الانواع الاخر من الطفرات . 75",
+          "micro_concept_id": "mc_xxx_xx",
+          "secondary_concepts": [],
+          "a_verifier": true,
+          "confidence": 0.76,
+          "source": "KHELIFA 1 - Volume 3 - Page 3",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": false,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p03_07",
+          "texte_brut": "تمرين يضاف لكل أنبوب : .متعدد اليوراسيل )( بالغة فيحياة اخلية وهي آبروتينات جزيئات عضويبة ذات 1 C-مختلفت موسومت ب نعبير لمعلومات وراثية محمولة على كليوتيدات في",
+          "texte_corrige": "تمرين يضاف لكل انبوب : .متعدد اليوراسيل )( بالغه فيحياه اخليه وهي ابروتينات جزيئات عضويبه ذات 1 C-مختلفت موسومت ب نعبير لمعلومات وراثيه محموله علا كليوتيدات في",
+          "micro_concept_id": "mc_xxx_xx",
+          "secondary_concepts": [],
+          "a_verifier": true,
+          "confidence": 0.63,
+          "source": "KHELIFA 1 - Volume 3 - Page 3",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": false,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p03_08",
+          "texte_brut": "نقترح دراسة العلاقة السموجودة بين تتابع فالين فينيل الانين يدشيا ADNJI وتتابع الأحماض الأمينية في جزيئة البوتين . إعداد سنة 1961 تحجربة",
+          "texte_corrige": "نقترح دراسه العلاقه السموجوده بين تتابع فالين فينيل الانين يدشيا ADNJI وتتابع الاحماض الامينيه في جزيئه البوتين . اعداد سنه 1961 تحجربه",
+          "micro_concept_id": "mc_prot_01",
+          "secondary_concepts": [],
+          "a_verifier": false,
+          "confidence": 0.67,
+          "source": "KHELIFA 1 - Volume 3 - Page 3",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": true,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p03_09",
+          "texte_brut": "الوثيقة )1( مراحل المكونات الهيوليت نيرنبارغ وماثيي في إطاردراسة من طسرف باحثين همسا ADN خالية منال) الشفرة الوراثية .",
+          "texte_corrige": "الوثيقه )1( مراحل المكونات الهيوليت نيرنبارغ وماثيي في اطاردراسه من طسرف باحثين همسا ADN خاليه منال) الشفره الوراثيه .",
+          "micro_concept_id": "mc_prot_01",
+          "secondary_concepts": [],
+          "a_verifier": false,
+          "confidence": 0.59,
+          "source": "KHELIFA 1 - Volume 3 - Page 3",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": true,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p03_10",
+          "texte_brut": "وال ARN بينمسا ٦ - حلل هذه النتائجء وماهي المعلومة الأساسية ترسي البروتينات بعد ذلل ويقاس الريبوزومات والأنزيمات  وتحضن التجرببية . استخراجها من هذه م في درجت حرارة 037 مؤسس استخلص كم نيوكليوتيدة",
+          "texte_corrige": "وال ARN بينمسا 6 - حلل هذه النتائجء وماهي المعلومه الاساسيه ترسي البروتينات بعد ذلل ويقاس الريبوزومات والانزيمات وتحضن التجرببيه . استخراجها من هذه م في درجت حراره 037 مؤسس استخلص كم نيوكليوتيده",
+          "micro_concept_id": "mc_prot_06",
+          "secondary_concepts": [],
+          "a_verifier": false,
+          "confidence": 0.56,
+          "source": "KHELIFA 1 - Volume 3 - Page 3",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": true,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p03_11",
+          "texte_brut": "الوثيقة )1( البوتين . نقترح التجربة التالية : التركيب تجربة : يخضع لسلسلة من عمليات الطرد ديبوزوم الساذل المطافي مستخلص خلايا كبدية محصل عليه بتمزيق الخلايا السائل الهلافي موضوعة في وسط يحافظ على بنية ونشاط العضيات . هي9 :",
+          "texte_corrige": "الوثيقه )1( البوتين . نقترح التجربه التاليه : التركيب تجربه : يخضع لسلسله من عمليات الطرد ديبوزوم الساذل المطافي مستخلص خلايا كبديه محصل عليه بتمزيق الخلايا السائل الهلافي موضوعه في وسط يحافظ علا بنيه ونشاط العضيات . هي9 :",
+          "micro_concept_id": "mc_xxx_xx",
+          "secondary_concepts": [],
+          "a_verifier": true,
+          "confidence": 0.57,
+          "source": "KHELIFA 1 - Volume 3 - Page 3",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": false,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p03_12",
+          "texte_brut": "بالوثيقة )2(. 1.1 ميكروزومات التجريبية . 1 - حلل 0.4 سائل طافي نهائي المحصل عليها . _ 2 10.2",
+          "texte_corrige": "بالوثيقه )2(. 1.1 ميكروزومات التجريبيه . 1 - حلل 0.4 سائل طافي نهائي المحصل عليها . _ 2 10.2",
+          "micro_concept_id": "mc_xxx_xx",
+          "secondary_concepts": [],
+          "a_verifier": true,
+          "confidence": 0.72,
+          "source": "KHELIFA 1 - Volume 3 - Page 3",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": false,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p03_13",
+          "texte_brut": "الوثيقة )2( ذلك ؟",
+          "texte_corrige": "الوثيقه )2( ذلك ؟",
+          "micro_concept_id": "mc_xxx_xx",
+          "secondary_concepts": [],
+          "a_verifier": true,
+          "confidence": 0.67,
+          "source": "KHELIFA 1 - Volume 3 - Page 3",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": false,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p03_14",
+          "texte_brut": "الوراثية كيف 59 تجربتى by: moo تجربتي",
+          "texte_corrige": "الوراثيه كيف 59 تجربتا by: moo تجربتي",
+          "micro_concept_id": "mc_xxx_xx",
+          "secondary_concepts": [],
+          "a_verifier": true,
+          "confidence": 0.77,
+          "source": "KHELIFA 1 - Volume 3 - Page 3",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": false,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p03_15",
+          "texte_brut": "الجزء العادي لدى تتابع يؤدي اللورور ظهور تفسير أنواع حيث",
+          "texte_corrige": "الجزء العادي لدا تتابع يؤدي اللورور ظهور تفسير انواع حيث",
+          "micro_concept_id": "mc_xxx_xx",
+          "secondary_concepts": [],
+          "a_verifier": true,
+          "confidence": 0.84,
+          "source": "KHELIFA 1 - Volume 3 - Page 3",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": false,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p03_16",
+          "texte_brut": "فسر",
+          "texte_corrige": "فسر",
+          "micro_concept_id": "mc_xxx_xx",
+          "secondary_concepts": [],
+          "a_verifier": true,
+          "confidence": 1.0,
+          "source": "KHELIFA 1 - Volume 3 - Page 3",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": false,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p03_17",
+          "texte_brut": "- استخرج",
+          "texte_corrige": "- استخرج",
+          "micro_concept_id": "mc_xxx_xx",
+          "secondary_concepts": [],
+          "a_verifier": true,
+          "confidence": 0.47,
+          "source": "KHELIFA 1 - Volume 3 - Page 3",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": false,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p03_18",
+          "texte_brut": "تفسر",
+          "texte_corrige": "تفسر",
+          "micro_concept_id": "mc_xxx_xx",
+          "secondary_concepts": [],
+          "a_verifier": true,
+          "confidence": 1.0,
+          "source": "KHELIFA 1 - Volume 3 - Page 3",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": false,
+          "notes": "OCR auto - verifier"
+        }
+      ]
+    },
+    {
+      "page": 4,
+      "blocks": 71,
+      "questions": [
+        {
+          "id": "q_khelifa1_v03_p04_01",
+          "texte_brut": "تمرين",
+          "texte_corrige": "تمرين",
+          "micro_concept_id": "mc_xxx_xx",
+          "secondary_concepts": [],
+          "a_verifier": true,
+          "confidence": 0.86,
+          "source": "KHELIFA 1 - Volume 3 - Page 4",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": false,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p04_02",
+          "texte_brut": "الوثيقة )1( يلخص آليات ومقر تتنوع البروتينات وتتخصص حسب المعلومات الوراثية المخزنة البروتين عند حقيقيات النواة . المرحلة المتطلبات بروتين 7 ب 10 بروتين",
+          "texte_corrige": "الوثيقه )1( يلخص اليات ومقر تتنوع البروتينات وتتخصص حسب المعلومات الوراثيه المخزنه البروتين عند حقيقيات النواه . المرحله المتطلبات بروتين 7 ب 10 بروتين",
+          "micro_concept_id": "mc_xxx_xx",
+          "secondary_concepts": [],
+          "a_verifier": true,
+          "confidence": 0.83,
+          "source": "KHELIFA 1 - Volume 3 - Page 4",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": false,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p04_03",
+          "texte_brut": "الوثيقة )1( 1  سم البيانات فقط",
+          "texte_corrige": "الوثيقه )1( 1 سم البيانات فقط",
+          "micro_concept_id": "mc_xxx_xx",
+          "secondary_concepts": [],
+          "a_verifier": true,
+          "confidence": 0.71,
+          "source": "KHELIFA 1 - Volume 3 - Page 4",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": false,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p04_04",
+          "texte_brut": "صف تجربة تثبت من خلالها مقر المرحلة )د محددا بدقة التقنية المستعملة. 2 النشاط ) س ( . برسم _ 3 بقياس مشعةو ARNm فيالفترتين زه وزا3 ثم نضيف لمستخلص بكتيري خالمن ADN أحماضا 4 كمية الأحماض الأمينية المدمجة )البروتينات",
+          "texte_corrige": "صف تجربه تثبت من خلالها مقر المرحله )د محددا بدقه التقنيه المستعمله. 2 النشاط ) س ( . برسم _ 3 بقياس مشعهو ARNm فيالفترتين زه وزا3 ثم نضيف لمستخلص بكتيري خالمن ADN احماضا 4 كميه الاحماض الامينيه المدمجه )البروتينات",
+          "micro_concept_id": "mc_prot_01",
+          "secondary_concepts": [
+            "mc_prot_04"
+          ],
+          "a_verifier": false,
+          "confidence": 0.6,
+          "source": "KHELIFA 1 - Volume 3 - Page 4",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": true,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p04_05",
+          "texte_brut": "في الوثيقة )02(. كميت الحموض",
+          "texte_corrige": "في الوثيقه )02(. كميت الحموض",
+          "micro_concept_id": "mc_xxx_xx",
+          "secondary_concepts": [],
+          "a_verifier": true,
+          "confidence": 0.48,
+          "source": "KHELIFA 1 - Volume 3 - Page 4",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": false,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p04_06",
+          "texte_brut": "أ- علل نزع ADN من المستخلص ب - حلل المنحنيين .",
+          "texte_corrige": "ا- علل نزع ADN من المستخلص ب - حلل المنحنيين .",
+          "micro_concept_id": "mc_prot_01",
+          "secondary_concepts": [],
+          "a_verifier": false,
+          "confidence": 0.76,
+          "source": "KHELIFA 1 - Volume 3 - Page 4",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": true,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p04_07",
+          "texte_brut": "تبينها ARNm إحدى خصائص جه _ ARNn ARN من ARN في الهيولى تكون د _ توجد كميتها ثابتة أثناء وخسارج فترة تركيب ذلك ؟",
+          "texte_corrige": "تبينها ARNm احدا خصائص جه _ ARNn ARN من ARN في الهيولا تكون د _ توجد كميتها ثابته اثناء وخسارج فتره تركيب ذلك ؟",
+          "micro_concept_id": "mc_prot_04",
+          "secondary_concepts": [],
+          "a_verifier": false,
+          "confidence": 0.73,
+          "source": "KHELIFA 1 - Volume 3 - Page 4",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": true,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p04_08",
+          "texte_brut": "البروتين . كيف 10 20 50 الزمن ) دقائق ( ARNm إضافة ARNm إضافة الوثيتة )2( تجربتى 60",
+          "texte_corrige": "البروتين . كيف 10 20 50 الزمن ) دقائق ( ARNm اضافه ARNm اضافه الوثيته )2( تجربتا 60",
+          "micro_concept_id": "mc_prot_04",
+          "secondary_concepts": [],
+          "a_verifier": false,
+          "confidence": 0.59,
+          "source": "KHELIFA 1 - Volume 3 - Page 4",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": true,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p04_09",
+          "texte_brut": "- وضح أمينية نقوم النتائج",
+          "texte_corrige": "- وضح امينيه نقوم النتائج",
+          "micro_concept_id": "mc_xxx_xx",
+          "secondary_concepts": [],
+          "a_verifier": true,
+          "confidence": 0.84,
+          "source": "KHELIFA 1 - Volume 3 - Page 4",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": false,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p04_10",
+          "texte_brut": "مبينة",
+          "texte_corrige": "مبينه",
+          "micro_concept_id": "mc_xxx_xx",
+          "secondary_concepts": [],
+          "a_verifier": true,
+          "confidence": 0.99,
+          "source": "KHELIFA 1 - Volume 3 - Page 4",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": false,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p04_11",
+          "texte_brut": "استخرج التي النتائج . أخسرى أنسواع",
+          "texte_corrige": "استخرج التي النتائج . اخسرا انسواع",
+          "micro_concept_id": "mc_xxx_xx",
+          "secondary_concepts": [],
+          "a_verifier": true,
+          "confidence": 0.68,
+          "source": "KHELIFA 1 - Volume 3 - Page 4",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": false,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p04_12",
+          "texte_brut": "تفسر",
+          "texte_corrige": "تفسر",
+          "micro_concept_id": "mc_xxx_xx",
+          "secondary_concepts": [],
+          "a_verifier": true,
+          "confidence": 1.0,
+          "source": "KHELIFA 1 - Volume 3 - Page 4",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": false,
+          "notes": "OCR auto - verifier"
+        }
+      ]
+    },
+    {
+      "page": 5,
+      "blocks": 130,
+      "questions": [
+        {
+          "id": "q_khelifa1_v03_p05_01",
+          "texte_brut": ".ن( بصفة )الثانيء الثالث، . تحدث بتوضع أحماض أمينية على طول السمورثة بمواصلة ربط يسمح تنقل طول سلسلة ال- ARNm. فيكل مرة يحدث الارتباط متتالية النكليوتيدات وذلك وفق تسلسل جديد والحمض",
+          "texte_corrige": ".ن( بصفه )الثانيء الثالث، . تحدث بتوضع احماض امينيه علا طول السمورثه بمواصله ربط يسمح تنقل طول سلسله ال- ARNm. فيكل مره يحدث الارتباط متتاليه النكليوتيدات وذلك وفق تسلسل جديد والحمض",
+          "micro_concept_id": "mc_prot_04",
+          "secondary_concepts": [],
+          "a_verifier": false,
+          "confidence": 0.77,
+          "source": "KHELIFA 1 - Volume 3 - Page 5",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": true,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p05_02",
+          "texte_brut": "بين حمض الأحداث الثلاثة التالية الشفرة المحمولة على اARNm J مع الشفرة 1 الجديد . المضادة لARNt J الحامل للحمض مما يستوجب",
+          "texte_corrige": "بين حمض الاحداث الثلاثه التاليه الشفره المحموله علا اARNm J مع الشفره 1 الجديد . المضاده لARNt J الحامل للحمض مما يستوجب",
+          "micro_concept_id": "mc_prot_05",
+          "secondary_concepts": [
+            "mc_prot_04"
+          ],
+          "a_verifier": false,
+          "confidence": 0.65,
+          "source": "KHELIFA 1 - Volume 3 - Page 5",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": true,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p05_03",
+          "texte_brut": "تشكل رابطة ببتيدية جديدة بين الحمضين 2 استهلاك طاقة خلوية . يحمل الحمض ARNt ال 3 فيتدحرج ) ينزلق بعدذلك الريبوزوم تجاه شفرة جديدة . 3 - النهاية (Terminaison) النهاية 3",
+          "texte_corrige": "تشكل رابطه ببتيديه جديده بين الحمضين 2 استهلاك طاقه خلويه . يحمل الحمض ARNt ال 3 فيتدحرج ) ينزلق بعدذلك الريبوزوم تجاه شفره جديده . 3 - النهايه (Terminaison) النهايه 3",
+          "micro_concept_id": "mc_prot_06",
+          "secondary_concepts": [
+            "mc_prot_05"
+          ],
+          "a_verifier": false,
+          "confidence": 0.82,
+          "source": "KHELIFA 1 - Volume 3 - Page 5",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": true,
+          "notes": "OCR auto - verifier"
+        }
+      ]
+    },
+    {
+      "page": 6,
+      "blocks": 125,
+      "questions": [
+        {
+          "id": "q_khelifa1_v03_p06_01",
+          "texte_brut": "إجابة التمرين .(1) عدم صنع الفرضيات : 1 .(2) عدم صنع )1( و )2(. عدم صنع غير فعال .",
+          "texte_corrige": "اجابه التمرين .(1) عدم صنع الفرضيات : 1 .(2) عدم صنع )1( و )2(. عدم صنع غير فعال .",
+          "micro_concept_id": "mc_xxx_xx",
+          "secondary_concepts": [],
+          "a_verifier": true,
+          "confidence": 0.83,
+          "source": "KHELIFA 1 - Volume 3 - Page 6",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": false,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p06_02",
+          "texte_brut": "مايفسرظهور السرطان في الخلايا الجلدية الناتج معطية خلايا مماثلة لها طانية الجلدية إن الخلايا 5 من الانقسام  وبماأن هذه الطفرةلم تصب الخلايا الجنسية لذالا ينتقل السرطان إلى الأبناء لأن الخلايا الجنسية",
+          "texte_corrige": "مايفسرظهور السرطان في الخلايا الجلديه الناتج معطيه خلايا مماثله لها طانيه الجلديه ان الخلايا 5 من الانقسام وبماان هذه الطفرهلم تصب الخلايا الجنسيه لذالا ينتقل السرطان الا الابناء لان الخلايا الجنسيه",
+          "micro_concept_id": "mc_xxx_xx",
+          "secondary_concepts": [],
+          "a_verifier": true,
+          "confidence": 0.62,
+          "source": "KHELIFA 1 - Volume 3 - Page 6",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": false,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p06_03",
+          "texte_brut": "تنقل الصفات الوراثية من الآباء إلى الأبناء وليست الخلايا الجلدية )الجسمية. تجربت .62 by: moo تجربتي الانزيم الانزيم الانزيم انزيم",
+          "texte_corrige": "تنقل الصفات الوراثيه من الاباء الا الابناء وليست الخلايا الجلديه )الجسميه. تجربت .62 by: moo تجربتي الانزيم الانزيم الانزيم انزيم",
+          "micro_concept_id": "mc_xxx_xx",
+          "secondary_concepts": [],
+          "a_verifier": true,
+          "confidence": 0.77,
+          "source": "KHELIFA 1 - Volume 3 - Page 6",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": false,
+          "notes": "OCR auto - verifier"
+        }
+      ]
+    },
+    {
+      "page": 7,
+      "blocks": 138,
+      "questions": [
+        {
+          "id": "q_khelifa1_v03_p07_01",
+          "texte_brut": "جبةالتمرين 2 إذا مرض الخضاب الاختلاف في المسافة المقطوعة يعبرعن الاختلاف فيبنية ؟ HbA خلل في بنية ARNm قطعة GUG CAC",
+          "texte_corrige": "جبهالتمرين 2 اذا مرض الخضاب الاختلاف في المسافه المقطوعه يعبرعن الاختلاف فيبنيه ؟ HbA خلل في بنيه ARNm قطعه GUG CAC",
+          "micro_concept_id": "mc_prot_04",
+          "secondary_concepts": [],
+          "a_verifier": false,
+          "confidence": 0.76,
+          "source": "KHELIFA 1 - Volume 3 - Page 7",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": true,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p07_02",
+          "texte_brut": "- - أ- الوثيقة 3: هناك توافق بين منحنى البوليزوم ) المنحنى الأحمرا ومنحنى الاحماض الامينية المشعة ) المنحنى ما يؤكد بأن الاحماض الامينية المشعة متمركزة في البوليزوم . الأخضرا البروتين يتم في البوليزوم . إذا ادماج الاحماض الامينية يؤكد بأن البوليزوم",
+          "texte_corrige": "- - ا- الوثيقه 3: هناك توافق بين منحنا البوليزوم ) المنحنا الاحمرا ومنحنا الاحماض الامينيه المشعه ) المنحنا ما يؤكد بان الاحماض الامينيه المشعه متمركزه في البوليزوم . الاخضرا البروتين يتم في البوليزوم . اذا ادماج الاحماض الامينيه يؤكد بان البوليزوم",
+          "micro_concept_id": "mc_xxx_xx",
+          "secondary_concepts": [],
+          "a_verifier": true,
+          "confidence": 0.73,
+          "source": "KHELIFA 1 - Volume 3 - Page 7",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": false,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p07_03",
+          "texte_brut": "بين منحنى البوليزوم ومنحنى ARNm )المنحنى الأزرق ( هناك يحتوي على ا  ARNm ) الرسول (. 63 تجربتئ by: moo تجربتي المنجلي الدم",
+          "texte_corrige": "بين منحنا البوليزوم ومنحنا ARNm )المنحنا الازرق ( هناك يحتوي علا ا ARNm ) الرسول (. 63 تجربتئ by: moo تجربتي المنجلي الدم",
+          "micro_concept_id": "mc_prot_04",
+          "secondary_concepts": [],
+          "a_verifier": false,
+          "confidence": 0.76,
+          "source": "KHELIFA 1 - Volume 3 - Page 7",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": true,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p07_04",
+          "texte_brut": "بينهما كوجي . كوجي أماكن الادماج اميني أدمج الأحماض البنائي القطب",
+          "texte_corrige": "بينهما كوجي . كوجي اماكن الادماج اميني ادمج الاحماض البنائي القطب",
+          "micro_concept_id": "mc_xxx_xx",
+          "secondary_concepts": [],
+          "a_verifier": true,
+          "confidence": 0.92,
+          "source": "KHELIFA 1 - Volume 3 - Page 7",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": false,
+          "notes": "OCR auto - verifier"
+        }
+      ]
+    },
+    {
+      "page": 8,
+      "blocks": 118,
+      "questions": [
+        {
+          "id": "q_khelifa1_v03_p08_01",
+          "texte_brut": "الوثيقة 4: اضافة ARNase بولزوم ب _ البوليزوم يتكون من ARNm+ ريبوزومات .",
+          "texte_corrige": "الوثيقه 4: اضافه ARNase بولزوم ب _ البوليزوم يتكون من ARNm+ ريبوزومات .",
+          "micro_concept_id": "mc_prot_06",
+          "secondary_concepts": [
+            "mc_prot_04"
+          ],
+          "a_verifier": false,
+          "confidence": 0.82,
+          "source": "KHELIFA 1 - Volume 3 - Page 8",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": true,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p08_02",
+          "texte_brut": "إجابة التمرين",
+          "texte_corrige": "اجابه التمرين",
+          "micro_concept_id": "mc_xxx_xx",
+          "secondary_concepts": [],
+          "a_verifier": true,
+          "confidence": 0.93,
+          "source": "KHELIFA 1 - Volume 3 - Page 8",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": false,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p08_03",
+          "texte_brut": "1 -أ - بماأن الفيروس يتكون فقط من ا ADN+ البروتين ) الشكل 1 من الوثيقة 1(. وبماأن اصابة البكتيريا بالفيروس تتجلى في: في البكتيريا . ADN-ا ADN تحلل * الام , تشكل فيروسات جديدة مشابهة يحمل جميع المعلومات الضرورية لتركيب البروتينات الخاصة بالفيروس ADN الاستنتاج: أن وبالتالي ADN يشرف على صنع البروتين .",
+          "texte_corrige": "1 -ا - بماان الفيروس يتكون فقط من ا ADN+ البروتين ) الشكل 1 من الوثيقه 1(. وبماان اصابه البكتيريا بالفيروس تتجلا في: في البكتيريا . ADN-ا ADN تحلل * الام , تشكل فيروسات جديده مشابهه يحمل جميع المعلومات الضروريه لتركيب البروتينات الخاصه بالفيروس ADN الاستنتاج: ان وبالتالي ADN يشرف علا صنع البروتين .",
+          "micro_concept_id": "mc_prot_01",
+          "secondary_concepts": [],
+          "a_verifier": false,
+          "confidence": 0.63,
+          "source": "KHELIFA 1 - Volume 3 - Page 8",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": true,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p08_04",
+          "texte_brut": "نسخة من القطع الدالة فقط محصورة بين القطع غير الدالة لذا الدالة 7 عدد ب عدد القطع غير الدالة 7. ج - نستنتج أن المورثة فيبدائيات النواة تتكون من قطع دالة فقط 5",
+          "texte_corrige": "نسخه من القطع الداله فقط محصوره بين القطع غير الداله لذا الداله 7 عدد ب عدد القطع غير الداله 7. ج - نستنتج ان المورثه فيبدائيات النواه تتكون من قطع داله فقط 5",
+          "micro_concept_id": "mc_prot_01",
+          "secondary_concepts": [],
+          "a_verifier": false,
+          "confidence": 0.71,
+          "source": "KHELIFA 1 - Volume 3 - Page 8",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": true,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p08_05",
+          "texte_brut": "إجابة التمرين ARN أ -1- لايمكن تعويض اليوريدين لأنها جزيئة مميزة لل .ADN Jمميزة ل لايكن تعويض الثيميدين يوجد بكثرة في البروتين . - يمكن تعويض اللوسين بحمض استؤصلت جزءمن كبدها واعتمادا على حساب",
+          "texte_corrige": "اجابه التمرين ARN ا -1- لايمكن تعويض اليوريدين لانها جزيئه مميزه لل .ADN Jمميزه ل لايكن تعويض الثيميدين يوجد بكثره في البروتين . - يمكن تعويض اللوسين بحمض استؤصلت جزءمن كبدها واعتمادا علا حساب",
+          "micro_concept_id": "mc_prot_01",
+          "secondary_concepts": [],
+          "a_verifier": false,
+          "confidence": 0.69,
+          "source": "KHELIFA 1 - Volume 3 - Page 8",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": true,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p08_06",
+          "texte_brut": "2 _ من مقارنة المنحنيات الخاصة بفئران المجموعة ) ب( ADN  يصنع أولاثم بعدذلك يصنع البروتين وأخيرا ا ARN أن _ يتضح الأخير من حالة البروتين ARN فيحالة الضائع التعليل : بعدذلك إلى بروتين بنائي =اجدة فيمستوى المورثة ينسخ ا ARN الرسول الذي",
+          "texte_corrige": "2 _ من مقارنه المنحنيات الخاصه بفئران المجموعه ) ب( ADN يصنع اولاثم بعدذلك يصنع البروتين واخيرا ا ARN ان _ يتضح الاخير من حاله البروتين ARN فيحاله الضائع التعليل : بعدذلك الا بروتين بنائي =اجده فيمستوا المورثه ينسخ ا ARN الرسول الذي",
+          "micro_concept_id": "mc_prot_01",
+          "secondary_concepts": [],
+          "a_verifier": false,
+          "confidence": 0.74,
+          "source": "KHELIFA 1 - Volume 3 - Page 8",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": true,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p08_07",
+          "texte_brut": "لتجديد الجزء المستأصل ا-ADN استعدادا للتضاعف ذلك تتضاعف 3 بروتين ARNm ADN ) المورثة( استنساخ تجربتئ by: moo",
+          "texte_corrige": "لتجديد الجزء المستاصل ا-ADN استعدادا للتضاعف ذلك تتضاعف 3 بروتين ARNm ADN ) المورثه( استنساخ تجربتئ by: moo",
+          "micro_concept_id": "mc_prot_01",
+          "secondary_concepts": [
+            "mc_prot_04"
+          ],
+          "a_verifier": false,
+          "confidence": 0.73,
+          "source": "KHELIFA 1 - Volume 3 - Page 8",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": true,
+          "notes": "OCR auto - verifier"
+        }
+      ]
+    },
+    {
+      "page": 9,
+      "blocks": 137,
+      "questions": [
+        {
+          "id": "q_khelifa1_v03_p09_01",
+          "texte_brut": "التمرين 73( يتكون من تحت وحدتين 4 ) الريبوزوم ( : _ 3 كما بروتينات  يحتوي الريبوزوم على موقعين A )الحمضي وP )البروتيني + ARNr من",
+          "texte_corrige": "التمرين 73( يتكون من تحت وحدتين 4 ) الريبوزوم ( : _ 3 كما بروتينات يحتوي الريبوزوم علا موقعين A )الحمضي وP )البروتيني + ARNr من",
+          "micro_concept_id": "mc_prot_06",
+          "secondary_concepts": [],
+          "a_verifier": false,
+          "confidence": 0.78,
+          "source": "KHELIFA 1 - Volume 3 - Page 9",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": true,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p09_02",
+          "texte_brut": "بين تحت الوحدتين السلسلة البيتيدية  ونفق يحتوي على على نفق فيتحت الوحدة . ARNm Jيسمح بانزلاق وحركة الريبوزوم على خيط ا ARNm 6",
+          "texte_corrige": "بين تحت الوحدتين السلسله البيتيديه ونفق يحتوي علا علا نفق فيتحت الوحده . ARNm Jيسمح بانزلاق وحركه الريبوزوم علا خيط ا ARNm 6",
+          "micro_concept_id": "mc_prot_06",
+          "secondary_concepts": [
+            "mc_prot_04"
+          ],
+          "a_verifier": false,
+          "confidence": 0.66,
+          "source": "KHELIFA 1 - Volume 3 - Page 9",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": true,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p09_03",
+          "texte_brut": "جابةالتمرين أن ا  ADN مسؤول عن صنع البروتين .",
+          "texte_corrige": "جابهالتمرين ان ا ADN مسؤول عن صنع البروتين .",
+          "micro_concept_id": "mc_prot_01",
+          "secondary_concepts": [],
+          "a_verifier": false,
+          "confidence": 0.61,
+          "source": "KHELIFA 1 - Volume 3 - Page 9",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": true,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p09_04",
+          "texte_brut": "ب _ قبل أن يصنع البروتين يصنع ا ARN وا  ARNm وسيط بين ا ADN والبروتين . العينات 1 و2 من ADN مصدرهما نفس الفأر . % G نسبة = % 20 == % C التعليل : نسبة ماخوذة من خلايا فأرآخر . ADN أماالعينة رقم 3 من ا نسبةلا تتفق مع النسب الموجودة",
+          "texte_corrige": "ب _ قبل ان يصنع البروتين يصنع ا ARN وا ARNm وسيط بين ا ADN والبروتين . العينات 1 و2 من ADN مصدرهما نفس الفار . % G نسبه = % 20 == % C التعليل : نسبه ماخوذه من خلايا فاراخر . ADN اماالعينه رقم 3 من ا نسبهلا تتفق مع النسب الموجوده",
+          "micro_concept_id": "mc_prot_01",
+          "secondary_concepts": [
+            "mc_prot_04"
+          ],
+          "a_verifier": false,
+          "confidence": 0.67,
+          "source": "KHELIFA 1 - Volume 3 - Page 9",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": true,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p09_05",
+          "texte_brut": "دابةالتمرين كمية البروتين ARNm كمية لا يوجد بروتين ARNm غير موجود من زا إلى ز30 يرتفع كمية البروتين بعدادخال ARNm فيزا3 تنقص كميته من ز30 إلى ز50",
+          "texte_corrige": "دابهالتمرين كميه البروتين ARNm كميه لا يوجد بروتين ARNm غير موجود من زا الا ز30 يرتفع كميه البروتين بعدادخال ARNm فيزا3 تنقص كميته من ز30 الا ز50",
+          "micro_concept_id": "mc_prot_04",
+          "secondary_concepts": [],
+          "a_verifier": false,
+          "confidence": 0.71,
+          "source": "KHELIFA 1 - Volume 3 - Page 9",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": true,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p09_06",
+          "texte_brut": "العلاقة بين _تين . فيغياب ARNm لا يوجدصنع بازدياد كمية ال_ بوجود ا  ARNm يصنع البروتين ويتوقف بنفاذ ا  ARNm أي أن وينعدم بنفاذه , ARNm وتنخفض بانخفاض الترجمة وأنا  ARNm يتفكك",
+          "texte_corrige": "العلاقه بين _تين . فيغياب ARNm لا يوجدصنع بازدياد كميه ال_ بوجود ا ARNm يصنع البروتين ويتوقف بنفاذ ا ARNm اي ان وينعدم بنفاذه , ARNm وتنخفض بانخفاض الترجمه وانا ARNm يتفكك",
+          "micro_concept_id": "mc_prot_04",
+          "secondary_concepts": [],
+          "a_verifier": false,
+          "confidence": 0.64,
+          "source": "KHELIFA 1 - Volume 3 - Page 9",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": true,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p09_07",
+          "texte_brut": "2 - أن ARNm ضروري لتركيب البروتين انطلاقامن أحماض أمينية فهو من البروتين الذي يصنع . فى نهاية الترجمةلان تعليماته خاصة بهذا عنوان الشكل 1: مخطط لاليةصنع البروتين في بدائيات النواة . 1 65 تجربتى by: moo تجربتي",
+          "texte_corrige": "2 - ان ARNm ضروري لتركيب البروتين انطلاقامن احماض امينيه فهو من البروتين الذي يصنع . فا نهايه الترجمهلان تعليماته خاصه بهذا عنوان الشكل 1: مخطط لاليهصنع البروتين في بدائيات النواه . 1 65 تجربتا by: moo تجربتي",
+          "micro_concept_id": "mc_prot_04",
+          "secondary_concepts": [],
+          "a_verifier": false,
+          "confidence": 0.75,
+          "source": "KHELIFA 1 - Volume 3 - Page 9",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": true,
+          "notes": "OCR auto - verifier"
+        }
+      ]
+    },
+    {
+      "page": 10,
+      "blocks": 121,
+      "questions": [
+        {
+          "id": "q_khelifa1_v03_p10_01",
+          "texte_brut": "العلاقة بين المورثة 4 اADN وتمثل النمط المورثة هي جزء من اثية ( .",
+          "texte_corrige": "العلاقه بين المورثه 4 اADN وتمثل النمط المورثه هي جزء من اثيه ( .",
+          "micro_concept_id": "mc_prot_01",
+          "secondary_concepts": [],
+          "a_verifier": false,
+          "confidence": 0.7,
+          "source": "KHELIFA 1 - Volume 3 - Page 10",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": true,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p10_02",
+          "texte_brut": ")الصفة البروتين يمثل النمط ADN من ا ARNm تنسخ المورثة بصنع البروتين كما ARNm إستنساخ (ADN) المورثة ترجمة الرسالة الوراثية المحمولة على ARNm إلى بروتين ترجمة",
+          "texte_corrige": ")الصفه البروتين يمثل النمط ADN من ا ARNm تنسخ المورثه بصنع البروتين كما ARNm استنساخ (ADN) المورثه ترجمه الرساله الوراثيه المحموله علا ARNm الا بروتين ترجمه",
+          "micro_concept_id": "mc_prot_01",
+          "secondary_concepts": [
+            "mc_prot_04"
+          ],
+          "a_verifier": false,
+          "confidence": 0.81,
+          "source": "KHELIFA 1 - Volume 3 - Page 10",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": true,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p10_03",
+          "texte_brut": "بروتين نوعي ا صفة ( ARNm أو قديلعب هذا البروتين 5112 288 5400 -)16 > 18غ(= X 18) = الكتلة المولية طول القطعة 034x 9 نانومتر = 306 نانومتر .",
+          "texte_corrige": "بروتين نوعي ا صفه ( ARNm او قديلعب هذا البروتين 5112 288 5400 -)16 > 18غ(= X 18) = الكتله الموليه طول القطعه 034x 9 نانومتر = 306 نانومتر .",
+          "micro_concept_id": "mc_prot_04",
+          "secondary_concepts": [],
+          "a_verifier": false,
+          "confidence": 0.78,
+          "source": "KHELIFA 1 - Volume 3 - Page 10",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": true,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p10_04",
+          "texte_brut": "إجابة التمرين الآلية هي آلية تركيب البروتين . 1 ARNt ) الناقل ع ، ARNm ص ، ADN س الجزيئات",
+          "texte_corrige": "اجابه التمرين الاليه هي اليه تركيب البروتين . 1 ARNt ) الناقل ع ، ARNm ص ، ADN س الجزيئات",
+          "micro_concept_id": "mc_prot_05",
+          "secondary_concepts": [
+            "mc_prot_01",
+            "mc_prot_04"
+          ],
+          "a_verifier": false,
+          "confidence": 0.8,
+          "source": "KHELIFA 1 - Volume 3 - Page 10",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": true,
+          "notes": "OCR auto - verifier"
+        }
+      ]
+    },
+    {
+      "page": 11,
+      "blocks": 128,
+      "questions": [
+        {
+          "id": "q_khelifa1_v03_p11_01",
+          "texte_brut": "جابةالتمرين  9 أ-1- نستخلص أن الرامزة تتكون من ثلاثة قواعد آزوتية . . Cys الرامزة UGU تعبرعن الخمض Val عن الخمض GUG الرامزة بالترجمة ) الرسم راجسع إجابة به عدة ريبوزومسات ARNm البوليزوم عبارة عن خيط",
+          "texte_corrige": "جابهالتمرين 9 ا-1- نستخلص ان الرامزه تتكون من ثلاثه قواعد ازوتيه . . Cys الرامزه UGU تعبرعن الخمض Val عن الخمض GUG الرامزه بالترجمه ) الرسم راجسع اجابه به عده ريبوزومسات ARNm البوليزوم عباره عن خيط",
+          "micro_concept_id": "mc_prot_06",
+          "secondary_concepts": [
+            "mc_prot_04"
+          ],
+          "a_verifier": false,
+          "confidence": 0.69,
+          "source": "KHELIFA 1 - Volume 3 - Page 11",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": true,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p11_02",
+          "texte_brut": "التمرين النوع نفس لأنسولين التي اخاص الأميني المرقم الاميني السخاص",
+          "texte_corrige": "التمرين النوع نفس لانسولين التي اخاص الاميني المرقم الاميني السخاص",
+          "micro_concept_id": "mc_xxx_xx",
+          "secondary_concepts": [],
+          "a_verifier": true,
+          "confidence": 0.78,
+          "source": "KHELIFA 1 - Volume 3 - Page 11",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": false,
+          "notes": "OCR auto - verifier"
+        }
+      ]
+    },
+    {
+      "page": 12,
+      "blocks": 148,
+      "questions": [
+        {
+          "id": "q_khelifa1_v03_p12_01",
+          "texte_brut": "إجابة التمرين | 10 الشريط TAC ACG CGA TTT TAT GTA 1 الشريط المكمل",
+          "texte_corrige": "اجابه التمرين  10 الشريط TAC ACG CGA TTT TAT GTA 1 الشريط المكمل",
+          "micro_concept_id": "mc_xxx_xx",
+          "secondary_concepts": [],
+          "a_verifier": true,
+          "confidence": 0.9,
+          "source": "KHELIFA 1 - Volume 3 - Page 12",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": false,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p12_02",
+          "texte_brut": "إجابة التمرين المعلومات بصنع السميلانين . معلومات ARNm أن صنع السميلانين . هذه المعلومات مستنسخةمن المورثة المسؤولة",
+          "texte_corrige": "اجابه التمرين المعلومات بصنع السميلانين . معلومات ARNm ان صنع السميلانين . هذه المعلومات مستنسخهمن المورثه المسؤوله",
+          "micro_concept_id": "mc_prot_01",
+          "secondary_concepts": [
+            "mc_prot_04"
+          ],
+          "a_verifier": false,
+          "confidence": 0.86,
+          "source": "KHELIFA 1 - Volume 3 - Page 12",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": true,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p12_03",
+          "texte_brut": "يعتبرهذا ا  ARNm وسيط بين المورثة في النواة والسميلانين في الهيولى . ARNm أخرى تنزع النواة لمنع استنساخ أية 2 يدخل في تركيب",
+          "texte_corrige": "يعتبرهذا ا ARNm وسيط بين المورثه في النواه والسميلانين في الهيولا . ARNm اخرا تنزع النواه لمنع استنساخ ايه 2 يدخل في تركيب",
+          "micro_concept_id": "mc_prot_01",
+          "secondary_concepts": [
+            "mc_prot_04"
+          ],
+          "a_verifier": false,
+          "confidence": 0.76,
+          "source": "KHELIFA 1 - Volume 3 - Page 12",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": true,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p12_04",
+          "texte_brut": "إن العلاقة بين نسبة الاشعاع وكمية البروتين طردية لأن الحمض أ - تحليل 3 البروتين . ARNm  وا ATP الوسط 1: نلاحظ تشكل البروتين بنسبة معتبرة عند وجودكل من الريبوزومات واك شديد في نسبة تشكل البروتين بغياب الريبوزومات . اثوسط 2: ATP Jفينسبة تشكل البروتين بغياب ا اثوسط 3: ARNm شديد في نسبة تشكل البروتين بغياب ا",
+          "texte_corrige": "ان العلاقه بين نسبه الاشعاع وكميه البروتين طرديه لان الحمض ا - تحليل 3 البروتين . ARNm وا ATP الوسط 1: نلاحظ تشكل البروتين بنسبه معتبره عند وجودكل من الريبوزومات واك شديد في نسبه تشكل البروتين بغياب الريبوزومات . اثوسط 2: ATP Jفينسبه تشكل البروتين بغياب ا اثوسط 3: ARNm شديد في نسبه تشكل البروتين بغياب ا",
+          "micro_concept_id": "mc_prot_06",
+          "secondary_concepts": [
+            "mc_prot_04"
+          ],
+          "a_verifier": false,
+          "confidence": 0.67,
+          "source": "KHELIFA 1 - Volume 3 - Page 12",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": true,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p12_05",
+          "texte_brut": "مصدر الطاقة اللازمة لتكوين الروابط البيتيدية بين الحموض الأمينية. ومواقع الأحماض الأمينية . من حيث عدد البروتين تحمل التعليمات اللازمة ARNm _ 4 AUG CUG",
+          "texte_corrige": "مصدر الطاقه اللازمه لتكوين الروابط البيتيديه بين الحموض الامينيه. ومواقع الاحماض الامينيه . من حيث عدد البروتين تحمل التعليمات اللازمه ARNm _ 4 AUG CUG",
+          "micro_concept_id": "mc_prot_04",
+          "secondary_concepts": [],
+          "a_verifier": false,
+          "confidence": 0.89,
+          "source": "KHELIFA 1 - Volume 3 - Page 12",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": true,
+          "notes": "OCR auto - verifier"
+        }
+      ]
+    },
+    {
+      "page": 13,
+      "blocks": 161,
+      "questions": [
+        {
+          "id": "q_khelifa1_v03_p13_01",
+          "texte_brut": "إجابةالتمرين 12 GAA المريض هي ( ADN) كليوتيدات من",
+          "texte_corrige": "اجابهالتمرين 12 GAA المريض هي ( ADN) كليوتيدات من",
+          "micro_concept_id": "mc_prot_01",
+          "secondary_concepts": [],
+          "a_verifier": false,
+          "confidence": 0.75,
+          "source": "KHELIFA 1 - Volume 3 - Page 13",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": true,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p13_02",
+          "texte_brut": "المقارنة غياب ثلاثة",
+          "texte_corrige": "المقارنه غياب ثلاثه",
+          "micro_concept_id": "mc_xxx_xx",
+          "secondary_concepts": [],
+          "a_verifier": true,
+          "confidence": 0.65,
+          "source": "KHELIFA 1 - Volume 3 - Page 13",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": false,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p13_03",
+          "texte_brut": "الأشخاص المصابين يتمثل بطفرة عن طريق فقدان قطعة صبغية 2- أ - نستنتج أن التغيير AAA GAA AAU AUC AUC UUU GGU GUU",
+          "texte_corrige": "الاشخاص المصابين يتمثل بطفره عن طريق فقدان قطعه صبغيه 2- ا - نستنتج ان التغيير AAA GAA AAU AUC AUC UUU GGU GUU",
+          "micro_concept_id": "mc_xxx_xx",
+          "secondary_concepts": [],
+          "a_verifier": true,
+          "confidence": 0.64,
+          "source": "KHELIFA 1 - Volume 3 - Page 13",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": false,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p13_04",
+          "texte_brut": "التمرين 13 ببتيد بالمورثة والقطعة \"ب\" آ- 1- القطعة أ٦ صنع بروتين جزءمن اADNJ يشرف السمورثة تيدات فيالمورثة والأحماض الأمينية للبروتين يدعى بالشفرة الوراثية .",
+          "texte_corrige": "التمرين 13 ببتيد بالمورثه والقطعه \"ب\" ا- 1- القطعه ا6 صنع بروتين جزءمن اADNJ يشرف السمورثه تيدات فيالمورثه والاحماض الامينيه للبروتين يدعا بالشفره الوراثيه .",
+          "micro_concept_id": "mc_prot_01",
+          "secondary_concepts": [],
+          "a_verifier": false,
+          "confidence": 0.62,
+          "source": "KHELIFA 1 - Volume 3 - Page 13",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": true,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p13_05",
+          "texte_brut": "بين النظام 2 3 - مراحل صنع البروتين باختصار : ARNm منا  ADN على مستوى النواة . المرحلة الاولى ARNm يحمل المعلومات الوراثية إلى بروتين بتدخسل ا ARNm ترجمة اك المرحلة الثانية ATP و",
+          "texte_corrige": "بين النظام 2 3 - مراحل صنع البروتين باختصار : ARNm منا ADN علا مستوا النواه . المرحله الاولا ARNm يحمل المعلومات الوراثيه الا بروتين بتدخسل ا ARNm ترجمه اك المرحله الثانيه ATP و",
+          "micro_concept_id": "mc_prot_01",
+          "secondary_concepts": [
+            "mc_prot_04"
+          ],
+          "a_verifier": false,
+          "confidence": 0.67,
+          "source": "KHELIFA 1 - Volume 3 - Page 13",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": true,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p13_06",
+          "texte_brut": ". ARNm العنصر الوسيط بين أءبهو 4 التمثيل : لدينا GUC UCC CUA GUC UAC ٧٧ إذاكان الشريط 1 هوالمستنسخ: لللا",
+          "texte_corrige": ". ARNm العنصر الوسيط بين اءبهو 4 التمثيل : لدينا GUC UCC CUA GUC UAC 77 اذاكان الشريط 1 هوالمستنسخ: لللا",
+          "micro_concept_id": "mc_prot_01",
+          "secondary_concepts": [
+            "mc_prot_04"
+          ],
+          "a_verifier": false,
+          "confidence": 0.82,
+          "source": "KHELIFA 1 - Volume 3 - Page 13",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": true,
+          "notes": "OCR auto - verifier"
+        }
+      ]
+    },
+    {
+      "page": 14,
+      "blocks": 153,
+      "questions": [
+        {
+          "id": "q_khelifa1_v03_p14_01",
+          "texte_brut": "أن يحدد لناماهوالشريط المستنسخ. عن الخمض أن يكون لدينا جدول الشفرات الوراثية ففي هذه الحالة نلاحظ مثلا الرامزة الأولى أية منها GUC Val فالين CAG أو بالتمثيل",
+          "texte_corrige": "ان يحدد لناماهوالشريط المستنسخ. عن الخمض ان يكون لدينا جدول الشفرات الوراثيه ففي هذه الحاله نلاحظ مثلا الرامزه الاولا ايه منها GUC Val فالين CAG او بالتمثيل",
+          "micro_concept_id": "mc_prot_01",
+          "secondary_concepts": [],
+          "a_verifier": false,
+          "confidence": 0.72,
+          "source": "KHELIFA 1 - Volume 3 - Page 14",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": true,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p14_02",
+          "texte_brut": "تحدد الشريط المستنسخ تعبرعن الفالين هي تشفرلك Hb إذا هواستبدال على الاقل قاعدة ازوتية واحدة على مستوى المورثة -1 - I Hb  المسؤول عن تركيب ا ADN  مستوى ال تغيير قاعدة ازوتية واحدة ADN ا ظهرت على بالاعتمادعلى جدول الشفرات الوراثية يمكن ايجاد اصل الطفرات",
+          "texte_corrige": "تحدد الشريط المستنسخ تعبرعن الفالين هي تشفرلك Hb اذا هواستبدال علا الاقل قاعده ازوتيه واحده علا مستوا المورثه -1 - I Hb المسؤول عن تركيب ا ADN مستوا ال تغيير قاعده ازوتيه واحده ADN ا ظهرت علا بالاعتمادعلا جدول الشفرات الوراثيه يمكن ايجاد اصل الطفرات",
+          "micro_concept_id": "mc_prot_01",
+          "secondary_concepts": [],
+          "a_verifier": false,
+          "confidence": 0.63,
+          "source": "KHELIFA 1 - Volume 3 - Page 14",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": true,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p14_03",
+          "texte_brut": "إجابة التمرين 14 5 - شبكة محببة ميتوكوندري 4 3 - غلاف نووي هيالوبلازم _ 2 9 - صبغين ) كروماتين ( . 8 _ مادة مفرزة 7 - حويصل",
+          "texte_corrige": "اجابه التمرين 14 5 - شبكه محببه ميتوكوندري 4 3 - غلاف نووي هيالوبلازم _ 2 9 - صبغين ) كروماتين ( . 8 _ ماده مفرزه 7 - حويصل",
+          "micro_concept_id": "mc_xxx_xx",
+          "secondary_concepts": [],
+          "a_verifier": true,
+          "confidence": 0.73,
+          "source": "KHELIFA 1 - Volume 3 - Page 14",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": false,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p14_04",
+          "texte_brut": "- يوجد نظام توافقي بين السمورثة الشفرة الوراثية . ب في مستوى المورثة في ترتيب القواعد وأنواعها قد يؤدي إلى تغييرفي التعبيعلى أي البروتين ويتم هذا دائما وفق الشفرة الوراثية. كليوتيدة  الرامزة الأولى هي رامزة البدء 150 II - 1 - إن اARNm J المناسب للمورثة يحتوي تن",
+          "texte_corrige": "- يوجد نظام توافقي بين السمورثه الشفره الوراثيه . ب في مستوا المورثه في ترتيب القواعد وانواعها قد يؤدي الا تغييرفي التعبيعلا اي البروتين ويتم هذا دائما وفق الشفره الوراثيه. كليوتيده الرامزه الاولا هي رامزه البدء 150 II - 1 - ان اARNm J المناسب للمورثه يحتوي تن",
+          "micro_concept_id": "mc_prot_07",
+          "secondary_concepts": [
+            "mc_prot_04"
+          ],
+          "a_verifier": false,
+          "confidence": 0.72,
+          "source": "KHELIFA 1 - Volume 3 - Page 14",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": true,
+          "notes": "OCR auto - verifier"
+        }
+      ]
+    },
+    {
+      "page": 15,
+      "blocks": 153,
+      "questions": [
+        {
+          "id": "q_khelifa1_v03_p15_01",
+          "texte_brut": "إجابة التمرين  15 تتبع مناطق الادماج والمسار والمآل . من ٥ : أ - التعليل اختيار اليوريدين لأنه يدخل في تركيب نيوكليوتيدة اختيار الأحماض الأمينية لأنها تدخل في تركيب البروتين . تحليل ب _",
+          "texte_corrige": "اجابه التمرين 15 تتبع مناطق الادماج والمسار والمال . من 5 : ا - التعليل اختيار اليوريدين لانه يدخل في تركيب نيوكليوتيده اختيار الاحماض الامينيه لانها تدخل في تركيب البروتين . تحليل ب _",
+          "micro_concept_id": "mc_xxx_xx",
+          "secondary_concepts": [],
+          "a_verifier": true,
+          "confidence": 0.66,
+          "source": "KHELIFA 1 - Volume 3 - Page 15",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": false,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p15_02",
+          "texte_brut": "الاشعاع في النواة وعدم ظهوره في الهيولىء يبين أن إدماج اليوريدين يتم على مستوى النواة . المزرعة )أ( المزرعة )ب( ظهور الاشعاع على مستوى الهيولى يدل على أن إدماج الأحماض الأمينية يتم على مستوى الهيولى . مستوى النواة . ARNm يتم تخليق ) استنساخ ( ٥ الاستخلاص : مستوى الهيولى .",
+          "texte_corrige": "الاشعاع في النواه وعدم ظهوره في الهيولاء يبين ان ادماج اليوريدين يتم علا مستوا النواه . المزرعه )ا( المزرعه )ب( ظهور الاشعاع علا مستوا الهيولا يدل علا ان ادماج الاحماض الامينيه يتم علا مستوا الهيولا . مستوا النواه . ARNm يتم تخليق ) استنساخ ( 5 الاستخلاص : مستوا الهيولا .",
+          "micro_concept_id": "mc_prot_01",
+          "secondary_concepts": [
+            "mc_prot_04"
+          ],
+          "a_verifier": false,
+          "confidence": 0.65,
+          "source": "KHELIFA 1 - Volume 3 - Page 15",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": true,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p15_03",
+          "texte_brut": "الذروة )5( تبين الا الذروة )5( هي ARNm ) الرسول ( . بها هي ممكن النتيجة ب يؤدي إلى عدم ظهور ARNm المتمثل بالقمة )5(. التعليل : توقيف الا موقع تثبيت",
+          "texte_corrige": "الذروه )5( تبين الا الذروه )5( هي ARNm ) الرسول ( . بها هي ممكن النتيجه ب يؤدي الا عدم ظهور ARNm المتمثل بالقمه )5(. التعليل : توقيف الا موقع تثبيت",
+          "micro_concept_id": "mc_prot_04",
+          "secondary_concepts": [],
+          "a_verifier": false,
+          "confidence": 0.82,
+          "source": "KHELIFA 1 - Volume 3 - Page 15",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": true,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p15_04",
+          "texte_brut": "الوثيقة )2(: 3 - تعليل تتدخل في تركيب أي بروتين . ARNt و ARNr متواجدان بصورة دائمة فقط أثناء تركيب البروتين لأنه يحمل معلومة وراثية لبروتين معينء ويتفكك بعد ARNm من البروتينات الانتهاءمن تركيب البروتين لأنه لا يتدخل في تركيب الأنواع | المعلومة المكملة والخاصة بتركيب البروتين =",
+          "texte_corrige": "الوثيقه )2(: 3 - تعليل تتدخل في تركيب اي بروتين . ARNt و ARNr متواجدان بصوره دائمه فقط اثناء تركيب البروتين لانه يحمل معلومه وراثيه لبروتين معينء ويتفكك بعد ARNm من البروتينات الانتهاءمن تركيب البروتين لانه لا يتدخل في تركيب الانواع  المعلومه المكمله والخاصه بتركيب البروتين =",
+          "micro_concept_id": "mc_prot_05",
+          "secondary_concepts": [
+            "mc_prot_04"
+          ],
+          "a_verifier": false,
+          "confidence": 0.62,
+          "source": "KHELIFA 1 - Volume 3 - Page 15",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": true,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p15_05",
+          "texte_brut": "الجدول في الصفحة 61( 5- المراحل الأساسية لتركيب البروتين : الاستنساخ وتتم في النواة . 71 by: moo تجربتي أميني أميني أميني",
+          "texte_corrige": "الجدول في الصفحه 61( 5- المراحل الاساسيه لتركيب البروتين : الاستنساخ وتتم في النواه . 71 by: moo تجربتي اميني اميني اميني",
+          "micro_concept_id": "mc_prot_01",
+          "secondary_concepts": [],
+          "a_verifier": false,
+          "confidence": 0.86,
+          "source": "KHELIFA 1 - Volume 3 - Page 15",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": true,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p15_06",
+          "texte_brut": "المقارن : خارج تظهر ظهور ستنتاج تصنيع الخروج التي ستنساخ على",
+          "texte_corrige": "المقارن : خارج تظهر ظهور ستنتاج تصنيع الخروج التي ستنساخ علا",
+          "micro_concept_id": "mc_xxx_xx",
+          "secondary_concepts": [],
+          "a_verifier": true,
+          "confidence": 0.92,
+          "source": "KHELIFA 1 - Volume 3 - Page 15",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": false,
+          "notes": "OCR auto - verifier"
+        }
+      ]
+    },
+    {
+      "page": 16,
+      "blocks": 140,
+      "questions": [
+        {
+          "id": "q_khelifa1_v03_p16_01",
+          "texte_brut": "إجابة التمرين  16 (ADN) اة وبالتالي الذخيرة الوراثية 1 - الاشكالية: وجود البروتينات فيالكرية الحمراء رغم غياب ذلك تفقد ذخيرتها الوراثية. الفرضية : الكرية الحمراء تصنع البروتين ثم 2 يتمثل باحتواء اخلية الأم على ا  ADN وغيابها في الكرية الحمراء. أ _ 3 الخلية الأم تعاني ثلاثة انقسامات ميتوزية فتتشكل 8 خلايا تتحول إلى خلايا وسطيةثم تفقد ذخيرتها",
+          "texte_corrige": "اجابه التمرين 16 (ADN) اه وبالتالي الذخيره الوراثيه 1 - الاشكاليه: وجود البروتينات فيالكريه الحمراء رغم غياب ذلك تفقد ذخيرتها الوراثيه. الفرضيه : الكريه الحمراء تصنع البروتين ثم 2 يتمثل باحتواء اخليه الام علا ا ADN وغيابها في الكريه الحمراء. ا _ 3 الخليه الام تعاني ثلاثه انقسامات ميتوزيه فتتشكل 8 خلايا تتحول الا خلايا وسطيهثم تفقد ذخيرتها",
+          "micro_concept_id": "mc_prot_01",
+          "secondary_concepts": [],
+          "a_verifier": false,
+          "confidence": 0.75,
+          "source": "KHELIFA 1 - Volume 3 - Page 16",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": true,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p16_02",
+          "texte_brut": "ARNt المتدخلة في تركيب الجزء من البروتين المناسب الرامزات المضادة لمختلف أ _ مختلف 5 A هي : AUG AUG GAC CCC CCC AAG Tyr",
+          "texte_corrige": "ARNt المتدخله في تركيب الجزء من البروتين المناسب الرامزات المضاده لمختلف ا _ مختلف 5 A هي : AUG AUG GAC CCC CCC AAG Tyr",
+          "micro_concept_id": "mc_prot_05",
+          "secondary_concepts": [],
+          "a_verifier": false,
+          "confidence": 0.81,
+          "source": "KHELIFA 1 - Volume 3 - Page 16",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": true,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p16_03",
+          "texte_brut": "إجابةالتمرين 17 UAA أو UAGأو UGA رامزات قف سبب توقف تركيب اخضاب HbA عندحمض ال  Arg يعود إلى وجود { ATC ACT أو ARNm مستوى _ عن حمض حمض الغلوتامين Glu بعد الأرجنين فيخضاب Cs يعود إلى استبدال رامزة قف برامزة - سبب CAG أو CAA ) Glu الغلوتامين",
+          "texte_corrige": "اجابهالتمرين 17 UAA او UAGاو UGA رامزات قف سبب توقف تركيب اخضاب HbA عندحمض ال Arg يعود الا وجود { ATC ACT او ARNm مستوا _ عن حمض حمض الغلوتامين Glu بعد الارجنين فيخضاب Cs يعود الا استبدال رامزه قف برامزه - سبب CAG او CAA ) Glu الغلوتامين",
+          "micro_concept_id": "mc_prot_04",
+          "secondary_concepts": [],
+          "a_verifier": false,
+          "confidence": 0.62,
+          "source": "KHELIFA 1 - Volume 3 - Page 16",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": true,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p16_04",
+          "texte_brut": "ATTأو ATC تبين ماسبق أن حدوث طفرة في الرامزة GTT الرامزة كافية A وذلك باستبدال القاعدة الآزوتية HbA 141 في التركيب عند الحمض بعدذلك ادماج الحموض الأمينية إلى غاية Cs رقم 142 في الخضاب رامزة التوقف في السموقع 174. مثحيت تجربت",
+          "texte_corrige": "ATTاو ATC تبين ماسبق ان حدوث طفره في الرامزه GTT الرامزه كافيه A وذلك باستبدال القاعده الازوتيه HbA 141 في التركيب عند الحمض بعدذلك ادماج الحموض الامينيه الا غايه Cs رقم 142 في الخضاب رامزه التوقف في السموقع 174. مثحيت تجربت",
+          "micro_concept_id": "mc_xxx_xx",
+          "secondary_concepts": [],
+          "a_verifier": true,
+          "confidence": 0.74,
+          "source": "KHELIFA 1 - Volume 3 - Page 16",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": false,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p16_05",
+          "texte_brut": "يفسر الأليل أنه ته الأليل على على كليوت النيو أخرى . الظاهرة",
+          "texte_corrige": "يفسر الاليل انه ته الاليل علا علا كليوت النيو اخرا . الظاهره",
+          "micro_concept_id": "mc_xxx_xx",
+          "secondary_concepts": [],
+          "a_verifier": true,
+          "confidence": 0.8,
+          "source": "KHELIFA 1 - Volume 3 - Page 16",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": false,
+          "notes": "OCR auto - verifier"
+        }
+      ]
+    },
+    {
+      "page": 17,
+      "blocks": 135,
+      "questions": [
+        {
+          "id": "q_khelifa1_v03_p17_01",
+          "texte_brut": "لجابةالتمرين أ - التعرف مع التعليل . T التعليل : سلسلتين قواعد آزوتية بوجود ADN البنية س U بوجود قواعد آزوتية ARN التعليل : سلسلة واحدة فقط البنية ص متعدد ببتيد التعليل : وجود سلسلة حموض أمينية. البنية ع",
+          "texte_corrige": "لجابهالتمرين ا - التعرف مع التعليل . T التعليل : سلسلتين قواعد ازوتيه بوجود ADN البنيه س U بوجود قواعد ازوتيه ARN التعليل : سلسله واحده فقط البنيه ص متعدد ببتيد التعليل : وجود سلسله حموض امينيه. البنيه ع",
+          "micro_concept_id": "mc_prot_01",
+          "secondary_concepts": [],
+          "a_verifier": false,
+          "confidence": 0.67,
+          "source": "KHELIFA 1 - Volume 3 - Page 17",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": true,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p17_02",
+          "texte_brut": "البنية الفراغية ند ADN الاحظ الوثيقة المجاورة (٠ فوسفسات 5 HO ثلاث قواعد آزوتية . لكل حمض الترتيب ج _ 2' فقط 4 حموض تعطي",
+          "texte_corrige": "البنيه الفراغيه ند ADN الاحظ الوثيقه المجاوره (0 فوسفسات 5 HO ثلاث قواعد ازوتيه . لكل حمض الترتيب ج _ 2' فقط 4 حموض تعطي",
+          "micro_concept_id": "mc_prot_01",
+          "secondary_concepts": [],
+          "a_verifier": false,
+          "confidence": 0.71,
+          "source": "KHELIFA 1 - Volume 3 - Page 17",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": true,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p17_03",
+          "texte_brut": "بين السمعلومات ونوعية متعدد الببتيد ا تحمل المعلومات من النواة إلى الهيولي لانه ج - الرسول إلى سلسلة متعددة الببتيدا . ترجمة . أ - السمرحلة ADN يحمل المعلومة الوراثية على شكل قواعد آزوتية. ب",
+          "texte_corrige": "بين السمعلومات ونوعيه متعدد الببتيد ا تحمل المعلومات من النواه الا الهيولي لانه ج - الرسول الا سلسله متعدده الببتيدا . ترجمه . ا - السمرحله ADN يحمل المعلومه الوراثيه علا شكل قواعد ازوتيه. ب",
+          "micro_concept_id": "mc_prot_01",
+          "secondary_concepts": [],
+          "a_verifier": false,
+          "confidence": 0.66,
+          "source": "KHELIFA 1 - Volume 3 - Page 17",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": true,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p17_04",
+          "texte_brut": "تنسخ هذه المعلومة في جزيئة ARNm طبقا للتكامل بين القواعد الآزوتية. ٥ هذه المعلومة فيسلسلة متعددة الببتيد وفق نظام دقيق يتمثل في قراءة المعلومة فياتجاه معين في السلسلة الببتيدية بواسطة ARNt برامزته المضادة التعرف على الحمض ء بداية ونهاية القراءة اتشكل السلسلة مقيدة بثلاثيات بأكثر من ثلاثية . يمكن أن الحمض ٥ :",
+          "texte_corrige": "تنسخ هذه المعلومه في جزيئه ARNm طبقا للتكامل بين القواعد الازوتيه. 5 هذه المعلومه فيسلسله متعدده الببتيد وفق نظام دقيق يتمثل في قراءه المعلومه فياتجاه معين في السلسله الببتيديه بواسطه ARNt برامزته المضاده التعرف علا الحمض ء بدايه ونهايه القراءه اتشكل السلسله مقيده بثلاثيات باكثر من ثلاثيه . يمكن ان الحمض 5 :",
+          "micro_concept_id": "mc_prot_05",
+          "secondary_concepts": [
+            "mc_prot_01",
+            "mc_prot_04"
+          ],
+          "a_verifier": false,
+          "confidence": 0.58,
+          "source": "KHELIFA 1 - Volume 3 - Page 17",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": true,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p17_05",
+          "texte_brut": "ببةالتمرين | 19",
+          "texte_corrige": "ببهالتمرين  19",
+          "micro_concept_id": "mc_xxx_xx",
+          "secondary_concepts": [],
+          "a_verifier": true,
+          "confidence": 0.43,
+          "source": "KHELIFA 1 - Volume 3 - Page 17",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": false,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p17_06",
+          "texte_brut": "_ المحقون باك ARNm قدصنع بروتين الهيموغلوبين إضافة إلى البروتينات الخاصة الخلايا البيضية للحيوان",
+          "texte_corrige": "_ المحقون باك ARNm قدصنع بروتين الهيموغلوبين اضافه الا البروتينات الخاصه الخلايا البيضيه للحيوان",
+          "micro_concept_id": "mc_prot_04",
+          "secondary_concepts": [],
+          "a_verifier": false,
+          "confidence": 0.38,
+          "source": "KHELIFA 1 - Volume 3 - Page 17",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": true,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p17_07",
+          "texte_brut": "غلوبين صنعت البروتينات اخاصة بها والخلايا الاصلية صنعت محقونة الخلايا البيضية بها نقط 73 تجربتى by: moo",
+          "texte_corrige": "غلوبين صنعت البروتينات اخاصه بها والخلايا الاصليه صنعت محقونه الخلايا البيضيه بها نقط 73 تجربتا by: moo",
+          "micro_concept_id": "mc_xxx_xx",
+          "secondary_concepts": [],
+          "a_verifier": true,
+          "confidence": 0.72,
+          "source": "KHELIFA 1 - Volume 3 - Page 17",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": false,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p17_08",
+          "texte_brut": "التمرين الرسم : راجع لتترجم وسيط الشرح ٥ تترجم الأميني معينة . الأميني",
+          "texte_corrige": "التمرين الرسم : راجع لتترجم وسيط الشرح 5 تترجم الاميني معينه . الاميني",
+          "micro_concept_id": "mc_xxx_xx",
+          "secondary_concepts": [],
+          "a_verifier": true,
+          "confidence": 0.86,
+          "source": "KHELIFA 1 - Volume 3 - Page 17",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": false,
+          "notes": "OCR auto - verifier"
+        }
+      ]
+    },
+    {
+      "page": 18,
+      "blocks": 114,
+      "questions": [
+        {
+          "id": "q_khelifa1_v03_p18_01",
+          "texte_brut": "ARNm هوالوسيط بين DNA والبروتين ) أي هوالحامل للرسالة الوراثية (. الظاهرة : استنساخ ب _1 مرحلة الإستنساخ ARNm إلى جه - اتجاه الاستنساخ ب _ نهاية الا أ - بداية التخطيطي للإستنساخ.",
+          "texte_corrige": "ARNm هوالوسيط بين DNA والبروتين ) اي هوالحامل للرساله الوراثيه (. الظاهره : استنساخ ب _1 مرحله الاستنساخ ARNm الا جه - اتجاه الاستنساخ ب _ نهايه الا ا - بدايه التخطيطي للاستنساخ.",
+          "micro_concept_id": "mc_prot_01",
+          "secondary_concepts": [
+            "mc_prot_04"
+          ],
+          "a_verifier": false,
+          "confidence": 0.71,
+          "source": "KHELIFA 1 - Volume 3 - Page 18",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": true,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p18_02",
+          "texte_brut": "الخيطية أءب من الوثيقة )1( 1 _ أ - تحديد طبيعة . ADN آ : ARNm ب: جزيئات . ARNm -ا بظاهرة استنساخ ب - ٥ يتعلق ء تحدث هذه الظاهرة في النواة )عند حقيقيات النواة (. .((19)",
+          "texte_corrige": "الخيطيه اءب من الوثيقه )1( 1 _ ا - تحديد طبيعه . ADN ا : ARNm ب: جزيئات . ARNm -ا بظاهره استنساخ ب - 5 يتعلق ء تحدث هذه الظاهره في النواه )عند حقيقيات النواه (. .((19)",
+          "micro_concept_id": "mc_prot_01",
+          "secondary_concepts": [
+            "mc_prot_04"
+          ],
+          "a_verifier": false,
+          "confidence": 0.59,
+          "source": "KHELIFA 1 - Volume 3 - Page 18",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": true,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p18_03",
+          "texte_brut": "الموضح لمرحلة النسخ من الوثيقة )1( مع البيانات . ) راجع ج _ 2 = استخراج السمراحل الاساسية متواجد كلياعلى مستوى الشبكة الهيولية الفعالة. ء في المرحلة الأولى موجودا بكمية معتبرة في جهاز بعدمدة زمنية يصبح تجربتى 74 by:",
+          "texte_corrige": "الموضح لمرحله النسخ من الوثيقه )1( مع البيانات . ) راجع ج _ 2 = استخراج السمراحل الاساسيه متواجد كلياعلا مستوا الشبكه الهيوليه الفعاله. ء في المرحله الاولا موجودا بكميه معتبره في جهاز بعدمده زمنيه يصبح تجربتا 74 by:",
+          "micro_concept_id": "mc_prot_01",
+          "secondary_concepts": [],
+          "a_verifier": false,
+          "confidence": 0.7,
+          "source": "KHELIFA 1 - Volume 3 - Page 18",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": true,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p18_04",
+          "texte_brut": "التمرين لتطور الاشعاع الاشعاع الاشعاع _ غولجي .",
+          "texte_corrige": "التمرين لتطور الاشعاع الاشعاع الاشعاع _ غولجي .",
+          "micro_concept_id": "mc_xxx_xx",
+          "secondary_concepts": [],
+          "a_verifier": true,
+          "confidence": 0.69,
+          "source": "KHELIFA 1 - Volume 3 - Page 18",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": false,
+          "notes": "OCR auto - verifier"
+        }
+      ]
+    },
+    {
+      "page": 19,
+      "blocks": 176,
+      "questions": [
+        {
+          "id": "q_khelifa1_v03_p19_01",
+          "texte_brut": "الرابطة بين ARNt والحمض _ 9 8 _ اتحجاه القراءة . 7 - رامزة . P البروتيني _ 6 .(Gly) 150 - 10 نلاحظ انزلاق الريبوزوم على الترجمة فيحقيقيات النواة ,",
+          "texte_corrige": "الرابطه بين ARNt والحمض _ 9 8 _ اتحجاه القراءه . 7 - رامزه . P البروتيني _ 6 .(Gly) 150 - 10 نلاحظ انزلاق الريبوزوم علا الترجمه فيحقيقيات النواه ,",
+          "micro_concept_id": "mc_prot_06",
+          "secondary_concepts": [
+            "mc_prot_05"
+          ],
+          "a_verifier": false,
+          "confidence": 0.7,
+          "source": "KHELIFA 1 - Volume 3 - Page 19",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": true,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p19_02",
+          "texte_brut": "بين ARNt والحمض المقر : الهيولى . الترجمة وبالضبط فيزمن الاستطالة. ٥ ; ب - المرحلة الاحظ الرسم المجاور ا . ج _ رابلت ببتيديت طرأفي الرامزة رقم 154 يتمثل التغيير",
+          "texte_corrige": "بين ARNt والحمض المقر : الهيولا . الترجمه وبالضبط فيزمن الاستطاله. 5 ; ب - المرحله الاحظ الرسم المجاور ا . ج _ رابلت ببتيديت طرافي الرامزه رقم 154 يتمثل التغيير",
+          "micro_concept_id": "mc_prot_05",
+          "secondary_concepts": [],
+          "a_verifier": false,
+          "confidence": 0.69,
+          "source": "KHELIFA 1 - Volume 3 - Page 19",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": true,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p19_03",
+          "texte_brut": "بالطفرة ويفسر المقاومة هذا يطلق ب 6CU 66 ٧ ٧C U حمض بتغيي المورثة نتيجة الطفرة قدرة",
+          "texte_corrige": "بالطفره ويفسر المقاومه هذا يطلق ب 6CU 66 7 7C U حمض بتغيي المورثه نتيجه الطفره قدره",
+          "micro_concept_id": "mc_xxx_xx",
+          "secondary_concepts": [],
+          "a_verifier": true,
+          "confidence": 0.73,
+          "source": "KHELIFA 1 - Volume 3 - Page 19",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": false,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p19_04",
+          "texte_brut": "صفة البكتريا بآخرعلى مستوى البروتين يعني حمض إن",
+          "texte_corrige": "صفه البكتريا باخرعلا مستوا البروتين يعني حمض ان",
+          "micro_concept_id": "mc_xxx_xx",
+          "secondary_concepts": [],
+          "a_verifier": true,
+          "confidence": 0.74,
+          "source": "KHELIFA 1 - Volume 3 - Page 19",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": false,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p19_05",
+          "texte_brut": "ما يؤكد العلاقة صفة < بروتين . قدرتها على الارتباط بها أدى إلى تغيير أحد الأحماض الأمينية في البروتين فتغيير البروتين (ADN) ة أدت إلى تغييرفي السمورثة < بروتين . يؤكد العلاقة أ - السمعلومات المستخلصة من التجارب يدل على أن النواة هي الحاملة للمعلومات الوراثية. 1 _ التجربة",
+          "texte_corrige": "ما يؤكد العلاقه صفه < بروتين . قدرتها علا الارتباط بها ادا الا تغيير احد الاحماض الامينيه في البروتين فتغيير البروتين (ADN) ه ادت الا تغييرفي السمورثه < بروتين . يؤكد العلاقه ا - السمعلومات المستخلصه من التجارب يدل علا ان النواه هي الحامله للمعلومات الوراثيه. 1 _ التجربه",
+          "micro_concept_id": "mc_prot_01",
+          "secondary_concepts": [],
+          "a_verifier": false,
+          "confidence": 0.63,
+          "source": "KHELIFA 1 - Volume 3 - Page 19",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": true,
+          "notes": "OCR auto - verifier"
+        }
+      ]
+    },
+    {
+      "page": 20,
+      "blocks": 139,
+      "questions": [
+        {
+          "id": "q_khelifa1_v03_p20_01",
+          "texte_brut": "يحدد نوع البروتين",
+          "texte_corrige": "يحدد نوع البروتين",
+          "micro_concept_id": "mc_xxx_xx",
+          "secondary_concepts": [],
+          "a_verifier": true,
+          "confidence": 0.72,
+          "source": "KHELIFA 1 - Volume 3 - Page 20",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": false,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p20_02",
+          "texte_brut": "الوسيط بين المورثات فيالنواة وتصنيع البروتين في الهيولى مراحل تركيب البروتينات : يمر تركيب البروتين عند الثديات بمرحلتين أساسيتين اADNJ ) السمورثة  . النسخ : وتحدث في النواةء حيث يستنسخ اARNm J من فيها الشفرة الوراثية الممثلة باك ARNm إلى وتحدث في الهيولى حيث : الترجمة",
+          "texte_corrige": "الوسيط بين المورثات فيالنواه وتصنيع البروتين في الهيولا مراحل تركيب البروتينات : يمر تركيب البروتين عند الثديات بمرحلتين اساسيتين اADNJ ) السمورثه . النسخ : وتحدث في النواهء حيث يستنسخ اARNm J من فيها الشفره الوراثيه الممثله باك ARNm الا وتحدث في الهيولا حيث : الترجمه",
+          "micro_concept_id": "mc_prot_01",
+          "secondary_concepts": [
+            "mc_prot_04"
+          ],
+          "a_verifier": false,
+          "confidence": 0.67,
+          "source": "KHELIFA 1 - Volume 3 - Page 20",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": true,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p20_03",
+          "texte_brut": "مرتبطة  مشكلة بروتين محدد . ب - خطوات آلية تركيب البروتين ليست متماثلة عند جميع الكائنات الحية. يختلف تركيب البروتين عند بدائيات 7 إجابة الموالي أو حقيقيات النواة بدائيات النواة ARNm كلياء فاك المورثة مجزأة لا",
+          "texte_corrige": "مرتبطه مشكله بروتين محدد . ب - خطوات اليه تركيب البروتين ليست متماثله عند جميع الكائنات الحيه. يختلف تركيب البروتين عند بدائيات 7 اجابه الموالي او حقيقيات النواه بدائيات النواه ARNm كلياء فاك المورثه مجزاه لا",
+          "micro_concept_id": "mc_prot_04",
+          "secondary_concepts": [],
+          "a_verifier": false,
+          "confidence": 0.71,
+          "source": "KHELIFA 1 - Volume 3 - Page 20",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": true,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p20_04",
+          "texte_brut": "ب - الفرق بين الجزيئتين : تختلف الجزيئتان المحصل عليهما في نوعين من الأحماض الأمينية رقم )2( فيالخيوان )1( هوسيستيين يقابله في الحيوان )2( التيروزين . الحمض رقم )5( فيالحيوان )1( هوليزين يقابله في الحيوان )2( الغلايسين . ٥ كليوتيدات فيالمورثة المسؤولةعن تركيب لهذا الفرق : يتمثل في اختلاف سلسلة جه - المصدر جزيئة كازيين فيكل حيوان . التوضيح بالرسم",
+          "texte_corrige": "ب - الفرق بين الجزيئتين : تختلف الجزيئتان المحصل عليهما في نوعين من الاحماض الامينيه رقم )2( فيالخيوان )1( هوسيستيين يقابله في الحيوان )2( التيروزين . الحمض رقم )5( فيالحيوان )1( هوليزين يقابله في الحيوان )2( الغلايسين . 5 كليوتيدات فيالمورثه المسؤولهعن تركيب لهذا الفرق : يتمثل في اختلاف سلسله جه - المصدر جزيئه كازيين فيكل حيوان . التوضيح بالرسم",
+          "micro_concept_id": "mc_xxx_xx",
+          "secondary_concepts": [],
+          "a_verifier": true,
+          "confidence": 0.67,
+          "source": "KHELIFA 1 - Volume 3 - Page 20",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": false,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p20_05",
+          "texte_brut": "التمرين _ راجع الطلائعي تترجم - تتم سريعة أ - تتابع كازيين ثدي : 1-",
+          "texte_corrige": "التمرين _ راجع الطلائعي تترجم - تتم سريعه ا - تتابع كازيين ثدي : 1-",
+          "micro_concept_id": "mc_xxx_xx",
+          "secondary_concepts": [],
+          "a_verifier": true,
+          "confidence": 0.78,
+          "source": "KHELIFA 1 - Volume 3 - Page 20",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": false,
+          "notes": "OCR auto - verifier"
+        }
+      ]
+    },
+    {
+      "page": 21,
+      "blocks": 85,
+      "questions": [
+        {
+          "id": "q_khelifa1_v03_p21_01",
+          "texte_brut": "اجابة التمرين |23 من : وحدات مكونة للحموض النووية وكل نيوكليوتيدة تتكون كليوتيدات ٥ جزيئة سكر ٥ جزيئة ٥ جزيئة حمض فسفور . نيوكليوزيدة . = حمض فسفور-",
+          "texte_corrige": "اجابه التمرين 23 من : وحدات مكونه للحموض النوويه وكل نيوكليوتيده تتكون كليوتيدات 5 جزيئه سكر 5 جزيئه 5 جزيئه حمض فسفور . نيوكليوزيده . = حمض فسفور-",
+          "micro_concept_id": "mc_xxx_xx",
+          "secondary_concepts": [],
+          "a_verifier": true,
+          "confidence": 0.76,
+          "source": "KHELIFA 1 - Volume 3 - Page 21",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": false,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p21_02",
+          "texte_brut": "ريبيت صفيرة النهايت مرحلت الترجمت العنوان : مراحل صنع البروتين في حقيقيات النواة 77 تجربتى by: moo تجربثي النيو",
+          "texte_corrige": "ريبيت صفيره النهايت مرحلت الترجمت العنوان : مراحل صنع البروتين في حقيقيات النواه 77 تجربتا by: moo تجربثي النيو",
+          "micro_concept_id": "mc_xxx_xx",
+          "secondary_concepts": [],
+          "a_verifier": true,
+          "confidence": 0.65,
+          "source": "KHELIFA 1 - Volume 3 - Page 21",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": false,
+          "notes": "OCR auto - verifier"
+        }
+      ]
+    },
+    {
+      "page": 22,
+      "blocks": 113,
+      "questions": [
+        {
+          "id": "q_khelifa1_v03_p22_01",
+          "texte_brut": "اجابة التمرين 24 السمادة \"أ\" هي البروتين . 1 -أ- تحليل السمنحنيات عالية فيها في الدقيقة 3 ثم بدأ بالتناقص تدريجيأ منحنى الشبكة الهيولية المحببة: كانت نسبة قيمة 97 إلى 14 ابتداءا من بجرور أولى حتى الدقيقة 10 ثم يتناقص الإشعاع بموازا: منحنى جهاز كولجي: نسبة الإشعاع متزايدة في",
+          "texte_corrige": "اجابه التمرين 24 السماده \"ا\" هي البروتين . 1 -ا- تحليل السمنحنيات عاليه فيها في الدقيقه 3 ثم بدا بالتناقص تدريجيا منحنا الشبكه الهيوليه المحببه: كانت نسبه قيمه 97 الا 14 ابتداءا من بجرور اولا حتا الدقيقه 10 ثم يتناقص الاشعاع بموازا: منحنا جهاز كولجي: نسبه الاشعاع متزايده في",
+          "micro_concept_id": "mc_xxx_xx",
+          "secondary_concepts": [],
+          "a_verifier": true,
+          "confidence": 0.62,
+          "source": "KHELIFA 1 - Volume 3 - Page 22",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": false,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p22_02",
+          "texte_brut": "والترجمة يحدثان فيآن واحد وفي مكان واحد )الهيولى  فإننا نلاحظ حسب الوثيقة )3( فإن هناد ظاهرتان فيآن واحد النسخ والترجمة. أمافي حقيقيات النواة فإن النسخ يحدث أولا وفي النواة ثم الترجمة بعدذلك في الهيولى , 2 - يمثل اتحجاه الترجمة. و السهم 1 - يمثل اتجاه النسخ ب",
+          "texte_corrige": "والترجمه يحدثان فيان واحد وفي مكان واحد )الهيولا فاننا نلاحظ حسب الوثيقه )3( فان هناد ظاهرتان فيان واحد النسخ والترجمه. امافي حقيقيات النواه فان النسخ يحدث اولا وفي النواه ثم الترجمه بعدذلك في الهيولا , 2 - يمثل اتحجاه الترجمه. و السهم 1 - يمثل اتجاه النسخ ب",
+          "micro_concept_id": "mc_prot_01",
+          "secondary_concepts": [],
+          "a_verifier": false,
+          "confidence": 0.66,
+          "source": "KHELIFA 1 - Volume 3 - Page 22",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": true,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p22_03",
+          "texte_brut": "إجابة التمرين |25 )4(_ حويصل افرازي . )6_ ميتوكوندري. )7- شبكة أندوبلازمية محببة . )8(- النواة) غلاف نووي (. )5(- جهاز 2 - صنع وافراز البروتين . البروتينات (ADN) كل الإعلام الوراثي - وجود نواة وجود شبكة محببة متطورة لصنع البروتين . وجود جهاز كولجي متطورلخزن وتكثيف البروتين .",
+          "texte_corrige": "اجابه التمرين 25 )4(_ حويصل افرازي . )6_ ميتوكوندري. )7- شبكه اندوبلازميه محببه . )8(- النواه) غلاف نووي (. )5(- جهاز 2 - صنع وافراز البروتين . البروتينات (ADN) كل الاعلام الوراثي - وجود نواه وجود شبكه محببه متطوره لصنع البروتين . وجود جهاز كولجي متطورلخزن وتكثيف البروتين .",
+          "micro_concept_id": "mc_prot_01",
+          "secondary_concepts": [],
+          "a_verifier": false,
+          "confidence": 0.64,
+          "source": "KHELIFA 1 - Volume 3 - Page 22",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": true,
+          "notes": "OCR auto - verifier"
+        }
+      ]
+    },
+    {
+      "page": 23,
+      "blocks": 156,
+      "questions": [
+        {
+          "id": "q_khelifa1_v03_p23_01",
+          "texte_brut": "أ - بمقارنة ADN الشخصين _ (T بالقاعدة الآزوتية (C)12 )ب(: - استبدال القاعدة الآزوتية رقم (T) بالقاعدة الآزوتية (A)10 الشخص )ج ( : - استبدال القاعدة الآزوتية رقم ب - تسمى الظاهرة بالطفرة . GGU UUG AUU UGG AAU",
+          "texte_corrige": "ا - بمقارنه ADN الشخصين _ (T بالقاعده الازوتيه (C)12 )ب(: - استبدال القاعده الازوتيه رقم (T) بالقاعده الازوتيه (A)10 الشخص )ج ( : - استبدال القاعده الازوتيه رقم ب - تسما الظاهره بالطفره . GGU UUG AUU UGG AAU",
+          "micro_concept_id": "mc_prot_01",
+          "secondary_concepts": [],
+          "a_verifier": false,
+          "confidence": 0.7,
+          "source": "KHELIFA 1 - Volume 3 - Page 23",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": true,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p23_02",
+          "texte_brut": "نشاط بناء البروتين فيالجزء B لوجود النواة وذلك 79 تجربتى by: moo تجربتي النتائج تفسير الأولى راجع",
+          "texte_corrige": "نشاط بناء البروتين فيالجزء B لوجود النواه وذلك 79 تجربتا by: moo تجربتي النتائج تفسير الاولا راجع",
+          "micro_concept_id": "mc_xxx_xx",
+          "secondary_concepts": [],
+          "a_verifier": true,
+          "confidence": 0.78,
+          "source": "KHELIFA 1 - Volume 3 - Page 23",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": false,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p23_03",
+          "texte_brut": "المصابين الشخص الشخص لدى لدى العادي : الشخص المصاب : الشخص الشخص",
+          "texte_corrige": "المصابين الشخص الشخص لدا لدا العادي : الشخص المصاب : الشخص الشخص",
+          "micro_concept_id": "mc_xxx_xx",
+          "secondary_concepts": [],
+          "a_verifier": true,
+          "confidence": 0.64,
+          "source": "KHELIFA 1 - Volume 3 - Page 23",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": false,
+          "notes": "OCR auto - verifier"
+        }
+      ]
+    },
+    {
+      "page": 24,
+      "blocks": 200,
+      "questions": [
+        {
+          "id": "q_khelifa1_v03_p24_01",
+          "texte_brut": "B معتبرفي الجزء الوراثي )ADN( الذي كل التركيب البروتيني مرتبط بالنواة التي عملية بناء البروتين . نشاط النواة في حين",
+          "texte_corrige": "B معتبرفي الجزء الوراثي )ADN( الذي كل التركيب البروتيني مرتبط بالنواه التي عمليه بناء البروتين . نشاط النواه في حين",
+          "micro_concept_id": "mc_prot_01",
+          "secondary_concepts": [],
+          "a_verifier": false,
+          "confidence": 0.91,
+          "source": "KHELIFA 1 - Volume 3 - Page 24",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": true,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p24_02",
+          "texte_brut": "A يصبح منعدما بعد القطع في الجزء ARN إن تركيب ا على النواة .",
+          "texte_corrige": "A يصبح منعدما بعد القطع في الجزء ARN ان تركيب ا علا النواه .",
+          "micro_concept_id": "mc_xxx_xx",
+          "secondary_concepts": [],
+          "a_verifier": true,
+          "confidence": 0.64,
+          "source": "KHELIFA 1 - Volume 3 - Page 24",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": false,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p24_03",
+          "texte_brut": "B بشكل معتبرفي الجزء ARN  تركيب ا أم ADN من ARN التفسير : تركيب اARN J مرتبط بالنواة فعلى مستواهايتم استنساخ كانت موجودة فيها قبل القطع. الهيولة فتحتفظ بالكمية البيتيد نتيجة اتحاد )6 2 - أ- نلاحظ أن ARN الرسول يتكون من 18 قاعدة آزوتية أدى إلى تشكيل حموض 18",
+          "texte_corrige": "B بشكل معتبرفي الجزء ARN تركيب ا ام ADN من ARN التفسير : تركيب اARN J مرتبط بالنواه فعلا مستواهايتم استنساخ كانت موجوده فيها قبل القطع. الهيوله فتحتفظ بالكميه البيتيد نتيجه اتحاد )6 2 - ا- نلاحظ ان ARN الرسول يتكون من 18 قاعده ازوتيه ادا الا تشكيل حموض 18",
+          "micro_concept_id": "mc_prot_01",
+          "secondary_concepts": [],
+          "a_verifier": false,
+          "confidence": 0.8,
+          "source": "KHELIFA 1 - Volume 3 - Page 24",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": true,
+          "notes": "OCR auto - verifier"
+        }
+      ]
+    },
+    {
+      "page": 25,
+      "blocks": 157,
+      "questions": [
+        {
+          "id": "q_khelifa1_v03_p25_01",
+          "texte_brut": "التعليل )تعليل نتيجة المقارنة : إن الكازائين من نوعين مختلفين . التحليل : اعتبارية داخل اخلية. ثابتة عند 5 ,1 شدة 15- 3 اعتبارية داخل اخلية. زيادة تدريجية فيشدة الاشعاع إلى 2,5 25- 15 داخل الخلية إلى أن تنعدم في الدقيقة 60",
+          "texte_corrige": "التعليل )تعليل نتيجه المقارنه : ان الكازائين من نوعين مختلفين . التحليل : اعتباريه داخل اخليه. ثابته عند 5 ,1 شده 15- 3 اعتباريه داخل اخليه. زياده تدريجيه فيشده الاشعاع الا 2,5 25- 15 داخل الخليه الا ان تنعدم في الدقيقه 60",
+          "micro_concept_id": "mc_xxx_xx",
+          "secondary_concepts": [],
+          "a_verifier": true,
+          "confidence": 0.7,
+          "source": "KHELIFA 1 - Volume 3 - Page 25",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": false,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p25_02",
+          "texte_brut": "هي : ) راجع الجدول صفحة 61(. ب _ مراحل الاستنساخ , ADNوال ATP بوليميراز نيوكليوتيدات حرةء ARN النسخ شروطها : اسيل السمشع أو اليوريدين ج - نستعمل داخل اخلية. الادماج ومتابعة الاشعاع لتحديد التعليل :",
+          "texte_corrige": "هي : ) راجع الجدول صفحه 61(. ب _ مراحل الاستنساخ , ADNوال ATP بوليميراز نيوكليوتيدات حرهء ARN النسخ شروطها : اسيل السمشع او اليوريدين ج - نستعمل داخل اخليه. الادماج ومتابعه الاشعاع لتحديد التعليل :",
+          "micro_concept_id": "mc_prot_01",
+          "secondary_concepts": [],
+          "a_verifier": false,
+          "confidence": 0.74,
+          "source": "KHELIFA 1 - Volume 3 - Page 25",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": true,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p25_03",
+          "texte_brut": "اليوراسيل صفة مميزة لARN J حيث يدخل في تركيب ا  ARN فقط بابةالقمرين 30 TACناسخة و توافق رامزة الانطلاقة وهي الثلاثية ATG على السلسلة ADN  نبحث عن منطقة ا ARNm مستوى AUG السلسلة الناسخة و بداية المنطقة الرامزة GGT ATG ATC CAG CAAACC AAACGA TCT AAC AAC TCC GCA CGTAGG CAT AAC G",
+          "texte_corrige": "اليوراسيل صفه مميزه لARN J حيث يدخل في تركيب ا ARN فقط بابهالقمرين 30 TACناسخه و توافق رامزه الانطلاقه وهي الثلاثيه ATG علا السلسله ADN نبحث عن منطقه ا ARNm مستوا AUG السلسله الناسخه و بدايه المنطقه الرامزه GGT ATG ATC CAG CAAACC AAACGA TCT AAC AAC TCC GCA CGTAGG CAT AAC G",
+          "micro_concept_id": "mc_prot_01",
+          "secondary_concepts": [
+            "mc_prot_04"
+          ],
+          "a_verifier": false,
+          "confidence": 0.67,
+          "source": "KHELIFA 1 - Volume 3 - Page 25",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": true,
+          "notes": "OCR auto - verifier"
+        }
+      ]
+    },
+    {
+      "page": 26,
+      "blocks": 141,
+      "questions": [
+        {
+          "id": "q_khelifa1_v03_p26_01",
+          "texte_brut": "إجابة التمرين |31 البكتيري مع مرور الزمن في السلالتين في المزرعتين . ذ 30_ 0  1 وقف في المزرعة )ب( الحاوية على ويستمر البكتيري فيكلمن السلالتين في المزرعتين 30 د : يتوقف ة . السلالة",
+          "texte_corrige": "اجابه التمرين 31 البكتيري مع مرور الزمن في السلالتين في المزرعتين . ذ 30_ 0 1 وقف في المزرعه )ب( الحاويه علا ويستمر البكتيري فيكلمن السلالتين في المزرعتين 30 د : يتوقف ه . السلاله",
+          "micro_concept_id": "mc_xxx_xx",
+          "secondary_concepts": [],
+          "a_verifier": true,
+          "confidence": 0.68,
+          "source": "KHELIFA 1 - Volume 3 - Page 26",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": false,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p26_02",
+          "texte_brut": "التمرين 32 البروتين كاملا : تعليل عجز خلايا الأرنب على 1 هذه الخلايا الهيولي للبراميسيوم وادخالها خلايا الأرنب دمج السمورثات المشفرة لبروتينات الغشاء أي تحول الرامر",
+          "texte_corrige": "التمرين 32 البروتين كاملا : تعليل عجز خلايا الارنب علا 1 هذه الخلايا الهيولي للبراميسيوم وادخالها خلايا الارنب دمج السمورثات المشفره لبروتينات الغشاء اي تحول الرامر",
+          "micro_concept_id": "mc_xxx_xx",
+          "secondary_concepts": [],
+          "a_verifier": true,
+          "confidence": 0.7,
+          "source": "KHELIFA 1 - Volume 3 - Page 26",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": false,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p26_03",
+          "texte_brut": "خلال التعبيرالمورثي بعملية نسخ لل ARNm انطلاقامن خيط اADN ) السمورثة ثم موافقة وحسب الشفرة الوراثية تتوقف عملية الترجمة عند الرامزة رقم UAA (7) )رامر إلى ليتحرر الببتيد فينفصل عنها الريبوزوم لغياب ARNt الموا لا يقابلها أي حمض التوقف ( تجربتى 82 by:",
+          "texte_corrige": "خلال التعبيرالمورثي بعمليه نسخ لل ARNm انطلاقامن خيط اADN ) السمورثه ثم موافقه وحسب الشفره الوراثيه تتوقف عمليه الترجمه عند الرامزه رقم UAA (7) )رامر الا ليتحرر الببتيد فينفصل عنها الريبوزوم لغياب ARNt الموا لا يقابلها اي حمض التوقف ( تجربتا 82 by:",
+          "micro_concept_id": "mc_prot_06",
+          "secondary_concepts": [
+            "mc_prot_05",
+            "mc_prot_01"
+          ],
+          "a_verifier": false,
+          "confidence": 0.74,
+          "source": "KHELIFA 1 - Volume 3 - Page 26",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": true,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p26_04",
+          "texte_brut": "بينما كوز النمو الأنزيم إجابة تصنيع تقوم يعد تترجم أمينية",
+          "texte_corrige": "بينما كوز النمو الانزيم اجابه تصنيع تقوم يعد تترجم امينيه",
+          "micro_concept_id": "mc_xxx_xx",
+          "secondary_concepts": [],
+          "a_verifier": true,
+          "confidence": 0.89,
+          "source": "KHELIFA 1 - Volume 3 - Page 26",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": false,
+          "notes": "OCR auto - verifier"
+        }
+      ]
+    },
+    {
+      "page": 27,
+      "blocks": 125,
+      "questions": [
+        {
+          "id": "q_khelifa1_v03_p27_01",
+          "texte_brut": "قدرة البارميسيوم على تركيب البروتين كاملا انطلاقا من جزء المورثة السابقة هي : 2- الفرضية القادرة على ما . للبراميسيوم القدرة على ترجمة رامزة التوقف UAA إلى حمض عملية الترجمة على امتداد ARNm مركبة جزيئة بروتينية واحدة دون انقطاع ذ- أ - نعم باستعمال هذه المعلومة يمكن إثبات صحة الفرضية. نقص فيعدد جزيئات الحمض يمكننا القول أن إماهة القطع الببتيدية المركبة من طرف خلايا الأرنب غلوتامين < ممايعني أن رامزة التوقف هذه عند الباميسيوم تعبعن حمض الغلوتامين . توصل إليه ف .",
+          "texte_corrige": "قدره البارميسيوم علا تركيب البروتين كاملا انطلاقا من جزء المورثه السابقه هي : 2- الفرضيه القادره علا ما . للبراميسيوم القدره علا ترجمه رامزه التوقف UAA الا حمض عمليه الترجمه علا امتداد ARNm مركبه جزيئه بروتينيه واحده دون انقطاع ذ- ا - نعم باستعمال هذه المعلومه يمكن اثبات صحه الفرضيه. نقص فيعدد جزيئات الحمض يمكننا القول ان اماهه القطع الببتيديه المركبه من طرف خلايا الارنب غلوتامين < ممايعني ان رامزه التوقف هذه عند الباميسيوم تعبعن حمض الغلوتامين . توصل اليه ف .",
+          "micro_concept_id": "mc_prot_04",
+          "secondary_concepts": [],
+          "a_verifier": false,
+          "confidence": 0.62,
+          "source": "KHELIFA 1 - Volume 3 - Page 27",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": true,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p27_02",
+          "texte_brut": "جابةالتمرين 33 الأول   ARNm في الزمن ز0ء نلاحظ تناقص فيكمية ARNm وزيادة فيكمية الأحماض _ 30 د : بعد الأمينية المدمجة فيالبروتين بالوحدات الاعتبارية. فيكمية ARNm وزيادة فيكمية الأحماض الأمينية الثانيك ARNm نلاحظ أيضا ذ 60 30 المدمجة في البروتين مع الزمن .",
+          "texte_corrige": "جابهالتمرين 33 الاول ARNm في الزمن ز0ء نلاحظ تناقص فيكميه ARNm وزياده فيكميه الاحماض _ 30 د : بعد الامينيه المدمجه فيالبروتين بالوحدات الاعتباريه. فيكميه ARNm وزياده فيكميه الاحماض الامينيه الثانيك ARNm نلاحظ ايضا ذ 60 30 المدمجه في البروتين مع الزمن .",
+          "micro_concept_id": "mc_prot_04",
+          "secondary_concepts": [],
+          "a_verifier": false,
+          "confidence": 0.74,
+          "source": "KHELIFA 1 - Volume 3 - Page 27",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": true,
+          "notes": "OCR auto - verifier"
+        }
+      ]
+    },
+    {
+      "page": 28,
+      "blocks": 138,
+      "questions": [
+        {
+          "id": "q_khelifa1_v03_p28_01",
+          "texte_brut": "التمرين 34 لدينا المورثة العادية ) قبل العرض للاشعة : 1 ADN TAC ACC GGA TAC ATC ARNm",
+          "texte_corrige": "التمرين 34 لدينا المورثه العاديه ) قبل العرض للاشعه : 1 ADN TAC ACC GGA TAC ATC ARNm",
+          "micro_concept_id": "mc_prot_01",
+          "secondary_concepts": [
+            "mc_prot_04"
+          ],
+          "a_verifier": false,
+          "confidence": 0.88,
+          "source": "KHELIFA 1 - Volume 3 - Page 28",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": true,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p28_02",
+          "texte_brut": "ADN وعند مقارنة تركيب المورثة العادية بالاحتمالات الممكنة ل كليوتيدات غيرت تركيب ثلاثية واحدة من فنلاحظ أن المورثة المتغيرة هي ناتجة عن طفرة نقطية ذلر فيبنية السلسلة الببتيدية يتمثل في استبدال البرولين بالثريونين  ويمكن عن ذلك بالاحتمالات التالية : القاعدة الأولى G من الثلاثية الثالثة لADN J الناسخ استبدل استبدل بT والقاعدة الثالثة A استبدلت",
+          "texte_corrige": "ADN وعند مقارنه تركيب المورثه العاديه بالاحتمالات الممكنه ل كليوتيدات غيرت تركيب ثلاثيه واحده من فنلاحظ ان المورثه المتغيره هي ناتجه عن طفره نقطيه ذلر فيبنيه السلسله الببتيديه يتمثل في استبدال البرولين بالثريونين ويمكن عن ذلك بالاحتمالات التاليه : القاعده الاولا G من الثلاثيه الثالثه لADN J الناسخ استبدل استبدل بT والقاعده الثالثه A استبدلت",
+          "micro_concept_id": "mc_prot_01",
+          "secondary_concepts": [],
+          "a_verifier": false,
+          "confidence": 0.69,
+          "source": "KHELIFA 1 - Volume 3 - Page 28",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": true,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p28_03",
+          "texte_brut": "بالتضاعف النصف محافظ وبالتالي كل تغيير يصيب المعلومة الوراثب ينتقل من اخلية الأصلية إلى خلايا في البيضة الملقحة سينتقل إلى الخلايا الناتجة عنها إجابةالتعرين 35 بنسخة المعلومة الوراثية هي اARNm J والذي تركيبه مرتبط بتركيب شريط ا  ADN الناسخ . ARN بوليميراز على ا  ADN الناسخ فينتج عن ذلك نسخ عدة جزيئات تثبيت عدة 2 _ أ - نلاحظ",
+          "texte_corrige": "بالتضاعف النصف محافظ وبالتالي كل تغيير يصيب المعلومه الوراثب ينتقل من اخليه الاصليه الا خلايا في البيضه الملقحه سينتقل الا الخلايا الناتجه عنها اجابهالتعرين 35 بنسخه المعلومه الوراثيه هي اARNm J والذي تركيبه مرتبط بتركيب شريط ا ADN الناسخ . ARN بوليميراز علا ا ADN الناسخ فينتج عن ذلك نسخ عده جزيئات تثبيت عده 2 _ ا - نلاحظ",
+          "micro_concept_id": "mc_prot_01",
+          "secondary_concepts": [
+            "mc_prot_04"
+          ],
+          "a_verifier": false,
+          "confidence": 0.53,
+          "source": "KHELIFA 1 - Volume 3 - Page 28",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": true,
+          "notes": "OCR auto - verifier"
+        },
+        {
+          "id": "q_khelifa1_v03_p28_04",
+          "texte_brut": "بينما الاستن الوقت . إن ترجمةا- ARNm إلى بروتين ا  ARNm المتماثلة تقريبافي ل ADN إلى ا  ARNm لم يكتمل . مثحين تجربتى 84 by: moo تجربتي",
+          "texte_corrige": "بينما الاستن الوقت . ان ترجمها- ARNm الا بروتين ا ARNm المتماثله تقريبافي ل ADN الا ا ARNm لم يكتمل . مثحين تجربتا 84 by: moo تجربتي",
+          "micro_concept_id": "mc_prot_01",
+          "secondary_concepts": [
+            "mc_prot_04"
+          ],
+          "a_verifier": false,
+          "confidence": 0.69,
+          "source": "KHELIFA 1 - Volume 3 - Page 28",
+          "type": "question",
+          "difficulte": "moyenne",
+          "bac_frequent": true,
+          "notes": "OCR auto - verifier"
+        }
+      ]
+    }
+  ]
+}

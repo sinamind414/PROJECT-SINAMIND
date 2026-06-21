@@ -1,0 +1,209 @@
+[
+  {
+    "id": "q_revision_86",
+    "texte_corrige": "حدد شروط تدمير الخلايا المستهدفة من طرف اللمفاويات T السامة (شروط التضعيف المزدوج)",
+    "micro_concept_id": "mc_imm_05",
+    "secondary_concepts": [
+      "mc_imm_02"
+    ],
+    "source": "605 Questions de Revision - Immunologie",
+    "type": "question_courte",
+    "difficulte": "difficile",
+    "bac_frequent": true,
+    "notes": "Double reconnaissance: CMH-I + peptide antigenique, meme complexe majeur."
+  },
+  {
+    "id": "q_revision_87",
+    "texte_corrige": "حدد شروط حدوث التضعيف المزدوج من الجانب الجزيئي",
+    "micro_concept_id": "mc_imm_05",
+    "secondary_concepts": [
+      "mc_imm_02"
+    ],
+    "source": "605 Questions de Revision - Immunologie",
+    "type": "question_explicative",
+    "difficulte": "difficile",
+    "bac_frequent": true,
+    "notes": "Appariement TCR-CMH, corecepteur CD8, meme origine cellulaire."
+  },
+  {
+    "id": "q_revision_88",
+    "texte_corrige": "استخرج من الملاحظة (التجربة) مراحل تدمير الخلايا المستهدفة من طرف LTC",
+    "micro_concept_id": "mc_imm_05",
+    "secondary_concepts": [
+      "mc_imm_02"
+    ],
+    "source": "605 Questions de Revision - Immunologie",
+    "type": "question_analyse",
+    "difficulte": "difficile",
+    "bac_frequent": true,
+    "notes": "Etapes: reconnaissance, double reconnaissance, exocytose perforine/granzymes, lyse."
+  },
+  {
+    "id": "q_revision_14",
+    "texte_corrige": "حدد مراحل تدمير الخلية المستهدفة من طرف اللمفاويات T السامة (CTL)",
+    "micro_concept_id": "mc_imm_05",
+    "secondary_concepts": [],
+    "source": "605 Questions de Revision - Immunologie",
+    "type": "question_courte",
+    "difficulte": "difficile",
+    "bac_frequent": true,
+    "notes": "Etapes CTL: double reconnaissance, exocytose perforine, formation pore, apoptose."
+  },
+  {
+    "id": "q_revision_011",
+    "texte_corrige": "حدد مميزات اللمفاويات T السامة (CTL)",
+    "micro_concept_id": "mc_imm_05",
+    "secondary_concepts": [
+      "mc_imm_02"
+    ],
+    "source": "605 Questions de Revision - Immunologie",
+    "type": "question_courte",
+    "difficulte": "moyenne",
+    "bac_frequent": true,
+    "notes": "CTL: CD8+, reconnaissance CMH-I, secretion perforine/granzymes, lyse cellules infectees."
+  },
+  {
+    "id": "q_revision_010",
+    "texte_corrige": "بين في فقرة كيفية تطور اللمفاويات T8 (CD8) إلى CTL",
+    "micro_concept_id": "mc_imm_02",
+    "secondary_concepts": [
+      "mc_imm_05"
+    ],
+    "source": "605 Questions de Revision - Immunologie",
+    "type": "question_explicative",
+    "difficulte": "moyenne",
+    "bac_frequent": true,
+    "notes": "CD8+ naive -> double reconnaissance -> activation -> proliferation -> differenciation en CTL."
+  },
+  {
+    "id": "q_revision_71",
+    "texte_corrige": "صف العضيات الخلوية التي تمكن من أداء البلازما (plasmocyte) لوظيفتها في إنتاج الأجسام المضادة",
+    "micro_concept_id": "mc_imm_04",
+    "secondary_concepts": [
+      "mc_imm_01"
+    ],
+    "source": "605 Questions de Revision - Immunologie",
+    "type": "question_courte",
+    "difficulte": "moyenne",
+    "bac_frequent": true,
+    "notes": "Plasmocyte: RER tres developpe, Golgi actif, nombreuses vesicules de secretion."
+  },
+  {
+    "id": "q_revision_73",
+    "texte_corrige": "علل رفض الطعم الثاني (greffe) بسرعة أكبر من الأول (مفهوم الذاكرة المناعية)",
+    "micro_concept_id": "mc_imm_06",
+    "secondary_concepts": [
+      "mc_imm_05"
+    ],
+    "source": "605 Questions de Revision - Immunologie",
+    "type": "question_explicative",
+    "difficulte": "moyenne",
+    "bac_frequent": true,
+    "notes": "Memoire immunitaire: lymphocytes T memoire pre-existants, reponse plus rapide et forte."
+  },
+  {
+    "id": "q_revision_75",
+    "texte_corrige": "اشرح مفهوم الورودات (rosettes)",
+    "micro_concept_id": "mc_imm_04",
+    "secondary_concepts": [
+      "mc_imm_01"
+    ],
+    "source": "605 Questions de Revision - Immunologie",
+    "type": "question_conceptuelle",
+    "difficulte": "difficile",
+    "bac_frequent": false,
+    "notes": "Rosettes: complexes LB+globules rouges opsonises via anticorps, test de reconnaissance."
+  },
+  {
+    "id": "q_revision_84",
+    "texte_corrige": "حدد خصائص الاستجابة المناعية الخلطية ذات الوساطة الخلوية (T-dependante)",
+    "micro_concept_id": "mc_imm_04",
+    "secondary_concepts": [
+      "mc_imm_01",
+      "mc_imm_02"
+    ],
+    "source": "605 Questions de Revision - Immunologie",
+    "type": "question_courte",
+    "difficulte": "moyenne",
+    "bac_frequent": true,
+    "notes": "Reponse humorale T-dependante: cooperation LB-LT4, switching isotypique, memoire."
+  },
+  {
+    "id": "q_revision_85",
+    "texte_corrige": "حدد خصائص الاستجابة المناعية الخلطية ذات الوساطة الخلوية (T-independante)",
+    "micro_concept_id": "mc_imm_04",
+    "secondary_concepts": [
+      "mc_imm_01"
+    ],
+    "source": "605 Questions de Revision - Immunologie",
+    "type": "question_courte",
+    "difficulte": "moyenne",
+    "bac_frequent": false,
+    "notes": "Reponse humorale T-independante: pas de cooperation LB-LT4, IgM seulement, pas de memoire."
+  },
+  {
+    "id": "q_revision_78",
+    "texte_corrige": "حدد نتيجة انتقاء (اختيار) اللمفاويات B الحية وتصنيفها تجاه المستضد",
+    "micro_concept_id": "mc_imm_04",
+    "secondary_concepts": [
+      "mc_imm_01",
+      "mc_imm_06"
+    ],
+    "source": "605 Questions de Revision - Immunologie",
+    "type": "question_courte",
+    "difficulte": "moyenne",
+    "bac_frequent": true,
+    "notes": "Resultat: proliferation clonale, differenciation en plasmocytes et LB memoire."
+  },
+  {
+    "id": "q_revision_89",
+    "texte_corrige": "بين المقصود بالـ BCG",
+    "micro_concept_id": "mc_imm_06",
+    "secondary_concepts": [],
+    "source": "605 Questions de Revision - Immunologie",
+    "type": "question_courte",
+    "difficulte": "facile",
+    "bac_frequent": true,
+    "notes": "BCG: vaccin antituberculeux (Bacille de Calmette-Guerin), immunite adaptative."
+  },
+  {
+    "id": "q_revision_001",
+    "texte_corrige": "حدد العلاقة الوظيفية الموجودة بين اللمفاويات والبلاعم (phagocytes)",
+    "micro_concept_id": "mc_imm_04",
+    "secondary_concepts": [
+      "mc_imm_01",
+      "mc_imm_02"
+    ],
+    "source": "605 Questions de Revision - Immunologie",
+    "type": "question_conceptuelle",
+    "difficulte": "moyenne",
+    "bac_frequent": true,
+    "notes": "Cooperation: CPA presente antigenes aux LT4, active LB. Phagocytes = cellules presentatrices."
+  },
+  {
+    "id": "q_revision_91",
+    "texte_corrige": "بين كيف تستقر (تثبت) البنية الرباعية للبروتين",
+    "micro_concept_id": "mc_struc_04",
+    "secondary_concepts": [
+      "mc_struc_03"
+    ],
+    "source": "605 Questions de Revision - Structure des Proteines",
+    "type": "question_explicative",
+    "difficulte": "moyenne",
+    "bac_frequent": false,
+    "notes": "Stabilisation: memes interactions que structure tertiaire entre sous-unites."
+  },
+  {
+    "id": "q_revision_5",
+    "texte_corrige": "وضح أهمية دراسة البروتينات بالنماذج الجزيئية (RasMol)",
+    "micro_concept_id": "mc_struc_05",
+    "secondary_concepts": [
+      "mc_struc_03"
+    ],
+    "source": "605 Questions de Revision - Structure des Proteines",
+    "type": "question_conceptuelle",
+    "difficulte": "moyenne",
+    "bac_frequent": true,
+    "notes": "Modelisation: visualisation structure 3D, etude relation structure-fonction."
+  }
+]
