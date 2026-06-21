@@ -1,0 +1,79 @@
+Tu es dans le repo PROJECT-SINAMIND.
+
+Objectif :
+Annuler uniquement la dernière modification liée aux fonctionnalités Gen Z interactives.
+
+Ne touche pas au backend.
+Ne touche pas au design Drive.
+Ne touche pas à la sidebar.
+Ne touche pas aux corrections RTL/arabe.
+Ne touche pas aux autres pages.
+
+La dernière modification a ajouté :
+- des composants learning
+- une simulation enzymatique
+- une banque SVT
+- une modification de /exercises
+- un widget Gen Z dans /dashboard
+
+Fichiers à supprimer si présents :
+
+khawarizmi-frontend/src/lib/svt-quiz-bank.ts
+
+khawarizmi-frontend/src/components/learning/InstantQuizButton.tsx
+khawarizmi-frontend/src/components/learning/ProgressiveReveal.tsx
+khawarizmi-frontend/src/components/learning/FlashChallenge.tsx
+khawarizmi-frontend/src/components/learning/HintButton.tsx
+khawarizmi-frontend/src/components/learning/SVTProgressMap.tsx
+khawarizmi-frontend/src/components/learning/GenZLabWidget.tsx
+
+khawarizmi-frontend/src/components/simulations/EnzymeActivitySimulator.tsx
+
+Supprimer aussi les dossiers s’ils deviennent vides :
+khawarizmi-frontend/src/components/learning
+khawarizmi-frontend/src/components/simulations
+
+Restaurer la page exercises depuis le backup si le fichier existe :
+
+khawarizmi-frontend/src/app/exercises/page.tsx.bak_genz
+
+Commande logique :
+si page.tsx.bak_genz existe, la copier vers :
+khawarizmi-frontend/src/app/exercises/page.tsx
+puis supprimer page.tsx.bak_genz.
+
+Sinon, ne rien inventer : demande le fichier original.
+
+Pour dashboard :
+ouvrir :
+khawarizmi-frontend/src/app/dashboard/page.tsx
+
+Supprimer uniquement :
+1. l’import :
+import { GenZLabWidget } from "@/components/learning/GenZLabWidget"
+
+2. le composant JSX :
+<GenZLabWidget />
+
+Ne modifie rien d’autre dans dashboard/page.tsx.
+
+Après suppression, exécuter :
+
+cd khawarizmi-frontend
+npm run build
+
+Si next manque :
+npm install
+npm run build
+
+Résultat attendu :
+- build réussi
+- /dashboard ne contient plus "مختبر Gen Z التفاعلي"
+- /exercises revient à l’état précédent
+- sidebar et design général restent inchangés
+
+À la fin, donne-moi seulement :
+1. fichiers supprimés
+2. fichiers restaurés
+3. résultat npm run build
+4. confirmation que le widget Gen Z a disparu du dashboard

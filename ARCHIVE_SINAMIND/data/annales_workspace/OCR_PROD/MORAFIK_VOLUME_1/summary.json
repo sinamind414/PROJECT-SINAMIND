@@ -1,0 +1,12 @@
+{
+  "volume": "MORAFIK_VOLUME_1",
+  "pdf": "C:\\Users\\zakaria\\Documents\\PROJET KHAWARIZMI IA\\khawarizmi-backend\\data\\ANNALES_SVT_BAC_ALGERIE\\SCIENCES_MORAFIK\\VOLUMES_MORAFIK\\MORAFIK_VOLUME_1.pdf",
+  "total_pages": 55,
+  "pages_processed": 55,
+  "errors": 0,
+  "total_characters": 68681,
+  "avg_confidence": 0.69,
+  "quality_warning": "None",
+  "timestamp": "2026-06-20T20:38:52.693848",
+  "bundle_dir": "C:\\Users\\zakaria\\Documents\\PROJET KHAWARIZMI IA\\data\\annales_workspace\\OCR_PROD\\MORAFIK_VOLUME_1"
+}

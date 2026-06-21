@@ -44,5 +44,3 @@ models/
 *.log
 logs/
 
-# Archive - non-project files
-ARCHIVE_SINAMIND/
