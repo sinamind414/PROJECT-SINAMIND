@@ -11,7 +11,7 @@ if str(ROOT) not in sys.path:
 
 from services.ocr import get_volume_processor
 
-BASE = Path(r"C:\Users\zakaria\Documents\projet khawarizmi A\LIVRES SCOLAIRES\ANALES SCIENCES\LIVRES ANNALES SVT BAC\DOSSIER ANNALES KHELIFA\KHELIFA 2\VOLUMES_KHELIFA2")
+BASE = ROOT / "data" / "ANNALES_SVT_BAC_ALGERIE" / "KHELIFA_2" / "VOLUMES_KHELIFA2"
 LOG_FILE = ROOT / "data" / "ocr_batch_log.json"
 OCR_PROD = ROOT / "data" / "annales_workspace" / "OCR_PROD"
 
