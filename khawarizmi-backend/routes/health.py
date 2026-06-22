@@ -63,3 +63,13 @@ async def data_foundation_debug():
     except Exception as e:
         foundation["error"] = str(e)
     return foundation
+
+
+@router.get("/api/metrics", tags=["Système"])
+async def get_metrics():
+    """Métriques d'observabilité — cache hit rate, fallback rate, compteurs."""
+    from services.metrics import get_global_stats
+    return {
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "stats": get_global_stats()
+    }

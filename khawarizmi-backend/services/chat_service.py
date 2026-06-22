@@ -24,6 +24,7 @@ from services.chat_prompt import (
 )
 from services.orientation_service import calculer_orientation
 from services.semantic_cache import get_semantic_cache, set_semantic_cache
+from services.metrics import MetricsCollector, record_request
 
 logger = logging.getLogger("khawarizmi.chat")
 
@@ -50,11 +51,18 @@ async def handle_tuteur(
     Returns:
         Dict avec reponse, type, cartes, etc.
     """
+    mc = MetricsCollector(user_id=str(user_id), endpoint="/api/tuteur")
+    mc.start("classification")
+
     # ── 1. Classification ──
     classification = classify(message)
     intent = classification["intent"]
     resp_type = classification["type"]
     is_init = classification["is_init"]
+
+    mc.end("classification")
+    mc.set("intent", intent)
+    mc.set("resp_type", resp_type)
 
     logger.info(f"Tuteur : user={user_id} intent={intent} type={resp_type}")
 
@@ -189,19 +197,31 @@ async def handle_tuteur(
     chapitre = context.get("chapitre", "general")
 
     # Cache sémantique : vérifier si une question similaire a déjà été posée
+    mc.start("cache_lookup")
     cached = await get_semantic_cache(message, chapitre)
+    mc.end("cache_lookup")
+    mc.set("cache_hit", cached is not None)
+
     if cached:
         logger.info(f"Tuteur cache HIT | user={user_id} type={cached.get('type')}")
+        mc.set("fallback_active", cached.get("fallback_active", False))
+        record_request("/api/tuteur", cache_hit=True, fallback=cached.get("fallback_active", False))
+        mc.flush()
         return cached
 
+    mc.start("rag")
     rag_chunks = await _rag_search(db, message, context.get("chapitre"))
+    mc.end("rag")
+    mc.set("rag_chunks_count", len(rag_chunks))
 
     if is_explication:
         prompt = build_explication_prompt(message, context, rag_chunks, context.get("history", []))
     else:
         prompt = build_socratique_prompt(message, context, rag_chunks, context.get("history", []))
 
+    mc.start("llm")
     reponse = await _call_gemini(prompt, openai_client)
+    mc.end("llm")
 
     if reponse is None:
         reponse = _fallback_socratique(message, rag_chunks)
@@ -223,7 +243,13 @@ async def handle_tuteur(
     }
 
     # Stocker dans le cache sémantique (uniquement si pas fallback)
+    mc.start("cache_store")
     await set_semantic_cache(message, result, chapitre)
+    mc.end("cache_store")
+
+    mc.set("fallback_active", fallback)
+    record_request("/api/tuteur", cache_hit=False, fallback=fallback)
+    mc.flush()
 
     return result
 

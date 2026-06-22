@@ -11,6 +11,7 @@ from deps import get_current_user, get_tutor, get_openai
 from rate_limit import limiter, chat_limit
 from schemas.session import ChatRequest
 from services.khawarizmi_engine import KhawarizmiTutor
+from services.metrics import MetricsCollector, record_request
 
 logger = logging.getLogger("khawarizmi.api")
 router = APIRouter()
@@ -26,23 +27,32 @@ async def chat_socratique(
     openai_client:AsyncOpenAI = Depends(get_openai),
 ):
     cfg = get_settings()
+    mc = MetricsCollector(user_id=str(current_user["id"]), endpoint="/api/chat")
 
+    mc.start("cache_lookup")
     cache_key = make_cache_key(
         "chat", body.sujet_id, body.question_id,
         body.message[:100], body.mode_force or "auto"
     )
     cached = await get_cache(cache_key)
+    mc.end("cache_lookup")
+    mc.set("cache_hit", cached is not None)
+
     if cached:
         logger.debug(f"Cache HIT : {cache_key[:20]}...")
         result = json.loads(cached)
         result["from_cache"] = True
+        record_request("/api/chat", cache_hit=True, fallback=False)
+        mc.flush()
         return result
 
+    mc.start("pre_analyse")
     pre_analyse = tutor.pre_analyser_sans_ia(
         body.sujet_id,
         body.question_id,
         body.message,
     )
+    mc.end("pre_analyse")
 
     try:
         system_prompt = tutor.build_system_prompt(
@@ -57,6 +67,7 @@ async def chat_socratique(
     except ValueError as e:
         raise HTTPException(404, f"Contenu introuvable : {e}")
 
+    mc.start("llm")
     try:
         response = await openai_client.chat.completions.create(
             model           = cfg.openai_model,
@@ -86,6 +97,11 @@ async def chat_socratique(
     except Exception as e:
         logger.error(f"Erreur OpenAI : {e}")
         raise HTTPException(502, f"Service IA temporairement indisponible : {e}")
+    mc.end("llm")
+
+    mc.set("tokens_total", tokens_used)
+    mc.set("tokens_input", response.usage.prompt_tokens if response.usage else 0)
+    mc.set("tokens_output", response.usage.completion_tokens if response.usage else 0)
 
     result = {
         **ia_result,
@@ -95,7 +111,12 @@ async def chat_socratique(
         "from_cache":      False,
     }
 
+    mc.start("cache_store")
     await set_cache(cache_key, json.dumps(result, ensure_ascii=False), cfg.cache_ttl)
+    mc.end("cache_store")
+
+    record_request("/api/chat", cache_hit=False, fallback=False)
+    mc.flush()
 
     logger.info(
         f"Chat : user={current_user['id']} "
