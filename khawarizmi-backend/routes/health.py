@@ -73,3 +73,13 @@ async def get_metrics():
         "timestamp": datetime.now(timezone.utc).isoformat(),
         "stats": get_global_stats()
     }
+
+
+@router.get("/api/calibration/stats", tags=["Système"])
+async def get_calibration_stats():
+    """Statistiques du calibrage Eval — Golden Set ONEC."""
+    from services.eval_calibration import get_calibration_stats
+    return {
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "golden_set": get_calibration_stats()
+    }

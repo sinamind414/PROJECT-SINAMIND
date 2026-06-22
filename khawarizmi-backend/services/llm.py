@@ -240,6 +240,18 @@ async def call_gpt4o_evaluator(
         concepts = [question["concept_cle"]]
     concepts_str = ", ".join(concepts)
 
+    # Calibrage ONEC : injecter des exemples few-shot du Golden Set
+    from services.eval_calibration import build_calibrated_prompt
+    chapitre = question.get("chapitre_id", question.get("chapitre", ""))
+    few_shot_block = build_calibrated_prompt(
+        chapitre=chapitre,
+        question_text=question.get("texte", ""),
+        max_examples=3,
+    )
+    calibrated_system_prompt = SYSTEM_PROMPT
+    if few_shot_block:
+        calibrated_system_prompt = SYSTEM_PROMPT + "\n" + few_shot_block
+
     user_message = f"""QUESTION: {question.get('texte', '')}
 REPONSE_ATTENDUE: {question.get('reponse_attendue', '')}
 CONCEPT_CLE: {question.get('concept_cle', '')}
@@ -259,7 +271,7 @@ REPONSE_ELEVE: {reponse}"""
             max_tokens      = 400,
             timeout         = 8.0,
             messages        = [
-                {"role": "system", "content": SYSTEM_PROMPT},
+                {"role": "system", "content": calibrated_system_prompt},
                 {"role": "user",   "content": user_message}
             ]
         )
@@ -281,7 +293,7 @@ REPONSE_ELEVE: {reponse}"""
                         max_tokens      = 400,
                         timeout         = 8.0,
                         messages        = [
-                            {"role": "system", "content": SYSTEM_PROMPT},
+                            {"role": "system", "content": calibrated_system_prompt},
                             {"role": "user",   "content": user_message}
                         ]
                     )
