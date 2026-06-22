@@ -1,0 +1,770 @@
+{
+  "page": 22,
+  "text": "Anagene باستعمال برنامج تيدات وتتابع نيو مقارن 2 ADN Jتيدات في مستوى ا نيواً باستعمل برنامج Anagene الحصول على نتائج تحويل على إلى تتابع ARN Jمستوى ا كليوتيدات )النافذة العلوية ( إلى تتابع مستوى سلسلة ببتيدية ) الوثيقة 3(. غلوبين الوثيقة )4( على نتائج مقارنة تتابع نيوكليوتيدات في مورثتين للسلسلة 8 كما البر إحداهما طافرة تم إجراءها باستعمل 1و٥1 er، |enقurt oدo IEGICCACCICOCICCIGACGACAAGICICCCGUIACIGCCCIGICGGGCAAGG AGE EقCGEGU d66d dn 5lom 00 unvernlon dr uetucodaudn UGGUCCACCUCACUCCUGRGCACARGUCUGCCGUUACUCCCCUGUGGGGCAAGGUGARCGUGEAUGAAGUUGGUGCUCAcccccucctere tUJIISLGUIhFFrOGIUGLULysSeFAIJUIIhrALJLcUIFpGIJLUsUJIASnUIIAspGluUalGlyclgclualaLcualye 5461 011 الونيقة )3( 01 71:304,478?:1008 Ionahon 00@6 ICGIGCRCCICACICCICAGGACAAGICIGCCGHIACICCCCIGIGCCGCAACUICAACGIGCMICA CGICCACCICACICCIGIGGREMAGICICCCGIIACIGCCCIGICCGCCAAGGIGAACGIGGAICAAGIecueGIeAcrercterte 10n 79u0cا٧ 0٥N ICGICCACCICACICCICAEGAGAAGICICCCGIIACICCCCIGICGCCCAAGGICMACGICCMCAAGNesetlCicerceIeeS الوثينة استغلال الوثائق : الوثيقة )3 معما توصلت إليه سابقا حول طريقة تحويل المعلومات الوراثية 1. هل تتوافق مع والترجبة الاستنساخ ي النيوكليوتيدات لمورثات مختلفة والموضحة في الوثيقة )4(؟ 2. مماذا تفيد مقارنة 22 الترجمة ClASSaRIe تحليل أمينية أماض كليوة لتتابع وكليو تتابع للنيو على امينية لأحماض ا تحتوي للهيمو نفس نامج توال6ة دانوة نتائج عمليتى التعليل . تتابع",
+  "char_count": 1322,
+  "confidence": 0.5,
+  "status": "success",
+  "words": [
+    {
+      "text": "Anagene باستعمال برنامج",
+      "conf": 1.0,
+      "bbox": [
+        124,
+        84,
+        352,
+        116
+      ]
+    },
+    {
+      "text": "تيدات وتتابع",
+      "conf": 0.8,
+      "bbox": [
+        462,
+        80,
+        572,
+        112
+      ]
+    },
+    {
+      "text": "نيو",
+      "conf": 1.0,
+      "bbox": [
+        600,
+        82,
+        628,
+        106
+      ]
+    },
+    {
+      "text": "مقارن",
+      "conf": 0.8,
+      "bbox": [
+        680,
+        78,
+        732,
+        104
+      ]
+    },
+    {
+      "text": "2",
+      "conf": 0.2,
+      "bbox": [
+        786,
+        76,
+        812,
+        102
+      ]
+    },
+    {
+      "text": "ADN Jتيدات في مستوى ا",
+      "conf": 0.7,
+      "bbox": [
+        58,
+        134,
+        276,
+        166
+      ]
+    },
+    {
+      "text": "نيواً",
+      "conf": 0.4,
+      "bbox": [
+        304,
+        136,
+        334,
+        162
+      ]
+    },
+    {
+      "text": "باستعمل برنامج Anagene الحصول على نتائج تحويل",
+      "conf": 0.8,
+      "bbox": [
+        372,
+        125,
+        805,
+        166
+      ]
+    },
+    {
+      "text": "على",
+      "conf": 0.7,
+      "bbox": [
+        54,
+        168,
+        94,
+        198
+      ]
+    },
+    {
+      "text": "إلى تتابع",
+      "conf": 0.9,
+      "bbox": [
+        214,
+        166,
+        288,
+        198
+      ]
+    },
+    {
+      "text": "ARN Jمستوى ا",
+      "conf": 0.7,
+      "bbox": [
+        318,
+        162,
+        464,
+        188
+      ]
+    },
+    {
+      "text": "كليوتيدات",
+      "conf": 0.9,
+      "bbox": [
+        508,
+        160,
+        600,
+        188
+      ]
+    },
+    {
+      "text": ")النافذة العلوية ( إلى تتابع",
+      "conf": 0.7,
+      "bbox": [
+        637,
+        155,
+        849,
+        193
+      ]
+    },
+    {
+      "text": "مستوى سلسلة ببتيدية ) الوثيقة 3(.",
+      "conf": 0.8,
+      "bbox": [
+        568,
+        186,
+        850,
+        218
+      ]
+    },
+    {
+      "text": "غلوبين",
+      "conf": 0.7,
+      "bbox": [
+        51,
+        227,
+        116,
+        259
+      ]
+    },
+    {
+      "text": "الوثيقة )4( على نتائج مقارنة تتابع نيوكليوتيدات في مورثتين للسلسلة 8",
+      "conf": 0.6,
+      "bbox": [
+        165,
+        215,
+        747,
+        255
+      ]
+    },
+    {
+      "text": "كما",
+      "conf": 0.5,
+      "bbox": [
+        792,
+        218,
+        828,
+        242
+      ]
+    },
+    {
+      "text": "البر",
+      "conf": 0.7,
+      "bbox": [
+        488,
+        250,
+        526,
+        280
+      ]
+    },
+    {
+      "text": "إحداهما طافرة تم إجراءها باستعمل",
+      "conf": 0.5,
+      "bbox": [
+        569,
+        247,
+        853,
+        283
+      ]
+    },
+    {
+      "text": "1و٥1",
+      "conf": 0.0,
+      "bbox": [
+        79,
+        308,
+        181,
+        323
+      ]
+    },
+    {
+      "text": "er،",
+      "conf": 0.0,
+      "bbox": [
+        195,
+        303,
+        327,
+        319
+      ]
+    },
+    {
+      "text": "|enقurt oدo",
+      "conf": 0.0,
+      "bbox": [
+        231,
+        325,
+        309,
+        339
+      ]
+    },
+    {
+      "text": "IEGICCACCICOCICCIGACGACAAGICICCCGUIACIGCCCIGICGGGCAAGG",
+      "conf": 0.1,
+      "bbox": [
+        234,
+        418,
+        609,
+        438
+      ]
+    },
+    {
+      "text": "AGE",
+      "conf": 0.3,
+      "bbox": [
+        627,
+        419,
+        651,
+        433
+      ]
+    },
+    {
+      "text": "EقCGEGU",
+      "conf": 0.0,
+      "bbox": [
+        775,
+        419,
+        845,
+        431
+      ]
+    },
+    {
+      "text": "d66d dn",
+      "conf": 0.0,
+      "bbox": [
+        89,
+        427,
+        145,
+        441
+      ]
+    },
+    {
+      "text": "5lom",
+      "conf": 0.0,
+      "bbox": [
+        93,
+        445,
+        135,
+        459
+      ]
+    },
+    {
+      "text": "00",
+      "conf": 0.0,
+      "bbox": [
+        78,
+        494,
+        120,
+        502
+      ]
+    },
+    {
+      "text": "unvernlon dr uetucodaudn",
+      "conf": 0.1,
+      "bbox": [
+        233,
+        537,
+        399,
+        553
+      ]
+    },
+    {
+      "text": "UGGUCCACCUCACUCCUGRGCACARGUCUGCCGUUACUCCCCUGUGGGGCAAGGUGARCGUGEAUGAAGUUGGUGCUCAcccccucctere",
+      "conf": 0.1,
+      "bbox": [
+        229,
+        546,
+        860,
+        572
+      ]
+    },
+    {
+      "text": "tUJIISLGUIhFFrOGIUGLULysSeFAIJUIIhrALJLcUIFpGIJLUsUJIASnUIIAspGluUalGlyclgclualaLcualye",
+      "conf": 0.0,
+      "bbox": [
+        237,
+        564,
+        852,
+        588
+      ]
+    },
+    {
+      "text": "5461 011",
+      "conf": 0.0,
+      "bbox": [
+        91,
+        591,
+        179,
+        605
+      ]
+    },
+    {
+      "text": "الونيقة )3(",
+      "conf": 0.6,
+      "bbox": [
+        768,
+        604,
+        856,
+        630
+      ]
+    },
+    {
+      "text": "01",
+      "conf": 0.4,
+      "bbox": [
+        79,
+        659,
+        141,
+        673
+      ]
+    },
+    {
+      "text": "71:304,478?:1008",
+      "conf": 0.0,
+      "bbox": [
+        197,
+        659,
+        331,
+        673
+      ]
+    },
+    {
+      "text": "Ionahon",
+      "conf": 0.1,
+      "bbox": [
+        173,
+        681,
+        229,
+        693
+      ]
+    },
+    {
+      "text": "00@6",
+      "conf": 0.0,
+      "bbox": [
+        277,
+        681,
+        313,
+        693
+      ]
+    },
+    {
+      "text": "ICGIGCRCCICACICCICAGGACAAGICIGCCGHIACICCCCIGIGCCGCAACUICAACGIGCMICA",
+      "conf": 0.1,
+      "bbox": [
+        238,
+        776,
+        701,
+        796
+      ]
+    },
+    {
+      "text": "CGICCACCICACICCIGIGGREMAGICICCCGIIACIGCCCIGICCGCCAAGGIGAACGIGGAICAAGIecueGIeAcrercterte",
+      "conf": 0.0,
+      "bbox": [
+        237,
+        790,
+        850,
+        815
+      ]
+    },
+    {
+      "text": "10n",
+      "conf": 0.1,
+      "bbox": [
+        281,
+        897,
+        311,
+        911
+      ]
+    },
+    {
+      "text": "79u0cا٧",
+      "conf": 0.0,
+      "bbox": [
+        389,
+        897,
+        449,
+        913
+      ]
+    },
+    {
+      "text": "0٥N",
+      "conf": 0.0,
+      "bbox": [
+        465,
+        897,
+        491,
+        911
+      ]
+    },
+    {
+      "text": "ICGICCACCICACICCICAEGAGAAGICICCCGIIACICCCCIGICGCCCAAGGICMACGICCMCAAGNesetlCicerceIeeS",
+      "conf": 0.0,
+      "bbox": [
+        241,
+        903,
+        854,
+        933
+      ]
+    },
+    {
+      "text": "الوثينة",
+      "conf": 0.9,
+      "bbox": [
+        799,
+        957,
+        851,
+        977
+      ]
+    },
+    {
+      "text": "استغلال الوثائق :",
+      "conf": 0.7,
+      "bbox": [
+        681,
+        1006,
+        829,
+        1042
+      ]
+    },
+    {
+      "text": "الوثيقة )3 معما توصلت إليه سابقا حول طريقة تحويل المعلومات الوراثية",
+      "conf": 0.5,
+      "bbox": [
+        63,
+        1041,
+        655,
+        1079
+      ]
+    },
+    {
+      "text": "1. هل تتوافق",
+      "conf": 0.8,
+      "bbox": [
+        695,
+        1037,
+        809,
+        1073
+      ]
+    },
+    {
+      "text": "مع",
+      "conf": 0.8,
+      "bbox": [
+        530,
+        1082,
+        556,
+        1106
+      ]
+    },
+    {
+      "text": "والترجبة",
+      "conf": 0.4,
+      "bbox": [
+        572,
+        1074,
+        642,
+        1100
+      ]
+    },
+    {
+      "text": "الاستنساخ",
+      "conf": 0.9,
+      "bbox": [
+        637,
+        1067,
+        730,
+        1106
+      ]
+    },
+    {
+      "text": "ي",
+      "conf": 0.9,
+      "bbox": [
+        787,
+        1073,
+        807,
+        1099
+      ]
+    },
+    {
+      "text": "النيوكليوتيدات لمورثات مختلفة والموضحة في الوثيقة )4(؟",
+      "conf": 0.6,
+      "bbox": [
+        163,
+        1099,
+        619,
+        1135
+      ]
+    },
+    {
+      "text": "2. مماذا تفيد مقارنة",
+      "conf": 0.5,
+      "bbox": [
+        658,
+        1096,
+        808,
+        1128
+      ]
+    },
+    {
+      "text": "22 الترجمة",
+      "conf": 0.3,
+      "bbox": [
+        746,
+        1152,
+        860,
+        1178
+      ]
+    },
+    {
+      "text": "ClASSaRIe",
+      "conf": 0.1,
+      "bbox": [
+        47,
+        1143,
+        379,
+        1200
+      ]
+    },
+    {
+      "text": "تحليل",
+      "conf": 1.0,
+      "bbox": [
+        729,
+        73,
+        783,
+        111
+      ]
+    },
+    {
+      "text": "أمينية",
+      "conf": 0.6,
+      "bbox": [
+        350,
+        76,
+        403,
+        110
+      ]
+    },
+    {
+      "text": "أماض",
+      "conf": 0.8,
+      "bbox": [
+        398,
+        75,
+        463,
+        110
+      ]
+    },
+    {
+      "text": "كليوة",
+      "conf": 0.9,
+      "bbox": [
+        563,
+        76,
+        608,
+        108
+      ]
+    },
+    {
+      "text": "لتتابع",
+      "conf": 0.9,
+      "bbox": [
+        622,
+        69,
+        687,
+        118
+      ]
+    },
+    {
+      "text": "وكليو",
+      "conf": 0.5,
+      "bbox": [
+        267,
+        128,
+        314,
+        164
+      ]
+    },
+    {
+      "text": "تتابع",
+      "conf": 1.0,
+      "bbox": [
+        326,
+        124,
+        382,
+        168
+      ]
+    },
+    {
+      "text": "للنيو",
+      "conf": 1.0,
+      "bbox": [
+        590,
+        155,
+        638,
+        189
+      ]
+    },
+    {
+      "text": "على",
+      "conf": 0.5,
+      "bbox": [
+        459,
+        152,
+        509,
+        192
+      ]
+    },
+    {
+      "text": "امينية",
+      "conf": 0.6,
+      "bbox": [
+        93,
+        162,
+        148,
+        197
+      ]
+    },
+    {
+      "text": "لأحماض",
+      "conf": 0.5,
+      "bbox": [
+        143,
+        161,
+        213,
+        196
+      ]
+    },
+    {
+      "text": "ا تحتوي",
+      "conf": 0.5,
+      "bbox": [
+        741,
+        214,
+        799,
+        254
+      ]
+    },
+    {
+      "text": "للهيمو",
+      "conf": 1.0,
+      "bbox": [
+        105,
+        224,
+        170,
+        262
+      ]
+    },
+    {
+      "text": "نفس",
+      "conf": 1.0,
+      "bbox": [
+        518,
+        246,
+        573,
+        281
+      ]
+    },
+    {
+      "text": "نامج",
+      "conf": 1.0,
+      "bbox": [
+        444,
+        246,
+        498,
+        286
+      ]
+    },
+    {
+      "text": "توال6ة",
+      "conf": 0.0,
+      "bbox": [
+        135,
+        441,
+        178,
+        459
+      ]
+    },
+    {
+      "text": "دانوة",
+      "conf": 0.0,
+      "bbox": [
+        142,
+        812,
+        184,
+        829
+      ]
+    },
+    {
+      "text": "نتائج",
+      "conf": 0.9,
+      "bbox": [
+        646,
+        1037,
+        702,
+        1080
+      ]
+    },
+    {
+      "text": "عمليتى",
+      "conf": 0.8,
+      "bbox": [
+        721,
+        1064,
+        788,
+        1100
+      ]
+    },
+    {
+      "text": "التعليل .",
+      "conf": 0.8,
+      "bbox": [
+        460,
+        1071,
+        533,
+        1106
+      ]
+    },
+    {
+      "text": "تتابع",
+      "conf": 1.0,
+      "bbox": [
+        610,
+        1099,
+        661,
+        1135
+      ]
+    }
+  ],
+  "word_count": 76
+}

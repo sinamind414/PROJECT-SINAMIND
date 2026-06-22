@@ -1,0 +1,12 @@
+{
+  "volume": "KHELIFA1_VOLUME_13",
+  "pdf": "C:\\Users\\zakaria\\Documents\\PROJET KHAWARIZMI IA\\khawarizmi-backend\\data\\ANNALES_SVT_BAC_ALGERIE\\KHELIFA_1\\VOLUMES_KHELIFA1\\KHELIFA1_VOLUME_13.pdf",
+  "total_pages": 28,
+  "pages_processed": 28,
+  "errors": 0,
+  "total_characters": 63646,
+  "avg_confidence": 0.63,
+  "quality_warning": "None",
+  "timestamp": "2026-06-21T21:03:35.292023",
+  "bundle_dir": "C:\\Users\\zakaria\\Documents\\PROJET KHAWARIZMI IA\\khawarizmi-backend\\data\\annales_workspace\\OCR_PROD\\KHELIFA1_VOLUME_13"
+}

@@ -1,0 +1,12 @@
+{
+  "volume": "livre_scolaire_3as_sciences_se",
+  "pdf": "C:\\Users\\zakaria\\Documents\\projet khawarizmi A\\LIVRES SCOLAIRES\\LIVRE SCOLAIRE SCIENCE BAC\\livre_scolaire_3as_sciences_se.pdf",
+  "total_pages": 334,
+  "pages_processed": 334,
+  "errors": 0,
+  "total_characters": 370494,
+  "avg_confidence": 0.62,
+  "quality_warning": "None",
+  "timestamp": "2026-06-21T15:20:06.073289",
+  "bundle_dir": "C:\\Users\\zakaria\\Documents\\PROJET KHAWARIZMI IA\\khawarizmi-backend\\data\\annales_workspace\\OCR_PROD\\livre_scolaire_3as_sciences_se"
+}

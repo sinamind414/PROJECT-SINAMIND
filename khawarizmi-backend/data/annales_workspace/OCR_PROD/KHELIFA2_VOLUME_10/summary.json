@@ -1,0 +1,12 @@
+{
+  "volume": "KHELIFA2_VOLUME_10",
+  "pdf": "C:\\Users\\zakaria\\Documents\\PROJET KHAWARIZMI IA\\khawarizmi-backend\\data\\ANNALES_SVT_BAC_ALGERIE\\KHELIFA_2\\VOLUMES_KHELIFA2\\KHELIFA2_VOLUME_10.pdf",
+  "total_pages": 25,
+  "pages_processed": 25,
+  "errors": 0,
+  "total_characters": 36399,
+  "avg_confidence": 0.58,
+  "quality_warning": "None",
+  "timestamp": "2026-06-21T10:32:58.521352",
+  "bundle_dir": "C:\\Users\\zakaria\\Documents\\PROJET KHAWARIZMI IA\\khawarizmi-backend\\data\\annales_workspace\\OCR_PROD\\KHELIFA2_VOLUME_10"
+}

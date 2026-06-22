@@ -1,0 +1,40 @@
+{
+  "page": 234,
+  "text": "ية الاسة 235 lbaSSalRhetخ",
+  "char_count": 25,
+  "confidence": 0.5,
+  "status": "success",
+  "words": [
+    {
+      "text": "ية الاسة",
+      "conf": 0.5,
+      "bbox": [
+        71,
+        65,
+        870,
+        199
+      ]
+    },
+    {
+      "text": "235",
+      "conf": 1.0,
+      "bbox": [
+        38,
+        1136,
+        80,
+        1160
+      ]
+    },
+    {
+      "text": "lbaSSalRhetخ",
+      "conf": 0.0,
+      "bbox": [
+        51,
+        1141,
+        377,
+        1200
+      ]
+    }
+  ],
+  "word_count": 3
+}

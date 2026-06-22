@@ -1,0 +1,30 @@
+{
+  "page": 171,
+  "text": "الطافسوب O|5ASSaR[e",
+  "char_count": 19,
+  "confidence": 0.26,
+  "status": "success",
+  "words": [
+    {
+      "text": "الطافسوب",
+      "conf": 0.5,
+      "bbox": [
+        164,
+        65,
+        858,
+        225
+      ]
+    },
+    {
+      "text": "O|5ASSaR[e",
+      "conf": 0.0,
+      "bbox": [
+        49,
+        1141,
+        377,
+        1200
+      ]
+    }
+  ],
+  "word_count": 2
+}

@@ -1,0 +1,630 @@
+{
+  "page": 334,
+  "text": "قانهة امداج& اممتعملة باللغة العربية الجزائر 2002 دار أساسيات الكيمياء الحيوية ع باللغة الفرنسية المر 1. Jacques Bergeron sciences de la vie et de le terre ler S Hatier 20O1 2. Jacques Bergeron S. V T terminal S Hatier 2002 3. Collection Raymond Tavernier , Claude Lizeaux S V T term S Bordas 2002 4. R Tavernier, C Lizeaux S V T term $ Bordas 1999 5. Collection Colomand Biologie Geologie (S V T) Hachette1994 6. MDupot J Souchou J  P Veillot Nouveau memento de Biologie Vuibert superieur 1998 7. Neil A. Campbell, Richard Mathieu Biologie ERPi editions 1995 8. Purves, Augustine, Fitz Patrick, Holl Lamautia , Mcnamara , Williams Neurosciences - juillet 2005 9. Le cours de Janis Kuby, Richard A Goldsby, Thomas J kindt Barbara A. Osborne - Immunologie DUNOD 2001 10. Christian Camara, Claudine Gastou, Therese Moreau $.V.T Entrainiment Ire S Hachette 2006 11 Sophie Lebrun, Patrice Delguel BAC 2OO6, S V  T Terminal Hachatte 2005 12. Heuriette Hornassel JM Homassel Reussir son BAC Term S S V T - Jokers Bordas 2O00 13. Heuriette Homassel JM Homassel SV  T Memo BAC Terminal $ Bordas 2002 14, Ministere de lamenagement du territoire et de 1' environnement MA T E) Rapport sur Tetat et lavenir de lenvironnement 20O5 مسادق علبه 2011 2012 !009 '٤bassafhe - وزارة النربية الرطنبة M.$. 1316/07 المراجع هومة - كاملي راجع من طرف",
+  "char_count": 1325,
+  "confidence": 0.63,
+  "status": "success",
+  "words": [
+    {
+      "text": "قانهة امداج& اممتعملة",
+      "conf": 0.2,
+      "bbox": [
+        346,
+        0,
+        879,
+        81
+      ]
+    },
+    {
+      "text": "باللغة العربية",
+      "conf": 0.8,
+      "bbox": [
+        657,
+        92,
+        800,
+        131
+      ]
+    },
+    {
+      "text": "الجزائر 2002",
+      "conf": 0.6,
+      "bbox": [
+        263,
+        139,
+        411,
+        175
+      ]
+    },
+    {
+      "text": "دار",
+      "conf": 1.0,
+      "bbox": [
+        476,
+        144,
+        512,
+        172
+      ]
+    },
+    {
+      "text": "أساسيات الكيمياء الحيوية",
+      "conf": 0.7,
+      "bbox": [
+        529,
+        138,
+        762,
+        174
+      ]
+    },
+    {
+      "text": "ع",
+      "conf": 1.0,
+      "bbox": [
+        777,
+        151,
+        797,
+        179
+      ]
+    },
+    {
+      "text": "باللغة الفرنسية",
+      "conf": 0.8,
+      "bbox": [
+        647,
+        204,
+        802,
+        243
+      ]
+    },
+    {
+      "text": "المر",
+      "conf": 0.3,
+      "bbox": [
+        837,
+        207,
+        875,
+        243
+      ]
+    },
+    {
+      "text": "1. Jacques Bergeron",
+      "conf": 0.7,
+      "bbox": [
+        49,
+        254,
+        279,
+        290
+      ]
+    },
+    {
+      "text": "sciences de la vie et de le terre ler S",
+      "conf": 0.6,
+      "bbox": [
+        298,
+        250,
+        710,
+        281
+      ]
+    },
+    {
+      "text": "Hatier 20O1",
+      "conf": 0.8,
+      "bbox": [
+        728,
+        254,
+        868,
+        284
+      ]
+    },
+    {
+      "text": "2. Jacques Bergeron",
+      "conf": 0.7,
+      "bbox": [
+        49,
+        292,
+        279,
+        332
+      ]
+    },
+    {
+      "text": "S. V T terminal S",
+      "conf": 0.3,
+      "bbox": [
+        298,
+        287,
+        500,
+        318
+      ]
+    },
+    {
+      "text": "Hatier 2002",
+      "conf": 0.6,
+      "bbox": [
+        518,
+        290,
+        662,
+        320
+      ]
+    },
+    {
+      "text": "3. Collection Raymond Tavernier , Claude Lizeaux",
+      "conf": 0.5,
+      "bbox": [
+        49,
+        326,
+        629,
+        366
+      ]
+    },
+    {
+      "text": "S V T term S",
+      "conf": 0.5,
+      "bbox": [
+        646,
+        330,
+        798,
+        360
+      ]
+    },
+    {
+      "text": "Bordas 2002",
+      "conf": 0.7,
+      "bbox": [
+        68,
+        366,
+        216,
+        396
+      ]
+    },
+    {
+      "text": "4. R Tavernier, C Lizeaux",
+      "conf": 0.4,
+      "bbox": [
+        48,
+        404,
+        344,
+        434
+      ]
+    },
+    {
+      "text": "S V T term $",
+      "conf": 0.6,
+      "bbox": [
+        364,
+        402,
+        522,
+        432
+      ]
+    },
+    {
+      "text": "Bordas 1999",
+      "conf": 0.9,
+      "bbox": [
+        540,
+        399,
+        693,
+        435
+      ]
+    },
+    {
+      "text": "5. Collection Colomand",
+      "conf": 0.7,
+      "bbox": [
+        48,
+        441,
+        324,
+        474
+      ]
+    },
+    {
+      "text": "Biologie Geologie (S V T)",
+      "conf": 0.7,
+      "bbox": [
+        344,
+        437,
+        651,
+        481
+      ]
+    },
+    {
+      "text": "Hachette1994",
+      "conf": 0.5,
+      "bbox": [
+        668,
+        444,
+        832,
+        474
+      ]
+    },
+    {
+      "text": "6. MDupot J Souchou J  P Veillot",
+      "conf": 0.5,
+      "bbox": [
+        47,
+        481,
+        441,
+        521
+      ]
+    },
+    {
+      "text": "Nouveau memento de Biologie",
+      "conf": 0.8,
+      "bbox": [
+        457,
+        480,
+        824,
+        522
+      ]
+    },
+    {
+      "text": "Vuibert superieur 1998",
+      "conf": 1.0,
+      "bbox": [
+        66,
+        515,
+        339,
+        555
+      ]
+    },
+    {
+      "text": "7. Neil A. Campbell, Richard Mathieu",
+      "conf": 0.5,
+      "bbox": [
+        47,
+        554,
+        488,
+        595
+      ]
+    },
+    {
+      "text": "Biologie",
+      "conf": 0.9,
+      "bbox": [
+        507,
+        557,
+        615,
+        595
+      ]
+    },
+    {
+      "text": "ERPi editions 1995",
+      "conf": 0.9,
+      "bbox": [
+        630,
+        558,
+        854,
+        588
+      ]
+    },
+    {
+      "text": "8. Purves, Augustine, Fitz Patrick, Holl Lamautia , Mcnamara , Williams",
+      "conf": 0.5,
+      "bbox": [
+        47,
+        595,
+        863,
+        635
+      ]
+    },
+    {
+      "text": "Neurosciences",
+      "conf": 0.6,
+      "bbox": [
+        68,
+        632,
+        238,
+        660
+      ]
+    },
+    {
+      "text": "- juillet 2005",
+      "conf": 0.8,
+      "bbox": [
+        248,
+        627,
+        393,
+        669
+      ]
+    },
+    {
+      "text": "9. Le cours de Janis Kuby, Richard A Goldsby, Thomas J kindt",
+      "conf": 0.6,
+      "bbox": [
+        47,
+        669,
+        781,
+        709
+      ]
+    },
+    {
+      "text": "Barbara A. Osborne - Immunologie",
+      "conf": 0.7,
+      "bbox": [
+        49,
+        701,
+        468,
+        744
+      ]
+    },
+    {
+      "text": "DUNOD 2001",
+      "conf": 0.7,
+      "bbox": [
+        488,
+        708,
+        662,
+        738
+      ]
+    },
+    {
+      "text": "10. Christian Camara, Claudine Gastou, Therese Moreau",
+      "conf": 0.7,
+      "bbox": [
+        49,
+        741,
+        704,
+        780
+      ]
+    },
+    {
+      "text": "$.V.T",
+      "conf": 0.4,
+      "bbox": [
+        723,
+        741,
+        798,
+        778
+      ]
+    },
+    {
+      "text": "Entrainiment Ire S",
+      "conf": 0.5,
+      "bbox": [
+        69,
+        777,
+        282,
+        810
+      ]
+    },
+    {
+      "text": "Hachette 2006",
+      "conf": 0.7,
+      "bbox": [
+        300,
+        782,
+        476,
+        812
+      ]
+    },
+    {
+      "text": "11 Sophie Lebrun, Patrice Delguel",
+      "conf": 0.8,
+      "bbox": [
+        51,
+        814,
+        451,
+        859
+      ]
+    },
+    {
+      "text": "BAC 2OO6, S V  T Terminal",
+      "conf": 0.5,
+      "bbox": [
+        469,
+        816,
+        785,
+        855
+      ]
+    },
+    {
+      "text": "Hachatte 2005",
+      "conf": 0.6,
+      "bbox": [
+        72,
+        850,
+        240,
+        882
+      ]
+    },
+    {
+      "text": "12. Heuriette Hornassel JM Homassel",
+      "conf": 0.4,
+      "bbox": [
+        55,
+        885,
+        498,
+        925
+      ]
+    },
+    {
+      "text": "Reussir son BAC Term S",
+      "conf": 0.5,
+      "bbox": [
+        520,
+        890,
+        812,
+        922
+      ]
+    },
+    {
+      "text": "S V T - Jokers Bordas 2O00",
+      "conf": 0.3,
+      "bbox": [
+        54,
+        915,
+        369,
+        957
+      ]
+    },
+    {
+      "text": "13. Heuriette Homassel JM Homassel",
+      "conf": 0.7,
+      "bbox": [
+        57,
+        954,
+        496,
+        995
+      ]
+    },
+    {
+      "text": "SV  T Memo BAC Terminal $",
+      "conf": 0.7,
+      "bbox": [
+        516,
+        960,
+        858,
+        992
+      ]
+    },
+    {
+      "text": "Bordas 2002",
+      "conf": 0.9,
+      "bbox": [
+        77,
+        987,
+        223,
+        1023
+      ]
+    },
+    {
+      "text": "14, Ministere de lamenagement du territoire et de 1' environnement",
+      "conf": 0.5,
+      "bbox": [
+        58,
+        1021,
+        826,
+        1070
+      ]
+    },
+    {
+      "text": "MA T E) Rapport sur Tetat et lavenir de lenvironnement 20O5",
+      "conf": 0.3,
+      "bbox": [
+        59,
+        1051,
+        794,
+        1101
+      ]
+    },
+    {
+      "text": "مسادق علبه",
+      "conf": 0.6,
+      "bbox": [
+        431,
+        1151,
+        515,
+        1169
+      ]
+    },
+    {
+      "text": "2011",
+      "conf": 1.0,
+      "bbox": [
+        558,
+        1148,
+        604,
+        1172
+      ]
+    },
+    {
+      "text": "2012",
+      "conf": 1.0,
+      "bbox": [
+        614,
+        1148,
+        660,
+        1172
+      ]
+    },
+    {
+      "text": "!009",
+      "conf": 1.0,
+      "bbox": [
+        18,
+        1162,
+        62,
+        1186
+      ]
+    },
+    {
+      "text": "'٤bassafhe",
+      "conf": 0.1,
+      "bbox": [
+        48,
+        1139,
+        377,
+        1200
+      ]
+    },
+    {
+      "text": "- وزارة النربية الرطنبة",
+      "conf": 0.5,
+      "bbox": [
+        370,
+        1168,
+        510,
+        1194
+      ]
+    },
+    {
+      "text": "M.$. 1316/07",
+      "conf": 0.6,
+      "bbox": [
+        550,
+        1168,
+        674,
+        1194
+      ]
+    },
+    {
+      "text": "المراجع",
+      "conf": 0.4,
+      "bbox": [
+        792,
+        88,
+        876,
+        138
+      ]
+    },
+    {
+      "text": "هومة",
+      "conf": 1.0,
+      "bbox": [
+        420,
+        136,
+        479,
+        176
+      ]
+    },
+    {
+      "text": "- كاملي",
+      "conf": 0.6,
+      "bbox": [
+        791,
+        140,
+        855,
+        184
+      ]
+    },
+    {
+      "text": "راجع",
+      "conf": 0.6,
+      "bbox": [
+        794,
+        206,
+        852,
+        251
+      ]
+    },
+    {
+      "text": "من طرف",
+      "conf": 0.8,
+      "bbox": [
+        370,
+        1148,
+        432,
+        1174
+      ]
+    }
+  ],
+  "word_count": 62
+}
