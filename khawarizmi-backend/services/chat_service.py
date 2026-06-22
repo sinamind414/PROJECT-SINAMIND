@@ -23,8 +23,12 @@ from services.chat_prompt import (
     build_motivation_prompt,
 )
 from services.orientation_service import calculer_orientation
+from services.semantic_cache import get_semantic_cache, set_semantic_cache
 
 logger = logging.getLogger("khawarizmi.chat")
+
+# Types de questions qui méritent le cache sémantique (pas init/navigation/refus)
+CACHEABLE_TYPES = {"sos_concept", "explication", "socratique", "feedback"}
 
 
 async def handle_tuteur(
@@ -121,6 +125,14 @@ async def handle_tuteur(
 
     # ── 5. Cas : motivation → appeler le cerveau + Gemini ──
     if resp_type == "motivation":
+        chapitre = context.get("chapitre", "general")
+
+        # Cache sémantique pour motivation
+        cached = await get_semantic_cache(message, chapitre)
+        if cached:
+            logger.info(f"Tuteur cache HIT (motivation) | user={user_id}")
+            return cached
+
         orientation = await calculer_orientation(db, user_id)
         prompt = build_motivation_prompt(message, context, orientation)
 
@@ -128,7 +140,7 @@ async def handle_tuteur(
         if reponse is None:
             reponse = _fallback_motivation(orientation)
 
-        return {
+        result = {
             "reponse": reponse,
             "type": "motivation",
             "question_suivante": None,
@@ -139,14 +151,25 @@ async def handle_tuteur(
             "fallback_active": reponse is None,
         }
 
+        await set_semantic_cache(message, result, chapitre)
+        return result
+
     # ── 6. Cas : feedback → Gemini ──
     if resp_type == "feedback":
+        chapitre = context.get("chapitre", "general")
+
+        # Cache sémantique pour feedback
+        cached = await get_semantic_cache(message, chapitre)
+        if cached:
+            logger.info(f"Tuteur cache HIT (feedback) | user={user_id}")
+            return cached
+
         prompt = build_feedback_prompt(message, context, context.get("history", []))
         reponse = await _call_gemini(prompt, openai_client)
         if reponse is None:
             reponse = "أرسل إجابتك في صفحة التمرين وسأقيمها هناك. هنا يمكنني مساعدتك على فهم المنهجية."
 
-        return {
+        result = {
             "reponse": reponse,
             "type": "feedback",
             "question_suivante": None,
@@ -157,9 +180,19 @@ async def handle_tuteur(
             "fallback_active": reponse is None,
         }
 
+        await set_semantic_cache(message, result, chapitre)
+        return result
+
     # ── 7. Cas : sos_concept ou explication → RAG + Gemini ──
     stability = context.get("fsrs_stability", 0)
     is_explication = stability is not None and stability < 3.0
+    chapitre = context.get("chapitre", "general")
+
+    # Cache sémantique : vérifier si une question similaire a déjà été posée
+    cached = await get_semantic_cache(message, chapitre)
+    if cached:
+        logger.info(f"Tuteur cache HIT | user={user_id} type={cached.get('type')}")
+        return cached
 
     rag_chunks = await _rag_search(db, message, context.get("chapitre"))
 
@@ -178,7 +211,7 @@ async def handle_tuteur(
 
     source_rag = rag_chunks[0]["source"] if rag_chunks else None
 
-    return {
+    result = {
         "reponse": reponse,
         "type": "explication" if is_explication else "socratique",
         "question_suivante": None,
@@ -188,6 +221,11 @@ async def handle_tuteur(
         "source_rag": source_rag,
         "fallback_active": fallback,
     }
+
+    # Stocker dans le cache sémantique (uniquement si pas fallback)
+    await set_semantic_cache(message, result, chapitre)
+
+    return result
 
 
 # ── Helpers ────────────────────────────────────────
