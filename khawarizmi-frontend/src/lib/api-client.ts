@@ -19,6 +19,7 @@ import {
   ExpandNodePayload,
   MindMapNode,
   ProgressResponse,
+  WeekActivityResponse,
   ActionVerbSummary,
   ActionVerbExercise,
   VerbEvaluateRequest,
@@ -382,6 +383,10 @@ class KhawarizmiApiClient {
 
   async getProgress(): Promise<ProgressResponse> {
     return this.request<ProgressResponse>("/api/progress")
+  }
+
+  async getWeekActivity(): Promise<WeekActivityResponse> {
+    return this.request<WeekActivityResponse>("/api/progress/week")
   }
 
   // ── Action Verbs ───────────────────────────────

@@ -3,6 +3,7 @@ import { getProgressSnapshot } from "@/lib/progress-store"
 import { methodologyChapterLinks } from "@/lib/methodology-chapters"
 import { activeLessons } from "@/lib/active-lessons"
 import { actionVerbs } from "@/lib/methodology-v1"
+import type { WeekActivityResponse } from "@/lib/types"
 
 const DAYS_AR = ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"]
 
@@ -11,7 +12,7 @@ function formatDate(d: Date): string {
   return `${d.getDate()} ${month}`
 }
 
-function getWeekDays(): WeekDay[] {
+function getWeekDaysFallback(): WeekDay[] {
   const now = new Date()
   const dayOfWeek = now.getDay()
   const week: WeekDay[] = []
@@ -19,23 +20,39 @@ function getWeekDays(): WeekDay[] {
   for (let i = 0; i < 7; i++) {
     const d = new Date(now)
     d.setDate(now.getDate() - dayOfWeek + i)
-    const dateStr = `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`
 
     let status: WeekDay["status"] = "planned"
-    if (i < dayOfWeek) status = "done"
+    if (i < dayOfWeek) status = "planned"
     if (i === dayOfWeek) status = "active"
-    if (i === dayOfWeek - 1) status = "done"
 
     week.push({
       dayLabelAr: DAYS_AR[d.getDay()],
       dateNumber: d.getDate(),
       status,
-      primaryTaskAr: i === dayOfWeek ? "مراجعة منهجية" : undefined,
-      href: i === dayOfWeek ? "/dashboard" : undefined,
+      load: 0,
     })
   }
 
   return week
+}
+
+function getWeekDaysFromApi(weekActivity: WeekActivityResponse): WeekDay[] {
+  return weekActivity.days.map((day) => {
+    const d = new Date(day.date)
+    return {
+      dayLabelAr: DAYS_AR[d.getDay()],
+      dateNumber: d.getDate(),
+      status: day.status,
+      primaryTaskAr: day.primary_task || undefined,
+      primaryChapter: day.primary_chapter || undefined,
+      duesCount: day.dues_count,
+      reviewedCount: day.reviewed_count,
+      load: day.load,
+      href: day.status === "active" && day.primary_chapter
+        ? `/cours/${day.primary_chapter}`
+        : day.status === "active" ? "/dashboard" : undefined,
+    }
+  })
 }
 
 function getRecentActions(snapshot: ReturnType<typeof getProgressSnapshot>): RecentAction[] {
@@ -201,11 +218,11 @@ function buildTomorrowTasks(
   return tomorrow.slice(0, 4)
 }
 
-export function buildDashboardState(): DailyDashboardState {
+export function buildDashboardState(weekActivity?: WeekActivityResponse | null): DailyDashboardState {
   const snapshot = getProgressSnapshot()
   const now = new Date()
   const todayLabelAr = formatDate(now)
-  const weekDays = getWeekDays()
+  const weekDays = weekActivity ? getWeekDaysFromApi(weekActivity) : getWeekDaysFallback()
   const todayTasks = buildTodayTasks(snapshot)
   const tomorrowTasks = buildTomorrowTasks(snapshot, todayTasks)
   const recentActions = getRecentActions(snapshot)
@@ -213,7 +230,12 @@ export function buildDashboardState(): DailyDashboardState {
   const masteredCount = snapshot.skills.filter((s) => s.level >= 75).length
   const weakCount = snapshot.skills.filter((s) => s.level < 60).length
 
-  const streakDays = weekDays.filter((d) => d.status === "done").length
+  // Streak réel depuis l'API FSRS, fallback sur calcul local
+  const streakDays = weekActivity?.streak_days ?? weekDays.filter((d) => d.status === "done").length
+
+  // Tâche prioritaire du jour : depuis l'API FSRS si disponible, sinon depuis buildTodayTasks
+  const todayPrimaryTask = weekDays.find((d) => d.status === "active")?.primaryTaskAr
+  const recommendedActionAr = todayPrimaryTask || todayTasks[0]?.titleAr
 
   return {
     todayLabelAr,
@@ -225,7 +247,7 @@ export function buildDashboardState(): DailyDashboardState {
     weakestSkill: snapshot.weakestSkill?.labelAr,
     dominantError: snapshot.dominantError?.labelAr,
     dominantErrorCount: snapshot.dominantError?.count,
-    recommendedActionAr: todayTasks[0]?.titleAr,
+    recommendedActionAr,
     recentActions,
     todayTasks,
     tomorrowTasks,

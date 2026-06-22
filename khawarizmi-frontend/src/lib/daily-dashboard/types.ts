@@ -21,6 +21,10 @@ export type WeekDay = {
   minutes?: number
   primaryTaskAr?: string
   href?: string
+  duesCount?: number
+  reviewedCount?: number
+  load?: 0 | 1 | 2 | 3
+  primaryChapter?: string
 }
 
 export type RecentAction = {

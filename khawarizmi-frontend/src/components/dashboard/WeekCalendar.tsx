@@ -10,6 +10,8 @@ const STATUS_STYLES: Record<string, { bg: string; text: string; icon: string }> 
   planned: { bg: "rgba(255,255,255,0.04)", text: "#64748B", icon: "" },
 }
 
+const LOAD_COLORS = ["transparent", "rgba(45,212,191,0.08)", "rgba(45,212,191,0.15)", "rgba(45,212,191,0.25)"]
+
 export function WeekCalendar({ days }: { days: WeekDay[] }) {
   return (
     <div className="rounded-2xl p-5" style={{ background: "#131E24" }}>
@@ -22,13 +24,15 @@ export function WeekCalendar({ days }: { days: WeekDay[] }) {
         {days.map((day, i) => {
           const style = STATUS_STYLES[day.status]
           const isActive = day.status === "active"
+          const load = day.load ?? 0
+          const loadColor = LOAD_COLORS[load]
 
           return (
             <div
               key={i}
               className="rounded-xl py-3 px-1 text-center transition-all"
               style={{
-                background: isActive ? "rgba(45,212,191,0.12)" : "rgba(255,255,255,0.02)",
+                background: isActive ? "rgba(45,212,191,0.12)" : loadColor,
                 border: isActive ? "1px solid rgba(45,212,191,0.3)" : "1px solid transparent",
               }}
             >
@@ -40,6 +44,9 @@ export function WeekCalendar({ days }: { days: WeekDay[] }) {
                 <span className="text-[10px]" style={{ color: style.text }}>
                   {style.icon}
                 </span>
+              )}
+              {day.duesCount != null && day.duesCount > 0 && (
+                <p className="text-[8px] text-gray-500 mt-0.5">{day.duesCount}due</p>
               )}
               {day.primaryTaskAr && (
                 <p className="text-[9px] text-gray-500 mt-1 truncate">{day.primaryTaskAr}</p>

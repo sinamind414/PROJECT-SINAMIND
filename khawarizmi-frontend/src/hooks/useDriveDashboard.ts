@@ -5,7 +5,7 @@ import type { DashboardData, Profile, Mission, Topic, WeekDay, Exercise, Mistake
 import { getGamificationSnapshot, getProgressSnapshot } from '@/lib/progress-store';
 import { buildDashboardState } from '@/lib/daily-dashboard/selectors';
 import apiClient from '@/lib/api-client';
-import type { ProgressResponse, OrientationResponse } from '@/lib/types';
+import type { ProgressResponse, OrientationResponse, WeekActivityResponse } from '@/lib/types';
 
 function getCountdown(): { days: number; label: string } {
   const bacDate = new Date('2026-06-10T00:00:00+01:00');
@@ -17,10 +17,10 @@ function getCountdown(): { days: number; label: string } {
 const DAYS_SHORT = ['ح', 'ن', 'ث', 'ر', 'خ', 'ج', 'س'];
 const DAYS_FULL = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
 
-function build(apiProgress?: ProgressResponse | null, dueCards?: number, orientation?: OrientationResponse | null): DashboardData {
+function build(apiProgress?: ProgressResponse | null, dueCards?: number, orientation?: OrientationResponse | null, weekActivity?: WeekActivityResponse | null): DashboardData {
   const gamification = getGamificationSnapshot();
   const snapshot = getProgressSnapshot();
-  const dashboard = buildDashboardState();
+  const dashboard = buildDashboardState(weekActivity);
   const countdown = getCountdown();
 
   const apiReady = apiProgress?.prediction_bac != null
@@ -132,16 +132,18 @@ export function useDriveDashboard(): DashboardData {
     const refreshLocal = () => setData(build(null));
     const refreshApi = async () => {
       try {
-        const [prog, due, orient] = await Promise.allSettled([
+        const [prog, due, orient, week] = await Promise.allSettled([
           apiClient.getProgress(),
           apiClient.getDueCards(),
           apiClient.getOrientation(),
+          apiClient.getWeekActivity(),
         ]);
         if (cancelled) return;
         const apiProgress = prog.status === 'fulfilled' ? prog.value : null;
         const dueCards = due.status === 'fulfilled' ? due.value.total : undefined;
         const orientation = orient.status === 'fulfilled' ? orient.value : null;
-        setData(build(apiProgress, dueCards, orientation));
+        const weekAct = week.status === 'fulfilled' ? week.value : null;
+        setData(build(apiProgress, dueCards, orientation, weekAct));
       } catch {
         // fallback local déjà chargé
       }

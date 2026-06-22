@@ -341,6 +341,30 @@ export interface ProgressResponse {
 }
 
 // ═══════════════════════════════════════════════
+// Week Activity (FSRS sync calendrier)
+// ═══════════════════════════════════════════════
+
+export interface WeekDayActivity {
+  date: string
+  day_index: number
+  dues_count: number
+  reviewed_count: number
+  status: "done" | "active" | "missed" | "planned"
+  primary_task: string | null
+  primary_chapter: string | null
+  load: 0 | 1 | 2 | 3
+}
+
+export interface WeekActivityResponse {
+  user_id: string
+  week_start: string
+  days: WeekDayActivity[]
+  streak_days: number
+  total_dues_this_week: number
+  total_reviewed_this_week: number
+}
+
+// ═══════════════════════════════════════════════
 // Action Verbs
 // ═══════════════════════════════════════════════
 
