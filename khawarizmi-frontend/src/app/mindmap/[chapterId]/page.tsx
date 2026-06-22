@@ -188,7 +188,7 @@ function MindMapContent() {
       }
       setChapter(foundChapter)
 
-      // 2. Request/Generate mindmap for this chapter
+      // 2. Request/Generate mindmap (async — non-bloquant)
       setGenerating(true)
       const res = await apiClient.generateMindMap({
         matiere,
@@ -197,32 +197,40 @@ function MindMapContent() {
         niveau_detail: "standard"
       })
 
+      // Cas 1 : Mind Map déjà en cache → affichage direct
+      if (res.status === "success" && res.mindmap) {
+        applyMindMap(res.mindmap)
+        return
+      }
+
+      // Cas 2 : no_context → erreur RAG strict
       if (res.status === "no_context") {
         throw new Error(res.message || UI_AR.aucun_contenu_mindmap)
       }
 
-      setMindmap(res.mindmap)
-      
-      // Compute positions and load React Flow structures
-      const layout = layoutTree(res.mindmap.racine)
-      
-      // Connect transversal semantic links
-      const transversalEdges: Edge[] = (res.mindmap.liens_transversaux || []).map((link, idx) => ({
-        id: `transversal-${idx}`,
-        source: link.source,
-        target: link.target,
-        label: link.relation,
-        type: "bezier",
-        animated: true,
-        style: { stroke: "#e2e8f0", strokeWidth: 1.5, strokeDasharray: "4 4" },
-        labelStyle: { fill: "#94a3b8", fontSize: 9, fontWeight: 500 }
-      }))
+      // Cas 3 : pending → polling jusqu'à completion
+      if (res.status === "pending" && res.task_id) {
+        const taskId = res.task_id
+        const maxAttempts = 60
+        for (let i = 0; i < maxAttempts; i++) {
+          await new Promise((r) => setTimeout(r, 1500))
+          const task = await apiClient.pollMindMapTask(taskId)
 
-      setNodes(layout.nodes)
-      setEdges([...layout.edges, ...transversalEdges])
+          if (task.status === "completed" && task.mindmap) {
+            applyMindMap(task.mindmap)
+            return
+          }
+          if (task.status === "failed") {
+            throw new Error(task.error === "no_context"
+              ? UI_AR.aucun_contenu_mindmap
+              : UI_AR.erreur_chargement_mindmap)
+          }
+          // status === "running" ou "pending" → continuer le polling
+        }
+        throw new Error("Délai de génération dépassé. Réessaie.")
+      }
 
-      // Auto select root node
-      setSelectedNode(res.mindmap.racine)
+      throw new Error(UI_AR.erreur_chargement_mindmap)
 
     } catch (err) {
       const msg = err instanceof Error ? err.message : UI_AR.erreur_chargement_mindmap
@@ -230,6 +238,60 @@ function MindMapContent() {
     } finally {
       setLoading(false)
       setGenerating(false)
+    }
+  }
+
+  // Applique le Mind Map au canvas React Flow
+  const applyMindMap = (mm: MindMapType) => {
+    setMindmap(mm)
+    const layout = layoutTree(mm.racine)
+    const transversalEdges: Edge[] = (mm.liens_transversaux || []).map((link, idx) => ({
+      id: `transversal-${idx}`,
+      source: link.source,
+      target: link.target,
+      label: link.relation,
+      type: "bezier",
+      animated: true,
+      style: { stroke: "#e2e8f0", strokeWidth: 1.5, strokeDasharray: "4 4" },
+      labelStyle: { fill: "#94a3b8", fontSize: 9, fontWeight: 500 }
+    }))
+    setNodes(layout.nodes)
+    setEdges([...layout.edges, ...transversalEdges])
+    setSelectedNode(mm.racine)
+  }
+
+  // Lazy loading : étendre un nœud à la demande
+  const handleExpandNode = async (node: MindMapNode) => {
+    if (!mindmap || !chapter || node.expanded) return
+    try {
+      const res = await apiClient.expandMindMapNode({
+        node_id: node.id,
+        node_label: node.label,
+        chapitre: chapter.titre_fr,
+        matiere: "SVT"
+      })
+      if (res.enfants && res.enfants.length > 0) {
+        // Mettre à jour l'arbre localement
+        const updatedTree = { ...mindmap.racine }
+        injectChildren(updatedTree, node.id, res.enfants)
+        setMindmap({ ...mindmap, racine: updatedTree })
+        const layout = layoutTree(updatedTree)
+        setNodes(layout.nodes)
+      }
+    } catch (err) {
+      console.error("Expansion échouée:", err)
+    }
+  }
+
+  // Helper : injecter les enfants dans l'arbre
+  const injectChildren = (root: MindMapNode, targetId: string, enfants: MindMapNode[]) => {
+    if (root.id === targetId) {
+      root.enfants = enfants
+      root.expanded = true
+      return
+    }
+    for (const child of root.enfants) {
+      injectChildren(child, targetId, enfants)
     }
   }
 

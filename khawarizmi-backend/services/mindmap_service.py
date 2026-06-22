@@ -3,12 +3,367 @@ import uuid
 import json
 import re
 import logging
+import asyncio
 from datetime import datetime, timedelta
 from typing import Optional
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
 from sqlalchemy import text
+from sqlalchemy.ext.asyncio import AsyncEngine
 
 logger = logging.getLogger("khawarizmi.mindmap_service")
+
+
+# ── Génération asynchrone (BackgroundTasks) ──────────────────────────────────
+# Le flux asynchrone évite les timeouts HTTP sur la génération MindMap :
+#   1. POST /generate  → crée une tâche, retourne task_id immédiatement
+#   2. Background task → RAG + LLM + save + flashcards
+#   3. GET /task/{id}  → polling côté frontend
+#   4. POST /expand    → lazy loading des sous-nœuds à la demande
+
+
+async def create_task(
+    user_id: str,
+    matiere: str,
+    chapitre: str,
+    filiere: str,
+    db: AsyncSession
+) -> str:
+    """Crée une entrée mindmap_tasks et retourne le task_id."""
+    task_id = str(uuid.uuid4())
+    await db.execute(
+        text("""
+            INSERT INTO mindmap_tasks
+                (id, user_id, chapitre, matiere, filiere, status, progress, created_at, updated_at)
+            VALUES
+                (:id, :user_id, :chapitre, :matiere, :filiere, 'pending', 'init', NOW(), NOW())
+        """),
+        {
+            "id": task_id,
+            "user_id": int(user_id),
+            "chapitre": chapitre,
+            "matiere": matiere,
+            "filiere": filiere
+        }
+    )
+    await db.commit()
+    return task_id
+
+
+async def _update_task(
+    task_id: str,
+    status: str,
+    progress: str = None,
+    error: str = None,
+    mindmap_id: str = None,
+    db: AsyncSession = None
+) -> None:
+    """Met à jour le statut d'une tâche."""
+    sets = ["status = :status", "updated_at = NOW()"]
+    params = {"id": task_id, "status": status}
+    if progress:
+        sets.append("progress = :progress")
+        params["progress"] = progress
+    if error:
+        sets.append("error = :error")
+        params["error"] = error
+    if mindmap_id:
+        sets.append("mindmap_id = :mindmap_id")
+        params["mindmap_id"] = mindmap_id
+    await db.execute(
+        text(f"UPDATE mindmap_tasks SET {', '.join(sets)} WHERE id = :id"),
+        params
+    )
+    await db.commit()
+
+
+async def get_task_status(task_id: str, user_id: str, db: AsyncSession) -> dict:
+    """Récupère le statut d'une tâche pour le polling frontend."""
+    result = await db.execute(
+        text("""
+            SELECT status, progress, error, mindmap_id, chapitre, created_at
+            FROM mindmap_tasks
+            WHERE id = :id AND user_id = :user_id
+        """),
+        {"id": task_id, "user_id": int(user_id)}
+    )
+    row = result.fetchone()
+    if not row:
+        return {"status": "not_found"}
+    return {
+        "status": row[0],
+        "progress": row[1],
+        "error": row[2],
+        "mindmap_id": row[3],
+        "chapitre": row[4],
+        "created_at": str(row[5]) if row[5] else None
+    }
+
+
+async def run_generation_background(
+    task_id: str,
+    matiere: str,
+    chapitre: str,
+    filiere: str,
+    niveau_detail: str,
+    user_id: str,
+    db_url: str,
+    openai_api_key: str,
+    openai_base_url: str,
+    openai_model: str
+) -> None:
+    """Tâche d'arrière-plan : génère le Mind Map hors de la requête HTTP.
+
+    Crée sa propre session DB car la session de la requête est fermée
+    après le retour de la réponse.
+    """
+    logger.info(f"MINDMAP_ASYNC | Tâche {task_id} démarrée pour '{chapitre}'")
+    engine = create_async_engine(db_url, pool_size=5, max_overflow=10, pool_pre_ping=True)
+    session_maker = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
+
+    async with session_maker() as db:
+        try:
+            await _update_task(task_id, "running", progress="rag", db=db)
+
+            # 1. Recherche RAG
+            from services.embedder import embedder
+            query_text = f"Chapitre: {chapitre} - Matiere: {matiere} - Filiere: {filiere}"
+            query_vector = embedder.encode([query_text])[0]
+            res_chunks = await db.execute(
+                text("""
+                    SELECT content, source FROM rag_chunks
+                    WHERE LOWER(matiere) = LOWER(:matiere)
+                    AND (LOWER(chapitre) = LOWER(:chapitre)
+                         OR LOWER(REPLACE(chapitre, 'é', 'e')) = LOWER(REPLACE(:chapitre, 'é', 'e')))
+                    ORDER BY embedding <=> CAST(:emb AS vector)
+                    LIMIT 5
+                """),
+                {"matiere": matiere, "chapitre": chapitre, "emb": str(query_vector.tolist())}
+            )
+            chunks = res_chunks.fetchall()
+
+            if not chunks:
+                await _update_task(task_id, "failed", error="no_context", db=db)
+                logger.warning(f"MINDMAP_ASYNC | Aucun contexte RAG pour '{chapitre}'")
+                return
+
+            context_text = "\n\n".join([f"Source: {c.source}\n{c.content}" for c in chunks])
+            source_names = ", ".join(list(set([c.source for c in chunks])))
+
+            # 2. Génération LLM (racine + niveau 1 seulement = lazy loading)
+            await _update_task(task_id, "running", progress="llm", db=db)
+
+            from services.llm import extract_json_from_gemini
+            from openai import AsyncOpenAI
+
+            openai_client = AsyncOpenAI(api_key=openai_api_key, base_url=openai_base_url)
+
+            # Prompt pour génération superficielle (racine + niveau 1 uniquement)
+            lazy_prompt = MINDMAP_SYSTEM_PROMPT + """
+
+GÉNÉRATION PROGRESSIVE (LAZY LOADING) :
+- Génère UNIQUEMENT la racine (niveau 0) et ses enfants directs (niveau 1).
+- NE génère PAS les niveaux 2 et 3 maintenant.
+- Les enfants de niveau 1 auront leurs sous-nœuds générés à la demande.
+- Chaque nœud de niveau 1 doit avoir un champ "has_children": true si des sous-nœuds existent.
+"""
+
+            user_prompt = f"""
+            CONTEXTE DES COURS OFFICIELS :
+            {context_text}
+
+            CHAPITRE : {chapitre}
+            MATIERE : {matiere}
+            FILIERE : {filiere}
+            NIVEAU DE DETAIL : {niveau_detail}
+            """
+
+            try:
+                response = await openai_client.chat.completions.create(
+                    model=openai_model,
+                    temperature=0.2,
+                    max_tokens=1200,
+                    timeout=20.0,
+                    messages=[
+                        {"role": "system", "content": lazy_prompt},
+                        {"role": "user", "content": user_prompt}
+                    ]
+                )
+                content = response.choices[0].message.content or ""
+                generated_data = extract_json_from_gemini(content)
+            except Exception as e:
+                logger.error(f"MINDMAP_ASYNC | Échec LLM: {e}")
+                generated_data = {}
+
+            if not generated_data or "racine" not in generated_data:
+                generated_data = {
+                    "racine": _build_default_racine(chapitre, matiere),
+                    "liens_transversaux": []
+                }
+
+            # 3. Formatage + sauvegarde
+            await _update_task(task_id, "running", progress="save", db=db)
+
+            def format_node_lazy(node: dict, level=0):
+                if "id" not in node or not node["id"] or len(node["id"]) < 5:
+                    node["id"] = str(uuid.uuid4())
+                node["niveau"] = level
+                if "maitrise_eleve" not in node:
+                    node["maitrise_eleve"] = 0
+                importance = node.get("importance", "moyenne")
+                if importance not in ["critique", "haute", "moyenne"]:
+                    node["importance"] = "moyenne"
+                    importance = "moyenne"
+                node["couleur"] = {
+                    "critique": "#E74C3C", "haute": "#F39C12", "moyenne": "#3498DB"
+                }[importance]
+                if "flashcard_auto" not in node:
+                    node["flashcard_auto"] = importance in ["critique", "haute"]
+                node["enfants"] = node.get("enfants", [])
+                node["expanded"] = False
+                for child in node["enfants"]:
+                    format_node_lazy(child, level + 1)
+
+            format_node_lazy(generated_data["racine"], level=0)
+
+            mindmap_id = str(uuid.uuid4())
+            mindmap_data = {
+                "id": mindmap_id,
+                "titre": chapitre.upper(),
+                "matiere": matiere,
+                "filiere": filiere,
+                "chapitre": chapitre,
+                "racine": generated_data["racine"],
+                "liens_transversaux": generated_data.get("liens_transversaux", []),
+                "metadata": {
+                    "genere_le": datetime.utcnow().isoformat(),
+                    "version": "2.0",
+                    "source_rag": source_names,
+                    "user_id": user_id,
+                    "lazy_loading": True
+                }
+            }
+
+            await save_mindmap(mindmap_data, user_id, db)
+
+            # 4. Flashcards FSRS
+            await _update_task(task_id, "running", progress="flashcards", db=db)
+            flashcards = await _generate_auto_flashcards(
+                mindmap_data["racine"], matiere, chapitre, user_id, db
+            )
+            if flashcards:
+                await persist_flashcards_to_fsrs(flashcards, matiere, chapitre, user_id, db)
+
+            # 5. Tâche terminée
+            await _update_task(task_id, "completed", progress="done", mindmap_id=mindmap_id, db=db)
+            logger.info(f"MINDMAP_ASYNC | Tâche {task_id} terminée — mindmap={mindmap_id}")
+
+        except Exception as e:
+            logger.error(f"MINDMAP_ASYNC | Tâche {task_id} échouée: {e}", exc_info=True)
+            await _update_task(task_id, "failed", error=str(e)[:500], db=db)
+
+    await engine.dispose()
+
+
+async def expand_node(
+    node_id: str,
+    node_label: str,
+    chapitre: str,
+    matiere: str,
+    user_id: str,
+    db: AsyncSession,
+    openai_client
+) -> dict:
+    """Lazy loading : génère les sous-nœuds d'un nœud à la demande.
+
+    Évite de générer l'arbre complet en une seule fois.
+    """
+    from services.embedder import embedder
+    from services.llm import extract_json_from_gemini
+    from config import get_settings
+
+    # 1. RAG ciblé sur le nœud spécifique
+    query_text = f"{matiere} {chapitre} {node_label}"
+    try:
+        query_vector = embedder.encode([query_text])[0]
+        res_chunks = await db.execute(
+            text("""
+                SELECT content, source FROM rag_chunks
+                WHERE LOWER(matiere) = LOWER(:matiere)
+                AND (LOWER(chapitre) = LOWER(:chapitre)
+                     OR LOWER(REPLACE(chapitre, 'é', 'e')) = LOWER(REPLACE(:chapitre, 'é', 'e')))
+                AND content ILIKE :keyword
+                ORDER BY embedding <=> CAST(:emb AS vector)
+                LIMIT 3
+            """),
+            {
+                "matiere": matiere, "chapitre": chapitre,
+                "keyword": f"%{node_label[:30]}%",
+                "emb": str(query_vector.tolist())
+            }
+        )
+        chunks = res_chunks.fetchall()
+    except Exception as e:
+        logger.error(f"MINDMAP_EXPAND | Erreur RAG: {e}")
+        chunks = []
+
+    context_text = "\n\n".join([f"Source: {c.source}\n{c.content}" for c in chunks]) if chunks else ""
+
+    expand_prompt = f"""
+    Tu es un expert pédagogique. Génère les sous-nœuds (niveau enfant) du nœud suivant.
+
+    NŒUD PARENT : {node_label}
+    CHAPITRE : {chapitre}
+    MATIERE : {matiere}
+
+    CONTEXTE RAG :
+    {context_text}
+
+    RÈGLES :
+    1. Maximum 5 sous-nœuds
+    2. Labels en ARABE (termes scientifiques en FR entre parenthèses)
+    3. Maximum 5 mots par label
+    4. Format JSON : {{"enfants": [{{"label": "...", "type": "...", "importance": "..."}}]}}
+
+    Réponds UNIQUEMENT avec le JSON.
+    """
+
+    _model = get_settings().openai_model
+    try:
+        response = await openai_client.chat.completions.create(
+            model=_model,
+            temperature=0.2,
+            max_tokens=800,
+            timeout=15.0,
+            messages=[
+                {"role": "system", "content": "Tu génères des sous-nœuds pédagogiques en JSON."},
+                {"role": "user", "content": expand_prompt}
+            ]
+        )
+        content = response.choices[0].message.content or ""
+        data = extract_json_from_gemini(content)
+    except Exception as e:
+        logger.error(f"MINDMAP_EXPAND | Échec LLM: {e}")
+        data = {}
+
+    enfants = data.get("enfants", []) if data else []
+
+    # Formater les nouveaux nœuds
+    for child in enfants:
+        child["id"] = str(uuid.uuid4())
+        child["niveau"] = 2
+        child["maitrise_eleve"] = 0
+        importance = child.get("importance", "moyenne")
+        child["couleur"] = {
+            "critique": "#E74C3C", "haute": "#F39C12", "moyenne": "#3498DB"
+        }.get(importance, "#3498DB")
+        child["flashcard_auto"] = importance in ["critique", "haute"]
+        child["enfants"] = []
+        child["expanded"] = False
+
+    return {"node_id": node_id, "enfants": enfants}
+
+
+
 
 
 MINDMAP_SYSTEM_PROMPT = """

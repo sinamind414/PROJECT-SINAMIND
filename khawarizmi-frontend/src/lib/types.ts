@@ -121,6 +121,8 @@ export interface MindMapNode {
   couleur: string
   enfants: MindMapNode[]
   fsrs_card_id?: string
+  expanded?: boolean
+  has_children?: boolean
 }
 
 export interface SemanticLink {
@@ -142,6 +144,7 @@ export interface MindMap {
     genere_le: string
     version: string
     source_rag: string
+    lazy_loading?: boolean
   }
 }
 
@@ -150,6 +153,22 @@ export interface MindMapGeneratePayload {
   chapitre: string
   filiere: string
   niveau_detail: "standard" | "détaillé"
+}
+
+export interface MindMapTaskStatus {
+  status: "pending" | "running" | "completed" | "failed" | "not_found"
+  progress?: string
+  error?: string
+  mindmap_id?: string
+  chapitre?: string
+  mindmap?: MindMap
+}
+
+export interface ExpandNodePayload {
+  node_id: string
+  node_label: string
+  chapitre: string
+  matiere: string
 }
 
 // ── Health ──────────────────────────────────────

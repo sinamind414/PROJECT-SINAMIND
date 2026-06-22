@@ -15,6 +15,9 @@ import {
   LoginPayload,
   MindMap,
   MindMapGeneratePayload,
+  MindMapTaskStatus,
+  ExpandNodePayload,
+  MindMapNode,
   ProgressResponse,
   ActionVerbSummary,
   ActionVerbExercise,
@@ -181,16 +184,33 @@ class KhawarizmiApiClient {
     })
   }
 
-  // ── Mind Map ───────────────────────────────────
+  // ── Mind Map (génération asynchrone + lazy loading) ─────────────
 
   async generateMindMap(payload: MindMapGeneratePayload) {
     return this.request<{
       status: string
-      mindmap: MindMap
-      flashcards_generees: Flashcard[]
-      source_rag: string
+      mindmap?: MindMap
+      mindmap_id?: string
+      task_id?: string
+      flashcards_generees?: Flashcard[]
+      source_rag?: string
+      cached?: boolean
       message?: string
     }>("/api/mindmap/generate", {
+      method: "POST",
+      body: JSON.stringify(payload)
+    })
+  }
+
+  async pollMindMapTask(taskId: string): Promise<MindMapTaskStatus> {
+    return this.request<MindMapTaskStatus>(`/api/mindmap/task/${taskId}`)
+  }
+
+  async expandMindMapNode(payload: ExpandNodePayload) {
+    return this.request<{
+      status: string
+      enfants: MindMapNode[]
+    }>("/api/mindmap/expand", {
       method: "POST",
       body: JSON.stringify(payload)
     })
