@@ -43,7 +43,7 @@ import {
   CriticalChaptersResponse
 } from "./types"
 
-const API_BASE_URL = ""
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? ""
 
 const TOKEN_KEY = "khawarizmi_token"
 

@@ -66,10 +66,10 @@ async def correct_fsrs_scores(student_id: str, question_id: str, corrected_score
             from fsrs import Card
             concept_states = {}
             if concept_ids:
-                cids_param = tuple(concept_ids) if len(concept_ids) > 1 else (concept_ids[0],)
+                # ANY(:array) obligatoire — IN :tuple bug asyncpg (AGENTS.md §1.5)
                 res_states = await db.execute(
-                    text("SELECT concept_id, fsrs_state FROM mastery_micro_concepts WHERE user_id = :uid AND concept_id IN :cids"),
-                    {"uid": int(student_id), "cids": cids_param}
+                    text("SELECT concept_id, fsrs_state FROM mastery_micro_concepts WHERE user_id = :uid AND concept_id = ANY(:cids)"),
+                    {"uid": int(student_id), "cids": list(concept_ids)}
                 )
                 for row in res_states.fetchall():
                     c_id = row[0]

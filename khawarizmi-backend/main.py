@@ -36,15 +36,10 @@ async def lifespan(app: FastAPI):
     state.tutor = KhawarizmiTutor(data_dir=data_dir)
     # === DEEP DATA FOUNDATION REPORT ===
     try:
-        loader = state.tutor.loader
-        report = loader.get_data_foundation_report()
-        logger.warning("═══════════════════════════════════════════════")
-        logger.warning("DATA FOUNDATION STATUS (DEEP MIGRATION)")
-        logger.warning(f"  Programme source : {report['programme']['source']}")
-        logger.warning(f"  Micro-concepts   : {report['programme']['total_micro_concepts']}")
-        logger.warning("═══════════════════════════════════════════════")
+        report = state.tutor.loader.get_data_foundation_report()
+        logger.warning(f"DATA FOUNDATION | {report['programme']['source']} | {report['programme']['total_micro_concepts']} micro-concepts")
     except Exception as e:
-        logger.error(f"Failed to report data foundation: {e}")
+        logger.error(f"Data foundation report: {e}")
     from services.scheduler import KhawarizmiScheduler
     state.scheduler = KhawarizmiScheduler()
     from services.interleaving import InterleavingSession
@@ -103,5 +98,4 @@ async def generic_exception_handler(request: Request, exc: Exception):
     logger.error(f"Erreur non gérée : {exc}", exc_info=True)
     return JSONResponse(status_code=500, content={"erreur": "Erreur serveur interne"})
 if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run("main:app", host="0.0.0.0", port=int(os.environ.get("PORT", 8000)), log_level="info")
+    import uvicorn; uvicorn.run("main:app", host="0.0.0.0", port=int(os.environ.get("PORT", 8000)), log_level="info")

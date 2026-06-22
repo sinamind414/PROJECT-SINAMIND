@@ -88,3 +88,36 @@ class TestOsGetenvRegression:
         self._check_file_no_os_getenv(
             "services/llm.py", "llm.py"
         )
+
+
+class TestInTupleRegression:
+    """Détecte l'utilisation de IN :param avec tuple (bug asyncpg).
+
+    RÈGLE AGENTS.md §1.5 : Utiliser ANY(:array) au lieu de IN :tuple.
+    asyncpg ne gère pas correctement IN avec des tuples de paramètres.
+    """
+
+    def _check_file_no_in_tuple(self, filepath: str, filename: str):
+        path = os.path.join(os.path.dirname(__file__), "..", filepath)
+        if not os.path.exists(path):
+            pytest.skip(f"Fichier introuvable: {path}")
+        with open(path, "r", encoding="utf-8") as f:
+            content = f.read()
+        assert " IN :cids" not in content, (
+            f"{filename} utilise 'IN :cids' (bug asyncpg) — "
+            "utiliser '= ANY(:cids)' avec list() au lieu de tuple()"
+        )
+        assert " IN :ids" not in content, (
+            f"{filename} utilise 'IN :ids' (bug asyncpg) — "
+            "utiliser '= ANY(:ids)' avec list()"
+        )
+
+    def test_fsrs_scheduler_no_in_tuple(self):
+        self._check_file_no_in_tuple(
+            "services/fsrs_scheduler.py", "fsrs_scheduler.py"
+        )
+
+    def test_reconciliation_queue_no_in_tuple(self):
+        self._check_file_no_in_tuple(
+            "services/reconciliation_queue.py", "reconciliation_queue.py"
+        )

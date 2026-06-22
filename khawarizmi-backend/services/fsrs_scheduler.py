@@ -89,15 +89,14 @@ async def select_next_question(student_id: int, db: AsyncSession) -> Optional[Di
     concept_stability = {c["concept_id"]: c["stability"] for c in due_concepts}
     
     # Récupérer les mappings questions <-> concepts pour les concepts dus
-    # Safe tuple injection in query
-    cids_param = tuple(concept_ids) if len(concept_ids) > 1 else (concept_ids[0],)
+    # ANY(:array) obligatoire — IN :tuple bug asyncpg (AGENTS.md §1.5)
     query_mappings = text("""
         SELECT question_id, micro_concept, weight
         FROM question_concept_map
-        WHERE micro_concept IN :cids
+        WHERE micro_concept = ANY(:cids)
     """)
-    
-    res_mappings = await db.execute(query_mappings, {"cids": cids_param})
+
+    res_mappings = await db.execute(query_mappings, {"cids": list(concept_ids)})
     mappings = res_mappings.fetchall()
     
     if not mappings:
