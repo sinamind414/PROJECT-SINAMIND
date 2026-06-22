@@ -124,30 +124,42 @@ async def run_generation_background(
         try:
             await _update_task(task_id, "running", progress="rag", db=db)
 
-            # 1. Recherche RAG
+            # 1. Recherche RAG + re-ranking hybride
             from services.embedder import embedder
+            from services.reranker import rerank
             query_text = f"Chapitre: {chapitre} - Matiere: {matiere} - Filiere: {filiere}"
             query_vector = embedder.encode([query_text])[0]
             res_chunks = await db.execute(
                 text("""
-                    SELECT content, source FROM rag_chunks
+                    SELECT content, source,
+                           1 - (embedding <=> CAST(:emb AS vector)) AS similarity
+                    FROM rag_chunks
                     WHERE LOWER(matiere) = LOWER(:matiere)
                     AND (LOWER(chapitre) = LOWER(:chapitre)
                          OR LOWER(REPLACE(chapitre, 'é', 'e')) = LOWER(REPLACE(:chapitre, 'é', 'e')))
                     ORDER BY embedding <=> CAST(:emb AS vector)
-                    LIMIT 5
+                    LIMIT 20
                 """),
                 {"matiere": matiere, "chapitre": chapitre, "emb": str(query_vector.tolist())}
             )
-            chunks = res_chunks.fetchall()
+            raw_chunks = [
+                {
+                    "content": r._mapping["content"],
+                    "source": r._mapping["source"],
+                    "similarity": float(r._mapping["similarity"]) if r._mapping["similarity"] else 0.0,
+                }
+                for r in res_chunks.fetchall()
+            ]
 
-            if not chunks:
+            if not raw_chunks:
                 await _update_task(task_id, "failed", error="no_context", db=db)
                 logger.warning(f"MINDMAP_ASYNC | Aucun contexte RAG pour '{chapitre}'")
                 return
 
-            context_text = "\n\n".join([f"Source: {c.source}\n{c.content}" for c in chunks])
-            source_names = ", ".join(list(set([c.source for c in chunks])))
+            # Re-ranking : garder les 5 meilleurs chunks
+            chunks = rerank(query_text, raw_chunks, top_k=5)
+            context_text = "\n\n".join([f"Source: {c['source']}\n{c['content']}" for c in chunks])
+            source_names = ", ".join(list(set([c["source"] for c in chunks])))
 
             # 2. Génération LLM (racine + niveau 1 seulement = lazy loading)
             await _update_task(task_id, "running", progress="llm", db=db)
@@ -279,21 +291,24 @@ async def expand_node(
     """
     from services.embedder import embedder
     from services.llm import extract_json_from_gemini
+    from services.reranker import rerank
     from config import get_settings
 
-    # 1. RAG ciblé sur le nœud spécifique
+    # 1. RAG ciblé sur le nœud spécifique + re-ranking
     query_text = f"{matiere} {chapitre} {node_label}"
     try:
         query_vector = embedder.encode([query_text])[0]
         res_chunks = await db.execute(
             text("""
-                SELECT content, source FROM rag_chunks
+                SELECT content, source,
+                       1 - (embedding <=> CAST(:emb AS vector)) AS similarity
+                FROM rag_chunks
                 WHERE LOWER(matiere) = LOWER(:matiere)
                 AND (LOWER(chapitre) = LOWER(:chapitre)
                      OR LOWER(REPLACE(chapitre, 'é', 'e')) = LOWER(REPLACE(:chapitre, 'é', 'e')))
                 AND content ILIKE :keyword
                 ORDER BY embedding <=> CAST(:emb AS vector)
-                LIMIT 3
+                LIMIT 10
             """),
             {
                 "matiere": matiere, "chapitre": chapitre,
@@ -301,12 +316,20 @@ async def expand_node(
                 "emb": str(query_vector.tolist())
             }
         )
-        chunks = res_chunks.fetchall()
+        raw_chunks = [
+            {
+                "content": r._mapping["content"],
+                "source": r._mapping["source"],
+                "similarity": float(r._mapping["similarity"]) if r._mapping["similarity"] else 0.0,
+            }
+            for r in res_chunks.fetchall()
+        ]
+        chunks = rerank(query_text, raw_chunks, top_k=3) if raw_chunks else []
     except Exception as e:
         logger.error(f"MINDMAP_EXPAND | Erreur RAG: {e}")
         chunks = []
 
-    context_text = "\n\n".join([f"Source: {c.source}\n{c.content}" for c in chunks]) if chunks else ""
+    context_text = "\n\n".join([f"Source: {c['source']}\n{c['content']}" for c in chunks]) if chunks else ""
 
     expand_prompt = f"""
     Tu es un expert pédagogique. Génère les sous-nœuds (niveau enfant) du nœud suivant.
@@ -452,21 +475,22 @@ async def generate_mindmap(
             "source_rag": mindmap_data.get("metadata", {}).get("source_rag", "")
         }
 
-    # 2. Recherche vectorielle dans rag_chunks pour collecter le contexte RAG
+    # 2. Recherche vectorielle dans rag_chunks + re-ranking
     from services.embedder import embedder
+    from services.reranker import rerank
     query_text = f"Chapitre: {chapitre} - Matiere: {matiere} - Filiere: {filiere}"
     try:
         query_vector = embedder.encode([query_text])[0]
-        logger.info(f"Recherche RAG: {len(embedder.encode([query_text])[0])} dim")
         res_chunks = await db.execute(
             text("""
-                SELECT content, source
+                SELECT content, source,
+                       1 - (embedding <=> CAST(:emb AS vector)) AS similarity
                 FROM rag_chunks
                 WHERE LOWER(matiere) = LOWER(:matiere)
-                AND (LOWER(chapitre) = LOWER(:chapitre) 
+                AND (LOWER(chapitre) = LOWER(:chapitre)
                      OR LOWER(REPLACE(chapitre, 'é', 'e')) = LOWER(REPLACE(:chapitre, 'é', 'e')))
                 ORDER BY embedding <=> CAST(:emb AS vector)
-                LIMIT 5
+                LIMIT 20
             """),
             {
                 "matiere": matiere,
@@ -474,8 +498,16 @@ async def generate_mindmap(
                 "emb": str(query_vector.tolist())
             }
         )
-        chunks = res_chunks.fetchall()
-        logger.info(f"Chunks RAG trouvés: {len(chunks)}")
+        raw_chunks = [
+            {
+                "content": r._mapping["content"],
+                "source": r._mapping["source"],
+                "similarity": float(r._mapping["similarity"]) if r._mapping["similarity"] else 0.0,
+            }
+            for r in res_chunks.fetchall()
+        ]
+        chunks = rerank(query_text, raw_chunks, top_k=5) if raw_chunks else []
+        logger.info(f"Chunks RAG trouvés: {len(raw_chunks)} → re-rankés: {len(chunks)}")
     except Exception as e:
         logger.error(f"Erreur recherche RAG: {type(e).__name__}: {e}")
         import traceback
@@ -490,8 +522,8 @@ async def generate_mindmap(
             "message": "Je n'ai pas trouve cette information dans la base. Consulte ton manuel officiel."
         }
 
-    context_text = "\n\n".join([f"Source: {c.source}\n{c.content}" for c in chunks])
-    source_names = ", ".join(list(set([c.source for c in chunks])))
+    context_text = "\n\n".join([f"Source: {c['source']}\n{c['content']}" for c in chunks])
+    source_names = ", ".join(list(set([c["source"] for c in chunks])))
 
     # 3. Interroger le LLM pour générer l'arborescence JSON
     user_prompt = f"""

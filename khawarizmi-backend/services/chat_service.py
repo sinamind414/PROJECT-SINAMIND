@@ -25,6 +25,7 @@ from services.chat_prompt import (
 from services.orientation_service import calculer_orientation
 from services.semantic_cache import get_semantic_cache, set_semantic_cache
 from services.metrics import MetricsCollector, record_request
+from services.reranker import rerank
 
 logger = logging.getLogger("khawarizmi.chat")
 
@@ -284,30 +285,64 @@ async def _rag_search(
     message: str,
     chapitre: Optional[str],
 ) -> List[Dict]:
-    """Recherche RAG dans pgvector."""
+    """Recherche RAG dans pgvector + re-ranking hybride.
+
+    Pipeline :
+    1. pgvector récupère 20 chunks (bi-encoder, rapide)
+    2. reranker.py re-score avec cosinus + BM25 + keyword coverage
+    3. On garde les 5 meilleurs
+    """
     if not chapitre:
         return []
 
     try:
+        from services.embedder import embedder
+        query_vector = embedder.encode([message])[0]
+        query_emb = str(query_vector.tolist())
+    except Exception as e:
+        logger.warning(f"Embedding échec, fallback dummy: {e}")
+        query_emb = _dummy_embedding()
+
+    try:
+        # Étape 1 : récupérer 20 chunks via pgvector (bi-encoder)
         result = await db.execute(
             text("""
                 SELECT content, source, chapter,
-                       1 - (embedding <=> :query_emb) AS similarity
+                       1 - (embedding <=> CAST(:query_emb AS vector)) AS similarity
                 FROM rag_chunks
                 WHERE chapter ILIKE :chapter
-                ORDER BY embedding <=> :query_emb
-                LIMIT 3
+                ORDER BY embedding <=> CAST(:query_emb AS vector)
+                LIMIT 20
             """),
-            {"chapter": f"%{chapitre}%", "query_emb": _dummy_embedding()},
+            {"chapter": f"%{chapitre}%", "query_emb": query_emb},
         )
-        return [
+        raw_chunks = [
             {
                 "content": r._mapping["content"],
                 "source": r._mapping["source"],
                 "chapter": r._mapping["chapter"],
+                "similarity": float(r._mapping["similarity"]) if r._mapping["similarity"] else 0.0,
             }
             for r in result.fetchall()
         ]
+
+        if not raw_chunks:
+            return []
+
+        # Étape 2 : re-ranking hybride (cosinus + BM25 + keyword coverage)
+        reranked = rerank(message, raw_chunks, top_k=5)
+
+        # Retourner sans les scores internes
+        return [
+            {
+                "content": c["content"],
+                "source": c["source"],
+                "chapter": c["chapter"],
+                "score_rerank": c.get("score_rerank", 0),
+            }
+            for c in reranked
+        ]
+
     except Exception as e:
         logger.warning(f"RAG search échec : {e}")
         return []
