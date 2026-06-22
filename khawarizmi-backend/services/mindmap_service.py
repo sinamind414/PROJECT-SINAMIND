@@ -467,35 +467,73 @@ async def update_node_maitrise(
     if not row:
         raise ValueError(f"Nœud {node_id} non trouvé")
 
-    # Mettre à jour l'état FSRS en fonction de la maîtrise
+    # Mettre à jour l'état FSRS avec le véritable algorithme fsrs-python
+    from fsrs import Card, Rating as FsrsRating, Scheduler as CardScheduler
+    from datetime import timezone
+    import json
+
     fsrs_card_id = f"mm_{node_id}"
-    fsrs_params = {
-        0: {"difficulty": 8.0, "stability": 0.0, "state": 0,
-            "interval": 1, "due_delta": 0},
-        1: {"difficulty": 5.0, "stability": 3.0, "state": 1,
-            "interval": 1, "due_delta": 1},
-        2: {"difficulty": 3.0, "stability": 15.0, "state": 2,
-            "interval": 7, "due_delta": 7},
-    }[maitrise]
+    mc_result = await db.execute(
+        text("SELECT fsrs_state FROM mastery_micro_concepts WHERE micro_concept_id = :mc_id AND user_id = :uid"),
+        {"mc_id": fsrs_card_id, "uid": u_id}
+    )
+    mc_row = mc_result.fetchone()
+
+    card = Card()
+    if mc_row and mc_row[0]:
+        try:
+            state_data = mc_row[0]
+            if isinstance(state_data, str):
+                state_data = json.loads(state_data)
+            card.stability = state_data.get("stability", card.stability)
+            card.difficulty = state_data.get("difficulty", card.difficulty)
+            card.reps = state_data.get("reps", card.reps)
+            card.lapses = state_data.get("lapses", card.lapses)
+            card.scheduled_days = state_data.get("scheduled_days", card.scheduled_days)
+        except Exception as e:
+            logger.warning(f"Impossible de parser fsrs_state pour {fsrs_card_id}: {e}")
+
+    rating_map = {0: FsrsRating.Again, 1: FsrsRating.Good, 2: FsrsRating.Easy}
+    fsrs_rating = rating_map[maitrise]
+
+    scheduler = CardScheduler()
+    now = datetime.now(timezone.utc)
+    scheduling_cards = scheduler.repeat(card, now)
+    new_card = scheduling_cards[fsrs_rating].card
+
+    due_date = new_card.due if hasattr(new_card, 'due') else now + timedelta(days=1)
+    interval = new_card.scheduled_days if hasattr(new_card, 'scheduled_days') else 1
+
+    fsrs_json = json.dumps({
+        "stability": new_card.stability,
+        "difficulty": new_card.difficulty,
+        "scheduled_days": new_card.scheduled_days,
+        "reps": new_card.reps,
+        "lapses": new_card.lapses,
+        "state": str(new_card.state),
+        "last_review": now.isoformat(),
+    })
 
     await db.execute(
         text("""
             INSERT INTO mastery_micro_concepts
                 (user_id, micro_concept_id, concept_id, chapter,
-                 difficulty, stability, state, due_date,
-                 prochaine_revision, interval_jours)
+                 difficulty, stability, fsrs_state, due_date,
+                 prochaine_revision, interval_jours, state, last_review)
             VALUES
                 (:user_id, :mc_id, :concept_id, :chapter,
-                 :difficulty, :stability, :state,
-                 :due_date, :next_rev, :interval)
+                 :difficulty, :stability, :fsrs_state::jsonb, :due_date,
+                 :next_rev, :interval, :state, :last_review)
             ON CONFLICT (user_id, micro_concept_id)
             DO UPDATE SET
                 difficulty = EXCLUDED.difficulty,
                 stability = EXCLUDED.stability,
-                state = EXCLUDED.state,
+                fsrs_state = EXCLUDED.fsrs_state,
                 due_date = EXCLUDED.due_date,
                 prochaine_revision = EXCLUDED.prochaine_revision,
                 interval_jours = EXCLUDED.interval_jours,
+                state = EXCLUDED.state,
+                last_review = EXCLUDED.last_review,
                 updated_at = NOW()
         """),
         {
@@ -503,12 +541,14 @@ async def update_node_maitrise(
             "mc_id": fsrs_card_id,
             "concept_id": node_id,
             "chapter": node_row[2] if node_row else "",
-            "difficulty": fsrs_params["difficulty"],
-            "stability": fsrs_params["stability"],
-            "state": fsrs_params["state"],
-            "due_date": datetime.utcnow(),
-            "next_rev": datetime.utcnow() + timedelta(days=fsrs_params["due_delta"]),
-            "interval": fsrs_params["interval"],
+            "difficulty": new_card.difficulty,
+            "stability": new_card.stability,
+            "fsrs_state": fsrs_json,
+            "due_date": due_date,
+            "next_rev": due_date,
+            "interval": interval,
+            "state": getattr(new_card.state, 'value', 0) if hasattr(new_card, 'state') else maitrise,
+            "last_review": now
         }
     )
 

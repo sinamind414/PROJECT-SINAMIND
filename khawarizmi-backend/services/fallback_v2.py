@@ -610,11 +610,11 @@ def compute_coverage_score(
     if not points_cles or not reponse_eleve.strip():
         return 0.0
     
-    emb_eleve = embedder.encode([reponse_eleve], normalize_embeddings=True)[0]
+    emb_eleve = embedder.encode([reponse_eleve])[0]
     
     covered = 0
     for point in points_cles:
-        emb_point = embedder.encode([point], normalize_embeddings=True)[0]
+        emb_point = embedder.encode([point])[0]
         sim = float(np.dot(emb_eleve, emb_point))
         if sim >= 0.60:
             covered += 1
@@ -699,10 +699,10 @@ async def evaluate_l2(
             stmt = text("""
                 SELECT 
                     reference_text,
-                    1 - (embedding <=> :emb::vector) AS cosine_similarity
+                    1 - (embedding <=> CAST(:emb AS vector)) AS cosine_similarity
                 FROM reference_embeddings
                 WHERE question_id = :qid
-                ORDER BY embedding <=> :emb::vector
+                ORDER BY embedding <=> CAST(:emb AS vector)
                 LIMIT 1
             """)
             result = await db.execute(stmt, {"emb": str(student_embedding.tolist()), "qid": question_id})

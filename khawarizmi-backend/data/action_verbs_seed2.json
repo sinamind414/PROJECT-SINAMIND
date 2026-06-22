@@ -1,0 +1,83 @@
+[
+  {
+    "slug": "define",
+    "ar": "عرّف",
+    "fr": "Définir",
+    "category": "simple_task",
+    "priority": "low",
+    "definition_ar": "إعطاء الحدود الدقيقة للمصطلح: الخصائص، السمات، الأهمية أو الدور.",
+    "objective_ar": "اختبار دقة المصطلحات العلمية.",
+    "formula_ar": "[المصطلح] هو/هي ... يتميز بـ ...",
+    "steps": [
+      {
+        "titleAr": "اذكر المعنى",
+        "descriptionAr": "قدّم حدود المصطلح بدقة.",
+        "required": true
+      }
+    ],
+    "required_markers": [],
+    "forbidden_markers": [],
+    "common_errors": [
+      "تعريف عام",
+      "وصف مطول بدل تعريف"
+    ],
+    "scoring_rules": [],
+    "bad_example": null,
+    "good_example": null,
+    "feedback_template_ar": null
+  },
+  {
+    "slug": "name",
+    "ar": "سمّى / تعرّف",
+    "fr": "Nommer",
+    "category": "simple_task",
+    "priority": "low",
+    "definition_ar": "تعيين عنصر ما بالاسم: بيان، عضية، عضو، مركب أو مفهوم.",
+    "objective_ar": "اختبار التعرف على البيانات أو العناصر.",
+    "formula_ar": "العنصر هو: ...",
+    "steps": [
+      {
+        "titleAr": "اكتب الاسم",
+        "descriptionAr": "لا تشرح إلا إذا طلب منك ذلك.",
+        "required": true
+      }
+    ],
+    "required_markers": [],
+    "forbidden_markers": [],
+    "common_errors": [
+      "شرح زائد",
+      "اسم غير علمي"
+    ],
+    "scoring_rules": [],
+    "bad_example": null,
+    "good_example": null,
+    "feedback_template_ar": null
+  },
+  {
+    "slug": "cite",
+    "ar": "اذكر",
+    "fr": "Citer",
+    "category": "simple_task",
+    "priority": "low",
+    "definition_ar": "العد بإيجاز مع استعمال الحد الأدنى من الكلمات.",
+    "objective_ar": "اختبار استرجاع العناصر الأساسية.",
+    "formula_ar": "تتمثل في: ...، ...، ...",
+    "steps": [
+      {
+        "titleAr": "اذكر العناصر",
+        "descriptionAr": "بإيجاز ودون تعليق.",
+        "required": true
+      }
+    ],
+    "required_markers": [],
+    "forbidden_markers": [],
+    "common_errors": [
+      "تفصيل زائد",
+      "نسيان عنصر"
+    ],
+    "scoring_rules": [],
+    "bad_example": null,
+    "good_example": null,
+    "feedback_template_ar": null
+  }
+]

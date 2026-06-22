@@ -1,11 +1,13 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { AuthGuard } from "@/components/auth/AuthGuard"
 import { AppShell } from "@/components/layout/AppShell"
 import { getAllSujets } from "@/lib/annales-bac"
 import type { SujetBac } from "@/lib/annales-bac"
+import apiClient from "@/lib/api-client"
+import type { Annale } from "@/lib/types"
 
 const DIFFICULTE_COLORS: Record<string, string> = {
   facile: "bg-emerald-500/15 text-emerald-400 border-emerald-500/25",
@@ -19,21 +21,58 @@ const DIFFICULTE_AR: Record<string, string> = {
   difficile: "صعب",
 }
 
+function annaleToSujet(a: Annale): SujetBac {
+  const diff = a.difficulte <= 2 ? "facile" : a.difficulte <= 4 ? "moyen" : "difficile"
+  return {
+    slug: a.slug || String(a.id),
+    titre: a.titre,
+    annee: a.annee,
+    session: "normale",
+    difficulte: diff as "facile" | "moyen" | "difficile",
+    duree: 180,
+    chapitres: a.tags || [],
+    exercices: [],
+  } as SujetBac
+}
+
 function AnnalesContent() {
   const [search, setSearch] = useState("")
+  const [sujets, setSujets] = useState<SujetBac[]>([])
+  const [loading, setLoading] = useState(true)
+  const [source, setSource] = useState<"api" | "local">("local")
 
-  const sujets = useMemo(() => getAllSujets(), [])
+  useEffect(() => {
+    let cancelled = false
+    (async () => {
+      try {
+        const res = await apiClient.getAnnales({ taille: 100 })
+        if (cancelled) return
+        if (res.items && res.items.length > 0) {
+          setSujets(res.items.map(annaleToSujet))
+          setSource("api")
+        } else {
+          setSujets(getAllSujets())
+          setSource("local")
+        }
+      } catch {
+        if (cancelled) return
+        setSujets(getAllSujets())
+        setSource("local")
+      } finally {
+        if (!cancelled) setLoading(false)
+      }
+    })()
+    return () => { cancelled = true }
+  }, [])
 
-  const filtered = useMemo(() => {
-    if (!search.trim()) return sujets
-    const q = search.toLowerCase()
-    return sujets.filter(
-      (s) =>
-        s.titre.toLowerCase().includes(q) ||
-        s.chapitres.some((c) => c.toLowerCase().includes(q)) ||
-        String(s.annee).includes(q)
-    )
-  }, [search, sujets])
+  const visible = !search.trim()
+    ? sujets
+    : sujets.filter(
+        (s) =>
+          s.titre.toLowerCase().includes(search.toLowerCase()) ||
+          s.chapitres.some((c) => c.toLowerCase().includes(search.toLowerCase())) ||
+          String(s.annee).includes(search)
+      )
 
   return (
     <AppShell>
@@ -43,7 +82,10 @@ function AnnalesContent() {
             <div>
               <h1 className="text-2xl font-bold text-white">مواضيع البكالوريا</h1>
               <p className="text-sm text-slate-400 mt-1">
-                {sujets.length} مواضيع بكالوريا علوم الطبيعة والحياة — 3 طرق للمراجعة
+                {loading ? "جاري التحميل..." : `${sujets.length} مواضيع بكالوريا علوم الطبيعة والحياة — 3 طرق للمراجعة`}
+                {source === "local" && !loading && (
+                  <span className="text-amber-500/70 text-[10px] mr-2">(وضع عدم الاتصال — بيانات محلية)</span>
+                )}
               </p>
             </div>
             <input
@@ -56,12 +98,12 @@ function AnnalesContent() {
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
-            {filtered.map((sujet) => (
+            {visible.map((sujet) => (
               <SujetCard key={sujet.slug} sujet={sujet} />
             ))}
           </div>
 
-          {filtered.length === 0 && (
+          {visible.length === 0 && !loading && (
             <div className="text-center py-20 text-slate-500 text-sm">لم يتم العثور على موضوع</div>
           )}
         </div>

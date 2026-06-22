@@ -1,16 +1,73 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import { notFound } from "next/navigation"
 import { AuthGuard } from "@/components/auth/AuthGuard"
 import { AppShell } from "@/components/layout/AppShell"
 import { getActionVerb, getCategoryLabel, getPriorityLabel } from "@/lib/methodology-v1"
+import apiClient from "@/lib/api-client"
+import type { VerbEvaluateResponse, ActionVerbExercise } from "@/lib/types"
 
 export default function ActionVerbDetailPage({ params }: { params: { slug: string } }) {
   const verb = getActionVerb(params.slug)
   if (!verb) notFound()
 
   const totalPoints = verb.scoringRules.reduce((sum, rule) => sum + rule.points, 0)
+
+  const [exercises, setExercises] = useState<ActionVerbExercise[]>([])
+  const [answer, setAnswer] = useState("")
+  const [evaluation, setEvaluation] = useState<VerbEvaluateResponse | null>(null)
+  const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    let cancelled = false
+    ;(async () => {
+      try {
+        const ex = await apiClient.getVerbExercises(params.slug)
+        if (!cancelled) setExercises(ex)
+      } catch {
+        // pas d'exercices — la page reste utilisable
+      }
+    })()
+    return () => { cancelled = true }
+  }, [params.slug])
+
+  async function submitAnswer() {
+    if (!answer.trim()) return
+    setLoading(true)
+    setEvaluation(null)
+    try {
+      const result = await apiClient.evaluateVerbAnswer({
+        verb_slug: params.slug,
+        answer,
+      })
+      setEvaluation(result)
+    } catch (err) {
+      setEvaluation({
+        verb_slug: params.slug,
+        score: 0,
+        score_max: totalPoints || 1,
+        percentage: 0,
+        success: [],
+        errors: [err instanceof Error ? err.message : "Erreur d'evaluation"],
+        missing_markers: [],
+        forbidden_found: [],
+        advice: "Reessaye.",
+        allow_second_attempt: true,
+      })
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  async function markReviewed(rating: 1 | 2 | 3 | 4) {
+    try {
+      await apiClient.reviewVerb(params.slug, rating, evaluation?.percentage)
+    } catch {
+      // silencieux
+    }
+  }
 
   return (
     <AuthGuard>
@@ -113,6 +170,96 @@ export default function ActionVerbDetailPage({ params }: { params: { slug: strin
                     )}
                   </div>
                 )}
+
+                {/* Section pratique — évaluation backend */}
+                <div className="rounded-3xl p-6 glass border border-mint/10">
+                  <h2 className="text-2xl font-bold text-white mb-4">تدرب على هذا الفعل</h2>
+                  {exercises.length > 0 && (
+                    <div className="mb-4 rounded-2xl p-4 bg-white/[0.03] border border-white/[0.05]">
+                      <p className="text-mint text-xs font-bold mb-1">التمرين المقترح</p>
+                      <p className="text-gray-200 text-sm leading-relaxed">{exercises[0].question_ar}</p>
+                    </div>
+                  )}
+                  <textarea
+                    value={answer}
+                    onChange={(e) => setAnswer(e.target.value)}
+                    placeholder="اكتب إجابتك هنا..."
+                    className="w-full min-h-[120px] rounded-2xl p-4 bg-white/[0.03] border border-white/[0.08] text-white text-sm placeholder:text-gray-600 focus:border-mint/40 focus:outline-none resize-y"
+                    dir="rtl"
+                  />
+                  <button
+                    onClick={submitAnswer}
+                    disabled={loading || !answer.trim()}
+                    className="mt-3 px-6 py-3 rounded-xl bg-mint text-slate-deep font-bold hover:bg-mint-soft transition disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    {loading ? "جاري التقييم..." : "قيّم إجابتي"}
+                  </button>
+
+                  {evaluation && (
+                    <div className="mt-5 space-y-4">
+                      <div className="flex items-center gap-4">
+                        <div className={`text-4xl font-bold ${evaluation.percentage >= 75 ? "text-emerald-400" : evaluation.percentage >= 50 ? "text-amber-400" : "text-red-400"}`}>
+                          {evaluation.percentage}%
+                        </div>
+                        <div>
+                          <p className="text-white font-bold">{evaluation.score}/{evaluation.score_max} نقطة</p>
+                          {evaluation.allow_second_attempt && (
+                            <p className="text-amber-400 text-xs">يمكنك إعادة المحاولة</p>
+                          )}
+                        </div>
+                      </div>
+
+                      {evaluation.success.length > 0 && (
+                        <div className="space-y-1">
+                          {evaluation.success.map((s, i) => (
+                            <p key={i} className="text-emerald-300 text-sm">{s}</p>
+                          ))}
+                        </div>
+                      )}
+                      {evaluation.errors.length > 0 && (
+                        <div className="space-y-1">
+                          {evaluation.errors.map((e, i) => (
+                            <p key={i} className="text-red-300 text-sm">{e}</p>
+                          ))}
+                        </div>
+                      )}
+                      {evaluation.missing_markers.length > 0 && (
+                        <div className="rounded-xl p-3 bg-amber-500/10 border border-amber-500/20">
+                          <p className="text-amber-300 text-xs font-bold mb-1">كلمات مفتاحية ناقصة:</p>
+                          <div className="flex flex-wrap gap-1.5">
+                            {evaluation.missing_markers.map((m) => (
+                              <span key={m} className="px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-200 text-xs">{m}</span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      {evaluation.forbidden_found.length > 0 && (
+                        <div className="rounded-xl p-3 bg-red-500/10 border border-red-500/20">
+                          <p className="text-red-300 text-xs font-bold mb-1">كلمات ممنوعة مستعملة:</p>
+                          <div className="flex flex-wrap gap-1.5">
+                            {evaluation.forbidden_found.map((m) => (
+                              <span key={m} className="px-2 py-0.5 rounded-full bg-red-500/10 text-red-200 text-xs">{m}</span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      {evaluation.advice && (
+                        <div className="rounded-xl p-3 bg-mint/10 border border-mint/20">
+                          <p className="text-mint text-sm">{evaluation.advice}</p>
+                        </div>
+                      )}
+
+                      {/* FSRS — marquer la révision */}
+                      <div className="flex items-center gap-2 pt-2">
+                        <p className="text-gray-400 text-xs">قيّم صعوبة هذا الفعل:</p>
+                        <button onClick={() => markReviewed(1)} className="px-3 py-1.5 rounded-lg bg-red-500/10 text-red-300 text-xs font-bold hover:bg-red-500/20">صعب جدا</button>
+                        <button onClick={() => markReviewed(2)} className="px-3 py-1.5 rounded-lg bg-amber-500/10 text-amber-300 text-xs font-bold hover:bg-amber-500/20">صعب</button>
+                        <button onClick={() => markReviewed(3)} className="px-3 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-300 text-xs font-bold hover:bg-emerald-500/20">جيد</button>
+                        <button onClick={() => markReviewed(4)} className="px-3 py-1.5 rounded-lg bg-mint/10 text-mint text-xs font-bold hover:bg-mint/20">سهل</button>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </section>
 
               <aside className="space-y-5">

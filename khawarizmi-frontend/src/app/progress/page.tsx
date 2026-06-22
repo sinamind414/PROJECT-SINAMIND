@@ -7,6 +7,8 @@ import { SurfaceCard } from "@/components/ui/SurfaceCard"
 import { SectionHeader } from "@/components/ui/SectionHeader"
 import { PillChip } from "@/components/ui/PillChip"
 import { clearStoredProgress, getProgressSnapshot, type ProgressSnapshot } from "@/lib/progress-store"
+import apiClient from "@/lib/api-client"
+import type { ProgressResponse } from "@/lib/types"
 
 function color(level: number) {
   if (level >= 75) return "#34D399"
@@ -16,19 +18,45 @@ function color(level: number) {
 
 export default function ProgressPage() {
   const [snapshot, setSnapshot] = useState<ProgressSnapshot | null>(null)
+  const [apiProgress, setApiProgress] = useState<ProgressResponse | null>(null)
+  const [source, setSource] = useState<"api" | "local">("local")
 
   useEffect(() => {
-    const refresh = () => setSnapshot(getProgressSnapshot())
-    refresh()
-    window.addEventListener("sinamind-progress-updated", refresh)
-    window.addEventListener("storage", refresh)
+    let cancelled = false
+    const refreshLocal = () => setSnapshot(getProgressSnapshot())
+
+    ;(async () => {
+      try {
+        const data = await apiClient.getProgress()
+        if (cancelled) return
+        if (data.concepts && data.concepts.length > 0) {
+          setApiProgress(data)
+          setSource("api")
+        } else {
+          refreshLocal()
+          setSource("local")
+        }
+      } catch {
+        if (cancelled) return
+        refreshLocal()
+        setSource("local")
+      }
+    })()
+
+    refreshLocal()
+    window.addEventListener("sinamind-progress-updated", refreshLocal)
+    window.addEventListener("storage", refreshLocal)
     return () => {
-      window.removeEventListener("sinamind-progress-updated", refresh)
-      window.removeEventListener("storage", refresh)
+      cancelled = true
+      window.removeEventListener("sinamind-progress-updated", refreshLocal)
+      window.removeEventListener("storage", refreshLocal)
     }
   }, [])
 
   const data = snapshot || getProgressSnapshot()
+  const apiReady = apiProgress?.prediction_bac ?? null
+  const apiDues = apiProgress?.dues_aujourd_hui ?? null
+  const apiConcepts = apiProgress?.concepts ?? []
 
   return (
     <PageShell>
@@ -42,7 +70,46 @@ export default function ProgressPage() {
           <p className="text-2xl font-bold text-white">{data.readiness}%</p>
           <p className="text-gray-500 text-[10px] mt-0.5">{data.totalAttempts} محاولة</p>
         </div>
+        {source === "api" && (
+          <div className="flex gap-2 mt-3">
+            {apiReady !== null && (
+              <div className="text-center rounded-xl p-3" style={{ background: "rgba(52,211,153,0.12)" }}>
+                <p className="text-gray-400 text-[10px] mb-0.5">تنبؤ البكالوريا</p>
+                <p className="text-xl font-bold text-emerald-400">{apiReady}/20</p>
+              </div>
+            )}
+            {apiDues !== null && (
+              <div className="text-center rounded-xl p-3" style={{ background: "rgba(251,191,36,0.12)" }}>
+                <p className="text-gray-400 text-[10px] mb-0.5">مراجعات اليوم</p>
+                <p className="text-xl font-bold text-amber-400">{apiDues}</p>
+              </div>
+            )}
+          </div>
+        )}
+        {source === "local" && (
+          <p className="text-amber-500/60 text-[10px] mt-2">(وضع محلي — البطاقة الخلفية غير متصلة)</p>
+        )}
       </PageHero>
+
+      {source === "api" && apiConcepts.length > 0 && (
+        <SurfaceCard>
+          <SectionHeader title="تقدم المفاهيم (FSRS)" />
+          <div className="space-y-2">
+            {apiConcepts.slice(0, 12).map((c) => (
+              <div key={`${c.matiere}-${c.chapitre_id}`} className="grid grid-cols-[1fr_120px_80px] gap-3 items-center">
+                <p className="text-white text-sm font-medium" dir="ltr">{c.chapitre_id}</p>
+                <div className="h-2 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.05)" }}>
+                  <div className="h-full rounded-full" style={{ width: `${Math.round(c.retrievability * 100)}%`, background: color(c.retrievability * 100) }} />
+                </div>
+                <div className="text-left">
+                  <p className="text-white font-bold text-sm">{Math.round(c.retrievability * 100)}%</p>
+                  {c.est_due && <p className="text-amber-400 text-[10px]">مستحقة اليوم</p>}
+                </div>
+              </div>
+            ))}
+          </div>
+        </SurfaceCard>
+      )}
 
       <SurfaceCard>
         <div className="flex items-center justify-between mb-4">

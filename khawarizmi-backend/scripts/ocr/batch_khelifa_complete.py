@@ -10,8 +10,9 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from services.ocr import get_volume_processor
+from services.ocr.bundle import BundleManager
 
-DATA_DIR = r"C:\Users\zakaria\Documents\projet khawarizmi A\LIVRES SCOLAIRES\ANALES SCIENCES\LIVRES ANNALES SVT BAC\DOSSIER ANNALES KHELIFA"
+ANNALES_DIR = ROOT / "data" / "ANNALES_SVT_BAC_ALGERIE"
 OCR_PROD = ROOT / "data" / "annales_workspace" / "OCR_PROD"
 LOG_FILE = ROOT / "data" / "batch_complete_log.json"
 
@@ -19,7 +20,7 @@ LOG_FILE = ROOT / "data" / "batch_complete_log.json"
 volumes = []
 
 # KHELIFA 1 (volumes 01-15)
-k1_dir = Path(DATA_DIR) / "KHELIFA 1" / "VOLUMES_KHELIFA1"
+k1_dir = ANNALES_DIR / "KHELIFA_1" / "VOLUMES_KHELIFA1"
 for v in range(1, 16):
     n = f"{v:02d}"
     name = f"KHELIFA1_VOLUME_{n}"
@@ -27,7 +28,7 @@ for v in range(1, 16):
     volumes.append((name, pdf))
 
 # FINAL BAC (volumes 1-6)
-fb_dir = Path(DATA_DIR) / "FINAL BAC" / "VOLUMES_FINALBAC"
+fb_dir = ANNALES_DIR / "FINAL_BAC" / "VOLUMES_FINALBAC"
 for v in range(1, 7):
     name = f"FINALBAC_VOLUME_{v}"
     pdf = fb_dir / f"{name}.pdf"
@@ -53,12 +54,15 @@ for name, pdf in volumes:
     try:
         proc = get_volume_processor(dpi=96, enable_hocr=True, use_gpu=True)
         summary = proc.process_volume(pdf)
+        bundle = BundleManager(pdf)
+        ocr_txt = bundle.export_combined_txt()
         elapsed = round(time.time() - t0, 1)
         row = summary.to_dict()
         row["elapsed_sec"] = elapsed
         results.append(row)
         msg = f"[DONE]  {name}: {row['pages_processed']}/{row['total_pages']}p, {row['total_characters']}ch, conf={row['avg_confidence']}, {elapsed}s"
         print(msg)
+        print(f"        Text bundle → {ocr_txt.name}")
         with open(LOG_FILE, "w", encoding="utf-8") as f:
             json.dump(results, f, ensure_ascii=False, indent=2)
     except Exception as e:

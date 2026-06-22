@@ -6,6 +6,8 @@ import { AuthGuard } from "@/components/auth/AuthGuard"
 import { AppShell } from "@/components/layout/AppShell"
 import { getProgressSnapshot, type ProgressSnapshot, type ErrorStat } from "@/lib/progress-store"
 import { methodologyErrors } from "@/lib/methodology-v1"
+import apiClient from "@/lib/api-client"
+import type { ProgressResponse } from "@/lib/types"
 
 const SKILL_TARGETS: Record<string, { href: string; actionAr: string }> = {
   document_analysis: { href: "/document-analysis", actionAr: "تدرب على استغلال الوثائق" },
@@ -25,13 +27,26 @@ function getLinkedSkill(errorCode: string): string | undefined {
 
 export default function RetryErrorsPage() {
   const [snapshot, setSnapshot] = useState<ProgressSnapshot | null>(null)
+  const [apiProgress, setApiProgress] = useState<ProgressResponse | null>(null)
 
   useEffect(() => {
+    let cancelled = false
     const refresh = () => setSnapshot(getProgressSnapshot())
+
+    ;(async () => {
+      try {
+        const data = await apiClient.getProgress()
+        if (!cancelled) setApiProgress(data)
+      } catch {
+        // backend indisponible — fallback local
+      }
+    })()
+
     refresh()
     window.addEventListener("sinamind-progress-updated", refresh)
     window.addEventListener("storage", refresh)
     return () => {
+      cancelled = true
       window.removeEventListener("sinamind-progress-updated", refresh)
       window.removeEventListener("storage", refresh)
     }
@@ -39,6 +54,7 @@ export default function RetryErrorsPage() {
 
   const data = snapshot || getProgressSnapshot()
   const errorsWithCount = data.errorStats.filter((e: ErrorStat) => e.count > 0)
+  const dueConcepts = apiProgress?.concepts.filter((c) => c.est_due) ?? []
 
   return (
     <AuthGuard>
@@ -114,6 +130,34 @@ export default function RetryErrorsPage() {
                     </div>
                   )
                 })}
+              </div>
+            )}
+
+            {dueConcepts.length > 0 && (
+              <div className="rounded-3xl p-6 glass border border-amber-500/20">
+                <h2 className="text-white font-bold text-base mb-2">⚡ مفاهيم مستحقة للمراجعة (FSRS)</h2>
+                <p className="text-gray-400 text-sm mb-4">{dueConcepts.length} مفهوم يحتاج مراجعة اليوم</p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {dueConcepts.slice(0, 10).map((c) => (
+                    <Link
+                      key={`${c.matiere}-${c.chapitre_id}`}
+                      href="/drill"
+                      className="flex items-center justify-between rounded-xl p-3 hover:bg-white/5 transition-colors"
+                      style={{ background: "rgba(255,255,255,0.02)" }}
+                    >
+                      <p className="text-white text-sm font-medium" dir="ltr">{c.chapitre_id}</p>
+                      <span className="text-amber-400 text-xs font-bold">
+                        {Math.round(c.retrievability * 100)}%
+                      </span>
+                    </Link>
+                  ))}
+                </div>
+                <Link
+                  href="/drill"
+                  className="inline-block mt-4 px-5 py-2.5 rounded-xl bg-amber-500/20 text-amber-300 text-sm font-bold hover:bg-amber-500/30 transition"
+                >
+                  ابدأ جلسة المراجعة ←
+                </Link>
               </div>
             )}
 

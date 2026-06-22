@@ -1,0 +1,177 @@
+[
+  {
+    "chapter_slug": "respiration-cellulaire",
+    "blocks": [
+      {
+        "block_type": "summary",
+        "title_ar": "التنفس الخلوي",
+        "body_ar": "التنفس الخلوي هو عملية هدم الجلوكوز بوجود الأكسجين لإنتاج الطاقة (ATP) في الميتوكوندري. يمر عبر ثلاث مراحل: التحلل السكري، دورة كريبس، والفسفرة التأكسدية.",
+        "quick_check": {"type": "true-false", "question_ar": "يحدث التنفس الخلوي في الميتوكوندري.", "options": ["صحيح", "خطأ"], "correct_index": 0, "explanation_ar": "نعم، التنفس الخلوي يحدث في الميتوكوندري."}
+      },
+      {
+        "block_type": "concept",
+        "title_ar": "المراحل الثلاث",
+        "body_ar": "1. التحلل السكري: في السيتوبلازم، يتحلل الجلوكوز إلى حمض البيروفيك. 2. دورة كريبس: في الميتوكوندري، يكتمل الهدم. 3. الفسفرة التأكسدية: في الميتوكوندري، تنتج معظم ATP.",
+        "quick_check": {"type": "mcq", "question_ar": "أين تحدث الفسفرة التأكسدية؟", "options": ["السيتوبلازم", "الميتوكوندري", "النواة", "الريبوسوم"], "correct_index": 1, "explanation_ar": "الفسفرة التأكسدية تحدث في الميتوكوندري."}
+      },
+      {
+        "block_type": "analogy",
+        "title_ar": "تشبيه بسيط",
+        "body_ar": "الميتوكوندري مثل محرك السيارة: يحرق الوقود (الجلوكوز) بوجود الأكسجين لإنتاج الطاقة (ATP). بدون أكسجين، يتوقف المحرك ويلجأ الخلية للتخمر.",
+        "quick_check": {"type": "mcq", "question_ar": "ماذا يحدث للخلية في غياب الأكسجين؟", "options": ["تتوقف تماما", "تقوم بالتخمر", "تنتج ATP أكثر", "لا شيء"], "correct_index": 1, "explanation_ar": "في غياب الأكسجين تقوم الخلية بالتخمر."}
+      },
+      {
+        "block_type": "mistake",
+        "title_ar": "خطأ شائع",
+        "body_ar": "خطأ: 'التنفس ينتج 32 ATP'. الصحيح: ينتج حوالي 38 ATP. لكن المردود الفعلي أقل بسبب تسرب البروتونات.",
+        "quick_check": {"type": "true-false", "question_ar": "التنفس الخلوي ينتج حوالي 38 ATP.", "options": ["صحيح", "خطأ"], "correct_index": 0, "explanation_ar": "نعم، نظريا 38 ATP."}
+      },
+      {
+        "block_type": "bac_link",
+        "title_ar": "في البكالوريا",
+        "body_ar": "أسئلة شائعة: حساب مردود الطاقة، مقارنة التنفس والتخمر، تحليل وثائق تظهر استهلاك O2 وإنتاج CO2.",
+        "quick_check": {"type": "short-answer", "question_ar": "اذكر مرحلة واحدة من مراحل التنفس الخلوي.", "options": [], "expected_keywords": ["تحلل", "كريبس", "فسفرة"], "explanation_ar": "المراحل: التحلل السكري، دورة كريبس، الفسفرة التأكسدية."}
+      }
+    ]
+  },
+  {
+    "chapter_slug": "photosynthese",
+    "blocks": [
+      {
+        "block_type": "summary",
+        "title_ar": "التركيب الضوئي",
+        "body_ar": "التركيب الضوئي هو تحويل الطاقة الضوئية إلى طاقة كيميائية في الصانعة الخضراء. ينتج الجلوكوز وO2 من CO2 وH2O.",
+        "quick_check": {"type": "true-false", "question_ar": "التركيب الضوئي ينتج الأكسجين.", "options": ["صحيح", "خطأ"], "correct_index": 0, "explanation_ar": "نعم، ينتج O2."}
+      },
+      {
+        "block_type": "concept",
+        "title_ar": "المرحلتان",
+        "body_ar": "المرحلة الضوئية: في الثايلاكويد، تنتج ATP وNADPH وO2. المرحلة الكيميائية: في الستروما، دورة كالفن تثبت CO2 وتنتج الجلوكوز.",
+        "quick_check": {"type": "mcq", "question_ar": "أين تحدث المرحلة الضوئية؟", "options": ["الستروما", "الثايلاكويد", "الميتوكوندري", "السيتوبلازم"], "correct_index": 1, "explanation_ar": "في الثايلاكويد."}
+      },
+      {
+        "block_type": "analogy",
+        "title_ar": "تشبيه بسيط",
+        "body_ar": "الصانعة الخضراء مثل مصنع: الضوء هو الكهرباء، CO2 هو المادة الخام، الجلوكوز هو المنتج، وO2 هو النفاية.",
+        "quick_check": {"type": "mcq", "question_ar": "ما المنتج النهائي للتركيب الضوئي؟", "options": ["O2 فقط", "جلوكوز", "CO2", "ماء"], "correct_index": 1, "explanation_ar": "الجلوكوز."}
+      },
+      {
+        "block_type": "mistake",
+        "title_ar": "خطأ شائع",
+        "body_ar": "خطأ: 'زيادة الإضاءة تزيد دائما التركيب الضوئي'. الصحيح: بعد حد معين يحدث إشباع ضوئي.",
+        "quick_check": {"type": "true-false", "question_ar": "يوجد حد أقصى لاستفادة النبات من الضوء.", "options": ["صحيح", "خطأ"], "correct_index": 0, "explanation_ar": "نعم، الإشباع الضوئي."}
+      },
+      {
+        "block_type": "bac_link",
+        "title_ar": "في البكالوريا",
+        "body_ar": "أسئلة: تحليل منحنى إنتاج O2 بدلالة الإضاءة، تفسير الإشباع الضوئي، مقارنة المرحلتين.",
+        "quick_check": {"type": "short-answer", "question_ar": "اكتب ناتج المرحلة الضوئية.", "options": [], "expected_keywords": ["atp", "nadph", "o2"], "explanation_ar": "ATP و NADPH و O2."}
+      }
+    ]
+  },
+  {
+    "chapter_slug": "activite-enzymatique",
+    "blocks": [
+      {
+        "block_type": "summary",
+        "title_ar": "النشاط الإنزيمي",
+        "body_ar": "الإنزيم بروتين يحفز التفاعلات. نشاطه يعتمد على الحرارة وpH. لكل إنزيم ظروف مثلى.",
+        "quick_check": {"type": "true-false", "question_ar": "الإنزيم بروتين.", "options": ["صحيح", "خطأ"], "correct_index": 0, "explanation_ar": "نعم."}
+      },
+      {
+        "block_type": "concept",
+        "title_ar": "الموقع الفعال",
+        "body_ar": "الإنزيم له موقع فعال ترتبط به الركيزة (S) لتكوين معقد ES ثم ينتج المنتج (P). الإنزيم لا يُستهلك.",
+        "quick_check": {"type": "mcq", "question_ar": "ماذا يعني ES؟", "options": ["إنزيم-ركيزة", "إنزيم-منتج", "طاقة", "لا شيء"], "correct_index": 0, "explanation_ar": "معقد إنزيم-ركيزة."}
+      },
+      {
+        "block_type": "analogy",
+        "title_ar": "تشبيه بسيط",
+        "body_ar": "الإنزيم مثل القفل والمفتاح: الركيزة هي المفتاح الذي يناسب الموقع الفعال. إذا تغير شكل القفل (تمسخ)، لا يعمل.",
+        "quick_check": {"type": "mcq", "question_ar": "ماذا يحدث للإنزيم عند 60°C؟", "options": ["يزداد نشاطه", "يتمسخ", "يبقى ثابتا", "يتضاعف"], "correct_index": 1, "explanation_ar": "التمسخ."}
+      },
+      {
+        "block_type": "mistake",
+        "title_ar": "خطأ شائع",
+        "body_ar": "خطأ: 'الإنزيم يُستهلك في التفاعل'. الصحيح: الإنزيم لا يتغير ويمكنه تحفيز آلاف التفاعلات.",
+        "quick_check": {"type": "true-false", "question_ar": "الإنزيم يُستهلك أثناء التفاعل.", "options": ["صحيح", "خطأ"], "correct_index": 1, "explanation_ar": "خطأ. لا يُستهلك."}
+      },
+      {
+        "block_type": "bac_link",
+        "title_ar": "في البكالوريا",
+        "body_ar": "أسئلة: تحليل منحنى نشاط إنزيم، استخراج القيمة المثلى، تفسير انخفاض النشاط.",
+        "quick_check": {"type": "short-answer", "question_ar": "ما درجة الحرارة المثلى لإنزيمات الجسم؟", "options": [], "expected_keywords": ["37"], "explanation_ar": "37°C."}
+      }
+    ]
+  },
+  {
+    "chapter_slug": "expression-genetique",
+    "blocks": [
+      {
+        "block_type": "summary",
+        "title_ar": "التعبير المورثي",
+        "body_ar": "التعبير المورثي هو تحويل المعلومة من ADN إلى بروتين. مرحلتان: الاستنساخ (ADN → ARNm) والترجمة (ARNm → بروتين).",
+        "quick_check": {"type": "true-false", "question_ar": "الاستنساخ ينتج ARNm.", "options": ["صحيح", "خطأ"], "correct_index": 0, "explanation_ar": "نعم."}
+      },
+      {
+        "block_type": "concept",
+        "title_ar": "الشفرة الوراثية",
+        "body_ar": "كل 3 نيوكليوتيدات (كودون) تشفر حمض أميني. 64 كودون لـ 20 حمض أميني. كودون التوقف ينهي الترجمة.",
+        "quick_check": {"type": "mcq", "question_ar": "كم حمض أميني يوجد؟", "options": ["3", "20", "64", "46"], "correct_index": 1, "explanation_ar": "20 حمض أميني."}
+      },
+      {
+        "block_type": "analogy",
+        "title_ar": "تشبيه بسيط",
+        "body_ar": "ADN مثل كتاب الوصفات، المورثة هي وصفة، ARNm هو نسخة الوصفة، الريبوسوم هو الطباخ.",
+        "quick_check": {"type": "mcq", "question_ar": "ما دور الريبوسوم؟", "options": ["نسخ ADN", "ترجمة ARNm", "تخريب البروتين", "لا شيء"], "correct_index": 1, "explanation_ar": "ترجمة ARNm."}
+      },
+      {
+        "block_type": "mistake",
+        "title_ar": "خطأ شائع",
+        "body_ar": "خطأ: 'كل مورثة تنتج بروتين واحد'. الصحيح: التضريب البديل يسمح بإنتاج عدة بروتينات من مورثة واحدة.",
+        "quick_check": {"type": "true-false", "question_ar": "مورثة واحدة يمكن أن تنتج عدة بروتينات.", "options": ["صحيح", "خطأ"], "correct_index": 0, "explanation_ar": "نعم، عبر التضريب البديل."}
+      },
+      {
+        "block_type": "bac_link",
+        "title_ar": "في البكالوريا",
+        "body_ar": "أسئلة: تحليل تسلسل ADN وARNm، استخراج الأحماض الأمينية، تفسير طفرة وتأثيرها.",
+        "quick_check": {"type": "short-answer", "question_ar": "اذكر مرحلتي التعبير المورثي.", "options": [], "expected_keywords": ["استنساخ", "ترجمة"], "explanation_ar": "الاستنساخ والترجمة."}
+      }
+    ]
+  },
+  {
+    "chapter_slug": "tectonique",
+    "blocks": [
+      {
+        "block_type": "summary",
+        "title_ar": "الصفائح التكتونية",
+        "body_ar": "الغلاف الصخري مقسم إلى صفائح تتحرك بفعل تيارات الحمل في الوشاح. 3 أنواع حدود: تباعد، تقارب، تحويل.",
+        "quick_check": {"type": "true-false", "question_ar": "الصفائح التكتونية تتحرك.", "options": ["صحيح", "خطأ"], "correct_index": 0, "explanation_ar": "نعم."}
+      },
+      {
+        "block_type": "concept",
+        "title_ar": "أنواع الحدود",
+        "body_ar": "تباعد: قشرة جديدة وظهرة. تقارب محيطي-قاري: غوص وخندق وبركان. تصادم قاري-قاري: جبال.",
+        "quick_check": {"type": "mcq", "question_ar": "ماذا يحدث عند حدود التباعد؟", "options": ["غوص", "تصادم", "قشرة جديدة", "لا شيء"], "correct_index": 2, "explanation_ar": "تكون قشرة جديدة."}
+      },
+      {
+        "block_type": "analogy",
+        "title_ar": "تشبيه بسيط",
+        "body_ar": "تيارات الحمل في الوشاح مثل الماء المغلي: تتحرك صعودا ونزولا وتحرك معها الصفائح.",
+        "quick_check": {"type": "mcq", "question_ar": "ما الذي يحرك الصفائح؟", "options": ["الرياح", "تيارات الحمل", "القمر", "دوران الأرض"], "correct_index": 1, "explanation_ar": "تيارات الحمل في الوشاح."}
+      },
+      {
+        "block_type": "mistake",
+        "title_ar": "خطأ شائع",
+        "body_ar": "خطأ: 'الصفيحة المحيطية لا تغوص'. الصحيح: الصفيحة المحيطية الأكثف تغوص تحت القارية.",
+        "quick_check": {"type": "true-false", "question_ar": "الصفيحة المحيطية تغوص تحت القارية.", "options": ["صحيح", "خطأ"], "correct_index": 0, "explanation_ar": "نعم، لأنها أكثف."}
+      },
+      {
+        "block_type": "bac_link",
+        "title_ar": "في البكالوريا",
+        "body_ar": "أسئلة: تحليل مقطع الأرض، تحديد نوع الحد، تفسير البراكين والزلازل.",
+        "quick_check": {"type": "short-answer", "question_ar": "اذكر نوع واحد من حدود الصفائح.", "options": [], "expected_keywords": ["تباعد", "تقارب", "تحويل"], "explanation_ar": "تباعد، تقارب، تحويل."}
+      }
+    ]
+  }
+]

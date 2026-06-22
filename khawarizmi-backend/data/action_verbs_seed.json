@@ -1,0 +1,143 @@
+[
+  {
+    "slug": "analyse",
+    "ar": "حلّل",
+    "fr": "Analyser",
+    "category": "document_exploitation",
+    "priority": "high",
+    "definition_ar": "التحليل هو تفكيك معطيات الوثيقة ووصف النتائج والعلاقات الظاهرة فيها قبل الانتقال إلى التفسير.",
+    "objective_ar": "إثبات أنك استغليت الوثيقة فعلا، لا أنك تحفظ الدرس فقط.",
+    "formula_ar": "تمثل الوثيقة ... حيث نلاحظ / يتبين أن ... من ... إلى ... بينما ...",
+    "steps": [
+      {"titleAr": "تقديم الوثيقة", "descriptionAr": "اذكر نوعها وما الذي تمثله: منحنى، جدول، تجربة، رسم.", "required": true},
+      {"titleAr": "تحديد المتغيرات", "descriptionAr": "حدد العامل المدروس والنتيجة أو الظاهرة المقاسة.", "required": true},
+      {"titleAr": "تفكيك المعطيات", "descriptionAr": "صف الزيادة أو النقصان أو الثبات أو المقارنة بين الحالات.", "required": true},
+      {"titleAr": "استعمال القيم", "descriptionAr": "اذكر قيما عددية، وحدات، فترات زمنية أو شروطا تجريبية.", "required": true},
+      {"titleAr": "منع التفسير", "descriptionAr": "لا تستعمل سببا أو مكتسبات قبلية داخل التحليل.", "required": true}
+    ],
+    "required_markers": ["تمثل الوثيقة", "نلاحظ", "يتبين", "من", "إلى", "بينما"],
+    "forbidden_markers": ["لأن", "بسبب", "راجع إلى", "يفسر", "وهذا يدل", "نعلم أن", "parce que", "s'explique"],
+    "common_errors": ["غياب تقديم الوثيقة", "غياب القيم العددية", "استعمال لأن داخل التحليل", "وصف عام دون تفكيك", "استرجاع الدرس بدل استغلال السند"],
+    "scoring_rules": [
+      {"code": "document_presentation", "labelAr": "تقديم الوثيقة", "points": 1, "checkType": "keyword"},
+      {"code": "variables", "labelAr": "تحديد المتغيرات", "points": 1, "checkType": "manual"},
+      {"code": "variation", "labelAr": "وصف التغيرات", "points": 2, "checkType": "keyword"},
+      {"code": "numerical_values", "labelAr": "استعمال القيم العددية", "points": 2, "checkType": "keyword"},
+      {"code": "no_interpretation", "labelAr": "عدم الخلط بالتفسير", "points": 1, "checkType": "forbidden_absence"}
+    ],
+    "bad_example": {"answerAr": "تنخفض كمية الغلوكوز لأن الخلايا تستعمله في التنفس.", "explanationAr": "استعملت كلمة لأن. هذا تفسير وليس تحليلا، كما أن القيم العددية غائبة."},
+    "good_example": {"answerAr": "تمثل الوثيقة تغير كمية الغلوكوز بدلالة الزمن، حيث نلاحظ انخفاضها من 2g/L إلى 0.5g/L خلال 30 دقيقة.", "explanationAr": "قدمت الوثيقة، وصفت التغير، واستعملت القيم دون تفسير السبب."},
+    "feedback_template_ar": "في التحليل صف الوثيقة فقط. إذا كتبت لأن أو بسبب فأنت خرجت إلى التفسير."
+  },
+  {
+    "slug": "interpret",
+    "ar": "فسّر",
+    "fr": "Interpréter",
+    "category": "interpretation",
+    "priority": "high",
+    "definition_ar": "التفسير هو الإجابة عن لماذا أو كيف، باستعمال معطيات السند والمكتسبات القبلية المناسبة.",
+    "objective_ar": "ربط الملاحظة بآلية علمية دقيقة لا مجرد تكرار الوثيقة.",
+    "formula_ar": "تفسر هذه النتيجة بـ ... لأن ... ونعلَم أن ...",
+    "steps": [
+      {"titleAr": "ابدأ من الملاحظة", "descriptionAr": "اذكر النتيجة التي تريد تفسيرها باختصار.", "required": true},
+      {"titleAr": "قدّم السبب", "descriptionAr": "استعمل: وهذا راجع إلى، سببه أن، يفسر ذلك بـ.", "required": true},
+      {"titleAr": "وظّف المكتسبات", "descriptionAr": "استعمل معلومة من الدرس تخدم السبب مباشرة.", "required": true},
+      {"titleAr": "اربط السبب بالنتيجة", "descriptionAr": "بيّن كيف يؤدي السبب إلى النتيجة.", "required": true}
+    ],
+    "required_markers": ["لأن", "راجع إلى", "سببه", "يفسر", "نعلم أن", "نتيجة لـ"],
+    "forbidden_markers": ["ربما", "أظن", "حسب رأيي"],
+    "common_errors": ["تفسير دون ملاحظة", "معلومة درس خارج الموضوع", "سببية خاطئة", "تكرار التحليل دون سبب"],
+    "scoring_rules": [
+      {"code": "observation_link", "labelAr": "الانطلاق من الملاحظة", "points": 1, "checkType": "manual"},
+      {"code": "causal_marker", "labelAr": "وجود علاقة سببية", "points": 2, "checkType": "keyword"},
+      {"code": "prior_knowledge", "labelAr": "توظيف مكتسب قبلي مناسب", "points": 2, "checkType": "manual"},
+      {"code": "scientific_accuracy", "labelAr": "دقة علمية", "points": 2, "checkType": "manual"}
+    ],
+    "bad_example": {"answerAr": "البروتين يرتفع وهذا جيد للخلية.", "explanationAr": "تفسير إنشائي وغامض، لا توجد آلية علمية ولا علاقة سببية واضحة."},
+    "good_example": {"answerAr": "يفسر ارتفاع كمية البروتين بتزايد ترجمة الـ ARNm، لأن الريبوزومات تركب سلاسل ببتيدية انطلاقا من الأحماض الأمينية.", "explanationAr": "ربط الملاحظة بآلية من الدرس واستعمل علاقة سببية."},
+    "feedback_template_ar": "التفسير ليس وصفا ثانيا للوثيقة. يجب أن تقدم السبب العلمي الذي يشرح الملاحظة."
+  },
+  {
+    "slug": "deduce",
+    "ar": "استنتج",
+    "fr": "Déduire",
+    "category": "deduction",
+    "priority": "high",
+    "definition_ar": "الاستنتاج هو تقديم المعلومة التي توصلت إليها بعد التحليل أو التفسير دون إضافة معلومات جديدة.",
+    "objective_ar": "إغلاق الاستدلال بجملة دقيقة تجيب عن هدف التجربة.",
+    "formula_ar": "نستنتج أن ...",
+    "steps": [
+      {"titleAr": "ارجع إلى هدف الوثيقة", "descriptionAr": "اسأل: ماذا أرادت التجربة أن تثبت؟", "required": true},
+      {"titleAr": "اكتب جملة قصيرة", "descriptionAr": "جملة أو جملتان كحد أقصى.", "required": true},
+      {"titleAr": "لا تضف جديدا", "descriptionAr": "لا تبدأ شرحا جديدا في الاستنتاج.", "required": true}
+    ],
+    "required_markers": ["نستنتج", "ومنه", "يدل ذلك على"],
+    "forbidden_markers": ["من جهة أخرى", "بالإضافة إلى", "كما نعلم أن"],
+    "common_errors": ["استنتاج طويل", "تكرار التحليل", "إضافة معلومة جديدة", "غياب جواب مباشر عن الهدف"],
+    "scoring_rules": [
+      {"code": "deduction_marker", "labelAr": "صيغة استنتاج واضحة", "points": 1, "checkType": "keyword"},
+      {"code": "direct_answer", "labelAr": "إجابة مباشرة عن الهدف", "points": 2, "checkType": "manual"},
+      {"code": "concise", "labelAr": "اختصار ودقة", "points": 1, "checkType": "manual"}
+    ],
+    "bad_example": {"answerAr": "نستنتج أن المنحنى يرتفع من 2 إلى 8 ثم هذا راجع إلى عدة عوامل درسناها سابقا في الوحدة.", "explanationAr": "هذا يكرر التحليل ويفتح تفسيرا جديدا بدل تقديم نتيجة قصيرة."},
+    "good_example": {"answerAr": "نستنتج أن الخلايا تزداد قدرتها على تركيب البروتين مع مرور الزمن.", "explanationAr": "جملة قصيرة ومباشرة مرتبطة بمعطيات الوثيقة."},
+    "feedback_template_ar": "الاستنتاج ليس فقرة. اكتب النتيجة التي تعلمتها من الوثيقة فقط."
+  },
+  {
+    "slug": "justify",
+    "ar": "علّل / برّر",
+    "fr": "Justifier / Argumenter",
+    "category": "argumentation",
+    "priority": "high",
+    "definition_ar": "التعليل أو التبرير يقوم على دليل من الوثيقة ومكتسب قبلي مناسب لإقناع المصحح بصحة الجواب.",
+    "objective_ar": "تحويل الرأي أو الاختيار إلى جواب مدعوم بحجة علمية.",
+    "formula_ar": "أختار / يظهر أن ... لأن ... والدليل من الوثيقة هو ... ونعلَم أن ...",
+    "steps": [
+      {"titleAr": "صرّح بالفكرة", "descriptionAr": "ما الشيء الذي تبرره؟", "required": true},
+      {"titleAr": "استخرج دليلا", "descriptionAr": "اذكر معطى من الوثيقة أو نتيجة تجريبية.", "required": true},
+      {"titleAr": "وظّف المعرفة", "descriptionAr": "اربط الدليل بمعلومة علمية مناسبة.", "required": true},
+      {"titleAr": "اختم بسبب واضح", "descriptionAr": "استعمل لأن أو ذلك راجع إلى عند الحاجة.", "required": true}
+    ],
+    "required_markers": ["لأن", "الدليل", "يتبين", "نلاحظ", "نعلم أن"],
+    "forbidden_markers": ["بدون سبب", "واضح فقط", "أظن"],
+    "common_errors": ["غياب الدليل", "حجة من الدرس دون وثيقة", "جواب عاطفي أو عام", "اختيار صحيح بتبرير ضعيف"],
+    "scoring_rules": [
+      {"code": "claim", "labelAr": "الفكرة أو الاختيار واضح", "points": 1, "checkType": "manual"},
+      {"code": "evidence", "labelAr": "دليل من الوثيقة", "points": 2, "checkType": "manual"},
+      {"code": "knowledge", "labelAr": "مكتسب قبلي مناسب", "points": 2, "checkType": "manual"},
+      {"code": "causal_link", "labelAr": "ربط منطقي", "points": 1, "checkType": "keyword"}
+    ],
+    "bad_example": {"answerAr": "الإجابة ب صحيحة لأنها تبدو منطقية.", "explanationAr": "لا يوجد دليل من الوثيقة ولا حجة علمية."},
+    "good_example": {"answerAr": "الإجابة ب صحيحة لأن الوثيقة تبين انخفاض النشاط الإنزيمي، ونعلم أن تغير البنية الفراغية للإنزيم يضعف تكامله مع مادة التفاعل.", "explanationAr": "اختيار + دليل + مكتسب قبلي + علاقة منطقية."},
+    "feedback_template_ar": "أي تبرير بلا دليل هو كلام مجاني. المصحح يبحث عن حجة من الوثيقة ثم ربط علمي."
+  },
+  {
+    "slug": "hypothesis",
+    "ar": "اقترح فرضية",
+    "fr": "Proposer une hypothèse",
+    "category": "scientific_inquiry",
+    "priority": "high",
+    "definition_ar": "الفرضية حل تفسيري مؤقت يربط بين سبب محتمل ونتيجة، ويجب أن يكون منطقيا وقابلا للتحقق.",
+    "objective_ar": "فتح مسار المسعى العلمي قبل التحقق من صحة الفرضية.",
+    "formula_ar": "انطلاقا من المعطيات، نفترض أن ... / يعود سبب ... إلى ... نتيجة لـ ...",
+    "steps": [
+      {"titleAr": "استغل الوثيقة أولا", "descriptionAr": "إذا كانت المهمة مركبة، حلل المعطيات قبل صياغة الفرضية.", "required": true},
+      {"titleAr": "استخرج المشكل", "descriptionAr": "حدد الظاهرة أو المرض أو التأثير المطلوب تفسيره.", "required": true},
+      {"titleAr": "اربط سببا بنتيجة", "descriptionAr": "الفرضية ليست كلمة، بل تفسير سببي.", "required": true},
+      {"titleAr": "اجعلها قابلة للاختبار", "descriptionAr": "يمكن التحقق منها بتجربة أو وثيقة لاحقة.", "required": true},
+      {"titleAr": "تجنب ربما", "descriptionAr": "استعمل صياغة علمية لا صياغة تردد.", "required": true}
+    ],
+    "required_markers": ["نفترض", "يعود سبب", "نتيجة", "خلل", "تأثير"],
+    "forbidden_markers": ["ربما", "أظن", "ممكن", "قد يكون فقط"],
+    "common_errors": ["فرضية غير قابلة للاختبار", "فرضية خارج الوثيقة", "صياغة كحقيقة قطعية", "نصف سطر غامض", "استعمال ربما"],
+    "scoring_rules": [
+      {"code": "linked_to_problem", "labelAr": "مرتبطة بالمشكل", "points": 2, "checkType": "manual"},
+      {"code": "causal", "labelAr": "تفسير سببي", "points": 2, "checkType": "keyword"},
+      {"code": "testable", "labelAr": "قابلة للاختبار", "points": 2, "checkType": "manual"},
+      {"code": "no_maybe", "labelAr": "صياغة علمية دون ربما", "points": 1, "checkType": "forbidden_absence"}
+    ],
+    "bad_example": {"answerAr": "ربما المرض بسبب مشكلة في الجسم.", "explanationAr": "غامضة، غير قابلة للاختبار، وتستعمل ربما ولا ترتبط بمعطى محدد."},
+    "good_example": {"answerAr": "نفترض أن سبب المرض هو حدوث طفرة في المورثة المسؤولة عن تركيب بروتين وظيفي، مما يؤدي إلى تركيب بروتين غير فعال.", "explanationAr": "تفسير سببي واضح وقابل للتحقق بوثائق لاحقة."},
+    "feedback_template_ar": "الفرضية ليست تخمينا فارغا. اربط سببا محتملا بنتيجة واجعلها قابلة للاختبار."
+  }
+]

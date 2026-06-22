@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import apiClient from "@/lib/api-client"
 import { PageShell } from "@/components/ui/PageShell"
 import { PageHero } from "@/components/ui/PageHero"
 import { SurfaceCard } from "@/components/ui/SurfaceCard"
@@ -25,17 +26,8 @@ function VideosContent() {
 
   const loadVideos = async () => {
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
-      const token = typeof window !== "undefined" ? localStorage.getItem("token") : null
-
-      const response = await fetch(`${apiUrl}/api/videos/all`, {
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
-      })
-
-      if (response.ok) {
-        const data = await response.json()
-        setVideos(data)
-      }
+      const data = await apiClient.getAllVideos()
+      setVideos(data)
     } catch (err) {
       console.error(err)
     } finally {

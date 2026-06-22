@@ -1,10 +1,13 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import { PageShell } from "@/components/ui/PageShell"
 import { PageHero } from "@/components/ui/PageHero"
 import { SurfaceCard } from "@/components/ui/SurfaceCard"
 import { PillChip } from "@/components/ui/PillChip"
+import { apiClient } from "@/lib/api-client"
+import type { DaProgressResponse, DaWeakSpotsResponse } from "@/lib/types"
 import { methodologyScenarios } from "@/lib/methodology-documents"
 import { methodologyChapterLinks } from "@/lib/methodology-chapters"
 
@@ -74,6 +77,16 @@ function groupChaptersByDomainAndUnit() {
 
 export default function DocumentAnalysisHubPage() {
   const domainGroups = groupChaptersByDomainAndUnit()
+  const [progress, setProgress] = useState<DaProgressResponse | null>(null)
+  const [weakSpots, setWeakSpots] = useState<DaWeakSpotsResponse | null>(null)
+
+  useEffect(() => {
+    apiClient.getDaProgress().then(setProgress).catch(() => {})
+    apiClient.getDaWeakSpots().then(setWeakSpots).catch(() => {})
+  }, [])
+
+  const duesCount = progress?.dues_aujourd_hui ?? 0
+  const weakCount = weakSpots?.total ?? 0
 
   return (
     <PageShell wide>
@@ -86,6 +99,22 @@ export default function DocumentAnalysisHubPage() {
       <p className="text-gray-400 text-sm">
         اختر وحدة للبدء. كل سيناريو يحتوي على 4 وثائق و 5 أسئلة منهجية على نمط البكالوريا.
       </p>
+
+      {(duesCount > 0 || weakCount > 0) && (
+        <div className="rounded-2xl p-4 flex flex-wrap items-center gap-4" style={{ background: "linear-gradient(135deg, rgba(45,212,191,0.12), rgba(251,191,36,0.08))" }}>
+          <div className="flex items-center gap-2">
+            <span className="text-2xl">🧠</span>
+            <div>
+              <p className="text-white font-bold text-sm">FSRS — Répétition espacée</p>
+              <p className="text-gray-400 text-xs">
+                {duesCount > 0 && `${duesCount} compétence(s) à réviser aujourd'hui`}
+                {duesCount > 0 && weakCount > 0 && " · "}
+                {weakCount > 0 && `${weakCount} point(s) faible(s) détecté(s)`}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {methodologyScenarios.map((scenario) => {

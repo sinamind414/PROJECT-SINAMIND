@@ -14,21 +14,14 @@ export function VideosWidget({ chapitre }: { chapitre: string }) {
 
   const loadVideos = async () => {
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
-      const token = typeof window !== "undefined" ? localStorage.getItem("token") : null
-
-      const response = await fetch(
-        `${apiUrl}/api/videos/by-chapter/${encodeURIComponent(chapitre)}`,
-        {
-          headers: token ? { "Authorization": `Bearer ${token}` } : {}
-        }
-      )
-
-      if (response.ok) {
-        const data = await response.json()
-        setVideos(data.slice(0, 3))
-      }
+      const data = await apiClient.getVideosByChapter(chapitre)
+      setVideos(data.slice(0, 3))
     } catch (err) {
+      console.error("Erreur vidéos:", err)
+    } finally {
+      setLoading(false)
+    }
+  }
       console.error("Erreur vidéos:", err)
     } finally {
       setLoading(false)

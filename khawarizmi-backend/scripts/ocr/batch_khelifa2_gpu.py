@@ -10,6 +10,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from services.ocr import get_volume_processor
+from services.ocr.bundle import BundleManager
 
 BASE = ROOT / "data" / "ANNALES_SVT_BAC_ALGERIE" / "KHELIFA_2" / "VOLUMES_KHELIFA2"
 LOG_FILE = ROOT / "data" / "ocr_batch_log.json"
@@ -35,11 +36,14 @@ for v in range(1, 16):
     try:
         proc = get_volume_processor(dpi=140, enable_hocr=True, use_gpu=True)
         summary = proc.process_volume(pdf)
+        bundle = BundleManager(pdf)
+        ocr_txt = bundle.export_combined_txt()
         elapsed = round(time.time() - t0, 1)
         row = summary.to_dict()
         row["elapsed_sec"] = elapsed
         results.append(row)
         print(f"[DONE] {name}: {row['pages_processed']}/{row['total_pages']}p, {row['total_characters']}ch, conf={row['avg_confidence']}, {elapsed}s")
+        print(f"       Text bundle → {ocr_txt.name}")
     except Exception as e:
         elapsed = round(time.time() - t0, 1)
         results.append({"volume": name, "error": str(e), "elapsed_sec": elapsed})

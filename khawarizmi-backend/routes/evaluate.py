@@ -126,11 +126,9 @@ async def evaluate(
         concept_states = {}
         
         if concept_ids:
-            # Safe tuple injection in query
-            cids_param = tuple(concept_ids) if len(concept_ids) > 1 else (concept_ids[0],)
             res_states = await db.execute(
-                text("SELECT concept_id, fsrs_state FROM mastery_micro_concepts WHERE user_id = :uid AND concept_id IN :cids"),
-                {"uid": user_id, "cids": cids_param}
+                text("SELECT concept_id, fsrs_state FROM mastery_micro_concepts WHERE user_id = :uid AND concept_id = ANY(:cids)"),
+                {"uid": user_id, "cids": list(concept_ids)}
             )
             
             from fsrs import Card

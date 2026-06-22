@@ -33,7 +33,8 @@ class VolumeProcessor:
 
     def process_volume(self, pdf_path: Path,
                        use_parallel: bool = False,
-                       progress_callback: Optional[Callable] = None) -> VolumeSummary:
+                       progress_callback: Optional[Callable] = None,
+                       resume: bool = False) -> VolumeSummary:
         from .pdf_renderer import PDFRenderer
         from .preprocessor import ImagePreprocessor
 
@@ -48,7 +49,39 @@ class VolumeProcessor:
         total_chars = 0
         confidences = []
 
+        # Resume: collect already-processed pages
+        if resume:
+            done = set()
+            for p in range(1, total_pages + 1):
+                meta_path = bundle._pages_meta_dir / f"page_{p:06d}.json"
+                txt_path = bundle._pages_txt_dir / f"page_{p:06d}.txt"
+                if meta_path.exists() and txt_path.exists():
+                    try:
+                        import json
+                        meta = json.loads(meta_path.read_text(encoding="utf-8"))
+                        if meta.get("status") == "success":
+                            pr = PageResult(
+                                page=p,
+                                text=meta.get("text", ""),
+                                char_count=meta.get("char_count", 0),
+                                confidence=meta.get("confidence", 0.0),
+                                words=[WordBox(w["text"], w["conf"], w["bbox"])
+                                       for w in meta.get("words", [])]
+                            )
+                            results.append(pr)
+                            total_chars += pr.char_count
+                            confidences.append(pr.confidence)
+                            done.add(p)
+                    except Exception:
+                        pass
+            if done:
+                logger.info("Resume: %d pages already done, skipping", len(done))
+
         for i in range(total_pages):
+            page_num = i + 1
+            if resume and page_num in done:
+                continue
+
             try:
                 img = renderer.render_page(pdf_path, i)
                 if img is None:
@@ -58,7 +91,7 @@ class VolumeProcessor:
                 text, conf, words = ocr.ocr_image(pre, return_hocr=self.enable_hocr)
 
                 pr = PageResult(
-                    page=i + 1,
+                    page=page_num,
                     text=text,
                     char_count=len(text),
                     confidence=conf,
@@ -68,16 +101,16 @@ class VolumeProcessor:
                 total_chars += len(text)
                 confidences.append(conf)
 
-                bundle.write_page_text(i + 1, text)
+                bundle.write_page_text(page_num, text)
                 bundle.write_page_meta(pr)
 
                 if progress_callback:
-                    progress_callback({"page": i + 1, "progress": round((i + 1) / total_pages * 100, 1)})
+                    progress_callback({"page": page_num, "progress": round((page_num) / total_pages * 100, 1)})
 
                 preprocessor.cleanup(img)
             except Exception as e:
                 errors += 1
-                logger.error("Page %d failed: %s", i + 1, e)
+                logger.error("Page %d failed: %s", page_num, e)
 
         avg = sum(confidences) / len(confidences) if confidences else 0
         summary = VolumeSummary(

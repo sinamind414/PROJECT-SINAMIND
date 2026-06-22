@@ -26,6 +26,7 @@ const MENU = [
   { href: "/annales", icon: BookMarked, labelAr: "مواضيع البكالوريا" },
   { href: "/action-verbs", icon: Zap, labelAr: "أفعال الأداء" },
   { href: "/document-analysis", icon: Search, labelAr: "استغلال الوثائق" },
+  { href: "/simulation", icon: Microscope, labelAr: "محاكاة تفاعلية" },
   { href: "/retry-errors", icon: AlertTriangle, labelAr: "إصلاح الأخطاء" },
   { href: "/exercises", icon: Dumbbell, labelAr: "التمارين" },
   { href: "/progress", icon: TrendingUp, labelAr: "التقدم" },

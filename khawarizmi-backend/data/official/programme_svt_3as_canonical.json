@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "version": "2026.2.0",
+    "version": "2026.2.1",
     "source": "ONEC - Programme officiel SVT Terminale Sciences Expérimentales Algérie",
     "matiere": "SVT",
     "niveau": "3AS",
@@ -89,6 +89,7 @@
           "id": "ch_photosynthese",
           "nom_fr": "Photosynthèse",
           "nom_ar": "التركيب الضوئي",
+          "unite": 1,
           "micro_concepts": [
             {"id": "mc_photo_01", "nom_fr": "Chloroplaste et thylakoïdes", "nom_ar": "البلاستيدات الخضراء والثايلاكويدات", "importance": "critique", "bac_frequent": true},
             {"id": "mc_photo_02", "nom_fr": "Phase photochimique (lumineuse)", "nom_ar": "المرحلة الضوئية", "importance": "critique", "bac_frequent": true},
@@ -100,12 +101,27 @@
           "id": "ch_respiration",
           "nom_fr": "Respiration cellulaire",
           "nom_ar": "التنفس الخلوي",
+          "unite": 2,
           "micro_concepts": [
             {"id": "mc_resp_01", "nom_fr": "Mitochondrie", "nom_ar": "الميتوكوندريا", "importance": "critique", "bac_frequent": true},
             {"id": "mc_resp_02", "nom_fr": "Glycolyse", "nom_ar": "الجليكوليز", "importance": "haute", "bac_frequent": true},
             {"id": "mc_resp_03", "nom_fr": "Cycle de Krebs", "nom_ar": "دورة كربس", "importance": "critique", "bac_frequent": true},
             {"id": "mc_resp_04", "nom_fr": "Chaîne respiratoire et phosphorylation oxydative", "nom_ar": "سلسلة التنفس والفسفرة التأكسدية", "importance": "critique", "bac_frequent": true},
-            {"id": "mc_resp_05", "nom_fr": "Fermentation (lactique et alcoolique)", "nom_ar": "التخمر", "importance": "haute", "bac_frequent": true}
+            {"id": "mc_resp_05", "nom_fr": "Fermentation (lactique et alcoolique)", "nom_ar": "التخمر", "importance": "haute", "bac_frequent": true},
+            {"id": "mc_resp_06", "nom_fr": "NAD⁺/NADH et FAD/FADH₂ (transporteurs d'électrons)", "nom_ar": "ناقلات الإلكترونات NAD⁺/NADH و FAD/FADH₂", "importance": "haute", "bac_frequent": true},
+            {"id": "mc_resp_07", "nom_fr": "Bilan ATP du cycle de Krebs", "nom_ar": "حصيلة ATP لدورة كربس", "importance": "haute", "bac_frequent": true}
+          ]
+        },
+        {
+          "id": "ch_bilan_energetique",
+          "nom_fr": "Transformations énergétiques au niveau cellulaire",
+          "nom_ar": "التحولات الطاقوية على المستوى الخلوي",
+          "unite": 3,
+          "micro_concepts": [
+            {"id": "mc_bilan_01", "nom_fr": "Relation entre photosynthèse et respiration", "nom_ar": "العلاقة بين التركيب الضوئي والتنفس الخلوي", "importance": "critique", "bac_frequent": true},
+            {"id": "mc_bilan_02", "nom_fr": "Bilan énergétique global comparé", "nom_ar": "الحصيلة الطاقوية المقارنة الشاملة", "importance": "critique", "bac_frequent": true},
+            {"id": "mc_bilan_03", "nom_fr": "Flux de l'énergie dans l'écosystème", "nom_ar": "تدفق الطاقة في النظام البيئي", "importance": "haute", "bac_frequent": true},
+            {"id": "mc_bilan_04", "nom_fr": "Équilibre énergétique cellulaire (production vs consommation)", "nom_ar": "التوازن الطاقوي الخلوي", "importance": "haute", "bac_frequent": true}
           ]
         }
       ]
@@ -116,15 +132,41 @@
       "nom_ar": "التكتونية العامة",
       "chapitres": [
         {
-          "id": "ch_tectonique",
-          "nom_fr": "Tectonique des plaques",
-          "nom_ar": "تكتونية الصفائح",
+          "id": "ch_tectonique_plaques",
+          "nom_fr": "Activité tectonique des plaques",
+          "nom_ar": "النشاط التكتوني للصفائح",
+          "unite": 1,
           "micro_concepts": [
-            {"id": "mc_tec_01", "nom_fr": "Structure interne de la Terre", "nom_ar": "البنية الداخلية للأرض", "importance": "haute", "bac_frequent": true},
-            {"id": "mc_tec_02", "nom_fr": "Plaques tectoniques", "nom_ar": "الصفائح التكتونية", "importance": "critique", "bac_frequent": true},
-            {"id": "mc_tec_03", "nom_fr": "Divergence et convergence des plaques", "nom_ar": "تباعد وتقارب الصفائح", "importance": "critique", "bac_frequent": true},
-            {"id": "mc_tec_04", "nom_fr": "Subduction et dorsales océaniques", "nom_ar": "الاندساس والحواف المتباعدة", "importance": "haute", "bac_frequent": true},
-            {"id": "mc_tec_05", "nom_fr": "Sismicité et volcanisme", "nom_ar": "الزلازل والبراكين", "importance": "haute", "bac_frequent": true}
+            {"id": "mc_tec_01", "nom_fr": "Identification des plaques tectoniques", "nom_ar": "تحديد الصفائح التكتونية", "importance": "critique", "bac_frequent": true},
+            {"id": "mc_tec_02", "nom_fr": "Types de mouvements de plaques (divergence, convergence, coulissement)", "nom_ar": "أنواع حركات الصفائح", "importance": "critique", "bac_frequent": true},
+            {"id": "mc_tec_03", "nom_fr": "Preuves de la dérive des continents", "nom_ar": "الأدلة على حركة الصفائح", "importance": "haute", "bac_frequent": true},
+            {"id": "mc_tec_04", "nom_fr": "Énergie interne de la Terre", "nom_ar": "الطاقة الداخلية للكرة الأرضية", "importance": "haute", "bac_frequent": true},
+            {"id": "mc_tec_05", "nom_fr": "Moteurs des mouvements tectoniques", "nom_ar": "محركات حركة الصفائح", "importance": "haute", "bac_frequent": true}
+          ]
+        },
+        {
+          "id": "ch_structure_terre",
+          "nom_fr": "Structure interne du globe terrestre",
+          "nom_ar": "بنية الكرة الأرضية",
+          "unite": 2,
+          "micro_concepts": [
+            {"id": "mc_struc_terre_01", "nom_fr": "Ondes sismiques (P, S, L) et leurs propriétés", "nom_ar": "الموجات الزلزالية وأنواعها", "importance": "critique", "bac_frequent": true},
+            {"id": "mc_struc_terre_02", "nom_fr": "Propagation des ondes sismiques dans les couches terrestres", "nom_ar": "انتشار الموجات الزلزالية في باطن الأرض", "importance": "critique", "bac_frequent": true},
+            {"id": "mc_struc_terre_03", "nom_fr": "Modélisation de la structure interne (discontinuités)", "nom_ar": "نمذجة البنية الداخلية للكرة الأرضية", "importance": "haute", "bac_frequent": true},
+            {"id": "mc_struc_terre_04", "nom_fr": "Composition chimique et minérale des couches", "nom_ar": "التركيب الكيميائي والمعدني للطبقات", "importance": "haute", "bac_frequent": true}
+          ]
+        },
+        {
+          "id": "ch_banies_geologiques",
+          "nom_fr": "Activité tectonique et structures géologiques associées",
+          "nom_ar": "النشاط التكتوني والبنيات الجيولوجية المرتبطة به",
+          "unite": 3,
+          "micro_concepts": [
+            {"id": "mc_geo_01", "nom_fr": "Dorsales océaniques et formation de la croûte", "nom_ar": "الظهرات وسط المحيطية وبناء اللوح المحيطي", "importance": "critique", "bac_frequent": true},
+            {"id": "mc_geo_02", "nom_fr": "Subduction et disparition de la croûte océanique", "nom_ar": "الغوص واختفاء اللوح المحيطي", "importance": "critique", "bac_frequent": true},
+            {"id": "mc_geo_03", "nom_fr": "Collision continentale et chaînes alpines", "nom_ar": "التصادم القاري وبناء السلاسل الجبلية", "importance": "critique", "bac_frequent": true},
+            {"id": "mc_geo_04", "nom_fr": "Ophiolites — témoins d'un ancien océan", "nom_ar": "الأوفيوليت — شواهد محيط قديم", "importance": "haute", "bac_frequent": true},
+            {"id": "mc_geo_05", "nom_fr": "Cycle de Wilson complet", "nom_ar": "دورة ويلسون الكاملة", "importance": "haute", "bac_frequent": true}
           ]
         }
       ]

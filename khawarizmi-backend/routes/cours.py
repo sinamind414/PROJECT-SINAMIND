@@ -15,6 +15,15 @@ MAPPING_PATH = Path(__file__).resolve().parent.parent / "data" / "chapter_mappin
 with open(MAPPING_PATH, "r", encoding="utf-8") as f:
     CHAPTER_MAPPING = json.load(f)
 
+# Source de vérité du cours (markdown canonique de 10 000 lignes).
+# La table rag_chunks est censée le contenir, mais l'ingest
+# (scripts/ingest_claude_opus.py) insère sous le nom
+# 'programme_national_svt_claude_opus.md'. On lit le fichier directement
+# en fallback quand la DB est vide — extract_section() fonctionnant sur
+# headers markdown, le résultat est identique au RAG pour un cours structuré.
+COURSE_FILE = Path(__file__).resolve().parent.parent / "data" / "courses" / "programme_national_svt_claude_opus.md"
+COURSE_SOURCE = "programme_national_svt_claude_opus.md"
+
 
 def score_match(chapitre: str, keywords: list[str]) -> int:
     c = chapitre.lower()
@@ -133,11 +142,6 @@ def fix_markdown_tables(content: str) -> str:
 
             # Check if next line is a separator
             has_separator = next_line.startswith("|") and "---" in next_line
-            # Or if next line is also a data row (table already has separator before)
-            is_data_row_after_separator = (
-                has_separator
-                or "---" in stripped  # unlikely but safe
-            )
 
             result.append(line)
 
@@ -343,82 +347,66 @@ SECTION_EMOJI_PATTERN = re.compile(
 )
 
 
+def _clean_course_content(raw: str, chapitre: str) -> str:
+    """Pipeline de nettoyage partagé : extraction de section + nettoyage ASCII."""
+    focused = extract_section(raw, chapitre)
+    no_schemas = remove_ascii_schemas(focused)
+    cleaned = clean_ascii_tables(no_schemas)
+    no_ascii = remove_ascii_art(cleaned)
+    fixed_tables = fix_markdown_tables(no_ascii)
+    split_tables = split_flat_tables(fixed_tables)
+    inline_fixed = fix_inline_tables(split_tables)
+    return convert_numbered_lists(inline_fixed)
+
+
 def extract_section(content: str, chapitre: str) -> str:
+    """Extrait la section du cours correspondant au chapitre demandé.
+
+    Stratégie robuste : collecte TOUS les headers markdown (#{1,4})
+    contenant un keyword, puis choisit celui de niveau le plus haut (= le
+    moins de #). On évite ainsi le faux départ sur un sous-header ### quand
+    une vraie section ## existe plus loin (keyword générique type "ADN").
+    On extrait ensuite jusqu'au prochain header de niveau <= au niveau retenu.
+
+    NOTE : on ignore les lignes commençant par un emoji sans '#'. Dans ce
+    markdown, TOUS les vrais headers de section sont en '## emoji' (regex
+    markdown ci-dessus), et les lignes 'emoji-nu' sont des occurrences
+    parasites (légendes de schémas, encadrés "le saviez-vous", résumés) qui
+    pollueraient la sélection (faux niveau 1 gagnant sur la vraie section ##).
+    """
     keywords = SECTION_KEYWORDS.get(chapitre, [chapitre])
     lines = content.split("\n")
-    extracted_lines = []
-    in_section = False
-    current_level = 0
-    found_start = False
 
+    # 1. Collecter tous les headers markdown (#{1,4}) qui matchent un keyword.
+    candidates = []
     for i, line in enumerate(lines):
         stripped = line.strip()
+        m = re.match(r"^(#{1,4})\s+(.+)$", stripped)
+        if m:
+            level = len(m.group(1))
+            title = m.group(2)
+            if any(kw.lower() in title.lower() for kw in keywords):
+                candidates.append((i, level))
 
-        # Ignorer les séparateurs seuls
-        if stripped == "---":
-            if in_section and found_start:
-                # Vérifier si la prochaine ligne est un header
-                next_line = lines[i + 1].strip() if i + 1 < len(lines) else ""
-                if SECTION_EMOJI_PATTERN.match(next_line) or re.match(r"^#{1,4}\s+", next_line):
-                    break
-                extracted_lines.append(line)
-            continue
+    if not candidates:
+        return content  # aucun match → l'appelant filtre (rejette si trop long)
 
-        # Détecter un titre markdown (## ou ###)
-        title_match = re.match(r"^(#{2,4})\s+(.+)$", stripped)
-        if title_match:
-            level = len(title_match.group(1))
-            title = title_match.group(2)
+    # 2. Niveau le plus haut disponible (priorité aux sections ##), puis 1er index.
+    best_level = min(c[1] for c in candidates)
+    start_idx, current_level = next(c for c in candidates if c[1] == best_level)
 
-            is_target = any(kw.lower() in title.lower() for kw in keywords)
-
-            if is_target and not found_start:
-                in_section = True
-                current_level = level
-                extracted_lines.append(line)
-                found_start = True
-                continue
-
-            if in_section and current_level and level <= current_level and found_start and not is_target:
-                if extracted_lines:
-                    break
-                in_section = False
-
-            if in_section:
-                extracted_lines.append(line)
-            continue
-
-        # Détecter les en-têtes emoji (📔, 📂, 📖, etc.)
-        sep_match = SECTION_EMOJI_PATTERN.match(stripped)
-        if sep_match:
-            header_text = sep_match.group(2)
-            is_target = any(kw.lower() in header_text.lower() for kw in keywords)
-
-            if is_target and not found_start:
-                in_section = True
-                current_level = 1
-                extracted_lines.append(line)
-                found_start = True
-                continue
-
-            if in_section and found_start and not is_target:
-                if extracted_lines:
-                    break
-                in_section = False
-                continue
-
-            if in_section and found_start and is_target:
-                extracted_lines.append(line)
-                continue
-
-            continue
-
-        # Si on est dans la section cible, on garde la ligne
-        if in_section and found_start:
+    # 3. Extraire depuis start_idx jusqu'au prochain header de niveau <= current_level.
+    extracted_lines = []
+    for i in range(start_idx, len(lines)):
+        line = lines[i]
+        stripped = line.strip()
+        if i == start_idx:
             extracted_lines.append(line)
-
-    if not extracted_lines:
-        return content
+            continue
+        m = re.match(r"^(#{1,4})\s+", stripped)
+        if m and len(m.group(1)) <= current_level:
+            break
+        extracted_lines.append(line)
 
     result = "\n".join(extracted_lines).strip()
     return result if result else content
@@ -446,7 +434,7 @@ async def get_cours(
             f"LOWER(chapitre) LIKE LOWER(:kw{i})" for i in range(len(keywords))
         )
         params = {f"kw{i}": f"%{k}%" for i, k in enumerate(keywords)}
-        params["source"] = "svt_bac_complet.md"
+        params["source"] = COURSE_SOURCE
 
         result = await db.execute(
             text(f"""
@@ -503,7 +491,7 @@ async def get_cours(
             text("""
                 SELECT content, chunk_index, importance, chapitre
                 FROM rag_chunks
-                WHERE source = 'svt_bac_complet.md'
+                WHERE source = :course_source
                 AND LOWER(chapitre) = LOWER(:chapitre)
                 AND LENGTH(content) > 200
                 AND content NOT LIKE '%تمارين%'
@@ -516,7 +504,7 @@ async def get_cours(
                 ORDER BY chunk_index ASC
                 LIMIT 30
             """),
-            {"chapitre": decoded},
+            {"chapitre": decoded, "course_source": COURSE_SOURCE},
         )
         rows = result.fetchall()
 
@@ -567,29 +555,58 @@ async def get_cours(
                     rows = result.fetchall()
 
     if not rows:
-        raise HTTPException(
-            status_code=404,
-            detail=f"Aucun contenu trouve pour : {decoded}",
-        )
+        # FALLBACK : lecture directe du markdown quand la DB est vide
+        # ou le nom source ne matche pas. Le contenu de cours étant structuré
+        # par headers, extract_section() récupère la bonne section sans RAG.
+        if not COURSE_FILE.exists():
+            logger.error(f"Fallback cours : fichier absent {COURSE_FILE}")
+            raise HTTPException(
+                status_code=404,
+                detail=f"Aucun contenu trouve pour : {decoded}",
+            )
+        try:
+            raw = COURSE_FILE.read_text(encoding="utf-8")
+            final_content = _clean_course_content(raw, decoded)
+            # extract_section() retourne tout le contenu si rien ne matche :
+            # on refuse alors pour éviter de servir 10 000 lignes hors-sujet.
+            if len(final_content.strip()) < 100:
+                logger.warning(
+                    f"Section vide pour '{decoded}' (fallback fichier) — "
+                    f"keywords={SECTION_KEYWORDS.get(decoded, [decoded])}"
+                )
+                raise HTTPException(
+                    status_code=404,
+                    detail=f"Aucun contenu trouve pour : {decoded}",
+                )
+            logger.info(f"Cours servi depuis fallback fichier : {decoded}")
+            return {
+                "chapitre": decoded,
+                "chapitre_rag": decoded,
+                "contenu": final_content,
+                "sources": [COURSE_SOURCE],
+                "total_chunks": 1,
+                "importance": "moyenne",
+            }
+        except HTTPException:
+            raise
+        except Exception as e:
+            logger.error(f"Fallback cours fichier échoué pour '{decoded}' : {e}")
+            raise HTTPException(
+                status_code=500,
+                detail=f"Erreur lors de la lecture du cours : {decoded}",
+            )
 
     content = "\n\n".join(r.content for r in rows)
     chapitre_reel = rows[0].chapitre
     importance = rows[0].importance if rows[0].importance else "moyenne"
 
-    focused = extract_section(content, decoded)
-    no_schemas = remove_ascii_schemas(focused)
-    cleaned = clean_ascii_tables(no_schemas)
-    no_ascii = remove_ascii_art(cleaned)
-    fixed_tables = fix_markdown_tables(no_ascii)
-    split_tables = split_flat_tables(fixed_tables)
-    inline_fixed = fix_inline_tables(split_tables)
-    final_content = convert_numbered_lists(inline_fixed)
+    final_content = _clean_course_content(content, decoded)
 
     return {
         "chapitre": decoded,
         "chapitre_rag": chapitre_reel,
         "contenu": final_content,
-        "sources": ["svt_bac_complet.md"],
+        "sources": [COURSE_SOURCE],
         "total_chunks": len(rows),
         "importance": importance,
     }

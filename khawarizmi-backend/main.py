@@ -82,7 +82,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="Khawarizmi API", version="2.0.0", lifespan=lifespan,
-              docs_url="/docs" if os.getenv("ENVIRONMENT") != "production" else None)
+              docs_url="/docs" if get_settings().ENVIRONMENT != "production" else None)
 app.add_middleware(CORSMiddleware, allow_origins=get_allowed_origins(),
                    allow_origin_regex=r"https://.*\.vercel\.app",
                    allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
@@ -90,8 +90,8 @@ app.state.limiter = limiter
 app.add_exception_handler(429, _rate_limit_exceeded_handler)
 app.add_middleware(SlowAPIMiddleware)
 
-from routes import health, auth, chat, cours, exercices, flashcards, sessions, mindmap, evaluate, session, payment, programme, lexique, videos, annales
-for r in [health,auth,chat,cours,exercices,flashcards,sessions,mindmap,evaluate,session,payment,programme,lexique,videos,annales]:
+from routes import health, auth, chat, cours, exercices, flashcards, sessions, mindmap, evaluate, session, payment, programme, lexique, videos, annales, action_verbs, document_analysis, orientation, tuteur, lessons, bac_blanc
+for r in [health,auth,chat,cours,exercices,flashcards,sessions,mindmap,evaluate,session,payment,programme,lexique,videos,annales,action_verbs,document_analysis,orientation,tuteur,lessons,bac_blanc]:
     app.include_router(r.router)
 
 

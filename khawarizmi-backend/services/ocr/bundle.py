@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 import logging
 
 from .config import get_config
@@ -39,3 +39,20 @@ class BundleManager:
             json.dumps(summary.to_dict(), ensure_ascii=False, indent=2),
             encoding="utf-8",
         )
+
+    def export_combined_txt(self, suffix: str = ".ocr.txt") -> Path:
+        pages = sorted(self._pages_txt_dir.glob("page_*.txt"))
+        if not pages:
+            logger.warning("No page text files to combine in %s", self._pages_txt_dir)
+            return self.bundle_dir / ("empty" + suffix)
+        out_path = self.bundle_dir / (self.bundle_dir.name + suffix)
+        with out_path.open("w", encoding="utf-8") as f:
+            for p in pages:
+                page_num = p.stem.replace("page_", "")
+                f.write(f"\n{'='*60}\n")
+                f.write(f"PAGE {page_num}\n")
+                f.write(f"{'='*60}\n")
+                f.write(p.read_text(encoding="utf-8"))
+                f.write("\n")
+        logger.info("Exported combined text (%d pages) → %s", len(pages), out_path.name)
+        return out_path

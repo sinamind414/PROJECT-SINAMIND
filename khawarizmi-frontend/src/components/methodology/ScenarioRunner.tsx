@@ -4,6 +4,7 @@ import { useMemo, useState } from "react"
 import { DocumentSetRenderer } from "@/components/methodology/DocumentRenderer"
 import { evaluateMethodologyAnswer, type MethodologyEvaluation } from "@/lib/methodology-evaluator"
 import { awardXP, claimBadge, saveMethodologyEvaluations, type GamificationAward } from "@/lib/progress-store"
+import { apiClient } from "@/lib/api-client"
 import type { MethodologyScenario, MethodologyQuestion } from "@/lib/methodology-documents"
 import type { MethodologyChapterLink } from "@/lib/methodology-chapters"
 
@@ -138,6 +139,8 @@ export function ScenarioRunner({
   const [result, setResult] = useState<ScenarioResult | null>(null)
   const [saved, setSaved] = useState(false)
   const [award, setAward] = useState<GamificationAward | null>(null)
+  const [submitting, setSubmitting] = useState(false)
+  const [apiSource, setApiSource] = useState(false)
 
   const questions = getActiveQuestions(scenario, chapterLink)
 
@@ -151,31 +154,85 @@ export function ScenarioRunner({
     setSaved(false)
   }
 
-  function submit() {
-    const evaluations = questions.map((question) => ({
-      question,
-      answer: answers[question.id] || "",
-      evaluation: evaluateMethodologyAnswer({ verbSlug: question.verbSlug, answer: answers[question.id] || "" }),
-    }))
+  async function submit() {
+    setSubmitting(true)
+    const chapterSlug = chapterLink?.slug || undefined
 
-    const readiness = Math.round(
-      evaluations.reduce((sum, item) => sum + item.evaluation.percentage, 0) / evaluations.length,
-    )
+    try {
+      const payload = {
+        scenario_id: scenario.id,
+        chapter_slug: chapterSlug,
+        answers: questions.map((q) => ({
+          verb_slug: q.verbSlug,
+          answer: answers[q.id] || "",
+        })),
+      }
+      const resp = await apiClient.evaluateDaAnswers(payload)
 
-    const next: ScenarioResult = { evaluations, readiness }
-    setResult(next)
+      const evaluations = questions.map((question) => {
+        const evalData = resp.evaluations.find((e) => e.verb_slug === question.verbSlug)
+        const evaluation: MethodologyEvaluation = evalData
+          ? {
+              verbSlug: evalData.verb_slug,
+              score: evalData.score,
+              scoreMax: evalData.score_max,
+              percentage: evalData.percentage,
+              success: evalData.success,
+              errors: evalData.errors,
+              missingMarkers: evalData.missing_markers,
+              forbiddenMarkersFound: evalData.forbidden_found,
+              criteria: [],
+              advice: evalData.advice,
+              allowSecondAttempt: true,
+              dominantErrorCode: evalData.dominant_error_code,
+            }
+          : evaluateMethodologyAnswer({ verbSlug: question.verbSlug, answer: answers[question.id] || "" })
 
-    saveMethodologyEvaluations(
-      evaluations.map((item) => ({
-        source: "document-analysis" as const,
-        verbSlug: item.question.verbSlug,
-        answer: item.answer,
-        evaluation: item.evaluation,
-      })),
-    )
-    setSaved(true)
-    const baseAward = awardXP("مهمة استغلال وثيقة", 60)
-    setAward(baseAward)
+        return { question, answer: answers[question.id] || "", evaluation }
+      })
+
+      const readiness = Math.round(
+        evaluations.reduce((sum, item) => sum + item.evaluation.percentage, 0) / evaluations.length,
+      )
+
+      setResult({ evaluations, readiness })
+      setApiSource(true)
+      saveMethodologyEvaluations(
+        evaluations.map((item) => ({
+          source: "document-analysis" as const,
+          verbSlug: item.question.verbSlug,
+          answer: item.answer,
+          evaluation: item.evaluation,
+        })),
+      )
+      setSaved(true)
+      setAward(awardXP("مهمة استغلال وثيقة", 60))
+    } catch {
+      setApiSource(false)
+      const evaluations = questions.map((question) => ({
+        question,
+        answer: answers[question.id] || "",
+        evaluation: evaluateMethodologyAnswer({ verbSlug: question.verbSlug, answer: answers[question.id] || "" }),
+      }))
+
+      const readiness = Math.round(
+        evaluations.reduce((sum, item) => sum + item.evaluation.percentage, 0) / evaluations.length,
+      )
+
+      setResult({ evaluations, readiness })
+      saveMethodologyEvaluations(
+        evaluations.map((item) => ({
+          source: "document-analysis" as const,
+          verbSlug: item.question.verbSlug,
+          answer: item.answer,
+          evaluation: item.evaluation,
+        })),
+      )
+      setSaved(true)
+      setAward(awardXP("مهمة استغلال وثيقة", 60))
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   function reset() {
@@ -183,6 +240,7 @@ export function ScenarioRunner({
     setResult(null)
     setSaved(false)
     setAward(null)
+    setApiSource(false)
   }
 
   return (
@@ -260,9 +318,10 @@ export function ScenarioRunner({
           <div className="mt-6 flex flex-wrap gap-3">
             <button
               onClick={submit}
-              className="px-5 py-3 rounded-xl bg-mint text-white font-bold hover:bg-mint-soft transition"
+              disabled={submitting}
+              className="px-5 py-3 rounded-xl bg-mint text-white font-bold hover:bg-mint-soft transition disabled:opacity-50"
             >
-              تحقق من المنهجية وسجل الخطأ
+              {submitting ? "جاري التقييم..." : "تحقق من المنهجية وسجل الخطأ"}
             </button>
             <button
               onClick={reset}
@@ -301,6 +360,11 @@ export function ScenarioRunner({
               </div>
               {saved && (
                 <p className="text-emerald-300 text-xs font-bold">✓ تم تسجيل الأخطاء في التقدم</p>
+              )}
+              {saved && (
+                <p className={`text-xs ${apiSource ? "text-mint-soft" : "text-amber-300"}`}>
+                  {apiSource ? "✓ FSRS mis à jour (backend)" : "⚠ Évaluation locale (backend indisponible)"}
+                </p>
               )}
               {award && (
                 <div className="rounded-3xl p-4 bg-emerald-500/10 border border-emerald-400/20 animate-fadeIn">

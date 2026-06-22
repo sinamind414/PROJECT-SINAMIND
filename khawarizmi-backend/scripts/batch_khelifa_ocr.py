@@ -2,6 +2,9 @@
 """
 Batch runner : applique ocr_pipeline_production.py à tous les volumes KHELIFA 1 & 2.
 
+DEPRECATED : Utiliser `scripts/ocr/batch_khelifa_complete.py`.
+Backend modulaire services/ocr/*. Conserve pour compatibilite.
+
 Usage :
   python scripts/batch_khelifa_ocr.py                        # les 30 volumes
   python scripts/batch_khelifa_ocr.py --serie 1               # KHELIFA 1 only

@@ -450,8 +450,8 @@ STRATÉGIQUE — À faire ce trimestre :
   [x] Ajouter Sentry monitoring
   [x] Implémenter /health endpoint
   [x] Implémenter Lexique SVT bilingue (221 termes, 4 endpoints API, RAG)
-  [ ] Connecter Next.js frontend au backend (en cours)
-  [ ] Connecter Mind Map ↔ FSRS
+  [x] Connecter Next.js frontend au backend (en cours)
+  [x] Connecter Mind Map ↔ FSRS
 
 ##############################################################
 # SECTION 11 — BUGS CRITIQUES CONNUS & RÉSOLUS

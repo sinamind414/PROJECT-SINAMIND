@@ -5,6 +5,7 @@ import { useParams } from "next/navigation"
 import Link from "next/link"
 import { AuthGuard } from "@/components/auth/AuthGuard"
 import { AppShell } from "@/components/layout/AppShell"
+import { ActiveLesson } from "@/components/lessons/ActiveLesson"
 import { ActiveLessonHero } from "@/components/lessons/ActiveLessonHero"
 import { ConceptCards } from "@/components/lessons/ConceptCards"
 import { LessonBlocks } from "@/components/lessons/LessonBlocks"
@@ -20,7 +21,7 @@ import type { CoursResponse } from "@/lib/types"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
 
-type CoursPageMode = "active" | "fallback-markdown" | "loading" | "empty"
+type CoursPageMode = "active-backend" | "active-local" | "fallback-markdown" | "loading" | "empty"
 
 function FallbackMarkdown({ chapitreParam }: { chapitreParam: string }) {
   const [cours, setCours] = useState<CoursResponse | null>(null)
@@ -104,6 +105,25 @@ export default function CoursDetailPage() {
   const params = useParams()
   const chapitreParam = (params.chapitre as string) || ""
   const activeLesson = getActiveLessonByChapterParam(chapitreParam)
+  const [useBackend, setUseBackend] = useState(true)
+
+  useEffect(() => {
+    setUseBackend(true)
+  }, [chapitreParam])
+
+  if (!activeLesson && useBackend) {
+    return (
+      <AuthGuard>
+        <AppShell>
+          <main className="flex-1 p-6 lg:p-8 overflow-auto">
+            <div className="max-w-4xl mx-auto">
+              <ActiveLesson key={chapitreParam} chapterSlug={chapitreParam} />
+            </div>
+          </main>
+        </AppShell>
+      </AuthGuard>
+    )
+  }
 
   if (!activeLesson) {
     return (

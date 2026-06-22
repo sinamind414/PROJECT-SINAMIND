@@ -1,0 +1,399 @@
+[
+  {
+    "slug": "validate-hypothesis",
+    "ar": "تحقق من صحة / صادق على فرضية",
+    "fr": "Valider une hypothèse",
+    "category": "scientific_inquiry",
+    "priority": "high",
+    "definition_ar": "المصادقة على الفرضية تتطلب مسارا: تحليل، تفسير عند الحاجة، علاقة، استنتاج جزئي، تركيب، ثم تأكيد أو نفي.",
+    "objective_ar": "إثبات التحكم في المسعى العلمي في التمرين الثالث.",
+    "formula_ar": "من الوثيقة ... نلاحظ ... وهذا يدل على ... ومنه نستنتج ... وبالتالي تصح / ترفض الفرضية ...",
+    "steps": [
+      {
+        "titleAr": "استغل كل وثيقة",
+        "descriptionAr": "لا تقفز مباشرة إلى المصادقة.",
+        "required": true
+      },
+      {
+        "titleAr": "قدّم استنتاجا جزئيا",
+        "descriptionAr": "بعد كل شكل أو وثيقة أعط نتيجة مرحلية.",
+        "required": true
+      },
+      {
+        "titleAr": "اربط الاستنتاجات",
+        "descriptionAr": "ركب النتائج الجزئية في نتيجة عامة.",
+        "required": true
+      },
+      {
+        "titleAr": "صادق أو انف",
+        "descriptionAr": "أكد الفرضية الصحيحة وانف الخاطئة إذا وجدت.",
+        "required": true
+      }
+    ],
+    "required_markers": [
+      "نلاحظ",
+      "نستنتج",
+      "الاستنتاج الجزئي",
+      "وبالتالي",
+      "تصح",
+      "ترفض",
+      "نصادق"
+    ],
+    "forbidden_markers": [
+      "الفرضية صحيحة"
+    ],
+    "common_errors": [
+      "مصادقة مباشرة",
+      "غياب الاستنتاجات الجزئية",
+      "عدم نفي الفرضية الخاطئة",
+      "خلط الوثائق دون تركيب"
+    ],
+    "scoring_rules": [
+      {
+        "code": "document_exploitation",
+        "labelAr": "استغلال الوثائق",
+        "points": 0,
+        "checkType": "manual"
+      },
+      {
+        "code": "partial_conclusions",
+        "labelAr": "استنتاجات جزئية",
+        "points": 0,
+        "checkType": "keyword"
+      },
+      {
+        "code": "synthesis",
+        "labelAr": "تركيب النتائج",
+        "points": 0,
+        "checkType": "manual"
+      },
+      {
+        "code": "validation",
+        "labelAr": "مصادقة أو نفي واضح",
+        "points": 0,
+        "checkType": "keyword"
+      }
+    ],
+    "bad_example": {
+      "answerAr": "الفرضية صحيحة لأن الوثائق تؤكد ذلك.",
+      "explanationAr": "مصادقة مباشرة دون تحليل ولا استنتاجات جزئية."
+    },
+    "good_example": {
+      "answerAr": "من الشكل أ نلاحظ انخفاض النشاط، ومنه نستنتج وجود خلل وظيفي. ومن الشكل ب يتبين تغير البنية، وبالتالي نصادق على فرضية تأثير الطفرة على وظيفة البروتين.",
+      "explanationAr": "استغلال وثائق + استنتاجات جزئية + مصادقة نهائية."
+    },
+    "feedback_template_ar": "لا تقل الفرضية صحيحة قبل أن تبني الدليل. المصادقة تأتي في النهاية لا في البداية."
+  },
+  {
+    "slug": "discuss",
+    "ar": "ناقش",
+    "fr": "Discuter",
+    "category": "compound_task",
+    "priority": "high",
+    "definition_ar": "المناقشة مهمة مركبة تشبه التحقق من الفرضية، مع إبراز الحجج وربما الإيجابيات والسلبيات.",
+    "objective_ar": "إظهار القدرة على بناء موقف علمي متوازن ومدعوم.",
+    "formula_ar": "بالاعتماد على الوثيقة ... نلاحظ ... وهذا يدل على ... لكن ... ومنه ...",
+    "steps": [
+      {
+        "titleAr": "استغل المعطيات",
+        "descriptionAr": "ابدأ من الوثائق لا من الرأي.",
+        "required": true
+      },
+      {
+        "titleAr": "فسر عند الحاجة",
+        "descriptionAr": "اربط الملاحظات بسبب علمي.",
+        "required": true
+      },
+      {
+        "titleAr": "أبرز الحجج والحدود",
+        "descriptionAr": "اذكر ما يدعم وما يعارض أو الإيجابيات والسلبيات.",
+        "required": true
+      },
+      {
+        "titleAr": "اتخذ موقفا",
+        "descriptionAr": "اختم باستنتاج علمي واضح ومتوازن.",
+        "required": true
+      }
+    ],
+    "required_markers": [
+      "من جهة",
+      "لكن",
+      "بينما",
+      "يدعم",
+      "ينفي",
+      "نستنتج"
+    ],
+    "forbidden_markers": [
+      "رأيي",
+      "أظن",
+      "واضح فقط"
+    ],
+    "common_errors": [
+      "مناقشة إنشائية",
+      "غياب الحجج",
+      "نسيان الجانب المخالف",
+      "عدم اتخاذ موقف نهائي"
+    ],
+    "scoring_rules": [
+      {
+        "code": "evidence",
+        "labelAr": "حجج من الوثائق",
+        "points": 0,
+        "checkType": "manual"
+      },
+      {
+        "code": "counterpoint",
+        "labelAr": "إبراز حد أو نفي",
+        "points": 0,
+        "checkType": "manual"
+      },
+      {
+        "code": "balanced_conclusion",
+        "labelAr": "موقف علمي نهائي",
+        "points": 0,
+        "checkType": "manual"
+      }
+    ],
+    "bad_example": {
+      "answerAr": "أناقش بأن الفرضية صحيحة لأنني أراها مناسبة.",
+      "explanationAr": "لا توجد حجج ولا وثائق ولا موقف علمي مبني."
+    },
+    "good_example": {
+      "answerAr": "تدعم نتائج الوثيقة الأولى الفرضية لأنها تبين انخفاض النشاط، بينما توضح الوثيقة الثانية سبب الانخفاض بتغير البنية، ومنه فالفرضية مقبولة.",
+      "explanationAr": "استعمل حججا وربطها بموقف نهائي."
+    },
+    "feedback_template_ar": "ناقش يعني ابن موقفا بالحجج. لا تحولها إلى رأي شخصي."
+  },
+  {
+    "slug": "scientific-text",
+    "ar": "اكتب نصا علميا",
+    "fr": "Composer un texte scientifique",
+    "category": "structured_production",
+    "priority": "high",
+    "definition_ar": "النص العلمي سؤال مقالي ينتظر استحضار وانتقاء وتنظيم المعارف وفق بناء منهجي واضح.",
+    "objective_ar": "إظهار القدرة على تركيب المعارف لا رميها عشوائيا.",
+    "formula_ar": "مقدمة بسياق عام + إشكالية؟ → عرض منظم → خاتمة تجيب عن الإشكالية.",
+    "steps": [
+      {
+        "titleAr": "اقرأ التعليمة",
+        "descriptionAr": "سطّر الكلمات المفتاحية وحدد المطلوب.",
+        "required": true
+      },
+      {
+        "titleAr": "اكتب مقدمة",
+        "descriptionAr": "سياق عام ثم طرح المشكل العلمي.",
+        "required": true
+      },
+      {
+        "titleAr": "نظم العرض",
+        "descriptionAr": "أفكار مرتبة، مصطلحات دقيقة، تسلسل منطقي.",
+        "required": true
+      },
+      {
+        "titleAr": "اختم مباشرة",
+        "descriptionAr": "الخاتمة تجيب عن الإشكالية ولا تضيف جديدا.",
+        "required": true
+      }
+    ],
+    "required_markers": [
+      "؟",
+      "أولا",
+      "ثانيا",
+      "في الختام",
+      "نستنتج"
+    ],
+    "forbidden_markers": [
+      "موضوعنا يتكلم",
+      "إلخ",
+      "كما قلنا سابقا"
+    ],
+    "common_errors": [
+      "غياب الإشكالية",
+      "عرض بلا ترتيب",
+      "مصطلحات ضعيفة",
+      "خاتمة تضيف معلومة جديدة"
+    ],
+    "scoring_rules": [
+      {
+        "code": "introduction",
+        "labelAr": "مقدمة وسياق",
+        "points": 0,
+        "checkType": "structure"
+      },
+      {
+        "code": "problematic",
+        "labelAr": "إشكالية واضحة",
+        "points": 0,
+        "checkType": "keyword"
+      },
+      {
+        "code": "development",
+        "labelAr": "عرض منظم",
+        "points": 1,
+        "checkType": "manual"
+      },
+      {
+        "code": "conclusion",
+        "labelAr": "خاتمة مباشرة",
+        "points": 0,
+        "checkType": "structure"
+      }
+    ],
+    "bad_example": {
+      "answerAr": "سأتحدث عن البروتينات. البروتينات مهمة ويوجد ADN وARN ثم تحدث الترجمة والاستنساخ.",
+      "explanationAr": "لا توجد إشكالية ولا ترتيب ولا خاتمة واضحة."
+    },
+    "good_example": {
+      "answerAr": "تضمن الخلية تحويل المعلومة الوراثية إلى بروتين وظيفي. فكيف يتم التعبير عن هذه المعلومة؟ يتم ذلك عبر الاستنساخ ثم الترجمة... وفي الختام، يسمح التعبير المورثي بتركيب بروتين يحدد الصفة.",
+      "explanationAr": "مقدمة + إشكالية + عرض منظم + خاتمة تجيب."
+    },
+    "feedback_template_ar": "النص العلمي ليس فقرة حرة. المصحح يبحث عن بناء: مقدمة، إشكالية، عرض، خاتمة."
+  },
+  {
+    "slug": "compare",
+    "ar": "قارن",
+    "fr": "Comparer",
+    "category": "document_exploitation",
+    "priority": "medium",
+    "definition_ar": "المقارنة لا تعني وصف عنصرين فقط، بل وضعهما تحت معيار واحد لإظهار الاختلاف أو التشابه.",
+    "objective_ar": "منع الإجابات المبعثرة التي تصف كل حالة وحدها دون علاقة.",
+    "formula_ar": "بالنسبة إلى معيار ...، نلاحظ أن ... بينما ...",
+    "steps": [
+      {
+        "titleAr": "حدد معيار المقارنة",
+        "descriptionAr": "مثلا: الكمية، النشاط، الزمن، البنية، الوظيفة.",
+        "required": true
+      },
+      {
+        "titleAr": "قارن الطرفين معا",
+        "descriptionAr": "لا تذكر طرفا وتنسى الآخر.",
+        "required": true
+      },
+      {
+        "titleAr": "استعمل بينما",
+        "descriptionAr": "أظهر الفرق أو التشابه بصيغة واضحة.",
+        "required": true
+      }
+    ],
+    "required_markers": [
+      "بينما",
+      "مقارنة",
+      "أكبر",
+      "أقل",
+      "نفس",
+      "مختلف"
+    ],
+    "forbidden_markers": [
+      "لأن",
+      "بسبب"
+    ],
+    "common_errors": [
+      "غياب معيار",
+      "وصف منفصل دون مقارنة",
+      "طرف واحد فقط",
+      "تفسير بدل مقارنة"
+    ],
+    "scoring_rules": [
+      {
+        "code": "criterion",
+        "labelAr": "معيار المقارنة",
+        "points": 0,
+        "checkType": "manual"
+      },
+      {
+        "code": "two_sides",
+        "labelAr": "ذكر الطرفين",
+        "points": 0,
+        "checkType": "manual"
+      },
+      {
+        "code": "comparison_marker",
+        "labelAr": "صيغة مقارنة",
+        "points": 0,
+        "checkType": "keyword"
+      }
+    ],
+    "bad_example": {
+      "answerAr": "في الحالة الأولى يوجد نشاط. في الحالة الثانية يوجد نشاط أيضا.",
+      "explanationAr": "لا يوجد معيار ولا فرق أو تشابه واضح."
+    },
+    "good_example": {
+      "answerAr": "بالنسبة إلى النشاط الإنزيمي، يكون مرتفعا في الحالة الشاهدة بينما ينخفض بوضوح في وجود المثبط.",
+      "explanationAr": "معيار + طرفان + مقارنة واضحة."
+    },
+    "feedback_template_ar": "إذا لم تذكر معيار المقارنة فأنت لا تقارن، أنت تسرد فقط."
+  },
+  {
+    "slug": "relationship",
+    "ar": "حدد العلاقة",
+    "fr": "Déterminer la relation",
+    "category": "document_exploitation",
+    "priority": "medium",
+    "definition_ar": "تحديد العلاقة يعني الانتقال من وصف X و Y إلى صياغة الرابط بينهما.",
+    "objective_ar": "تدريب الطالب على بناء جملة علاقة لا جملتين منفصلتين.",
+    "formula_ar": "كلما ... فإن ... / العلاقة بين X و Y هي علاقة ...",
+    "steps": [
+      {
+        "titleAr": "حدد المتغيرين",
+        "descriptionAr": "ما X وما Y؟",
+        "required": true
+      },
+      {
+        "titleAr": "راقب اتجاه التغير",
+        "descriptionAr": "هل يزيدان معا؟ هل يزيد أحدهما وينقص الآخر؟",
+        "required": true
+      },
+      {
+        "titleAr": "صغ العلاقة",
+        "descriptionAr": "استعمل كلما أو العلاقة بين.",
+        "required": true
+      }
+    ],
+    "required_markers": [
+      "كلما",
+      "العلاقة",
+      "طردية",
+      "عكسية",
+      "يزداد",
+      "ينخفض"
+    ],
+    "forbidden_markers": [
+      "فقط",
+      "لا علاقة"
+    ],
+    "common_errors": [
+      "وصف دون علاقة",
+      "عدم تحديد المتغيرين",
+      "خلط العلاقة السببية بالارتباط"
+    ],
+    "scoring_rules": [
+      {
+        "code": "variables",
+        "labelAr": "تحديد المتغيرين",
+        "points": 0,
+        "checkType": "manual"
+      },
+      {
+        "code": "direction",
+        "labelAr": "اتجاه العلاقة",
+        "points": 0,
+        "checkType": "manual"
+      },
+      {
+        "code": "relationship_sentence",
+        "labelAr": "جملة علاقة واضحة",
+        "points": 0,
+        "checkType": "keyword"
+      }
+    ],
+    "bad_example": {
+      "answerAr": "التركيز يزيد والنشاط يزيد.",
+      "explanationAr": "وصفت تغيرين لكن لم تصغ العلاقة بينهما."
+    },
+    "good_example": {
+      "answerAr": "العلاقة بين تركيز المادة والنشاط الإنزيمي طردية، فكلما زاد التركيز ازداد النشاط إلى حد معين.",
+      "explanationAr": "حدد المتغيرين وصاغ العلاقة بوضوح."
+    },
+    "feedback_template_ar": "اكتب كلما... فإن... وإلا فأنت لم تحدد العلاقة فعليا."
+  }
+]

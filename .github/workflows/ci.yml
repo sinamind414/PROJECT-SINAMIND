@@ -56,7 +56,7 @@ jobs:
           pip install ruff black
       - name: Ruff (linting)
         working-directory: khawarizmi-backend
-        run: ruff check . --output-format=github || true
+        run: ruff check . --output-format=github
       - name: Vérifier taille de main.py
         working-directory: khawarizmi-backend
         run: |
@@ -130,7 +130,7 @@ jobs:
             --cov-report=xml \
             --cov-report=term-missing \
             --cov-fail-under=50 \
-            -v --tb=short || true
+            -v --tb=short
 
   build-docker:
     name: Build Docker
@@ -167,5 +167,4 @@ jobs:
       - name: Vérifier le déploiement
         run: |
           sleep 30
-          curl -f https://khawarizmi-backend.railway.app/health || \
-          echo "Health check échoué"
+          curl -f --retry 3 --retry-delay 10 https://khawarizmi-backend.railway.app/health

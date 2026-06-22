@@ -2,6 +2,9 @@
 """
 Pipeline OCR oriente production -- arabe (principal) + francais.
 
+DEPRECATED : Utiliser `scripts/ocr/ocr_pipeline_production.py`
+(backend modulaire services/ocr/*). Conserve pour compatibilite.
+
 Traite :
 - PDF (extraction native + OCR)
 - Image unique (PNG, JPG, JPEG, TIFF, TIF, BMP, WEBP)

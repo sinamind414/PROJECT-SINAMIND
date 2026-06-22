@@ -1,13 +1,15 @@
 "use client"
 
 import Link from "next/link"
-import { useMemo } from "react"
+import { useMemo, useEffect, useState } from "react"
 import { AuthGuard } from "@/components/auth/AuthGuard"
 import { AppShell } from "@/components/layout/AppShell"
 import { DiagnosticUnitCard } from "@/components/diagnostic/DiagnosticUnitCard"
 import { UNITS_CONFIG, methodologyChapterLinks } from "@/lib/methodology-chapters"
 import { methodologyScenarios } from "@/lib/methodology-documents"
 import { getProgressSnapshot } from "@/lib/progress-store"
+import apiClient from "@/lib/api-client"
+import type { CriticalChaptersResponse } from "@/lib/types"
 
 const IMPORTANCE_COLORS: Record<string, string> = {
   critique: "bg-red-500/15 text-red-200 border-red-500/30",
@@ -52,8 +54,31 @@ export default function DiagnosticHubPage() {
     try { return getProgressSnapshot() } catch { return null }
   }, [])
 
+  const [criticalChapters, setCriticalChapters] = useState<CriticalChaptersResponse | null>(null)
+  const [apiTotalChapters, setApiTotalChapters] = useState<number | null>(null)
+
+  useEffect(() => {
+    let cancelled = false
+    ;(async () => {
+      try {
+        const [crit, prog] = await Promise.allSettled([
+          apiClient.getCriticalChapters("SVT", "Sciences Experimentales"),
+          apiClient.getProgramme("SVT", "Sciences Experimentales"),
+        ])
+        if (cancelled) return
+        if (crit.status === 'fulfilled') setCriticalChapters(crit.value)
+        if (prog.status === 'fulfilled') setApiTotalChapters(prog.value.total_chapters)
+      } catch {
+        // backend indisponible — fallback local
+      }
+    })()
+    return () => { cancelled = true }
+  }, [])
+
   const totalQuestions = methodologyScenarios.reduce((sum, s) => sum + s.questions.length, 0)
   const attemptedCount = snapshot?.totalAttempts || 0
+  const criticalCount = criticalChapters?.total ?? 0
+  const totalChaptersDisplay = apiTotalChapters ?? methodologyChapterLinks.length
 
   return (
     <AuthGuard>
@@ -71,7 +96,7 @@ export default function DiagnosticHubPage() {
             </header>
 
             {/* Progress summary */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div className="rounded-2xl p-5 glass-soft border border-mint/10">
                 <p className="text-gray-400 text-xs mb-1">الوحدات المتاحة</p>
                 <p className="text-3xl font-bold text-white">{UNITS_CONFIG.length}</p>
@@ -79,8 +104,17 @@ export default function DiagnosticHubPage() {
               </div>
               <div className="rounded-2xl p-5 glass-soft border border-mint/10">
                 <p className="text-gray-400 text-xs mb-1">الفصول المدمجة</p>
-                <p className="text-3xl font-bold text-white">{methodologyChapterLinks.length}</p>
-                <p className="text-gray-500 text-xs">جميع فصول البرنامج الوطني</p>
+                <p className="text-3xl font-bold text-white">{totalChaptersDisplay}</p>
+                <p className="text-gray-500 text-xs">
+                  {apiTotalChapters !== null ? "من البطاقة الخلفية" : "بيانات محلية"}
+                </p>
+              </div>
+              <div className="rounded-2xl p-5 glass-soft border border-red-500/20">
+                <p className="text-gray-400 text-xs mb-1">فصول حرجة للبكالوريا</p>
+                <p className="text-3xl font-bold text-red-300">{criticalCount || "—"}</p>
+                <p className="text-gray-500 text-xs">
+                  {criticalChapters ? "مصنفة كأولوية قصوى" : "غير متصل بالبطاقة الخلفية"}
+                </p>
               </div>
               <div className="rounded-2xl p-5 glass-soft border border-mint/10">
                 <p className="text-gray-400 text-xs mb-1">إجمالي الأسئلة المنهجية</p>
@@ -88,6 +122,39 @@ export default function DiagnosticHubPage() {
                 <p className="text-gray-500 text-xs">{attemptedCount > 0 ? `${attemptedCount} مهارات تم التمرن عليها` : "ابدأ التمرين الآن"}</p>
               </div>
             </div>
+
+            {/* Critical chapters from API */}
+            {criticalChapters && criticalChapters.critical_chapters.length > 0 && (
+              <div className="rounded-3xl p-5 glass border border-red-500/20">
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <h2 className="text-white font-bold mb-1">الفصول الحرجة — أولوية قصوى للمراجعة</h2>
+                    <p className="text-gray-400 text-sm">{criticalChapters.total} فصل مصنف كأولوية قصوى من البطاقة الخلفية</p>
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {criticalChapters.critical_chapters.slice(0, 9).map((ch) => (
+                    <Link
+                      key={ch.id}
+                      href={`/cours/${encodeURIComponent(ch.titre_fr)}`}
+                      className="rounded-2xl p-4 transition-all hover:scale-[1.02] border border-red-500/20 glass-soft"
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-gray-500 text-xs">الفصل {ch.numero}</span>
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold border bg-red-500/15 text-red-200 border-red-500/30">
+                          قصوى
+                        </span>
+                      </div>
+                      <h4 className="text-white font-bold text-sm leading-relaxed">{ch.titre_fr}</h4>
+                      <p className="text-gray-500 text-xs mt-1">{ch.unit_titre} · {ch.domain_titre}</p>
+                      <div className="mt-2 text-xs text-red-300 font-bold">
+                        راجع هذا الفصل ←
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Global diagnostic link */}
             <div className="rounded-3xl p-5 glass border border-mint/10">

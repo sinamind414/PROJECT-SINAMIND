@@ -98,18 +98,12 @@ class KhawarizmiTutor:
         self.loader = get_data_loader(data_dir)
 
         self.programme_canonical = self.loader.load_canonical_programme()
-        self.annales_clean = {}
-        self.lexique = {}
 
-        # Temporary compatibility layer
+        # === CONNECTION DES DONNÉES RESTANTES (SVT UNIQUEMENT) ===
         self.programme_sciences = self.programme_canonical
-        self.annales_sciences = self.annales_clean
-        self.lexique_complet = self.lexique
-
-        # Legacy subjects
-        self.programme_maths    = self._charger_json(data_dir, 'programme_maths_3as.json', optional=True)
-        self.annales_maths      = self._charger_json(data_dir, 'annales_maths_3as.json', optional=True)
-        self.programme_physique = self._charger_json(data_dir, 'programme_physique_3as.json', optional=True)
+        self.annales_sciences   = self._charger_json(data_dir, 'annales_sciences_3as.json', optional=True)
+        self.lexique_complet    = self._charger_json(data_dir, 'lexique_svt_terminale_complet.json', optional=True)
+        self.methodologie       = self._charger_json(data_dir, 'methodologie_sciences_3as.json', optional=True)
 
         self._index_questions        = self._construire_index()
         self._index_micro_concepts   = self._construire_index_micro_concepts()
@@ -145,7 +139,6 @@ class KhawarizmiTutor:
         index = {}
         
         sources = [
-            ('maths', self.annales_maths),
             ('sciences', self.annales_sciences)
         ]
         
@@ -191,7 +184,7 @@ class KhawarizmiTutor:
 
     def _construire_index_micro_concepts(self) -> dict:
         index = {}
-        programmes = [self.programme_maths, self.programme_sciences]
+        programmes = [self.programme_sciences]
         for programme in programmes:
             if not programme:
                 continue
@@ -617,6 +610,7 @@ Type d'erreur : {type_erreur}
 {instruction_mode}
 
 ━━━ RÈGLES ━━━
+→ Ne réponds qu'à partir du CONTEXTE FOURNI. Si l'information ne s'y trouve pas, tu as l'interdiction de l'inventer et tu dois répondre "Je n'ai pas trouvé cette information dans la base. Consulte ton manuel officiel."
 → Tu ne dois JAMAIS inventer de faits, de dates, ou de formules.
 → Ne révèle JAMAIS la solution officielle
 → Commence par ce qui est CORRECT dans la réponse de l'élève

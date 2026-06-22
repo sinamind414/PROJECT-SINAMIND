@@ -41,6 +41,15 @@ If you cannot parse the student input, return:
   "missing_concepts": []
 }
 
+If the expected scientific information is NOT found in the provided evaluation context or rules, you MUST NOT invent it. You must return:
+{
+  "global_score": 0.0,
+  "concept_scores": {},
+  "feedback_fr": "Je n'ai pas trouvé cette information dans la base. Consulte ton manuel officiel.",
+  "feedback_ar": "لم أجد هذه المعلومة في القاعدة. راجع كتابك المدرسي الرسمي.",
+  "missing_concepts": []
+}
+
 ═══════════════════════════════════════════════
 EVALUATION CONTEXT (injected per request)
 ═══════════════════════════════════════════════

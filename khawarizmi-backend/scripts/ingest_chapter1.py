@@ -207,7 +207,7 @@ async def ingest_chapter1():
                     INSERT INTO reference_embeddings
                         (question_id, variant_index, reference_text,
                          embedding, source, metadata)
-                    VALUES (:qid, 0, :text, :emb::vector, 'livre_scolaire_ch1', :meta)
+                    VALUES (:qid, 0, :text, CAST(:emb AS vector), 'livre_scolaire_ch1', :meta)
                     ON CONFLICT (question_id, variant_index)
                     DO UPDATE SET
                         reference_text = EXCLUDED.reference_text,

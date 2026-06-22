@@ -298,6 +298,90 @@ export interface AnnalesResponse {
 }
 
 // ═══════════════════════════════════════════════
+// Progression (FSRS)
+// ═══════════════════════════════════════════════
+
+export interface ProgressConcept {
+  matiere: string
+  chapitre_id: string
+  stability: number
+  difficulty: number
+  retrievability: number
+  prochaine_revision: string | null
+  interval_jours: number | null
+  est_due: boolean
+}
+
+export interface ProgressResponse {
+  user_id?: string
+  nb_concepts: number
+  dues_aujourd_hui: number
+  prediction_bac: number | null
+  concepts: ProgressConcept[]
+  message?: string
+}
+
+// ═══════════════════════════════════════════════
+// Action Verbs
+// ═══════════════════════════════════════════════
+
+export interface ActionVerbSummary {
+  slug: string
+  ar: string
+  fr: string
+  category: string
+  priority: string
+}
+
+export interface ActionVerbExercise {
+  id: string
+  verb_slug: string
+  type: "identification" | "application" | "bac_style"
+  question_ar: string
+  context_ar?: string
+  model_answer_ar?: string
+  difficulty: number
+}
+
+export interface VerbEvaluateRequest {
+  verb_slug: string
+  answer: string
+  exercise_id?: string
+}
+
+export interface VerbEvaluateResponse {
+  verb_slug: string
+  score: number
+  score_max: number
+  percentage: number
+  success: string[]
+  errors: string[]
+  missing_markers: string[]
+  forbidden_found: string[]
+  advice: string
+  dominant_error_code?: string
+  allow_second_attempt: boolean
+}
+
+export interface VerbProgressItem {
+  verb_slug: string
+  stability: number
+  difficulty: number
+  last_score: number
+  attempts: number
+  est_due: boolean
+  prochaine_revision?: string
+  interval_jours: number
+}
+
+export interface VerbProgressResponse {
+  user_id: string
+  nb_verbs: number
+  dues_aujourd_hui: number
+  verbs: VerbProgressItem[]
+}
+
+// ═══════════════════════════════════════════════
 // Couleurs pour le programme
 // ═══════════════════════════════════════════════
 
@@ -340,5 +424,316 @@ export const TYPE_EMOJI: Record<ChapterType, string> = {
   experience: "🔬",
   rappel: "🔄",
   synthese: "🎯"
+}
+
+// ═══════════════════════════════════════════════
+// Document Analysis
+// ═══════════════════════════════════════════════
+
+export interface DaScenarioSummary {
+  id: string
+  slug: string
+  chapter_slug: string | null
+  unit_key: string
+  title_ar: string
+  subtitle_ar: string
+  context_ar: string
+  nb_documents: number
+  nb_questions: number
+  dominant_skills: string[]
+}
+
+export interface DaDocument {
+  type: string
+  title_ar: string
+  caption_ar: string | null
+  data: Record<string, unknown> | null
+}
+
+export interface DaQuestion {
+  id: string
+  verb_slug: string
+  level: "L1" | "L2" | "L3"
+  n: number
+  title_ar: string
+  skill_ar: string
+  doc_ref: string
+  prompt_ar: string
+  placeholder_ar: string | null
+}
+
+export interface DaScenarioDetail {
+  id: string
+  slug: string
+  chapter_slug: string | null
+  unit_key: string
+  title_ar: string
+  subtitle_ar: string
+  context_ar: string
+  mindmap_node_id: string | null
+  dominant_skills: string[]
+  documents: DaDocument[]
+  questions: DaQuestion[]
+}
+
+export interface DaEvaluateAnswerInput {
+  question_id: string
+  verb_slug: string
+  answer: string
+}
+
+export interface DaEvaluateRequest {
+  scenario_id: string
+  chapter_slug?: string
+  answers: DaEvaluateAnswerInput[]
+}
+
+export interface DaAnswerEvaluation {
+  question_id: string
+  verb_slug: string
+  score: number
+  score_max: number
+  percentage: number
+  success: string[]
+  errors: string[]
+  missing_markers: string[]
+  forbidden_found: string[]
+  advice: string
+  dominant_error_code?: string
+}
+
+export interface DaEvaluateResponse {
+  scenario_id: string
+  session_id: string
+  score_global: number
+  nb_questions: number
+  evaluations: DaAnswerEvaluation[]
+  fsrs_updated: number
+}
+
+export interface DaFsrsItem {
+  verb_slug: string
+  chapter_slug: string
+  stability: number
+  difficulty: number
+  last_score: number
+  attempts: number
+  est_due: boolean
+  prochaine_revision: string | null
+  interval_jours: number
+}
+
+export interface DaProgressResponse {
+  user_id: string
+  nb_skills: number
+  dues_aujourd_hui: number
+  skills: DaFsrsItem[]
+}
+
+export interface DaWeakSpot {
+  verb_slug: string
+  chapter_slug: string
+  last_score: number
+  attempts: number
+  est_due: boolean
+}
+
+export interface DaWeakSpotsResponse {
+  user_id: string
+  total: number
+  weak_spots: DaWeakSpot[]
+}
+
+// ═══════════════════════════════════════════════
+// Active Lessons
+// ═══════════════════════════════════════════════
+
+export interface QuickCheck {
+  type: "true-false" | "mcq" | "short-answer"
+  question_ar: string
+  options: string[]
+  correct_index?: number
+  expected_keywords?: string[]
+  explanation_ar: string
+}
+
+export interface LessonBlock {
+  id: string
+  block_type: "summary" | "concept" | "analogy" | "mistake" | "bac_link"
+  sort_order: number
+  title_ar: string
+  body_ar: string
+  visual_hint?: string
+  quick_check: QuickCheck
+}
+
+export interface LessonResponse {
+  chapter_slug: string
+  blocks: LessonBlock[]
+  blocks_total: number
+}
+
+export interface CheckAnswerResponse {
+  block_id: string
+  correct: boolean
+  explanation_ar: string
+  score_percentage: number
+  blocks_completed: number
+  blocks_total: number
+  lesson_completed: boolean
+}
+
+// ═══════════════════════════════════════════════
+// Bac Blanc immersif
+// ═══════════════════════════════════════════════
+
+export interface BacSubjectSummary {
+  subject_number: number
+  title_ar: string
+  themes_ar: string[]
+  estimated_minutes: number
+  nb_exercises: number
+}
+
+export interface BacExercise {
+  exercise_id: string
+  title_ar: string
+  verb_slug: string
+  doc_ref: string
+  prompt_ar: string
+  placeholder_ar: string
+  model_answer_ar: string
+  points: number
+}
+
+export interface BacSubjectDetail {
+  subject_number: number
+  title_ar: string
+  themes_ar: string[]
+  estimated_minutes: number
+  exercises: BacExercise[]
+}
+
+export interface StartBacResponse {
+  session_id: string
+  subjects: BacSubjectSummary[]
+}
+
+export interface ChooseSubjectResponse {
+  session_id: string
+  subject: BacSubjectDetail
+  time_limit_sec: number
+}
+
+export interface ExerciseScore {
+  exercise_id: string
+  title_ar: string
+  score: number
+  score_max: number
+  percentage: number
+  skipped: boolean
+}
+
+export interface VerbScore {
+  verb_slug: string
+  score: number
+  score_max: number
+  percentage: number
+}
+
+export interface SubmitBacResponse {
+  session_id: string
+  score_global: number
+  time_used_sec: number
+  scores_by_exercise: ExerciseScore[]
+  scores_by_verb: VerbScore[]
+  exercises_skipped: number
+  debrief_message: string
+}
+
+export interface CorrectionAnswer {
+  exercise_id: string
+  question_id: string
+  title_ar: string
+  verb_slug: string
+  student_answer: string
+  model_answer: string
+  score: number
+  score_max: number
+  percentage: number
+  feedback: string
+  skipped: boolean
+}
+
+export interface CorrectionResponse {
+  session_id: string
+  corrections: CorrectionAnswer[]
+}
+
+// ═══════════════════════════════════════════════
+// Orientation (SAD)
+// ═══════════════════════════════════════════════
+
+export interface OrientationRecommendation {
+  priorite: number
+  type: "cours" | "action_verb" | "document_analysis" | "flashcards" | "mindmap" | "annales"
+  chapitre_slug: string | null
+  chapitre_ar: string | null
+  raison: string
+  action: string
+  score_priorite: number
+}
+
+export interface OrientationResponse {
+  prediction_bac: number | null
+  dues_aujourd_hui: {
+    flashcards: number
+    action_verbs: number
+    document_analysis: number
+  }
+  recommendations: OrientationRecommendation[]
+  message: string
+}
+
+// ═══════════════════════════════════════════════
+// Tuteur Contextuel (Chat)
+// ═══════════════════════════════════════════════
+
+export interface ChatHistoryMessage {
+  role: "user" | "assistant"
+  content: string
+}
+
+export interface ChatContext {
+  chapitre?: string
+  page_source?: string
+  fsrs_stability?: number
+  fsrs_due?: boolean
+  last_score?: number
+  orientation_chapitre?: string
+  history?: ChatHistoryMessage[]
+}
+
+export interface ChatCard {
+  titre: string
+  raison: string
+  action: string
+  bouton: string
+}
+
+export interface TuteurRequest {
+  message: string
+  context?: ChatContext
+}
+
+export interface TuteurResponse {
+  reponse: string
+  type: "socratique" | "explication" | "feedback" | "motivation" | "orientation" | "refus" | "navigation"
+  question_suivante?: string
+  cartes: ChatCard[]
+  flashcards_suggerees: string[]
+  redirect?: string
+  source_rag?: string
+  fallback_active: boolean
 }
 
