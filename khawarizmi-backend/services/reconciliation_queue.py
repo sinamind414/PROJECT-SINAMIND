@@ -108,6 +108,10 @@ async def correct_fsrs_scores(student_id: str, question_id: str, corrected_score
             config_row = res_config.fetchone()
             user_fsrs_config = config_row[0] if config_row else None
             
+            # Charger le graphe de dépendances
+            from services.fsrs_graph import load_concept_graph
+            concept_graph = await load_concept_graph(db)
+
             updates = update_concept_graph(
                 user_id=int(student_id),
                 question_id=question_id,
@@ -115,7 +119,8 @@ async def correct_fsrs_scores(student_id: str, question_id: str, corrected_score
                 mapping=mapping,
                 concept_states=concept_states,
                 now=datetime.now(timezone.utc),
-                user_fsrs_config=user_fsrs_config
+                user_fsrs_config=user_fsrs_config,
+                graph=concept_graph,
             )
             
             # 4. Enregistrer
