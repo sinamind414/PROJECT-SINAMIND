@@ -26,6 +26,7 @@ from services.orientation_service import calculer_orientation
 from services.semantic_cache import get_semantic_cache, set_semantic_cache
 from services.metrics import MetricsCollector, record_request
 from services.reranker import rerank
+from services.remediation import get_due_concept_for_question, build_due_concept_question
 
 logger = logging.getLogger("khawarizmi.chat")
 
@@ -111,6 +112,31 @@ async def handle_tuteur(
     if resp_type == "orientation" or is_init:
         orientation = await calculer_orientation(db, user_id)
         cartes = _build_cartes_from_orientation(orientation)
+
+        # Lien 1 (FSRS → Question auto) : si init, vérifier les concepts dus
+        due_concept = await get_due_concept_for_question(db, user_id)
+        if due_concept and is_init:
+            due_push = build_due_concept_question(due_concept)
+            greeting = "سلام! "
+            if orientation["prediction_bac"] is not None:
+                greeting += f"توقعك للبكالوريا: {orientation['prediction_bac']}/100. "
+            # Combiner l'orientation + la question sur le concept dû
+            msg = orientation["message"] + "\n\n" + due_push["reponse"]
+            cartes = cartes + due_push["cartes"]
+            mc.set("due_concept_pushed", due_concept["concept_id"])
+            logger.info(f"Tuteur | Lien 1 FSRS push: concept={due_concept['concept_id']} stability={due_concept['stability']}")
+            return {
+                "reponse": greeting + msg,
+                "type": "orientation_with_due_push",
+                "question_suivante": due_push["question_suivante"],
+                "cartes": cartes,
+                "flashcards_suggerees": [],
+                "redirect": due_push.get("redirect"),
+                "source_rag": None,
+                "fallback_active": False,
+                "due_concept": due_concept["concept_id"],
+                "due_chapter": due_concept["chapter"],
+            }
 
         if is_init:
             greeting = "سلام! "

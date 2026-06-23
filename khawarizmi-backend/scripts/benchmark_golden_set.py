@@ -74,13 +74,11 @@ async def benchmark_rag_only(questions: list) -> dict:
                         SELECT content, source,
                                1 - (embedding <=> CAST(:emb AS vector)) AS similarity
                         FROM rag_chunks
-                        WHERE LOWER(matiere) = LOWER(:matiere)
-                        AND (LOWER(chapitre) = LOWER(:chapitre)
-                             OR LOWER(REPLACE(chapitre, 'é', 'e')) = LOWER(REPLACE(:chapitre, 'é', 'e')))
+                        WHERE matiere ILIKE '%SVT%'
                         ORDER BY embedding <=> CAST(:emb AS vector)
                         LIMIT 3
                     """),
-                    {"matiere": "SVT", "chapitre": chapitre, "emb": str(query_vector.tolist())}
+                    {"emb": str(query_vector.tolist())}
                 )
                 chunks = res.fetchall()
                 rag_time = (time.perf_counter() - t0) * 1000
@@ -190,13 +188,11 @@ async def benchmark_full(questions: list) -> dict:
                         SELECT content, source,
                                1 - (embedding <=> CAST(:emb AS vector)) AS similarity
                         FROM rag_chunks
-                        WHERE LOWER(matiere) = LOWER(:matiere)
-                        AND (LOWER(chapitre) = LOWER(:chapitre)
-                             OR LOWER(REPLACE(chapitre, 'é', 'e')) = LOWER(REPLACE(:chapitre, 'é', 'e')))
+                        WHERE matiere ILIKE '%SVT%'
                         ORDER BY embedding <=> CAST(:emb AS vector)
                         LIMIT 3
                     """),
-                    {"matiere": "SVT", "chapitre": chapitre, "emb": str(query_vector.tolist())}
+                    {"emb": str(query_vector.tolist())}
                 )
                 chunks = res.fetchall()
                 rag_time = (time.perf_counter() - t0) * 1000
