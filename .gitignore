@@ -44,3 +44,6 @@ models/
 *.log
 logs/
 
+
+# Benchmark results
+khawarizmi-backend/data/benchmark_results.json
