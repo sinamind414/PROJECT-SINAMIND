@@ -188,7 +188,8 @@ def split_flat_tables(content: str) -> str:
     for line in lines:
         stripped = line.strip()
 
-        if stripped.count("|") >= 6:
+        # Ne pas diviser les lignes de tableaux Markdown légitimes qui commencent et finissent par "|"
+        if stripped.count("|") >= 6 and not (stripped.startswith("|") and stripped.endswith("|")):
             cells = [c.strip() for c in stripped.split("|") if c.strip()]
             if len(cells) >= 6:
                 nb_cols = 3

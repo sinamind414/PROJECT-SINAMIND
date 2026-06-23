@@ -468,7 +468,8 @@ class KhawarizmiTutor:
         pre_analyse:   Optional[dict] = None,
         niveau_sm2:    int = 0,
         score_actuel:  float = 0.0,
-        mode_force:    Optional[str] = None
+        mode_force:    Optional[str] = None,
+        calendar_context: Optional[dict] = None,
     ) -> str:
 
         data     = self._get_question(sujet_id, question_id)
@@ -547,6 +548,21 @@ Si la question demande un "Interprétation (تفسير)", l'élève DOIT répond
         mode_config = MODES_PEDAGOGIQUES.get(mode_id, MODES_PEDAGOGIQUES['ANNALES_COMPLEXES'])
         instruction_mode = mode_config['instruction']
 
+        bloc_calendrier = ""
+        if calendar_context:
+            stats = calendar_context.get("user_stats", {"mastered": 0, "total": 0, "avg_stability": 0.0})
+            bloc_calendrier = f"""
+━━━ CONTEXTE TEMPOREL & FSRS (CALENDRIER BAC) ━━━
+→ Jours restants avant le BAC : {calendar_context.get('days_to_bac', 0)} jours.
+→ Phase de préparation : {calendar_context.get('phase', 'N/A')}
+→ État de mémorisation FSRS de l'élève : {stats.get('mastered', 0)} concepts maîtrisés sur {stats.get('total', 0)} révisés (Stabilité moyenne : {stats.get('avg_stability', 0.0)} jours).
+
+→ INSTRUCTIONS DE TON & COACHING :
+* Si la phase contient 'Sprint final' (J-15 avant le BAC) : Sois extrêmement concis, focalisé sur l'essentiel, dynamique et encourageant. Privilégie un rythme rapide de questions/réponses socratiques (Active Recall).
+* Si l'élève a une stabilité de mémoire moyenne faible : Rappelle-lui avec bienveillance que la régularité des révisions quotidiennes (FSRS) est la clé de la réussite au BAC.
+* Personnalise ton introduction ou tes encouragements en faisant subtilement référence au temps restant avant le BAC pour le motiver !
+"""
+
         format_output = ""
         if mode_config['output_format'] == 'json_autopsy':
             format_output = f"""
@@ -605,6 +621,7 @@ Type d'erreur : {type_erreur}
 ━━━ MÉTHODE SOCRATIQUE ━━━
 {methode}
 {bloc_minhajiya}
+{bloc_calendrier}
 
 ━━━ INSTRUCTION PÉDAGOGIQUE (MODE: {mode_id}) ━━━
 {instruction_mode}

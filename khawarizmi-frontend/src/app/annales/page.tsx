@@ -30,9 +30,15 @@ function annaleToSujet(a: Annale): SujetBac {
     session: "normale",
     difficulte: diff as "facile" | "moyen" | "difficile",
     duree: 180,
+    totalPages: 0,
+    matiere: a.matiere,
+    filiere: a.filiere,
+    url_pdf: a.fichier_sujet || "",
+    url_corrige: a.fichier_correction || undefined,
     chapitres: a.tags || [],
     exercices: [],
-  } as SujetBac
+    subjects: [],
+  }
 }
 
 function AnnalesContent() {
@@ -43,7 +49,7 @@ function AnnalesContent() {
 
   useEffect(() => {
     let cancelled = false
-    (async () => {
+    async function fetchData() {
       try {
         const res = await apiClient.getAnnales({ taille: 100 })
         if (cancelled) return
@@ -61,7 +67,8 @@ function AnnalesContent() {
       } finally {
         if (!cancelled) setLoading(false)
       }
-    })()
+    }
+    fetchData()
     return () => { cancelled = true }
   }, [])
 

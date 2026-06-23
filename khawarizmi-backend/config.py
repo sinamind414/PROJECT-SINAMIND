@@ -34,6 +34,18 @@ class Settings(BaseSettings):
     ia_max_tokens: int = 600
     AI_MODEL_PRIMARY: str = "gemini-2.5-flash"
 
+    VISION_API_KEY: str = ""
+    vision_base_url: str = "https://api.openai.com/v1"
+    vision_model: str = "gpt-4o-mini"
+
+    # ── Z.AI / GLM-4.7 ──────────────────────────────────────────
+    ZAI_API_KEY: str = ""
+    zai_model: str = "glm-4.7"
+    zai_base_url: str = "https://api.z.ai/api/paas/v4/"
+
+    CLOUDFLARE_ACCOUNT_ID: str = ""
+    CLOUDFLARE_API_TOKEN: str = ""
+
     SENTRY_DSN: str = ""
 
     ALLOWED_ORIGINS: str = ""

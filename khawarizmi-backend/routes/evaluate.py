@@ -209,10 +209,10 @@ async def evaluate(
             await db.execute(
                 text("""
                     INSERT INTO mastery_micro_concepts
-                        (user_id, concept_id, chapter, due_date,
+                        (user_id, micro_concept_id, concept_id, chapter, due_date,
                          interval_jours, difficulty, stability, fsrs_state, pending_real_evaluation, updated_at)
                     VALUES
-                        (:user_id, :c_id, :chapter, :due,
+                        (:user_id, :c_id, :c_id, :chapter, :due,
                          :interval, :difficulty, :stability, :fsrs_state::jsonb, :pending_eval, NOW())
                     ON CONFLICT (user_id, concept_id)
                     DO UPDATE SET
@@ -264,16 +264,17 @@ async def evaluate(
 
     else:
         # Fallback L3 ou erreur totale : carte en attente (Tag)
+        concept_cle = question.get("concept_cle", "concept_general")
         await db.execute(
             text("""
-                INSERT INTO mastery_micro_concepts (user_id, concept_id, chapter, pending_real_evaluation, updated_at)
-                VALUES (:user_id, :mc_id, :chapter, TRUE, NOW())
+                INSERT INTO mastery_micro_concepts (user_id, micro_concept_id, concept_id, chapter, pending_real_evaluation, updated_at)
+                VALUES (:user_id, :mc_id, :mc_id, :chapter, TRUE, NOW())
                 ON CONFLICT (user_id, concept_id)
                 DO UPDATE SET pending_real_evaluation = TRUE, updated_at = NOW()
             """),
             {
                 "user_id": user_id,
-                "mc_id": req.question_id,
+                "mc_id": concept_cle,
                 "chapter": question.get("chapitre_id", "ch_inconnu")
             }
         )

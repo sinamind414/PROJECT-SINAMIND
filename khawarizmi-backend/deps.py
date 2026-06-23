@@ -42,6 +42,13 @@ def get_openai():
     return s.openai
 
 
+def get_dual_coding():
+    s = _get_state()
+    if not s.dual_coding:
+        raise HTTPException(503, "Dual Coding non configuré - clé Vision API manquante")
+    return s.dual_coding
+
+
 async def get_current_user(
     request: Request,
     db: AsyncSession = Depends(get_db),

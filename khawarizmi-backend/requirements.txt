@@ -7,6 +7,7 @@ pgvector==0.4.2
 psycopg2-binary==2.9.12
 redis==8.0.0
 openai==2.41.0
+zai-sdk==0.2.3
 tenacity==9.1.4
 numpy==2.4.2
 scikit-learn==1.8.0

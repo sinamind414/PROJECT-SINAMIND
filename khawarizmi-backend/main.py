@@ -46,9 +46,9 @@ async def lifespan(app: FastAPI):
     state.interleaving = InterleavingSession()
     if cfg.OPENAI_API_KEY:
         from openai import AsyncOpenAI
-        from services.dual_coding import DualCodingService
         state.openai = AsyncOpenAI(api_key=cfg.OPENAI_API_KEY, base_url=cfg.openai_base_url)
-        state.dual_coding = DualCodingService(state.openai)
+    from services.dual_coding import DualCodingService
+    state.dual_coding = DualCodingService(state.openai)
     if cfg.DATABASE_URL:
         try:
             db_url = cfg.DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://", 1).replace("postgres://", "postgresql+asyncpg://", 1)
@@ -85,8 +85,8 @@ app.state.limiter = limiter
 app.add_exception_handler(429, _rate_limit_exceeded_handler)
 app.add_middleware(SlowAPIMiddleware)
 
-from routes import health, auth, chat, cours, exercices, flashcards, sessions, mindmap, evaluate, session, payment, programme, lexique, videos, annales, action_verbs, document_analysis, orientation, tuteur, lessons, bac_blanc
-for r in [health,auth,chat,cours,exercices,flashcards,sessions,mindmap,evaluate,session,payment,programme,lexique,videos,annales,action_verbs,document_analysis,orientation,tuteur,lessons,bac_blanc]:
+from routes import health, auth, chat, cours, exercices, flashcards, sessions, mindmap, evaluate, session, payment, programme, lexique, videos, annales, action_verbs, document_analysis, orientation, tuteur, lessons, bac_blanc, dual_coding
+for r in [health,auth,chat,cours,exercices,flashcards,sessions,mindmap,evaluate,session,payment,programme,lexique,videos,annales,action_verbs,document_analysis,orientation,tuteur,lessons,bac_blanc,dual_coding]:
     app.include_router(r.router)
 
 

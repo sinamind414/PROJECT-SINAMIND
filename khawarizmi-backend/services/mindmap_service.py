@@ -4,7 +4,7 @@ import json
 import re
 import logging
 import asyncio
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Optional
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
 from sqlalchemy import text
@@ -247,7 +247,7 @@ GÉNÉRATION PROGRESSIVE (LAZY LOADING) :
                 "racine": generated_data["racine"],
                 "liens_transversaux": generated_data.get("liens_transversaux", []),
                 "metadata": {
-                    "genere_le": datetime.utcnow().isoformat(),
+                    "genere_le": datetime.now(timezone.utc).isoformat(),
                     "version": "2.0",
                     "source_rag": source_names,
                     "user_id": user_id,
@@ -605,7 +605,7 @@ async def generate_mindmap(
         "racine": generated_data["racine"],
         "liens_transversaux": generated_data.get("liens_transversaux", []),
         "metadata": {
-            "genere_le": datetime.utcnow().isoformat(),
+            "genere_le": datetime.now(timezone.utc).isoformat(),
             "version": "2.0",
             "source_rag": source_names,
             "user_id": user_id
@@ -693,18 +693,50 @@ async def persist_flashcards_to_fsrs(
     u_id = int(user_id)
     saved = []
 
+    from fsrs import Card, Rating
+    from services.fsrs_config import get_fsrs_scheduler
+    from services.fsrs_graph import run_fsrs_step
+    from datetime import timezone
+    import json as _json
+
+    scheduler_inst = get_fsrs_scheduler()
+    now = datetime.now(timezone.utc)
+    default_card = Card()
+
     for card in flashcards:
         card_id = f"mm_{card['node_id']}"
+        updated_card = run_fsrs_step(default_card, Rating.Good, now, scheduler_inst)
+
+        due_date = updated_card.due if hasattr(updated_card, 'due') else now + timedelta(days=1)
+        interval = updated_card.scheduled_days if hasattr(updated_card, 'scheduled_days') else 1
+
+        fsrs_json = _json.dumps({
+            "stability": updated_card.stability,
+            "difficulty": updated_card.difficulty,
+            "scheduled_days": interval,
+            "reps": getattr(updated_card, "reps", 0),
+            "lapses": getattr(updated_card, "lapses", 0),
+            "state": str(updated_card.state),
+            "last_review": now.isoformat(),
+            "review_history": [{
+                "rating": Rating.Good.value,
+                "reviewed_at": now.isoformat(),
+                "elapsed_days": 0,
+                "scheduled_days": interval,
+                "state_before": str(default_card.state),
+            }],
+        })
+
         result = await db.execute(
             text("""
                 INSERT INTO mastery_micro_concepts
                     (user_id, micro_concept_id, concept_id, chapter,
                      difficulty, stability, state, due_date,
-                     prochaine_revision, interval_jours)
+                     prochaine_revision, interval_jours, fsrs_state, last_review)
                 VALUES
                     (:user_id, :mc_id, :concept_id, :chapter,
                      :difficulty, :stability, :state, :due_date,
-                     :next_rev, :interval)
+                     :next_rev, :interval, :fsrs_state::jsonb, :last_review)
                 ON CONFLICT (user_id, micro_concept_id)
                 DO UPDATE SET
                     chapter = EXCLUDED.chapter
@@ -715,12 +747,14 @@ async def persist_flashcards_to_fsrs(
                 "mc_id": card_id,
                 "concept_id": card["node_id"],
                 "chapter": chapitre,
-                "difficulty": 5.0,
-                "stability": 0.0,
-                "state": 0,
-                "due_date": datetime.utcnow(),
-                "next_rev": datetime.utcnow(),
-                "interval": 1,
+                "difficulty": updated_card.difficulty,
+                "stability": updated_card.stability,
+                "state": 1,
+                "due_date": due_date,
+                "next_rev": due_date,
+                "interval": interval,
+                "fsrs_state": fsrs_json,
+                "last_review": now,
             }
         )
         row = result.fetchone()
@@ -737,7 +771,7 @@ async def persist_flashcards_to_fsrs(
                 "fsrs_id": card_id,
                 "node_id": card["node_id"],
                 "user_id": u_id,
-                "updated_at": datetime.utcnow()
+                "updated_at": now,
             }
         )
 
@@ -771,7 +805,7 @@ async def save_mindmap(
             "filiere": mindmap["filiere"],
             "chapitre": mindmap["chapitre"],
             "data": json.dumps(mindmap, ensure_ascii=False),
-            "created_at": datetime.utcnow()
+            "created_at": datetime.now(timezone.utc)
         }
     )
 
@@ -801,8 +835,8 @@ async def save_mindmap(
                 "bac_frequent": node.get("bac_frequent", False),
                 "fsrs_card_id": node.get("fsrs_card_id"),
                 "maitrise_eleve": node.get("maitrise_eleve", 0),
-                "created_at": datetime.utcnow(),
-                "updated_at": datetime.utcnow()
+                "created_at": datetime.now(timezone.utc),
+                "updated_at": datetime.now(timezone.utc)
             }
         )
         for child in node.get("enfants", []):
@@ -846,7 +880,7 @@ async def update_node_maitrise(
             "node_id": node_id,
             "maitrise": maitrise,
             "user_id": u_id,
-            "updated_at": datetime.utcnow()
+            "updated_at": datetime.now(timezone.utc)
         }
     )
     row = result.fetchone()
@@ -854,12 +888,15 @@ async def update_node_maitrise(
     if not row:
         raise ValueError(f"Nœud {node_id} non trouvé")
 
-    # Mettre à jour l'état FSRS avec le véritable algorithme fsrs-python
-    from fsrs import Card, Rating as FsrsRating, Scheduler as CardScheduler
-    from datetime import timezone
+    # Mettre à jour l'état FSRS via le vrai scheduler calibré
+    from fsrs import Card, Rating
+    from services.fsrs_config import get_fsrs_scheduler
+    from services.fsrs_graph import run_fsrs_step
     import json
 
     fsrs_card_id = f"mm_{node_id}"
+
+    # Charger l'état actuel de la carte si elle existe
     mc_result = await db.execute(
         text("SELECT fsrs_state FROM mastery_micro_concepts WHERE micro_concept_id = :mc_id AND user_id = :uid"),
         {"mc_id": fsrs_card_id, "uid": u_id}
@@ -867,6 +904,7 @@ async def update_node_maitrise(
     mc_row = mc_result.fetchone()
 
     card = Card()
+    review_history = []
     if mc_row and mc_row[0]:
         try:
             state_data = mc_row[0]
@@ -877,28 +915,48 @@ async def update_node_maitrise(
             card.reps = state_data.get("reps", card.reps)
             card.lapses = state_data.get("lapses", card.lapses)
             card.scheduled_days = state_data.get("scheduled_days", card.scheduled_days)
+            review_history = state_data.get("review_history", [])
         except Exception as e:
             logger.warning(f"Impossible de parser fsrs_state pour {fsrs_card_id}: {e}")
 
-    rating_map = {0: FsrsRating.Again, 1: FsrsRating.Good, 2: FsrsRating.Easy}
+    # Mapper la maîtrise sur le rating FSRS (Again → Hard → Good)
+    rating_map = {0: Rating.Again, 1: Rating.Hard, 2: Rating.Good}
     fsrs_rating = rating_map[maitrise]
 
-    scheduler = CardScheduler()
-    now = datetime.now(timezone.utc)
-    scheduling_cards = scheduler.repeat(card, now)
-    new_card = scheduling_cards[fsrs_rating].card
+    # Récupérer la configuration FSRS de l'élève
+    res_config = await db.execute(
+        text("SELECT fsrs_config FROM users WHERE id = :uid"),
+        {"uid": u_id}
+    )
+    config_row = res_config.fetchone()
+    user_fsrs_config = config_row[0] if config_row else None
 
-    due_date = new_card.due if hasattr(new_card, 'due') else now + timedelta(days=1)
-    interval = new_card.scheduled_days if hasattr(new_card, 'scheduled_days') else 1
+    # Appliquer le scheduler calibré
+    scheduler_inst = get_fsrs_scheduler(user_fsrs_config)
+    now_utc = datetime.now(timezone.utc)
+    updated_card = run_fsrs_step(card, fsrs_rating, now_utc, scheduler_inst)
+
+    due_date = updated_card.due if hasattr(updated_card, 'due') else now_utc + timedelta(days=1)
+    interval = updated_card.scheduled_days if hasattr(updated_card, 'scheduled_days') else 1
+
+    # Préserver l'historique des révisions
+    review_history.append({
+        "rating": fsrs_rating.value if hasattr(fsrs_rating, 'value') else maitrise,
+        "reviewed_at": now_utc.isoformat(),
+        "elapsed_days": 0,
+        "scheduled_days": interval,
+        "state_before": str(card.state),
+    })
 
     fsrs_json = json.dumps({
-        "stability": new_card.stability,
-        "difficulty": new_card.difficulty,
-        "scheduled_days": new_card.scheduled_days,
-        "reps": new_card.reps,
-        "lapses": new_card.lapses,
-        "state": str(new_card.state),
-        "last_review": now.isoformat(),
+        "stability": updated_card.stability,
+        "difficulty": updated_card.difficulty,
+        "scheduled_days": interval,
+        "reps": getattr(updated_card, "reps", 0),
+        "lapses": getattr(updated_card, "lapses", 0),
+        "state": str(updated_card.state),
+        "last_review": now_utc.isoformat(),
+        "review_history": review_history,
     })
 
     await db.execute(
@@ -906,11 +964,11 @@ async def update_node_maitrise(
             INSERT INTO mastery_micro_concepts
                 (user_id, micro_concept_id, concept_id, chapter,
                  difficulty, stability, fsrs_state, due_date,
-                 prochaine_revision, interval_jours, state, last_review)
+                 prochaine_revision, interval_jours, state, last_review, updated_at)
             VALUES
                 (:user_id, :mc_id, :concept_id, :chapter,
                  :difficulty, :stability, :fsrs_state::jsonb, :due_date,
-                 :next_rev, :interval, :state, :last_review)
+                 :next_rev, :interval, :state, :last_review, :updated_at)
             ON CONFLICT (user_id, micro_concept_id)
             DO UPDATE SET
                 difficulty = EXCLUDED.difficulty,
@@ -921,21 +979,22 @@ async def update_node_maitrise(
                 interval_jours = EXCLUDED.interval_jours,
                 state = EXCLUDED.state,
                 last_review = EXCLUDED.last_review,
-                updated_at = NOW()
+                updated_at = EXCLUDED.updated_at
         """),
         {
             "user_id": u_id,
             "mc_id": fsrs_card_id,
             "concept_id": node_id,
             "chapter": node_row[2] if node_row else "",
-            "difficulty": new_card.difficulty,
-            "stability": new_card.stability,
+            "difficulty": updated_card.difficulty,
+            "stability": updated_card.stability,
             "fsrs_state": fsrs_json,
             "due_date": due_date,
             "next_rev": due_date,
             "interval": interval,
-            "state": getattr(new_card.state, 'value', 0) if hasattr(new_card, 'state') else maitrise,
-            "last_review": now
+            "state": updated_card.state.value if hasattr(updated_card.state, 'value') else int(updated_card.state),
+            "last_review": now_utc,
+            "updated_at": now_utc,
         }
     )
 

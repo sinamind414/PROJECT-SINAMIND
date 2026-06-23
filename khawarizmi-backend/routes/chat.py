@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from openai import AsyncOpenAI
 from config import get_settings
 from cache import get_cache, set_cache, make_cache_key
-from deps import get_current_user, get_tutor, get_openai
+from deps import get_current_user, get_tutor, get_openai, get_db
 from rate_limit import limiter, chat_limit
 from schemas.session import ChatRequest
 from services.khawarizmi_engine import KhawarizmiTutor
@@ -25,6 +25,7 @@ async def chat_socratique(
     current_user: Dict        = Depends(get_current_user),
     tutor:        KhawarizmiTutor = Depends(get_tutor),
     openai_client:AsyncOpenAI = Depends(get_openai),
+    db:           AsyncSession = Depends(get_db),
 ):
     cfg = get_settings()
     mc = MetricsCollector(user_id=str(current_user["id"]), endpoint="/api/chat")
@@ -32,7 +33,7 @@ async def chat_socratique(
     mc.start("cache_lookup")
     cache_key = make_cache_key(
         "chat", body.sujet_id, body.question_id,
-        body.message[:100], body.mode_force or "auto"
+        body.message, body.mode_force or "auto"
     )
     cached = await get_cache(cache_key)
     mc.end("cache_lookup")
@@ -54,6 +55,52 @@ async def chat_socratique(
     )
     mc.end("pre_analyse")
 
+    # ─── Calcul du Contexte Temporel & FSRS ──────────────
+    from datetime import date
+    from sqlalchemy import text as sa_text
+    today = date.today()
+    year = today.year
+    if today.month > 6 or (today.month == 6 and today.day > 10):
+        year += 1
+    bac_date = date(year, 6, 5)
+    days_to_bac = (bac_date - today).days
+
+    if days_to_bac > 90:
+        phase_label = "Phase 1 : Apprentissage progressif (Septembre - Mars)"
+    elif days_to_bac > 15:
+        phase_label = "Phase 2 : Révisions intensives (Avril - Mai)"
+    else:
+        phase_label = "Phase 3 : Sprint final (J-15 avant le BAC)"
+
+    user_stats = {"mastered": 0, "total": 0, "avg_stability": 0.0}
+    try:
+        result_stats = await db.execute(
+            sa_text("""
+                SELECT 
+                    COUNT(*) as total,
+                    COUNT(*) FILTER (WHERE stability > 10.0) as mastered,
+                    COALESCE(AVG(stability), 0.0) as avg_stability
+                FROM mastery_micro_concepts
+                WHERE user_id = :uid
+            """),
+            {"uid": current_user["id"]}
+        )
+        row_stats = result_stats.fetchone()
+        if row_stats:
+            user_stats = {
+                "total": row_stats[0],
+                "mastered": row_stats[1],
+                "avg_stability": round(row_stats[2] or 0.0, 1)
+            }
+    except Exception as e:
+        logger.error(f"Erreur stats chat FSRS: {e}")
+
+    calendar_context = {
+        "days_to_bac": days_to_bac,
+        "phase": phase_label,
+        "user_stats": user_stats
+    }
+
     try:
         system_prompt = tutor.build_system_prompt(
             sujet_id      = body.sujet_id,
@@ -63,6 +110,7 @@ async def chat_socratique(
             niveau_sm2    = body.niveau_sm2,
             score_actuel  = body.score_actuel,
             mode_force    = body.mode_force,
+            calendar_context = calendar_context,
         )
     except ValueError as e:
         raise HTTPException(404, f"Contenu introuvable : {e}")

@@ -9,13 +9,13 @@ import base64
 import logging
 from typing import Dict, Any, Optional
 from openai import AsyncOpenAI
+from config import get_settings
 
 logger = logging.getLogger('khawarizmi.dual_coding')
 
 # ═══ CONSTANTES ═════════════════════════════════════════════════
 MAX_IMAGE_SIZE_MB  = 5
 MIN_IMAGE_SIZE_B   = 1000   # < 1Ko = image corrompue
-VISION_MODEL       = 'gpt-4o-mini'
 VISION_TEMPERATURE = 0.25   # Légèrement plus souple pour la vision
 VISION_MAX_TOKENS  = 400
 VISION_DETAIL      = 'low'  # 'low' = 85 tokens fixes = 3x moins cher
@@ -183,9 +183,29 @@ class DualCodingService:
     Dual Coding Theory : texte + visuel = +75% rétention.
     """
 
-    def __init__(self, openai_client: AsyncOpenAI):
-        self.client  = openai_client
+    def __init__(self, openai_client: AsyncOpenAI = None):
+        cfg = get_settings()
         self.schemas = SCHEMAS_SVT
+
+        if cfg.VISION_API_KEY:
+            self.client = AsyncOpenAI(
+                api_key=cfg.VISION_API_KEY,
+                base_url=cfg.vision_base_url,
+            )
+            self.model = cfg.vision_model
+            self.vision_available = True
+        elif openai_client is not None:
+            self.client = openai_client
+            self.model = cfg.vision_model
+            self.vision_available = True
+        else:
+            self.client = None
+            self.model = None
+            self.vision_available = False
+            logger.warning(
+                "Vision IA désactivée — VISION_API_KEY non configurée. "
+                "Le dual coding retournera un message d'erreur gracieux."
+            )
 
     # ═══ MÉTHODE PRINCIPALE ════════════════════════════════════
 
@@ -204,6 +224,15 @@ class DualCodingService:
         Returns:
             Dict avec score, feedback socratique et éléments manquants
         """
+        # ── Guard : vision IA disponible ? ────────────────────────
+        if not self.vision_available:
+            return {
+                'erreur':   "La vision IA n'est pas configurée sur ce serveur.",
+                'score':    0,
+                'feedback': "L'évaluation de schémas par photo nécessite une clé API Vision. "
+                            "Demande à ton enseignant de l'activer.",
+            }
+
         # ── Validation ──────────────────────────────────────────
         validation = self._valider_image(image_base64)
         if not validation['valide']:
@@ -230,7 +259,7 @@ class DualCodingService:
 
         try:
             response = await self.client.chat.completions.create(
-                model    = VISION_MODEL,
+                model    = self.model,
                 messages = [{
                     'role': 'user',
                     'content': [
@@ -275,6 +304,10 @@ class DualCodingService:
         """Valide l'image avant d'appeler l'API."""
         if not image_base64:
             return {'valide': False, 'message': 'Image vide ou manquante.'}
+
+        # Nettoyer l'en-tête base64 (Data URI) si présent (ex: data:image/jpeg;base64,...)
+        if ',' in image_base64:
+            image_base64 = image_base64.split(',')[-1]
 
         try:
             image_bytes = base64.b64decode(image_base64)

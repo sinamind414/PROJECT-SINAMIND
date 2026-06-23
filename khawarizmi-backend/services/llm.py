@@ -7,6 +7,96 @@ from config import get_settings
 
 logger = logging.getLogger("khawarizmi.llm")
 
+def _get_glm47_client():
+    """Retourne un client AsyncOpenAI pointant vers Z.AI (GLM-4.7) si configuré."""
+    cfg = get_settings()
+    if cfg.ZAI_API_KEY:
+        return AsyncOpenAI(
+            api_key=cfg.ZAI_API_KEY,
+            base_url=cfg.zai_base_url,
+        )
+    return None
+
+
+async def _call_with_fallback(
+    messages: list,
+    primary_client: AsyncOpenAI,
+    primary_model: str,
+    temperature: float = 0,
+    max_tokens: int = 400,
+    timeout: float = 8.0,
+) -> object:
+    """Appelle le modèle principal avec fallback automatique vers Gemini → GLM-4.7 → OpenAI."""
+    providers = []
+
+    # Fallback 1 : Gemini 2.5 Flash (gratuit, 15 req/min)
+    cfg = get_settings()
+    if cfg.GEMINI_API_KEY and cfg.GEMINI_API_KEY != "test-gemini-key":
+        providers.append((
+            "Gemini 2.5 Flash",
+            AsyncOpenAI(
+                api_key=cfg.GEMINI_API_KEY,
+                base_url="https://generativelanguage.googleapis.com/v1beta/openai/",
+            ),
+            "gemini-2.5-flash",
+        ))
+
+    # Fallback 2 : Cloudflare GLM-5.2 (gratuit, 10K neurons/jour)
+    if cfg.CLOUDFLARE_API_TOKEN:
+        providers.append((
+            "Cloudflare GLM-5.2",
+            AsyncOpenAI(
+                api_key=cfg.CLOUDFLARE_API_TOKEN,
+                base_url=f"https://api.cloudflare.com/client/v4/accounts/{cfg.CLOUDFLARE_ACCOUNT_ID}/ai/v1",
+            ),
+            "@cf/zai-org/glm-5.2",
+        ))
+
+    # Fallback 3 : GLM-4.7 (Z.AI)
+    glm_client = _get_glm47_client()
+    if glm_client:
+        providers.append((
+            "GLM-4.7",
+            glm_client,
+            cfg.zai_model,
+        ))
+
+    # Fallback 4 : OpenAI gpt-4o-mini
+    fallback_key = cfg.OPENAI_FALLBACK_API_KEY or cfg.REAL_OPENAI_API_KEY
+    if fallback_key:
+        providers.append((
+            "OpenAI gpt-4o-mini",
+            AsyncOpenAI(api_key=fallback_key, base_url="https://api.openai.com/v1"),
+            "gpt-4o-mini",
+        ))
+
+    # Tentative principale
+    try:
+        return await primary_client.chat.completions.create(
+            model=primary_model, temperature=temperature,
+            max_tokens=max_tokens, timeout=timeout, messages=messages,
+        )
+    except Exception as e:
+        is_rate_limit = "429" in str(e) or "quota" in str(e).lower()
+        if not is_rate_limit:
+            raise
+
+    # Fallbacks séquentiels
+    for name, client, model in providers:
+        try:
+            logger.warning(f"⚠️ Fallback vers {name}...")
+            resp = await client.chat.completions.create(
+                model=model, temperature=temperature,
+                max_tokens=max_tokens, timeout=timeout, messages=messages,
+            )
+            logger.info(f"✅ Fallback {name} réussi.")
+            return resp
+        except Exception as fallback_err:
+            logger.error(f"❌ Échec {name} : {fallback_err}")
+
+    raise RuntimeError("Tous les providers IA ont échoué (rate limit). Réessaie plus tard.")
+
+
 SYSTEM_PROMPT = """You are KHAWARIZMI-EVAL, a scientific evaluation engine for 
 Algerian Baccalauréat (3AS Sciences Expérimentales). 
 
@@ -92,6 +182,27 @@ CRITICAL ERRORS (always -> global_score < 0.20):
 - "la mitose produit des cellules haploïdes"
 - "les enzymes se consomment dans la réaction"
 - Any reversal of cause/effect in a biological mechanism
+
+═══════════════════════════════════════════════
+SPECIFIC EVALUATION RULES — ONEC ALGERIAN BAC
+═══════════════════════════════════════════════
+You must strictly enforce the following Algerian ONEC methodology ("manhadjiya") rules:
+
+1. THE VERB "ANALYSER" / حلّل (Analyser) :
+   - An analysis is purely descriptive; the student MUST NOT explain or interpret.
+   - Required parts of a valid analysis:
+     * Part A: Define the document (ماذا تمثل الوثيقة؟) using: "تمثل الوثيقة..."
+     * Part B: Deconstruct the data (تفكيك المعطيات) describing trends (تزايد، ثبات، تناقص) and key values.
+     * Part C: Establish a logical relation (إيجاد علاقة) using: "أي كلما... زاد/نقص..."
+     * Part D: Provide a Deduction/Conclusion (تقديم استنتاج).
+   - CRITICAL VIOLATIONS FOR "ANALYSER":
+     * If the student attempts to interpret or explain during analysis using causal terms like "راجع إلى", "يعود إلى", "يدل على", "لأن" -> Set "global_score" to MAX 0.50. Causal interpretation is forbidden inside analysis.
+     * If there is no Deduction (استنتاج) -> Set "global_score" to MAX 0.60.
+
+2. THE VERB "EXPLAIN/INTERPRET" / فسر (Interpreter) :
+   - The student must provide a strict cause-and-effect relationship (علاقة سببية) between the variables and the biological result (answering "Why?" or "How?").
+   - Must use causal terms: "راجع إلى", "يعود إلى", "سببه", "لأن".
+   - Must explicitly link the experimental findings of the document with their prerequisite biological knowledge (المكتسبات القبلية).
 
 ═══════════════════════════════════════════════
 SPECIFIC EVALUATION RULES — CHAPITRE 1: SYNTHÈSE DES PROTÉINES
@@ -263,49 +374,16 @@ REPONSE_ELEVE: {reponse}"""
     # Timeout de 8 secondes passé directement à l'appel réseau
     _model = get_settings().openai_model
     
-    try:
-        response = await client.chat.completions.create(
-            model           = _model,
-            temperature     = 0,
-            seed            = 42,
-            max_tokens      = 400,
-            timeout         = 8.0,
-            messages        = [
-                {"role": "system", "content": calibrated_system_prompt},
-                {"role": "user",   "content": user_message}
-            ]
-        )
-    except Exception as e:
-        # Si c'est une erreur de quota / rate limit (429), on tente le fallback immédiat vers OpenAI gpt-4o-mini
-        if "429" in str(e) or "quota" in str(e).lower():
-            logger.warning("⚠️ Quota atteint ou 429 sur le client principal. Tentative de fallback OpenAI...")
-            fallback_key = get_settings().OPENAI_FALLBACK_API_KEY or get_settings().REAL_OPENAI_API_KEY
-            if fallback_key:
-                try:
-                    fallback_client = AsyncOpenAI(
-                        api_key=fallback_key,
-                        base_url="https://api.openai.com/v1"
-                    )
-                    response = await fallback_client.chat.completions.create(
-                        model           = "gpt-4o-mini",
-                        temperature     = 0,
-                        seed            = 42,
-                        max_tokens      = 400,
-                        timeout         = 8.0,
-                        messages        = [
-                            {"role": "system", "content": calibrated_system_prompt},
-                            {"role": "user",   "content": user_message}
-                        ]
-                    )
-                    logger.info("✅ Fallback OpenAI (gpt-4o-mini) réussi.")
-                except Exception as fallback_err:
-                    logger.error(f"❌ Échec du fallback OpenAI : {fallback_err}")
-                    raise e
-            else:
-                logger.warning("⚠️ Aucune clé API de fallback (OPENAI_FALLBACK_API_KEY) configurée.")
-                raise e
-        else:
-            raise e
+    messages = [
+        {"role": "system", "content": calibrated_system_prompt},
+        {"role": "user",   "content": user_message}
+    ]
+
+    response = await _call_with_fallback(
+        messages=messages,
+        primary_client=client,
+        primary_model=_model,
+    )
 
     content = response.choices[0].message.content or ""
     result = extract_json_from_gemini(content)

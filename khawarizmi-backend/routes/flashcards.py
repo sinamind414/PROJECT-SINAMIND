@@ -18,7 +18,25 @@ router = APIRouter()
 
 def _get_state():
     from main import state
+    if state.interleaving is None:
+        from services.interleaving import InterleavingSession
+        state.interleaving = InterleavingSession()
+    if state.scheduler is None:
+        from services.scheduler import KhawarizmiScheduler
+        state.scheduler = KhawarizmiScheduler()
     return state
+
+
+_MATIERE_ALIASES = {
+    "svt": "sciences_naturelles",
+    "sciences": "sciences_naturelles",
+    "sciences naturelles": "sciences_naturelles",
+    "maths": "mathematiques",
+    "mathematiques": "mathematiques",
+    "physique": "physique",
+    "physique chimie": "physique",
+    "pc": "physique",
+}
 
 
 @router.post("/api/drill/session", tags=["Drill"])
@@ -28,10 +46,11 @@ async def generer_session_drill(
     db:           AsyncSession  = Depends(get_db),
 ):
     s = _get_state()
+    matiere = _MATIERE_ALIASES.get(body.matiere.lower().strip(), body.matiere)
     session = await s.interleaving.generer_session(
         user_id      = current_user["id"],
         db           = db,
-        matiere      = body.matiere,
+        matiere      = matiere,
         nb_questions = body.nb_questions,
     )
 

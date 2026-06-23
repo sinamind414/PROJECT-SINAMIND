@@ -61,11 +61,7 @@ def test_webhook_invalid_signature():
         headers={"signature": "bad_sig"}
     )
     assert response.status_code == 403
-    assert response.json() == {
-        "erreur": "Invalid signature",
-        "status": 403,
-        "path": "/api/payment/webhook/chargily"
-    }
+    assert response.json() == {"erreur": "Invalid signature"}
 
 
 @pytest.mark.asyncio

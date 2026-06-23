@@ -78,7 +78,7 @@ export function EnzymeSimulation() {
   function recordPoint() {
     setCurvePoints((prev) => {
       if (prev.some((p) => p.temp === temperature)) return prev
-      return [...prev, { temp, activity }].sort((a, b) => a.temp - b.temp)
+      return [...prev, { temp: temperature, activity }].sort((a, b) => a.temp - b.temp)
     })
   }
 

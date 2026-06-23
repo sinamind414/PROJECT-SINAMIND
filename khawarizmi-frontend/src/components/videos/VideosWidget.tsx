@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
+import apiClient from "@/lib/api-client"
 import { VideoCard } from "./VideoCard"
 
 export function VideosWidget({ chapitre }: { chapitre: string }) {
@@ -17,11 +18,6 @@ export function VideosWidget({ chapitre }: { chapitre: string }) {
       const data = await apiClient.getVideosByChapter(chapitre)
       setVideos(data.slice(0, 3))
     } catch (err) {
-      console.error("Erreur vidéos:", err)
-    } finally {
-      setLoading(false)
-    }
-  }
       console.error("Erreur vidéos:", err)
     } finally {
       setLoading(false)

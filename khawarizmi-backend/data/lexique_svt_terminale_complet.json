@@ -10,7 +10,7 @@
     "langues_cibles": [
       "arabe"
     ],
-    "total_entrees": 221
+    "total_entrees": 235
   },
   "domaines": [
     {
@@ -6076,6 +6076,352 @@
                 "structure",
                 "magmatisme",
                 "intrusion"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "domaine-methode",
+      "nom_fr": "Méthodologie scientifique",
+      "nom_ar": "المنهجية العلمية",
+      "categories": [
+        {
+          "id": "cat-methode-1",
+          "nom_fr": "Verbes d'action méthodologiques (ONEC)",
+          "nom_ar": "الأفعال الأدائية المنهجية (الONEC)",
+          "termes": [
+            {
+              "id": "term-222",
+              "terme_fr": "Analyser",
+              "terme_ar": "حلّل",
+              "abreviation": null,
+              "type": "methode",
+              "definition_fr": "Décomposer les données d'un document pour en décrire les tendances, valeurs et relations, sans interpréter ni expliquer.",
+              "definition_ar": "التحليل هو تفكيك معطيات الوثيقة ووصف النتائج والعلاقات الظاهرة فيها قبل الانتقال إلى التفسير.",
+              "synonymes_fr": [],
+              "synonymes_ar": [],
+              "importance": "haute",
+              "bac_frequent": true,
+              "chapitre_principal": "Méthodologie ONEC",
+              "micro_concept_id": "methode_onec",
+              "exemples_contexte": [
+                "تمثل الوثيقة تغير كمية الغلوكوز بدلالة الزمن، حيث نلاحظ انخفاضها من 2g/L إلى 0.5g/L خلال 30 دقيقة."
+              ],
+              "termes_lies": [],
+              "tags": [
+                "methode",
+                "analyse",
+                "document",
+                "onec"
+              ]
+            },
+            {
+              "id": "term-223",
+              "terme_fr": "Interpréter / Expliquer",
+              "terme_ar": "فسّر",
+              "abreviation": null,
+              "type": "methode",
+              "definition_fr": "Répondre au pourquoi ou au comment en établissant une relation de cause à effet entre les données et les connaissances scientifiques.",
+              "definition_ar": "التفسير هو الإجابة عن لماذا أو كيف، باستعمال معطيات السند والمكتسبات القبلية المناسبة.",
+              "synonymes_fr": [],
+              "synonymes_ar": [],
+              "importance": "haute",
+              "bac_frequent": true,
+              "chapitre_principal": "Méthodologie ONEC",
+              "micro_concept_id": "methode_onec",
+              "exemples_contexte": [
+                "يفسر ارتفاع كمية البروتين بتزايد ترجمة الـ ARNm، لأن الريبوزومات تركب سلاسل ببتيدية انطلاقا من الأحماض الأمينية."
+              ],
+              "termes_lies": [],
+              "tags": [
+                "methode",
+                "interpretation",
+                "onec"
+              ]
+            },
+            {
+              "id": "term-224",
+              "terme_fr": "Déduire",
+              "terme_ar": "استنتج",
+              "abreviation": null,
+              "type": "methode",
+              "definition_fr": "Tirer une conclusion concise à partir de l'analyse ou de l'interprétation, sans ajouter d'informations nouvelles.",
+              "definition_ar": "الاستنتاج هو تقديم المعلومة التي توصلت إليها بعد التحليل أو التفسير دون إضافة معلومات جديدة.",
+              "synonymes_fr": [],
+              "synonymes_ar": [],
+              "importance": "haute",
+              "bac_frequent": true,
+              "chapitre_principal": "Méthodologie ONEC",
+              "micro_concept_id": "methode_onec",
+              "exemples_contexte": [
+                "نستنتج أن الخلايا تزداد قدرتها على تركيب البروتين مع مرور الزمن."
+              ],
+              "termes_lies": [],
+              "tags": [
+                "methode",
+                "deduction",
+                "onec"
+              ]
+            },
+            {
+              "id": "term-225",
+              "terme_fr": "Justifier / Argumenter",
+              "terme_ar": "علّل / برّر",
+              "abreviation": null,
+              "type": "methode",
+              "definition_fr": "Appuyer une affirmation par un argument tiré du document et confirmé par une connaissance scientifique préalable.",
+              "definition_ar": "التعليل أو التبرير يقوم على دليل من الوثيقة ومكتسب قبلي مناسب لإقناع المصحح بصحة الجواب.",
+              "synonymes_fr": [],
+              "synonymes_ar": [],
+              "importance": "haute",
+              "bac_frequent": true,
+              "chapitre_principal": "Méthodologie ONEC",
+              "micro_concept_id": "methode_onec",
+              "exemples_contexte": [
+                "الإجابة ب صحيحة لأن الوثيقة تبين انخفاض النشاط الإنزيمي، ونعلم أن تغير البنية الفراغية للإنزيم يضعف تكامله مع مادة التفاعل."
+              ],
+              "termes_lies": [],
+              "tags": [
+                "methode",
+                "argumentation",
+                "onec"
+              ]
+            },
+            {
+              "id": "term-226",
+              "terme_fr": "Proposer une hypothèse",
+              "terme_ar": "اقترح فرضية",
+              "abreviation": null,
+              "type": "methode",
+              "definition_fr": "Formuler une explication provisoire et testable reliant une cause possible à un effet observé.",
+              "definition_ar": "الفرضية حل تفسيري مؤقت يربط بين سبب محتمل ونتيجة، ويجب أن يكون منطقيا وقابلا للتحقق.",
+              "synonymes_fr": [],
+              "synonymes_ar": [],
+              "importance": "haute",
+              "bac_frequent": true,
+              "chapitre_principal": "Méthodologie ONEC",
+              "micro_concept_id": "methode_onec",
+              "exemples_contexte": [
+                "نفترض أن سبب المرض هو حدوث طفرة في المورثة المسؤولة عن تركيب بروتين وظيفي، مما يؤدي إلى تركيب بروتين غير فعال."
+              ],
+              "termes_lies": [],
+              "tags": [
+                "methode",
+                "hypothese",
+                "onec"
+              ]
+            },
+            {
+              "id": "term-227",
+              "terme_fr": "Définir",
+              "terme_ar": "عرّف",
+              "abreviation": null,
+              "type": "methode",
+              "definition_fr": "Donner les limites précises d'un terme scientifique : propriétés, caractéristiques, rôle.",
+              "definition_ar": "إعطاء الحدود الدقيقة للمصطلح: الخصائص، السمات، الأهمية أو الدور.",
+              "synonymes_fr": [],
+              "synonymes_ar": [],
+              "importance": "haute",
+              "bac_frequent": true,
+              "chapitre_principal": "Méthodologie ONEC",
+              "micro_concept_id": "methode_onec",
+              "exemples_contexte": [],
+              "termes_lies": [],
+              "tags": [
+                "methode",
+                "definition",
+                "onec"
+              ]
+            },
+            {
+              "id": "term-228",
+              "terme_fr": "Nommer / Identifier",
+              "terme_ar": "سمّى / تعرّف",
+              "abreviation": null,
+              "type": "methode",
+              "definition_fr": "Reconnaître et désigner un élément par son nom exact : donnée, structure, organe, concept.",
+              "definition_ar": "تعيين عنصر ما بالاسم: بيان، عضية، عضو، مركب أو مفهوم.",
+              "synonymes_fr": [],
+              "synonymes_ar": [],
+              "importance": "haute",
+              "bac_frequent": true,
+              "chapitre_principal": "Méthodologie ONEC",
+              "micro_concept_id": "methode_onec",
+              "exemples_contexte": [],
+              "termes_lies": [],
+              "tags": [
+                "methode",
+                "identification",
+                "onec"
+              ]
+            },
+            {
+              "id": "term-229",
+              "terme_fr": "Citer / Énumérer",
+              "terme_ar": "اذكر",
+              "abreviation": null,
+              "type": "methode",
+              "definition_fr": "Lister brièvement les éléments en utilisant un minimum de mots.",
+              "definition_ar": "العد بإيجاز مع استعمال الحد الأدنى من الكلمات.",
+              "synonymes_fr": [],
+              "synonymes_ar": [],
+              "importance": "haute",
+              "bac_frequent": true,
+              "chapitre_principal": "Méthodologie ONEC",
+              "micro_concept_id": "methode_onec",
+              "exemples_contexte": [],
+              "termes_lies": [],
+              "tags": [
+                "methode",
+                "enumeration",
+                "onec"
+              ]
+            },
+            {
+              "id": "term-230",
+              "terme_fr": "Valider une hypothèse",
+              "terme_ar": "تحقق من صحة الفرضية / صادق على فرضية",
+              "abreviation": null,
+              "type": "methode",
+              "definition_fr": "Parcours complet : analyse, interprétation partielle, conclusion partielle, synthèse, puis confirmation ou réfutation de la hypothèse.",
+              "definition_ar": "المصادقة على الفرضية تتطلب مسارا: تحليل، تفسير عند الحاجة، علاقة، استنتاج جزئي، تركيب، ثم تأكيد أو نفي.",
+              "synonymes_fr": [],
+              "synonymes_ar": [],
+              "importance": "haute",
+              "bac_frequent": true,
+              "chapitre_principal": "Méthodologie ONEC",
+              "micro_concept_id": "methode_onec",
+              "exemples_contexte": [
+                "من الشكل أ نلاحظ انخفاض النشاط، ومنه نستنتج وجود خلل وظيفي. ومن الشكل ب يتبين تغير البنية، وبالتالي نصادق على فرضية تأثير الطفرة على وظيفة البروتين."
+              ],
+              "termes_lies": [],
+              "tags": [
+                "methode",
+                "hypothese",
+                "verification",
+                "onec"
+              ]
+            },
+            {
+              "id": "term-231",
+              "terme_fr": "Discuter",
+              "terme_ar": "ناقش",
+              "abreviation": null,
+              "type": "methode",
+              "definition_fr": "Tâche complexe combinant analyse de documents, interprétation et mise en regard d'arguments pour et contre.",
+              "definition_ar": "المناقشة مهمة مركبة تشبه التحقق من الفرضية، مع إبراز الحجج وربما الإيجابيات والسلبيات.",
+              "synonymes_fr": [],
+              "synonymes_ar": [],
+              "importance": "haute",
+              "bac_frequent": true,
+              "chapitre_principal": "Méthodologie ONEC",
+              "micro_concept_id": "methode_onec",
+              "exemples_contexte": [
+                "تدعم نتائج الوثيقة الأولى الفرضية لأنها تبين انخفاض النشاط، بينما توضح الوثيقة الثانية سبب الانخفاض بتغير البنية، ومنه فالفرضية مقبولة."
+              ],
+              "termes_lies": [],
+              "tags": [
+                "methode",
+                "discussion",
+                "onec"
+              ]
+            },
+            {
+              "id": "term-232",
+              "terme_fr": "Composer un texte scientifique",
+              "terme_ar": "اكتب نصاً علمياً",
+              "abreviation": null,
+              "type": "methode",
+              "definition_fr": "Rédiger un texte structuré avec introduction, problématique, développement organisé et conclusion.",
+              "definition_ar": "النص العلمي سؤال مقالي ينتظر استحضار وانتقاء وتنظيم المعارف وفق بناء منهجي واضح.",
+              "synonymes_fr": [],
+              "synonymes_ar": [],
+              "importance": "haute",
+              "bac_frequent": true,
+              "chapitre_principal": "Méthodologie ONEC",
+              "micro_concept_id": "methode_onec",
+              "exemples_contexte": [
+                "تضمن الخلية تحويل المعلومة الوراثية إلى بروتين وظيفي. فكيف يتم التعبير عن هذه المعلومة؟ يتم ذلك عبر الاستنساخ ثم الترجمة... وفي الختام، يسمح التعبير المورثي بتركيب بروتين يحدد الصفة."
+              ],
+              "termes_lies": [],
+              "tags": [
+                "methode",
+                "redaction",
+                "onec"
+              ]
+            },
+            {
+              "id": "term-233",
+              "terme_fr": "Comparer",
+              "terme_ar": "قارن",
+              "abreviation": null,
+              "type": "methode",
+              "definition_fr": "Mettre deux éléments sous un critère unique pour mettre en évidence différences et similitudes.",
+              "definition_ar": "المقارنة لا تعني وصف عنصرين فقط، بل وضعهما تحت معيار واحد لإظهار الاختلاف أو التشابه.",
+              "synonymes_fr": [],
+              "synonymes_ar": [],
+              "importance": "haute",
+              "bac_frequent": true,
+              "chapitre_principal": "Méthodologie ONEC",
+              "micro_concept_id": "methode_onec",
+              "exemples_contexte": [
+                "بالنسبة إلى النشاط الإنزيمي، يكون مرتفعا في الحالة الشاهدة بينما ينخفض بوضوح في وجود المثبط."
+              ],
+              "termes_lies": [],
+              "tags": [
+                "methode",
+                "comparaison",
+                "document",
+                "onec"
+              ]
+            },
+            {
+              "id": "term-234",
+              "terme_fr": "Déterminer la relation",
+              "terme_ar": "حدد العلاقة",
+              "abreviation": null,
+              "type": "methode",
+              "definition_fr": "Établir la liaison entre deux variables en formulant une phrase du type « chaque fois que… alors… ».",
+              "definition_ar": "تحديد العلاقة يعني الانتقال من وصف X و Y إلى صياغة الرابط بينهما.",
+              "synonymes_fr": [],
+              "synonymes_ar": [],
+              "importance": "haute",
+              "bac_frequent": true,
+              "chapitre_principal": "Méthodologie ONEC",
+              "micro_concept_id": "methode_onec",
+              "exemples_contexte": [
+                "العلاقة بين تركيز المادة والنشاط الإنزيمي طردية، فكلما زاد التركيز ازداد النشاط إلى حد معين."
+              ],
+              "termes_lies": [],
+              "tags": [
+                "methode",
+                "relation",
+                "document",
+                "onec"
+              ]
+            },
+            {
+              "id": "term-235",
+              "terme_fr": "Décrire",
+              "terme_ar": "صِف",
+              "abreviation": null,
+              "type": "methode",
+              "definition_fr": "Exposer de manière détaillée les caractéristiques d'un phénomène, d'une structure ou d'une expérience en se basant sur les observations directes.",
+              "definition_ar": "عرض تفصيلي لخصائص ظاهرة أو بنية أو تجربة استناداً إلى الملاحظات المباشرة.",
+              "synonymes_fr": [],
+              "synonymes_ar": [],
+              "importance": "haute",
+              "bac_frequent": true,
+              "chapitre_principal": "Méthodologie ONEC",
+              "micro_concept_id": "methode_onec",
+              "exemples_contexte": [],
+              "termes_lies": [],
+              "tags": [
+                "methode",
+                "description",
+                "onec"
               ]
             }
           ]

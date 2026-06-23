@@ -163,6 +163,7 @@ export function ScenarioRunner({
         scenario_id: scenario.id,
         chapter_slug: chapterSlug,
         answers: questions.map((q) => ({
+          question_id: q.id,
           verb_slug: q.verbSlug,
           answer: answers[q.id] || "",
         })),

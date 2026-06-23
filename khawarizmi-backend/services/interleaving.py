@@ -185,8 +185,13 @@ class InterleavingSession:
         """Récupère la récupérabilité moyenne d'un chapitre pour un élève."""
         from sqlalchemy import text
 
+        # Calcul de la récupérabilité FSRS à la volée (colonne physiquesupprimée)
         query = text("""
-            SELECT COALESCE(AVG(mmc.retrievability), 0.5) as avg_ret
+            SELECT COALESCE(
+                AVG(
+                    1.0 / (1.0 + (EXTRACT(EPOCH FROM (NOW() - COALESCE(mmc.last_review, mmc.created_at))) / 86400.0) / (9.0 * COALESCE(NULLIF(mmc.stability, 0), 1.0)))
+                ), 0.5
+            ) as avg_ret
             FROM mastery_micro_concepts mmc
             JOIN micro_concepts mc ON mc.id = mmc.micro_concept_id
             WHERE mmc.user_id     = :user_id
@@ -219,7 +224,7 @@ class InterleavingSession:
         """
         from sqlalchemy import text
 
-        # Priorité 1 : Questions dues FSRS
+        # Priorité 1 : Questions dues FSRS (calcul de récupérabilité à la volée)
         query_dues = text("""
             SELECT
                 a.id,
@@ -227,7 +232,7 @@ class InterleavingSession:
                 a.micro_concept_id,
                 a.chapitre_id,
                 a.difficulte,
-                mmc.retrievability,
+                1.0 / (1.0 + (EXTRACT(EPOCH FROM (NOW() - COALESCE(mmc.last_review, mmc.created_at))) / 86400.0) / (9.0 * COALESCE(NULLIF(mmc.stability, 0), 1.0))) AS retrievability,
                 mmc.prochaine_revision
             FROM annales a
             LEFT JOIN mastery_micro_concepts mmc
@@ -239,7 +244,7 @@ class InterleavingSession:
                 OR mmc.prochaine_revision IS NULL
               )
             ORDER BY
-                COALESCE(mmc.retrievability, 0) ASC,
+                retrievability ASC,
                 RANDOM()
             LIMIT :limit
         """)
