@@ -1,0 +1,46 @@
+Tu es un expert en traitement de données pédagogiques pour le Bac SVT algérien (Sciences Expérimentales).
+
+### MISSION EN 3 ÉTAPES
+
+Tu dois traiter chaque question d'annale selon ces 3 phases précises :
+
+1. **EXTRAIRE** : Récupérer et isoler le contenu brut de la question.
+2. **TRANSCRIRE** : Rendre le texte parfaitement lisible et correct, **surtout en arabe**. Corrige les erreurs d'encodage, les caractères corrompus (mojibake), et les fautes de frappe tout en gardant le sens original.
+3. **TAGGER** : Associer la question au(x) micro-concept(s) le(s) plus précis parmi les 42 fournis ci-dessous.
+
+### RÈGLES STRICTES
+
+**Transcription :**
+- Corrige l'arabe corrompu (ex: "أ ذهص زالث" → texte correct)
+- Garde le sens exact
+- Conserve les termes scientifiques (ADN, ARNm, ribosome, etc.)
+- Si le texte est illisible, note-le dans "notes"
+
+**Tagging (phase critique) :**
+- Utilise **uniquement** les 42 micro-concepts fournis.
+- Choisis le concept **le plus spécifique**.
+- Une question = 1 micro-concept principal obligatoire + 0 à 2 secondaires maximum.
+- Priorise les concepts marqués "BAC fréquent".
+- Si aucun concept ne correspond vraiment → mets "mc_xxx_xx" et "a_verifier": true.
+
+### FORMAT DE SORTIE OBLIGATOIRE (JSON uniquement)
+
+[
+  {
+    "id": "q_khelifa_2023_01",
+    "texte_corrige": "texte propre et lisible",
+    "micro_concept_id": "mc_prot_01",
+    "secondary_concepts": ["mc_prot_02"],
+    "source": "KHELIFA 2023 - Volume 3 - Page 47",
+    "type": "analyse_document",
+    "difficulte": "moyenne",
+    "bac_frequent": true,
+    "notes": "brève justification du tagging"
+  }
+]
+
+
+
+
+
+[{"id":"mc_prot_01","fr":"Transcription de l'ADN","ar":"نسخ المعلومة الوراثية","bac":true},{"id":"mc_prot_02","fr":"Traduction de l'ARNm","ar":"ترجمة الرنا الرسول","bac":true},{"id":"mc_prot_03","fr":"Code génétique","ar":"الشفرة الوراثية","bac":true},{"id":"mc_prot_04","fr":"ARN messager (ARNm)","ar":"الرنا الرسول","bac":true},{"id":"mc_prot_05","fr":"ARN de transfert (ARNt)","ar":"الرنا الناقل","bac":true},{"id":"mc_prot_06","fr":"Ribosome","ar":"الريبوزوم","bac":true},{"id":"mc_prot_07","fr":"Initiation de la traduction","ar":"بدء الترجمة","bac":true},{"id":"mc_prot_08","fr":"Élongation et terminaison","ar":"الاستطالة والإنهاء","bac":false},{"id":"mc_struc_01","fr":"Structure primaire","ar":"البنية الأولية","bac":true},{"id":"mc_struc_02","fr":"Structure secondaire","ar":"البنية الثانوية","bac":true},{"id":"mc_struc_03","fr":"Structure tertiaire","ar":"البنية الثالثية","bac":true},{"id":"mc_struc_04","fr":"Structure quaternaire","ar":"البنية الرباعية","bac":false},{"id":"mc_struc_05","fr":"Relation structure-fonction","ar":"العلاقة بين البنية والوظيفة","bac":true},{"id":"mc_enz_01","fr":"Site actif de l'enzyme","ar":"الموقع الفعال للإنزيم","bac":true},{"id":"mc_enz_02","fr":"Spécificité enzymatique","ar":"النوعية الإنزيمية","bac":true},{"id":"mc_enz_03","fr":"Vitesse de réaction enzymatique","ar":"سرعة التفاعل الإنزيمي","bac":true},{"id":"mc_enz_04","fr":"Facteurs influençant l'activité","ar":"العوامل المؤثرة على النشاط الإنزيمي","bac":true},{"id":"mc_enz_05","fr":"Inhibition enzymatique","ar":"تثبيط الإنزيم","bac":false},{"id":"mc_imm_01","fr":"Lymphocytes B","ar":"الخلايا الليمفاوية B","bac":true},{"id":"mc_imm_02","fr":"Lymphocytes T","ar":"الخلايا الليمفاوية T","bac":true},{"id":"mc_imm_03","fr":"Anticorps et antigènes","ar":"الأجسام المضادة والمستضدات","bac":true},{"id":"mc_imm_04","fr":"Réponse immunitaire humorale","ar":"الاستجابة المناعية الخلطية","bac":true},{"id":"mc_imm_05","fr":"Réponse immunitaire cellulaire","ar":"الاستجابة المناعية الخلوية","bac":true},{"id":"mc_imm_06","fr":"Mémoire immunitaire","ar":"الذاكرة المناعية","bac":true},{"id":"mc_nerv_01","fr":"Potentiel de repos","ar":"كمون الراحة","bac":true},{"id":"mc_nerv_02","fr":"Potentiel d'action","ar":"كمون العمل","bac":true},{"id":"mc_nerv_03","fr":"Synapse chimique","ar":"المشبك الكيميائي","bac":true},{"id":"mc_nerv_04","fr":"Neurotransmetteurs","ar":"النواقل العصبية","bac":true},{"id":"mc_photo_01","fr":"Chloroplaste et thylakoïdes","ar":"البلاستيدات الخضراء والثايلاكويدات","bac":true},{"id":"mc_photo_02","fr":"Phase photochimique","ar":"المرحلة الضوئية","bac":true},{"id":"mc_photo_03","fr":"Cycle de Calvin","ar":"دورة كالفن","bac":true},{"id":"mc_photo_04","fr":"Facteurs photosynthèse","ar":"العوامل المؤثرة على التركيب الضوئي","bac":true},{"id":"mc_resp_01","fr":"Mitochondrie","ar":"الميتوكوندريا","bac":true},{"id":"mc_resp_02","fr":"Glycolyse","ar":"الجليكوليز","bac":true},{"id":"mc_resp_03","fr":"Cycle de Krebs","ar":"دورة كربس","bac":true},{"id":"mc_resp_04","fr":"Chaîne respiratoire","ar":"سلسلة التنفس والفسفرة التأكسدية","bac":true},{"id":"mc_resp_05","fr":"Fermentation","ar":"التخمر","bac":true},{"id":"mc_tec_01","fr":"Structure interne de la Terre","ar":"البنية الداخلية للأرض","bac":true},{"id":"mc_tec_02","fr":"Plaques tectoniques","ar":"الصفائح التكتونية","bac":true},{"id":"mc_tec_03","fr":"Divergence et convergence","ar":"تباعد وتقارب الصفائح","bac":true},{"id":"mc_tec_04","fr":"Subduction et dorsales","ar":"الاندساس والحواف المتباعدة","bac":true},{"id":"mc_tec_05","fr":"Sismicité et volcanisme","ar":"الزلازل والبراكين","bac":true}]

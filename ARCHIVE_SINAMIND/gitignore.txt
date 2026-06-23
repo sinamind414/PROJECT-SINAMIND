@@ -1,0 +1,47 @@
+# Environnement — CRITIQUE
+**/.env
+**/.env.*
+!**/.env.example
+
+# Secrets
+*.pem
+*.key
+*.p12
+secrets/
+
+# Backups et données lourdes
+*.backup_*
+*.backup_inject_*
+*.bak
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Node
+node_modules/
+.next/
+dist/
+.expo/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Modèles IA lourds
+models/
+!models/minilm_onnx_int8/model_quantized.onnx
+*.zip
+*.tar.gz
+*.gguf
+
+# Logs
+*.log
+logs/
+

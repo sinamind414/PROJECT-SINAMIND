@@ -1,0 +1,151 @@
+7. MATRICE DE COMPLÉTUDE
+                    PDF  OCR  Questions  Branché API
+KHELIFA 1 V01-05    ✅   ✅      ✅          ✅
+KHELIFA 1 V06-10    ✅   ⚠️      ✅          ⚠️ (stubs)
+KHELIFA 1 V11       ✅   ✅      ✅          ✅
+KHELIFA 1 V12-15    ✅   ❌      ❌          ❌
+KHELIFA 2 V01-15    ✅   ✅      ❌          ❌
+FINALBAC V1-4       ✅   ✅*     ❌          ❌  (*archive only)
+FINALBAC V5         ✅   ⚠️*     ❌          ❌  (*incomplet)
+FINALBAC V6         ✅   ❌      ❌          ❌
+MOURAFIK V1-3       ✅   ✅*     ❌          ❌  (*archive only)
+Livre scolaire      ✅   ✅      —           —
+
+
+
+ Get-ChildItem -LiteralPath "C:\Users\zakaria\Documents\PROJET KHAWARIZMI IA\khawarizmi-backend\data\sciences_qr_atomiques.json" | Select-Object Name, Length
+Name                       Length
+----                       ------
+sciences_qr_atomiques.json      2
+# Check content of empty qr_atomiques
+$ Get-Content -LiteralPath "C:\Users\zakaria\Documents\PROJET KHAWARIZMI IA\khawarizmi-backend\data\sciences_qr_atomiques.json"
+[]
+# Programmes directory contents
+$ Get-ChildItem -LiteralPath "C:\Users\zakaria\Documents\PROJET KHAWARIZMI IA\khawarizmi-backend\data\programmes" -Recurse -File | Select-Object Name, @{N='SizeKB';E={[math]::Round($_.Length/1KB,1)}}
+Name                             SizeKB
+----                             ------
+svt_sciences_experimentales.json   19,9
+# Check videos_seed size
+$ Get-ChildItem -LiteralPath "C:\Users\zakaria\Documents\PROJET KHAWARIZMI IA\khawarizmi-backend\data\videos_seed.json" | Select-Object Name, @{N='SizeKB';E={[math]::Round($_.Length/1KB,1)}}
+Name             SizeKB
+----             ------
+videos_seed.json    2,6
+# Check manhadjiya seed size
+$ Get-ChildItem -LiteralPath "C:\Users\zakaria\Documents\PROJET KHAWARIZMI IA\khawarizmi-backend\data\manhadjiya_v1_seed.json" | Select-Object Name, @{N='SizeKB';E={[math]::Round($_.Length/1KB,1)}}
+Name                    SizeKB
+----                    ------
+manhadjiya_v1_seed.json   15,9
+Voici le BILAN GENERAL COMPLET de toutes les données et OCR du projet :
+BILAN DATA & OCR — IA Khawarizmi Pro
+1. SOURCES PDF BRUTES (ANNALES_SVT_BAC_ALGERIE/)
+Série	Volumes	PDFs présents
+KHELIFA 1	15	V01–V15
+KHELIFA 2	15	V01–V15
+FINALBAC	6	V1–V6
+MOURAFIK	3	V1–V3
+TOTAL	39	39 PDFs
+2. PIPELINE OCR — ÉTAT PAR VOLUME
+KHELIFA 1 (15 volumes)
+Volume	OCR brut	OCR workspace	Questions extraites	JSON consolidé
+V01	ocr_output/	ARCHIVE (28 pages)	ocr_output/ (186 KB)	211 KB
+V02	ocr_output/	ARCHIVE (28 pages)	ocr_output/ (279 KB)	317 KB
+V03	ocr_output/	ARCHIVE (28 pages)	ocr_output/ (134 KB)	151 KB
+V04	ocr_output/	ARCHIVE (28 pages)	ocr_output/ (94 KB)	106 KB
+V05	ocr_output/	ARCHIVE (28 pages)	ocr_output/ (188 KB)	214 KB
+V06	ocr_production/ bundle	ARCHIVE (28 pages)	ocr_output/ (74 KB)	2.3 KB (stub)
+V07	ocr_production/ bundle	ARCHIVE (20 pages)	ocr_output/ (74 KB)	2.3 KB (stub)
+V08	ocr_production/ bundle	ARCHIVE (10 pages)	ocr_output/ (99 KB)	2.3 KB (stub)
+V09	ocr_production/ bundle	annales_workspace/ (25 pages)	ocr_output/ (62 KB)	2.3 KB (stub)
+V10	ocr_production/ bundle	annales_workspace/ (25 pages)	ocr_output/ (58 KB)	2.3 KB (stub)
+V11	ocr_production/ bundle	annales_workspace/ (25 pages)	ocr_output/ (232 KB)	263 KB
+V12–V15	AUCUN OCR	—	—	—
+KHELIFA 2 (15 volumes)
+Volume	OCR workspace
+V01–V14	annales_workspace/OCR_PROD/ (25 pages chacun)
+V15	annales_workspace/OCR_PROD/ (19 pages)
+MAIS : Aucune extraction de questions n'existe pour KHELIFA 2. Pas de khelifa2_*.json dans ocr_output/.
+FINALBAC (6 volumes)
+Volume	OCR workspace (ARCHIVE)	OCR workspace (actif)
+V1	ARCHIVE (40 pages, summary)	ABSENT
+V2	ARCHIVE (40 pages, summary)	ABSENT
+V3	ARCHIVE (40 pages, summary)	ABSENT
+V4	ARCHIVE (40 pages, summary)	ABSENT
+V5	ARCHIVE (18 pages, pas de summary)	ABSENT
+V6	ABSENT	ABSENT
+MOURAFIK (3 volumes)
+Volume	OCR workspace (ARCHIVE)	OCR workspace (actif)
+V1	ARCHIVE (55 pages, summary)	ABSENT
+V2	ARCHIVE (55 pages, summary)	ABSENT
+V3	ARCHIVE (53 pages, summary)	ABSENT
+3. EXTRACTION DE QUESTIONS
+Source	Fichiers questions
+KHELIFA 1 (V01–V11)	ocr_output/khelifa1_volume{01-11}_questions.json
+KHELIFA 1 (consolidé)	ocr_output/khelifa_all_questions.json
+KHELIFA 1 (batch traité)	processed_khelifa_questions_batch{1-4}.json
+KHELIFA 2	AUCUN
+FINALBAC	AUCUN
+MOURAFIK	AUCUN
+4. DONNÉES STRUCTURÉES (data/)
+Fichier	Taille	Rôle
+annales_sciences_3as.json	558 KB	Annales sciences 3AS
+annales_seed.json	4.8 KB	Seed DB annales
+lexique_svt_terminale_complet.json	282 KB	Lexique SVT bilingue
+programme_sciences_3as.json	95 KB	Programme legacy
+sciences_bac_exercices.json	97 KB	Exercices BAC
+sciences_methodologie.json	333 KB	Méthodologie
+sciences_resumes.json	169 KB	Résumés
+methodologie_sciences_3as.json	490 KB	Méthodologie 3AS
+sciences_qr_atomiques.json	2 B (vide [])	QR atomiques
+chapter_mapping.json	5.6 KB	Mapping chapitres
+eddirasa_minhajiya_links.json	11 KB	Liens éducatifs
+manhadjiya_v1_seed.json	16 KB	Seed manhadjiya
+videos_seed.json	2.7 KB	Seed vidéos
+ocr_batch_log.json	8.6 KB	Log OCR batch
+Données officielles (official/)
+Fichier	Taille	Rôle
+programme_svt_3as_canonical.json	13.6 KB	Programme canonique (source de vérité)
+micro_concepts_reference.json	8.4 KB	Référentiel micro-concepts
+Cours (courses/)
+Fichier	Taille	Rôle
+programme_national_svt_claude_opus.md	605 KB	Programme national SVT complet
+traduction_proteine.txt	3.2 KB	Cours traduction
+transcription_adn.txt	2.5 KB	Cours transcription
+Livre scolaire OCR
+Source	Pages	Statut
+livre_scolaire_3as_sciences_se	334 pages	OCR COMPLET (workspace)
+5. BRANCHEMENT API
+Donnée	Route API	Table DB	Statut
+Annales (seed)	/api/annales/	annales	Branché (seed générique uniquement)
+KHELIFA 1 questions	Via khawarizmi_engine.py	—	Branché (JSON direct)
+KHELIFA 2	—	—	NON BRANCHÉ
+FINALBAC	—	—	NON BRANCHÉ
+MOURAFIK	—	—	NON BRANCHÉ
+Lexique SVT	/api/lexique/	lexique_termes	Branché
+Programme	Via data_loader.py	—	Branché
+Mind Map	/api/mindmap/	—	Branché
+Flashcards	/api/flashcards/	—	Branché
+6. RÉSUMÉ DES LACUNES CRITIQUES
+Problème	Impact
+KHELIFA 1 V12–V15 : 0 OCR	4 volumes inaccessibles
+KHELIFA 1 V06–V10 : JSON stubs (2.3 KB)	Données structurées incomplètes
+KHELIFA 2 : 0 extraction questions	15 volumes OCR-izés mais inutilisables
+FINALBAC V5 : OCR incomplet (18 pages, pas de summary)	Volume partiel
+FINALBAC V6 : 0 OCR	Volume manquant
+FINALBAC V1–V4 : OCR en archive, pas dans workspace actif	Non branché
+MOURAFIK V1–V3 : OCR en archive, pas dans workspace actif	Non branché
+FINALBAC & MOURAFIK : 0 extraction questions	Inutilisables par l'API
+sciences_qr_atomiques.json : vide	Fonctionnalité QR atomiques cassée
+annales_seed.json : générique (pas de KHELIFA/FINALBAC/MOURAFIK)	DB annales quasi vide
+Aucun script d'extraction questions pour KHELIFA 2, FINALBAC, MOURAFIK	Pipeline incomplet
+7. MATRICE DE COMPLÉTUDE
+                    PDF  OCR  Questions  Branché API
+KHELIFA 1 V01-05    ✅   ✅      ✅          ✅
+KHELIFA 1 V06-10    ✅   ⚠️      ✅          ⚠️ (stubs)
+KHELIFA 1 V11       ✅   ✅      ✅          ✅
+KHELIFA 1 V12-15    ✅   ❌      ❌          ❌
+KHELIFA 2 V01-15    ✅   ✅      ❌          ❌
+FINALBAC V1-4       ✅   ✅*     ❌          ❌  (*archive only)
+FINALBAC V5         ✅   ⚠️*     ❌          ❌  (*incomplet)
+FINALBAC V6         ✅   ❌      ❌          ❌
+MOURAFIK V1-3       ✅   ✅*     ❌          ❌  (*archive only)
+Livre scolaire      ✅   ✅      —           —

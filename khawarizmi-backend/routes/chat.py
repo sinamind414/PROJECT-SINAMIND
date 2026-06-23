@@ -109,7 +109,7 @@ async def chat_socratique(
             pre_analyse   = pre_analyse,
             niveau_sm2    = body.niveau_sm2,
             score_actuel  = body.score_actuel,
-            mode_force    = body.mode_force,
+            mode_force    = body.mode_force or 'ANNALES_COMPLEXES',
             calendar_context = calendar_context,
         )
     except ValueError as e:
