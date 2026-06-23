@@ -13,6 +13,7 @@ from rate_limit import limiter, evaluate_limit
 from services.llm import call_gpt4o_evaluator
 from services.fallback import fallback_safe_json
 from services.fallback_v2 import evaluate_l2
+from services.remediation import update_mindmap_after_eval, suggest_action_verb
 
 logger = logging.getLogger("khawarizmi.evaluate")
 router = APIRouter()
@@ -29,6 +30,13 @@ class EvaluateRequest(BaseModel):
     tentative: int = 1
     lang: str = "fr"
 
+class ActionVerbSuggestion(BaseModel):
+    verb_slug: str
+    verb_fr: str
+    reason_ar: str
+    href: str
+    priority: str = "medium"
+
 class EvaluateResponse(BaseModel):
     score: int
     statut: str
@@ -36,6 +44,7 @@ class EvaluateResponse(BaseModel):
     manquant: List[str]
     next_review_date: Optional[str] = None
     source: str
+    recommended_verb: Optional[ActionVerbSuggestion] = None
 
 # ═══════════════════════════════
 # ENDPOINT PRINCIPAL
@@ -162,6 +171,10 @@ async def evaluate(
         config_row = res_config.fetchone()
         user_fsrs_config = config_row[0] if config_row else None
 
+        # Charger le graphe de dépendances depuis la DB
+        from services.fsrs_graph import load_concept_graph
+        concept_graph = await load_concept_graph(db)
+
         # Mettre à jour le graphe
         updates = update_concept_graph(
             user_id=user_id,
@@ -170,7 +183,8 @@ async def evaluate(
             mapping=mapping,
             concept_states=concept_states,
             now=datetime.now(timezone.utc),
-            user_fsrs_config=user_fsrs_config
+            user_fsrs_config=user_fsrs_config,
+            graph=concept_graph,
         )
         
         chapter = question.get("chapitre_id", "ch_inconnu")
@@ -272,6 +286,37 @@ async def evaluate(
 
     # Normaliser la cohérence score/statut/manquant
     eval_result = normalize_result(eval_result)
+
+    # ── Lien 2 (Eval → MindMap color) : mettre à jour le nœud MindMap ──
+    concept_cle = question.get("concept_cle", "")
+    chapter = question.get("chapitre_id", "")
+    try:
+        await update_mindmap_after_eval(
+            db=db,
+            user_id=str(user_id),
+            concept_id=concept_cle,
+            score=eval_result.get("score", 0),
+            chapter=chapter,
+        )
+        await db.commit()
+    except Exception as e:
+        logger.warning(f"MINDMAP_LINK | Erreur mise à jour nœud: {e}")
+
+    # ── Lien 3 (Eval → Verbe d'action) : suggérer un verbe pour la remédiation ──
+    error_type = eval_result.get("error_type")
+    missing_concepts = eval_result.get("manquant", [])
+    action_verb = suggest_action_verb(
+        error_type=error_type,
+        chapter=chapter,
+        score=eval_result.get("score", 0),
+        missing_concepts=missing_concepts,
+    )
+    if action_verb:
+        eval_result["recommended_verb"] = action_verb
+        logger.info(
+            f"ACTION_VERB_LINK | user={user_id} | q={req.question_id} | "
+            f"verb={action_verb['verb_slug']} | reason={action_verb['reason_ar']}"
+        )
 
     # Traduire le feedback si la langue est arabe
     if req.lang == "ar":
