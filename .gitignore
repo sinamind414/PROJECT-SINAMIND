@@ -46,5 +46,8 @@ khawarizmi-backend/models/*
 logs/
 
 
+# Archive sinamind
+ARCHIVE_SINAMIND/
+
 # Benchmark results
 khawarizmi-backend/data/benchmark_results.json

@@ -1,5 +1,0 @@
-backend/data/annales_seed.json
-backend/data/chapter_mapping.json
-backend/data/lexique_svt_terminale_complet.json
-backend/data/programmes/svt_sciences_experimentales.json
-backend/routes/annales.py
