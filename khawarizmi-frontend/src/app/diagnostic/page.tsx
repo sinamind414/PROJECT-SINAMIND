@@ -145,7 +145,8 @@ export default function DiagnosticHubPage() {
                           قصوى
                         </span>
                       </div>
-                      <h4 className="text-white font-bold text-sm leading-relaxed">{ch.titre_fr}</h4>
+                      <h4 className="text-white font-bold text-sm leading-relaxed">{ch.titre_ar || ch.titre_fr}</h4>
+                      <p className="text-gray-500 text-xs mt-1" dir="ltr">{ch.titre_fr}</p>
                       <p className="text-gray-500 text-xs mt-1">{ch.unit_titre} · {ch.domain_titre}</p>
                       <div className="mt-2 text-xs text-red-300 font-bold">
                         راجع هذا الفصل ←

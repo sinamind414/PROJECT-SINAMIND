@@ -45,6 +45,7 @@ export interface SujetBac {
   matiere: string
   filiere: string
   titre: string
+  titreAr: string
   difficulte: "facile" | "moyen" | "difficile"
   duree: number
   totalPages: number
@@ -63,6 +64,7 @@ const SUJETS: SujetBac[] = [
     matiere: "SVT",
     filiere: "Sciences Expérimentales",
     titre: "Sujet Bac SVT SE 2025",
+    titreAr: "موضوع بكالوريا SVT علوم تجريبية 2025",
     difficulte: "moyen",
     duree: 180,
     totalPages: 10,
@@ -128,7 +130,7 @@ const SUJETS: SujetBac[] = [
   {
     slug: "bac-svt-se-2024",
     annee: 2024, session: "normale", matiere: "SVT", filiere: "Sciences Expérimentales",
-    titre: "Sujet Bac SVT SE 2024", difficulte: "moyen", duree: 180,
+    titre: "Sujet Bac SVT SE 2024", titreAr: "موضوع بكالوريا SVT علوم تجريبية 2024", difficulte: "moyen", duree: 180,
     totalPages: 10,
     chapitres: ["Génétique", "Immunologie", "Système nerveux"],
     url_pdf: "https://www.dzexams.com/fr/sujets/bac-svt-se-2024",
@@ -192,7 +194,7 @@ const SUJETS: SujetBac[] = [
   {
     slug: "bac-svt-se-2023",
     annee: 2023, session: "normale", matiere: "SVT", filiere: "Sciences Expérimentales",
-    titre: "Sujet Bac SVT SE 2023", difficulte: "moyen", duree: 180,
+    titre: "Sujet Bac SVT SE 2023", titreAr: "موضوع بكالوريا SVT علوم تجريبية 2023", difficulte: "moyen", duree: 180,
     totalPages: 10,
     chapitres: ["Génétique", "Immunologie", "Enzymologie"],
     url_pdf: "https://www.dzexams.com/fr/sujets/bac-svt-se-2023",
@@ -255,7 +257,7 @@ const SUJETS: SujetBac[] = [
   {
     slug: "bac-svt-se-2022",
     annee: 2022, session: "normale", matiere: "SVT", filiere: "Sciences Expérimentales",
-    titre: "Sujet Bac SVT SE 2022", difficulte: "difficile", duree: 180,
+    titre: "Sujet Bac SVT SE 2022", titreAr: "موضوع بكالوريا SVT علوم تجريبية 2022", difficulte: "difficile", duree: 180,
     totalPages: 10,
     chapitres: ["Génétique", "Immunologie", "Système nerveux", "Enzymologie"],
     url_pdf: "https://www.dzexams.com/fr/sujets/bac-svt-se-2022",
@@ -319,7 +321,7 @@ const SUJETS: SujetBac[] = [
   {
     slug: "bac-svt-se-2021",
     annee: 2021, session: "normale", matiere: "SVT", filiere: "Sciences Expérimentales",
-    titre: "Sujet Bac SVT SE 2021", difficulte: "facile", duree: 180,
+    titre: "Sujet Bac SVT SE 2021", titreAr: "موضوع بكالوريا SVT علوم تجريبية 2021", difficulte: "facile", duree: 180,
     totalPages: 10,
     chapitres: ["Génétique", "Immunologie"],
     url_pdf: "https://www.dzexams.com/fr/sujets/bac-svt-se-2021",
@@ -382,7 +384,7 @@ const SUJETS: SujetBac[] = [
   {
     slug: "bac-svt-se-2020",
     annee: 2020, session: "normale", matiere: "SVT", filiere: "Sciences Expérimentales",
-    titre: "Sujet Bac SVT SE 2020", difficulte: "moyen", duree: 180,
+    titre: "Sujet Bac SVT SE 2020", titreAr: "موضوع بكالوريا SVT علوم تجريبية 2020", difficulte: "moyen", duree: 180,
     totalPages: 10,
     chapitres: ["Système nerveux", "Immunologie", "Génétique"],
     url_pdf: "https://www.dzexams.com/fr/sujets/bac-svt-se-2020",
@@ -445,7 +447,7 @@ const SUJETS: SujetBac[] = [
   {
     slug: "bac-svt-se-2019",
     annee: 2019, session: "normale", matiere: "SVT", filiere: "Sciences Expérimentales",
-    titre: "Sujet Bac SVT SE 2019", difficulte: "difficile", duree: 180,
+    titre: "Sujet Bac SVT SE 2019", titreAr: "موضوع بكالوريا SVT علوم تجريبية 2019", difficulte: "difficile", duree: 180,
     totalPages: 10,
     chapitres: ["Génétique", "Enzymologie", "Système nerveux"],
     url_pdf: "https://www.dzexams.com/fr/sujets/bac-svt-se-2019",
@@ -509,7 +511,7 @@ const SUJETS: SujetBac[] = [
   {
     slug: "bac-svt-se-2018",
     annee: 2018, session: "normale", matiere: "SVT", filiere: "Sciences Expérimentales",
-    titre: "Sujet Bac SVT SE 2018", difficulte: "facile", duree: 180,
+    titre: "Sujet Bac SVT SE 2018", titreAr: "موضوع بكالوريا SVT علوم تجريبية 2018", difficulte: "facile", duree: 180,
     totalPages: 10,
     chapitres: ["Immunologie", "Génétique"],
     url_pdf: "https://www.dzexams.com/fr/sujets/bac-svt-se-2018",
@@ -572,7 +574,7 @@ const SUJETS: SujetBac[] = [
   {
     slug: "bac-svt-se-2017",
     annee: 2017, session: "normale", matiere: "SVT", filiere: "Sciences Expérimentales",
-    titre: "Sujet Bac SVT SE 2017", difficulte: "moyen", duree: 180,
+    titre: "Sujet Bac SVT SE 2017", titreAr: "موضوع بكالوريا SVT علوم تجريبية 2017", difficulte: "moyen", duree: 180,
     totalPages: 10,
     chapitres: ["Système nerveux", "Immunologie", "Génétique", "Enzymologie"],
     url_pdf: "https://www.dzexams.com/fr/sujets/bac-svt-se-2017",
@@ -635,7 +637,7 @@ const SUJETS: SujetBac[] = [
   {
     slug: "bac-svt-se-2016",
     annee: 2016, session: "normale", matiere: "SVT", filiere: "Sciences Expérimentales",
-    titre: "Sujet Bac SVT SE 2016", difficulte: "facile", duree: 180,
+    titre: "Sujet Bac SVT SE 2016", titreAr: "موضوع بكالوريا SVT علوم تجريبية 2016", difficulte: "facile", duree: 180,
     totalPages: 10,
     chapitres: ["Génétique", "Immunologie"],
     url_pdf: "https://www.dzexams.com/fr/sujets/bac-svt-se-2016",
@@ -708,7 +710,16 @@ export function getAllSujets(): SujetBac[] {
 }
 
 export function getSujetBySlug(slug: string): SujetBac | undefined {
-  return SUJETS.find((s) => s.slug === slug)
+  const exact = SUJETS.find((s) => s.slug === slug)
+  if (exact) return exact
+
+  // Fallback tolérant : correspondance par année extraite du slug
+  const yearMatch = slug.match(/\d{4}/)
+  if (yearMatch) {
+    const year = parseInt(yearMatch[0], 10)
+    return SUJETS.find((s) => s.annee === year)
+  }
+  return undefined
 }
 
 export function getAnneeRange(): number[] {

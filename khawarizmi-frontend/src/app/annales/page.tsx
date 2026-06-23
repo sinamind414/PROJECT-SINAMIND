@@ -26,6 +26,7 @@ function annaleToSujet(a: Annale): SujetBac {
   return {
     slug: a.slug || String(a.id),
     titre: a.titre,
+    titreAr: a.titre_ar || a.titre,
     annee: a.annee,
     session: "normale",
     difficulte: diff as "facile" | "moyen" | "difficile",
@@ -129,8 +130,9 @@ function SujetCard({ sujet }: { sujet: SujetBac }) {
         <div className="flex items-start justify-between gap-3">
           <div>
             <h3 className="text-white font-bold text-base group-hover:text-mint-soft transition-colors">
-              {sujet.titre}
+              {sujet.titreAr}
             </h3>
+            <p className="text-xs text-slate-500 mt-0.5" dir="ltr">{sujet.titre}</p>
             <p className="text-xs text-slate-500 mt-0.5">
               {sujet.annee} · {sujet.session === "normale" ? "دورة عادية" : "دورة استدراكية"}
             </p>

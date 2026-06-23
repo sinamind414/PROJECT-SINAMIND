@@ -1,11 +1,19 @@
-# Task 4 Report — Load graph before FSRS update
+# Task 4 Report: Create FeedbackButtons.tsx
 
-**Status:** DONE
+## Status: DONE
 
-**Commit:** `f27226add3e64b157819908a98b9a1f8e0436c23`
+## Changes Made
+- Created `src/components/dashboard/chatbot/FeedbackButtons.tsx`
+- Exports `FeedbackType` type and `FeedbackButtons` component
+- 5 feedback buttons in 3+2 grid layout (RTL Arabic)
+- Dark theme matching existing chatbot components (ChatBubble, SuggestionChips)
+- Pill-shaped buttons with emoji + Arabic text
+- `disabled` prop grays out buttons
+- Compact size (text-xs), pill shape, subtle hover/active transitions
 
-**Changes made to `khawarizmi-backend/services/reconciliation_queue.py`:**
-- Inserted `load_concept_graph(db)` call before `update_concept_graph()` at line 111
-- Added `graph=concept_graph` keyword argument to the call
+## Verification
+- TypeScript compiles: YES (no errors in FeedbackButtons.tsx; 1 pre-existing error in SuggestionChips.tsx is unrelated)
 
-**Syntax check:** `ast.parse` — Syntax OK
+## Concerns
+- The parent component (useChatbot or chatbot container) must import `FeedbackType` from this file and control button visibility/after-click state
+- Pre-existing TS error in SuggestionChips.tsx:61 (trailing bracket) — not introduced by this task

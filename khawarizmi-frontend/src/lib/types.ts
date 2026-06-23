@@ -280,6 +280,7 @@ export interface CriticalChaptersResponse {
     id: string
     numero: number
     titre_fr: string
+    titre_ar?: string
     page?: number
     type?: ChapterType
     importance: ChapterImportance
@@ -296,6 +297,7 @@ export interface CriticalChaptersResponse {
 export interface Annale {
   id: number
   titre: string
+  titre_ar?: string
   slug: string
   matiere: string
   niveau: string

@@ -51,7 +51,8 @@ function DetailContent() {
                 <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${DIFFICULTE_COLORS[sujet.difficulte]}`}>
                   {sujet.difficulte === "facile" ? "سهل" : sujet.difficulte === "moyen" ? "متوسط" : "صعب"}
                 </span>
-                <h1 className="text-2xl sm:text-3xl font-bold text-white">{sujet.titre}</h1>
+                <h1 className="text-2xl sm:text-3xl font-bold text-white">{sujet.titreAr}</h1>
+                <p className="text-sm text-slate-400" dir="ltr">{sujet.titre}</p>
                 <p className="text-sm text-slate-400">{sujet.matiere} · {sujet.filiere}</p>
               </div>
             </div>

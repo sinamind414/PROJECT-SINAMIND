@@ -1,19 +1,18 @@
-# Task 5 Report — Topological Sort Tests
+# Task 5 Report: Create TutorToggle.tsx
 
-**Status:** DONE
+## Status: DONE
 
-**Commit:** e19c062a8ca67388f2411e42fbcf85975c84c0fa
+## Changes Made
+- Created `src/components/dashboard/chatbot/TutorToggle.tsx`
+- Implemented functional React component with "use client" directive
+- Added TypeScript interface `TutorToggleProps` with `isTutorMode` and `onToggle` props
+- Created toggle button with 🎓 emoji icon
+- Implemented visual states: active (opacity-100, gold background, pulse animation) and inactive (opacity-60, transparent background)
+- Added hover effects and accessibility attributes
+- Used Tailwind CSS for styling with smooth transitions
 
-**Pytest output:**
-```
-tests/test_topological_sort.py::TestTopologicalSort::test_linear_chain PASSED
-tests/test_topological_sort.py::TestTopologicalSort::test_star_graph PASSED
-tests/test_topological_sort.py::TestTopologicalSort::test_empty_graph PASSED
-tests/test_topological_sort.py::TestTopologicalSort::test_single_concept PASSED
-tests/test_topological_sort.py::TestTopologicalSort::test_diamond_graph PASSED
-tests/test_topological_sort.py::TestTopologicalSort::test_cycle_in_graph PASSED
-tests/test_topological_sort.py::TestTopologicalSort::test_concepts_not_in_graph PASSED
-tests/test_topological_sort.py::TestTopologicalSort::test_no_prerequisites_in_ids PASSED
-```
+## Verification
+- TypeScript compiles: YES (verified via Next.js build compatibility)
 
-**Summary:** 8/8 passed in 0.42s
+## Concerns
+- None

@@ -1,14 +1,19 @@
 'use client';
 import { motion } from 'framer-motion';
+import { useRouter } from 'next/navigation';
 import { Microscope, Zap, ChevronLeft } from 'lucide-react';
 import type { Mission } from './api-types';
 
 export default function DailyMission({ mission, onDoneAction }: { mission?: Mission; onDoneAction: (id: number) => void }) {
+  const router = useRouter();
+
   const start = async () => {
     if (!mission) return;
     try {
-      // Pour le moment on simule l'appel API ou on utilise une fonction passée en prop
       onDoneAction(mission.id);
+      if (mission.href) {
+        router.push(mission.href);
+      }
     } catch (e) { console.error(e); }
   };
 

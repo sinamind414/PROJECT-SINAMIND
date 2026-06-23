@@ -101,14 +101,15 @@ async def seed_annales(
     for annale in data.get("annales", []):
         await db.execute(
             text("""
-                INSERT INTO annales (titre, slug, matiere, niveau, filiere, annee, type,
+                INSERT INTO annales (titre, titre_ar, slug, matiere, niveau, filiere, annee, type,
                                      fichier_sujet, fichier_correction, tags, difficulte)
-                VALUES (:titre, :slug, :matiere, :niveau, :filiere, :annee, :type,
+                VALUES (:titre, :titre_ar, :slug, :matiere, :niveau, :filiere, :annee, :type,
                         :fichier_sujet, :fichier_correction, :tags, :difficulte)
-                ON CONFLICT (slug) DO NOTHING
+                ON CONFLICT (slug) DO UPDATE SET titre_ar = EXCLUDED.titre_ar
             """),
             {
                 "titre": annale["titre"],
+                "titre_ar": annale.get("titre_ar", annale["titre"]),
                 "slug": annale["slug"],
                 "matiere": annale.get("matiere", "SVT"),
                 "niveau": annale.get("niveau", "3ème année"),

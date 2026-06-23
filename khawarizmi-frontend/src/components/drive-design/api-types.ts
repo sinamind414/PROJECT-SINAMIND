@@ -23,6 +23,7 @@ export interface Mission {
   icon: string;
   status: string;
   day_label: string;
+  href?: string;
 }
 
 export interface Topic {

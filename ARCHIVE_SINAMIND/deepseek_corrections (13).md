@@ -882,7 +882,7 @@ You must strictly enforce the following Algerian ONEC methodology ("manhadjiya")
 2. THE VERB "EXPLAIN/INTERPRET" / فسر (Interpreter) :
    - The student must provide a strict cause-and-effect relationship (علاقة سببية) between the variables and the biological result (answering "Why?" or "How?").
    - Must use causal terms: "راجع إلى", "يعود إلى", "سببه", "لأن".
-   - Must explicitly link the experimental findings of the document with their prerequisite biological knowledge (المكتسبات القbelies).
+   - Must explicitly link the experimental findings of the document with their prerequisite biological knowledge (المكتسبات القبلية).
 """
 ```
 
@@ -915,10 +915,10 @@ Absence de tables en base de données pour les Exercices.
 
 ---
 
-## FICHIER 15 : `khawarizmi-backend/services/khawarizmi_engine.py` (Enrichissement Prompt)
+## FICHIER 15 : `khawarizmi-backend/services/khawarizmi_engine.py` (Enrichissement Prompt, Méthodologie ONEC Strict & Langue Arabe Obligatoire)
 
 ### Problème :
-Le chatbot de tutorat est totalement déconnecté du calendrier scolaire et des statistiques de mémorisation FSRS de l'élève. L'IA n'ajuste pas son ton, sa patience ou son type de questions socratiques selon que l'élève révise tranquillement en cours d'année ou qu'il soit dans la phase critique "Sprint final" (J-15 avant le BAC), ce qui brise l'expérience immersive de coaching personnalisé.
+Le chatbot de tutorat est totalement déconnecté du calendrier scolaire et des statistiques de mémorisation FSRS de l'élève. L'IA n'ajuste pas son ton, sa patience ou son type de questions socratiques selon que l'élève révise tranquillement ou soit dans la phase "Sprint final". De plus, le chatbot répondait parfois en français à l'élève alors que les consignes officielles du BAC SVT et la méthodologie de l'ONEC doivent être dispensées en arabe académique avec les termes scientifiques francophones entre parenthèses.
 
 ### Recherche & Remplacement (Search & Replace) :
 
@@ -953,10 +953,23 @@ Le chatbot de tutorat est totalement déconnecté du calendrier scolaire et des 
     ) -> str:
 ```
 
-**Étape 2 (Construction de l'instruction temporelle et FSRS) :**
+**Étape 2 (Régulation sémantique de la méthodologie ONEC SVT et du calendrier FSRS) :**
 
 **Ancien Code :**
 ```python
+        bloc_minhajiya = ""
+        if matiere == 'sciences':
+            bloc_minhajiya = """
+━━━ MÉTHODOLOGIE SCIENCES (MINHAJIYA) ━━━
+En Sciences, tu DOIS évaluer si l'élève respecte la méthode scientifique stricte, pas juste s'il a le bon mot-clé.
+Si la question demande un "Analyse (تحليل)", l'élève DOIT :
+1. Définir le document (تمثل الوثيقة...)
+2. Faire une lecture descriptive rigoureuse (نلاحظ تزايد / تناقص / ثبات) SANS interpréter. S'il dit "نلاحظ طرح" (on observe une libération) au lieu de "نلاحظ تزايد" (on observe une augmentation), c'est une ERREUR DE MÉTHODE.
+3. Conclure en liant la condition et le résultat.
+Si la question demande un "Interprétation (تفسير)", l'élève DOIT répondre au Pourquoi (لماذا) et au Comment (كيف) en utilisant ses acquis et les données.
+→ Si l'élève ne respecte pas cette rigueur, corrige-le doucement sur sa méthodologie avant de valider le contenu !
+"""
+
         mode_id = mode_force if mode_force else self.router_par_niveau(niveau_sm2, score_actuel)
         mode_config = MODES_PEDAGOGIQUES.get(mode_id, MODES_PEDAGOGIQUES['ANNALES_COMPLEXES'])
         instruction_mode = mode_config['instruction']
@@ -966,6 +979,28 @@ Le chatbot de tutorat est totalement déconnecté du calendrier scolaire et des 
 
 **Nouveau Code :**
 ```python
+        bloc_minhajiya = ""
+        if matiere == 'sciences':
+            bloc_minhajiya = """
+━━━ MÉTHODOLOGIE SCIENCES (MINHAJIYA — CONSIGNES ONEC) ━━━
+Tu es le gardien absolu de la méthodologie ONEC. Tu dois faire respecter les règles pour chaque verbe d'action de SVT :
+
+1. VERBE "ANALYSER" (حلّل / Analyser) :
+   - L'élève DOIT définir la وثيقة ("تمثل الوثيقة...")
+   - L'élève DOIT décomposer les résultats avec des valeurs chiffrées/ شروط الشرح.
+   - L'élève DOIT formuler une relation logique (العلاقة: كلما زاد... زاد/نقص...).
+   - L'élève DOIT formuler une déduction (الاستنتاج) courte et directe.
+   - INTERDICTION ABSOLUE d'interpréter ou expliquer les causes dans l'analyse. S'il utilise des connecteurs de cause ("راجع إلى", "بسبب", "لأن"), tu dois le corriger immédiatement et lui rappeler la règle ONEC.
+
+2. VERBE "EXPLIQUER" (فسّر / Interpreter) :
+   - L'élève DOIT formuler une relation de cause à effet ("علاقة سببية") en répondant au Pourquoi et au Comment.
+   - L'élève DOIT utiliser les termes d'explication obligatoires ("راجع إلى", "يعود إلى", "سببه", "لأن").
+   - L'élève DOIT lier les faits expérimentaux avec ses مكتسبات قبلية (connaissances).
+
+3. VERBE "DÉDUIRE" (استنتج / Déduire) :
+   - L'élève DOIT formuler une conclusion courte et directe (1 ou 2 phrases max) qui répond à l'objectif de l'expérience, sans ajouter de nouvelles explications.
+"""
+
         mode_id = mode_force if mode_force else self.router_par_niveau(niveau_sm2, score_actuel)
         mode_config = MODES_PEDAGOGIQUES.get(mode_id, MODES_PEDAGOGIQUES['ANNALES_COMPLEXES'])
         instruction_mode = mode_config['instruction']
@@ -988,15 +1023,26 @@ Le chatbot de tutorat est totalement déconnecté du calendrier scolaire et des 
         format_output = ""
 ```
 
-**Étape 3 (Injection dans le prompt global) :**
+**Étape 3 (Injection dans le prompt global, restriction de la langue de réponse en Arabe obligatoire, et REJET DU HORS-SUJET) :**
 
 **Ancien Code :**
 ```python
 ━━━ MÉTHODE SOCRATIQUE ━━━
 {methode}
 {bloc_minhajiya}
+{bloc_calendrier}
 
 ━━━ INSTRUCTION PÉDAGOGIQUE (MODE: {mode_id}) ━━━
+{instruction_mode}
+
+━━━ RÈGLES ━━━
+→ Tu ne dois JAMAIS inventer de faits, de dates, ou de formules.
+→ Ne révèle JAMAIS la solution officielle
+→ Commence par ce qui est CORRECT dans la réponse de l'élève
+→ Pose UNE seule question (pas plusieurs)
+→ Réponds en français ou arabe selon la langue de l'élève
+{hint_instruction}
+{format_output}
 ```
 
 **Nouveau Code :**
@@ -1007,7 +1053,279 @@ Le chatbot de tutorat est totalement déconnecté du calendrier scolaire et des 
 {bloc_calendrier}
 
 ━━━ INSTRUCTION PÉDAGOGIQUE (MODE: {mode_id}) ━━━
+{instruction_mode}
+
+━━━ RÈGLES ━━━
+→ Tu ne dois JAMAIS inventer de faits, de dates, ou de formules.
+→ Ne révèle JAMAIS la solution officielle
+→ Commence par ce qui est CORRECT dans la réponse de l'élève
+→ Pose UNE seule question (pas plusieurs)
+→ Réponds OBLIGATOIREMENT en arabe (avec les termes scientifiques universels entre parenthèses en français, ex: 'بوليميراز (ARN polymérase)')
+{hint_instruction}
+{format_output}
 ```
+
+---
+
+## FICHIER 16 : `.gitignore` (Mise à disposition du modèle ONX local en production)
+
+### Problème :
+Le modèle d'embeddings ONNX local de 17 Mo (`model_quantized.onnx`) essentiel pour le fonctionnement dégradé (L2 Fallback 100% local) sans internet ni API extérieure était ignoré par Git à cause de la directive globale `models/` dans le fichier `.gitignore`. Les déploiements en production sur Railway s'effondraient donc au démarrage par manque de fichier modèle.
+
+### Recherche & Remplacement (Search & Replace) :
+
+**Ancien Code :**
+```gitignore
+# Modèles IA lourds
+models/
+*.zip
+*.tar.gz
+*.gguf
+```
+
+**Nouveau Code :**
+```gitignore
+# Modèles IA lourds
+models/
+!models/minilm_onnx_int8/model_quantized.onnx
+*.zip
+*.tar.gz
+*.gguf
+```
+
+---
+
+## FICHIER 17 : `khawarizmi-frontend/src/components/drive-design/api-types.ts`
+
+### Problème :
+Le modèle d'interface frontend `Mission` n'intègre pas la propriété d'URI cible (`href`), empêchant la redirection dynamique depuis les défis du tableau de bord vers les modules d'entraînement correspondants.
+
+### Recherche & Remplacement (Search & Replace) :
+
+**Ancien Code :**
+```typescript
+export interface Mission {
+  id: number;
+  title: string;
+  description: string;
+  xp_reward: number;
+  icon: string;
+  status: string;
+  day_label: string;
+}
+```
+
+**Nouveau Code :**
+```typescript
+export interface Mission {
+  id: number;
+  title: string;
+  description: string;
+  xp_reward: number;
+  icon: string;
+  status: string;
+  day_label: string;
+  href?: string;
+}
+```
+
+---
+
+## FICHIER 18 : `khawarizmi-frontend/src/hooks/useDriveDashboard.ts`
+
+### Problème :
+Le hook d'agrégation d'état `useDriveDashboard` écarte la propriété `task.href` lors de la projection des tâches de la journée dans l'interface de défis.
+
+### Recherche & Remplacement (Search & Replace) :
+
+**Ancien Code :**
+```typescript
+  const missions: Mission[] = dashboard.todayTasks.map((task, i) => ({
+    id: i + 1,
+    title: task.titleAr,
+    description: task.detailAr || task.reasonAr || '',
+    xp_reward: task.estimatedMinutes * 5,
+    icon: task.type === 'lesson' ? 'book' : task.type === 'drill' ? 'zap' : 'check',
+    status: task.status === 'done' ? 'done' : 'pending',
+    day_label: 'اليوم',
+  }));
+```
+
+**Nouveau Code :**
+```typescript
+  const missions: Mission[] = dashboard.todayTasks.map((task, i) => ({
+    id: i + 1,
+    title: task.titleAr,
+    description: task.detailAr || task.reasonAr || '',
+    xp_reward: task.estimatedMinutes * 5,
+    icon: task.type === 'lesson' ? 'book' : task.type === 'drill' ? 'zap' : 'check',
+    status: task.status === 'done' ? 'done' : 'pending',
+    day_label: 'اليوم',
+    href: task.href,
+  }));
+```
+
+---
+
+## FICHIER 19 : `khawarizmi-frontend/src/components/drive-design/DailyMission.tsx`
+
+### Problème :
+Le composant de défi quotidien `DailyMission` n'utilise pas le routeur client. Le clic sur « ابدأ هذا التحدي » (Commencer ce défi) simulait simplement l'action comme complétée de manière fictive au lieu de rediriger l'élève vers le module d'entraînement (ex : `/action-verbs/hypothesis`).
+
+### Recherche & Remplacement (Search & Replace) :
+
+**Ancien Code :**
+```typescript
+'use client';
+import { motion } from 'framer-motion';
+import { Microscope, Zap, ChevronLeft } from 'lucide-react';
+import type { Mission } from './api-types';
+
+export default function DailyMission({ mission, onDoneAction }: { mission?: Mission; onDoneAction: (id: number) => void }) {
+  const start = async () => {
+    if (!mission) return;
+    try {
+      // Pour le moment on simule l'appel API ou on utilise une fonction passée en prop
+      onDoneAction(mission.id);
+    } catch (e) { console.error(e); }
+  };
+```
+
+**Nouveau Code :**
+```typescript
+'use client';
+import { motion } from 'framer-motion';
+import { Microscope, Zap, ChevronLeft } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import type { Mission } from './api-types';
+
+export default function DailyMission({ mission, onDoneAction }: { mission?: Mission; onDoneAction: (id: number) => void }) {
+  const router = useRouter();
+
+  const start = async () => {
+    if (!mission) return;
+    try {
+      if (mission.href) {
+        router.push(mission.href);
+      } else {
+        onDoneAction(mission.id);
+      }
+    } catch (e) { console.error(e); }
+  };
+```
+
+---
+
+## FICHIER 20 : `khawarizmi-frontend/src/lib/annales-bac.ts` (Résolution de l'incohérence des sujets de BAC)
+
+### Problème :
+Défaut de routage sur les fiches de sujets BAC. Les Slugs de sujets définis dans le fichier statique frontend `lib/annales-bac.ts` (ex : `bac-svt-se-2020`) ne correspondent pas aux Slugs injectés en base de données par le script de seed `annales_seed.json` (ex : `bac-s-2020-svt`). Lors de l'accès au détail d'un sujet, le système renvoie une erreur « الموضوع غير موجود » (Sujet introuvable).
+
+### Recherche & Remplacement (Search & Replace) :
+
+**Ancien Code :**
+```typescript
+export function getSujetBySlug(slug: string): SujetBac | undefined {
+  return SUJETS.find((s) => s.slug === slug)
+}
+```
+
+**Nouveau Code :**
+```typescript
+export function getSujetBySlug(slug: string): SujetBac | undefined {
+  const exact = SUJETS.find((s) => s.slug === slug)
+  if (exact) return exact
+
+  // Fallback tolérant : correspondance par année extraite du slug
+  const yearMatch = slug.match(/\d{4}/)
+  if (yearMatch) {
+    const year = parseInt(yearMatch[0], 10)
+    return SUJETS.find((s) => s.annee === year)
+  }
+  return undefined
+}
+```
+
+---
+
+## FICHIER 21 : `khawarizmi-backend/services/khawarizmi_engine.py` (Filtre Langue et Rejet du Hors-Sujet)
+
+### Problème :
+Le chatbot souffrait de deux anomalies d'intelligence artificielle :
+1. **Mélange de langues et alignement automatique :** Lorsque l'élève posait une question en français, le chatbot répondait intégralement en français, alors que les consignes méthodologiques du BAC doivent impérativement être enseignées en arabe.
+2. **Acceptation du hors-sujet :** Si l'élève posait des questions sans rapport avec la biologie (ex : sur la vie d'Ibn Sina, la physique, la philo), le chatbot se mettait à discuter de ce sujet au lieu d'opposer un refus poli pour recentrer l'élève sur son entraînement SVT.
+
+### Recherche & Remplacement (Search & Replace) :
+
+**Ancien Code :**
+```python
+        prompt = f"""
+🚨 INSTRUCTIONS DE LANGUE — Le programme BAC est enseigné en ARABE.
+TOUS les labels, titres et descriptions générés doivent être en arabe.
+Termes scientifiques universels gardés entre parenthèses en FR.
+Format : "النص بالعربية (terme FR)"
+
+Tu es KHAWARIZMI, tuteur expert du BAC algérien en {nom_matiere}.
+
+━━━ PHILOSOPHIE ABSOLUE ━━━
+Tu ne donnes JAMAIS la réponse directement.
+Tu guides l'élève vers la compréhension par des QUESTIONS.
+Tu commences TOUJOURS par reconnaître ce qui est correct.
+Tu es bienveillant mais précis.
+```
+
+**Nouveau Code :**
+```python
+        prompt = f"""
+🚨 RÈGLES DE LANGUE ET FILTRAGE ABSOLUES (CRITIQUE) :
+1. LANGUE ARABE OBLIGATOIRE : Tu dois répondre EXCLUSIVEMENT en arabe classique académique. Même si l'élève te pose des questions en français, anglais, russe, ou alphabet latin, ignore complètement sa langue et réponds-lui UNIQUEMENT en arabe classique. Tu dois garder uniquement les termes scientifiques universels entre parenthèses en français, ex: "الاستنساخ (la transcription)". Il est strictement interdit d'utiliser des mots français ordinaires (comme "importante") au milieu de tes phrases en arabe !
+2. REJET DU HORS-SUJET (OFF-TOPIC) : Tu es un tuteur spécialisé UNIQUEMENT dans les SVT (sciences de la vie et de la terre) de Terminale Algérie. Si l'élève te pose une question hors-sujet (comme l'histoire, la philosophie, Ibn Sina, la physique générale, ou des salutations distrayantes), tu DOIS refuser de répondre avec courtoisie, lui indiquer que tu n'es configuré que pour les sciences biologiques, et le recentrer immédiatement sur le chapitre de SVT en cours.
+   - Exemple de réponse type obligatoire en cas de hors-sujet: "عذراً، أنا هنا كأستاذ لمادة علوم الطبيعة والحياة فقط لمساعدتك في البكالوريا. دعنا نركز على موضوع درسنا اليوم وهو {chapitre_nom or 'العلوم الطبيعية'}..."
+
+Tu es KHAWARIZMI, tuteur expert du BAC algérien en {nom_matiere}.
+
+━━━ PHILOSOPHIE ABSOLUE ━━━
+Tu ne donnes JAMAIS la réponse directement.
+Tu guides l'élève vers la compréhension par des QUESTIONS.
+Tu commences TOUJOURS par reconnaître ce qui est correct.
+Tu es bienveillant mais précis.
+```
+
+Et au niveau de la section `RÈGLES` finale :
+
+**Ancien Code :**
+```python
+━━━ RÈGLES ━━━
+→ Tu ne dois JAMAIS inventer de faits, de dates, ou de formules.
+→ Ne révèle JAMAIS la solution officielle
+→ Commence par ce qui est CORRECT dans la réponse de l'élève
+→ Pose UNE seule question (pas plusieurs)
+→ Réponds en français ou arabe selon la langue de l'élève
+{hint_instruction}
+{format_output}
+```
+
+**Nouveau Code :**
+```python
+━━━ RÈGLES ━━━
+→ Tu ne dois JAMAIS inventer de faits, de dates, ou de formules.
+→ Ne révèle JAMAIS la solution officielle
+→ Commence par ce qui est CORRECT dans la réponse de l'élève
+→ Pose UNE seule question (pas plusieurs)
+→ Réponds OBLIGATOIREMENT en arabe (avec les termes scientifiques universels entre parenthèses en français, ex: 'بوليميراز (ARN polymérase)')
+{hint_instruction}
+{format_output}
+```
+
+---
+
+## FICHIER 22 : `khawarizmi-frontend/src/app/simulations/membrane-transport/page.tsx` (Nouveau Fichier - Intégration PhET Arabe)
+
+### Problème :
+L'interface de simulation interactive pour le transport membranaire (rôle des canaux, pompes à sodium-potassium et de l'ATP pour maintenir le potentiel de repos à -70 mV) s'affichait en français, ce qui créait une rupture cognitive avec l'arabe de ta plateforme.
+
+### Code de page à créer :
+Génération complète du laboratoire virtuel synchrone de transport membranaire avec l'iframe PhET paramétré nativement en **Arabe classique** (`?locale=ar`) et couplé à ton tuteur IA d'évaluation à droite.
 
 ---
 

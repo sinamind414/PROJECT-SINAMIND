@@ -2,6 +2,7 @@
   "annales": [
     {
       "titre": "Bac S 2024 – SVT (Spécialité)",
+      "titre_ar": "بكالوريا 2024 – SVT (تخصص)",
       "slug": "bac-s-2024-svt-spe",
       "matiere": "SVT",
       "niveau": "3ème année",
@@ -15,6 +16,7 @@
     },
     {
       "titre": "Bac S 2023 – SVT",
+      "titre_ar": "بكالوريا 2023 – SVT",
       "slug": "bac-s-2023-svt",
       "matiere": "SVT",
       "niveau": "3ème année",
@@ -28,6 +30,7 @@
     },
     {
       "titre": "Bac S 2022 – SVT",
+      "titre_ar": "بكالوريا 2022 – SVT",
       "slug": "bac-s-2022-svt",
       "matiere": "SVT",
       "niveau": "3ème année",
@@ -41,6 +44,7 @@
     },
     {
       "titre": "Bac S 2021 – SVT",
+      "titre_ar": "بكالوريا 2021 – SVT",
       "slug": "bac-s-2021-svt",
       "matiere": "SVT",
       "niveau": "3ème année",
@@ -54,6 +58,7 @@
     },
     {
       "titre": "Bac S 2020 – SVT",
+      "titre_ar": "بكالوريا 2020 – SVT",
       "slug": "bac-s-2020-svt",
       "matiere": "SVT",
       "niveau": "3ème année",
@@ -67,6 +72,7 @@
     },
     {
       "titre": "Bac S 2019 – SVT",
+      "titre_ar": "بكالوريا 2019 – SVT",
       "slug": "bac-s-2019-svt",
       "matiere": "SVT",
       "niveau": "3ème année",
@@ -80,6 +86,7 @@
     },
     {
       "titre": "KHELIFA 1 – Annales SVT BAC (Vol 1)",
+      "titre_ar": "خليفة 1 – سنوات SVT بكالوريا (المجلد 1)",
       "slug": "khelifa1-vol01",
       "matiere": "SVT",
       "niveau": "3ème année",
@@ -93,6 +100,7 @@
     },
     {
       "titre": "KHELIFA 1 – Annales SVT BAC (Vol 2)",
+      "titre_ar": "خليفة 1 – سنوات SVT بكالوريا (المجلد 2)",
       "slug": "khelifa1-vol02",
       "matiere": "SVT",
       "niveau": "3ème année",
@@ -106,6 +114,7 @@
     },
     {
       "titre": "KHELIFA 2 – Annales SVT BAC (Vol 1)",
+      "titre_ar": "خليفة 2 – سنوات SVT بكالوريا (المجلد 1)",
       "slug": "khelifa2-vol01",
       "matiere": "SVT",
       "niveau": "3ème année",
@@ -119,6 +128,7 @@
     },
     {
       "titre": "FINAL BAC – Révision SVT (Vol 1)",
+      "titre_ar": "البكالوريا النهائية – مراجعة SVT (المجلد 1)",
       "slug": "finalbac-vol01",
       "matiere": "SVT",
       "niveau": "3ème année",
@@ -132,6 +142,7 @@
     },
     {
       "titre": "SCIENCES MORAFIK – SVT BAC (Vol 1)",
+      "titre_ar": "علوم مورافيك – SVT بكالوريا (المجلد 1)",
       "slug": "morafik-vol01",
       "matiere": "SVT",
       "niveau": "3ème année",

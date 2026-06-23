@@ -64,6 +64,7 @@ function build(apiProgress?: ProgressResponse | null, dueCards?: number, orienta
         icon: task.type === 'lesson' ? 'book' : task.type === 'drill' ? 'zap' : 'check',
         status: task.status === 'done' ? 'done' : 'pending',
         day_label: 'اليوم',
+        href: task.href,
       }));
 
   // Si l'API renvoie des concepts FSRS, on les utilise comme topics
