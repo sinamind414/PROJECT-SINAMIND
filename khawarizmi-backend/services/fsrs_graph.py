@@ -6,6 +6,7 @@ Recommandé par Claude 3 Opus.
 
 import logging
 import json
+import time
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from fsrs import Scheduler, Card, Rating
@@ -15,20 +16,30 @@ logger = logging.getLogger("khawarizmi.fsrs_graph")
 # scheduler par défaut (sentence-transformers ou initialisation basique)
 default_scheduler = Scheduler()
 
-# Graphe statique de dépendances entre micro-concepts
-CONCEPT_GRAPH = {
-    # Chapitre 1 & 2 : Protéines & structure
-    "structure_tertiaire": ["liaison_faible", "acide_amine"],
-    "site_actif": ["structure_tertiaire", "specificite_enzymatique"],
-    "denaturation": ["structure_tertiaire", "liaison_faible"],
-    
-    # Chapitre 4 : Immunité
-    "reponse_immunitaire_specifique": ["antigene", "anticorps", "lymphocyte"],
-    "cooperation_cellulaire": ["lymphocyte_T4", "lymphocyte_T8", "lymphocyte_B", "macrophage"],
-    
-    # Chapitre 5 : Nerveux
-    "potentiel_action": ["potentiel_repos", "permeabilite_membranaire"],
-}
+_graph_cache: Dict[str, Any] = {"data": {}, "timestamp": 0.0}
+GRAPH_CACHE_TTL = 300  # 5 minutes
+
+def get_concept_graph() -> Dict[str, List[str]]:
+    return _graph_cache["data"]
+
+async def load_concept_graph(db) -> Dict[str, List[str]]:
+    now = time.time()
+    if now - _graph_cache["timestamp"] < GRAPH_CACHE_TTL and _graph_cache["data"]:
+        return _graph_cache["data"]
+    from sqlalchemy import text
+    res = await db.execute(text("""
+        SELECT concept_id, prerequisite_id
+        FROM concept_prerequisites
+        ORDER BY concept_id
+    """))
+    rows = res.fetchall()
+    graph: Dict[str, List[str]] = {}
+    for concept_id, prereq_id in rows:
+        graph.setdefault(concept_id, []).append(prereq_id)
+    _graph_cache["data"] = graph
+    _graph_cache["timestamp"] = now
+    logger.info(f"Loaded {len(graph)} concept dependencies from DB")
+    return graph
 
 @dataclass
 class ConceptNode:
@@ -117,6 +128,7 @@ def update_concept_graph(
     concept_states: Dict[str, Card],  # États FSRS actuels (depuis la base)
     now: Optional[datetime] = None,
     user_fsrs_config: Optional[dict] = None,
+    graph: Optional[Dict[str, List[str]]] = None,
 ) -> Dict[str, dict]:
     """
     Met à jour l'état FSRS de chaque micro-concept impliqué.
@@ -148,11 +160,12 @@ def update_concept_graph(
         except Exception as e:
             logger.error(f"Erreur FSRS sur le concept {concept_id}: {e}")
             
+    active_graph = graph if graph is not None else get_concept_graph()
     # ── Propagation aux prérequis (haut niveau échoue → prérequis immédiatement dû) ──
-    _propagate_prerequisite_penalties(ratings, concept_states, updates, now)
+    _propagate_prerequisite_penalties(ratings, concept_states, updates, now, active_graph)
     
     # ── Propagation aux concepts dépendants (prérequis échoue → stabilité dépendante réduite de 15%) ──
-    _propagate_dependent_penalties(ratings, concept_states, updates)
+    _propagate_dependent_penalties(ratings, concept_states, updates, active_graph)
     
     return updates
 
@@ -162,13 +175,14 @@ def _propagate_prerequisite_penalties(
     concept_states: Dict[str, Card],
     updates: dict,
     now: datetime,
+    graph: Dict[str, List[str]],
 ):
     """
     Pénalise ou reprogramme les prérequis si le concept de haut niveau échoue.
     """
     for concept_id, rating in ratings.items():
-        if rating == Rating.Again and concept_id in CONCEPT_GRAPH:
-            for prereq_id in CONCEPT_GRAPH[concept_id]:
+        if rating == Rating.Again and concept_id in graph:
+            for prereq_id in graph[concept_id]:
                 if prereq_id not in updates:
                     # Rendre le prérequis immédiatement dû pour vérification des bases
                     prereq_card = concept_states.get(prereq_id, Card())
@@ -190,6 +204,7 @@ def _propagate_dependent_penalties(
     ratings: Dict[str, Rating],
     concept_states: Dict[str, Card],
     updates: dict,
+    graph: Dict[str, List[str]],
     penalty: float = 0.15
 ):
     """
@@ -197,7 +212,7 @@ def _propagate_dependent_penalties(
     """
     for failed_concept, rating in ratings.items():
         if rating == Rating.Again:
-            for dependent_concept, prereqs in CONCEPT_GRAPH.items():
+            for dependent_concept, prereqs in graph.items():
                 if failed_concept in prereqs:
                     if dependent_concept not in updates:
                         card = concept_states.get(dependent_concept, Card())
