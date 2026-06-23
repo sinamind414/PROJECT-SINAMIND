@@ -29,20 +29,12 @@ def get_user_key(request: Request) -> str:
     return f"user:{user_id}:{plan}"
 
 
-def chat_limit(request: Request) -> str:
-    info = _get_user_plan(request)
-    if info is None:
-        return "20/hour"
-    _, plan = info
-    return "100/hour" if plan == "pro" else "20/hour"
+def chat_limit(key: str) -> str:
+    return "100/hour" if (key and ":pro" in key) else "20/hour"
 
 
-def evaluate_limit(request: Request) -> str:
-    info = _get_user_plan(request)
-    if info is None:
-        return "15/hour"
-    _, plan = info
-    return "80/hour" if plan == "pro" else "15/hour"
+def evaluate_limit(key: str) -> str:
+    return "80/hour" if (key and ":pro" in key) else "15/hour"
 
 
 limiter = Limiter(key_func=get_user_key)

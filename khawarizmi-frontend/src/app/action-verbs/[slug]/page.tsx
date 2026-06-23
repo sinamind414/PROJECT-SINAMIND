@@ -2,15 +2,17 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
-import { notFound } from "next/navigation"
+import { notFound, useParams } from "next/navigation"
 import { AuthGuard } from "@/components/auth/AuthGuard"
 import { AppShell } from "@/components/layout/AppShell"
 import { getActionVerb, getCategoryLabel, getPriorityLabel } from "@/lib/methodology-v1"
 import apiClient from "@/lib/api-client"
 import type { VerbEvaluateResponse, ActionVerbExercise } from "@/lib/types"
 
-export default function ActionVerbDetailPage({ params }: { params: { slug: string } }) {
-  const verb = getActionVerb(params.slug)
+export default function ActionVerbDetailPage() {
+  const params = useParams()
+  const slug = params.slug as string
+  const verb = getActionVerb(slug)
   if (!verb) notFound()
 
   const totalPoints = verb.scoringRules.reduce((sum, rule) => sum + rule.points, 0)
@@ -24,14 +26,14 @@ export default function ActionVerbDetailPage({ params }: { params: { slug: strin
     let cancelled = false
     ;(async () => {
       try {
-        const ex = await apiClient.getVerbExercises(params.slug)
+        const ex = await apiClient.getVerbExercises(slug)
         if (!cancelled) setExercises(ex)
       } catch {
         // pas d'exercices — la page reste utilisable
       }
     })()
     return () => { cancelled = true }
-  }, [params.slug])
+  }, [slug])
 
   async function submitAnswer() {
     if (!answer.trim()) return
@@ -39,13 +41,13 @@ export default function ActionVerbDetailPage({ params }: { params: { slug: strin
     setEvaluation(null)
     try {
       const result = await apiClient.evaluateVerbAnswer({
-        verb_slug: params.slug,
+        verb_slug: slug,
         answer,
       })
       setEvaluation(result)
     } catch (err) {
       setEvaluation({
-        verb_slug: params.slug,
+        verb_slug: slug,
         score: 0,
         score_max: totalPoints || 1,
         percentage: 0,
@@ -63,7 +65,7 @@ export default function ActionVerbDetailPage({ params }: { params: { slug: strin
 
   async function markReviewed(rating: 1 | 2 | 3 | 4) {
     try {
-      await apiClient.reviewVerb(params.slug, rating, evaluation?.percentage)
+      await apiClient.reviewVerb(slug, rating, evaluation?.percentage)
     } catch {
       // silencieux
     }
