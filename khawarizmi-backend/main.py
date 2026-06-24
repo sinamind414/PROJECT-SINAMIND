@@ -10,7 +10,7 @@ from config import get_allowed_origins, get_settings
 from monitoring import setup_monitoring
 from rate_limit import limiter
 from routes.errors import generic_exception_handler, http_exception_handler, validation_exception_handler
-from routes.lifespan import lifespan, state
+from routes.lifespan import lifespan, state  # noqa: F401 — re-exported for deps.py
 from routes.openapi_config import openapi_metadata
 
 setup_monitoring()
@@ -27,9 +27,23 @@ app.add_exception_handler(422, validation_exception_handler)
 app.add_middleware(SlowAPIMiddleware)
 
 from routes import (
-    annales, auth, chat, chatbot, cours, dual_coding, evaluate,
-    exercices, flashcards, health, lexique, mindmap, payment,
-    programme, progress, session, videos,
+    annales,
+    auth,
+    chat,
+    chatbot,
+    cours,
+    dual_coding,
+    evaluate,
+    exercices,
+    flashcards,
+    health,
+    lexique,
+    mindmap,
+    payment,
+    programme,
+    progress,
+    session,
+    videos,
 )
 
 routers = [health.router, auth.router, chat.router, chatbot.router,
