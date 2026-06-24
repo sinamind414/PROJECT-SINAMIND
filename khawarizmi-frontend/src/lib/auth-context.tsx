@@ -5,6 +5,7 @@
 
 import {
   createContext,
+  useCallback,
   useContext,
   useState,
   useEffect,
@@ -33,13 +34,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true)
 
   // Charger l'utilisateur au montage
-  useEffect(() => {
-    loadUser()
-  }, [])
-
-  const loadUser = async () => {
+  const loadUser = useCallback(async () => {
     if (!apiClient.isAuthenticated()) {
-      setLoading(false)
+      setLoading(() => false)
       return
     }
 
@@ -50,9 +47,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       apiClient.clearToken()
       setUser(null)
     } finally {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- async auth bootstrap
       setLoading(false)
     }
-  }
+  }, [])
+
+  useEffect(() => {
+    void loadUser()
+  }, [loadUser])
 
   const login = async (email: string, password: string) => {
     await apiClient.login(email, password)

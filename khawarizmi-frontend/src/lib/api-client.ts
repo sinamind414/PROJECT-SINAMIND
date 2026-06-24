@@ -15,31 +15,6 @@ import {
   LoginPayload,
   MindMap,
   MindMapGeneratePayload,
-  MindMapTaskStatus,
-  ExpandNodePayload,
-  MindMapNode,
-  ProgressResponse,
-  WeekActivityResponse,
-  ActionVerbSummary,
-  ActionVerbExercise,
-  VerbEvaluateRequest,
-  VerbEvaluateResponse,
-  VerbProgressResponse,
-  DaScenarioSummary,
-  DaScenarioDetail,
-  DaEvaluateRequest,
-  DaEvaluateResponse,
-  DaProgressResponse,
-  DaWeakSpotsResponse,
-  OrientationResponse,
-  TuteurRequest,
-  TuteurResponse,
-  LessonResponse,
-  CheckAnswerResponse,
-  StartBacResponse,
-  ChooseSubjectResponse,
-  SubmitBacResponse,
-  CorrectionResponse,
   Rating,
   RegisterPayload,
   User,
@@ -47,7 +22,7 @@ import {
   CriticalChaptersResponse
 } from "./types"
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? ""
+const API_BASE_URL = ""
 
 const TOKEN_KEY = "khawarizmi_token"
 
@@ -65,13 +40,11 @@ class KhawarizmiApiClient {
   setToken(token: string): void {
     if (typeof window === "undefined") return
     localStorage.setItem(TOKEN_KEY, token)
-    document.cookie = `${TOKEN_KEY}=${token}; path=/; max-age=604800; SameSite=Lax`
   }
 
   clearToken(): void {
     if (typeof window === "undefined") return
     localStorage.removeItem(TOKEN_KEY)
-    document.cookie = `${TOKEN_KEY}=; path=/; max-age=0`
   }
 
   isAuthenticated(): boolean {
@@ -162,7 +135,15 @@ class KhawarizmiApiClient {
   }
 
   async getMe(): Promise<User> {
-    const rawUser = await this.request<any>("/api/auth/me")
+    interface BackendUser {
+      id: number | string
+      email: string
+      prenom?: string
+      nom?: string
+      filiere?: string
+      plan?: "free" | "premium"
+    }
+    const rawUser = await this.request<BackendUser>("/api/auth/me")
     return {
       id: String(rawUser.id),
       email: rawUser.email,
@@ -187,33 +168,16 @@ class KhawarizmiApiClient {
     })
   }
 
-  // ── Mind Map (génération asynchrone + lazy loading) ─────────────
+  // ── Mind Map ───────────────────────────────────
 
   async generateMindMap(payload: MindMapGeneratePayload) {
     return this.request<{
       status: string
-      mindmap?: MindMap
-      mindmap_id?: string
-      task_id?: string
-      flashcards_generees?: Flashcard[]
-      source_rag?: string
-      cached?: boolean
+      mindmap: MindMap
+      flashcards_generees: Flashcard[]
+      source_rag: string
       message?: string
     }>("/api/mindmap/generate", {
-      method: "POST",
-      body: JSON.stringify(payload)
-    })
-  }
-
-  async pollMindMapTask(taskId: string): Promise<MindMapTaskStatus> {
-    return this.request<MindMapTaskStatus>(`/api/mindmap/task/${taskId}`)
-  }
-
-  async expandMindMapNode(payload: ExpandNodePayload) {
-    return this.request<{
-      status: string
-      enfants: MindMapNode[]
-    }>("/api/mindmap/expand", {
       method: "POST",
       body: JSON.stringify(payload)
     })
@@ -236,9 +200,15 @@ class KhawarizmiApiClient {
   }
 
   async getWeakNodes(mindmapId: string) {
+    interface WeakNode {
+      id: string
+      label: string
+      maitrise: number
+      chapter_id?: string
+    }
     return this.request<{
       mindmap_id: string
-      weak_nodes: any[]
+      weak_nodes: WeakNode[]
       total: number
       message: string
     }>(`/api/mindmap/${mindmapId}/weak`)
@@ -364,163 +334,10 @@ class KhawarizmiApiClient {
     return this.request<Annale>(`/api/annales/${id}`)
   }
 
-  // ── Videos ─────────────────────────────────────
-
-  async getVideosByChapter(chapitre: string): Promise<any[]> {
-    const encoded = encodeURIComponent(chapitre)
-    return this.request<any[]>(`/api/videos/by-chapter/${encoded}`)
-  }
-
-  async getAllVideos(): Promise<any[]> {
-    return this.request<any[]>("/api/videos/all")
-  }
-
   // ── Health Check ───────────────────────────────
 
   async healthCheck(): Promise<HealthCheck> {
     return this.request<HealthCheck>("/health")
-  }
-
-  // ── Progression (FSRS) ─────────────────────────
-
-  async getProgress(): Promise<ProgressResponse> {
-    return this.request<ProgressResponse>("/api/progress")
-  }
-
-  async getWeekActivity(): Promise<WeekActivityResponse> {
-    return this.request<WeekActivityResponse>("/api/progress/week")
-  }
-
-  // ── Action Verbs ───────────────────────────────
-
-  async getActionVerbs(): Promise<ActionVerbSummary[]> {
-    return this.request<ActionVerbSummary[]>("/api/action-verbs")
-  }
-
-  async getActionVerb(slug: string): Promise<Record<string, unknown>> {
-    return this.request<Record<string, unknown>>(`/api/action-verbs/${slug}`)
-  }
-
-  async getVerbExercises(slug: string): Promise<ActionVerbExercise[]> {
-    return this.request<ActionVerbExercise[]>(`/api/action-verbs/${slug}/exercises`)
-  }
-
-  async evaluateVerbAnswer(payload: VerbEvaluateRequest): Promise<VerbEvaluateResponse> {
-    return this.request<VerbEvaluateResponse>("/api/action-verbs/evaluate", {
-      method: "POST",
-      body: JSON.stringify(payload)
-    })
-  }
-
-  async getVerbProgress(): Promise<VerbProgressResponse> {
-    return this.request<VerbProgressResponse>("/api/action-verbs/progress")
-  }
-
-  async reviewVerb(slug: string, rating: 1 | 2 | 3 | 4, scorePercentage?: number): Promise<Record<string, unknown>> {
-    return this.request<Record<string, unknown>>(`/api/action-verbs/${slug}/review`, {
-      method: "POST",
-      body: JSON.stringify({ rating, score_percentage: scorePercentage })
-    })
-  }
-
-  // ── Document Analysis ──────────────────────────
-
-  async getDaScenarios(): Promise<DaScenarioSummary[]> {
-    return this.request<DaScenarioSummary[]>("/api/document-analysis/scenarios")
-  }
-
-  async getDaScenario(slug: string): Promise<DaScenarioDetail> {
-    return this.request<DaScenarioDetail>(`/api/document-analysis/scenarios/${slug}`)
-  }
-
-  async evaluateDaAnswers(payload: DaEvaluateRequest): Promise<DaEvaluateResponse> {
-    return this.request<DaEvaluateResponse>("/api/document-analysis/evaluate", {
-      method: "POST",
-      body: JSON.stringify(payload)
-    })
-  }
-
-  async getDaCorrection(slug: string): Promise<Record<string, unknown>> {
-    return this.request<Record<string, unknown>>(`/api/document-analysis/scenarios/${slug}/correction`)
-  }
-
-  async getDaProgress(): Promise<DaProgressResponse> {
-    return this.request<DaProgressResponse>("/api/document-analysis/progress")
-  }
-
-  async reviewDaSkill(verbSlug: string, chapterSlug: string, rating: 1 | 2 | 3 | 4, scorePercentage?: number): Promise<Record<string, unknown>> {
-    return this.request<Record<string, unknown>>("/api/document-analysis/review", {
-      method: "POST",
-      body: JSON.stringify({ verb_slug: verbSlug, chapter_slug: chapterSlug, rating, score_percentage: scorePercentage })
-    })
-  }
-
-  async getDaWeakSpots(): Promise<DaWeakSpotsResponse> {
-    return this.request<DaWeakSpotsResponse>("/api/document-analysis/weak-spots")
-  }
-
-  // ── Orientation (SAD) ──────────────────────────
-
-  async getOrientation(): Promise<OrientationResponse> {
-    return this.request<OrientationResponse>("/api/orientation")
-  }
-
-  // ── Active Lessons ─────────────────────────────
-
-  async getLesson(chapterSlug: string): Promise<LessonResponse> {
-    const encoded = encodeURIComponent(chapterSlug)
-    return this.request<LessonResponse>(`/api/lessons/${encoded}`)
-  }
-
-  async checkLessonAnswer(chapterSlug: string, blockId: string, answer: string): Promise<CheckAnswerResponse> {
-    const encoded = encodeURIComponent(chapterSlug)
-    return this.request<CheckAnswerResponse>(`/api/lessons/${encoded}/check`, {
-      method: "POST",
-      body: JSON.stringify({ block_id: blockId, answer })
-    })
-  }
-
-  // ── Bac Blanc immersif ─────────────────────────
-
-  async startBac(annaleSlug: string): Promise<StartBacResponse> {
-    return this.request<StartBacResponse>("/api/bac-blanc/start", {
-      method: "POST",
-      body: JSON.stringify({ annale_slug: annaleSlug })
-    })
-  }
-
-  async chooseBacSubject(sessionId: string, choice: 1 | 2): Promise<ChooseSubjectResponse> {
-    return this.request<ChooseSubjectResponse>("/api/bac-blanc/choose", {
-      method: "POST",
-      body: JSON.stringify({ session_id: sessionId, subject_choice: choice })
-    })
-  }
-
-  async saveBacAnswer(sessionId: string, exerciseId: string, answerText: string, skipped: boolean = false): Promise<Record<string, unknown>> {
-    return this.request<Record<string, unknown>>("/api/bac-blanc/save", {
-      method: "POST",
-      body: JSON.stringify({ session_id: sessionId, exercise_id: exerciseId, question_id: exerciseId, answer_text: answerText, skipped })
-    })
-  }
-
-  async submitBac(sessionId: string): Promise<SubmitBacResponse> {
-    return this.request<SubmitBacResponse>("/api/bac-blanc/submit", {
-      method: "POST",
-      body: JSON.stringify({ session_id: sessionId })
-    })
-  }
-
-  async getBacCorrection(sessionId: string): Promise<CorrectionResponse> {
-    return this.request<CorrectionResponse>(`/api/bac-blanc/${sessionId}/correction`)
-  }
-
-  // ── Tuteur Contextuel (Chat) ──────────────────
-
-  async sendTuteurMessage(payload: TuteurRequest): Promise<TuteurResponse> {
-    return this.request<TuteurResponse>("/api/tuteur", {
-      method: "POST",
-      body: JSON.stringify(payload)
-    })
   }
 }
 

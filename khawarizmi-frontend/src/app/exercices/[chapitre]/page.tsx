@@ -18,10 +18,9 @@ export default function ExercicesPage() {
 
   useEffect(() => {
     if (!chapitreTitle) return
-    setLoading(true)
     apiClient.getExercices(chapitreTitle)
       .then(setData)
-      .catch((e) => setError(e.message || "Erreur de chargement"))
+      .catch((e: Error) => setError(e.message || "Erreur de chargement"))
       .finally(() => setLoading(false))
   }, [chapitreTitle])
 

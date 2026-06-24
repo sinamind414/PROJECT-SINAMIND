@@ -2,7 +2,7 @@
 
 "use client"
 
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 
 import apiClient from "@/lib/api-client"
 import { Programme } from "@/lib/types"
@@ -25,12 +25,8 @@ export function ProgrammeView({
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => {
-    loadProgramme()
-  }, [matiere, filiere])
-
-  const loadProgramme = async () => {
-    setLoading(true)
+  const loadProgramme = useCallback(async () => {
+    setLoading(() => true)
     setError(null)
     try {
       const data = await apiClient.getProgramme(matiere, filiere)
@@ -41,9 +37,14 @@ export function ProgrammeView({
         : UI_AR.erreur_chargement
       setError(msg)
     } finally {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- async data fetching
       setLoading(false)
     }
-  }
+  }, [matiere, filiere])
+
+  useEffect(() => {
+    void loadProgramme()
+  }, [loadProgramme])
 
   if (loading) {
     return (

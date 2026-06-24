@@ -1,28 +1,50 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import Link from "next/link"
-import apiClient from "@/lib/api-client"
 import { VideoCard } from "./VideoCard"
 
+interface Video {
+  id: number
+  youtube_id: string
+  titre: string
+  chaine: string
+  duree: string
+  chapitre: string
+  description: string
+}
+
 export function VideosWidget({ chapitre }: { chapitre: string }) {
-  const [videos, setVideos] = useState<any[]>([])
+  const [videos, setVideos] = useState<Video[]>([])
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    loadVideos()
-  }, [chapitre])
-
-  const loadVideos = async () => {
+  const loadVideos = useCallback(async () => {
     try {
-      const data = await apiClient.getVideosByChapter(chapitre)
-      setVideos(data.slice(0, 3))
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+      const token = typeof window !== "undefined" ? localStorage.getItem("token") : null
+
+      const response = await fetch(
+        `${apiUrl}/api/videos/by-chapter/${encodeURIComponent(chapitre)}`,
+        {
+          headers: token ? { "Authorization": `Bearer ${token}` } : {}
+        }
+      )
+
+      if (response.ok) {
+        const data = (await response.json()) as Video[]
+        setVideos(() => data.slice(0, 3))
+      }
     } catch (err) {
       console.error("Erreur vidéos:", err)
     } finally {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- async data fetching
       setLoading(false)
     }
-  }
+  }, [chapitre])
+
+  useEffect(() => {
+    void loadVideos()
+  }, [loadVideos])
 
   if (loading) return null
   if (videos.length === 0) return null

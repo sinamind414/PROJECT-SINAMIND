@@ -1,11 +1,19 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import apiClient from "@/lib/api-client"
+import { useCallback, useEffect, useState } from "react"
 import { PageShell } from "@/components/ui/PageShell"
 import { PageHero } from "@/components/ui/PageHero"
-import { SurfaceCard } from "@/components/ui/SurfaceCard"
 import { VideoCard } from "@/components/videos/VideoCard"
+
+interface Video {
+  id: number
+  youtube_id: string
+  titre: string
+  chaine: string
+  duree: string
+  chapitre: string
+  description: string
+}
 
 export default function VideosPage() {
   return (
@@ -16,24 +24,34 @@ export default function VideosPage() {
 }
 
 function VideosContent() {
-  const [videos, setVideos] = useState<any[]>([])
+  const [videos, setVideos] = useState<Video[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState("")
 
-  useEffect(() => {
-    loadVideos()
-  }, [])
-
-  const loadVideos = async () => {
+  const loadVideos = useCallback(async () => {
     try {
-      const data = await apiClient.getAllVideos()
-      setVideos(data)
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+      const token = typeof window !== "undefined" ? localStorage.getItem("token") : null
+
+      const response = await fetch(`${apiUrl}/api/videos/all`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      })
+
+      if (response.ok) {
+        const data = (await response.json()) as Video[]
+        setVideos(data)
+      }
     } catch (err) {
       console.error(err)
     } finally {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- async data fetching
       setLoading(false)
     }
-  }
+  }, [])
+
+  useEffect(() => {
+    void loadVideos()
+  }, [loadVideos])
 
   const filtered = videos.filter(
     (v) =>
@@ -41,7 +59,7 @@ function VideosContent() {
       v.chapitre.toLowerCase().includes(search.toLowerCase()),
   )
 
-  const grouped = filtered.reduce<Record<string, any[]>>((acc, video) => {
+  const grouped = filtered.reduce<Record<string, Video[]>>((acc, video) => {
     if (!acc[video.chapitre]) acc[video.chapitre] = []
     acc[video.chapitre].push(video)
     return acc

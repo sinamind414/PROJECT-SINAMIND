@@ -11,9 +11,17 @@ from typing import Dict, Any, Optional, List
 from deps import get_current_user, get_db, get_openai, get_scheduler
 from rate_limit import limiter, evaluate_limit
 from services.llm import call_gpt4o_evaluator
-from services.fallback import fallback_safe_json
 from services.fallback_v2 import evaluate_l2
 from services.remediation import update_mindmap_after_eval, suggest_action_verb
+
+def fallback_safe_json() -> dict:
+    """Niveau 3 : JSON de secours absolu."""
+    return {
+        "score": 0,
+        "statut": "ERREUR",
+        "feedback": "L'algorithme de Khawarizmi est en cours de mise à jour. Réessaie dans quelques secondes.",
+        "manquant": [],
+    }
 
 logger = logging.getLogger("khawarizmi.evaluate")
 router = APIRouter()

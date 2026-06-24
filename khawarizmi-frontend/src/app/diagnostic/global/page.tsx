@@ -1,6 +1,7 @@
 "use client"
 
 import { useMemo, useState } from "react"
+import Link from "next/link"
 import { AuthGuard } from "@/components/auth/AuthGuard"
 import { AppShell } from "@/components/layout/AppShell"
 import { DocumentSetRenderer } from "@/components/methodology/DocumentRenderer"
@@ -283,9 +284,9 @@ export default function DiagnosticGlobalPage() {
                       {result.priorityFixes.length ? result.priorityFixes.map((fix) => <p key={fix} className="text-gray-300 text-sm leading-relaxed">→ {fix}</p>) : <p className="text-gray-500 text-sm">لا توجد أولوية حادة. انتقل إلى وضعية بكالوريا.</p>}
                     </div>
 
-                    <a href="/document-analysis" className="block text-center px-5 py-3 rounded-xl bg-mint text-slate-deep font-black hover:bg-mint-soft transition">
+                    <Link href="/document-analysis" className="block text-center px-5 py-3 rounded-xl bg-mint text-slate-deep font-black hover:bg-mint-soft transition">
                       أصلح أكبر خطأ الآن ➜
-                    </a>
+                    </Link>
 
                     <div className="space-y-2">
                       <p className="text-white font-bold mb-2">تفصيل سريع</p>
