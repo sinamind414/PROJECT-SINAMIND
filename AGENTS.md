@@ -1,8 +1,20 @@
 # AGENTS.md — IA Khawarizmi Pro
-# Version : 2.1.0
+# Version : 2.2.0
 # Emplacement : Racine du projet
 # Rôle : System Prompt permanent pour tout agent IA
 #         intervenant sur ce projet
+
+# PATCH — Fabuleux V4 — 2026-06-24
+# ─────────────────────────────────────
+# - Bug 7 corrigé : scheduler.repeat → review_card (routes/flashcards.py)
+# - Bug 8 corrigé : UUID→integer user_id (da_fsrs, da_sessions, action_verb_progress)
+# - Bug 9 corrigé : est_due inexistante (orientation_service.py)
+# - Bug 10 corrigé : block_type 'content' manquant (schemas/lesson.py)
+# - P0 : scheduler.py AsyncSession import, test_payment.py assertion ErrorResponse
+# - P1 : api-client.ts +18 méthodes, methodology-evaluator sync fallback
+# - P2 : numpy 2.4.2→1.26.4 (numba compat), routes 10→26, services 6→29
+# - CI/CD : GitHub Actions 3 jobs (test-backend, build-frontend, e2e-smoke)
+# - Staging : backend Railway + frontend Vercel live
 
 ##############################################################
 # SECTION 0 — IDENTITÉ DU PROJET
@@ -57,7 +69,7 @@ Stack technique officiel :
 - Migrations : **Alembic uniquement** (jamais SQL inline)
 - Dépendances : **versions épinglées** dans requirements.txt
 
-Structure obligatoire du backend :
+Structure du backend (26 routes, 29 services) :
 
 ```
 khawarizmi-backend/
@@ -66,58 +78,49 @@ khawarizmi-backend/
 ├── auth.py              (JWT uniquement)
 ├── database.py          (connexion DB)
 ├── cache.py             (Redis uniquement)
-├── schemas/
-│   ├── user.py
-│   ├── session.py
-│   ├── flashcard.py
-│   ├── mindmap.py
-│   └── lexique.py
-├── models/
-│   ├── user.py
-│   ├── concept.py
-│   ├── session.py
-│   ├── payment.py
-│   ├── reference.py
-│   └── lexique.py
-├── routes/
-│   ├── auth.py
-│   ├── chat.py
-│   ├── evaluate.py
-│   ├── flashcards.py
-│   ├── mindmap.py
-│   ├── sessions.py
-│   ├── health.py
-│   ├── programme.py
-│   ├── lexique.py
-│   └── payment.py
-├── services/
-│   ├── rag_service.py
-│   ├── ai_service.py
-│   ├── fsrs_service.py
-│   ├── mindmap_service.py
-│   ├── payment_service.py
-│   └── khawarizmi_engine.py
-├── migrations/
-│   ├── env.py
-│   └── versions/
-│       ├── 001_initial_schema.py
-│       ├── 002_programme_officiel.py
-│       ├── 003_mindmaps_and_nodes.py
-│       ├── 004_rag_chunks.py
-│       └── 005_lexique_termes.py
-├── tests/
-│   ├── conftest.py
-│   ├── test_auth.py
-│   ├── test_chat.py
-│   ├── test_mindmap.py
-│   └── test_fsrs.py
-├── scripts/
-├── .env.example
-├── .gitignore
-├── requirements.txt
-├── Dockerfile
-├── docker-compose.yml
-└── README.md
+├── deps.py              (get_db, get_state, get_settings)
+├── schemas/             (Pydantic models)
+├── models/              (SQLAlchemy ORM)
+├── routes/              (23 API routes)
+│   ├── action_verbs.py       ├── orientation.py
+│   ├── annales.py            ├── payment.py
+│   ├── auth.py               ├── progress.py
+│   ├── bac_blanc.py          ├── programme.py
+│   ├── chat.py               ├── session.py
+│   ├── chatbot.py            ├── tuteur.py
+│   ├── cours.py              ├── videos.py
+│   ├── document_analysis.py  ├── dual_coding.py
+│   ├── evaluate.py           ├── errors.py (infra)
+│   ├── exercices.py          ├── lifespan.py (infra)
+│   ├── flashcards.py         ├── openapi_config.py (infra)
+│   ├── health.py             ├── lexique.py
+│   ├── lessons.py            ├── mindmap.py
+├── services/            (29 fichiers)
+│   ─ Piliers pédagogiques :
+│   ├── khawarizmi_engine.py  (orchestrateur piliers)
+│   ├── language_service.py   (Pilier 1 — Simplification)
+│   ├── remediation.py        (Pilier 2 — Active Recall)
+│   ├── scheduler.py + fsrs_graph.py + fsrs_config.py (Pilier 3 — FSRS)
+│   ├── mindmap_service.py    (Pilier 4 — Mind Map)
+│   ─ RAG / IA :
+│   ├── llm.py                (Gemini + OpenAI fallback)
+│   ├── embedder.py + reranker.py + semantic_cache.py
+│   ├── data_loader.py + questions.py
+│   ─ Domaine :
+│   ├── chat_service.py + chat_prompt.py + chat_classifier.py
+│   ├── action_verbs_service.py + document_analysis_service.py
+│   ├── correction_service.py + orientation_service.py
+│   ├── payment_service.py + feedback_translator.py
+│   ├── dual_coding.py + interleaving.py
+│   ├── metrics.py + fallback_v2.py + reconciliation_queue.py
+│   ├── eval_calibration.py
+├── migrations/versions/  (001–017)
+├── tests/               (13+ fichiers, conftest.py)
+├── scripts/             (seed_dev.py, inject_data.py, ...)
+├── requirements.txt     (épinglé, numpy 1.26.4)
+├── Dockerfile           (Railway)
+├── railway.toml
+└── .env.example
 ```
 
 ## 1.3 Ports et Déploiement
