@@ -5,17 +5,17 @@ from datetime import datetime, timezone
 from fastapi import APIRouter, HTTPException, Depends, Request
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import text
+from sqlalchemy import text, bindparam
 from typing import Dict, Any, Optional, List
 
 from deps import get_current_user, get_db, get_openai, get_scheduler
 from rate_limit import limiter, evaluate_limit
 from services.llm import call_gpt4o_evaluator
 from services.fallback_v2 import evaluate_l2
-from services.remediation import update_mindmap_after_eval, suggest_action_verb
 
-def fallback_safe_json() -> dict:
-    """Niveau 3 : JSON de secours absolu."""
+
+def _safe_json_fallback() -> dict:
+    """Niveau 3 — JSON de secours absolu, retourné en cas d'erreur d'évaluateur."""
     return {
         "score": 0,
         "statut": "ERREUR",
@@ -38,13 +38,6 @@ class EvaluateRequest(BaseModel):
     tentative: int = 1
     lang: str = "fr"
 
-class ActionVerbSuggestion(BaseModel):
-    verb_slug: str
-    verb_fr: str
-    reason_ar: str
-    href: str
-    priority: str = "medium"
-
 class EvaluateResponse(BaseModel):
     score: int
     statut: str
@@ -52,7 +45,6 @@ class EvaluateResponse(BaseModel):
     manquant: List[str]
     next_review_date: Optional[str] = None
     source: str
-    recommended_verb: Optional[ActionVerbSuggestion] = None
 
 # ═══════════════════════════════
 # ENDPOINT PRINCIPAL
@@ -143,9 +135,15 @@ async def evaluate(
         concept_states = {}
         
         if concept_ids:
+            # Safe tuple injection in query — asyncpg requires `expanding` for IN
+            cids_param = tuple(concept_ids) if len(concept_ids) > 1 else (concept_ids[0],)
+            stmt = text(
+                "SELECT concept_id, fsrs_state FROM mastery_micro_concepts "
+                "WHERE user_id = :uid AND concept_id IN :cids"
+            ).bindparams(bindparam("cids", expanding=True))
             res_states = await db.execute(
-                text("SELECT concept_id, fsrs_state FROM mastery_micro_concepts WHERE user_id = :uid AND concept_id = ANY(:cids)"),
-                {"uid": user_id, "cids": list(concept_ids)}
+                stmt,
+                {"uid": user_id, "cids": cids_param}
             )
             
             from fsrs import Card
@@ -179,10 +177,6 @@ async def evaluate(
         config_row = res_config.fetchone()
         user_fsrs_config = config_row[0] if config_row else None
 
-        # Charger le graphe de dépendances depuis la DB
-        from services.fsrs_graph import load_concept_graph
-        concept_graph = await load_concept_graph(db)
-
         # Mettre à jour le graphe
         updates = update_concept_graph(
             user_id=user_id,
@@ -191,8 +185,7 @@ async def evaluate(
             mapping=mapping,
             concept_states=concept_states,
             now=datetime.now(timezone.utc),
-            user_fsrs_config=user_fsrs_config,
-            graph=concept_graph,
+            user_fsrs_config=user_fsrs_config
         )
         
         chapter = question.get("chapitre_id", "ch_inconnu")
@@ -217,10 +210,10 @@ async def evaluate(
             await db.execute(
                 text("""
                     INSERT INTO mastery_micro_concepts
-                        (user_id, micro_concept_id, concept_id, chapter, due_date,
+                        (user_id, concept_id, chapter, due_date,
                          interval_jours, difficulty, stability, fsrs_state, pending_real_evaluation, updated_at)
                     VALUES
-                        (:user_id, :c_id, :c_id, :chapter, :due,
+                        (:user_id, :c_id, :chapter, :due,
                          :interval, :difficulty, :stability, :fsrs_state::jsonb, :pending_eval, NOW())
                     ON CONFLICT (user_id, concept_id)
                     DO UPDATE SET
@@ -272,17 +265,16 @@ async def evaluate(
 
     else:
         # Fallback L3 ou erreur totale : carte en attente (Tag)
-        concept_cle = question.get("concept_cle", "concept_general")
         await db.execute(
             text("""
-                INSERT INTO mastery_micro_concepts (user_id, micro_concept_id, concept_id, chapter, pending_real_evaluation, updated_at)
-                VALUES (:user_id, :mc_id, :mc_id, :chapter, TRUE, NOW())
+                INSERT INTO mastery_micro_concepts (user_id, concept_id, chapter, pending_real_evaluation, updated_at)
+                VALUES (:user_id, :mc_id, :chapter, TRUE, NOW())
                 ON CONFLICT (user_id, concept_id)
                 DO UPDATE SET pending_real_evaluation = TRUE, updated_at = NOW()
             """),
             {
                 "user_id": user_id,
-                "mc_id": concept_cle,
+                "mc_id": req.question_id,
                 "chapter": question.get("chapitre_id", "ch_inconnu")
             }
         )
@@ -296,41 +288,10 @@ async def evaluate(
     # Normaliser la cohérence score/statut/manquant
     eval_result = normalize_result(eval_result)
 
-    # ── Lien 2 (Eval → MindMap color) : mettre à jour le nœud MindMap ──
-    concept_cle = question.get("concept_cle", "")
-    chapter = question.get("chapitre_id", "")
-    try:
-        await update_mindmap_after_eval(
-            db=db,
-            user_id=str(user_id),
-            concept_id=concept_cle,
-            score=eval_result.get("score", 0),
-            chapter=chapter,
-        )
-        await db.commit()
-    except Exception as e:
-        logger.warning(f"MINDMAP_LINK | Erreur mise à jour nœud: {e}")
-
-    # ── Lien 3 (Eval → Verbe d'action) : suggérer un verbe pour la remédiation ──
-    error_type = eval_result.get("error_type")
-    missing_concepts = eval_result.get("manquant", [])
-    action_verb = suggest_action_verb(
-        error_type=error_type,
-        chapter=chapter,
-        score=eval_result.get("score", 0),
-        missing_concepts=missing_concepts,
-    )
-    if action_verb:
-        eval_result["recommended_verb"] = action_verb
-        logger.info(
-            f"ACTION_VERB_LINK | user={user_id} | q={req.question_id} | "
-            f"verb={action_verb['verb_slug']} | reason={action_verb['reason_ar']}"
-        )
-
     # Traduire le feedback si la langue est arabe
     if req.lang == "ar":
         from services.feedback_translator import translate_feedback
-        eval_result["feedback"] = translate_feedback(eval_result.get("feedback", ""), lang="ar")
+        eval_result["feedback"] = translate_feedback(eval_result.get("feedback", ""))
 
     return EvaluateResponse(
         score            = eval_result["score"],
@@ -411,7 +372,7 @@ async def evaluate_with_fallback(question: dict, req: EvaluateRequest, openai_cl
         logger.error(f"FALLBACK_L3 | user={user_id} | q={req.question_id} | reason={str(e)}")
 
     # NIVEAU 3 — JSON de sécurité absolu
-    result = fallback_safe_json()
+    result = _safe_json_fallback()
     result["source"] = "FALLBACK_L3"
     return result
 
