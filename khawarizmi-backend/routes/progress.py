@@ -1,11 +1,12 @@
 import logging
-from datetime import datetime, timezone, timedelta
-from typing import Dict, List
+from datetime import UTC, datetime, timedelta
+
 from fastapi import APIRouter, Depends
+from fsrs import Card
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
+
 from deps import get_current_user, get_db, get_scheduler
-from fsrs import Card
 
 logger = logging.getLogger("khawarizmi.api")
 router = APIRouter()
@@ -13,7 +14,7 @@ router = APIRouter()
 
 @router.get("/api/progress", tags=["Progression"])
 async def get_progression(
-    current_user: Dict         = Depends(get_current_user),
+    current_user: dict = Depends(get_current_user),
     db:           AsyncSession = Depends(get_db),
 ):
     result = await db.execute(
@@ -43,14 +44,14 @@ async def get_progression(
         }
 
     scheduler = get_scheduler()
-    cards_par_matiere: Dict[str, List] = {}
+    cards_par_matiere: dict[str, list] = {}
 
     concepts = []
     for row in rows:
         matiere, chapitre_id, difficulty, stability, fsrs_state_json, next_rev, interval = row
 
         card = Card()
-        card.stability  = stability  or 0.0
+        card.stability = stability or 0.0
         card.difficulty = difficulty or 0.0
 
         cards_par_matiere.setdefault(matiere, []).append(card)
@@ -64,7 +65,7 @@ async def get_progression(
             "retrievability":    retrievability,
             "prochaine_revision": next_rev.isoformat() if next_rev else None,
             "interval_jours":    interval,
-            "est_due":           next_rev <= datetime.now(timezone.utc) if next_rev else True,
+            "est_due":           next_rev <= datetime.now(UTC) if next_rev else True,
         })
 
     prediction = scheduler.predire_score_bac(cards_par_matiere)
@@ -81,10 +82,10 @@ async def get_progression(
 
 @router.get("/api/week-activity", tags=["Progression"])
 async def get_week_activity(
-    current_user: Dict         = Depends(get_current_user),
+    current_user: dict = Depends(get_current_user),
     db:           AsyncSession = Depends(get_db),
 ):
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     week_start = now - timedelta(days=now.weekday())
     week_start = week_start.replace(hour=0, minute=0, second=0, microsecond=0)
 
@@ -92,7 +93,7 @@ async def get_week_activity(
         text("""
             SELECT
                 mmc.prochaine_revision as due_date,
-                mmc.reviewed_at
+                mmc.last_review as reviewed_at
             FROM mastery_micro_concepts mmc
             WHERE mmc.user_id = :user_id
               AND mmc.prochaine_revision >= :week_start
