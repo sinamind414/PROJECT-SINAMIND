@@ -1,6 +1,7 @@
 """Schémas Pydantic pour le Tuteur Contextuel."""
 
-from typing import Optional, List, Literal
+from typing import Literal
+
 from pydantic import BaseModel, Field
 
 
@@ -10,17 +11,18 @@ class ChatHistoryMessage(BaseModel):
 
 
 class ChatContext(BaseModel):
-    chapitre: Optional[str] = None
-    page_source: Optional[str] = None
-    fsrs_stability: Optional[float] = None
-    fsrs_due: Optional[bool] = None
-    last_score: Optional[int] = None
-    orientation_chapitre: Optional[str] = None
-    history: List[ChatHistoryMessage] = []
+    chapitre: str | None = None
+    page_source: str | None = None
+    fsrs_stability: float | None = None
+    fsrs_due: bool | None = None
+    last_score: int | None = None
+    orientation_chapitre: str | None = None
+    history: list[ChatHistoryMessage] = []
 
 
 class ChatCard(BaseModel):
     """Carte cliquable dans le chat (redirection)."""
+
     titre: str
     raison: str
     action: str
@@ -34,11 +36,10 @@ class TuteurRequest(BaseModel):
 
 class TuteurResponse(BaseModel):
     reponse: str
-    type: Literal["socratique", "explication", "feedback",
-                   "motivation", "orientation", "refus", "navigation"]
-    question_suivante: Optional[str] = None
-    cartes: List[ChatCard] = []
-    flashcards_suggerees: List[str] = []
-    redirect: Optional[str] = None
-    source_rag: Optional[str] = None
+    type: Literal["socratique", "explication", "feedback", "motivation", "orientation", "refus", "navigation"]
+    question_suivante: str | None = None
+    cartes: list[ChatCard] = []
+    flashcards_suggerees: list[str] = []
+    redirect: str | None = None
+    source_rag: str | None = None
     fallback_active: bool = False

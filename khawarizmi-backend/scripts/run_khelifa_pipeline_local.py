@@ -31,7 +31,6 @@ import sys
 import time
 from collections import Counter
 from pathlib import Path
-from typing import List, Optional
 
 import cv2
 import numpy as np
@@ -61,10 +60,11 @@ KHELIFA2_DIR = ANNALES_DIR / "KHELIFA_2" / "VOLUMES_KHELIFA2"
 _reader = None
 
 
-def get_reader(gpu: bool = True) -> "easyocr.Reader":
+def get_reader(gpu: bool = True) -> easyocr.Reader:
     global _reader
     if _reader is None:
         import easyocr
+
         log.info("Initialisation EasyOCR (gpu=%s)...", gpu)
         _reader = easyocr.Reader(["ar", "en"], gpu=gpu)
     return _reader
@@ -73,6 +73,7 @@ def get_reader(gpu: bool = True) -> "easyocr.Reader":
 # ---------------------------------------------------------------------------
 # Prétraitement image OpenCV
 # ---------------------------------------------------------------------------
+
 
 def _deskew(image: np.ndarray) -> np.ndarray:
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY) if image.ndim == 3 else image
@@ -97,10 +98,7 @@ def _deskew(image: np.ndarray) -> np.ndarray:
 
 def preprocess_for_ocr(img_array: np.ndarray) -> np.ndarray:
     img = _deskew(img_array)
-    if img.ndim == 3:
-        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    else:
-        gray = img
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY) if img.ndim == 3 else img
     denoised = cv2.fastNlMeansDenoising(gray, h=10, templateWindowSize=7, searchWindowSize=21)
     binary = cv2.adaptiveThreshold(denoised, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, blockSize=31, C=10)
     return binary
@@ -118,41 +116,85 @@ Q_PATTERN = re.compile(
 )
 
 MC_MAP: dict[str, str] = {
-    "استنساخ": "mc_prot_01", "نسخ": "mc_prot_01", "transcription": "mc_prot_01",
-    "ADN": "mc_prot_01", "ARNm": "mc_prot_04", "الرنا الرسول": "mc_prot_04",
-    "ترجمة": "mc_prot_02", "traduction": "mc_prot_02",
-    "ARNt": "mc_prot_05", "الرنا الناقل": "mc_prot_05", "anticodon": "mc_prot_05",
-    "ريبوزوم": "mc_prot_06", "ribosome": "mc_prot_06",
-    "كودون": "mc_prot_03", "رامزة": "mc_prot_03", "شفرة": "mc_prot_03",
-    "بدء": "mc_prot_07", "initiation": "mc_prot_07",
-    "استطالة": "mc_prot_08", "إطالة": "mc_prot_08", "إنهاء": "mc_prot_08",
-    "بنية أولية": "mc_struc_01", "بنية اولية": "mc_struc_01",
-    "بنية ثانوية": "mc_struc_02", "بنية ثالثية": "mc_struc_03",
-    "بنية رباعية": "mc_struc_04", "بنية فراغية": "mc_struc_05",
-    "إنزيم": "mc_enz_01", "enzyme": "mc_enz_01", "موقع فعال": "mc_enz_01",
-    "نوعية إنزيمية": "mc_enz_02", "تثبيط": "mc_enz_05", "inhibition": "mc_enz_05",
-    "لمفاويات B": "mc_imm_01", "LB": "mc_imm_01",
-    "لمفاويات T": "mc_imm_02", "LT4": "mc_imm_02", "LT8": "mc_imm_02",
-    "مستضد": "mc_imm_03", "antigene": "mc_imm_03",
-    "جسم مضاد": "mc_imm_03", "anticorps": "mc_imm_03",
-    "مناعة خلطية": "mc_imm_04", "humorale": "mc_imm_04",
-    "مناعة خلوية": "mc_imm_05", "cellulaire": "mc_imm_05", "CTL": "mc_imm_05",
-    "ذاكرة مناعية": "mc_imm_06", "memoire": "mc_imm_06", "vaccin": "mc_imm_06",
-    "كلوروبلاست": "mc_photo_01", "chloroplaste": "mc_photo_01",
-    "طور ضوئي": "mc_photo_02", "دورة كالفن": "mc_photo_03",
-    "ميتوكندري": "mc_resp_01", "mitochondrie": "mc_resp_01",
-    "تحلل سكري": "mc_resp_02", "glycolyse": "mc_resp_02",
-    "كريس": "mc_resp_03", "Krebs": "mc_resp_03",
-    "سلسلة تنفسية": "mc_resp_04", "تخمر": "mc_resp_05", "fermentation": "mc_resp_05",
-    "بنية الأرض": "mc_tec_01", "sismique": "mc_tec_01",
-    "صفائح": "mc_tec_02", "plaques": "mc_tec_02",
-    "تباعد": "mc_tec_03", "تقارب": "mc_tec_03",
-    "غوص": "mc_tec_04", "subduction": "mc_tec_04",
-    "زلزال": "mc_tec_05", "بركان": "mc_tec_05", "volcan": "mc_tec_05",
+    "استنساخ": "mc_prot_01",
+    "نسخ": "mc_prot_01",
+    "transcription": "mc_prot_01",
+    "ADN": "mc_prot_01",
+    "ARNm": "mc_prot_04",
+    "الرنا الرسول": "mc_prot_04",
+    "ترجمة": "mc_prot_02",
+    "traduction": "mc_prot_02",
+    "ARNt": "mc_prot_05",
+    "الرنا الناقل": "mc_prot_05",
+    "anticodon": "mc_prot_05",
+    "ريبوزوم": "mc_prot_06",
+    "ribosome": "mc_prot_06",
+    "كودون": "mc_prot_03",
+    "رامزة": "mc_prot_03",
+    "شفرة": "mc_prot_03",
+    "بدء": "mc_prot_07",
+    "initiation": "mc_prot_07",
+    "استطالة": "mc_prot_08",
+    "إطالة": "mc_prot_08",
+    "إنهاء": "mc_prot_08",
+    "بنية أولية": "mc_struc_01",
+    "بنية اولية": "mc_struc_01",
+    "بنية ثانوية": "mc_struc_02",
+    "بنية ثالثية": "mc_struc_03",
+    "بنية رباعية": "mc_struc_04",
+    "بنية فراغية": "mc_struc_05",
+    "إنزيم": "mc_enz_01",
+    "enzyme": "mc_enz_01",
+    "موقع فعال": "mc_enz_01",
+    "نوعية إنزيمية": "mc_enz_02",
+    "تثبيط": "mc_enz_05",
+    "inhibition": "mc_enz_05",
+    "لمفاويات B": "mc_imm_01",
+    "LB": "mc_imm_01",
+    "لمفاويات T": "mc_imm_02",
+    "LT4": "mc_imm_02",
+    "LT8": "mc_imm_02",
+    "مستضد": "mc_imm_03",
+    "antigene": "mc_imm_03",
+    "جسم مضاد": "mc_imm_03",
+    "anticorps": "mc_imm_03",
+    "مناعة خلطية": "mc_imm_04",
+    "humorale": "mc_imm_04",
+    "مناعة خلوية": "mc_imm_05",
+    "cellulaire": "mc_imm_05",
+    "CTL": "mc_imm_05",
+    "ذاكرة مناعية": "mc_imm_06",
+    "memoire": "mc_imm_06",
+    "vaccin": "mc_imm_06",
+    "كلوروبلاست": "mc_photo_01",
+    "chloroplaste": "mc_photo_01",
+    "طور ضوئي": "mc_photo_02",
+    "دورة كالفن": "mc_photo_03",
+    "ميتوكندري": "mc_resp_01",
+    "mitochondrie": "mc_resp_01",
+    "تحلل سكري": "mc_resp_02",
+    "glycolyse": "mc_resp_02",
+    "كريس": "mc_resp_03",
+    "Krebs": "mc_resp_03",
+    "سلسلة تنفسية": "mc_resp_04",
+    "تخمر": "mc_resp_05",
+    "fermentation": "mc_resp_05",
+    "بنية الأرض": "mc_tec_01",
+    "sismique": "mc_tec_01",
+    "صفائح": "mc_tec_02",
+    "plaques": "mc_tec_02",
+    "تباعد": "mc_tec_03",
+    "تقارب": "mc_tec_03",
+    "غوص": "mc_tec_04",
+    "subduction": "mc_tec_04",
+    "زلزال": "mc_tec_05",
+    "بركان": "mc_tec_05",
+    "volcan": "mc_tec_05",
 }
 # ---------------------------------------------------------------------------
 # Fonctions OCR et extraction
 # ---------------------------------------------------------------------------
+
 
 def ocr_page(pix, reader, use_preprocess: bool = True) -> list[dict]:
     tmp = f"/tmp/ocr_{os.urandom(4).hex()}.png"
@@ -180,11 +222,13 @@ def ocr_page(pix, reader, use_preprocess: bool = True) -> list[dict]:
             else:
                 continue
             if conf > 0.3 and text.strip():
-                blocks.append({
-                    "text": text.strip(),
-                    "confidence": round(float(conf), 2),
-                    "bbox": [round(float(x), 1) for pt in bbox for x in pt],
-                })
+                blocks.append(
+                    {
+                        "text": text.strip(),
+                        "confidence": round(float(conf), 2),
+                        "bbox": [round(float(x), 1) for pt in bbox for x in pt],
+                    }
+                )
         return blocks
     finally:
         if os.path.exists(tmp):
@@ -216,11 +260,26 @@ def tag_concept(text: str):
     if not found:
         return "mc_xxx_xx", [], True
     spec = {
-        "mc_prot_07": 3, "mc_prot_08": 3, "mc_prot_05": 3, "mc_prot_06": 3,
-        "mc_enz_01": 3, "mc_enz_02": 3, "mc_imm_04": 3, "mc_imm_05": 3, "mc_imm_06": 3,
-        "mc_struc_01": 2, "mc_struc_02": 2, "mc_struc_03": 2, "mc_struc_04": 2,
-        "mc_prot_01": 2, "mc_prot_02": 2, "mc_prot_03": 2, "mc_prot_04": 2,
-        "mc_imm_01": 2, "mc_imm_02": 2, "mc_imm_03": 2,
+        "mc_prot_07": 3,
+        "mc_prot_08": 3,
+        "mc_prot_05": 3,
+        "mc_prot_06": 3,
+        "mc_enz_01": 3,
+        "mc_enz_02": 3,
+        "mc_imm_04": 3,
+        "mc_imm_05": 3,
+        "mc_imm_06": 3,
+        "mc_struc_01": 2,
+        "mc_struc_02": 2,
+        "mc_struc_03": 2,
+        "mc_struc_04": 2,
+        "mc_prot_01": 2,
+        "mc_prot_02": 2,
+        "mc_prot_03": 2,
+        "mc_prot_04": 2,
+        "mc_imm_01": 2,
+        "mc_imm_02": 2,
+        "mc_imm_03": 2,
     }
     sf = sorted(found, key=lambda x: spec.get(x, 0), reverse=True)
     return sf[0], sf[1:3], False
@@ -235,9 +294,12 @@ def clean_arabic(text: str) -> str:
     t = t.replace("٣", "3").replace("٤", "4").replace("٥", "5")
     t = t.replace("٦", "6").replace("٧", "7").replace("٨", "8").replace("٩", "9")
     return t
+
+
 # ---------------------------------------------------------------------------
 # Traitement d'un volume
 # ---------------------------------------------------------------------------
+
 
 def process_volume(
     pdf_path: Path,
@@ -275,7 +337,7 @@ def process_volume(
             main, sec, av = tag_concept(cleaned)
             avg_conf = round(sum(b["confidence"] for b in q["blocks"]) / len(q["blocks"]), 2)
             qd = {
-                "id": f"q_khelifa{serie}_v{vol_num:02d}_p{page_no:02d}_{qi+1:02d}",
+                "id": f"q_khelifa{serie}_v{vol_num:02d}_p{page_no:02d}_{qi + 1:02d}",
                 "texte_brut": q["texte_brut"][:500],
                 "texte_corrige": cleaned[:500],
                 "micro_concept_id": main,
@@ -296,14 +358,25 @@ def process_volume(
 
         elapsed = time.time() - t_start
         eta = (elapsed / (pn + 1)) * (total - pn - 1) / 60
-        log.info("  Page %d/%d — %d blocs, %d q | %ds ecoulees, ETA ~%dmin", page_no, total, len(blocks), len(qs), int(elapsed), int(eta))
+        log.info(
+            "  Page %d/%d — %d blocs, %d q | %ds ecoulees, ETA ~%dmin",
+            page_no,
+            total,
+            len(blocks),
+            len(qs),
+            int(elapsed),
+            int(eta),
+        )
 
     doc.close()
     vol_data["processed_pages"] = total
     return vol_data, all_q
+
+
 # ---------------------------------------------------------------------------
 # Volumes déjà traités (détection automatique)
 # ---------------------------------------------------------------------------
+
 
 def already_processed(set_ids: set[str]) -> set[str]:
     """Retourne les IDs de volumes déjà présents dans ocr_output."""
@@ -325,6 +398,7 @@ def already_processed(set_ids: set[str]) -> set[str]:
 # ---------------------------------------------------------------------------
 # Pipeline principal
 # ---------------------------------------------------------------------------
+
 
 def run_pipeline(args: argparse.Namespace) -> None:
     OCR_OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
@@ -374,7 +448,10 @@ def run_pipeline(args: argparse.Namespace) -> None:
 
             try:
                 vol_data, questions = process_volume(
-                    pdf_path, serie, vol, reader,
+                    pdf_path,
+                    serie,
+                    vol,
+                    reader,
                     dpi=args.dpi,
                     use_preprocess=not args.no_preprocess,
                     resume=args.resume,
@@ -425,9 +502,12 @@ def run_pipeline(args: argparse.Namespace) -> None:
 # CLI
 # ---------------------------------------------------------------------------
 
+
 def build_parser() -> argparse.ArgumentParser:
     ap = argparse.ArgumentParser(description="Pipeline OCR local KHELIFA 1 & 2")
-    ap.add_argument("--serie", type=int, choices=[1, 2], default=None, help="Série à traiter (1 ou 2, défaut: les deux)")
+    ap.add_argument(
+        "--serie", type=int, choices=[1, 2], default=None, help="Série à traiter (1 ou 2, défaut: les deux)"
+    )
     ap.add_argument("--start-volume", type=int, default=None, help="Premier volume (défaut: 1)")
     ap.add_argument("--end-volume", type=int, default=None, help="Dernier volume (défaut: 15)")
     ap.add_argument("--dpi", type=int, default=150, help="DPI de rendu PDF (défaut: 150)")

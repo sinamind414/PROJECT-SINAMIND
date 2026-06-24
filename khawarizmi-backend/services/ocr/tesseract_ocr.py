@@ -1,10 +1,9 @@
 import csv
+import logging
 import os
 import subprocess
 import tempfile
 from pathlib import Path
-from typing import List, Optional, Tuple
-import logging
 
 import cv2
 import numpy as np
@@ -16,15 +15,13 @@ config = get_config()
 
 
 class TesseractOCR:
-    def __init__(self, psm: Optional[int] = None, oem: Optional[int] = None):
+    def __init__(self, psm: int | None = None, oem: int | None = None):
         self.psm = psm or config.default_psm
         self.oem = oem or config.default_oem
         self.langs = config.tesseract_langs
         self.cmd = config.tesseract_cmd
 
-    def ocr_image(
-        self, image: np.ndarray, return_hocr: bool = False
-    ) -> Tuple[str, float, List[dict]]:
+    def ocr_image(self, image: np.ndarray, return_hocr: bool = False) -> tuple[str, float, list[dict]]:
         with tempfile.TemporaryDirectory() as tmp_dir:
             img_path = Path(tmp_dir) / "page.png"
             if not cv2.imwrite(str(img_path), image):
@@ -39,11 +36,17 @@ class TesseractOCR:
 
     def _run_tesseract_text(self, img_path: Path) -> str:
         command = [
-            self.cmd, str(img_path), "stdout",
-            "-l", self.langs,
-            "--psm", str(self.psm),
-            "--oem", str(self.oem),
-            "-c", "preserve_interword_spaces=1",
+            self.cmd,
+            str(img_path),
+            "stdout",
+            "-l",
+            self.langs,
+            "--psm",
+            str(self.psm),
+            "--oem",
+            str(self.oem),
+            "-c",
+            "preserve_interword_spaces=1",
         ]
         result = self._run(command)
         if result.returncode != 0:
@@ -52,12 +55,17 @@ class TesseractOCR:
             return ""
         return result.stdout.strip()
 
-    def _run_tesseract_tsv(self, img_path: Path) -> Tuple[List[dict], float]:
+    def _run_tesseract_tsv(self, img_path: Path) -> tuple[list[dict], float]:
         command = [
-            self.cmd, str(img_path), "stdout",
-            "-l", self.langs,
-            "--psm", str(self.psm),
-            "--oem", str(self.oem),
+            self.cmd,
+            str(img_path),
+            "stdout",
+            "-l",
+            self.langs,
+            "--psm",
+            str(self.psm),
+            "--oem",
+            str(self.oem),
             "tsv",
         ]
         result = self._run(command)
@@ -65,7 +73,7 @@ class TesseractOCR:
             return [], 0.0
         return self._parse_tsv(result.stdout)
 
-    def _parse_tsv(self, tsv_text: str) -> Tuple[List[dict], float]:
+    def _parse_tsv(self, tsv_text: str) -> tuple[list[dict], float]:
         words = []
         confidences = []
         lines = [line for line in tsv_text.splitlines() if line.strip()]
@@ -91,17 +99,19 @@ class TesseractOCR:
                     conf = float(conf_raw)
                 except ValueError:
                     conf = 0.0
-            words.append({
-                "text": text,
-                "conf": conf,
-                "bbox": bbox,
-            })
+            words.append(
+                {
+                    "text": text,
+                    "conf": conf,
+                    "bbox": bbox,
+                }
+            )
             if conf > 0:
                 confidences.append(conf)
         avg_conf = round(sum(confidences) / len(confidences), 2) if confidences else 0.0
         return words, avg_conf
 
-    def _run(self, command: List[str], timeout: int = 180) -> subprocess.CompletedProcess:
+    def _run(self, command: list[str], timeout: int = 180) -> subprocess.CompletedProcess:
         env = os.environ.copy()
         env.setdefault("OMP_THREAD_LIMIT", "1")
         return subprocess.run(

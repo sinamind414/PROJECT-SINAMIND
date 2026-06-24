@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import List, Optional, Dict, Any
+from typing import Any
 
 
 @dataclass
@@ -9,7 +9,7 @@ class WordBox:
     conf: float
     bbox: tuple
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return {"text": self.text, "conf": round(self.conf, 1), "bbox": self.bbox}
 
 
@@ -20,11 +20,11 @@ class PageResult:
     char_count: int = 0
     confidence: float = 0.0
     status: str = "success"
-    error: Optional[str] = None
+    error: str | None = None
     processing_time: float = 0.0
-    words: List[WordBox] = field(default_factory=list)
+    words: list[WordBox] = field(default_factory=list)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "page": self.page,
             "text": self.text,
@@ -32,7 +32,7 @@ class PageResult:
             "confidence": round(self.confidence, 2),
             "status": self.status,
             "words": [w.to_dict() for w in self.words],
-            "word_count": len(self.words)
+            "word_count": len(self.words),
         }
 
 
@@ -47,7 +47,7 @@ class VolumeSummary:
     avg_confidence: float
     quality_warning: str
     timestamp: str = field(default_factory=lambda: datetime.now().isoformat())
-    bundle_dir: Optional[str] = None
+    bundle_dir: str | None = None
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return {k: getattr(self, k) for k in self.__dataclass_fields__}

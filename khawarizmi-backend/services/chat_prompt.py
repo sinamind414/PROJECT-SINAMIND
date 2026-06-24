@@ -4,10 +4,7 @@ Chaque type de réponse a un prompt spécifique.
 Tous incluent le contexte FSRS + RAG + historique.
 """
 
-from typing import Dict, List
-
 from services.chat_classifier import detect_language
-
 
 # ── Prompt de base (règles communes) ───────────────
 
@@ -27,21 +24,21 @@ RÈGLES ABSOLUES :
 
 def build_socratique_prompt(
     message: str,
-    context: Dict,
-    rag_chunks: List[Dict],
-    history: List[Dict],
+    context: dict,
+    rag_chunks: list[dict],
+    history: list[dict],
 ) -> str:
     """Prompt pour une question de concept (méthode socratique)."""
     lang = detect_language(message)
-    rag_text = "\n".join(
-        f"[{c.get('source', 'RAG')}] {c.get('content', '')[:300]}"
-        for c in rag_chunks[:3]
-    ) if rag_chunks else "Aucun contexte RAG trouvé."
+    rag_text = (
+        "\n".join(f"[{c.get('source', 'RAG')}] {c.get('content', '')[:300]}" for c in rag_chunks[:3])
+        if rag_chunks
+        else "Aucun contexte RAG trouvé."
+    )
 
-    history_text = "\n".join(
-        f"{m['role']}: {m['content'][:100]}"
-        for m in history[-3:]
-    ) if history else "Pas d'historique."
+    history_text = (
+        "\n".join(f"{m['role']}: {m['content'][:100]}" for m in history[-3:]) if history else "Pas d'historique."
+    )
 
     stability = context.get("fsrs_stability", 0)
     is_weak = stability is not None and stability < 5.0
@@ -52,10 +49,10 @@ TYPE DE RÉPONSE : SOCRATIQUE
 L'élève pose une question sur un concept. Tu le guides sans donner la réponse.
 
 CONTEXTE ÉLÈVE :
-- Chapitre : {context.get('chapitre', 'non précisé')}
-- Page actuelle : {context.get('page_source', 'inconnue')}
-- FSRS stability : {stability} ({'FAIBLE - élève en difficulté' if is_weak else 'OK'})
-- Dernier score : {context.get('last_score', 'N/A')}%
+- Chapitre : {context.get("chapitre", "non précisé")}
+- Page actuelle : {context.get("page_source", "inconnue")}
+- FSRS stability : {stability} ({"FAIBLE - élève en difficulté" if is_weak else "OK"})
+- Dernier score : {context.get("last_score", "N/A")}%
 
 CONTEXTE RAG (base scientifique) :
 {rag_text}
@@ -66,7 +63,7 @@ HISTORIQUE :
 MESSAGE DE L'ÉLÈVE :
 {message}
 
-Réponds en {"arabe" if lang == 'ar' else 'français'}. MAX 3 phrases.
+Réponds en {"arabe" if lang == "ar" else "français"}. MAX 3 phrases.
 Termine par UNE question qui guide l'élève à réfléchir.
 Si stability < 5, simplifie ton explication et utilise une analogie concrète.
 """
@@ -74,20 +71,21 @@ Si stability < 5, simplifie ton explication et utilise une analogie concrète.
 
 def build_explication_prompt(
     message: str,
-    context: Dict,
-    rag_chunks: List[Dict],
-    history: List[Dict],
+    context: dict,
+    rag_chunks: list[dict],
+    history: list[dict],
 ) -> str:
     """Prompt pour un concept difficile (stability < 3)."""
-    rag_text = "\n".join(
-        f"[{c.get('source', 'RAG')}] {c.get('content', '')[:300]}"
-        for c in rag_chunks[:3]
-    ) if rag_chunks else ""
+    rag_text = (
+        "\n".join(f"[{c.get('source', 'RAG')}] {c.get('content', '')[:300]}" for c in rag_chunks[:3])
+        if rag_chunks
+        else ""
+    )
 
     return f"""{BASE_RULES}
 
 TYPE DE RÉPONSE : EXPLICATION SIMPLE (Feynman)
-L'élève a un stability FSRS très faible ({context.get('fsrs_stability', 0)}).
+L'élève a un stability FSRS très faible ({context.get("fsrs_stability", 0)}).
 Il ne comprend pas. Utilise la méthode Feynman :
 1. UNE phrase d'explication simple
 2. UNE analogie concrète de la vie quotidienne
@@ -105,8 +103,8 @@ Réponds en arabe. Format : 1 explication + 1 analogie + 1 question.
 
 def build_feedback_prompt(
     message: str,
-    context: Dict,
-    history: List[Dict],
+    context: dict,
+    history: list[dict],
 ) -> str:
     """Prompt pour évaluer la réponse de l'élève."""
     last_score = context.get("last_score", 0)
@@ -131,8 +129,8 @@ Réponds en arabe. MAX 3 phrases. Sois précis sur ce qui manque.
 
 def build_motivation_prompt(
     message: str,
-    context: Dict,
-    orientation: Dict,
+    context: dict,
+    orientation: dict,
 ) -> str:
     """Prompt pour rassurer un élève stressé."""
     prediction = orientation.get("prediction_bac", "N/A")
@@ -147,7 +145,7 @@ L'élève exprime du stress ou de la fatigue.
 DONNÉES RÉELLES de l'élève :
 - Prédiction BAC : {prediction}/100
 - Cartes dues aujourd'hui : {fc_dues}
-- Chapitre actuel : {context.get('chapitre', 'N/A')}
+- Chapitre actuel : {context.get("chapitre", "N/A")}
 
 Structure :
 1. Valide son sentiment (1 phrase, sans blabla)
@@ -183,7 +181,7 @@ Réponds en arabe. MAX 3 phrases. Ferme mais bienveillant.
 
 def build_navigation_prompt(
     message: str,
-    context: Dict,
+    context: dict,
 ) -> str:
     """Prompt pour aider l'élève à trouver une page."""
     return f"""{BASE_RULES}
@@ -192,7 +190,7 @@ TYPE DE RÉPONSE : NAVIGATION
 L'élève cherche une page ou un cours.
 
 Pages disponibles :
-- /cours/{context.get('chapitre', '...')} — cours du chapitre
+- /cours/{context.get("chapitre", "...")} — cours du chapitre
 - /flashcards — révision FSRS
 - /document-analysis — analyse de documents
 - /action-verbs — verbes méthodologiques

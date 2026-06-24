@@ -1,15 +1,16 @@
 """Schémas Pydantic pour les Active Lessons."""
 
-from typing import Optional, List, Literal
+from typing import Literal
+
 from pydantic import BaseModel, Field
 
 
 class QuickCheck(BaseModel):
     type: Literal["true-false", "mcq", "short-answer"]
     question_ar: str
-    options: List[str] = []
-    correct_index: Optional[int] = None
-    expected_keywords: List[str] = []
+    options: list[str] = []
+    correct_index: int | None = None
+    expected_keywords: list[str] = []
     explanation_ar: str = ""
 
 
@@ -19,13 +20,13 @@ class LessonBlock(BaseModel):
     sort_order: int
     title_ar: str
     body_ar: str
-    visual_hint: Optional[str] = None
+    visual_hint: str | None = None
     quick_check: QuickCheck
 
 
 class LessonResponse(BaseModel):
     chapter_slug: str
-    blocks: List[LessonBlock] = []
+    blocks: list[LessonBlock] = []
     blocks_total: int = 0
 
 

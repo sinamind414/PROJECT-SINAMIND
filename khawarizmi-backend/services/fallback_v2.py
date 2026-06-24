@@ -1,16 +1,15 @@
-# -*- coding: utf-8 -*-
 """
 services/fallback_v2.py - Version 2.1 de l'évaluateur local composite (L2)
 Amélioré selon la revue technique : Regex + TF-IDF + Multilingual MiniLM
 """
 
-import re
-import numpy as np
 import logging
+import re
 import unicodedata
-from functools import lru_cache
 from dataclasses import dataclass
-from typing import Dict, Any, List, Tuple, Optional
+from typing import Any
+
+import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from sqlalchemy import text
@@ -24,37 +23,38 @@ _embedding_cache = {}  # Cache global pour les embeddings des réponses types
 
 @dataclass
 class L2Result:
-    score_final: float          # 0.0 — 1.0 (en proportion, sera multiplié par 10)
+    score_final: float  # 0.0 — 1.0 (en proportion, sera multiplié par 10)
     semantic_score: float
     structural_score: float
     coverage_score: float
-    concepts_trouves: List[str]
-    concepts_manquants: List[str]
-    verdict: str                # "correct" | "partiel" | "insuffisant"
-    feedback_fallback: str      # Message pédagogique minimal
+    concepts_trouves: list[str]
+    concepts_manquants: list[str]
+    verdict: str  # "correct" | "partiel" | "insuffisant"
+    feedback_fallback: str  # Message pédagogique minimal
     needs_l1_review: bool = False
 
 
 # ── Normalisation bilingue ─────────────────────────────────
 
+
 def _normalize_ar_fr(text: str) -> str:
     """
-    Normalisation bilingue : diacritiques arabes, accents français, 
+    Normalisation bilingue : diacritiques arabes, accents français,
     diacritiques, lowercase.
     """
     if not text:
         return ""
     # Supprimer tashkeel arabe (ً ٌ ٍ َ ُ ِ ّ ْ)
-    text = re.sub(r'[\u064B-\u065F\u0670]', '', text)
+    text = re.sub(r"[\u064B-\u065F\u0670]", "", text)
     # Normaliser alef/hamza
-    text = re.sub(r'[إأآا]', 'ا', text)
+    text = re.sub(r"[إأآا]", "ا", text)
     # Normaliser ya finale et ta marbouta
-    text = re.sub(r'[ىي]', 'ي', text)
-    text = re.sub(r'ة', 'ه', text)
+    text = re.sub(r"[ىي]", "ي", text)
+    text = text.replace(r"ة", "ه")
     # Lowercase + accents français
     text = text.lower()
-    text = unicodedata.normalize('NFD', text)
-    text = re.sub(r'[\u0300-\u036f]', '', text)  # Supprimer accents
+    text = unicodedata.normalize("NFD", text)
+    text = re.sub(r"[\u0300-\u036f]", "", text)  # Supprimer accents
     return text.strip()
 
 
@@ -63,23 +63,21 @@ def _normalize_ar_fr(text: str) -> str:
 NEGATION_MARKERS_FR = r"(?:ne\s+.*?\s+pas|n'.*?pas|sans|aucun|jamais|ni)"
 NEGATION_MARKERS_AR = r"(?:لا\s|ليس|لم\s|لن\s|بدون|دون)"
 
+
 def concept_present_without_negation(text_normalized: str, pattern_normalized: str) -> bool:
     """Vérifie qu'un concept est mentionné SANS être nié dans le texte normalisé."""
     match = re.search(pattern_normalized, text_normalized, re.IGNORECASE)
     if not match:
         return False
-    
+
     # Extraire une fenêtre de 60 caractères autour du match
     start = max(0, match.start() - 60)
-    window = text_normalized[start:match.end() + 20]
-    
+    window = text_normalized[start : match.end() + 20]
+
     # Vérifier l'absence de négation dans la fenêtre
     if re.search(NEGATION_MARKERS_FR, window, re.IGNORECASE):
         return False
-    if re.search(NEGATION_MARKERS_AR, window):
-        return False
-    
-    return True
+    return not re.search(NEGATION_MARKERS_AR, window)
 
 
 # ── Table de synonymes normalisés ─────────────────────────
@@ -96,7 +94,7 @@ SYNONYMES = {
         r"structure\s+tertiaire",
         r"(?:ال)?بنيه\s*(?:ال)?ثالثيه",
         r"(?:ال)?بنيه\s*(?:ال)?ثلاثيه",
-        r"(?:ال)?بنيه\s*(?:ال)?فراغيه",        # variante courante
+        r"(?:ال)?بنيه\s*(?:ال)?فراغيه",  # variante courante
         r"conformation\s+3d",
         r"repliement\s+tridimensionnel",
     ],
@@ -122,7 +120,7 @@ SYNONYMES = {
         r"انزيم\s+(?:الـ\s*)?arn\s+بوليميراز",
         r"بوليميراز\s+arn",
         r"إنزيم\s+بوليميراز",
-        r"rna\s+polymerase"
+        r"rna\s+polymerase",
     ],
     "ARN polymérase": [
         r"arn\s+polymerase",
@@ -130,18 +128,10 @@ SYNONYMES = {
         r"انزيم\s+(?:الـ\s*)?arn\s+بوليميراز",
         r"بوليميراز\s+arn",
         r"إنزيم\s+بوليميراز",
-        r"rna\s+polymerase"
+        r"rna\s+polymerase",
     ],
-    "transcription": [
-        r"transcription",
-        r"استنساخ",
-        r"عمليه\s+(?:ال)?استنساخ"
-    ],
-    "adn": [
-        r"adn",
-        r"(?:الـ\s*)?adn",
-        r"حمض\s+نووي\s+ريبوزي\s+ناقص\s+(?:ال)?اوكسجين"
-    ],
+    "transcription": [r"transcription", r"استنساخ", r"عمليه\s+(?:ال)?استنساخ"],
+    "adn": [r"adn", r"(?:الـ\s*)?adn", r"حمض\s+نووي\s+ريبوزي\s+ناقص\s+(?:ال)?اوكسجين"],
     "arnm": [
         r"arnm",
         r"arn\s+messager",
@@ -149,7 +139,7 @@ SYNONYMES = {
         r"حمض\s+نووي\s+ريبوزي\s+رسول",
         r"الحمض\s+النووي\s+الريبوزي\s+المرسال",
         r"arn\s+رسول",
-        r"arnm\s+ناضج"
+        r"arnm\s+ناضج",
     ],
     "ARNm": [
         r"arnm",
@@ -158,7 +148,7 @@ SYNONYMES = {
         r"حمض\s+نووي\s+ريبوزي\s+رسول",
         r"الحمض\s+النووي\s+الريبوزي\s+المرسال",
         r"arn\s+رسول",
-        r"arnm\s+ناضج"
+        r"arnm\s+ناضج",
     ],
     "brin transcrit": [
         r"الخيط\s+المنقول",
@@ -166,7 +156,7 @@ SYNONYMES = {
         r"خيط\s+القالب",
         r"brin\s+transcrit",
         r"brin\s+template",
-        r"brin\s+matrice"
+        r"brin\s+matrice",
     ],
     "brin_transcrit": [
         r"الخيط\s+المنقول",
@@ -174,71 +164,26 @@ SYNONYMES = {
         r"خيط\s+القالب",
         r"brin\s+transcrit",
         r"brin\s+template",
-        r"brin\s+matrice"
+        r"brin\s+matrice",
     ],
-    "intron": [
-        r"(?:ال)?قطعه\s+غير\s+داله",
-        r"(?:ال)?مقطع\s+غير\s+مشفر",
-        r"(?:ال)?انترون"
-    ],
-    "exon": [
-        r"(?:ال)?قطعه\s+داله",
-        r"(?:ال)?مقطع\s+مشفر",
-        r"(?:ال)?اكسون"
-    ],
-    "codon": [
-        r"(?:ال)?رامزه",
-        r"(?:ال)?كودون",
-        r"ثلاثي\s+نكليوتيد"
-    ],
-    "anticodon": [
-        r"مضاد\s*(?:ال)?رامزه",
-        r"(?:ال)?حامل\s+الثلاثي",
-        r"anticodon"
-    ],
-    "ribosome": [
-        r"(?:ال)?ريبوزوم",
-        r"(?:ال)?ريبوسوم",
-        r"ribosome"
-    ],
-    "polysome": [
-        r"متعدد\s*(?:ال)?ريبوزوم",
-        r"(?:ال)?بوليزوم",
-        r"polyribosome",
-        r"polysome"
-    ],
-    "liaison peptidique": [
-        r"(?:ال)?رابطه\s*(?:ال)?ببتيديه",
-        r"(?:ال)?وصل\s*(?:ال)?ببتيدي",
-        r"liaison\s+peptidique"
-    ],
-    "liaison_peptidique": [
-        r"(?:ال)?رابطه\s*(?:ال)?ببتيديه",
-        r"(?:ال)?وصل\s*(?:ال)?ببتيدي",
-        r"liaison\s+peptidique"
-    ],
-    "translocation": [
-        r"(?:ال)?انزلاق",
-        r"(?:ال)?ازاحه\s*(?:ال)?ريبوزوميه",
-        r"translocation"
-    ],
-    "méthionine": [
-        r"(?:ال)?ميثيونين",
-        r"حمض\s+اميني\s+اول",
-        r"methionine"
-    ],
-    "methionine": [
-        r"(?:ال)?ميثيونين",
-        r"حمض\s+اميني\s+اول",
-        r"methionine"
-    ],
+    "intron": [r"(?:ال)?قطعه\s+غير\s+داله", r"(?:ال)?مقطع\s+غير\s+مشفر", r"(?:ال)?انترون"],
+    "exon": [r"(?:ال)?قطعه\s+داله", r"(?:ال)?مقطع\s+مشفر", r"(?:ال)?اكسون"],
+    "codon": [r"(?:ال)?رامزه", r"(?:ال)?كودون", r"ثلاثي\s+نكليوتيد"],
+    "anticodon": [r"مضاد\s*(?:ال)?رامزه", r"(?:ال)?حامل\s+الثلاثي", r"anticodon"],
+    "ribosome": [r"(?:ال)?ريبوزوم", r"(?:ال)?ريبوسوم", r"ribosome"],
+    "polysome": [r"متعدد\s*(?:ال)?ريبوزوم", r"(?:ال)?بوليزوم", r"polyribosome", r"polysome"],
+    "liaison peptidique": [r"(?:ال)?رابطه\s*(?:ال)?ببتيديه", r"(?:ال)?وصل\s*(?:ال)?ببتيدي", r"liaison\s+peptidique"],
+    "liaison_peptidique": [r"(?:ال)?رابطه\s*(?:ال)?ببتيديه", r"(?:ال)?وصل\s*(?:ال)?ببتيدي", r"liaison\s+peptidique"],
+    "translocation": [r"(?:ال)?انزلاق", r"(?:ال)?ازاحه\s*(?:ال)?ريبوزوميه", r"translocation"],
+    "méthionine": [r"(?:ال)?ميثيونين", r"حمض\s+اميني\s+اول", r"methionine"],
+    "methionine": [r"(?:ال)?ميثيونين", r"حمض\s+اميني\s+اول", r"methionine"],
     "aminoacyl-ARNt synthétase": [
         r"(?:ال)?تنشيط",
         r"امينو\s+اسيل",
         r"سينتيتار",
         r"النزيم\s+النوعي",
         r"aminoacyl\s+arn",
-        r"aminoacyl\s+trna"
+        r"aminoacyl\s+trna",
     ],
     "aminoacyl_arnt_synthetase": [
         r"(?:ال)?تنشيط",
@@ -246,7 +191,7 @@ SYNONYMES = {
         r"سينتيتار",
         r"النزيم\s+النوعي",
         r"aminoacyl\s+arn",
-        r"aminoacyl\s+trna"
+        r"aminoacyl\s+trna",
     ],
     "أمينو أسيل ARNt سينتيتار": [
         r"(?:ال)?تنشيط",
@@ -254,277 +199,109 @@ SYNONYMES = {
         r"سينتيتار",
         r"النزيم\s+النوعي",
         r"aminoacyl\s+arn",
-        r"aminoacyl\s+trna"
+        r"aminoacyl\s+trna",
     ],
-    "codon stop": [
-        r"(?:ال)?توقف",
-        r"(?:ال)?موقفه",
-        r"stop"
-    ],
-    "codon_stop": [
-        r"(?:ال)?توقف",
-        r"(?:ال)?موقفه",
-        r"stop"
-    ],
-    "stop_codons": [
-        r"(?:ال)?توقف",
-        r"(?:ال)?موقفه",
-        r"stop"
-    ],
-    "codon initiateur": [
-        r"(?:ال)?انطلاق",
-        r"(?:ال)?بدايه",
-        r"start",
-        r"aug"
-    ],
-    "codon_initiateur": [
-        r"(?:ال)?انطلاق",
-        r"(?:ال)?بدايه",
-        r"start",
-        r"aug"
-    ],
-    "AUG_start": [
-        r"(?:ال)?انطلاق",
-        r"(?:ال)?بدايه",
-        r"start",
-        r"aug"
-    ],
-    "dégénérescence": [
-        r"(?:ال)?تدهور",
-        r"متدهور",
-        r"(?:ال)?انحلال",
-        r"منحل",
-        r"redundancy",
-        r"degenere"
-    ],
-    "degenere": [
-        r"(?:ال)?تدهور",
-        r"متدهور",
-        r"(?:ال)?انحلال",
-        r"منحل",
-        r"redundancy",
-        r"degenere"
-    ],
-    "autoradiographie": [
-        r"اشعاع",
-        r"autoradiographie",
-        r"autoradiography"
-    ],
-    "miqr_synthesis": [
-        r"مقر.*تركيب",
-        r"نواه",
-        r"noyau",
-        r"synthesis\s+site"
-    ],
-    "ARNm_migration": [
-        r"هجره",
-        r"يهاجر",
-        r"انتقال",
-        r"migration",
-        r"transfert"
-    ],
-    "brin_transcrit_polarite": [
-        r"3'-tacggatcc-5'",
-        r"3'\s*(?:vers|to|إلى)\s*5'",
-        r"3'\s*->\s*5'"
-    ],
-    "substitution_T_vers_U": [
-        r"t\s*->\s*u",
-        r"t\s*(?:vers|إلى)\s*u",
-        r"استبدال\s+t\s+ب\s+u"
-    ],
-    "site_A_P": [
-        r"site\s+a",
-        r"site\s+p",
-        r"الموقع\s+a",
-        r"الموقع\s+p"
-    ],
-    "anticodon_codon": [
-        r"anticodon",
-        r"codon",
-        r"الرامزة\s+المضادة",
-        r"الرامزة"
-    ],
-    "H2O": [
-        r"فقدان\s+جزيء\s+ماء",
-        r"فقدان\s+h2o",
-        r"perte\s+d'une\s+molecule\s+d'eau",
-        r"h2o"
-    ],
+    "codon stop": [r"(?:ال)?توقف", r"(?:ال)?موقفه", r"stop"],
+    "codon_stop": [r"(?:ال)?توقف", r"(?:ال)?موقفه", r"stop"],
+    "stop_codons": [r"(?:ال)?توقف", r"(?:ال)?موقفه", r"stop"],
+    "codon initiateur": [r"(?:ال)?انطلاق", r"(?:ال)?بدايه", r"start", r"aug"],
+    "codon_initiateur": [r"(?:ال)?انطلاق", r"(?:ال)?بدايه", r"start", r"aug"],
+    "AUG_start": [r"(?:ال)?انطلاق", r"(?:ال)?بدايه", r"start", r"aug"],
+    "dégénérescence": [r"(?:ال)?تدهور", r"متدهور", r"(?:ال)?انحلال", r"منحل", r"redundancy", r"degenere"],
+    "degenere": [r"(?:ال)?تدهور", r"متدهور", r"(?:ال)?انحلال", r"منحل", r"redundancy", r"degenere"],
+    "autoradiographie": [r"اشعاع", r"autoradiographie", r"autoradiography"],
+    "miqr_synthesis": [r"مقر.*تركيب", r"نواه", r"noyau", r"synthesis\s+site"],
+    "ARNm_migration": [r"هجره", r"يهاجر", r"انتقال", r"migration", r"transfert"],
+    "brin_transcrit_polarite": [r"3'-tacggatcc-5'", r"3'\s*(?:vers|to|إلى)\s*5'", r"3'\s*->\s*5'"],
+    "substitution_T_vers_U": [r"t\s*->\s*u", r"t\s*(?:vers|إلى)\s*u", r"استبدال\s+t\s+ب\s+u"],
+    "site_A_P": [r"site\s+a", r"site\s+p", r"الموقع\s+a", r"الموقع\s+p"],
+    "anticodon_codon": [r"anticodon", r"codon", r"الرامزة\s+المضادة", r"الرامزة"],
+    "H2O": [r"فقدان\s+جزيء\s+ماء", r"فقدان\s+h2o", r"perte\s+d'une\s+molecule\s+d'eau", r"h2o"],
     "epissage_eucaryotes": [
         r"ابساج",
         r"قطع\s+و\s*وصل",
         r"اقصاء\s*(?:ال)?انترون",
         r"حذف\s*(?:ال)?قطع",
         r"epissage",
-        r"splicing"
+        r"splicing",
     ],
-    "couplage_procaryotes": [
-        r"اقترan",
-        r"متزامن",
-        r"couplage"
-    ],
-    "enveloppe_nucleaire": [
-        r"غلاف\s+نووي",
-        r"غشاء\s+نووي",
-        r"نواه",
-        r"نوى",
-        r"nucle[ou]s",
-        r"enveloppe\s+nucleaire"
-    ],
-    "universel": [
-        r"عالميه",
-        r"عالمي",
-        r"universal"
-    ],
-    "non_chevauchant": [
-        r"غير\s+متداخل",
-        r"non\s+chevauchant"
-    ],
+    "couplage_procaryotes": [r"اقترan", r"متزامن", r"couplage"],
+    "enveloppe_nucleaire": [r"غلاف\s+نووي", r"غشاء\s+نووي", r"نواه", r"نوى", r"nucle[ou]s", r"enveloppe\s+nucleaire"],
+    "universel": [r"عالميه", r"عالمي", r"universal"],
+    "non_chevauchant": [r"غير\s+متداخل", r"non\s+chevauchant"],
     "rer": [
         r"(?:ال)?شبكه\s*(?:ال)?هيوليه\s*(?:ال)?فعاله",
         r"(?:ال)?شبكه\s*(?:ال)?هيوليه\s*(?:ال)?محببه",
         r"reticulum\s+endoplasmique",
-        r"rer"
+        r"rer",
     ],
     "الشبكة الهيولية الفعالة": [
         r"(?:ال)?شبكه\s*(?:ال)?هيوليه\s*(?:ال)?فعاله",
         r"(?:ال)?شبكه\s*(?:ال)?هيوليه\s*(?:ال)?محببه",
         r"reticulum\s+endoplasmique",
-        r"rer"
+        r"rer",
     ],
-    "appareil_de_golgi": [
-        r"جهاز\s+غولجي",
-        r"جهاز\s+كولجي",
-        r"golgi",
-        r"dictyosome"
-    ],
-    "جهاز غولجي": [
-        r"جهاز\s+غولجي",
-        r"جهاز\s+كولجي",
-        r"golgi",
-        r"dictyosome"
-    ],
-    "vesicules_de_secretion": [
-        r"حويصلات\s+افرازيه",
-        r"vesicules\s+de\s+secretion"
-    ],
-    "حويصلات إفرازية": [
-        r"حويصلات\s+افرازيه",
-        r"vesicules\s+de\s+secretion"
-    ],
-    "site_d_attachement": [
-        r"موقع\s+تثبيت",
-        r"موقع\s+ربط",
-        r"attachement"
-    ],
-    "موقع تثبيت": [
-        r"موقع\s+تثبيت",
-        r"موقع\s+ربط",
-        r"attachement"
-    ],
-    "الرامزة المضادة": [
-        r"مضاد\s*(?:ال)?رامزه",
-        r"(?:ال)?حامل\s+الثلاثي",
-        r"anticodon"
-    ],
-    "المضاد الرامزة": [
-        r"مضاد\s*(?:ال)?رامزه",
-        r"(?:ال)?حامل\s+الثلاثي",
-        r"anticodon"
-    ],
-    "initiation": [
-        r"(?:ال)?انطلاق",
-        r"initiation",
-        r"انطلق"
-    ],
-    "elongation": [
-        r"(?:ال)?استطاله",
-        r"elongation",
-        r"استطيل"
-    ],
-    "terminaison": [
-        r"(?:ال)?نهايه",
-        r"terminaison",
-        r"نتهي"
-    ],
-    "uracile_radioactif": [
-        r"(?:ال)?يوراسيل",
-        r"uracile",
-        r"مشع"
-    ],
-    "arnm_synthesis": [
-        r"تركيب",
-        r"تصنيع",
-        r"نسخ",
-        r"synthesis",
-        r"transcription"
-    ],
-    "hemo_rabbit": [
-        r"هيموغلوبين",
-        r"ارنب",
-        r"hemoglobine"
-    ],
-    "arnm_transmission": [
-        r"نقل.*معلومات",
-        r"حمل.*معلومات",
-        r"transmission",
-        r"transfert"
-    ],
-    "universalite": [
-        r"عالميه",
-        r"بصرف\s+النظر",
-        r"universalite"
-    ]
+    "appareil_de_golgi": [r"جهاز\s+غولجي", r"جهاز\s+كولجي", r"golgi", r"dictyosome"],
+    "جهاز غولجي": [r"جهاز\s+غولجي", r"جهاز\s+كولجي", r"golgi", r"dictyosome"],
+    "vesicules_de_secretion": [r"حويصلات\s+افرازيه", r"vesicules\s+de\s+secretion"],
+    "حويصلات إفرازية": [r"حويصلات\s+افرازيه", r"vesicules\s+de\s+secretion"],
+    "site_d_attachement": [r"موقع\s+تثبيت", r"موقع\s+ربط", r"attachement"],
+    "موقع تثبيت": [r"موقع\s+تثبيت", r"موقع\s+ربط", r"attachement"],
+    "الرامزة المضادة": [r"مضاد\s*(?:ال)?رامزه", r"(?:ال)?حامل\s+الثلاثي", r"anticodon"],
+    "المضاد الرامزة": [r"مضاد\s*(?:ال)?رامزه", r"(?:ال)?حامل\s+الثلاثي", r"anticodon"],
+    "initiation": [r"(?:ال)?انطلاق", r"initiation", r"انطلق"],
+    "elongation": [r"(?:ال)?استطاله", r"elongation", r"استطيل"],
+    "terminaison": [r"(?:ال)?نهايه", r"terminaison", r"نتهي"],
+    "uracile_radioactif": [r"(?:ال)?يوراسيل", r"uracile", r"مشع"],
+    "arnm_synthesis": [r"تركيب", r"تصنيع", r"نسخ", r"synthesis", r"transcription"],
+    "hemo_rabbit": [r"هيموغلوبين", r"ارنب", r"hemoglobine"],
+    "arnm_transmission": [r"نقل.*معلومات", r"حمل.*معلومات", r"transmission", r"transfert"],
+    "universalite": [r"عالميه", r"بصرف\s+النظر", r"universalite"],
 }
 
 
-def compute_structural_score(
-    text: str,
-    concepts_requis: List[str]
-) -> Tuple[float, List[str], List[str]]:
+def compute_structural_score(text: str, concepts_requis: list[str]) -> tuple[float, list[str], list[str]]:
     """
     Retourne (score, concepts_trouvés, concepts_manquants).
     Score = ratio de concepts détectés sans négation.
     """
     trouves = []
     manquants = []
-    
+
     text_norm = _normalize_ar_fr(text)
-    
+
     for concept_key in concepts_requis:
         patterns = SYNONYMES.get(concept_key, [concept_key])
         # Normaliser aussi les synonymes pour assurer la cohérence
         patterns_norm = [_normalize_ar_fr(p) for p in patterns]
-        
-        found = any(
-            concept_present_without_negation(text_norm, p) for p in patterns_norm
-        )
+
+        found = any(concept_present_without_negation(text_norm, p) for p in patterns_norm)
         if found:
             trouves.append(concept_key)
         else:
             manquants.append(concept_key)
-    
+
     if not concepts_requis:
         return 0.5, trouves, manquants
-    
+
     score = len(trouves) / len(concepts_requis)
     return score, trouves, manquants
 
 
 # ── Similarité sémantique par embeddings ───────────────────
 
+
 def precompute_reference_embeddings(questions: dict):
     """Pré-calcule les embeddings des réponses de référence au démarrage de l'app."""
     global _embedding_cache
     logger.info("Pré-calcul des embeddings pour le fallback L2...")
-    
+
     count = 0
     for q_id, q_data in questions.items():
         reponses_ref = q_data.get("reponses_reference", [])
         if not reponses_ref and "reponse_attendue" in q_data:
             reponses_ref = [q_data["reponse_attendue"]]
-        
+
         if reponses_ref:
             try:
                 embeddings = list(embedder.encode(reponses_ref))
@@ -532,64 +309,61 @@ def precompute_reference_embeddings(questions: dict):
                 count += 1
             except Exception as e:
                 logger.error(f"Erreur encodage pour question {q_id}: {e}")
-                
+
     logger.info(f"Pré-calcul terminé pour {count} questions.")
 
 
-def compute_semantic_score(
-    reponse_eleve: str,
-    reponses_reference: List[str],
-    question_id: Optional[str] = None
-) -> float:
+def compute_semantic_score(reponse_eleve: str, reponses_reference: list[str], question_id: str | None = None) -> float:
     """
     Cosine similarity maximale entre la réponse élève
     et les N réponses de référence acceptables.
     """
     if not reponse_eleve.strip() or not reponses_reference:
         return 0.0
-    
+
     # Vérifier le cache
     emb_ref_list = None
     if question_id and question_id in _embedding_cache:
         emb_ref_list = _embedding_cache[question_id]
-        
+
     if emb_ref_list is None:
         emb_ref_list = list(embedder.encode(reponses_reference))
         if question_id:
             _embedding_cache[question_id] = emb_ref_list
-    
+
     emb_eleve = embedder.encode([reponse_eleve])[0]
-    
+
     max_sim = 0.0
     for emb_ref in emb_ref_list:
         sim = float(np.dot(emb_eleve, emb_ref))
         max_sim = max(max_sim, sim)
-    
+
     return max_sim
 
 
 # ── TF-IDF Cosine Similarity ─────────────────────────────
 
-def compute_tfidf_similarity(reponse_eleve: str, reponses_reference: List[str]) -> float:
+
+def compute_tfidf_similarity(reponse_eleve: str, reponses_reference: list[str]) -> float:
     """
     Calcule la similarité cosinus maximale TF-IDF basée sur des n-grammes de caractères.
     Très robuste aux fautes d'orthographe et variations morphologiques.
     """
     if not reponse_eleve.strip() or not reponses_reference:
         return 0.0
-    
+
     normalized_refs = [_normalize_ar_fr(r) for r in reponses_reference]
     normalized_eleve = _normalize_ar_fr(reponse_eleve)
-    
-    all_texts = normalized_refs + [normalized_eleve]
-    
+
+    all_texts = [*normalized_refs, normalized_eleve]
+
     # Analyseur par n-grammes de caractères de 3 à 5
-    vectorizer = TfidfVectorizer(analyzer='char_wb', ngram_range=(3, 5))
+    vectorizer = TfidfVectorizer(analyzer="char_wb", ngram_range=(3, 5))
     try:
         tfidf_matrix = vectorizer.fit_transform(all_texts)
         ref_vectors = tfidf_matrix[:-1]
         eleve_vector = tfidf_matrix[-1]
-        
+
         similarities = cosine_similarity(eleve_vector, ref_vectors)
         return float(np.max(similarities))
     except Exception as e:
@@ -599,36 +373,31 @@ def compute_tfidf_similarity(reponse_eleve: str, reponses_reference: List[str]) 
 
 # ── Couverture conceptuelle (Signal 3) ────────────────────
 
-def compute_coverage_score(
-    reponse_eleve: str,
-    points_cles: List[str]
-) -> float:
+
+def compute_coverage_score(reponse_eleve: str, points_cles: list[str]) -> float:
     """
     Pour chaque point clé, mesure si la réponse de l'élève
     en couvre le sens (seuil cosine >= 0.60 par point).
     """
     if not points_cles or not reponse_eleve.strip():
         return 0.0
-    
+
     emb_eleve = embedder.encode([reponse_eleve])[0]
-    
+
     covered = 0
     for point in points_cles:
         emb_point = embedder.encode([point])[0]
         sim = float(np.dot(emb_eleve, emb_point))
         if sim >= 0.60:
             covered += 1
-    
+
     return covered / len(points_cles)
 
 
 # ── Common Mistakes (Erreurs fréquentes) ──────────────────
 
-async def check_common_mistakes(
-    student_answer: str,
-    chapter_id: str,
-    db
-) -> Optional[dict]:
+
+async def check_common_mistakes(student_answer: str, chapter_id: str, db) -> dict | None:
     import re
 
     mistakes = await db.execute(
@@ -639,7 +408,7 @@ async def check_common_mistakes(
             ORDER BY frequency DESC
             LIMIT 10
         """),
-        {"cid": chapter_id}
+        {"cid": chapter_id},
     )
     rows = mistakes.fetchall()
 
@@ -648,13 +417,13 @@ async def check_common_mistakes(
         try:
             if re.search(pattern, student_answer, re.IGNORECASE):
                 return {
-                    "source"        : "common_mistakes",
-                    "statut"        : "RETRY",
-                    "score"         : 2,
-                    "feedback"      : row[1],
-                    "error_type"    : row[2],
+                    "source": "common_mistakes",
+                    "statut": "RETRY",
+                    "score": 2,
+                    "feedback": row[1],
+                    "error_type": row[2],
                     "feynman_prompt": row[3],
-                    "needs_l1_review": False
+                    "needs_l1_review": False,
                 }
         except re.error:
             continue
@@ -664,10 +433,11 @@ async def check_common_mistakes(
 
 # ── Évaluateur composite ──────────────────────────────────
 
+
 async def evaluate_l2(
     reponse_eleve: str,
     question_data: dict,
-    db: Optional[Any] = None,
+    db: Any | None = None,
     # Poids calibrés de la revue technique
     w_semantic: float = 0.40,
     w_tfidf: float = 0.25,
@@ -679,12 +449,12 @@ async def evaluate_l2(
     reponses_ref = question_data.get("reponses_reference", [])
     if not reponses_ref and "reponse_attendue" in question_data:
         reponses_ref = [question_data["reponse_attendue"]]
-        
+
     concepts_req = question_data.get("concepts_requis", [])
     if not concepts_req and "concept_cle" in question_data:
         cc = question_data["concept_cle"]
         concepts_req = [cc] if cc else []
-        
+
     points_cles = question_data.get("points_cles", [])
     if not points_cles and reponses_ref:
         points_cles = [reponses_ref[0]]
@@ -692,12 +462,12 @@ async def evaluate_l2(
     # Signal 1 : Sémantique (embeddings MiniLM)
     question_id = question_data.get("question_id")
     s1 = 0.0
-    
+
     if db and question_id:
         try:
             student_embedding = embedder.encode([reponse_eleve])[0]
             stmt = text("""
-                SELECT 
+                SELECT
                     reference_text,
                     1 - (embedding <=> CAST(:emb AS vector)) AS cosine_similarity
                 FROM reference_embeddings
@@ -714,21 +484,23 @@ async def evaluate_l2(
                 logger.warning(f"FALLBACK_L2 | No precomputed vector in DB for q={question_id}. Doing local search.")
                 s1 = compute_semantic_score(reponse_eleve, reponses_ref, question_id)
         except Exception as e:
-            logger.error(f"FALLBACK_L2 | Error querying reference embeddings from DB: {e}. Falling back to local encoding.")
+            logger.error(
+                f"FALLBACK_L2 | Error querying reference embeddings from DB: {e}. Falling back to local encoding."
+            )
             s1 = compute_semantic_score(reponse_eleve, reponses_ref, question_id)
     else:
         s1 = compute_semantic_score(reponse_eleve, reponses_ref, question_id)
-    
+
     # Signal 2 : TF-IDF Cosine Similarity
     s2 = compute_tfidf_similarity(reponse_eleve, reponses_ref)
-    
+
     # Signal 3 : Structurel (regex + synonymes + anti-négation)
     s3, trouves, manquants = compute_structural_score(reponse_eleve, concepts_req)
-    
+
     # Score composite
     # final_score = 0.40 * cosine_embedding_score + 0.25 * tfidf_char_ngram_score + 0.35 * regex_weighted_score
     score = w_semantic * s1 + w_tfidf * s2 + w_structural * s3
-    
+
     # Seuils de décision
     # < 0.35  → Rating.Again  (insuffisant)
     # 0.35-0.59 → Rating.Hard  (partiel) + enqueue L1 review
@@ -743,32 +515,31 @@ async def evaluate_l2(
     else:
         verdict = "insuffisant"
         feedback = _feedback_insuffisant(manquants)
-        
+
     # Détection de la zone grise (ambiguë) -> demande d'évaluation L1 asynchrone (0.35 à < 0.70)
     needs_l1_review = 0.35 <= score < 0.70
-    
+
     return L2Result(
         score_final=round(score, 3),
         semantic_score=round(s1, 3),
         structural_score=round(s3, 3),
-        coverage_score=round(s2, 3),   # Utilise le score TF-IDF comme indicateur de couverture
+        coverage_score=round(s2, 3),  # Utilise le score TF-IDF comme indicateur de couverture
         concepts_trouves=trouves,
         concepts_manquants=manquants,
         verdict=verdict,
         feedback_fallback=feedback,
-        needs_l1_review=needs_l1_review
+        needs_l1_review=needs_l1_review,
     )
 
 
 # ── Génération de feedback minimal ────────────────────────
 
+
 def _feedback_correct(trouves, manquants):
     if not manquants:
         return "إجابة ممتازة! لقد غطيت جميع المفاهيم المطلوبة. / Excellente réponse, tous les concepts sont couverts."
-    return (
-        f"Bonne réponse globale. Concepts manquants pour une réponse parfaite : "
-        f"{', '.join(manquants)}."
-    )
+    return f"Bonne réponse globale. Concepts manquants pour une réponse parfaite : {', '.join(manquants)}."
+
 
 def _feedback_partiel(trouves, manquants, semantic_score):
     base = f"Réponse partiellement correcte. Vous avez mentionné : {', '.join(trouves) if trouves else 'aucun concept clé'}."
@@ -777,6 +548,7 @@ def _feedback_partiel(trouves, manquants, semantic_score):
     if semantic_score < 0.5:
         base += "\n🔍 Reformulez avec plus de précision scientifique."
     return base
+
 
 def _feedback_insuffisant(manquants):
     if not manquants:
@@ -790,38 +562,40 @@ def _feedback_insuffisant(manquants):
 
 class L2Evaluator:
     """Wrapper class for L2 fallback evaluation for backward compatibility and testing."""
-    def __init__(self, concept_db: Optional[dict] = None):
+
+    def __init__(self, concept_db: dict | None = None):
         self.concept_db = concept_db or {}
-        
-    async def evaluate_async(self, student_answer: str, question_id: str, db: Optional[Any] = None) -> dict:
+
+    async def evaluate_async(self, student_answer: str, question_id: str, db: Any | None = None) -> dict:
         # Load question data from questions_db or concept_db
         from services.questions import get_question
+
         question_data = self.concept_db.get(question_id) or get_question(question_id) or {}
         if not question_data:
             question_data = {"question_id": question_id}
-            
+
         res = await evaluate_l2(student_answer, question_data, db)
         return {
-            "score": int(round(res.score_final * 10)),
+            "score": round(res.score_final * 10),
             "verdict": res.verdict,
             "feedback": res.feedback_fallback,
             "missing_concepts": res.concepts_manquants,
             "concepts_trouves": res.concepts_trouves,
-            "needs_l1_review": res.needs_l1_review
+            "needs_l1_review": res.needs_l1_review,
         }
-        
+
     def evaluate(self, student_answer: str, question_id: str) -> dict:
         """Synchronous wrapper for tests"""
         import asyncio
+
         try:
             loop = asyncio.get_event_loop()
         except RuntimeError:
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
-            
+
         if loop.is_running():
             # Run in a synchronous executor or return mock/run_coroutine
             return loop.run_until_complete(self.evaluate_async(student_answer, question_id))
         else:
             return loop.run_until_complete(self.evaluate_async(student_answer, question_id))
-

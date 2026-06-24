@@ -68,7 +68,7 @@ export function BacBlancImmersif({ annaleSlug }: { annaleSlug: string }) {
       const sk = skipped[ex.exercise_id] || false
       if (ans || sk) {
         try {
-          await apiClient.saveBacAnswer(sessionId, ex.exercise_id, ans, sk)
+          await apiClient.saveBacAnswer(sessionId, ex.exercise_id, ex.exercise_id, ans, sk)
         } catch { /* */ }
       }
     }

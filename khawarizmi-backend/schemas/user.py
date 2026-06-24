@@ -1,13 +1,14 @@
-from typing import Dict, Any, Optional
+from typing import Any
+
 from pydantic import BaseModel, EmailStr, Field, field_validator
 
 
 class RegisterRequest(BaseModel):
-    email:    EmailStr
+    email: EmailStr
     password: str = Field(min_length=8, max_length=100)
-    prenom:   str = Field(min_length=2, max_length=50)
-    wilaya:   Optional[str] = None
-    filiere:  str = Field(default="sciences")
+    prenom: str = Field(min_length=2, max_length=50)
+    wilaya: str | None = None
+    filiere: str = Field(default="sciences")
 
     @field_validator("password")
     @classmethod
@@ -18,19 +19,19 @@ class RegisterRequest(BaseModel):
 
 
 class LoginRequest(BaseModel):
-    email:    EmailStr
+    email: EmailStr
     password: str
 
 
 class AuthResponse(BaseModel):
     access_token: str
-    token_type:   str = "bearer"
-    user:         Dict[str, Any]
+    token_type: str = "bearer"
+    user: dict[str, Any]
 
 
 class WaitlistRequest(BaseModel):
-    name:   str       = Field(min_length=2, max_length=50)
-    email:  EmailStr
-    wilaya: Optional[str] = None
-    lang:   str       = "fr"
-    source: Optional[str] = None
+    name: str = Field(min_length=2, max_length=50)
+    email: EmailStr
+    wilaya: str | None = None
+    lang: str = "fr"
+    source: str | None = None

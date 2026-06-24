@@ -1,10 +1,15 @@
 """Crée un compte démo pour tester l'application."""
-import asyncio, os, sys
+
+import asyncio
+import os
+import sys
+
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy import text
-from auth import hash_password, create_access_token
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
+
+from auth import create_access_token, hash_password
 
 
 async def main():
@@ -24,9 +29,7 @@ async def main():
     hashed = hash_password(demo_pwd)
 
     async with AsyncSession(engine) as session:
-        r = await session.execute(
-            text("SELECT id, email FROM users WHERE email = :e"), {"e": demo_email}
-        )
+        r = await session.execute(text("SELECT id, email FROM users WHERE email = :e"), {"e": demo_email})
         existing = r.fetchone()
 
         if existing:
@@ -55,14 +58,14 @@ async def main():
 
         token = create_access_token({"sub": user_id, "plan": "premium"})
 
-        print(f"\n{'='*45}")
-        print(f"  DEMO ACCOUNT")
-        print(f"{'='*45}")
+        print(f"\n{'=' * 45}")
+        print("  DEMO ACCOUNT")
+        print(f"{'=' * 45}")
         print(f"  Email:    {demo_email}")
         print(f"  Password: {demo_pwd}")
-        print(f"  Plan:     Premium")
-        print(f"{'='*45}")
-        print(f"\nToken JWT (pour tests API):")
+        print("  Plan:     Premium")
+        print(f"{'=' * 45}")
+        print("\nToken JWT (pour tests API):")
         print(f"{token}\n")
 
     await engine.dispose()

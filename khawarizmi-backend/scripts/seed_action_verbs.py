@@ -2,6 +2,7 @@
 
 Usage: python scripts/seed_action_verbs.py
 """
+
 import asyncio
 import json
 import sys
@@ -10,9 +11,10 @@ from pathlib import Path
 ROOT = Path(__file__).parent.parent
 sys.path.insert(0, str(ROOT))
 
-from sqlalchemy import text  # noqa: E402
-from sqlalchemy.ext.asyncio import create_async_engine  # noqa: E402
-from config import get_settings  # noqa: E402
+from sqlalchemy import text
+from sqlalchemy.ext.asyncio import create_async_engine
+
+from config import get_settings
 
 SEED_FILES = [
     ROOT / "data" / "action_verbs_seed.json",
@@ -97,8 +99,12 @@ async def seed():
                     "forbidden_markers": json.dumps(v.get("forbidden_markers", []), ensure_ascii=False),
                     "common_errors": json.dumps(v.get("common_errors", []), ensure_ascii=False),
                     "scoring_rules": json.dumps(v.get("scoring_rules", []), ensure_ascii=False),
-                    "bad_example": json.dumps(v.get("bad_example"), ensure_ascii=False) if v.get("bad_example") else None,
-                    "good_example": json.dumps(v.get("good_example"), ensure_ascii=False) if v.get("good_example") else None,
+                    "bad_example": json.dumps(v.get("bad_example"), ensure_ascii=False)
+                    if v.get("bad_example")
+                    else None,
+                    "good_example": json.dumps(v.get("good_example"), ensure_ascii=False)
+                    if v.get("good_example")
+                    else None,
                     "feedback_template_ar": v.get("feedback_template_ar"),
                 },
             )

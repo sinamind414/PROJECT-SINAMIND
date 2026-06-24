@@ -15,12 +15,10 @@ ROOT = Path(__file__).parent.parent
 sys.path.insert(0, str(ROOT))
 
 from sqlalchemy import text
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
-
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 DB_URL = os.environ.get(
-    "DATABASE_URL",
-    "postgresql+asyncpg://khawarizmi_user:MOT_DE_PASSE_FORT_ICI@localhost:5432/khawarizmi"
+    "DATABASE_URL", "postgresql+asyncpg://khawarizmi_user:MOT_DE_PASSE_FORT_ICI@localhost:5432/khawarizmi"
 )
 
 
@@ -39,10 +37,11 @@ def normalize_text(text: str) -> str:
         return text
     return unicodedata.normalize("NFC", text).strip()
 
+
 async def import_programme(file_path: Path):
     print(f"\nImport : {file_path.name}")
 
-    with open(file_path, "r", encoding="utf-8") as f:
+    with open(file_path, encoding="utf-8") as f:
         data = json.load(f)
 
     matiere = normalize_text(data["matiere"])
@@ -62,7 +61,7 @@ async def import_programme(file_path: Path):
                     )
                 )
             """),
-            {"matiere": matiere, "filiere": filiere}
+            {"matiere": matiere, "filiere": filiere},
         )
 
         await db.execute(
@@ -74,7 +73,7 @@ async def import_programme(file_path: Path):
                     AND filiere = :filiere
                 )
             """),
-            {"matiere": matiere, "filiere": filiere}
+            {"matiere": matiere, "filiere": filiere},
         )
 
         await db.execute(
@@ -83,7 +82,7 @@ async def import_programme(file_path: Path):
                 WHERE matiere = :matiere
                 AND filiere = :filiere
             """),
-            {"matiere": matiere, "filiere": filiere}
+            {"matiere": matiere, "filiere": filiere},
         )
 
         domain_count = 0
@@ -108,8 +107,8 @@ async def import_programme(file_path: Path):
                     "filiere": filiere,
                     "numero": domain_data["numero"],
                     "titre_fr": normalize_text(domain_data["titre_fr"]),
-                    "titre_ar": normalize_text(domain_data.get("titre_ar")) if domain_data.get("titre_ar") else None
-                }
+                    "titre_ar": normalize_text(domain_data.get("titre_ar")) if domain_data.get("titre_ar") else None,
+                },
             )
             domain_count += 1
 
@@ -131,8 +130,8 @@ async def import_programme(file_path: Path):
                         "numero": unit_data["numero"],
                         "titre_fr": normalize_text(unit_data["titre_fr"]),
                         "titre_ar": normalize_text(unit_data.get("titre_ar")) if unit_data.get("titre_ar") else None,
-                        "page": unit_data.get("page")
-                    }
+                        "page": unit_data.get("page"),
+                    },
                 )
                 unit_count += 1
 
@@ -153,13 +152,13 @@ async def import_programme(file_path: Path):
                             "unit_id": unit_id,
                             "numero": chap_data["numero"],
                             "titre_fr": normalize_text(chap_data["titre_fr"]),
-                            "titre_ar": normalize_text(chap_data.get("titre_ar")) if chap_data.get("titre_ar") else None,
+                            "titre_ar": normalize_text(chap_data.get("titre_ar"))
+                            if chap_data.get("titre_ar")
+                            else None,
                             "page": chap_data.get("page"),
                             "type": chap_data.get("type"),
-                            "importance": chap_data.get(
-                                "importance", "moyenne"
-                            )
-                        }
+                            "importance": chap_data.get("importance", "moyenne"),
+                        },
                     )
                     chapter_count += 1
 

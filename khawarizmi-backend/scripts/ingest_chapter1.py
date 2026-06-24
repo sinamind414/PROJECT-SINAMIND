@@ -1,12 +1,12 @@
-# -*- coding: utf-8 -*-
 """
 scripts/ingest_chapter1.py - Ingestion des chunks du manuel scolaire pour le RAG.
 """
 
+import asyncio
+import json
 import os
 import sys
-import json
-import asyncio
+
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import create_async_engine
 
@@ -26,7 +26,7 @@ CHAPTER1_CHUNKS = [
         "type": "experience",
         "priority": 2,
         "texte": """تقنية التصوير الإشعاعي الذاتي تسمح بتتبع مسار المركبات المشعة داخل الخلية. بعد تحضين خلايا البنكرياس مع أحماض أمينية مشعة لمدة 3 دقائق، تمركز الإشعاع في منطقة الشبكة الهيولية المحببة (الريبوزومات). الاستنتاج: مقر تركيب البروتين هو الريبوزوم.""",
-        "concepts": ["autoradiographie_technique", "ribosome_maqar", "methode_onec"]
+        "concepts": ["autoradiographie_technique", "ribosome_maqar", "methode_onec"],
     },
     {
         "id": "ch1_act2_arnm_grenouille",
@@ -36,7 +36,7 @@ CHAPTER1_CHUNKS = [
         "type": "experience",
         "priority": 1,
         "texte": """تجربة حقن ARNm الأرنب في الخلايا البيضية للضفدع: المجموعة الثالثة أنتجت بروتينات الضفدع + هيموغلوبين الأرنب. الاستنتاج: ARNm يحمل المعلومات الوراثية ويوجه تركيب البروتين بصرف النظر عن نوع الخلية (عالمية الشفرة الوراثية).""",
-        "concepts": ["ARNm_messager", "ARNm_universalite", "information_genetique"]
+        "concepts": ["ARNm_messager", "ARNm_universalite", "information_genetique"],
     },
     {
         "id": "ch1_act2_uracile_radioactif",
@@ -46,9 +46,8 @@ CHAPTER1_CHUNKS = [
         "type": "experience",
         "priority": 1,
         "texte": """تجربة اليوراسيل المشع: اليوراسيل قاعدة أزوتية خاصة بـ ARN (غير موجودة في ADN). بعد فترة قصيرة: الإشعاع في النواة. بعد فترة أطول: الإشعاع ينتقل إلى الهيولى. الاستنتاج: ARNm يُصنع في النواة ثم ينتقل إلى الهيولى.""",
-        "concepts": ["uracile_ARN_only", "ARNm_migration", "ARNm_messager"]
+        "concepts": ["uracile_ARN_only", "ARNm_migration", "ARNm_messager"],
     },
-
     # ════ النشاط 3 : الاستنساخ ════
     {
         "id": "ch1_act3_arn_polymerase",
@@ -58,7 +57,7 @@ CHAPTER1_CHUNKS = [
         "type": "experience",
         "priority": 1,
         "texte": """تثبيط إنزيم ARN بوليمراز بمادة α-أمانيتين (مستخرجة من فطر Amanita phalloides) أدى إلى توقف تشكل ARNm. الاستنتاج: ARN بوليمراز ضروري وأساسي لعملية الاستنساخ. الإنزيم يفتح سلسلتي ADN ويقرأ السلسلة المستنسخة ويربط النيوكليوتيدات في اتجاه 5' → 3'.""",
-        "concepts": ["ARN_polymerase_role", "inhibition_alpha_amanitine", "transcription_direction"]
+        "concepts": ["ARN_polymerase_role", "inhibition_alpha_amanitine", "transcription_direction"],
     },
     {
         "id": "ch1_act3_phases_transcription",
@@ -68,7 +67,12 @@ CHAPTER1_CHUNKS = [
         "type": "hasila",
         "priority": 1,
         "texte": """مراحل الاستنساخ الثلاث: الانطلاق: ارتباط ARN بوليمراز بمنطقة البداية وانفتاح سلسلتي ADN. الاستطالة: تحرك الإنزيم وقراءة السلسلة المستنسخة (3'→5') وربط النيوكليوتيدات المتكاملة لتشكيل ARNm (5'→3'). النهاية: انتهاء تركيب ARNm وانفصال الإنزيم والـ ARNm والتحام سلسلتي ADN.""",
-        "concepts": ["transcription_initiation", "transcription_elongation", "transcription_terminaison", "polarite_5_3"]
+        "concepts": [
+            "transcription_initiation",
+            "transcription_elongation",
+            "transcription_terminaison",
+            "polarite_5_3",
+        ],
     },
     {
         "id": "ch1_act3_epissage",
@@ -78,9 +82,8 @@ CHAPTER1_CHUNKS = [
         "type": "hasila",
         "priority": 1,
         "texte": """عند حقيقيات النواة: ARNm الأولي يخضع لعملية النضج (الإسبلايسينغ): حذف القطع غير الدالة (Introns/الإنترونات) وربط القطع الدالة (Exons/الإكسونات) ← ARNm ناضج أقل طولاً يغادر إلى الهيولى. هذه الظاهرة غائبة تماماً عند بدائيات النواة (البكتيريا).""",
-        "concepts": ["epissage", "introns_suppression", "exons_jonction", "ARNm_mature", "eucaryotes_only"]
+        "concepts": ["epissage", "introns_suppression", "exons_jonction", "ARNm_mature", "eucaryotes_only"],
     },
-
     # ════ النشاط 4 : الشفرة الوراثية ════
     {
         "id": "ch1_act4_code_genetique_base",
@@ -90,7 +93,13 @@ CHAPTER1_CHUNKS = [
         "type": "hasila",
         "priority": 1,
         "texte": """الشفرة الوراثية: الرامزة = 3 نيوكليوتيدات تشفر لحمض أميني واحد. 64 رامزة إجمالاً (4³): 61 رامزة تشفر لـ 20 حمض أميني (الشفرة منحلة/متردّدة)، 3 رامزات توقف: UAA، UAG، UGA (لا تشفر لأي حمض أميني)، ورامزة الانطلاق: AUG (تشفر للميثيونين دائماً). الشفرة عالمية: نفس الشفرة لجميع الكائنات الحية.""",
-        "concepts": ["codon_definition", "code_degenere", "AUG_methionine", "stop_codons_UAA_UAG_UGA", "code_universel"]
+        "concepts": [
+            "codon_definition",
+            "code_degenere",
+            "AUG_methionine",
+            "stop_codons_UAA_UAG_UGA",
+            "code_universel",
+        ],
     },
     {
         "id": "ch1_act4_nirenberg",
@@ -100,9 +109,8 @@ CHAPTER1_CHUNKS = [
         "type": "experience",
         "priority": 2,
         "texte": """تجربة Nirenberg: ARNm اصطناعي من U فقط (UUU...) ← سلسلة من فينيل ألانين (Phe) فقط. النتيجة: رامزة UUU تشفر للفينيل ألانين. بالمثل: AAA→Lys, CCC→Pro, GGG→Gly. الاستنتاج: الرمز الوراثي يقرأ بثلاثيات متتالية غير متداخلة.""",
-        "concepts": ["nirenberg_experience", "decodage_codon", "code_non_chevauchant"]
+        "concepts": ["nirenberg_experience", "decodage_codon", "code_non_chevauchant"],
     },
-
     # ════ النشاط 5 : مراحل الترجمة ════
     {
         "id": "ch1_act5_polysome",
@@ -112,7 +120,7 @@ CHAPTER1_CHUNKS = [
         "type": "hasila",
         "priority": 1,
         "texte": """متعدد الريبوزوم (البوليزوم/Polyribosome): عدة ريبوزومات تنزلق على نفس خيط ARNm في نفس الوقت. الفائدة: تضاعف كمية البروتين المصنع في نفس الوقت. إضافة ريبونيوكلياز (يفكك ARNm) ← اختفاء البوليزوم وتوقف تركيب البروتين (إثبات دور ARNm في تماسك البوليزوم).""",
-        "concepts": ["polysome_definition", "polysome_role_quantite", "ARNm_polysome_liaison"]
+        "concepts": ["polysome_definition", "polysome_role_quantite", "ARNm_polysome_liaison"],
     },
     {
         "id": "ch1_act5_ribosome_structure",
@@ -122,7 +130,7 @@ CHAPTER1_CHUNKS = [
         "type": "schema",
         "priority": 2,
         "texte": """الريبوزوم يتكون من وحدتين: الوحدة الكبرى (50S عند البكتيريا): تحتوي على الموقع P (موقع الببتيد) والموقع A (موقع الحمض الأميني) ونفق خروج السلسلة الببتيدية. الوحدة الصغرى (30S): موقع ارتباط ARNm. كلتا الوحدتين تتكونان من بروتينات و ARNr.""",
-        "concepts": ["ribosome_structure", "site_P_peptidyl", "site_A_aminoacyl", "ARNr_composition"]
+        "concepts": ["ribosome_structure", "site_P_peptidyl", "site_A_aminoacyl", "ARNr_composition"],
     },
     {
         "id": "ch1_act5_arnt_structure",
@@ -132,7 +140,7 @@ CHAPTER1_CHUNKS = [
         "type": "schema",
         "priority": 1,
         "texte": """ARNt (الحمض الريبي الناقل) يتميز بموقعين أساسيين: 1. موقع تثبيت الحمض الأميني في النهاية 3' (CCA-3')، 2. موقع الرامزة المضادة (Anticodon): تتكامل مع رامزة ARNm بروابط هيدروجينية. البنية الثلاثية الأبعاد: شكل حرف L مقلوب.""",
-        "concepts": ["ARNt_site_AA", "anticodon_site", "ARNt_3D_structure", "complementarite_codon_anticodon"]
+        "concepts": ["ARNt_site_AA", "anticodon_site", "ARNt_3D_structure", "complementarite_codon_anticodon"],
     },
     {
         "id": "ch1_act5_activation_AA",
@@ -142,7 +150,7 @@ CHAPTER1_CHUNKS = [
         "type": "hasila",
         "priority": 1,
         "texte": """تنشيط الأحماض الأمينية (خطوة ضرورية قبل الترجمة): الحمض الأميني + ARNt + ATP --[أمينو أسيل ARNt سينتيتار]-→ معقد (AA-ARNt) نشط + AMP + بيروفسفات. كل حمض أميني له إنزيم نوعي خاص به.""",
-        "concepts": ["activation_AA", "aminoacyl_ARNt_synthetase", "ATP_energie_activation", "specificite_enzyme"]
+        "concepts": ["activation_AA", "aminoacyl_ARNt_synthetase", "ATP_energie_activation", "specificite_enzyme"],
     },
     {
         "id": "ch1_act5_phases_traduction",
@@ -152,9 +160,15 @@ CHAPTER1_CHUNKS = [
         "type": "hasila",
         "priority": 1,
         "texte": """مراحل الترجمة الثلاث: الانطلاق: ARNm يرتبط بالوحدة الصغرى، ARNt-Met (رامزة مضادة UAC) يتوضع على AUG في الموقع P، التحام الوحدة الكبرى. الاستطالة: ARNt الثاني يتوضع في الموقع A، تشكل الرابطة الببتيدية بين الحمضين بتدخل إنزيمات وATP، انزلاق الريبوزوم رامزة واحدة نحو 3'، الموقع A يصبح شاغراً لاستقبال حمض جديد. النهاية: وصول رامزة توقف (UAA أو UAG أو UGA)، انفصال السلسلة الببتيدية + تحرير الميثيونين الأول، تفكك الريبوزوم إلى وحدتيه.""",
-        "concepts": ["traduction_initiation", "traduction_elongation", "traduction_terminaison", "liaison_peptidique", "ribosome_glissement", "methionine_liberation"]
+        "concepts": [
+            "traduction_initiation",
+            "traduction_elongation",
+            "traduction_terminaison",
+            "liaison_peptidique",
+            "ribosome_glissement",
+            "methionine_liberation",
+        ],
     },
-
     # ════ الحصيلة المعرفية (الأولوية القصوى) ════
     {
         "id": "ch1_hasila_complete",
@@ -166,13 +180,21 @@ CHAPTER1_CHUNKS = [
         "is_bareme_source": True,
         "texte": """يتم تركيب البروتين في الهيولى، ويتطلب نقل نسخة من المعلومات الوراثية من النواة في صورة جزيء الـ ARNm. يتم تركيب جزيء ARNm بواسطة إنزيم نوعي يدعى ARN بوليمراز عبر ثلاث خطوات: الانطلاق (ارتباط الإنزيم ببداية المورثة وفتح السلسلتين)، الاستطالة (ربط النيوكليوتيدات المتكاملة)، النهاية (انفصال ARNm الأولي والإنزيم). عند حقيقيات النواة: حذف الإنترونات وربط الإكسونات ← ARNm ناضج. وحدة الشفرة الوراثية هي الرامزة (3 نيوكليوتيدات تشفر لحمض أميني واحد). 64 رامزة لـ 20 حمض أميني. 61 رامزة تشفر للأحماض الأمينية (منها AUG رامزة الانطلاق). 3 رامزات توقف (UAA, UAG, UGA). تتم الترجمة على مستوى متعدد الريبوزوم (البوليزوم). يتطلب تدخل الـ ARNt الذي يقوم بتنشيط الأحماض الأمينية بتدخل إنزيم نوعي (أمينو أسيل ARNt سينتيتار) وطاقة ATP. الريبوزومات تتكون من تحت وحدتين تحتوي الكبرى على الموقعين A و P. الانطلاق: تشكيل معقد الانطلاق وتوضع الميثيونين في الموقع P. الاستطالة: توالي توضع الأحماض وتشكل الروابط الببتيدية وانزلاق الريبوزوم من 5' إلى 3'. النهاية: الوصول لرامزة التوقف وانفصال السلسلة الببتيدية وتفكك العضيات. ينطوي البروتين ليأخذ بنيته الفراغية. إذا كان إفرازياً: ينتقل عبر الشبكة الهيولية الفعالة ← جهاز غولجي ← حويصلات إفرازية ← خارج الخلية. عند بدائيات النواة: الاستنساخ والترجمة في الهيولى معاً وفي نفس الوقت (لا يوجد غشاء نووي).""",
         "concepts": [
-            "maqar_synthese_proteine", "ARNm_messager_role", "expression_genique_2etapes",
-            "transcription_3phases", "epissage_eucaryotes", "code_genetique_64_codons",
-            "traduction_polysome", "activation_AA_ATP", "traduction_3phases",
-            "destin_proteine_secretion", "procaryotes_couplage_traduction"
-        ]
-    }
+            "maqar_synthese_proteine",
+            "ARNm_messager_role",
+            "expression_genique_2etapes",
+            "transcription_3phases",
+            "epissage_eucaryotes",
+            "code_genetique_64_codons",
+            "traduction_polysome",
+            "activation_AA_ATP",
+            "traduction_3phases",
+            "destin_proteine_secretion",
+            "procaryotes_couplage_traduction",
+        ],
+    },
 ]
+
 
 async def ingest_chapter1():
     # Charger la configuration
@@ -180,17 +202,17 @@ async def ingest_chapter1():
     db_url = cfg.DATABASE_URL
     if not db_url:
         db_url = os.getenv("DATABASE_URL")
-        
+
     if not db_url:
         print("Error: DATABASE_URL not set in environment or settings.")
         return
-        
+
     if db_url.startswith("postgres://"):
         db_url = db_url.replace("postgres://", "postgresql+asyncpg://", 1)
     elif db_url.startswith("postgresql://"):
         db_url = db_url.replace("postgresql://", "postgresql+asyncpg://", 1)
-        
-    print(f"Connecting to database...")
+
+    print("Connecting to database...")
     engine = create_async_engine(db_url, echo=False)
 
     print(f"Ingestion de {len(CHAPTER1_CHUNKS)} chunks — Chapitre 1")
@@ -219,16 +241,19 @@ async def ingest_chapter1():
                     "qid": chunk["id"],
                     "text": chunk["texte"],
                     "emb": str(embedding.tolist()),
-                    "meta": json.dumps({
-                        "branche":      chunk["branche"],
-                        "sous_branche": chunk.get("sous_branche"),
-                        "page":         chunk["page"],
-                        "type":         chunk["type"],
-                        "priority":     chunk["priority"],
-                        "concepts":     chunk["concepts"],
-                        "is_bareme":    chunk.get("is_bareme_source", False)
-                    }, ensure_ascii=False)
-                }
+                    "meta": json.dumps(
+                        {
+                            "branche": chunk["branche"],
+                            "sous_branche": chunk.get("sous_branche"),
+                            "page": chunk["page"],
+                            "type": chunk["type"],
+                            "priority": chunk["priority"],
+                            "concepts": chunk["concepts"],
+                            "is_bareme": chunk.get("is_bareme_source", False),
+                        },
+                        ensure_ascii=False,
+                    ),
+                },
             )
 
             symbol = "⭐" if chunk.get("is_bareme_source") else "✅"
@@ -236,15 +261,14 @@ async def ingest_chapter1():
 
     # Vérification finale
     async with engine.connect() as conn:
-        res = await conn.execute(
-            text("SELECT COUNT(*) FROM reference_embeddings WHERE source = 'livre_scolaire_ch1'")
-        )
+        res = await conn.execute(text("SELECT COUNT(*) FROM reference_embeddings WHERE source = 'livre_scolaire_ch1'"))
         count = res.scalar()
-        print(f"\n{'='*60}")
+        print(f"\n{'=' * 60}")
         print(f"  Résultat : {count} chunks ingérés pour le chapitre 1")
-        print(f"  Priorité 1 (bareme) : الحصيلة المعرفية ⭐")
+        print("  Priorité 1 (bareme) : الحصيلة المعرفية ⭐")
 
     await engine.dispose()
+
 
 if __name__ == "__main__":
     asyncio.run(ingest_chapter1())

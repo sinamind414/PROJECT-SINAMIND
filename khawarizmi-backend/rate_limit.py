@@ -1,11 +1,12 @@
 from fastapi import Request
+from jose import jwt
 from slowapi import Limiter
 from slowapi.util import get_remote_address
-from jose import jwt
 
 
 def _get_cfg():
     from main import get_settings
+
     return get_settings()
 
 
@@ -30,11 +31,11 @@ def get_user_key(request: Request) -> str:
 
 
 def chat_limit(key: str) -> str:
-    return "100/hour" if (key and ":pro" in key) else "20/hour"
+    return "100/hour" if (key and (":premium" in key or ":pro" in key)) else "20/hour"
 
 
 def evaluate_limit(key: str) -> str:
-    return "80/hour" if (key and ":pro" in key) else "15/hour"
+    return "80/hour" if (key and (":premium" in key or ":pro" in key)) else "15/hour"
 
 
 limiter = Limiter(key_func=get_user_key)

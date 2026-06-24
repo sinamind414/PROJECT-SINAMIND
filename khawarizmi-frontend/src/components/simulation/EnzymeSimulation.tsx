@@ -280,7 +280,7 @@ export function EnzymeSimulation() {
 
                 {curvePoints.length === 0 && (
                   <text x="200" y="100" textAnchor="middle" fill="#475569" fontSize="11">
-                    غيّر الحرارة واضغط "سجل النقطة" لرسم المنحنى
+                    غيّر الحرارة واضغط &quot;سجل النقطة&quot; لرسم المنحنى
                   </text>
                 )}
               </svg>

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Batch GPU OCR pour tous les volumes KHELIFA2 restants."""
+
 import json
 import sys
 import time
@@ -30,7 +31,7 @@ for v in range(1, 16):
         print(f"[MISS] {pdf}")
         continue
 
-    print(f"\n{'='*60}")
+    print(f"\n{'=' * 60}")
     print(f"[START] {name}")
     t0 = time.time()
     try:
@@ -42,7 +43,9 @@ for v in range(1, 16):
         row = summary.to_dict()
         row["elapsed_sec"] = elapsed
         results.append(row)
-        print(f"[DONE] {name}: {row['pages_processed']}/{row['total_pages']}p, {row['total_characters']}ch, conf={row['avg_confidence']}, {elapsed}s")
+        print(
+            f"[DONE] {name}: {row['pages_processed']}/{row['total_pages']}p, {row['total_characters']}ch, conf={row['avg_confidence']}, {elapsed}s"
+        )
         print(f"       Text bundle → {ocr_txt.name}")
     except Exception as e:
         elapsed = round(time.time() - t0, 1)
@@ -51,6 +54,6 @@ for v in range(1, 16):
 
 LOG_FILE.parent.mkdir(parents=True, exist_ok=True)
 LOG_FILE.write_text(json.dumps(results, ensure_ascii=False, indent=2), encoding="utf-8")
-print(f"\n{'='*60}")
+print(f"\n{'=' * 60}")
 print(f"BATCH COMPLETE — {len(results)} volumes processed")
 print(f"Log: {LOG_FILE}")

@@ -17,15 +17,11 @@ from __future__ import annotations
 import argparse
 import json
 import logging
-import os
 import re
-import shutil
 import subprocess
 import sys
-import time
 from collections import Counter
 from pathlib import Path
-from typing import Dict, List, Optional, Set, Tuple
 
 logging.basicConfig(
     level=logging.INFO,
@@ -64,42 +60,86 @@ Q_PATTERN = re.compile(
     re.IGNORECASE,
 )
 
-MC_MAP: Dict[str, str] = {
-    "استنساخ": "mc_prot_01", "نسخ": "mc_prot_01", "transcription": "mc_prot_01",
-    "ADN": "mc_prot_01", "ARNm": "mc_prot_04", "الرنا الرسول": "mc_prot_04",
-    "ترجمة": "mc_prot_02", "traduction": "mc_prot_02",
-    "ARNt": "mc_prot_05", "الرنا الناقل": "mc_prot_05", "anticodon": "mc_prot_05",
-    "ريبوزوم": "mc_prot_06", "ribosome": "mc_prot_06",
-    "كودون": "mc_prot_03", "رامزة": "mc_prot_03", "شفرة": "mc_prot_03",
-    "بدء": "mc_prot_07", "initiation": "mc_prot_07",
-    "استطالة": "mc_prot_08", "إطالة": "mc_prot_08", "إنهاء": "mc_prot_08",
-    "بنية أولية": "mc_struc_01", "بنية اولية": "mc_struc_01",
-    "بنية ثانوية": "mc_struc_02", "بنية ثالثية": "mc_struc_03",
-    "بنية رباعية": "mc_struc_04", "بنية فراغية": "mc_struc_05",
-    "إنزيم": "mc_enz_01", "enzyme": "mc_enz_01", "موقع فعال": "mc_enz_01",
-    "نوعية إنزيمية": "mc_enz_02", "تثبيط": "mc_enz_05", "inhibition": "mc_enz_05",
-    "لمفاويات B": "mc_imm_01", "LB": "mc_imm_01",
-    "لمفاويات T": "mc_imm_02", "LT4": "mc_imm_02", "LT8": "mc_imm_02",
-    "مستضد": "mc_imm_03", "antigene": "mc_imm_03",
-    "جسم مضاد": "mc_imm_03", "anticorps": "mc_imm_03",
-    "مناعة خلطية": "mc_imm_04", "humorale": "mc_imm_04",
-    "مناعة خلوية": "mc_imm_05", "cellulaire": "mc_imm_05", "CTL": "mc_imm_05",
-    "ذاكرة مناعية": "mc_imm_06", "memoire": "mc_imm_06", "vaccin": "mc_imm_06",
-    "كلوروبلاست": "mc_photo_01", "chloroplaste": "mc_photo_01",
-    "طور ضوئي": "mc_photo_02", "دورة كالفن": "mc_photo_03",
-    "ميتوكندري": "mc_resp_01", "mitochondrie": "mc_resp_01",
-    "تحلل سكري": "mc_resp_02", "glycolyse": "mc_resp_02",
-    "كريس": "mc_resp_03", "Krebs": "mc_resp_03",
-    "سلسلة تنفسية": "mc_resp_04", "تخمر": "mc_resp_05", "fermentation": "mc_resp_05",
-    "بنية الأرض": "mc_tec_01", "sismique": "mc_tec_01",
-    "صفائح": "mc_tec_02", "plaques": "mc_tec_02",
-    "تباعد": "mc_tec_03", "تقارب": "mc_tec_03",
-    "غوص": "mc_tec_04", "subduction": "mc_tec_04",
-    "زلزال": "mc_tec_05", "بركان": "mc_tec_05", "volcan": "mc_tec_05",
+MC_MAP: dict[str, str] = {
+    "استنساخ": "mc_prot_01",
+    "نسخ": "mc_prot_01",
+    "transcription": "mc_prot_01",
+    "ADN": "mc_prot_01",
+    "ARNm": "mc_prot_04",
+    "الرنا الرسول": "mc_prot_04",
+    "ترجمة": "mc_prot_02",
+    "traduction": "mc_prot_02",
+    "ARNt": "mc_prot_05",
+    "الرنا الناقل": "mc_prot_05",
+    "anticodon": "mc_prot_05",
+    "ريبوزوم": "mc_prot_06",
+    "ribosome": "mc_prot_06",
+    "كودون": "mc_prot_03",
+    "رامزة": "mc_prot_03",
+    "شفرة": "mc_prot_03",
+    "بدء": "mc_prot_07",
+    "initiation": "mc_prot_07",
+    "استطالة": "mc_prot_08",
+    "إطالة": "mc_prot_08",
+    "إنهاء": "mc_prot_08",
+    "بنية أولية": "mc_struc_01",
+    "بنية اولية": "mc_struc_01",
+    "بنية ثانوية": "mc_struc_02",
+    "بنية ثالثية": "mc_struc_03",
+    "بنية رباعية": "mc_struc_04",
+    "بنية فراغية": "mc_struc_05",
+    "إنزيم": "mc_enz_01",
+    "enzyme": "mc_enz_01",
+    "موقع فعال": "mc_enz_01",
+    "نوعية إنزيمية": "mc_enz_02",
+    "تثبيط": "mc_enz_05",
+    "inhibition": "mc_enz_05",
+    "لمفاويات B": "mc_imm_01",
+    "LB": "mc_imm_01",
+    "لمفاويات T": "mc_imm_02",
+    "LT4": "mc_imm_02",
+    "LT8": "mc_imm_02",
+    "مستضد": "mc_imm_03",
+    "antigene": "mc_imm_03",
+    "جسم مضاد": "mc_imm_03",
+    "anticorps": "mc_imm_03",
+    "مناعة خلطية": "mc_imm_04",
+    "humorale": "mc_imm_04",
+    "مناعة خلوية": "mc_imm_05",
+    "cellulaire": "mc_imm_05",
+    "CTL": "mc_imm_05",
+    "ذاكرة مناعية": "mc_imm_06",
+    "memoire": "mc_imm_06",
+    "vaccin": "mc_imm_06",
+    "كلوروبلاست": "mc_photo_01",
+    "chloroplaste": "mc_photo_01",
+    "طور ضوئي": "mc_photo_02",
+    "دورة كالفن": "mc_photo_03",
+    "ميتوكندري": "mc_resp_01",
+    "mitochondrie": "mc_resp_01",
+    "تحلل سكري": "mc_resp_02",
+    "glycolyse": "mc_resp_02",
+    "كريس": "mc_resp_03",
+    "Krebs": "mc_resp_03",
+    "سلسلة تنفسية": "mc_resp_04",
+    "تخمر": "mc_resp_05",
+    "fermentation": "mc_resp_05",
+    "بنية الأرض": "mc_tec_01",
+    "sismique": "mc_tec_01",
+    "صفائح": "mc_tec_02",
+    "plaques": "mc_tec_02",
+    "تباعد": "mc_tec_03",
+    "تقارب": "mc_tec_03",
+    "غوص": "mc_tec_04",
+    "subduction": "mc_tec_04",
+    "زلزال": "mc_tec_05",
+    "بركان": "mc_tec_05",
+    "volcan": "mc_tec_05",
 }
 # ---------------------------------------------------------------------------
 # Utilitaires texte
 # ---------------------------------------------------------------------------
+
 
 def clean_arabic(text: str) -> str:
     t = re.sub(r"\s+", " ", text).strip()
@@ -121,11 +161,26 @@ def tag_concept(text: str):
     if not found:
         return "mc_xxx_xx", [], True
     spec = {
-        "mc_prot_07": 3, "mc_prot_08": 3, "mc_prot_05": 3, "mc_prot_06": 3,
-        "mc_enz_01": 3, "mc_enz_02": 3, "mc_imm_04": 3, "mc_imm_05": 3, "mc_imm_06": 3,
-        "mc_struc_01": 2, "mc_struc_02": 2, "mc_struc_03": 2, "mc_struc_04": 2,
-        "mc_prot_01": 2, "mc_prot_02": 2, "mc_prot_03": 2, "mc_prot_04": 2,
-        "mc_imm_01": 2, "mc_imm_02": 2, "mc_imm_03": 2,
+        "mc_prot_07": 3,
+        "mc_prot_08": 3,
+        "mc_prot_05": 3,
+        "mc_prot_06": 3,
+        "mc_enz_01": 3,
+        "mc_enz_02": 3,
+        "mc_imm_04": 3,
+        "mc_imm_05": 3,
+        "mc_imm_06": 3,
+        "mc_struc_01": 2,
+        "mc_struc_02": 2,
+        "mc_struc_03": 2,
+        "mc_struc_04": 2,
+        "mc_prot_01": 2,
+        "mc_prot_02": 2,
+        "mc_prot_03": 2,
+        "mc_prot_04": 2,
+        "mc_imm_01": 2,
+        "mc_imm_02": 2,
+        "mc_imm_03": 2,
     }
     sf = sorted(found, key=lambda x: spec.get(x, 0), reverse=True)
     return sf[0], sf[1:3], False
@@ -135,10 +190,11 @@ def tag_concept(text: str):
 # Extraction des questions depuis un fichier .ocr.txt
 # ---------------------------------------------------------------------------
 
-def extract_questions_from_ocr_text(text: str, source_label: str, serie: int, vol_num: int, page_no: int) -> List[Dict]:
+
+def extract_questions_from_ocr_text(text: str, source_label: str, serie: int, vol_num: int, page_no: int) -> list[dict]:
     questions = []
     lines = text.split("\n")
-    current_q: List[str] = []
+    current_q: list[str] = []
     in_question = False
 
     for line in lines:
@@ -149,22 +205,24 @@ def extract_questions_from_ocr_text(text: str, source_label: str, serie: int, vo
                 cleaned = clean_arabic(raw)
                 if len(cleaned) > 10:
                     main, sec, av = tag_concept(cleaned)
-                    qid = f"q_khelifa{serie}_v{vol_num:02d}_p{page_no:02d}_{len(questions)+1:02d}"
-                    questions.append({
-                        "id": qid,
-                        "texte_brut": raw[:500],
-                        "texte_corrige": cleaned[:500],
-                        "micro_concept_id": main,
-                        "secondary_concepts": sec,
-                        "a_verifier": av,
-                        "confidence": 0.5,
-                        "source": source_label,
-                        "type": "question",
-                        "difficulte": "moyenne",
-                        "bac_frequent": not av,
-                        "notes": "OCR Tesseract + extraction regex",
-                        "source_page": page_no,
-                    })
+                    qid = f"q_khelifa{serie}_v{vol_num:02d}_p{page_no:02d}_{len(questions) + 1:02d}"
+                    questions.append(
+                        {
+                            "id": qid,
+                            "texte_brut": raw[:500],
+                            "texte_corrige": cleaned[:500],
+                            "micro_concept_id": main,
+                            "secondary_concepts": sec,
+                            "a_verifier": av,
+                            "confidence": 0.5,
+                            "source": source_label,
+                            "type": "question",
+                            "difficulte": "moyenne",
+                            "bac_frequent": not av,
+                            "notes": "OCR Tesseract + extraction regex",
+                            "source_page": page_no,
+                        }
+                    )
                 current_q = []
                 in_question = False
             continue
@@ -175,22 +233,24 @@ def extract_questions_from_ocr_text(text: str, source_label: str, serie: int, vo
                 cleaned = clean_arabic(raw)
                 if len(cleaned) > 10:
                     main, sec, av = tag_concept(cleaned)
-                    qid = f"q_khelifa{serie}_v{vol_num:02d}_p{page_no:02d}_{len(questions)+1:02d}"
-                    questions.append({
-                        "id": qid,
-                        "texte_brut": raw[:500],
-                        "texte_corrige": cleaned[:500],
-                        "micro_concept_id": main,
-                        "secondary_concepts": sec,
-                        "a_verifier": av,
-                        "confidence": 0.5,
-                        "source": source_label,
-                        "type": "question",
-                        "difficulte": "moyenne",
-                        "bac_frequent": not av,
-                        "notes": "OCR Tesseract + extraction regex",
-                        "source_page": page_no,
-                    })
+                    qid = f"q_khelifa{serie}_v{vol_num:02d}_p{page_no:02d}_{len(questions) + 1:02d}"
+                    questions.append(
+                        {
+                            "id": qid,
+                            "texte_brut": raw[:500],
+                            "texte_corrige": cleaned[:500],
+                            "micro_concept_id": main,
+                            "secondary_concepts": sec,
+                            "a_verifier": av,
+                            "confidence": 0.5,
+                            "source": source_label,
+                            "type": "question",
+                            "difficulte": "moyenne",
+                            "bac_frequent": not av,
+                            "notes": "OCR Tesseract + extraction regex",
+                            "source_page": page_no,
+                        }
+                    )
             current_q = [line_stripped]
             in_question = True
         elif in_question and len(current_q) < 15:
@@ -201,33 +261,33 @@ def extract_questions_from_ocr_text(text: str, source_label: str, serie: int, vo
         cleaned = clean_arabic(raw)
         if len(cleaned) > 10:
             main, sec, av = tag_concept(cleaned)
-            qid = f"q_khelifa{serie}_v{vol_num:02d}_p{page_no:02d}_{len(questions)+1:02d}"
-            questions.append({
-                "id": qid,
-                "texte_brut": raw[:500],
-                "texte_corrige": cleaned[:500],
-                "micro_concept_id": main,
-                "secondary_concepts": sec,
-                "a_verifier": av,
-                "confidence": 0.5,
-                "source": source_label,
-                "type": "question",
-                "difficulte": "moyenne",
-                "bac_frequent": not av,
-                "notes": "OCR Tesseract + extraction regex",
-                "source_page": page_no,
-            })
+            qid = f"q_khelifa{serie}_v{vol_num:02d}_p{page_no:02d}_{len(questions) + 1:02d}"
+            questions.append(
+                {
+                    "id": qid,
+                    "texte_brut": raw[:500],
+                    "texte_corrige": cleaned[:500],
+                    "micro_concept_id": main,
+                    "secondary_concepts": sec,
+                    "a_verifier": av,
+                    "confidence": 0.5,
+                    "source": source_label,
+                    "type": "question",
+                    "difficulte": "moyenne",
+                    "bac_frequent": not av,
+                    "notes": "OCR Tesseract + extraction regex",
+                    "source_page": page_no,
+                }
+            )
 
     return questions
 
 
-def parse_ocr_pages(ocr_text: str) -> Dict[int, str]:
+def parse_ocr_pages(ocr_text: str) -> dict[int, str]:
     """Extrait le texte par page depuis le format assemble de ocr_pipeline_production."""
-    pages: Dict[int, str] = {}
-    current_page = None
-    current_lines: List[str] = []
+    pages: dict[int, str] = {}
 
-    page_header = re.compile(r"^={70,}\nPAGE (\d+)\n={70,}", re.MULTILINE)
+    re.compile(r"^={70,}\nPAGE (\d+)\n={70,}", re.MULTILINE)
 
     # Split by page headers
     parts = re.split(r"={70,}\n(PAGE \d+)\n={70,}", ocr_text)
@@ -247,24 +307,26 @@ def parse_ocr_pages(ocr_text: str) -> Dict[int, str]:
     return pages
 
 
-def process_ocr_file(ocr_path: Path, serie: int, vol_num: int) -> Tuple[List[Dict], Dict]:
+def process_ocr_file(ocr_path: Path, serie: int, vol_num: int) -> tuple[list[dict], dict]:
     """Convertit un fichier .ocr.txt en questions structurées."""
     text = ocr_path.read_text(encoding="utf-8", errors="replace")
     pages = parse_ocr_pages(text)
 
-    all_questions: List[Dict] = []
-    volume_pages: List[Dict] = []
+    all_questions: list[dict] = []
+    volume_pages: list[dict] = []
 
     for page_no in sorted(pages.keys()):
         page_text = pages[page_no]
         source_label = f"KHELIFA {serie} - Volume {vol_num} - Page {page_no}"
         qs = extract_questions_from_ocr_text(page_text, source_label, serie, vol_num, page_no)
         all_questions.extend(qs)
-        volume_pages.append({
-            "page": page_no,
-            "chars": len(page_text),
-            "questions": len(qs),
-        })
+        volume_pages.append(
+            {
+                "page": page_no,
+                "chars": len(page_text),
+                "questions": len(qs),
+            }
+        )
 
     vol_data = {
         "source": f"KHELIFA {serie} - Volume {vol_num}",
@@ -275,9 +337,12 @@ def process_ocr_file(ocr_path: Path, serie: int, vol_num: int) -> Tuple[List[Dic
     }
 
     return all_questions, vol_data
+
+
 # ---------------------------------------------------------------------------
 # Étape 1 : OCR (appelle ocr_pipeline_production.py)
 # ---------------------------------------------------------------------------
+
 
 def ocr_stem(pdf_path: Path) -> str:
     """Nom du fichier de sortie produit par ocr_pipeline_production (basé sur le nom du PDF)."""
@@ -286,15 +351,23 @@ def ocr_stem(pdf_path: Path) -> str:
 
 def run_ocr_volume(pdf_path: Path, out_dir: Path, workers: int, dpi: int, pdf_mode: str) -> bool:
     cmd = [
-        sys.executable, str(PROD_SCRIPT),
+        sys.executable,
+        str(PROD_SCRIPT),
         str(pdf_path),
-        "--workers", str(workers),
-        "--dpi", str(dpi),
-        "--out-dir", str(out_dir),
-        "--lang", "ara+fra",
-        "--pdf-mode", pdf_mode,
-        "--suffix", ".ocr.txt",
-        "--timeout", "120",
+        "--workers",
+        str(workers),
+        "--dpi",
+        str(dpi),
+        "--out-dir",
+        str(out_dir),
+        "--lang",
+        "ara+fra",
+        "--pdf-mode",
+        pdf_mode,
+        "--suffix",
+        ".ocr.txt",
+        "--timeout",
+        "120",
     ]
     result = subprocess.run(cmd, capture_output=True, text=True)
     stem = ocr_stem(pdf_path)
@@ -314,6 +387,7 @@ def is_ocr_done(out_dir: Path, pdf_path: Path) -> bool:
 # ---------------------------------------------------------------------------
 # Étape 2 : Extraction des questions
 # ---------------------------------------------------------------------------
+
 
 def extract_volume_questions(serie: int, vol: int, pdf_path: Path, ocr_dir: Path, q_dir: Path) -> bool:
     stem_ocr = ocr_stem(pdf_path)
@@ -341,9 +415,10 @@ def extract_volume_questions(serie: int, vol: int, pdf_path: Path, ocr_dir: Path
 # Étape 3 : Consolidation
 # ---------------------------------------------------------------------------
 
+
 def consolidate_questions(q_dir: Path) -> None:
     log.info("Consolidation des questions…")
-    all_q: List[Dict] = []
+    all_q: list[dict] = []
     for qfile in sorted(q_dir.glob("*_questions.json")):
         try:
             all_q.extend(json.loads(qfile.read_text(encoding="utf-8")))
@@ -351,18 +426,19 @@ def consolidate_questions(q_dir: Path) -> None:
             log.warning("Erreur lecture %s : %s", qfile.name, exc)
 
     consolidated_path = q_dir / "khelifa_all_questions.json"
-    consolidated_path.write_text(
-        json.dumps(all_q, ensure_ascii=False, indent=2), encoding="utf-8"
-    )
+    consolidated_path.write_text(json.dumps(all_q, ensure_ascii=False, indent=2), encoding="utf-8")
 
     log.info("Total questions : %d", len(all_q))
     mc_counts = Counter(q.get("micro_concept_id", "N/A") for q in all_q)
     log.info("Distribution des micro-concepts :")
     for mc, count in mc_counts.most_common():
         log.info("  %s: %d", mc, count)
+
+
 # ---------------------------------------------------------------------------
 # Pipeline principal
 # ---------------------------------------------------------------------------
+
 
 def run_pipeline(args: argparse.Namespace) -> None:
     OCR_OUT_DIR.mkdir(parents=True, exist_ok=True)
@@ -403,7 +479,8 @@ def run_pipeline(args: argparse.Namespace) -> None:
                 log.info("=" * 60)
 
                 success = run_ocr_volume(
-                    pdf_path, OCR_OUT_DIR,
+                    pdf_path,
+                    OCR_OUT_DIR,
                     workers=args.workers,
                     dpi=args.dpi,
                     pdf_mode=args.pdf_mode,

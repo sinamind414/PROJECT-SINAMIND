@@ -14,12 +14,12 @@ Flux :
 Gain attendu : 2-5s → 100ms pour les questions fréquentes.
 """
 
-import json
 import hashlib
+import json
 import logging
 import time
+
 import numpy as np
-from typing import Optional, Dict
 
 logger = logging.getLogger("khawarizmi.semantic_cache")
 
@@ -29,16 +29,18 @@ CACHE_TTL = 3600  # 1 heure
 
 
 def _get_state():
-    from main import state
+    from routes.lifespan import state
+
     return state
 
 
 def _get_embedder():
     from services.embedder import embedder
+
     return embedder
 
 
-async def get_semantic_cache(message: str, chapitre: str) -> Optional[Dict]:
+async def get_semantic_cache(message: str, chapitre: str) -> dict | None:
     """Recherche sémantique dans le cache Redis.
 
     Args:
@@ -97,10 +99,7 @@ async def get_semantic_cache(message: str, chapitre: str) -> Optional[Dict]:
             response["cache_similarity"] = round(best_sim, 3)
             return response
 
-        logger.debug(
-            f"SEMANTIC_CACHE MISS | best_sim={best_sim:.3f} chapitre={chapitre} "
-            f"entries={len(keys)}"
-        )
+        logger.debug(f"SEMANTIC_CACHE MISS | best_sim={best_sim:.3f} chapitre={chapitre} entries={len(keys)}")
         return None
 
     except Exception as e:
@@ -108,12 +107,7 @@ async def get_semantic_cache(message: str, chapitre: str) -> Optional[Dict]:
         return None
 
 
-async def set_semantic_cache(
-    message: str,
-    response: Dict,
-    chapitre: str,
-    ttl: int = CACHE_TTL
-) -> None:
+async def set_semantic_cache(message: str, response: dict, chapitre: str, ttl: int = CACHE_TTL) -> None:
     """Stocke une réponse dans le cache sémantique.
 
     Args:
@@ -173,7 +167,7 @@ async def set_semantic_cache(
         logger.warning(f"Semantic cache set error: {e}")
 
 
-async def clear_semantic_cache(chapitre: str = None) -> int:
+async def clear_semantic_cache(chapitre: str | None = None) -> int:
     """Vide le cache sémantique pour un chapitre (ou tout si chapitre=None).
 
     Returns:

@@ -21,7 +21,7 @@ export function VideosWidget({ chapitre }: { chapitre: string }) {
   const loadVideos = useCallback(async () => {
     try {
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
-      const token = typeof window !== "undefined" ? localStorage.getItem("token") : null
+      const token = typeof window !== "undefined" ? localStorage.getItem("khawarizmi_token") : null
 
       const response = await fetch(
         `${apiUrl}/api/videos/by-chapter/${encodeURIComponent(chapitre)}`,

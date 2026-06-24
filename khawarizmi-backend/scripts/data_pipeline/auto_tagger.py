@@ -9,10 +9,9 @@ Utilisation :
     python auto_tagger.py --batch questions.txt --output tagged.json
 """
 
-import json
 import argparse
+import json
 from pathlib import Path
-from typing import List, Dict, Optional
 
 BASE = Path(__file__).parent.parent.parent
 REF_PATH = BASE / "data" / "official" / "micro_concepts_reference.json"
@@ -28,66 +27,78 @@ except FileNotFoundError:
 # Mapping de mots-clés (à enrichir au fil du temps)
 KEYWORD_MAP = {
     # Synthèse des protéines
-    "transcription": "mc_prot_01", "استنساخ": "mc_prot_01", "نسخ": "mc_prot_01",
+    "transcription": "mc_prot_01",
+    "استنساخ": "mc_prot_01",
+    "نسخ": "mc_prot_01",
     "arn polymérase": "mc_prot_01",
-    "traduction": "mc_prot_02", "ترجمة": "mc_prot_02",
-    "code génétique": "mc_prot_03", "الشفرة الوراثية": "mc_prot_03",
-    "arn messager": "mc_prot_04", "الرنا الرسول": "mc_prot_04", "arnm": "mc_prot_04",
-    "arn de transfert": "mc_prot_05", "الرنا الناقل": "mc_prot_05",
-    "ribosome": "mc_prot_06", "ريبوزوم": "mc_prot_06",
+    "traduction": "mc_prot_02",
+    "ترجمة": "mc_prot_02",
+    "code génétique": "mc_prot_03",
+    "الشفرة الوراثية": "mc_prot_03",
+    "arn messager": "mc_prot_04",
+    "الرنا الرسول": "mc_prot_04",
+    "arnm": "mc_prot_04",
+    "arn de transfert": "mc_prot_05",
+    "الرنا الناقل": "mc_prot_05",
+    "ribosome": "mc_prot_06",
+    "ريبوزوم": "mc_prot_06",
     "initiation": "mc_prot_07",
     "élongation": "mc_prot_08",
-
     # Structure
     "structure primaire": "mc_struc_01",
-    "structure secondaire": "mc_struc_02", "hélice": "mc_struc_02", "feuillet": "mc_struc_02",
+    "structure secondaire": "mc_struc_02",
+    "hélice": "mc_struc_02",
+    "feuillet": "mc_struc_02",
     "structure tertiaire": "mc_struc_03",
     "structure quaternaire": "mc_struc_04",
     "structure-fonction": "mc_struc_05",
-
     # Enzymes
-    "site actif": "mc_enz_01", "الموقع الفعال": "mc_enz_01",
+    "site actif": "mc_enz_01",
+    "الموقع الفعال": "mc_enz_01",
     "spécificité": "mc_enz_02",
     "vitesse": "mc_enz_03",
-    "température": "mc_enz_04", "ph": "mc_enz_04",
+    "température": "mc_enz_04",
+    "ph": "mc_enz_04",
     "inhibition": "mc_enz_05",
-
     # Immunité
     "lymphocyte b": "mc_imm_01",
     "lymphocyte t": "mc_imm_02",
-    "anticorps": "mc_imm_03", "الأجسام المضادة": "mc_imm_03",
+    "anticorps": "mc_imm_03",
+    "الأجسام المضادة": "mc_imm_03",
     "réponse humorale": "mc_imm_04",
     "réponse cellulaire": "mc_imm_05",
     "mémoire immunitaire": "mc_imm_06",
-
     # Nerveux
-    "potentiel de repos": "mc_nerv_01", "كمون الراحة": "mc_nerv_01",
+    "potentiel de repos": "mc_nerv_01",
+    "كمون الراحة": "mc_nerv_01",
     "potentiel d'action": "mc_nerv_02",
     "synapse": "mc_nerv_03",
     "neurotransmetteur": "mc_nerv_04",
-
     # Photosynthèse
     "chloroplaste": "mc_photo_01",
     "phase lumineuse": "mc_photo_02",
-    "cycle de calvin": "mc_photo_03", "كالفن": "mc_photo_03",
-
+    "cycle de calvin": "mc_photo_03",
+    "كالفن": "mc_photo_03",
     # Respiration
     "mitochondrie": "mc_resp_01",
     "glycolyse": "mc_resp_02",
     "cycle de krebs": "mc_resp_03",
     "chaîne respiratoire": "mc_resp_04",
     "fermentation": "mc_resp_05",
-
     # Tectonique
     "structure interne": "mc_tec_01",
-    "plaques tectoniques": "mc_tec_02", "الصفائح": "mc_tec_02",
-    "divergence": "mc_tec_03", "convergence": "mc_tec_03",
-    "subduction": "mc_tec_04", "dorsale": "mc_tec_04",
-    "sismicité": "mc_tec_05", "volcanisme": "mc_tec_05",
+    "plaques tectoniques": "mc_tec_02",
+    "الصفائح": "mc_tec_02",
+    "divergence": "mc_tec_03",
+    "convergence": "mc_tec_03",
+    "subduction": "mc_tec_04",
+    "dorsale": "mc_tec_04",
+    "sismicité": "mc_tec_05",
+    "volcanisme": "mc_tec_05",
 }
 
 
-def suggest_micro_concepts(text: str, top_k: int = 3) -> List[Dict]:
+def suggest_micro_concepts(text: str, top_k: int = 3) -> list[dict]:
     """Retourne les meilleurs micro-concepts pour un texte donné."""
     if not text or not MICRO_CONCEPTS:
         return []
@@ -121,13 +132,13 @@ def suggest_micro_concepts(text: str, top_k: int = 3) -> List[Dict]:
             "id": r["mc"]["id"],
             "nom_fr": r["mc"].get("nom_fr", ""),
             "nom_ar": r["mc"].get("nom_ar", ""),
-            "score": r["score"]
+            "score": r["score"],
         }
         for r in sorted_results
     ]
 
 
-def process_batch(input_path: Path, output_path: Optional[Path] = None) -> List[Dict]:
+def process_batch(input_path: Path, output_path: Path | None = None) -> list[dict]:
     """Traite un fichier texte (une question par ligne)."""
     results = []
     with open(input_path, encoding="utf-8") as f:
@@ -139,7 +150,7 @@ def process_batch(input_path: Path, output_path: Optional[Path] = None) -> List[
             "line": i,
             "texte": line,
             "suggested_micro_concept_id": suggestions[0]["id"] if suggestions else None,
-            "suggestions": suggestions
+            "suggestions": suggestions,
         }
         results.append(result)
 

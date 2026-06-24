@@ -8,56 +8,57 @@ From now on, this is the ONLY place that should load programme, annales, lexique
 import json
 import logging
 from pathlib import Path
-from typing import Dict, Any, Optional
+from typing import Any
 
 logger = logging.getLogger("khawarizmi.data_loader")
 
 DATA_ROOT = Path(__file__).parent.parent / "data"
 OFFICIAL_DIR = DATA_ROOT / "official"
 
+
 class DataLoader:
-    def __init__(self, data_dir: Optional[str] = None):
+    def __init__(self, data_dir: str | None = None):
         self.data_dir = Path(data_dir) if data_dir else DATA_ROOT
-        self._programme_canonical: Dict = {}
+        self._programme_canonical: dict = {}
         self._loaded_from = {}
 
-    def load_canonical_programme(self) -> Dict[str, Any]:
+    def load_canonical_programme(self) -> dict[str, Any]:
         """Load the new official canonical programme (preferred)."""
         candidates = [
             OFFICIAL_DIR / "programme_svt_3as_canonical.json",
             self.data_dir / "official" / "programme_svt_3as_canonical.json",
         ]
-        
+
         for path in candidates:
             if path.exists():
-                with open(path, "r", encoding="utf-8") as f:
+                with open(path, encoding="utf-8") as f:
                     data = json.load(f)
                 self._programme_canonical = data
                 self._loaded_from["programme"] = str(path)
                 logger.info(f"✅ Loaded CANONICAL programme from {path}")
                 return data
-        
+
         # Temporary fallback (will be removed later)
         old_path = self.data_dir / "programme_sciences_3as.json"
         if old_path.exists():
             logger.warning("⚠️ FALLBACK: Using OLD programme_sciences_3as.json")
-            with open(old_path, "r", encoding="utf-8") as f:
+            with open(old_path, encoding="utf-8") as f:
                 data = json.load(f)
             self._programme_canonical = data
             self._loaded_from["programme"] = str(old_path) + " (DEPRECATED)"
             return data
-        
+
         raise FileNotFoundError("No programme found (canonical or legacy)")
 
-    def get_programme(self) -> Dict:
+    def get_programme(self) -> dict:
         if not self._programme_canonical:
             self.load_canonical_programme()
         return self._programme_canonical
 
-    def get_data_foundation_report(self) -> Dict:
+    def get_data_foundation_report(self) -> dict:
         """Rich diagnostic report for debug endpoint."""
         prog = self.get_programme()
-        
+
         total_mc = 0
         chapters = 0
         if prog and "domaines" in prog:
@@ -72,14 +73,12 @@ class DataLoader:
                 "version": prog.get("metadata", {}).get("version") if prog else None,
                 "total_micro_concepts": total_mc,
                 "total_chapters": chapters,
-                "status": "CANONICAL" if "official" in str(self._loaded_from.get("programme", "")) else "LEGACY"
+                "status": "CANONICAL" if "official" in str(self._loaded_from.get("programme", "")) else "LEGACY",
             },
-            "migration": {
-                "phase": "deep_foundation"
-            }
+            "migration": {"phase": "deep_foundation"},
         }
 
-    def get_loading_report(self) -> Dict:
+    def get_loading_report(self) -> dict:
         """Loading report for engine initialization."""
         self.get_programme()
         return {
@@ -88,13 +87,17 @@ class DataLoader:
                 len(ch.get("micro_concepts", []))
                 for d in self._programme_canonical.get("domaines", [])
                 for ch in d.get("chapitres", [])
-            ) if self._programme_canonical and "domaines" in self._programme_canonical else 0
+            )
+            if self._programme_canonical and "domaines" in self._programme_canonical
+            else 0,
         }
+
 
 # Singleton
 _loader_instance = None
 
-def get_data_loader(data_dir: Optional[str] = None) -> DataLoader:
+
+def get_data_loader(data_dir: str | None = None) -> DataLoader:
     global _loader_instance
     if _loader_instance is None:
         _loader_instance = DataLoader(data_dir)

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Batch GPU OCR for all remaining KHELIFA + FINAL BAC volumes."""
+
 import json
 import sys
 import time
@@ -40,7 +41,7 @@ for name, pdf in volumes:
     if summary_path.exists():
         j = json.loads(summary_path.read_text(encoding="utf-8"))
         print(f"[SKIP] {name} already done ({j['pages_processed']}/{j['total_pages']}p)")
-        results.append({"volume": name, "status": "skipped", "pages": j['pages_processed']})
+        results.append({"volume": name, "status": "skipped", "pages": j["pages_processed"]})
         continue
 
     if not pdf.exists():
@@ -48,7 +49,7 @@ for name, pdf in volumes:
         results.append({"volume": name, "status": "missing", "error": str(pdf)})
         continue
 
-    print(f"\n{'='*60}")
+    print(f"\n{'=' * 60}")
     print(f"[START] {name} — {pdf.parent.name}")
     t0 = time.time()
     try:
@@ -75,6 +76,6 @@ for name, pdf in volumes:
 total_p = sum(r.get("pages_processed", 0) for r in results if "pages_processed" in r)
 total_c = sum(r.get("total_characters", 0) for r in results if "total_characters" in r)
 total_t = sum(r.get("elapsed_sec", 0) for r in results)
-print(f"\n{'='*60}")
+print(f"\n{'=' * 60}")
 print(f"BATCH COMPLETE — {len(volumes)} volumes, {total_p} pages, {total_c} chars, {total_t:.0f}s")
 print(f"Log: {LOG_FILE}")

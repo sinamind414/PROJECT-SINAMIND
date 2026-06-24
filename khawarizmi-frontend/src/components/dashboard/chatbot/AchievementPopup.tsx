@@ -20,8 +20,6 @@ export default function AchievementPopup({ newBadge, onDismiss }: AchievementPop
   const config = BADGE_CONFIG[newBadge] || { emoji: '🏅', label: newBadge, message: 'تهانينا!' };
 
   useEffect(() => {
-    let timeout: ReturnType<typeof setTimeout>;
-
     import('canvas-confetti').then((mod) => {
       const confetti = mod.default;
       confetti({
@@ -32,7 +30,7 @@ export default function AchievementPopup({ newBadge, onDismiss }: AchievementPop
       });
     });
 
-    timeout = setTimeout(() => {
+    const timeout = setTimeout(() => {
       if (!dismissedRef.current) {
         dismissedRef.current = true;
         onDismiss();

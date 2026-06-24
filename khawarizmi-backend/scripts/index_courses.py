@@ -1,13 +1,13 @@
-# -*- coding: utf-8 -*-
 """
 scripts/index_courses.py - Ingests SVT course documents into the PostgreSQL vector database (RAG).
 """
 
+import asyncio
 import os
 import sys
 import uuid
-import asyncio
 from pathlib import Path
+
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import create_async_engine
 
@@ -38,7 +38,7 @@ async def index_chapter(file_path: Path, metadata: dict, engine):
         return
 
     print(f"Reading course: {file_path.name}")
-    with open(file_path, "r", encoding="utf-8") as f:
+    with open(file_path, encoding="utf-8") as f:
         content = f.read()
 
     chunks = chunk_text(content)
@@ -48,12 +48,12 @@ async def index_chapter(file_path: Path, metadata: dict, engine):
     embeddings = embedder.encode(chunks)
 
     async with engine.begin() as conn:
-        for idx, (chunk, emb) in enumerate(zip(chunks, embeddings)):
+        for idx, (chunk, emb) in enumerate(zip(chunks, embeddings, strict=False)):
             chunk_id = uuid.uuid4()
             await conn.execute(
                 text("""
                     INSERT INTO rag_chunks
-                        (id, content, embedding, source, 
+                        (id, content, embedding, source,
                          matiere, chapitre, importance,
                          chunk_index, created_at)
                     VALUES
@@ -70,8 +70,8 @@ async def index_chapter(file_path: Path, metadata: dict, engine):
                     "matiere": metadata["matiere"],
                     "chapitre": metadata["chapitre"],
                     "importance": metadata["importance"],
-                    "chunk_index": idx
-                }
+                    "chunk_index": idx,
+                },
             )
 
     print(f"  SUCCESS: {len(chunks)} chunks indexed.")
@@ -105,25 +105,17 @@ async def main():
             "metadata": {
                 "matiere": "SVT",
                 "chapitre": "Transcription de l'information genetique au niveau de l'ADN",
-                "importance": "critique"
-            }
+                "importance": "critique",
+            },
         },
         {
             "file": "traduction_proteine.txt",
-            "metadata": {
-                "matiere": "SVT",
-                "chapitre": "La traduction",
-                "importance": "critique"
-            }
+            "metadata": {"matiere": "SVT", "chapitre": "La traduction", "importance": "critique"},
         },
         {
             "file": "traduction_proteine.txt",
-            "metadata": {
-                "matiere": "SVT",
-                "chapitre": "Les etapes de la traduction",
-                "importance": "critique"
-            }
-        }
+            "metadata": {"matiere": "SVT", "chapitre": "Les etapes de la traduction", "importance": "critique"},
+        },
     ]
 
     for ch in chapters_to_index:

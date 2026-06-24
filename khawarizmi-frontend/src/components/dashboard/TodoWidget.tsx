@@ -4,12 +4,10 @@ import Link from "next/link"
 import { apiClient } from "@/lib/api-client"
 
 type DueCard = {
-  id: string
-  concept_id: string
-  question_text?: string
+  id?: string
+  recto: string
+  verso: string
   chapitre?: string
-  retrievability?: number
-  due_date?: string
 }
 
 type Todo = {
@@ -28,15 +26,14 @@ export function TodoWidget() {
   useEffect(() => {
     async function fetchDueCards() {
       try {
-        const cards = await apiClient.request<DueCard[]>("/api/flashcards/due")
-        if (cards && cards.length > 0) {
+        const data = await apiClient.getDueCards()
+        const cards = data?.cards || []
+        if (cards.length > 0) {
           setTodos(cards.map((card) => ({
-            title: card.question_text?.slice(0, 40) || card.concept_id,
+            title: card.recto?.slice(0, 40) || card.verso?.slice(0, 40) || "Flashcard",
             detail: card.chapitre || "مراجعة",
             subject: "علم الأحياء",
-            date: card.due_date
-              ? new Date(card.due_date).toLocaleDateString("fr-FR", { day: "numeric", month: "short" })
-              : "aujourd'hui",
+            date: "aujourd'hui",
             done: false,
             cardId: card.id,
           })))

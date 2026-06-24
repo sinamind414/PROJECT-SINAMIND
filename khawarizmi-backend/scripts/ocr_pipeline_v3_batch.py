@@ -17,8 +17,8 @@ import json
 import logging
 import sys
 import time
+from datetime import UTC, datetime
 from pathlib import Path
-from datetime import datetime, timezone
 
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
@@ -48,13 +48,13 @@ PDF_DIRS = {
 
 
 def utc_now_iso() -> str:
-    return datetime.now(timezone.utc).replace(microsecond=0).isoformat()
+    return datetime.now(UTC).replace(microsecond=0).isoformat()
 
 
 def list_all_pdf_volumes() -> list:
     """Liste tous les volumes PDF disponibles avec leur chemin."""
     volumes = []
-    for prefix, pdf_dir in PDF_DIRS.items():
+    for _prefix, pdf_dir in PDF_DIRS.items():
         if not pdf_dir.exists():
             logger.warning("Dossier PDF introuvable : %s", pdf_dir)
             continue
@@ -91,7 +91,7 @@ def get_ocr_page_count(volume_name: str) -> int:
     return len(list(pages_txt_dir.glob("page_*.txt")))
 
 
-def detect_missing_volumes(force: bool = False, volume_filter: list = None) -> list:
+def detect_missing_volumes(force: bool = False, volume_filter: list | None = None) -> list:
     """Detecte les volumes necessitant un OCR."""
     all_pdfs = list_all_pdf_volumes()
     missing = []
@@ -134,6 +134,7 @@ def run_ocr_volume(pdf_path: Path, use_gpu: bool = True, dpi: int = 200) -> dict
     # Export du texte combine
     try:
         from services.ocr.bundle import BundleManager
+
         bundle = BundleManager(pdf_path)
         ocr_txt = bundle.export_combined_txt()
         logger.info("Texte combine exporte : %s", ocr_txt.name)
@@ -149,18 +150,14 @@ def run_ocr_volume(pdf_path: Path, use_gpu: bool = True, dpi: int = 200) -> dict
 
 def main():
     parser = argparse.ArgumentParser(description="OCR Pipeline v3 — Batch GPU")
-    parser.add_argument("--force", action="store_true",
-                        help="Re-OCR tous les volumes meme ceux deja faits")
-    parser.add_argument("--volumes", nargs="*", default=None,
-                        help="Volumes specifiques a traiter (ex: KHELIFA1_VOLUME_09)")
-    parser.add_argument("--dry-run", action="store_true",
-                        help="Lister les volumes sans lancer l'OCR")
-    parser.add_argument("--no-gpu", action="store_true",
-                        help="Utiliser Tesseract CPU au lieu de EasyOCR GPU")
-    parser.add_argument("--dpi", type=int, default=200,
-                        help="DPI de rendu PDF (defaut: 200)")
-    parser.add_argument("--output-report", default=None,
-                        help="Chemin du rapport JSON de fin")
+    parser.add_argument("--force", action="store_true", help="Re-OCR tous les volumes meme ceux deja faits")
+    parser.add_argument(
+        "--volumes", nargs="*", default=None, help="Volumes specifiques a traiter (ex: KHELIFA1_VOLUME_09)"
+    )
+    parser.add_argument("--dry-run", action="store_true", help="Lister les volumes sans lancer l'OCR")
+    parser.add_argument("--no-gpu", action="store_true", help="Utiliser Tesseract CPU au lieu de EasyOCR GPU")
+    parser.add_argument("--dpi", type=int, default=200, help="DPI de rendu PDF (defaut: 200)")
+    parser.add_argument("--output-report", default=None, help="Chemin du rapport JSON de fin")
     args = parser.parse_args()
 
     use_gpu = not args.no_gpu
@@ -191,6 +188,7 @@ def main():
     if use_gpu:
         try:
             import torch
+
             if not torch.cuda.is_available():
                 logger.warning("CUDA non disponible -> fallback Tesseract CPU")
                 use_gpu = False
@@ -223,11 +221,13 @@ def main():
             print(f"  Temps          : {result.get('elapsed_seconds', 0)}s")
         except Exception as e:
             logger.error("Echec OCR %s : %s", pdf_path.name, e)
-            results.append({
-                "volume": pdf_path.stem,
-                "error": str(e),
-                "processed_at": utc_now_iso(),
-            })
+            results.append(
+                {
+                    "volume": pdf_path.stem,
+                    "error": str(e),
+                    "processed_at": utc_now_iso(),
+                }
+            )
 
     total_elapsed = time.perf_counter() - total_start
 

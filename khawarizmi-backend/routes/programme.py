@@ -2,6 +2,7 @@
 """Routes pour le programme officiel."""
 
 import unicodedata
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -23,10 +24,7 @@ def normalize_filiere(filiere: str) -> str:
 
 @router.get("/{matiere}/{filiere}")
 async def get_programme(
-    matiere: str,
-    filiere: str,
-    current_user: dict = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    matiere: str, filiere: str, current_user: dict = Depends(get_current_user), db: AsyncSession = Depends(get_db)
 ):
     """Retourne le programme complet d'une matière/filière."""
 
@@ -65,17 +63,13 @@ async def get_programme(
             )
             ORDER BY d.numero, u.numero, c.numero
         """),
-        {"matiere": matiere, "filiere": filiere}
+        {"matiere": matiere, "filiere": filiere},
     )
 
     rows = result.fetchall()
 
     if not rows:
-        raise HTTPException(
-            status_code=404,
-            detail=f"Aucun programme trouvé pour "
-                   f"{matiere} - {filiere}"
-        )
+        raise HTTPException(status_code=404, detail=f"Aucun programme trouvé pour {matiere} - {filiere}")
 
     # Restructurer en hiérarchie
     domains_map = {}
@@ -89,7 +83,7 @@ async def get_programme(
                 "numero": row.domain_numero,
                 "titre_fr": row.domain_titre_fr,
                 "titre_ar": row.domain_titre_ar,
-                "units": {}
+                "units": {},
             }
 
         if row.unit_id:
@@ -103,19 +97,21 @@ async def get_programme(
                     "titre_fr": row.unit_titre_fr,
                     "titre_ar": row.unit_titre_ar,
                     "page": row.unit_page,
-                    "chapters": []
+                    "chapters": [],
                 }
 
             if row.chapter_id:
-                domain["units"][u_id]["chapters"].append({
-                    "id": str(row.chapter_id),
-                    "numero": row.chapter_numero,
-                    "titre_fr": row.chapter_titre_fr,
-                    "titre_ar": row.chapter_titre_ar,
-                    "page": row.chapter_page,
-                    "type": row.chapter_type,
-                    "importance": row.chapter_importance
-                })
+                domain["units"][u_id]["chapters"].append(
+                    {
+                        "id": str(row.chapter_id),
+                        "numero": row.chapter_numero,
+                        "titre_fr": row.chapter_titre_fr,
+                        "titre_ar": row.chapter_titre_ar,
+                        "page": row.chapter_page,
+                        "type": row.chapter_type,
+                        "importance": row.chapter_importance,
+                    }
+                )
 
     # Convertir units dict en list
     domains = []
@@ -127,20 +123,13 @@ async def get_programme(
         "matiere": matiere,
         "filiere": filiere,
         "domains": domains,
-        "total_chapters": sum(
-            len(u["chapters"])
-            for d in domains
-            for u in d["units"]
-        )
+        "total_chapters": sum(len(u["chapters"]) for d in domains for u in d["units"]),
     }
 
 
 @router.get("/{matiere}/{filiere}/chapters/critical")
 async def get_critical_chapters(
-    matiere: str,
-    filiere: str,
-    current_user: dict = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    matiere: str, filiere: str, current_user: dict = Depends(get_current_user), db: AsyncSession = Depends(get_db)
 ):
     """Retourne uniquement les chapitres critiques."""
 
@@ -166,14 +155,9 @@ async def get_critical_chapters(
             AND c.importance = 'critique'
             ORDER BY d.numero, u.numero, c.numero
         """),
-        {"matiere": matiere, "filiere": filiere}
+        {"matiere": matiere, "filiere": filiere},
     )
 
     chapters = [dict(r._mapping) for r in result.fetchall()]
 
-    return {
-        "matiere": matiere,
-        "filiere": filiere,
-        "critical_chapters": chapters,
-        "total": len(chapters)
-    }
+    return {"matiere": matiere, "filiere": filiere, "critical_chapters": chapters, "total": len(chapters)}
