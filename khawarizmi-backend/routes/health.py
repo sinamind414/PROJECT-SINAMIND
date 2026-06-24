@@ -37,6 +37,9 @@ async def health_check():
         except Exception:
             pass
 
+    now = datetime.now(timezone.utc)
+    backup_info = _check_backup_status()
+
     return {
         "status": "healthy" if (db_ok and redis_ok) else "degraded",
         "version": cfg.VERSION,
@@ -44,8 +47,32 @@ async def health_check():
         "redis": "connected" if redis_ok else "error",
         "ai_model": cfg.AI_MODEL_PRIMARY,
         "fallback_active": not db_ok or not redis_ok,
+        "backup": backup_info,
         "environment": cfg.ENVIRONMENT,
-        "timestamp": datetime.now(timezone.utc).isoformat()
+        "timestamp": now.isoformat()
+    }
+
+
+def _check_backup_status():
+    import os, pathlib
+    backup_dir = pathlib.Path(os.environ.get("BACKUP_DIR", "backups"))
+    if not backup_dir.exists():
+        backup_dir = pathlib.Path(__file__).parent.parent / "backups"
+    if not backup_dir.exists():
+        return {"status": "not_configured", "last_backup": None}
+
+    backups = sorted(backup_dir.glob("*.sql.gz"), key=lambda f: f.stat().st_mtime, reverse=True)
+    if not backups:
+        return {"status": "no_backups", "last_backup": None}
+
+    latest = backups[0]
+    age_hours = (datetime.now(timezone.utc) - datetime.fromtimestamp(latest.stat().st_mtime, tz=timezone.utc)).total_seconds() / 3600
+    return {
+        "status": "ok" if age_hours < 30 else "stale",
+        "last_backup": latest.name,
+        "age_hours": round(age_hours, 1),
+        "count": len(backups),
+        "directory": str(backup_dir.absolute())
     }
 
 

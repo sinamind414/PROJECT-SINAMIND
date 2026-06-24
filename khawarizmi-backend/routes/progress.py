@@ -1,5 +1,5 @@
 import logging
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from typing import Dict, List
 from fastapi import APIRouter, Depends
 from sqlalchemy import text
@@ -76,4 +76,78 @@ async def get_progression(
         "dues_aujourd_hui": dues_auj,
         "prediction_bac":   prediction,
         "concepts":         concepts,
+    }
+
+
+@router.get("/api/week-activity", tags=["Progression"])
+async def get_week_activity(
+    current_user: Dict         = Depends(get_current_user),
+    db:           AsyncSession = Depends(get_db),
+):
+    now = datetime.now(timezone.utc)
+    week_start = now - timedelta(days=now.weekday())
+    week_start = week_start.replace(hour=0, minute=0, second=0, microsecond=0)
+
+    result = await db.execute(
+        text("""
+            SELECT
+                mmc.prochaine_revision as due_date,
+                mmc.reviewed_at
+            FROM mastery_micro_concepts mmc
+            WHERE mmc.user_id = :user_id
+              AND mmc.prochaine_revision >= :week_start
+              AND mmc.prochaine_revision < :week_end
+        """),
+        {
+            "user_id": current_user["id"],
+            "week_start": week_start,
+            "week_end": week_start + timedelta(days=7),
+        }
+    )
+    rows = result.fetchall()
+
+    days = []
+    total_dues = 0
+    total_reviewed = 0
+    for i in range(7):
+        day_date = week_start + timedelta(days=i)
+        day_dues = sum(1 for r in rows if r.due_date and r.due_date.date() == day_date.date())
+        day_reviewed = sum(1 for r in rows if r.reviewed_at and r.reviewed_at.date() == day_date.date())
+        total_dues += day_dues
+        total_reviewed += day_reviewed
+
+        today = now.date()
+        if day_date.date() == today:
+            status = "active"
+        elif day_date.date() < today:
+            status = "done" if day_reviewed >= day_dues else "missed"
+        else:
+            status = "planned"
+
+        load = 0
+        if day_dues > 10:
+            load = 3
+        elif day_dues > 5:
+            load = 2
+        elif day_dues > 0:
+            load = 1
+
+        days.append({
+            "date": day_date.isoformat(),
+            "day_index": i,
+            "dues_count": day_dues,
+            "reviewed_count": day_reviewed,
+            "status": status,
+            "primary_task": None,
+            "primary_chapter": None,
+            "load": load,
+        })
+
+    return {
+        "user_id": current_user["id"],
+        "week_start": week_start.isoformat(),
+        "days": days,
+        "streak_days": total_dues,
+        "total_dues_this_week": total_dues,
+        "total_reviewed_this_week": total_reviewed,
     }

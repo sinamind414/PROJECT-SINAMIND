@@ -1,0 +1,32 @@
+# .ruff.toml — Khawarizmi Pro (Backend Python)
+target-version = "py312"
+line-length = 120
+exclude = ["migrations/versions/*", "__pycache__", ".venv", "node_modules"]
+
+[format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "lf"
+
+[lint]
+select = [
+    "F",    # Pyflakes : erreurs logiques
+    "E",    # Pycodestyle : conventions PEP 8
+    "W",    # Pycodestyle : avertissements
+    "I",    # Isort : ordre des imports
+    "N",    # Naming : conventions de nommage
+    "UP",   # Pyupgrade : modernisation Python 3.12
+    "B",    # Bugbear : bugs potentiels
+    "SIM",  # Simplicité : code simplifiable
+    "C4",   # Compréhension : list/set/dict comprehensions
+    "RUF",  # Règles spécifiques Ruff
+]
+ignore = [
+    "E501",    # ligne trop longue (géré par formateur)
+    "E741",    # noms vague (i, j, k) — acceptable
+    "N802",    # noms fonctions en lower_case — accepté
+    "N803",    # noms arguments en lower_case — accepté
+]
+fixable = ["ALL"]
+unfixable = []
+preview = true

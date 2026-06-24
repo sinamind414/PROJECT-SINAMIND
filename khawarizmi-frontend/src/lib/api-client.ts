@@ -19,7 +19,10 @@ import {
   RegisterPayload,
   User,
   Programme,
-  CriticalChaptersResponse
+  CriticalChaptersResponse,
+  ProgressResponse,
+  OrientationResponse,
+  WeekActivityResponse,
 } from "./types"
 
 const API_BASE_URL = ""
@@ -332,6 +335,20 @@ class KhawarizmiApiClient {
 
   async getAnnale(id: number): Promise<Annale> {
     return this.request<Annale>(`/api/annales/${id}`)
+  }
+
+  // ── Dashboard / Progress ─────────────────────
+
+  async getProgress(): Promise<ProgressResponse> {
+    return this.request<ProgressResponse>("/api/progress")
+  }
+
+  async getOrientation(): Promise<OrientationResponse> {
+    return this.request<OrientationResponse>("/api/orientation")
+  }
+
+  async getWeekActivity(): Promise<WeekActivityResponse> {
+    return this.request<WeekActivityResponse>("/api/week-activity")
   }
 
   // ── Health Check ───────────────────────────────
