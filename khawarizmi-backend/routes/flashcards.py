@@ -247,19 +247,18 @@ async def review_flashcard(
     card = Card()
     now = datetime.now(UTC)
     scheduler = CardScheduler()
-    scheduling_cards = scheduler.repeat(card, now)
-    new_card = scheduling_cards[fsrs_rating].card
+    new_card, _review_log = scheduler.review_card(card, fsrs_rating)
 
     due_date = new_card.due if hasattr(new_card, "due") else now + timedelta(days=1)
-    interval = new_card.scheduled_days if hasattr(new_card, "scheduled_days") else 1
+    interval = getattr(new_card, "scheduled_days", 1) or 1
 
     fsrs_json = json.dumps(
         {
             "stability": new_card.stability,
             "difficulty": new_card.difficulty,
-            "scheduled_days": new_card.scheduled_days,
-            "reps": new_card.reps,
-            "lapses": new_card.lapses,
+            "scheduled_days": getattr(new_card, "scheduled_days", interval),
+            "reps": getattr(new_card, "reps", 0),
+            "lapses": getattr(new_card, "lapses", 0),
             "state": str(new_card.state),
             "last_review": now.isoformat(),
         }
