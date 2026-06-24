@@ -16,7 +16,7 @@ class QuickCheck(BaseModel):
 
 class LessonBlock(BaseModel):
     id: str
-    block_type: Literal["summary", "concept", "analogy", "mistake", "bac_link"]
+    block_type: Literal["summary", "concept", "analogy", "mistake", "bac_link", "content"]
     sort_order: int
     title_ar: str
     body_ar: str

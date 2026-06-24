@@ -519,6 +519,54 @@ CAUSE : next-pwa n'était pas configuré (aucun import, aucune config).
 FIX : `npm uninstall next-pwa` — package mort, 0 impact fonctionnel.
 IMPACT : Résolu — 5 high supprimés du rapport npm audit.
 
+## Bug 7 (NON RÉSOLU) : flashcards/review — Scheduler.repeat inexistant
+
+RUNTIME : `AttributeError: 'Scheduler' object has no attribute 'repeat'`
+CAUSE : Dans `routes/flashcards.py:250`, la méthode `scheduler.repeat(card, now)`
+        n'existe pas sur l'objet `CardScheduler()` (package fsrs). La méthode
+        correcte serait `scheduler.review_card(card, rating)` ou similaire selon
+        la version de la librairie FSRS.
+FICHIER : `khawarizmi-backend/routes/flashcards.py` (ligne 250)
+IMPACT : Élevé — POST /api/flashcards/{card_id}/review retourne 500
+         même sur base non vide.
+NOTE : Découvert pendant les tests d'empty states. Non corrigé car nécessite
+       analyse de l'API exacte de la librairie FSRS utilisée.
+
+## Bug 8 (RÉSOLU) : UUID user_id dans da_fsrs, da_sessions, action_verb_progress
+
+SCHÉMA : Ces 3 tables ont `user_id` en UUID alors que les 8 autres tables
+         utilisent `integer`. JWT retourne un entier → erreur SQL 500.
+FIX : `ALTER COLUMN user_id TYPE integer USING (0)` — exécuté sur la base
+      PostgreSQL le 24/06/2026.
+FICHIERS : `da_fsrs`, `da_sessions`, `action_verb_progress`
+IMPACT : Résolu — correction manuelle en DB, pas de migration Alembic.
+         Si DB recréée, les colonnes seront à nouveau UUID → migration
+         017 nécessaire pour uniformiser.
+
+## Bug 9 (RÉSOLU) : orientation_service — colonne est_due inexistante
+
+RUNTIME : `UndefinedColumnError: column "est_due" does not exist`
+CAUSE : La requête SQL dans `orientation_service.py` sélectionnait
+        `est_due` qui n'est pas une colonne de `action_verb_progress`.
+FIX : Remplacé par calcul Python depuis `prochaine_revision`.
+FICHIER : `khawarizmi-backend/services/orientation_service.py` (ligne 60)
+IMPACT : Résolu — GET /api/orientation retournait 500 sur base vide.
+
+## Bug 10 (RÉSOLU) : block_type Literal manquait 'content'
+
+RUNTIME : Pydantic validation error → 500 sur GET /api/lessons/{slug}
+CAUSE : Le Literal dans `LessonBlock.block_type` n'incluait pas `"content"`
+        qui est utilisé par les données seed.
+FIX : Ajout de `"content"` au Literal.
+FICHIER : `khawarizmi-backend/schemas/lesson.py` (ligne 19)
+IMPACT : Résolu — tous les blocs de type "content" retournaient 500.
+
+SÉCURITÉ : `serialize-javascript ≤7.0.2` (high) via la chaîne
+           next-pwa → workbox-webpack-plugin → serialize-javascript.
+CAUSE : next-pwa n'était pas configuré (aucun import, aucune config).
+FIX : `npm uninstall next-pwa` — package mort, 0 impact fonctionnel.
+IMPACT : Résolu — 5 high supprimés du rapport npm audit.
+
 ##############################################################
 # SECTION 12 — TESTS DE RÉGRESSION OBLIGATOIRES
 ##############################################################
@@ -528,6 +576,8 @@ obligatoires pour détecter des régressions silencieuses :
 
 - test_config_critical.py : Détecte le retour du bug case_sensitive
   (vérifie que les variables UPPER_CASE du .env sont lues)
+- test_empty_states.py : Vérifie qu'aucun endpoint ne retourne 500
+  quand l'utilisateur n'a pas de données (base vide ou vierge)
 
 ##############################################################
 # FIN — AGENTS.md v2.1.0 — IA KHAWARIZMI PRO

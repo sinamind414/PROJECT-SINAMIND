@@ -87,35 +87,15 @@ def upgrade() -> None:
         "ON exercises (is_active, matiere)"
     )
 
-    # ── user_exercise_responses (colonnes additionnelles) ────────────
-    op.add_column(
-        "user_exercise_responses",
-        sa.Column("max_score", sa.Integer(), nullable=True),
-    )
-    op.add_column(
-        "user_exercise_responses",
-        sa.Column("percentage", sa.Float(), nullable=True),
-    )
-    op.add_column(
-        "user_exercise_responses",
-        sa.Column("is_correct", sa.Boolean(), nullable=True),
-    )
-    op.add_column(
-        "user_exercise_responses",
-        sa.Column("evaluation_details", JSONB(), nullable=True),
-    )
-    op.add_column(
-        "user_exercise_responses",
-        sa.Column("time_spent_seconds", sa.Integer(), nullable=True),
-    )
-    op.add_column(
-        "user_exercise_responses",
-        sa.Column("hints_used", sa.Integer(), server_default="0", nullable=False),
-    )
-    op.add_column(
-        "user_exercise_responses",
-        sa.Column("evaluated_at", sa.DateTime(timezone=True), nullable=True),
-    )
+    # ── user_exercise_responses (colonnes additionnelles, IF NOT EXISTS) ──
+    # Certaines colonnes (max_score) existent déjà via 014_create_exercises_tables
+    op.execute("ALTER TABLE user_exercise_responses ADD COLUMN IF NOT EXISTS max_score INTEGER")
+    op.execute("ALTER TABLE user_exercise_responses ADD COLUMN IF NOT EXISTS percentage FLOAT")
+    op.execute("ALTER TABLE user_exercise_responses ADD COLUMN IF NOT EXISTS is_correct BOOLEAN")
+    op.execute("ALTER TABLE user_exercise_responses ADD COLUMN IF NOT EXISTS evaluation_details JSONB")
+    op.execute("ALTER TABLE user_exercise_responses ADD COLUMN IF NOT EXISTS time_spent_seconds INTEGER")
+    op.execute("ALTER TABLE user_exercise_responses ADD COLUMN IF NOT EXISTS hints_used INTEGER DEFAULT 0 NOT NULL")
+    op.execute("ALTER TABLE user_exercise_responses ADD COLUMN IF NOT EXISTS evaluated_at TIMESTAMP WITH TIME ZONE")
 
     # Indexes analytics
     op.execute(
