@@ -519,7 +519,7 @@ CAUSE : next-pwa n'était pas configuré (aucun import, aucune config).
 FIX : `npm uninstall next-pwa` — package mort, 0 impact fonctionnel.
 IMPACT : Résolu — 5 high supprimés du rapport npm audit.
 
-## Bug 7 (NON RÉSOLU) : flashcards/review — Scheduler.repeat inexistant
+## Bug 7 (RÉSOLU) : flashcards/review — Scheduler.repeat inexistant
 
 RUNTIME : `AttributeError: 'Scheduler' object has no attribute 'repeat'`
 CAUSE : Dans `routes/flashcards.py:250`, la méthode `scheduler.repeat(card, now)`
@@ -527,10 +527,11 @@ CAUSE : Dans `routes/flashcards.py:250`, la méthode `scheduler.repeat(card, now
         correcte serait `scheduler.review_card(card, rating)` ou similaire selon
         la version de la librairie FSRS.
 FICHIER : `khawarizmi-backend/routes/flashcards.py` (ligne 250)
-IMPACT : Élevé — POST /api/flashcards/{card_id}/review retourne 500
-         même sur base non vide.
-NOTE : Découvert pendant les tests d'empty states. Non corrigé car nécessite
-       analyse de l'API exacte de la librairie FSRS utilisée.
+IMPACT : Élevé — POST /api/flashcards/{card_id}/review retournait 500.
+FIX : `scheduler.repeat(card, now)` → `scheduler.review_card(card, rating)` retournant
+      un tuple `(Card, ReviewLog)`. Attributs `scheduled_days`, `reps`, `lapses` remplacés
+      par `getattr()` avec fallbacks (absents du Card v4.0).
+STATUT : Résolu le 24/06/2026.
 
 ## Bug 8 (RÉSOLU) : UUID user_id dans da_fsrs, da_sessions, action_verb_progress
 
