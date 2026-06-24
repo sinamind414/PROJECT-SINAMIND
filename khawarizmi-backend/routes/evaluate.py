@@ -322,7 +322,7 @@ async def evaluate(
     # Traduire le feedback si la langue est arabe
     if req.lang == "ar":
         from services.feedback_translator import translate_feedback
-        eval_result["feedback"] = translate_feedback(eval_result.get("feedback", ""))
+        eval_result["feedback"] = translate_feedback(eval_result.get("feedback", ""), lang="ar")
 
     return EvaluateResponse(
         score            = eval_result["score"],

@@ -9,6 +9,33 @@ from datetime import datetime, timezone
 from typing import Dict, Any, List, Optional
 import logging
 
+
+def _topological_sort(concept_ids: list, graph: dict) -> list:
+    """Trier les concepts selon leurs dépendances (Kahn algorithm).
+    graph = {"A": ["B"]} means A must precede B."""
+    in_degree = {c: 0 for c in concept_ids}
+    adjacency = {c: [] for c in concept_ids}
+    for precursor, dependents in graph.items():
+        if precursor not in in_degree:
+            continue
+        for dependent in dependents:
+            if dependent in adjacency:
+                adjacency[precursor].append(dependent)
+                in_degree[dependent] += 1
+    queue = [c for c, d in in_degree.items() if d == 0]
+    result = []
+    while queue:
+        node = queue.pop(0)
+        result.append(node)
+        for neighbor in adjacency.get(node, []):
+            in_degree[neighbor] -= 1
+            if in_degree[neighbor] == 0:
+                queue.append(neighbor)
+    for c in concept_ids:
+        if c not in result:
+            result.append(c)
+    return result
+
 logger = logging.getLogger('khawarizmi.scheduler')
 
 # ═══ COEFFICIENTS BAC ALGÉRIEN ══════════════════════════════
@@ -274,3 +301,92 @@ class KhawarizmiScheduler:
         dues_filtrees.sort(key=lambda x: x['retrievability'])
 
         return dues_filtrees[:limit]
+
+    async def get_due_concepts(self, student_id: int, db: AsyncSession) -> List[Dict[str, Any]]:
+        from sqlalchemy import text
+        from datetime import timedelta
+        now = datetime.now(timezone.utc)
+        target_date = now + timedelta(days=1)
+        query = text("""
+            SELECT concept_id, stability, due_date, state
+            FROM mastery_micro_concepts
+            WHERE user_id = :uid
+              AND due_date <= :target_date
+              AND state IN (1,2,3)
+            ORDER BY due_date ASC, stability ASC
+        """)
+        result = await db.execute(query, {"uid": student_id, "target_date": target_date})
+        rows = result.fetchall()
+        due_concepts = []
+        for row in rows:
+            due_concepts.append({
+                "concept_id": row[0],
+                "stability": row[1] if row[1] is not None else 0.0,
+                "due_date": row[2],
+                "state": row[3]
+            })
+        return due_concepts
+
+    async def select_next_question(self, student_id: int, db: AsyncSession) -> Optional[Dict[str, Any]]:
+        from sqlalchemy import text
+        due_concepts = await self.get_due_concepts(student_id, db)
+        if not due_concepts:
+            query_new = text("""
+                SELECT qcm.question_id, qcm.micro_concept
+                FROM question_concept_map qcm
+                LEFT JOIN mastery_micro_concepts mmc 
+                  ON mmc.concept_id = qcm.micro_concept AND mmc.user_id = :uid
+                WHERE mmc.id IS NULL
+                ORDER BY RANDOM()
+                LIMIT 1
+            """)
+            res_new = await db.execute(query_new, {"uid": student_id})
+            row = res_new.fetchone()
+            if row:
+                return {"question_id": row[0], "concept_id": row[1], "type": "NEW"}
+            query_fallback = text("""
+                SELECT question_id, micro_concept 
+                FROM question_concept_map 
+                ORDER BY RANDOM() 
+                LIMIT 1
+            """)
+            res_fallback = await db.execute(query_fallback)
+            row_fb = res_fallback.fetchone()
+            if row_fb:
+                return {"question_id": row_fb[0], "concept_id": row_fb[1], "type": "NEW_FALLBACK"}
+            return {"question_id": "q_test", "concept_id": "transcription", "type": "DEFAULT"}
+
+        concept_ids = [c["concept_id"] for c in due_concepts]
+        concept_stability = {c["concept_id"]: c["stability"] for c in due_concepts}
+        cids_param = list(concept_ids)
+        query_mappings = text("""
+            SELECT question_id, micro_concept, weight
+            FROM question_concept_map
+            WHERE micro_concept = ANY(:cids)
+        """)
+        res_mappings = await db.execute(query_mappings, {"cids": cids_param})
+        mappings = res_mappings.fetchall()
+        if not mappings:
+            concept_fb = concept_ids[0]
+            return {"question_id": "q_test", "concept_id": concept_fb, "type": "DUE_FALLBACK"}
+            
+        question_scores = {}
+        question_concept_assoc = {}
+        for q_id, concept_id, weight in mappings:
+            stability = concept_stability.get(concept_id, 0.0)
+            inv_stability = 1.0 / max(stability, 0.1)
+            score_contrib = weight * inv_stability
+            if q_id not in question_scores:
+                question_scores[q_id] = 0.0
+                question_concept_assoc[q_id] = concept_id
+            question_scores[q_id] += score_contrib
+            
+        sorted_questions = sorted(question_scores.items(), key=lambda x: x[1], reverse=True)
+        best_q_id, best_score = sorted_questions[0]
+        best_concept_id = question_concept_assoc[best_q_id]
+        return {
+            "question_id": best_q_id,
+            "concept_id": best_concept_id,
+            "score": best_score,
+            "type": "DUE"
+        }

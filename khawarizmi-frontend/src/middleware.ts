@@ -1,42 +1,44 @@
 // src/middleware.ts
-// Protection des routes côté serveur
+// Protection stricte des routes côté serveur
 
 import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
 
-// Routes qui nécessitent une authentification
 const PROTECTED_ROUTES = [
   "/dashboard",
   "/diagnostic",
   "/drill",
   "/feynman",
-  "/scanner"
+  "/scanner",
+  "/exercises",
+  "/mindmap",
+  "/progress"
 ]
 
-// Routes accessibles uniquement si NON connecté
 const AUTH_ROUTES = [
   "/auth/login",
   "/auth/register"
 ]
 
 export function middleware(request: NextRequest) {
-  const token = request.cookies.get("khawarizmi_token")?.value
+  const tokenCookie = request.cookies.get("khawarizmi_token")?.value
   const { pathname } = request.nextUrl
 
-  // Note : le token réel est dans localStorage côté client.
-  // Ce middleware fait une vérification basique côté serveur.
-  // La vraie protection est dans chaque page via useAuth.
+  const isProtected = PROTECTED_ROUTES.some(route => pathname.startsWith(route))
+  const isAuthRoute = AUTH_ROUTES.some(route => pathname.startsWith(route))
 
-  const isProtected = PROTECTED_ROUTES.some(route =>
-    pathname.startsWith(route)
-  )
+  // 1. Visiteur anonyme tentant d'accéder à une page privée -> Redirect Login
+  if (isProtected && !tokenCookie) {
+    const loginUrl = new URL("/auth/login", request.url)
+    loginUrl.searchParams.set("redirect", pathname)
+    return NextResponse.redirect(loginUrl)
+  }
 
-  const isAuthRoute = AUTH_ROUTES.some(route =>
-    pathname.startsWith(route)
-  )
-
-  // Si route protégée et pas de cookie → laisser passer
-  // (la vraie vérification se fera côté client avec useAuth)
+  // 2. Utilisateur connecté tentant d'accéder à Login/Register -> Redirect Dashboard
+  if (isAuthRoute && tokenCookie) {
+    const dashboardUrl = new URL("/dashboard", request.url)
+    return NextResponse.redirect(dashboardUrl)
+  }
 
   return NextResponse.next()
 }
@@ -48,6 +50,9 @@ export const config = {
     "/drill/:path*",
     "/feynman/:path*",
     "/scanner/:path*",
+    "/exercises/:path*",
+    "/mindmap/:path*",
+    "/progress/:path*",
     "/auth/:path*"
   ]
 }

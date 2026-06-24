@@ -1,7 +1,7 @@
 """Tests for topological sort of concept dependencies."""
 
 import pytest
-from services.fsrs_scheduler import _topological_sort
+from services.scheduler import _topological_sort
 
 
 class TestTopologicalSort:

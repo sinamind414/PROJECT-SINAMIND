@@ -55,7 +55,7 @@ BEGIN
 END $$;
 
 -- 4. Index pour la requête "quels concepts réviser aujourd'hui"
-CREATE INDEX IF NOT EXISTS idx_due_user ON mastery_micro_concepts (user_id, due_date) WHERE state IN (1, 2, 3);
+CREATE INDEX IF NOT EXISTS idx_due_user ON mastery_micro_concepts (user_id, due_date);
 
 -- Table du graphe de dépendances (statique, chargée au déploiement)
 CREATE TABLE IF NOT EXISTS concept_prerequisites (

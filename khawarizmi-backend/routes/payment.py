@@ -120,8 +120,6 @@ async def chargily_webhook(
     # 3. Traitement selon le statut
     if status == "paid":
         if not payment_row:
-            # Insérer si absent (par sécurité, bien qu'il devrait exister au moment du checkout)
-            # Récupérer user_id depuis les métadonnées de Chargily si présentes
             metadata = data.get("metadata", {})
             user_id = metadata.get("user_id") if isinstance(metadata, dict) else None
             
@@ -152,9 +150,29 @@ async def chargily_webhook(
                 }
             )
             
-        await db.commit()
-        # Lancement asynchrone de l'activation premium en arrière-plan
-        background_tasks.add_task(activate_premium, checkout_id)
+        # TRANSACTION ATOMIQUE SYNCHRONE (Zéro perte de paiement)
+        try:
+            res = await db.execute(
+                text("SELECT user_id FROM payments WHERE checkout_id = :cid"),
+                {"cid": checkout_id}
+            )
+            row = res.fetchone()
+            target_uid = row[0] if row else None
+
+            if target_uid:
+                await db.execute(
+                    text("UPDATE users SET plan = 'pro' WHERE id = :uid"),
+                    {"uid": target_uid}
+                )
+                await db.commit()
+                logger.info(f"PAIEMENT PRO ATOMIQUE VALIDE | user={target_uid} | checkout={checkout_id}")
+            else:
+                await db.commit()
+                logger.warning(f"PAIEMENT SANS USER ASSOCIE | checkout={checkout_id}")
+        except Exception as e:
+            await db.rollback()
+            logger.error(f"ERREUR CRITIQUE TRANSACTION PAIEMENT: {e}", exc_info=True)
+            raise HTTPException(status_code=500, detail="Database transaction failed")
         
     elif status in ["failed", "canceled"]:
         if payment_row:

@@ -231,8 +231,7 @@ def upgrade() -> None:
     op.create_index("idx_mastery_fsrs_state", "mastery_micro_concepts",
                      [sa.text("fsrs_state")], postgresql_using="gin")
     op.create_index("idx_due_user", "mastery_micro_concepts",
-                     ["user_id", "due_date"],
-                     postgresql_where=sa.text("state IN (1,2,3)"))
+                     ["user_id", "due_date"])
 
     # Materialised view
     op.execute("""

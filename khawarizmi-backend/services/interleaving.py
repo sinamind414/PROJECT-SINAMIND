@@ -92,13 +92,20 @@ class InterleavingSession:
         Returns:
             Dict avec questions mélangées + métriques
         """
-        if matiere not in self.chapitres:
+        matiere_map = {
+            'svt': 'sciences_naturelles',
+            'sciences': 'sciences_naturelles',
+            'maths': 'mathematiques',
+            'physique_chimie': 'physique'
+        }
+        matiere_norm = matiere_map.get(matiere.lower(), matiere)
+        if matiere_norm not in self.chapitres:
             raise ValueError(
                 f"Matière '{matiere}' inconnue. "
                 f"Disponibles : {list(self.chapitres.keys())}"
             )
 
-        chapitres_matiere = self.chapitres[matiere]
+        chapitres_matiere = self.chapitres[matiere_norm]
         questions_par_ch  = max(1, nb_questions // CONFIG['nb_chapitres_session'])
 
         # Sélectionner les chapitres prioritaires

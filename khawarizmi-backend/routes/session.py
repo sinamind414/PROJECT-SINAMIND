@@ -192,10 +192,10 @@ async def get_next_question(
     Retourne la prochaine question optimale basée sur le scoring FSRS
     (poids_concept * 1 / stabilité) pour les concepts dus de l'élève.
     """
-    from services.fsrs_scheduler import select_next_question
+    from services.scheduler import KhawarizmiScheduler
     
-    user_id = current_user["id"]
-    result = await select_next_question(user_id, db)
+    scheduler = KhawarizmiScheduler()
+    result = await scheduler.select_next_question(current_user["id"], db)
     if not result:
         raise HTTPException(status_code=404, detail="Aucune question disponible")
         

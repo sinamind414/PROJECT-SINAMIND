@@ -101,8 +101,11 @@ class KhawarizmiTutor:
 
         # === CONNECTION DES DONNÉES RESTANTES (SVT UNIQUEMENT) ===
         self.programme_sciences = self.programme_canonical
-        self.annales_sciences   = self._charger_json(data_dir, 'annales_sciences_3as.json', optional=True)
-        self.lexique_complet    = self._charger_json(data_dir, 'lexique_svt_terminale_complet.json', optional=True)
+        self.programme_maths    = self._charger_json(data_dir, 'programme_maths_3as.json', optional=True)
+        self.annales_clean      = self._charger_json(data_dir, 'annales_sciences_3as.json', optional=True)
+        self.annales_sciences   = self.annales_clean
+        self.lexique            = self._charger_json(data_dir, 'lexique_svt_terminale_complet.json', optional=True)
+        self.lexique_complet    = self.lexique
         self.methodologie       = self._charger_json(data_dir, 'methodologie_sciences_3as.json', optional=True)
 
         self._index_questions        = self._construire_index()
@@ -184,17 +187,24 @@ class KhawarizmiTutor:
 
     def _construire_index_micro_concepts(self) -> dict:
         index = {}
-        programmes = [self.programme_sciences]
+        programmes = [self.programme_maths, self.programme_sciences]
         for programme in programmes:
             if not programme:
                 continue
-            # Some programmes might be a list directly, or a dict with 'chapitres'
-            chapitres = programme.get('chapitres', []) if isinstance(programme, dict) else programme
-            for chapitre in chapitres:
-                for mc in chapitre.get('micro_concepts', []):
-                    mc_id = mc.get('id')
-                    if mc_id:
-                        index[mc_id] = {'micro_concept': mc, 'chapitre': chapitre}
+            if isinstance(programme, dict) and 'domaines' in programme:
+                for d in programme.get('domaines', []):
+                    for chapitre in d.get('chapitres', []):
+                        for mc in chapitre.get('micro_concepts', []):
+                            mc_id = mc.get('id')
+                            if mc_id:
+                                index[mc_id] = {'micro_concept': mc, 'chapitre': chapitre}
+            else:
+                chapitres = programme.get('chapitres', []) if isinstance(programme, dict) else programme
+                for chapitre in chapitres:
+                    for mc in chapitre.get('micro_concepts', []):
+                        mc_id = mc.get('id')
+                        if mc_id:
+                            index[mc_id] = {'micro_concept': mc, 'chapitre': chapitre}
         logger.info(f"Index MC : {len(index)} micro-concepts")
         return index
 
