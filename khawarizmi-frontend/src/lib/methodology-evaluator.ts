@@ -1,5 +1,4 @@
 import { getActionVerb, type ActionVerbRule } from "@/lib/methodology-v1"
-import { apiClient } from "@/lib/api-client"
 
 export type MethodologyCriterionResult = {
   code: string
@@ -294,56 +293,63 @@ function evaluateGeneric(verb: ActionVerbRule, answer: string): MethodologyEvalu
   return finalizeEvaluation(evaluation)
 }
 
-export async function evaluateMethodologyAnswer(input: EvaluateMethodologyInput): Promise<MethodologyEvaluation> {
+export function evaluateMethodologyAnswer(input: EvaluateMethodologyInput): MethodologyEvaluation {
   try {
-    const result = await apiClient.request<MethodologyEvaluation>("/api/action-verbs/evaluate", {
-      method: "POST",
-      body: JSON.stringify({ verb_slug: input.verbSlug, answer: input.answer }),
-    })
-    if (result && result.verbSlug) return result
-  } catch {
-    // Fallback local
-  }
+    const verb = getActionVerb(input.verbSlug)
+    const answer = input.answer.trim()
 
-  const verb = getActionVerb(input.verbSlug)
-  if (!verb) {
+    if (!verb) {
+      return {
+        verbSlug: input.verbSlug,
+        score: 0,
+        scoreMax: 1,
+        percentage: 0,
+        success: [],
+        errors: ["الفعل الأدائي غير موجود في قاعدة المنهجية."],
+        missingMarkers: [],
+        forbiddenMarkersFound: [],
+        criteria: [],
+        advice: "أضف هذا الفعل إلى قاعدة methodology-v1 قبل محاولة تصحيحه.",
+        allowSecondAttempt: false,
+      }
+    }
+
+    if (!answer) {
+      return {
+        verbSlug: verb.slug,
+        score: 0,
+        scoreMax: verb.scoringRules.reduce((sum, rule) => sum + rule.points, 0) || 1,
+        percentage: 0,
+        success: [],
+        errors: ["الإجابة فارغة."],
+        missingMarkers: verb.requiredMarkers,
+        forbiddenMarkersFound: [],
+        criteria: [],
+        advice: "اكتب إجابة أولا. لا يمكن تصحيح فراغ.",
+        allowSecondAttempt: true,
+      }
+    }
+
+    if (verb.slug === "analyse") return evaluateAnalyse(verb, answer)
+    if (verb.slug === "interpret") return evaluateInterpret(verb, answer)
+    if (verb.slug === "deduce") return evaluateDeduce(verb, answer)
+    if (verb.slug === "hypothesis") return evaluateHypothesis(verb, answer)
+    if (verb.slug === "scientific-text") return evaluateScientificText(verb, answer)
+
+    return evaluateGeneric(verb, answer)
+  } catch {
     return {
       verbSlug: input.verbSlug,
       score: 0,
       scoreMax: 1,
       percentage: 0,
       success: [],
-      errors: ["الفعل الأدائي غير موجود في قاعدة المنهجية."],
+      errors: ["خطأ في التصحيح."],
       missingMarkers: [],
       forbiddenMarkersFound: [],
       criteria: [],
-      advice: "أضف هذا الفعل إلى قاعدة methodology-v1 قبل محاولة تصحيحه.",
-      allowSecondAttempt: false,
-    }
-  }
-
-  const answer = input.answer.trim()
-  if (!answer) {
-    return {
-      verbSlug: verb.slug,
-      score: 0,
-      scoreMax: verb.scoringRules.reduce((sum, rule) => sum + rule.points, 0) || 1,
-      percentage: 0,
-      success: [],
-      errors: ["الإجابة فارغة."],
-      missingMarkers: verb.requiredMarkers,
-      forbiddenMarkersFound: [],
-      criteria: [],
-      advice: "اكتب إجابة أولا. لا يمكن تصحيح فراغ.",
+      advice: "أعد المحاولة.",
       allowSecondAttempt: true,
     }
   }
-
-  if (verb.slug === "analyse") return evaluateAnalyse(verb, answer)
-  if (verb.slug === "interpret") return evaluateInterpret(verb, answer)
-  if (verb.slug === "deduce") return evaluateDeduce(verb, answer)
-  if (verb.slug === "hypothesis") return evaluateHypothesis(verb, answer)
-  if (verb.slug === "scientific-text") return evaluateScientificText(verb, answer)
-
-  return evaluateGeneric(verb, answer)
 }

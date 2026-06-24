@@ -9,6 +9,8 @@ from datetime import datetime, timezone
 from typing import Dict, Any, List, Optional
 import logging
 
+from sqlalchemy.ext.asyncio import AsyncSession
+
 
 def _topological_sort(concept_ids: list, graph: dict) -> list:
     """Trier les concepts selon leurs dépendances (Kahn algorithm).

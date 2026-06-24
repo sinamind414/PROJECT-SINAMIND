@@ -117,15 +117,18 @@ async def chat_socratique(
 
     mc.start("llm")
     try:
-        response = await openai_client.chat.completions.create(
-            model           = cfg.openai_model,
-            messages        = [
+        from services.llm import _call_with_fallback
+
+        response = await _call_with_fallback(
+            messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user",   "content": body.message},
             ],
-            temperature     = cfg.ia_temperature,
-            max_tokens      = cfg.ia_max_tokens,
-            timeout         = 30.0,
+            primary_client=openai_client,
+            primary_model=cfg.openai_model,
+            temperature=cfg.ia_temperature,
+            max_tokens=cfg.ia_max_tokens,
+            timeout=30.0,
         )
 
         raw_content  = response.choices[0].message.content or ""

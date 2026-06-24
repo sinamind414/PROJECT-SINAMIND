@@ -59,8 +59,28 @@ async def lifespan(app: FastAPI):
     if cfg.OPENAI_API_KEY:
         from openai import AsyncOpenAI
         from services.dual_coding import DualCodingService
-        state.openai = AsyncOpenAI(api_key=cfg.OPENAI_API_KEY, base_url=cfg.openai_base_url)
+
+        api_key = cfg.OPENAI_API_KEY
+        base_url = cfg.openai_base_url
+        model = cfg.openai_model
+
+        # Auto-détection Groq : gsk_* prefix
+        if api_key.startswith("gsk_"):
+            base_url = "https://api.groq.com/openai/v1"
+            if not model or model in ("gpt-4o-mini",) or "gpt" in model:
+                model = "llama-3.3-70b-versatile"
+            logger.info(f"IA Provider auto-détecté: Groq ({model})")
+
+        # Auto-détection Gemini : AIza* prefix
+        elif api_key.startswith("AIza"):
+            base_url = "https://generativelanguage.googleapis.com/v1beta/openai/"
+            if not model or "gpt" in model:
+                model = "gemini-2.5-flash"
+            logger.info(f"IA Provider auto-détecté: Gemini ({model})")
+
+        state.openai = AsyncOpenAI(api_key=api_key, base_url=base_url)
         state.dual_coding = DualCodingService(state.openai)
+        logger.info(f"IA initialisée: {base_url} | model={model}")
 
     if cfg.DATABASE_URL:
         try:
