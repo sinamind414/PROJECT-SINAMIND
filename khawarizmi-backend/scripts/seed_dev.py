@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -28,7 +29,15 @@ sys.path.insert(0, str(ROOT))
 
 import asyncpg
 
-DB_DSN = "postgresql://khawarizmi_user:MOT_DE_PASSE_FORT_ICI@localhost:5432/khawarizmi"
+DEFAULT_DB_DSN = "postgresql://khawarizmi_user:MOT_DE_PASSE_FORT_ICI@localhost:5432/khawarizmi"
+
+
+def get_db_dsn() -> str:
+    dsn = os.environ.get("DATABASE_URL", DEFAULT_DB_DSN)
+    return (
+        dsn.replace("postgresql+asyncpg://", "postgresql://", 1)
+        .replace("postgres+asyncpg://", "postgresql://", 1)
+    )
 
 DATA_FILES = {
     "action_verbs": ROOT / "data" / "action_verbs_seed.json",
@@ -223,7 +232,7 @@ async def seed_bac_blanc(conn: asyncpg.Connection) -> int:
 
 
 async def main(force: bool = False) -> None:
-    conn = await asyncpg.connect(DB_DSN)
+    conn = await asyncpg.connect(get_db_dsn())
 
     print("=" * 60)
     print("  SEED DEV — Khawarizmi Pro")
