@@ -17,18 +17,40 @@ import {
   LogOut,
   Flame,
   Microscope,
+  Network,
+  Repeat,
 } from "lucide-react"
 
-const MENU = [
+type MenuItem = { href: string; icon: typeof LayoutDashboard; labelAr: string }
+type Separator = { type: "sep"; label: string }
+type MenuEntry = MenuItem | Separator
+
+const MENU: MenuEntry[] = [
+  // PHASE 1 — التعلّم
+  { type: "sep", label: "التعلّم" },
   { href: "/dashboard", icon: LayoutDashboard, labelAr: "لوحة التحكم" },
   { href: "/cours", icon: BookOpen, labelAr: "الدروس النشطة" },
-  { href: "/diagnostic", icon: ListChecks, labelAr: "التشخيص" },
-  { href: "/annales", icon: BookMarked, labelAr: "مواضيع البكالوريا" },
+  { href: "/mindmap", icon: Network, labelAr: "الخريطة الذهنية" },
+
+  // PHASE 2 — التدريب
+  { type: "sep", label: "التدريب" },
+  { href: "/simulation", icon: Microscope, labelAr: "محاكاة تفاعلية" },
+  { href: "/exercises", icon: Dumbbell, labelAr: "التمارين" },
+  { href: "/retry-errors", icon: AlertTriangle, labelAr: "إصلاح الأخطاء" },
+  { href: "/drill", icon: Repeat, labelAr: "مراجعة سريعة" },
+
+  // PHASE 3 — المنهجية
+  { type: "sep", label: "المنهجية" },
   { href: "/action-verbs", icon: Zap, labelAr: "أفعال الأداء" },
   { href: "/document-analysis", icon: Search, labelAr: "استغلال الوثائق" },
-  { href: "/simulation", icon: Microscope, labelAr: "محاكاة تفاعلية" },
-  { href: "/retry-errors", icon: AlertTriangle, labelAr: "إصلاح الأخطاء" },
-  { href: "/exercises", icon: Dumbbell, labelAr: "التمارين" },
+
+  // PHASE 4 — التقييم
+  { type: "sep", label: "التقييم" },
+  { href: "/diagnostic", icon: ListChecks, labelAr: "التشخيص" },
+  { href: "/annales", icon: BookMarked, labelAr: "مواضيع البكالوريا" },
+
+  // PHASE 5 — المتابعة
+  { type: "sep", label: "المتابعة" },
   { href: "/progress", icon: TrendingUp, labelAr: "التقدم" },
 ]
 
@@ -72,23 +94,34 @@ export function Sidebar() {
       {/* Nav */}
       <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-1">
         {MENU.map((item, i) => {
-          const Icon = item.icon
-          const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`)
+          if ("type" in item && item.type === "sep") {
+            return (
+              <div key={`sep-${item.label}`} className="pt-3 pb-1 px-1">
+                <span className="text-[10px] font-black tracking-wider text-mint/40 uppercase">
+                  {item.label}
+                </span>
+              </div>
+            )
+          }
+
+          const entry = item as MenuItem
+          const Icon = entry.icon
+          const isActive = pathname === entry.href || pathname.startsWith(`${entry.href}/`)
           return (
             <motion.div
-              key={item.href}
+              key={entry.href}
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.05 * i }}
+              transition={{ delay: 0.03 * i }}
             >
               <Link
-                href={item.href}
-                className={`w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-bold transition-all group ${isActive ? 'bg-mint/15 border border-mint/40 text-mint' : 'text-slate-300 hover:bg-white/5 hover:text-mint-soft border border-transparent'}`}
+                href={entry.href}
+                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-bold transition-all group ${isActive ? 'bg-mint/15 border border-mint/40 text-mint' : 'text-slate-300 hover:bg-white/5 hover:text-mint-soft border border-transparent'}`}
               >
                 <span className={`w-9 h-9 rounded-lg flex items-center justify-center transition-all ${isActive ? 'bg-mint/20 text-mint shadow-md shadow-mint/20' : 'bg-white/5 text-slate-400 group-hover:text-mint'}`}>
                   <Icon className="w-4.5 h-4.5" strokeWidth={2.2} />
                 </span>
-                <span className="flex-1 text-right">{item.labelAr}</span>
+                <span className="flex-1 text-right">{entry.labelAr}</span>
                 {isActive && <span className="w-1.5 h-1.5 rounded-full bg-mint pulse-glow" />}
               </Link>
             </motion.div>
