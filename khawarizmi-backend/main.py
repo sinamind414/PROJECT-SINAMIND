@@ -137,6 +137,7 @@ from routes import (
     mindmap,
     payment,
     programme,
+    progress,
     session,
     videos,
 )
@@ -153,6 +154,7 @@ routers = [
     session.router,
     payment.router,
     programme.router,
+    progress.router,
     lexique.router,
     videos.router,
     annales.router,
