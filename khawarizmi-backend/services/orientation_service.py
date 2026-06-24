@@ -56,7 +56,7 @@ async def calculer_orientation(
     # ── 2. Action verbs faibles ──
     av_result = await db.execute(
         text("""
-            SELECT verb_slug, last_score, attempts, est_due
+            SELECT verb_slug, last_score, attempts, prochaine_revision
             FROM action_verb_progress
             WHERE user_id = :uid
         """),
@@ -66,7 +66,7 @@ async def calculer_orientation(
     total_av_dues = 0
     for r in av_result.fetchall():
         m = r._mapping
-        is_due = m.get("est_due", False)
+        is_due = m["prochaine_revision"] is None or m["prochaine_revision"] <= now
         if is_due:
             total_av_dues += 1
         if (m["last_score"] or 0) < WEAK_SCORE_THRESHOLD:
