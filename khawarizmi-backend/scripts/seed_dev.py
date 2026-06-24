@@ -55,10 +55,7 @@ async def table_count(conn: asyncpg.Connection, table: str) -> int:
 
 async def seed_action_verbs(conn: asyncpg.Connection) -> int:
     data = load_json(DATA_FILES["action_verbs"])
-    if isinstance(data, dict):
-        verbs = data.get("action_verbs", [])
-    else:
-        verbs = data
+    verbs = data.get("action_verbs", []) if isinstance(data, dict) else data
     inserted = 0
     for v in verbs:
         slug = v["slug"]
@@ -80,8 +77,14 @@ async def seed_action_verbs(conn: asyncpg.Connection) -> int:
                  $12,$13,
                  $14,$15,$16)
             """,
-            slug, v["ar"], v["fr"], v.get("category", "general"), v.get("priority", "medium"),
-            v.get("definition_ar", ""), v.get("objective_ar", ""), v.get("formula_ar", ""),
+            slug,
+            v["ar"],
+            v["fr"],
+            v.get("category", "general"),
+            v.get("priority", "medium"),
+            v.get("definition_ar", ""),
+            v.get("objective_ar", ""),
+            v.get("formula_ar", ""),
             json.dumps(v.get("steps", []), ensure_ascii=False),
             json.dumps(v.get("required_markers", []), ensure_ascii=False),
             json.dumps(v.get("forbidden_markers", []), ensure_ascii=False),
@@ -111,7 +114,10 @@ async def seed_doc_analysis(conn: asyncpg.Connection) -> tuple[int, int]:
             VALUES ($1,$2,$3,$4,$5,$6)
             RETURNING id
             """,
-            slug, unit_key, sc["title_ar"], sc.get("subtitle_ar", ""),
+            slug,
+            unit_key,
+            sc["title_ar"],
+            sc.get("subtitle_ar", ""),
             sc.get("context_ar", ""),
             json.dumps(sc.get("dominant_skills", []), ensure_ascii=False),
         )
@@ -124,10 +130,16 @@ async def seed_doc_analysis(conn: asyncpg.Connection) -> tuple[int, int]:
                      doc_ref, prompt_ar, placeholder_ar, model_answer_ar, learning_focus_ar)
                 VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)
                 """,
-                sc_id, q["verb_slug"], q.get("level", 1), q.get("n", 0),
-                q.get("title_ar", ""), q.get("skill_ar", ""),
-                q.get("doc_ref", ""), q.get("prompt_ar", ""),
-                q.get("placeholder_ar", ""), q.get("model_answer_ar", ""),
+                sc_id,
+                q["verb_slug"],
+                q.get("level", 1),
+                q.get("n", 0),
+                q.get("title_ar", ""),
+                q.get("skill_ar", ""),
+                q.get("doc_ref", ""),
+                q.get("prompt_ar", ""),
+                q.get("placeholder_ar", ""),
+                q.get("model_answer_ar", ""),
                 q.get("learning_focus_ar", ""),
             )
             questions_ok += 1
@@ -136,10 +148,7 @@ async def seed_doc_analysis(conn: asyncpg.Connection) -> tuple[int, int]:
 
 async def seed_lessons(conn: asyncpg.Connection) -> int:
     data = load_json(DATA_FILES["lessons"])
-    if isinstance(data, list):
-        blocks = data
-    else:
-        blocks = data.get("lesson_blocks", data.get("lessons", []))
+    blocks = data if isinstance(data, list) else data.get("lesson_blocks", data.get("lessons", []))
     inserted = 0
     for blk in blocks:
         chapter_slug = blk.get("chapter_slug", blk.get("chapitre_slug", ""))
@@ -151,7 +160,9 @@ async def seed_lessons(conn: asyncpg.Connection) -> int:
         quick_check = json.dumps(blk.get("quick_check", blk.get("verification_rapide", {})), ensure_ascii=False)
         exists = await conn.fetchval(
             "SELECT 1 FROM lesson_blocks WHERE chapter_slug = $1 AND sort_order = $2 AND block_type = $3",
-            chapter_slug, sort_order, block_type,
+            chapter_slug,
+            sort_order,
+            block_type,
         )
         if exists:
             continue
@@ -161,7 +172,13 @@ async def seed_lessons(conn: asyncpg.Connection) -> int:
                 (chapter_slug, block_type, sort_order, title_ar, body_ar, visual_hint, quick_check)
             VALUES ($1,$2,$3,$4,$5,$6,$7)
             """,
-            chapter_slug, block_type, sort_order, title_ar, body_ar, visual_hint, quick_check,
+            chapter_slug,
+            block_type,
+            sort_order,
+            title_ar,
+            body_ar,
+            visual_hint,
+            quick_check,
         )
         inserted += 1
     return inserted
@@ -169,10 +186,7 @@ async def seed_lessons(conn: asyncpg.Connection) -> int:
 
 async def seed_bac_blanc(conn: asyncpg.Connection) -> int:
     data = load_json(DATA_FILES["bac_blanc"])
-    if isinstance(data, dict):
-        subjects = data.get("bac_subjects", data.get("subjects", []))
-    else:
-        subjects = data
+    subjects = data.get("bac_subjects", data.get("subjects", [])) if isinstance(data, dict) else data
     inserted = 0
     for subj in subjects:
         annale_slug = subj.get("annale_slug", subj.get("slug", ""))
@@ -183,7 +197,8 @@ async def seed_bac_blanc(conn: asyncpg.Connection) -> int:
         exercises = json.dumps(subj.get("exercises", subj.get("exercices", [])), ensure_ascii=False)
         exists = await conn.fetchval(
             "SELECT 1 FROM bac_subjects WHERE annale_slug = $1 AND subject_number = $2",
-            annale_slug, subject_number,
+            annale_slug,
+            subject_number,
         )
         if exists:
             continue
@@ -193,7 +208,12 @@ async def seed_bac_blanc(conn: asyncpg.Connection) -> int:
                 (annale_slug, subject_number, title_ar, themes_ar, estimated_minutes, exercises)
             VALUES ($1,$2,$3,$4,$5,$6)
             """,
-            annale_slug, subject_number, title_ar, themes_ar, estimated_minutes, exercises,
+            annale_slug,
+            subject_number,
+            title_ar,
+            themes_ar,
+            estimated_minutes,
+            exercises,
         )
         inserted += 1
     return inserted
@@ -233,6 +253,7 @@ async def main(force: bool = False) -> None:
     # 5. Programme SVT (via import_programme.py logique)
     print("  [5/5] Programme SVT…")
     from scripts.import_programme import import_programme
+
     programmes_dir = ROOT / "data" / "programmes"
     for fpath in sorted(programmes_dir.glob("*.json")):
         await import_programme(fpath)

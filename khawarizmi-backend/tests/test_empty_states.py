@@ -58,10 +58,11 @@ async def empty_user_headers(client: AsyncClient) -> dict:
         # ("POST", "/flashcards/00000000-0000-0000-0000-000000000000/review", {"rating": 3}),
     ],
 )
-async def test_endpoint_not_500(method: str, path: str, body: dict | None, client: AsyncClient, empty_user_headers: dict):
+async def test_endpoint_not_500(
+    method: str, path: str, body: dict | None, client: AsyncClient, empty_user_headers: dict
+):
     """Vérifie qu'un endpoint ne retourne PAS 500 (même sur base vide)."""
     response = await client.request(method, f"{BASE}{path}", json=body, headers=empty_user_headers)
     assert response.status_code != 500, (
-        f"{method} {path} a retourné 500 sur donn ées vides. "
-        f"Body: {response.text[:200]}"
+        f"{method} {path} a retourné 500 sur donn ées vides. Body: {response.text[:200]}"
     )
