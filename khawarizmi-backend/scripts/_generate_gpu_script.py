@@ -317,6 +317,10 @@ if __name__ == "__main__":
     main()
 '''
 
-with open(r'C:\Users\zakaria\Documents\PROJET KHAWARIZMI IA\khawarizmi-backend\scripts\gpu_batch_ocr.py', 'w', encoding='utf-8') as f:
+with open(
+    r"C:\Users\zakaria\Documents\PROJET KHAWARIZMI IA\khawarizmi-backend\scripts\gpu_batch_ocr.py",
+    "w",
+    encoding="utf-8",
+) as f:
     f.write(content)
-print('Script created:', len(content), 'bytes')
+print("Script created:", len(content), "bytes")

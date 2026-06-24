@@ -45,6 +45,9 @@ khawarizmi-backend/models/*
 *.log
 logs/
 
+# Patches (artefacts temporaires)
+*.patch
+
 
 # Archive sinamind
 ARCHIVE_SINAMIND/

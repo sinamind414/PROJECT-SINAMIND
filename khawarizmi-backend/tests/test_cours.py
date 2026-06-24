@@ -9,8 +9,8 @@ Endpoints testés :
 
 import pytest
 
-
 # ── /api/cours/list ──────────────────────────────────────────────────
+
 
 @pytest.mark.asyncio
 async def test_list_chapitres_requires_auth(client):
@@ -42,6 +42,7 @@ async def test_list_chapitres_contains_core_topics(client, auth_headers):
 
 
 # ── /api/cours/{chapitre_title} ──────────────────────────────────────
+
 
 @pytest.mark.asyncio
 async def test_get_cours_endpoint_accessible(client):

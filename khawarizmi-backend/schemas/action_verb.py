@@ -1,4 +1,5 @@
-from typing import Optional, List, Literal
+from typing import Literal
+
 from pydantic import BaseModel, Field
 
 
@@ -36,15 +37,15 @@ class ActionVerbDetail(BaseModel):
     priority: str
     definition_ar: str
     objective_ar: str
-    formula_ar: Optional[str] = None
-    steps: List[MethodologyStep] = []
-    required_markers: List[str] = []
-    forbidden_markers: List[str] = []
-    common_errors: List[str] = []
-    scoring_rules: List[ScoringRule] = []
-    bad_example: Optional[VerbExample] = None
-    good_example: Optional[VerbExample] = None
-    feedback_template_ar: Optional[str] = None
+    formula_ar: str | None = None
+    steps: list[MethodologyStep] = []
+    required_markers: list[str] = []
+    forbidden_markers: list[str] = []
+    common_errors: list[str] = []
+    scoring_rules: list[ScoringRule] = []
+    bad_example: VerbExample | None = None
+    good_example: VerbExample | None = None
+    feedback_template_ar: str | None = None
 
 
 class ActionVerbExercise(BaseModel):
@@ -52,15 +53,15 @@ class ActionVerbExercise(BaseModel):
     verb_slug: str
     type: Literal["identification", "application", "bac_style"] = "application"
     question_ar: str
-    context_ar: Optional[str] = None
-    model_answer_ar: Optional[str] = None
+    context_ar: str | None = None
+    model_answer_ar: str | None = None
     difficulty: int = Field(default=3, ge=1, le=5)
 
 
 class EvaluateRequest(BaseModel):
     verb_slug: str
     answer: str = Field(..., min_length=1)
-    exercise_id: Optional[str] = None
+    exercise_id: str | None = None
 
 
 class EvaluateResponse(BaseModel):
@@ -68,18 +69,18 @@ class EvaluateResponse(BaseModel):
     score: int
     score_max: int
     percentage: int
-    success: List[str] = []
-    errors: List[str] = []
-    missing_markers: List[str] = []
-    forbidden_found: List[str] = []
+    success: list[str] = []
+    errors: list[str] = []
+    missing_markers: list[str] = []
+    forbidden_found: list[str] = []
     advice: str = ""
-    dominant_error_code: Optional[str] = None
+    dominant_error_code: str | None = None
     allow_second_attempt: bool = True
 
 
 class VerbReviewRequest(BaseModel):
     rating: Literal[1, 2, 3, 4]
-    score_percentage: Optional[int] = Field(default=None, ge=0, le=100)
+    score_percentage: int | None = Field(default=None, ge=0, le=100)
 
 
 class VerbProgressItem(BaseModel):
@@ -89,7 +90,7 @@ class VerbProgressItem(BaseModel):
     last_score: int
     attempts: int
     est_due: bool
-    prochaine_revision: Optional[str] = None
+    prochaine_revision: str | None = None
     interval_jours: float
 
 
@@ -97,4 +98,4 @@ class VerbProgressResponse(BaseModel):
     user_id: str
     nb_verbs: int
     dues_aujourd_hui: int
-    verbs: List[VerbProgressItem] = []
+    verbs: list[VerbProgressItem] = []

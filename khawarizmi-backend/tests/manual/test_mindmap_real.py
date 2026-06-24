@@ -3,11 +3,12 @@
 # Usage : python tests/manual/test_mindmap_real.py
 # Nécessite : backend sur localhost:8000, utilisateur demo-mindmap@khawarizmi.dz
 
-import urllib.request
-import urllib.error
 import json
 import sys
-sys.stdout.reconfigure(encoding='utf-8')
+import urllib.error
+import urllib.request
+
+sys.stdout.reconfigure(encoding="utf-8")
 
 print("=" * 60)
 print("VALIDATION CHAINE COMPLETE — KHAWARIZMI PRO")
@@ -15,15 +16,10 @@ print("=" * 60)
 
 # Étape 1 — Login
 print("\n[1/3] Login...")
-login_data = json.dumps({
-    "email": "demo-mindmap@khawarizmi.dz",
-    "password": "Demo1234!"
-}).encode("utf-8")
+login_data = json.dumps({"email": "demo-mindmap@khawarizmi.dz", "password": "Demo1234!"}).encode("utf-8")
 
 req = urllib.request.Request(
-    "http://localhost:8000/api/auth/login",
-    data=login_data,
-    headers={"Content-Type": "application/json"}
+    "http://localhost:8000/api/auth/login", data=login_data, headers={"Content-Type": "application/json"}
 )
 
 try:
@@ -37,20 +33,19 @@ except Exception as e:
 
 # Étape 2 — Génération Mind Map
 print("\n[2/3] Generation Mind Map (Transcription ADN)...")
-mindmap_data = json.dumps({
-    "matiere": "SVT",
-    "chapitre": "Transcription de l'information genetique au niveau de l'ADN",
-    "filiere": "Sciences Experimentales",
-    "niveau_detail": "standard"
-}).encode("utf-8")
+mindmap_data = json.dumps(
+    {
+        "matiere": "SVT",
+        "chapitre": "Transcription de l'information genetique au niveau de l'ADN",
+        "filiere": "Sciences Experimentales",
+        "niveau_detail": "standard",
+    }
+).encode("utf-8")
 
 req = urllib.request.Request(
     "http://localhost:8000/api/mindmap/generate",
     data=mindmap_data,
-    headers={
-        "Content-Type": "application/json",
-        "Authorization": f"Bearer {token}"
-    }
+    headers={"Content-Type": "application/json", "Authorization": f"Bearer {token}"},
 )
 
 try:
@@ -89,14 +84,8 @@ else:
 
 # Vérification présence de vrais termes scientifiques
 contenu_str = json.dumps(mindmap).lower()
-termes_attendus = [
-    "polymerase", "promoteur", "initiation",
-    "elongation", "transcription", "arn", "adn"
-]
-termes_trouves = [
-    t for t in termes_attendus
-    if t in contenu_str
-]
+termes_attendus = ["polymerase", "promoteur", "initiation", "elongation", "transcription", "arn", "adn"]
+termes_trouves = [t for t in termes_attendus if t in contenu_str]
 
 print(f"\n  Termes scientifiques trouves: {len(termes_trouves)}/{len(termes_attendus)}")
 for t in termes_trouves:

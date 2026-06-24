@@ -10,23 +10,22 @@ Pipeline :
 """
 
 import logging
-from typing import Dict, List, Optional
 
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from services.chat_classifier import classify
 from services.chat_prompt import (
-    build_socratique_prompt,
     build_explication_prompt,
     build_feedback_prompt,
     build_motivation_prompt,
+    build_socratique_prompt,
 )
-from services.orientation_service import calculer_orientation
-from services.semantic_cache import get_semantic_cache, set_semantic_cache
 from services.metrics import MetricsCollector, record_request
+from services.orientation_service import calculer_orientation
+from services.remediation import build_due_concept_question, get_due_concept_for_question
 from services.reranker import rerank
-from services.remediation import get_due_concept_for_question, build_due_concept_question
+from services.semantic_cache import get_semantic_cache, set_semantic_cache
 
 logger = logging.getLogger("khawarizmi.chat")
 
@@ -36,11 +35,11 @@ CACHEABLE_TYPES = {"sos_concept", "explication", "socratique", "feedback"}
 
 async def handle_tuteur(
     message: str,
-    context: Dict,
+    context: dict,
     user_id: str,
     db: AsyncSession,
     openai_client=None,
-) -> Dict:
+) -> dict:
     """Pipeline complet du tuteur contextuel.
 
     Args:
@@ -124,7 +123,9 @@ async def handle_tuteur(
             msg = orientation["message"] + "\n\n" + due_push["reponse"]
             cartes = cartes + due_push["cartes"]
             mc.set("due_concept_pushed", due_concept["concept_id"])
-            logger.info(f"Tuteur | Lien 1 FSRS push: concept={due_concept['concept_id']} stability={due_concept['stability']}")
+            logger.info(
+                f"Tuteur | Lien 1 FSRS push: concept={due_concept['concept_id']} stability={due_concept['stability']}"
+            )
             return {
                 "reponse": greeting + msg,
                 "type": "orientation_with_due_push",
@@ -283,7 +284,8 @@ async def handle_tuteur(
 
 # ── Helpers ────────────────────────────────────────
 
-def _build_cartes_from_orientation(orientation: Dict) -> List[Dict]:
+
+def _build_cartes_from_orientation(orientation: dict) -> list[dict]:
     """Convertit les recommandations d'orientation en cartes cliquables."""
     cartes = []
     bouton_map = {
@@ -296,12 +298,14 @@ def _build_cartes_from_orientation(orientation: Dict) -> List[Dict]:
     }
 
     for rec in orientation.get("recommendations", []):
-        cartes.append({
-            "titre": rec.get("chapitre_ar") or rec.get("raison", "مهمة"),
-            "raison": rec.get("raison", ""),
-            "action": rec.get("action", "#"),
-            "bouton": bouton_map.get(rec.get("type", "cours"), "ابدأ"),
-        })
+        cartes.append(
+            {
+                "titre": rec.get("chapitre_ar") or rec.get("raison", "مهمة"),
+                "raison": rec.get("raison", ""),
+                "action": rec.get("action", "#"),
+                "bouton": bouton_map.get(rec.get("type", "cours"), "ابدأ"),
+            }
+        )
 
     return cartes
 
@@ -309,8 +313,8 @@ def _build_cartes_from_orientation(orientation: Dict) -> List[Dict]:
 async def _rag_search(
     db: AsyncSession,
     message: str,
-    chapitre: Optional[str],
-) -> List[Dict]:
+    chapitre: str | None,
+) -> list[dict]:
     """Recherche RAG dans pgvector + re-ranking hybride.
 
     Pipeline :
@@ -323,6 +327,7 @@ async def _rag_search(
 
     try:
         from services.embedder import embedder
+
         query_vector = embedder.encode([message])[0]
         query_emb = str(query_vector.tolist())
     except Exception as e:
@@ -379,13 +384,14 @@ def _dummy_embedding() -> str:
     return "[" + ",".join(["0"] * 384) + "]"
 
 
-async def _call_gemini(prompt: str, openai_client=None) -> Optional[str]:
+async def _call_gemini(prompt: str, openai_client=None) -> str | None:
     """Appelle Gemini via OpenAI client. Retourne None si échec."""
     if not openai_client:
         return None
 
     try:
         from config import get_settings
+
         cfg = get_settings()
 
         response = await openai_client.chat.completions.create(
@@ -404,18 +410,20 @@ async def _call_gemini(prompt: str, openai_client=None) -> Optional[str]:
         return None
 
 
-def _fallback_motivation(orientation: Dict) -> str:
+def _fallback_motivation(orientation: dict) -> str:
     """Fallback motivation sans IA."""
     prediction = orientation.get("prediction_bac", "N/A")
     dues = orientation.get("dues_aujourd_hui", {})
     fc_dues = dues.get("flashcards", 0)
 
     if prediction != "N/A" and prediction is not None:
-        return f"طبيعي تشعر بالضغط. توقعك الحالي: {prediction}/100. عندك {fc_dues} بطاقة لمراجعة اليوم. نبدأ بواحدة فقط؟"
+        return (
+            f"طبيعي تشعر بالضغط. توقعك الحالي: {prediction}/100. عندك {fc_dues} بطاقة لمراجعة اليوم. نبدأ بواحدة فقط؟"
+        )
     return f"طبيعي تشعر بالضغط. عندك {fc_dues} بطاقة لمراجعة اليوم. نبدأ بواحدة فقط؟"
 
 
-def _fallback_socratique(message: str, rag_chunks: List[Dict]) -> str:
+def _fallback_socratique(message: str, rag_chunks: list[dict]) -> str:
     """Fallback socratique sans IA."""
     if rag_chunks:
         content = rag_chunks[0]["content"][:200]
@@ -423,7 +431,7 @@ def _fallback_socratique(message: str, rag_chunks: List[Dict]) -> str:
     return "سؤال مهم! حاول ربطه بما درسته في الدرس. ما هي المعلومات التي تذكرها حول هذا الموضوع؟"
 
 
-def _extract_flashcard_suggestions(rag_chunks: List[Dict]) -> List[str]:
+def _extract_flashcard_suggestions(rag_chunks: list[dict]) -> list[str]:
     """Extrait des suggestions de flashcards depuis le RAG."""
     if not rag_chunks:
         return []

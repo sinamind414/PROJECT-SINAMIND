@@ -45,12 +45,12 @@ function buildPriorityFixes(evaluations: DiagnosticResult["evaluations"]) {
   return Array.from(new Set(fixes)).slice(0, 4)
 }
 
-function buildDiagnosticResult(answers: Record<string, string>): DiagnosticResult {
-  const evaluations = QUESTIONS.map((question) => ({
+async function buildDiagnosticResult(answers: Record<string, string>): Promise<DiagnosticResult> {
+  const evaluations = await Promise.all(QUESTIONS.map(async (question) => ({
     question,
     answer: answers[question.id] || "",
-    evaluation: evaluateMethodologyAnswer({ verbSlug: question.verbSlug, answer: answers[question.id] || "" }),
-  }))
+    evaluation: await evaluateMethodologyAnswer({ verbSlug: question.verbSlug, answer: answers[question.id] || "" }),
+  })))
 
   const readiness = Math.round(evaluations.reduce((sum, item) => sum + item.evaluation.percentage, 0) / evaluations.length)
   const weak = evaluations.filter((item) => item.evaluation.percentage < 60)
@@ -167,8 +167,8 @@ export default function DiagnosticGlobalPage() {
     setSaved(false)
   }
 
-  function submitDiagnostic() {
-    const next = buildDiagnosticResult(answers)
+  async function submitDiagnostic() {
+    const next = await buildDiagnosticResult(answers)
     setResult(next)
     saveMethodologyEvaluations(next.evaluations.map((item) => ({
       source: "diagnostic",

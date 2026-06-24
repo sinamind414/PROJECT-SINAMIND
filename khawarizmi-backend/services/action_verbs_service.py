@@ -4,46 +4,44 @@ Port de methodology-evaluator.ts côté backend.
 """
 
 import re
-from typing import Dict, List, Optional
-
 
 # ── Normalisation arabe ───────────────────────────
 
-_ARABIC_DIACRITICS = re.compile(r'[\u064B-\u0652\u0670\u0640]')
-_ALEF_VARIANTS = {'أ': 'ا', 'إ': 'ا', 'آ': 'ا', 'ٱ': 'ا'}
-_TA_MARBUTA = re.compile(r'ة')
+_ARABIC_DIACRITICS = re.compile(r"[\u064B-\u0652\u0670\u0640]")
+_ALEF_VARIANTS = {"أ": "ا", "إ": "ا", "آ": "ا", "ٱ": "ا"}
+_TA_MARBUTA = re.compile(r"ة")
 
 
 def normalize_arabic(text: str) -> str:
     """Normalise le texte arabe : supprime diacritiques, unifie alef, ta-marbuta→ha."""
     if not text:
         return ""
-    t = _ARABIC_DIACRITICS.sub('', text)
+    t = _ARABIC_DIACRITICS.sub("", text)
     for variant, canonical in _ALEF_VARIANTS.items():
         t = t.replace(variant, canonical)
-    t = _TA_MARBUTA.sub('ه', t)
+    t = _TA_MARBUTA.sub("ه", t)
     t = t.lower().strip()
     return t
 
 
-def includes_any(text: str, markers: List[str]) -> bool:
+def includes_any(text: str, markers: list[str]) -> bool:
     """Vérifie si au moins un marqueur est présent dans le texte normalisé."""
     norm = normalize_arabic(text)
     return any(normalize_arabic(m) in norm for m in markers)
 
 
-def found_markers(text: str, markers: List[str]) -> List[str]:
+def found_markers(text: str, markers: list[str]) -> list[str]:
     """Retourne les marqueurs présents dans le texte."""
     norm = normalize_arabic(text)
     return [m for m in markers if normalize_arabic(m) in norm]
 
 
 def has_number(text: str) -> bool:
-    return bool(re.search(r'[0-9\u0660-\u0669]', text))
+    return bool(re.search(r"[0-9\u0660-\u0669]", text))
 
 
 def has_question_mark(text: str) -> bool:
-    return '؟' in text or '?' in text
+    return "؟" in text or "?" in text
 
 
 # ── Marqueurs par verbe ───────────────────────────
@@ -58,10 +56,11 @@ RELATION_MARKERS = ["كلما", "العلاقة", "طردية", "عكسية", "�
 
 # ── Évaluation ────────────────────────────────────
 
+
 def evaluate_answer(
-    verb: Dict,
+    verb: dict,
     answer: str,
-) -> Dict:
+) -> dict:
     """Évalue la réponse d'un élève pour un verbe donné.
 
     Args:
@@ -95,8 +94,8 @@ def evaluate_answer(
 
     score = 0
     score_max = 0
-    success: List[str] = []
-    errors: List[str] = []
+    success: list[str] = []
+    errors: list[str] = []
 
     for rule in scoring_rules:
         points = rule.get("points", 0)
@@ -151,17 +150,17 @@ def evaluate_answer(
     }
 
 
-def _compute_score_max(verb: Dict) -> int:
+def _compute_score_max(verb: dict) -> int:
     rules = verb.get("scoring_rules", [])
     return sum(r.get("points", 0) for r in rules) or 1
 
 
 def _compute_dominant_error(
-    verb: Dict,
-    missing: List[str],
-    forbidden_found: List[str],
+    verb: dict,
+    missing: list[str],
+    forbidden_found: list[str],
     answer: str,
-) -> Optional[str]:
+) -> str | None:
     slug = verb["slug"]
 
     if forbidden_found and slug == "analyse":
@@ -184,9 +183,9 @@ def _compute_dominant_error(
 
 
 def _build_advice(
-    verb: Dict,
-    missing: List[str],
-    forbidden_found: List[str],
+    verb: dict,
+    missing: list[str],
+    forbidden_found: list[str],
     percentage: int,
 ) -> str:
     template = verb.get("feedback_template_ar", "")
@@ -195,7 +194,7 @@ def _build_advice(
     if percentage >= 85:
         return f"أحسنت! إجابتك تتوافق مع منهجية فعل «{verb.get('ar', slug)}». واصل التدريب على أفعال أخرى."
 
-    parts: List[str] = []
+    parts: list[str] = []
     if missing:
         parts.append(f"أضف الكلمات المفتاحية الناقصة: {', '.join(missing[:3])}")
     if forbidden_found:
@@ -207,6 +206,7 @@ def _build_advice(
 
 
 # ── Conversion score → rating FSRS ────────────────
+
 
 def score_to_fsrs_rating(percentage: int) -> int:
     """Convertit un pourcentage en rating FSRS (1-4)."""

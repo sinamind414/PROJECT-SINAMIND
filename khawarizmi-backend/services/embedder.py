@@ -1,17 +1,17 @@
-# -*- coding: utf-8 -*-
 """
 services/embedder.py - Service d'embeddings ultra-léger (pure ONNX + Tokenizers, sans PyTorch).
 """
 
-import os
 import logging
+import os
 import zipfile
+
 import numpy as np
-from typing import List
 import onnxruntime as ort
 from tokenizers import Tokenizer
 
 logger = logging.getLogger("khawarizmi.embedder")
+
 
 class KhawarizmiEmbedder:
     """
@@ -19,38 +19,38 @@ class KhawarizmiEmbedder:
     sans aucune dépendance à PyTorch, Optimum ou Transformers.
     Ultra-léger en mémoire (< 30 MB) et rapide pour le CPU de production.
     """
-    
+
     def __init__(self):
         # Résoudre le chemin absolu du modèle ONNX
         model_path = os.getenv("ONNX_MODEL_PATH", "models/minilm_onnx_int8")
         if not os.path.isabs(model_path):
             base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
             model_path = os.path.join(base_dir, model_path)
-            
+
         logger.info(f"Initialisation de l'embedder ONNX à : {model_path}")
-        
+
         # Décompresser le modèle zip s'il n'existe pas en tant qu'onnx
         onnx_file = os.path.join(model_path, "model_quantized.onnx")
         zip_file = os.path.join(model_path, "model_quantized.zip")
         if not os.path.exists(onnx_file) and os.path.exists(zip_file):
             logger.info(f"Décompression du modèle ONNX depuis {zip_file}...")
             try:
-                with zipfile.ZipFile(zip_file, 'r') as zip_ref:
+                with zipfile.ZipFile(zip_file, "r") as zip_ref:
                     zip_ref.extractall(model_path)
                 logger.info("Décompression terminée.")
             except Exception as e:
                 logger.error(f"Erreur décompression ONNX: {e}")
-                
+
         # 1. Charger le tokenizer via Hugging Face Tokenizers (Rust/C++ bindings)
         tokenizer_file = os.path.join(model_path, "tokenizer.json")
         self.tokenizer = Tokenizer.from_file(tokenizer_file)
         self.tokenizer.enable_truncation(max_length=128)
         self.tokenizer.enable_padding(direction="right", pad_id=0, pad_type_id=0, pad_token="[PAD]")
-        
+
         # 2. Lancer la session ONNX Runtime de manière résiliente
         self.session = None
         self._fallback_mode = False
-        
+
         if os.path.exists(onnx_file):
             try:
                 sess_options = ort.SessionOptions()
@@ -64,11 +64,11 @@ class KhawarizmiEmbedder:
         else:
             logger.warning(f"Fichier ONNX manquant ({onnx_file}). Activation du mode Fallback déterministe TF-IDF.")
             self._fallback_mode = True
-        
-    def encode(self, texts: List[str]) -> np.ndarray:
+
+    def encode(self, texts: list[str]) -> np.ndarray:
         if not texts:
             return np.empty((0, 384), dtype=np.float32)
-            
+
         if self._fallback_mode or self.session is None:
             dim = 384
             res = []
@@ -81,38 +81,36 @@ class KhawarizmiEmbedder:
 
         # Tokenisation
         encodings = self.tokenizer.encode_batch(texts)
-        
+
         # Préparer les inputs pour l'infrerence ONNX en int64 (numpy)
         input_ids = np.array([e.ids for e in encodings], dtype=np.int64)
         attention_mask = np.array([e.attention_mask for e in encodings], dtype=np.int64)
         token_type_ids = np.array([e.type_ids for e in encodings], dtype=np.int64)
-        
-        inputs = {
-            "input_ids": input_ids,
-            "attention_mask": attention_mask,
-            "token_type_ids": token_type_ids
-        }
-        
+
+        inputs = {"input_ids": input_ids, "attention_mask": attention_mask, "token_type_ids": token_type_ids}
+
         # Executer le modèle ONNX
         outputs = self.session.run(None, inputs)
         last_hidden_state = outputs[0]  # Shape: (batch_size, seq_len, 384)
-        
+
         # Mean Pooling en NumPy
         input_mask_expanded = np.expand_dims(attention_mask, axis=-1).astype(float)
         sum_embeddings = np.sum(last_hidden_state * input_mask_expanded, axis=1)
         sum_mask = np.sum(input_mask_expanded, axis=1)
         sum_mask = np.clip(sum_mask, 1e-9, None)
         embeddings = sum_embeddings / sum_mask
-        
+
         # Normalisation L2 en NumPy
         norms = np.linalg.norm(embeddings, axis=1, keepdims=True)
         norms = np.clip(norms, 1e-9, None)
         embeddings = embeddings / norms
-        
+
         return embeddings
+
 
 # Lazy singleton
 _embedder_instance = None
+
 
 def get_embedder() -> "KhawarizmiEmbedder":
     global _embedder_instance
@@ -120,9 +118,10 @@ def get_embedder() -> "KhawarizmiEmbedder":
         _embedder_instance = KhawarizmiEmbedder()
     return _embedder_instance
 
+
 class _LazyEmbedder:
     def encode(self, texts):
         return get_embedder().encode(texts)
 
-embedder = _LazyEmbedder()
 
+embedder = _LazyEmbedder()

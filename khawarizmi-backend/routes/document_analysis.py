@@ -6,27 +6,27 @@ avec évaluation regex + répétition espacée FSRS.
 
 import json
 import logging
-from datetime import datetime, timezone, timedelta
-from typing import Dict, List
+from datetime import UTC, datetime, timedelta
 
 from fastapi import APIRouter, Depends, HTTPException
+from fsrs import Card
+from fsrs import Rating as FsrsRating
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from database import get_db
 from deps import get_current_user, get_scheduler
 from schemas.document_analysis import (
-    EvaluateRequest,
-    EvaluateResponse,
     AnswerEvaluation,
-    DaReviewRequest,
     DaFsrsItem,
     DaProgressResponse,
-    WeakSpotsResponse,
+    DaReviewRequest,
+    EvaluateRequest,
+    EvaluateResponse,
     WeakSpot,
+    WeakSpotsResponse,
 )
 from services.document_analysis_service import evaluate_answer, score_to_fsrs_rating
-from fsrs import Card, Rating as FsrsRating
 
 logger = logging.getLogger("khawarizmi.api")
 router = APIRouter(prefix="/api/document-analysis", tags=["Document Analysis"])
@@ -34,9 +34,10 @@ router = APIRouter(prefix="/api/document-analysis", tags=["Document Analysis"])
 
 # ── 1. GET /api/document-analysis/scenarios — liste ──
 
+
 @router.get("/scenarios")
 async def lister_scenarios(
-    current_user: Dict = Depends(get_current_user),
+    current_user: dict = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
     """Retourne la liste de tous les scénarios d'analyse de documents."""
@@ -52,18 +53,16 @@ async def lister_scenarios(
         """)
     )
     rows = result.fetchall()
-    return [
-        {**dict(r._mapping), "id": str(r._mapping["id"])}
-        for r in rows
-    ]
+    return [{**dict(r._mapping), "id": str(r._mapping["id"])} for r in rows]
 
 
 # ── 2. GET /api/document-analysis/scenarios/{slug} — détail ──
 
+
 @router.get("/scenarios/{slug}")
 async def detail_scenario(
     slug: str,
-    current_user: Dict = Depends(get_current_user),
+    current_user: dict = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
     """Retourne un scénario complet avec documents et questions (SANS model answers)."""
@@ -137,10 +136,11 @@ async def detail_scenario(
 
 # ── 3. POST /api/document-analysis/evaluate — évaluer ──
 
+
 @router.post("/evaluate", response_model=EvaluateResponse)
 async def evaluer_reponses(
     body: EvaluateRequest,
-    current_user: Dict = Depends(get_current_user),
+    current_user: dict = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
     """Évalue les réponses d'un élève pour un scénario donné."""
@@ -168,7 +168,7 @@ async def evaluer_reponses(
     )
     session_id = session_result.fetchone()._mapping["id"]
 
-    evaluations: List[AnswerEvaluation] = []
+    evaluations: list[AnswerEvaluation] = []
     total_score = 0
     fsrs_count = 0
 
@@ -263,10 +263,11 @@ async def evaluer_reponses(
 
 # ── 4. GET /api/document-analysis/scenarios/{slug}/correction ──
 
+
 @router.get("/scenarios/{slug}/correction")
 async def correction_scenario(
     slug: str,
-    current_user: Dict = Depends(get_current_user),
+    current_user: dict = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
     """Retourne les model answers d'un scénario (après évaluation)."""
@@ -310,9 +311,10 @@ async def correction_scenario(
 
 # ── 5. GET /api/document-analysis/progress — progression FSRS ──
 
+
 @router.get("/progress", response_model=DaProgressResponse)
 async def progression_da(
-    current_user: Dict = Depends(get_current_user),
+    current_user: dict = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
     """Retourne la progression FSRS de l'élève sur l'analyse de documents."""
@@ -328,29 +330,30 @@ async def progression_da(
     )
     rows = result.fetchall()
 
-    now = datetime.now(timezone.utc)
-    skills: List[DaFsrsItem] = []
+    now = datetime.now(UTC)
+    skills: list[DaFsrsItem] = []
     dues = 0
 
     for r in rows:
         m = r._mapping
-        est_due = (
-            m["prochaine_revision"] is not None
-            and m["prochaine_revision"] <= now
-        ) or m["prochaine_revision"] is None
+        est_due = (m["prochaine_revision"] is not None and m["prochaine_revision"] <= now) or m[
+            "prochaine_revision"
+        ] is None
         if est_due:
             dues += 1
-        skills.append(DaFsrsItem(
-            verb_slug=m["verb_slug"],
-            chapter_slug=m["chapter_slug"],
-            stability=m["stability"] or 0.0,
-            difficulty=m["difficulty"] or 0.0,
-            last_score=m["last_score"] or 0,
-            attempts=m["attempts"] or 0,
-            est_due=est_due,
-            prochaine_revision=m["prochaine_revision"].isoformat() if m["prochaine_revision"] else None,
-            interval_jours=m["interval_jours"] or 0.0,
-        ))
+        skills.append(
+            DaFsrsItem(
+                verb_slug=m["verb_slug"],
+                chapter_slug=m["chapter_slug"],
+                stability=m["stability"] or 0.0,
+                difficulty=m["difficulty"] or 0.0,
+                last_score=m["last_score"] or 0,
+                attempts=m["attempts"] or 0,
+                est_due=est_due,
+                prochaine_revision=m["prochaine_revision"].isoformat() if m["prochaine_revision"] else None,
+                interval_jours=m["interval_jours"] or 0.0,
+            )
+        )
 
     return DaProgressResponse(
         user_id=str(current_user["id"]),
@@ -362,10 +365,11 @@ async def progression_da(
 
 # ── 6. POST /api/document-analysis/review — révision FSRS ──
 
+
 @router.post("/review")
 async def reviser_da(
     body: DaReviewRequest,
-    current_user: Dict = Depends(get_current_user),
+    current_user: dict = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
     """Marque une révision FSRS pour un verbe×chapitre et programme la prochaine."""
@@ -402,18 +406,20 @@ async def reviser_da(
     fsrs_rating = FsrsRating(rating)
     new_card = scheduler.review_card(card, fsrs_rating)
 
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     next_review = now + timedelta(days=new_card.scheduled_days)
 
-    fsrs_json = json.dumps({
-        "stability": new_card.stability,
-        "difficulty": new_card.difficulty,
-        "scheduled_days": new_card.scheduled_days,
-        "reps": new_card.reps,
-        "lapses": new_card.lapses,
-        "state": str(new_card.state),
-        "last_review": now.isoformat(),
-    })
+    fsrs_json = json.dumps(
+        {
+            "stability": new_card.stability,
+            "difficulty": new_card.difficulty,
+            "scheduled_days": new_card.scheduled_days,
+            "reps": new_card.reps,
+            "lapses": new_card.lapses,
+            "state": str(new_card.state),
+            "last_review": now.isoformat(),
+        }
+    )
 
     await db.execute(
         text("""
@@ -466,13 +472,14 @@ async def reviser_da(
 
 # ── 7. GET /api/document-analysis/weak-spots — faiblesses ──
 
+
 @router.get("/weak-spots", response_model=WeakSpotsResponse)
 async def faiblesses_da(
-    current_user: Dict = Depends(get_current_user),
+    current_user: dict = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
     """Retourne les faiblesses de l'élève (compétences dues + scores faibles)."""
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     result = await db.execute(
         text("""
             SELECT verb_slug, chapter_slug, last_score, attempts,
@@ -490,17 +497,18 @@ async def faiblesses_da(
     weak_spots = []
     for r in rows:
         m = r._mapping
-        est_due = (
-            m["prochaine_revision"] is not None
-            and m["prochaine_revision"] <= now
-        ) or m["prochaine_revision"] is None
-        weak_spots.append(WeakSpot(
-            verb_slug=m["verb_slug"],
-            chapter_slug=m["chapter_slug"],
-            last_score=m["last_score"] or 0,
-            attempts=m["attempts"] or 0,
-            est_due=est_due,
-        ))
+        est_due = (m["prochaine_revision"] is not None and m["prochaine_revision"] <= now) or m[
+            "prochaine_revision"
+        ] is None
+        weak_spots.append(
+            WeakSpot(
+                verb_slug=m["verb_slug"],
+                chapter_slug=m["chapter_slug"],
+                last_score=m["last_score"] or 0,
+                attempts=m["attempts"] or 0,
+                est_due=est_due,
+            )
+        )
 
     return WeakSpotsResponse(
         user_id=str(current_user["id"]),
@@ -510,6 +518,7 @@ async def faiblesses_da(
 
 
 # ── Helper : update FSRS après évaluation ─────────
+
 
 async def _update_fsrs(
     db: AsyncSession,

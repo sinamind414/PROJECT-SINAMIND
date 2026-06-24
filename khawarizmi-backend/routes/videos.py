@@ -2,6 +2,7 @@
 
 import json
 from pathlib import Path
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -13,22 +14,15 @@ router = APIRouter(prefix="/api/videos", tags=["Videos"])
 
 
 @router.get("/all")
-async def get_all_videos(
-    current_user: dict = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
-):
-    result = await db.execute(
-        text("SELECT * FROM videos ORDER BY chapitre, id")
-    )
+async def get_all_videos(current_user: dict = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
+    result = await db.execute(text("SELECT * FROM videos ORDER BY chapitre, id"))
     rows = result.fetchall()
     return [dict(r._mapping) for r in rows]
 
 
 @router.get("/by-chapter/{chapitre}")
 async def get_videos_by_chapter(
-    chapitre: str,
-    current_user: dict = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    chapitre: str, current_user: dict = Depends(get_current_user), db: AsyncSession = Depends(get_db)
 ):
     result = await db.execute(
         text("""
@@ -37,22 +31,20 @@ async def get_videos_by_chapter(
             ORDER BY id
             LIMIT 10
         """),
-        {"pattern": f"%{chapitre}%"}
+        {"pattern": f"%{chapitre}%"},
     )
     rows = result.fetchall()
     return [dict(r._mapping) for r in rows]
 
 
 @router.post("/seed")
-async def seed_videos(
-    db: AsyncSession = Depends(get_db)
-):
+async def seed_videos(db: AsyncSession = Depends(get_db)):
     seed_path = Path(__file__).parent.parent / "data" / "videos_seed.json"
 
     if not seed_path.exists():
         raise HTTPException(404, "Fichier seed introuvable")
 
-    with open(seed_path, "r", encoding="utf-8") as f:
+    with open(seed_path, encoding="utf-8") as f:
         videos = json.load(f)
 
     count = 0
@@ -62,7 +54,7 @@ async def seed_videos(
                 INSERT INTO videos (youtube_id, titre, chaine, duree, chapitre, description)
                 VALUES (:youtube_id, :titre, :chaine, :duree, :chapitre, :description)
             """),
-            video
+            video,
         )
         count += 1
 

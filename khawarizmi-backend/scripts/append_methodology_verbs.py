@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 append_methodology_verbs.py
 ───────────────────────────
@@ -192,9 +191,9 @@ def build_term(slug: str, verb: dict, seed: dict | None, next_id: int) -> dict:
 
     # Enrichir avec les données seed si disponibles
     if seed:
-        term["exemples_contexte"] = [
-            seed.get("good_example", {}).get("answerAr", "")
-        ] if seed.get("good_example") else []
+        term["exemples_contexte"] = (
+            [seed.get("good_example", {}).get("answerAr", "")] if seed.get("good_example") else []
+        )
         term["definition_ar"] = seed.get("definition_ar", verb["definition_ar"])
 
     return term
@@ -244,9 +243,7 @@ def main():
 
     lexique["domaines"].append(domain)
     lexique["metadata"]["total_entrees"] = sum(
-        len(cat["termes"])
-        for dom in lexique["domaines"]
-        for cat in dom["categories"]
+        len(cat["termes"]) for dom in lexique["domaines"] for cat in dom["categories"]
     )
 
     # Sauvegarder

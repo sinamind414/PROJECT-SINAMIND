@@ -39,7 +39,6 @@ import sys
 import tempfile
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from pathlib import Path
-from typing import List, Optional, Tuple
 
 import cv2
 import numpy as np
@@ -67,16 +66,12 @@ def check_requirements() -> None:
         log.error("Tesseract introuvable dans le PATH. Installez-le : choco install tesseract")
         sys.exit(1)
 
-    result = subprocess.run(
-        [tesseract_cmd, "--list-langs"],
-        capture_output=True, text=True
-    )
+    result = subprocess.run([tesseract_cmd, "--list-langs"], capture_output=True, text=True)
     installed = result.stdout + result.stderr
     missing = [lang for lang in ("ara", "fra") if lang not in installed]
     if missing:
         log.error(
-            "Langues Tesseract manquantes : %s\n"
-            "  Telechargez : https://github.com/tesseract-ocr/tessdata/raw/main/%s",
+            "Langues Tesseract manquantes : %s\n  Telechargez : https://github.com/tesseract-ocr/tessdata/raw/main/%s",
             missing,
             ".traineddata / ".join(f"{l}.traineddata" for l in missing),
         )
@@ -90,8 +85,7 @@ def _deskew(image: np.ndarray) -> np.ndarray:
     """Corrige l'inclinaison du scan via la transformée de Hough."""
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY) if image.ndim == 3 else image
     edges = cv2.Canny(gray, 50, 150, apertureSize=3)
-    lines = cv2.HoughLinesP(edges, 1, np.pi / 180, threshold=100,
-                             minLineLength=100, maxLineGap=10)
+    lines = cv2.HoughLinesP(edges, 1, np.pi / 180, threshold=100, minLineLength=100, maxLineGap=10)
     if lines is None:
         return image
 
@@ -110,9 +104,7 @@ def _deskew(image: np.ndarray) -> np.ndarray:
 
     h, w = image.shape[:2]
     M = cv2.getRotationMatrix2D((w / 2, h / 2), median_angle, 1.0)
-    return cv2.warpAffine(image, M, (w, h),
-                          flags=cv2.INTER_LINEAR,
-                          borderMode=cv2.BORDER_REPLICATE)
+    return cv2.warpAffine(image, M, (w, h), flags=cv2.INTER_LINEAR, borderMode=cv2.BORDER_REPLICATE)
 
 
 def preprocess_image(img_array: np.ndarray) -> np.ndarray:
@@ -122,15 +114,13 @@ def preprocess_image(img_array: np.ndarray) -> np.ndarray:
     """
     img = _deskew(img_array)
 
-    if img.ndim == 3:
-        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    else:
-        gray = img
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY) if img.ndim == 3 else img
 
     denoised = cv2.fastNlMeansDenoising(gray, h=10, templateWindowSize=7, searchWindowSize=21)
 
     binary = cv2.adaptiveThreshold(
-        denoised, 255,
+        denoised,
+        255,
         cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
         cv2.THRESH_BINARY,
         blockSize=31,
@@ -146,7 +136,7 @@ def preprocess_image(img_array: np.ndarray) -> np.ndarray:
 # ---------------------------------------------------------------------------
 # OCR d'une page (worker)
 # ---------------------------------------------------------------------------
-def _ocr_single(args: Tuple) -> Tuple[int, str, Optional[str]]:
+def _ocr_single(args: tuple) -> tuple[int, str, str | None]:
     page_no, img_array, psm, oem, timeout = args
     error = None
     text = ""
@@ -165,12 +155,19 @@ def _ocr_single(args: Tuple) -> Tuple[int, str, Optional[str]]:
 
         result = subprocess.run(
             [
-                tesseract_cmd, tmp_path, "-",
-                "-l", "ara+fra",
-                "--psm", str(psm),
-                "--oem", str(oem),
-                "-c", "preserve_interword_spaces=1",
-                "-c", "textord_arabic_right_to_left=1",
+                tesseract_cmd,
+                tmp_path,
+                "-",
+                "-l",
+                "ara+fra",
+                "--psm",
+                str(psm),
+                "--oem",
+                str(oem),
+                "-c",
+                "preserve_interword_spaces=1",
+                "-c",
+                "textord_arabic_right_to_left=1",
             ],
             capture_output=True,
             text=True,
@@ -211,14 +208,11 @@ def _already_done_pages(out_path: Path) -> set:
 IMAGE_EXTENSIONS = {".png", ".jpg", ".jpeg", ".tiff", ".tif", ".bmp", ".webp"}
 
 
-def _load_pages(source: Path, dpi: int, start: int, end: Optional[int]) -> List[Tuple[int, np.ndarray]]:
+def _load_pages(source: Path, dpi: int, start: int, end: int | None) -> list[tuple[int, np.ndarray]]:
     pages = []
 
     if source.is_dir():
-        files = sorted(
-            f for f in source.iterdir()
-            if f.suffix.lower() in IMAGE_EXTENSIONS
-        )
+        files = sorted(f for f in source.iterdir() if f.suffix.lower() in IMAGE_EXTENSIONS)
         for idx, f in enumerate(files, start=1):
             img = cv2.imread(str(f))
             if img is not None:
@@ -238,16 +232,14 @@ def _load_pages(source: Path, dpi: int, start: int, end: Optional[int]) -> List[
 
         with fitz.open(str(source)) as doc:
             total = doc.page_count
-            _end = min(end, total) if end else total
-            _start = max(1, start)
+            end_ = min(end, total) if end else total
+            start_ = max(1, start)
 
             mat = fitz.Matrix(dpi / 72, dpi / 72)
-            for page_no in range(_start, _end + 1):
+            for page_no in range(start_, end_ + 1):
                 page = doc[page_no - 1]
                 pix = page.get_pixmap(matrix=mat, alpha=False)
-                img_array = np.frombuffer(pix.samples, dtype=np.uint8).reshape(
-                    pix.height, pix.width, pix.n
-                )
+                img_array = np.frombuffer(pix.samples, dtype=np.uint8).reshape(pix.height, pix.width, pix.n)
                 if pix.n == 4:
                     img_array = cv2.cvtColor(img_array, cv2.COLOR_RGBA2BGR)
                 elif pix.n == 1:
@@ -266,13 +258,13 @@ def ocr_pipeline(
     source: str,
     dpi: int = 300,
     start: int = 1,
-    end: Optional[int] = None,
+    end: int | None = None,
     timeout: int = 120,
     psm: int = 3,
     oem: int = 1,
     workers: int = 2,
     resume: bool = False,
-    out_dir: Optional[str] = None,
+    out_dir: str | None = None,
     suffix: str = ".ocr.txt",
 ) -> str:
     src = Path(source)
@@ -300,13 +292,12 @@ def ocr_pipeline(
         log.info("Toutes les pages sont déjà traitées. Rien à faire.")
         return str(out_path)
 
-    log.info("%d pages à traiter (workers=%d, DPI=%d, OEM=%d, PSM=%d)",
-             len(pages_to_do), workers, dpi, oem, psm)
+    log.info("%d pages à traiter (workers=%d, DPI=%d, OEM=%d, PSM=%d)", len(pages_to_do), workers, dpi, oem, psm)
 
     worker_args = [(pno, img, psm, oem, timeout) for pno, img in pages_to_do]
 
     results: dict = {}
-    errors_summary: List[Tuple[int, str]] = []
+    errors_summary: list[tuple[int, str]] = []
 
     with ProcessPoolExecutor(max_workers=workers) as executor:
         futures = {executor.submit(_ocr_single, arg): arg[0] for arg in worker_args}
@@ -317,9 +308,14 @@ def ocr_pipeline(
                 errors_summary.append((page_no, error))
             total_pages = len(pages_to_do)
             done_count = len(results)
-            log.info("Page %d traitée [%d/%d] — %d chars%s",
-                     page_no, done_count, total_pages, len(text),
-                     " ⚠️ ERREUR" if error else "")
+            log.info(
+                "Page %d traitée [%d/%d] — %d chars%s",
+                page_no,
+                done_count,
+                total_pages,
+                len(text),
+                " ⚠️ ERREUR" if error else "",
+            )
 
     sep = "=" * 70
     new_blocks = []
@@ -352,31 +348,18 @@ def ocr_pipeline(
 # Entrée CLI
 # ---------------------------------------------------------------------------
 if __name__ == "__main__":
-    ap = argparse.ArgumentParser(
-        description="OCR arabe+français — PDF, images, dossiers"
-    )
-    ap.add_argument("source",
-                    help="PDF, image (PNG/JPG/TIFF/BMP/WEBP) ou dossier d'images")
-    ap.add_argument("--dpi",     type=int, default=300,
-                    help="Résolution de rendu PDF (défaut: 300)")
-    ap.add_argument("--start",   type=int, default=1,
-                    help="Première page PDF (défaut: 1)")
-    ap.add_argument("--end",     type=int, default=None,
-                    help="Dernière page PDF (défaut: fin du document)")
-    ap.add_argument("--timeout", type=int, default=120,
-                    help="Timeout Tesseract par page en secondes (défaut: 120)")
-    ap.add_argument("--psm",     type=int, default=3,
-                    help="Page Segmentation Mode Tesseract (défaut: 3)")
-    ap.add_argument("--oem",     type=int, default=1,
-                    help="OCR Engine Mode (défaut: 1=LSTM)")
-    ap.add_argument("--workers", type=int, default=2,
-                    help="Nombre de workers parallèles (défaut: 2)")
-    ap.add_argument("--resume",  action="store_true",
-                    help="Reprendre : ignorer les pages déjà traitées")
-    ap.add_argument("--out-dir", default=None,
-                    help="Dossier de sortie (défaut: même dossier que la source)")
-    ap.add_argument("--suffix",  default=".ocr.txt",
-                    help="Extension du fichier de sortie (défaut: .ocr.txt)")
+    ap = argparse.ArgumentParser(description="OCR arabe+français — PDF, images, dossiers")
+    ap.add_argument("source", help="PDF, image (PNG/JPG/TIFF/BMP/WEBP) ou dossier d'images")
+    ap.add_argument("--dpi", type=int, default=300, help="Résolution de rendu PDF (défaut: 300)")
+    ap.add_argument("--start", type=int, default=1, help="Première page PDF (défaut: 1)")
+    ap.add_argument("--end", type=int, default=None, help="Dernière page PDF (défaut: fin du document)")
+    ap.add_argument("--timeout", type=int, default=120, help="Timeout Tesseract par page en secondes (défaut: 120)")
+    ap.add_argument("--psm", type=int, default=3, help="Page Segmentation Mode Tesseract (défaut: 3)")
+    ap.add_argument("--oem", type=int, default=1, help="OCR Engine Mode (défaut: 1=LSTM)")
+    ap.add_argument("--workers", type=int, default=2, help="Nombre de workers parallèles (défaut: 2)")
+    ap.add_argument("--resume", action="store_true", help="Reprendre : ignorer les pages déjà traitées")
+    ap.add_argument("--out-dir", default=None, help="Dossier de sortie (défaut: même dossier que la source)")
+    ap.add_argument("--suffix", default=".ocr.txt", help="Extension du fichier de sortie (défaut: .ocr.txt)")
     args = ap.parse_args()
 
     check_requirements()

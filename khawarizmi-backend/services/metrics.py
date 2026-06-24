@@ -26,9 +26,8 @@ Usage :
 """
 
 import json
-import time
 import logging
-from typing import Dict, Optional
+import time
 
 logger = logging.getLogger("khawarizmi.metrics")
 
@@ -39,9 +38,9 @@ class MetricsCollector:
     def __init__(self, user_id: str, endpoint: str):
         self.user_id = user_id
         self.endpoint = endpoint
-        self._timers: Dict[str, float] = {}
-        self._durations: Dict[str, float] = {}
-        self._metrics: Dict[str, any] = {}
+        self._timers: dict[str, float] = {}
+        self._durations: dict[str, float] = {}
+        self._metrics: dict[str, any] = {}
         self._start_total = time.perf_counter()
 
     def start(self, step: str) -> None:
@@ -61,7 +60,7 @@ class MetricsCollector:
         """Enregistre une métrique arbitraire (tokens, cache_hit, etc.)."""
         self._metrics[key] = value
 
-    def flush(self) -> Dict:
+    def flush(self) -> dict:
         """Log les métriques en JSON structuré et retourne le dict.
 
         Format de sortie (log JSON) :
@@ -121,7 +120,7 @@ def record_request(endpoint: str, cache_hit: bool, fallback: bool) -> None:
         _global_counters[f"{prefix}_fallback"] += 1
 
 
-def get_global_stats() -> Dict:
+def get_global_stats() -> dict:
     """Retourne les statistiques globales (pour /health ou monitoring)."""
     stats = {}
     for prefix in ["chat", "tuteur"]:

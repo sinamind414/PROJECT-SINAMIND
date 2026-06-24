@@ -18,7 +18,7 @@ ROOT = Path(__file__).parent.parent
 sys.path.insert(0, str(ROOT))
 
 from sqlalchemy import text
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from config import get_settings
 
@@ -133,10 +133,10 @@ async def main():
     print("=" * 60)
 
     # Chargement des fichiers JSON
-    with open(MICRO_CONCEPTS_PATH, "r", encoding="utf-8") as f:
+    with open(MICRO_CONCEPTS_PATH, encoding="utf-8") as f:
         mc_data = json.load(f)
 
-    with open(QUESTIONS_TAGGEES_PATH, "r", encoding="utf-8") as f:
+    with open(QUESTIONS_TAGGEES_PATH, encoding="utf-8") as f:
         questions = json.load(f)
 
     print(f"\n  Micro-concepts a importer : {len(mc_data['micro_concepts'])}")
@@ -144,15 +144,11 @@ async def main():
 
     # Connexion a la DB (conversion vers asyncpg comme dans main.py)
     settings = get_settings()
-    db_url = (
-        settings.DATABASE_URL
-        .replace("postgresql://", "postgresql+asyncpg://", 1)
-        .replace("postgres://", "postgresql+asyncpg://", 1)
+    db_url = settings.DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://", 1).replace(
+        "postgres://", "postgresql+asyncpg://", 1
     )
     engine = create_async_engine(db_url, pool_size=2)
-    session_factory = async_sessionmaker(
-        engine, class_=AsyncSession, expire_on_commit=False
-    )
+    session_factory = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 
     async with session_factory() as db:
         print("\n[1/2] Insertion des micro-concepts...")
@@ -173,14 +169,10 @@ async def main():
     print("=" * 60)
 
     async with session_factory() as db:
-        result = await db.execute(
-            text("SELECT COUNT(*) FROM micro_concepts")
-        )
+        result = await db.execute(text("SELECT COUNT(*) FROM micro_concepts"))
         print(f"  Total micro_concepts en DB : {result.scalar()}")
 
-        result = await db.execute(
-            text("SELECT COUNT(*) FROM question_concept_map")
-        )
+        result = await db.execute(text("SELECT COUNT(*) FROM question_concept_map"))
         print(f"  Total mappings en DB       : {result.scalar()}")
 
         result = await db.execute(

@@ -16,12 +16,12 @@ Output :
     - data/benchmark_results.json : résultats détaillés
 """
 
+import argparse
 import asyncio
 import json
-import time
-import argparse
 import pathlib
 import sys
+import time
 
 # Ajouter le répertoire backend au path
 sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
@@ -29,16 +29,19 @@ sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 
 async def benchmark_rag_only(questions: list) -> dict:
     """Benchmark RAG uniquement (sans appel LLM) — mesure la couverture."""
-    from services.embedder import embedder
-    from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
     from sqlalchemy import text
+    from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+
     from config import get_settings
+    from services.embedder import embedder
 
     cfg = get_settings()
     if not cfg.DATABASE_URL:
         return {"error": "DATABASE_URL non configuré"}
 
-    db_url = cfg.DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://", 1).replace("postgres://", "postgresql+asyncpg://", 1)
+    db_url = cfg.DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://", 1).replace(
+        "postgres://", "postgresql+asyncpg://", 1
+    )
     engine = create_async_engine(db_url, pool_size=5, max_overflow=10, pool_pre_ping=True)
     session_maker = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 
@@ -53,7 +56,7 @@ async def benchmark_rag_only(questions: list) -> dict:
             q_id = q["id"]
             chapitre = q["chapitre"]
             question = q["question"]
-            reponse_attendue = q["reponse_attendue"]
+            q["reponse_attendue"]
             mots_cles = q["mots_cles_attendus"]
 
             # 1. Embedding
@@ -78,7 +81,7 @@ async def benchmark_rag_only(questions: list) -> dict:
                         ORDER BY embedding <=> CAST(:emb AS vector)
                         LIMIT 3
                     """),
-                    {"emb": str(query_vector.tolist())}
+                    {"emb": str(query_vector.tolist())},
                 )
                 chunks = res.fetchall()
                 rag_time = (time.perf_counter() - t0) * 1000
@@ -94,29 +97,33 @@ async def benchmark_rag_only(questions: list) -> dict:
                 mots_trouves = [m for m in mots_cles if m.lower() in chunk_text.lower()]
                 coverage = len(mots_trouves) / len(mots_cles) if mots_cles else 0
 
-                results.append({
-                    "id": q_id,
-                    "status": "rag_hit",
-                    "chapitre": chapitre,
-                    "niveau": q["niveau"],
-                    "embed_ms": round(emb_time, 2),
-                    "rag_ms": round(rag_time, 2),
-                    "chunks_count": len(chunks),
-                    "best_similarity": round(float(chunks[0][2]), 4) if chunks[0][2] else 0,
-                    "mots_cles_attendus": mots_cles,
-                    "mots_cles_trouves": mots_trouves,
-                    "keyword_coverage": round(coverage, 3),
-                })
+                results.append(
+                    {
+                        "id": q_id,
+                        "status": "rag_hit",
+                        "chapitre": chapitre,
+                        "niveau": q["niveau"],
+                        "embed_ms": round(emb_time, 2),
+                        "rag_ms": round(rag_time, 2),
+                        "chunks_count": len(chunks),
+                        "best_similarity": round(float(chunks[0][2]), 4) if chunks[0][2] else 0,
+                        "mots_cles_attendus": mots_cles,
+                        "mots_cles_trouves": mots_trouves,
+                        "keyword_coverage": round(coverage, 3),
+                    }
+                )
             else:
                 rag_miss += 1
-                results.append({
-                    "id": q_id,
-                    "status": "rag_miss",
-                    "chapitre": chapitre,
-                    "niveau": q["niveau"],
-                    "embed_ms": round(emb_time, 2),
-                    "rag_ms": round(rag_time, 2),
-                })
+                results.append(
+                    {
+                        "id": q_id,
+                        "status": "rag_miss",
+                        "chapitre": chapitre,
+                        "niveau": q["niveau"],
+                        "embed_ms": round(emb_time, 2),
+                        "rag_ms": round(rag_time, 2),
+                    }
+                )
 
     await engine.dispose()
 
@@ -134,18 +141,20 @@ async def benchmark_rag_only(questions: list) -> dict:
 
 async def benchmark_full(questions: list) -> dict:
     """Benchmark complet RAG + LLM — mesure la qualité des réponses."""
-    from services.embedder import embedder
-    from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
-    from sqlalchemy import text
-    from config import get_settings
     from openai import AsyncOpenAI
-    from services.llm import extract_json_from_gemini
+    from sqlalchemy import text
+    from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+
+    from config import get_settings
+    from services.embedder import embedder
 
     cfg = get_settings()
     if not cfg.DATABASE_URL:
         return {"error": "DATABASE_URL non configuré"}
 
-    db_url = cfg.DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://", 1).replace("postgres://", "postgresql+asyncpg://", 1)
+    db_url = cfg.DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://", 1).replace(
+        "postgres://", "postgresql+asyncpg://", 1
+    )
     engine = create_async_engine(db_url, pool_size=5, max_overflow=10, pool_pre_ping=True)
     session_maker = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 
@@ -167,7 +176,7 @@ async def benchmark_full(questions: list) -> dict:
             reponse_attendue = q["reponse_attendue"]
             mots_cles = q["mots_cles_attendus"]
 
-            print(f"  [{i+1}/{len(questions)}] {q_id} — {chapitre}...", end=" ", flush=True)
+            print(f"  [{i + 1}/{len(questions)}] {q_id} — {chapitre}...", end=" ", flush=True)
 
             # 1. Embedding
             t0 = time.perf_counter()
@@ -192,7 +201,7 @@ async def benchmark_full(questions: list) -> dict:
                         ORDER BY embedding <=> CAST(:emb AS vector)
                         LIMIT 3
                     """),
-                    {"emb": str(query_vector.tolist())}
+                    {"emb": str(query_vector.tolist())},
                 )
                 chunks = res.fetchall()
                 rag_time = (time.perf_counter() - t0) * 1000
@@ -204,7 +213,6 @@ async def benchmark_full(questions: list) -> dict:
 
             if not chunks:
                 print("RAG MISS")
-                rag_miss_count = 1
                 results.append({"id": q_id, "status": "rag_miss", "chapitre": chapitre})
                 continue
 
@@ -244,36 +252,40 @@ Réponds en arabe, sois précis et pédagogique."""
 
                 print(f"OK ({llm_time:.0f}ms, cov={llm_keyword_coverage:.0%})")
 
-                results.append({
-                    "id": q_id,
-                    "status": "success",
-                    "chapitre": chapitre,
-                    "niveau": q["niveau"],
-                    "embed_ms": round(emb_time, 2),
-                    "rag_ms": round(rag_time, 2),
-                    "llm_ms": round(llm_time, 2),
-                    "best_similarity": round(float(chunks[0][2]), 4) if chunks[0][2] else 0,
-                    "mots_cles_attendus": mots_cles,
-                    "mots_cles_trouves_llm": mots_trouves_llm,
-                    "llm_keyword_coverage": round(llm_keyword_coverage, 3),
-                    "llm_response_preview": llm_response[:200],
-                    "reponse_attendue_preview": reponse_attendue[:200],
-                })
+                results.append(
+                    {
+                        "id": q_id,
+                        "status": "success",
+                        "chapitre": chapitre,
+                        "niveau": q["niveau"],
+                        "embed_ms": round(emb_time, 2),
+                        "rag_ms": round(rag_time, 2),
+                        "llm_ms": round(llm_time, 2),
+                        "best_similarity": round(float(chunks[0][2]), 4) if chunks[0][2] else 0,
+                        "mots_cles_attendus": mots_cles,
+                        "mots_cles_trouves_llm": mots_trouves_llm,
+                        "llm_keyword_coverage": round(llm_keyword_coverage, 3),
+                        "llm_response_preview": llm_response[:200],
+                        "reponse_attendue_preview": reponse_attendue[:200],
+                    }
+                )
 
             except Exception as e:
                 llm_fail += 1
                 llm_time = (time.perf_counter() - t0) * 1000
                 total_llm_time += llm_time
                 print(f"LLM FAIL ({e})")
-                results.append({
-                    "id": q_id,
-                    "status": "llm_error",
-                    "chapitre": chapitre,
-                    "embed_ms": round(emb_time, 2),
-                    "rag_ms": round(rag_time, 2),
-                    "llm_ms": round(llm_time, 2),
-                    "error": str(e)[:200],
-                })
+                results.append(
+                    {
+                        "id": q_id,
+                        "status": "llm_error",
+                        "chapitre": chapitre,
+                        "embed_ms": round(emb_time, 2),
+                        "rag_ms": round(rag_time, 2),
+                        "llm_ms": round(llm_time, 2),
+                        "error": str(e)[:200],
+                    }
+                )
 
     await engine.dispose()
 
@@ -310,17 +322,19 @@ def print_summary(stats: dict, full: bool = False):
     print(f"RAG couverture  : {stats['rag_coverage']:.1%} ({stats.get('rag_hits', 0)} hits)")
 
     if full:
-        print(f"LLM succès     : {stats.get('llm_success_rate', 0):.1%} ({stats.get('llm_success', 0)}/{stats['total_questions']})")
+        print(
+            f"LLM succès     : {stats.get('llm_success_rate', 0):.1%} ({stats.get('llm_success', 0)}/{stats['total_questions']})"
+        )
         print(f"Keyword coverage moyen : {stats.get('avg_keyword_coverage', 0):.1%}")
 
-    print(f"\nLatences :")
+    print("\nLatences :")
     print(f"  Embedding : {stats['avg_embedding_ms']:.1f} ms (moyenne)")
     print(f"  RAG       : {stats['avg_rag_ms']:.1f} ms (moyenne)")
     if full:
         print(f"  LLM       : {stats.get('avg_llm_ms', 0):.1f} ms (moyenne)")
 
     # Détail par chapitre
-    print(f"\nPar chapitre :")
+    print("\nPar chapitre :")
     chapitre_stats = {}
     for r in stats.get("results", []):
         ch = r.get("chapitre", "?")
@@ -353,12 +367,12 @@ async def main():
         print("Génère-le d'abord: python scripts/generate_golden_set.py")
         return
 
-    with open(golden_path, "r", encoding="utf-8") as f:
+    with open(golden_path, encoding="utf-8") as f:
         golden = json.load(f)
 
     questions = golden["questions"]
     if args.limit:
-        questions = questions[:args.limit]
+        questions = questions[: args.limit]
 
     print(f"Benchmark Golden Set — {len(questions)} questions")
     print(f"Mode: {'RAG only' if args.no_llm else 'Full (RAG + LLM)'}")

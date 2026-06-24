@@ -1,8 +1,9 @@
 """Validate the generated lexique JSON."""
+
 import json
 
 path = "data/lexique_svt_terminale_complet.json"
-with open(path, "r", encoding="utf-8") as f:
+with open(path, encoding="utf-8") as f:
     raw = f.read()
 
 print("=== ENCODING ===")
@@ -11,39 +12,43 @@ ar_check = "البروتينات" in raw
 print(f"Arabic preserved: {ar_check}")
 
 d = json.loads(raw)
-all_terms = [
-    t
-    for dom in d["domaines"]
-    for cat in dom["categories"]
-    for t in cat["termes"]
-]
+all_terms = [t for dom in d["domaines"] for cat in dom["categories"] for t in cat["termes"]]
 
 print("\n=== STRUCTURE ===")
 print(f"Metadata total_entrees: {d['metadata']['total_entrees']}")
 print(f"Domaines: {len(d['domaines'])}")
 
 errors = []
-for di, dom in enumerate(d["domaines"]):
-    for ci, cat in enumerate(dom["categories"]):
-        for ti, t in enumerate(cat["termes"]):
+for _di, dom in enumerate(d["domaines"]):
+    for _ci, cat in enumerate(dom["categories"]):
+        for _ti, t in enumerate(cat["termes"]):
             for field in [
-                "id", "terme_fr", "terme_ar", "type",
-                "definition_fr", "definition_ar",
-                "importance", "chapitre_principal"
+                "id",
+                "terme_fr",
+                "terme_ar",
+                "type",
+                "definition_fr",
+                "definition_ar",
+                "importance",
+                "chapitre_principal",
             ]:
                 if not t.get(field):
-                    errors.append(f"{t.get('id','?')} missing {field}")
+                    errors.append(f"{t.get('id', '?')} missing {field}")
             if t.get("type") not in [
-                "molecule", "enzyme", "concept", "processus",
-                "cellule", "organite", "structure", "mecanisme"
+                "molecule",
+                "enzyme",
+                "concept",
+                "processus",
+                "cellule",
+                "organite",
+                "structure",
+                "mecanisme",
             ]:
                 errors.append(f"{t.get('id')} invalid type: {t.get('type')}")
             if t.get("importance") not in ["critique", "haute", "moyenne"]:
-                errors.append(
-                    f"{t.get('id')} invalid importance: {t.get('importance')}"
-                )
+                errors.append(f"{t.get('id')} invalid importance: {t.get('importance')}")
 
-print(f"\n=== VALIDATION ===")
+print("\n=== VALIDATION ===")
 print(f"Total terms: {len(all_terms)}")
 print(f"Errors: {len(errors)}")
 for e in errors[:10]:
@@ -63,6 +68,7 @@ print(f"Cross-links: {len(d['liens_transversaux'])}")
 
 # Sample
 import random
+
 print("\n=== SAMPLE ===")
 for t in random.sample(all_terms, min(5, len(all_terms))):
     print(f"  {t['id']}: {t['terme_fr']} ({t['terme_ar']}) [{t['importance']}]")

@@ -6,12 +6,10 @@ document-analysis, mindmap) et calcule des recommandations priorisées.
 0 appel IA. 100% SQL. Latence < 200ms.
 """
 
-from datetime import datetime, timezone
-from typing import Dict, List
+from datetime import UTC, datetime
 
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
-
 
 # ── Poids par importance ───────────────────────────
 
@@ -26,13 +24,13 @@ MAX_RECOMMENDATIONS = 3
 async def calculer_orientation(
     db: AsyncSession,
     user_id: str,
-) -> Dict:
+) -> dict:
     """Calcule l'orientation pédagogique pour un élève.
 
     Returns:
         Dict avec prediction_bac, dues, recommendations, message.
     """
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
 
     # ── 1. Flashcards dues par chapitre ──
     fc_result = await db.execute(
@@ -47,7 +45,7 @@ async def calculer_orientation(
         """),
         {"uid": user_id, "now": now},
     )
-    fc_by_chapter: Dict[str, int] = {}
+    fc_by_chapter: dict[str, int] = {}
     total_fc_dues = 0
     for r in fc_result.fetchall():
         ch = r._mapping["chapter"]
@@ -64,19 +62,21 @@ async def calculer_orientation(
         """),
         {"uid": user_id},
     )
-    weak_verbs: List[Dict] = []
+    weak_verbs: list[dict] = []
     total_av_dues = 0
     for r in av_result.fetchall():
         m = r._mapping
-        is_due = m["est_due"] if "est_due" in m.keys() else False
+        is_due = m.get("est_due", False)
         if is_due:
             total_av_dues += 1
         if (m["last_score"] or 0) < WEAK_SCORE_THRESHOLD:
-            weak_verbs.append({
-                "verb_slug": m["verb_slug"],
-                "last_score": m["last_score"] or 0,
-                "attempts": m["attempts"] or 0,
-            })
+            weak_verbs.append(
+                {
+                    "verb_slug": m["verb_slug"],
+                    "last_score": m["last_score"] or 0,
+                    "attempts": m["attempts"] or 0,
+                }
+            )
 
     # ── 3. Document analysis dues ──
     da_result = await db.execute(
@@ -88,15 +88,12 @@ async def calculer_orientation(
         """),
         {"uid": user_id},
     )
-    da_by_chapter: Dict[str, int] = {}
+    da_by_chapter: dict[str, int] = {}
     total_da_dues = 0
     for r in da_result.fetchall():
         m = r._mapping
         ch = m["chapter_slug"]
-        is_due = (
-            m["prochaine_revision"] is None
-            or m["prochaine_revision"] <= now
-        )
+        is_due = m["prochaine_revision"] is None or m["prochaine_revision"] <= now
         if is_due:
             total_da_dues += 1
             da_by_chapter[ch] = da_by_chapter.get(ch, 0) + 1
@@ -111,7 +108,7 @@ async def calculer_orientation(
         """),
         {"uid": user_id},
     )
-    weak_nodes_by_chapter: Dict[str, int] = {}
+    weak_nodes_by_chapter: dict[str, int] = {}
     for r in mm_result.fetchall():
         ch = r._mapping["chapitre"] or "general"
         weak_nodes_by_chapter[ch] = weak_nodes_by_chapter.get(ch, 0) + 1
@@ -126,8 +123,9 @@ async def calculer_orientation(
                 c.importance,
                 c.bac_frequent
             FROM chapters c
-        """))
-    chapter_meta: Dict[str, Dict] = {}
+        """)
+    )
+    chapter_meta: dict[str, dict] = {}
     for r in ch_result.fetchall():
         m = r._mapping
         chapter_meta[m["chapter_id"]] = {
@@ -150,7 +148,7 @@ async def calculer_orientation(
         """),
         {"uid": user_id},
     )
-    chapter_stability: Dict[str, float] = {}
+    chapter_stability: dict[str, float] = {}
     total_stability = 0.0
     total_concepts = 0
     for r in pred_result.fetchall():
@@ -167,13 +165,9 @@ async def calculer_orientation(
         prediction_bac = round(min(100, avg_stability * 10))
 
     # ── 7. Calcul du score de priorité par chapitre ──
-    all_chapters = set(
-        list(fc_by_chapter.keys())
-        + list(da_by_chapter.keys())
-        + list(weak_nodes_by_chapter.keys())
-    )
+    all_chapters = set(list(fc_by_chapter.keys()) + list(da_by_chapter.keys()) + list(weak_nodes_by_chapter.keys()))
 
-    chapter_scores: List[Dict] = []
+    chapter_scores: list[dict] = []
 
     for ch in all_chapters:
         fc_dues = fc_by_chapter.get(ch, 0)
@@ -194,22 +188,24 @@ async def calculer_orientation(
             score += int((5.0 - stability) * weight)
 
         if score > 0:
-            chapter_scores.append({
-                "chapter": ch,
-                "score": score,
-                "fc_dues": fc_dues,
-                "da_dues": da_dues,
-                "weak_nodes": weak_nodes,
-                "stability": stability,
-                "importance": importance,
-                "titre_ar": meta.get("titre_ar", ch),
-                "titre_fr": meta.get("titre_fr", ch),
-            })
+            chapter_scores.append(
+                {
+                    "chapter": ch,
+                    "score": score,
+                    "fc_dues": fc_dues,
+                    "da_dues": da_dues,
+                    "weak_nodes": weak_nodes,
+                    "stability": stability,
+                    "importance": importance,
+                    "titre_ar": meta.get("titre_ar", ch),
+                    "titre_fr": meta.get("titre_fr", ch),
+                }
+            )
 
     chapter_scores.sort(key=lambda x: -x["score"])
 
     # ── 8. Construire les recommandations ──
-    recommendations: List[Dict] = []
+    recommendations: list[dict] = []
 
     # (a) Top chapitres par score FSRS
     for cs in chapter_scores[:MAX_RECOMMENDATIONS]:
@@ -227,15 +223,17 @@ async def calculer_orientation(
         if cs["stability"] < 5.0:
             raisons.append(f"stabilité faible ({cs['stability']:.1f})")
 
-        recommendations.append({
-            "priorite": len(recommendations) + 1,
-            "type": "cours",
-            "chapitre_slug": cs["chapter"],
-            "chapitre_ar": cs["titre_ar"],
-            "raison": " · ".join(raisons),
-            "action": f"/cours/{cs['chapter']}",
-            "score_priorite": cs["score"],
-        })
+        recommendations.append(
+            {
+                "priorite": len(recommendations) + 1,
+                "type": "cours",
+                "chapitre_slug": cs["chapter"],
+                "chapitre_ar": cs["titre_ar"],
+                "raison": " · ".join(raisons),
+                "action": f"/cours/{cs['chapter']}",
+                "score_priorite": cs["score"],
+            }
+        )
 
     # (b) Verbes méthodologiques faibles
     if weak_verbs and len(recommendations) < MAX_RECOMMENDATIONS:
@@ -243,15 +241,17 @@ async def calculer_orientation(
         for v in weakest:
             if len(recommendations) >= MAX_RECOMMENDATIONS:
                 break
-            recommendations.append({
-                "priorite": len(recommendations) + 1,
-                "type": "action_verb",
-                "chapitre_slug": None,
-                "chapitre_ar": None,
-                "raison": f"Verbe '{v['verb_slug']}' : score moyen {v['last_score']}%",
-                "action": f"/action-verbs/{v['verb_slug']}",
-                "score_priorite": (WEAK_SCORE_THRESHOLD - v["last_score"]) // 5,
-            })
+            recommendations.append(
+                {
+                    "priorite": len(recommendations) + 1,
+                    "type": "action_verb",
+                    "chapitre_slug": None,
+                    "chapitre_ar": None,
+                    "raison": f"Verbe '{v['verb_slug']}' : score moyen {v['last_score']}%",
+                    "action": f"/action-verbs/{v['verb_slug']}",
+                    "score_priorite": (WEAK_SCORE_THRESHOLD - v["last_score"]) // 5,
+                }
+            )
 
     # (c) Document analysis dues (si pas déjà couvert)
     if len(recommendations) < MAX_RECOMMENDATIONS:
@@ -262,15 +262,17 @@ async def calculer_orientation(
             if already:
                 continue
             meta = _find_chapter_meta(ch, chapter_meta)
-            recommendations.append({
-                "priorite": len(recommendations) + 1,
-                "type": "document_analysis",
-                "chapitre_slug": ch,
-                "chapitre_ar": meta.get("titre_ar", ch),
-                "raison": f"{nb} analyse(s) de document en retard (FSRS)",
-                "action": f"/document-analysis/chapters/{ch}",
-                "score_priorite": nb * 2,
-            })
+            recommendations.append(
+                {
+                    "priorite": len(recommendations) + 1,
+                    "type": "document_analysis",
+                    "chapitre_slug": ch,
+                    "chapitre_ar": meta.get("titre_ar", ch),
+                    "raison": f"{nb} analyse(s) de document en retard (FSRS)",
+                    "action": f"/document-analysis/chapters/{ch}",
+                    "score_priorite": nb * 2,
+                }
+            )
 
     # ── 9. Message ──
     if not recommendations:
@@ -293,7 +295,7 @@ async def calculer_orientation(
     }
 
 
-def _find_chapter_meta(chapter: str, meta: Dict[str, Dict]) -> Dict:
+def _find_chapter_meta(chapter: str, meta: dict[str, dict]) -> dict:
     """Cherche les métadonnées d'un chapitre par slug ou titre."""
     if chapter in meta:
         return meta[chapter]

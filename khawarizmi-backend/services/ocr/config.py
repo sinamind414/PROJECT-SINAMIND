@@ -1,7 +1,8 @@
-from pathlib import Path
 from dataclasses import dataclass
+from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parents[2]
+
 
 @dataclass
 class OCRConfig:
@@ -18,7 +19,9 @@ class OCRConfig:
     enable_preprocessing: bool = True
     bundle_suffix: str = ".ocr_prod_full.txt"
 
+
 config = OCRConfig()
+
 
 def get_config():
     return config

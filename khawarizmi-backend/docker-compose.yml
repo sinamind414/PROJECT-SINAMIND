@@ -51,7 +51,7 @@ services:
       - "8000:8000"
     volumes:
       - ./services:/app/services
-      - "C:/Users/zakaria/Documents/RESSOURCES_KHAWARIZMI/LIVRES SCOLAIRES:/app/data:ro"
+      - ${DATA_DIR:-./data}:/app/data:ro
     depends_on:
       db:
         condition: service_healthy

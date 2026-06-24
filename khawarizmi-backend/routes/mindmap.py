@@ -4,22 +4,22 @@
 
 import json
 import logging
-from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import text
-from pydantic import BaseModel, Field
 from typing import Literal
 
-from deps import get_db, get_current_user, get_openai
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
+from pydantic import BaseModel, Field
+from sqlalchemy import text
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from config import get_settings
+from deps import get_current_user, get_db, get_openai
 from services.mindmap_service import (
-    generate_mindmap,
-    update_node_maitrise,
-    get_weak_nodes,
     create_task,
+    expand_node,
     get_task_status,
+    get_weak_nodes,
     run_generation_background,
-    expand_node
+    update_node_maitrise,
 )
 
 logger = logging.getLogger("khawarizmi.api")
@@ -46,13 +46,14 @@ class ExpandNodeRequest(BaseModel):
 
 # ── Génération asynchrone (non-bloquante) ────────────────────────────────────
 
+
 @router.post("/generate")
 async def generate_mindmap_endpoint(
     request: MindMapGenerateRequest,
     background_tasks: BackgroundTasks,
     current_user: dict = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-    openai_client = Depends(get_openai)
+    openai_client=Depends(get_openai),
 ):
     """Démarre la génération asynchrone d'un Mind Map.
 
@@ -67,32 +68,25 @@ async def generate_mindmap_endpoint(
             SELECT id, data FROM mindmaps
             WHERE user_id = :user_id AND LOWER(chapitre) = LOWER(:chapitre)
         """),
-        {"user_id": int(user_id), "chapitre": request.chapitre}
+        {"user_id": int(user_id), "chapitre": request.chapitre},
     )
     row = result.fetchone()
     if row:
         # Mind Map déjà généré → retour direct
-        return {
-            "status": "success",
-            "mindmap": json.loads(row[1]),
-            "mindmap_id": row[0],
-            "cached": True
-        }
+        return {"status": "success", "mindmap": json.loads(row[1]), "mindmap_id": row[0], "cached": True}
 
     # Créer la tâche asynchrone
     task_id = await create_task(
-        user_id=user_id,
-        matiere=request.matiere,
-        chapitre=request.chapitre,
-        filiere=request.filiere,
-        db=db
+        user_id=user_id, matiere=request.matiere, chapitre=request.chapitre, filiere=request.filiere, db=db
     )
 
     # Lancer la génération en arrière-plan
     cfg = get_settings()
     db_url = cfg.DATABASE_URL or ""
     if db_url:
-        db_url = db_url.replace("postgresql://", "postgresql+asyncpg://", 1).replace("postgres://", "postgresql+asyncpg://", 1)
+        db_url = db_url.replace("postgresql://", "postgresql+asyncpg://", 1).replace(
+            "postgres://", "postgresql+asyncpg://", 1
+        )
 
     background_tasks.add_task(
         run_generation_background,
@@ -105,28 +99,22 @@ async def generate_mindmap_endpoint(
         db_url=db_url,
         openai_api_key=cfg.OPENAI_API_KEY,
         openai_base_url=cfg.openai_base_url,
-        openai_model=cfg.openai_model
+        openai_model=cfg.openai_model,
     )
 
     return {
         "status": "pending",
         "task_id": task_id,
-        "message": "Génération du Mind Map en cours. Poll /task/{task_id} pour suivre."
+        "message": f"Génération du Mind Map en cours. Poll /task/{task_id} pour suivre.",
     }
 
 
 @router.get("/task/{task_id}")
 async def get_task_status_endpoint(
-    task_id: str,
-    current_user: dict = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    task_id: str, current_user: dict = Depends(get_current_user), db: AsyncSession = Depends(get_db)
 ):
     """Polling : récupère le statut d'une tâche de génération."""
-    result = await get_task_status(
-        task_id=task_id,
-        user_id=str(current_user["id"]),
-        db=db
-    )
+    result = await get_task_status(task_id=task_id, user_id=str(current_user["id"]), db=db)
 
     if result["status"] == "not_found":
         raise HTTPException(status_code=404, detail="Tâche non trouvée")
@@ -135,7 +123,7 @@ async def get_task_status_endpoint(
     if result["status"] == "completed" and result.get("mindmap_id"):
         mm_result = await db.execute(
             text("SELECT data FROM mindmaps WHERE id = :id AND user_id = :user_id"),
-            {"id": result["mindmap_id"], "user_id": int(current_user["id"])}
+            {"id": result["mindmap_id"], "user_id": int(current_user["id"])},
         )
         mm_row = mm_result.fetchone()
         if mm_row:
@@ -149,7 +137,7 @@ async def expand_node_endpoint(
     request: ExpandNodeRequest,
     current_user: dict = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-    openai_client = Depends(get_openai)
+    openai_client=Depends(get_openai),
 ):
     """Lazy loading : génère les sous-nœuds d'un nœud à la demande."""
     result = await expand_node(
@@ -159,25 +147,24 @@ async def expand_node_endpoint(
         matiere=request.matiere,
         user_id=str(current_user["id"]),
         db=db,
-        openai_client=openai_client
+        openai_client=openai_client,
     )
     return {"status": "success", "enfants": result["enfants"]}
 
 
 # ── Endpoints existants (compatibilité) ──────────────────────────────────────
 
+
 @router.get("/{mindmap_id}")
 async def get_mindmap(
-    mindmap_id: str,
-    current_user: dict = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    mindmap_id: str, current_user: dict = Depends(get_current_user), db: AsyncSession = Depends(get_db)
 ):
     result = await db.execute(
         text("""
             SELECT data FROM mindmaps
             WHERE id = :id AND user_id = :user_id
         """),
-        {"id": mindmap_id, "user_id": int(current_user["id"])}
+        {"id": mindmap_id, "user_id": int(current_user["id"])},
     )
     row = result.fetchone()
 
@@ -192,14 +179,11 @@ async def update_maitrise(
     node_id: str,
     body: MaitriseUpdateRequest,
     current_user: dict = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
 ):
     try:
         result = await update_node_maitrise(
-            node_id=node_id,
-            maitrise=body.maitrise,
-            user_id=str(current_user["id"]),
-            db=db
+            node_id=node_id, maitrise=body.maitrise, user_id=str(current_user["id"]), db=db
         )
         return {
             "status": "success",
@@ -208,8 +192,8 @@ async def update_maitrise(
             "message": {
                 0: "Nœud marqué comme non compris. Révision prioritaire activée.",
                 1: "Nœud en cours d'apprentissage.",
-                2: "Nœud maîtrisé. Révision espacée activée."
-            }[body.maitrise]
+                2: "Nœud maîtrisé. Révision espacée activée.",
+            }[body.maitrise],
         }
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
@@ -217,15 +201,9 @@ async def update_maitrise(
 
 @router.get("/{mindmap_id}/weak")
 async def get_weak_nodes_endpoint(
-    mindmap_id: str,
-    current_user: dict = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    mindmap_id: str, current_user: dict = Depends(get_current_user), db: AsyncSession = Depends(get_db)
 ):
-    nodes = await get_weak_nodes(
-        mindmap_id=mindmap_id,
-        user_id=str(current_user["id"]),
-        db=db
-    )
+    nodes = await get_weak_nodes(mindmap_id=mindmap_id, user_id=str(current_user["id"]), db=db)
 
     return {
         "mindmap_id": mindmap_id,
@@ -233,7 +211,7 @@ async def get_weak_nodes_endpoint(
         "total": len(nodes),
         "message": (
             f"{len(nodes)} nœud(s) à revoir en priorité."
-            if nodes else
-            "Excellent ! Tous les nœuds sont en cours ou maîtrisés."
-        )
+            if nodes
+            else "Excellent ! Tous les nœuds sont en cours ou maîtrisés."
+        ),
     }

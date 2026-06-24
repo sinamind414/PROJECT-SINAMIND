@@ -57,9 +57,7 @@ def volume_done(out_dir: Path, stem: str) -> bool:
     bundle_state = out_dir / f"{stem}.ocr.txt.bundle" / "run.state.json"
     if not txt_file.exists():
         return False
-    if not bundle_state.exists():
-        return False
-    return True
+    return bundle_state.exists()
 
 
 def run_batch(args: argparse.Namespace) -> None:
@@ -90,15 +88,23 @@ def run_batch(args: argparse.Namespace) -> None:
             log.info("=" * 70)
 
             cmd = [
-                sys.executable, str(SCRIPT),
+                sys.executable,
+                str(SCRIPT),
                 str(pdf_path),
-                "--workers", str(args.workers),
-                "--dpi", str(args.dpi),
-                "--out-dir", str(OCR_OUT_DIR),
-                "--lang", "ara+fra",
-                "--pdf-mode", args.pdf_mode,
-                "--suffix", ".ocr.txt",
-                "--timeout", "120",
+                "--workers",
+                str(args.workers),
+                "--dpi",
+                str(args.dpi),
+                "--out-dir",
+                str(OCR_OUT_DIR),
+                "--lang",
+                "ara+fra",
+                "--pdf-mode",
+                args.pdf_mode,
+                "--suffix",
+                ".ocr.txt",
+                "--timeout",
+                "120",
             ]
 
             result = subprocess.run(cmd, capture_output=True, text=True)

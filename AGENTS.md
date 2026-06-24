@@ -498,6 +498,27 @@ WORKAROUND : `psql -c "UPDATE alembic_version SET version_num = '005'"`
 FICHIER : migrations/env.py (driver asyncpg)
 IMPACT : Moyen — retarde les déploiements si non documenté
 
+## Bug 5 : postcss vulnérable dans Next.js (moderate, accepté)
+
+SÉCURITÉ : `npm audit --omit=dev` rapporte 2 moderate.
+CAUSE : `postcss <8.5.10` embarqué par Next.js dans sa chaîne de build.
+        CVE : GHSA-qx2v-qp2m-jg93 (XSS via `</style>` non échappé).
+FIX DIRECT : Aucun — `npm audit fix --force` downgrade Next 16 → 9 (breaking).
+SURFACE : Build-time uniquement, nécessite input CSS utilisateur contrôlé.
+          Non exploitable dans l'état actuel de l'application.
+STATUT : Accepté temporairement. Résolu upstream quand Next 16.3+ bundle
+         postcss ≥8.5.10, ou en retirant le lock postcss du bundle.
+FICHIER : khawarizmi-frontend/package.json (dépendance transitive next)
+IMPACT : Faible — modéré, build-time, pas de risque runtime.
+
+## Bug 6 (RÉSOLU) : next-pwa vulnérable retiré
+
+SÉCURITÉ : `serialize-javascript ≤7.0.2` (high) via la chaîne
+           next-pwa → workbox-webpack-plugin → serialize-javascript.
+CAUSE : next-pwa n'était pas configuré (aucun import, aucune config).
+FIX : `npm uninstall next-pwa` — package mort, 0 impact fonctionnel.
+IMPACT : Résolu — 5 high supprimés du rapport npm audit.
+
 ##############################################################
 # SECTION 12 — TESTS DE RÉGRESSION OBLIGATOIRES
 ##############################################################

@@ -9,6 +9,7 @@ import logging
 import pathlib
 
 from sqlalchemy import text
+
 from database import get_db
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
@@ -52,7 +53,9 @@ async def seed():
                     "exercises": json.dumps(subject["exercises"], ensure_ascii=False),
                 },
             )
-            logger.info(f"  INSERT : {subject['annale_slug']} sujet {subject['subject_number']} ({len(subject['exercises'])} exercices)")
+            logger.info(
+                f"  INSERT : {subject['annale_slug']} sujet {subject['subject_number']} ({len(subject['exercises'])} exercices)"
+            )
 
         await db.commit()
         logger.info("Seed bac blanc termine")

@@ -170,7 +170,7 @@ export function ScenarioRunner({
       }
       const resp = await apiClient.evaluateDaAnswers(payload)
 
-      const evaluations = questions.map((question) => {
+      const evaluations = await Promise.all(questions.map(async (question) => {
         const evalData = resp.evaluations.find((e) => e.verb_slug === question.verbSlug)
         const evaluation: MethodologyEvaluation = evalData
           ? {
@@ -187,10 +187,10 @@ export function ScenarioRunner({
               allowSecondAttempt: true,
               dominantErrorCode: evalData.dominant_error_code,
             }
-          : evaluateMethodologyAnswer({ verbSlug: question.verbSlug, answer: answers[question.id] || "" })
+          : await evaluateMethodologyAnswer({ verbSlug: question.verbSlug, answer: answers[question.id] || "" })
 
         return { question, answer: answers[question.id] || "", evaluation }
-      })
+      }))
 
       const readiness = Math.round(
         evaluations.reduce((sum, item) => sum + item.evaluation.percentage, 0) / evaluations.length,
@@ -210,11 +210,11 @@ export function ScenarioRunner({
       setAward(awardXP("مهمة استغلال وثيقة", 60))
     } catch {
       setApiSource(false)
-      const evaluations = questions.map((question) => ({
+      const evaluations = await Promise.all(questions.map(async (question) => ({
         question,
         answer: answers[question.id] || "",
-        evaluation: evaluateMethodologyAnswer({ verbSlug: question.verbSlug, answer: answers[question.id] || "" }),
-      }))
+        evaluation: await evaluateMethodologyAnswer({ verbSlug: question.verbSlug, answer: answers[question.id] || "" }),
+      })))
 
       const readiness = Math.round(
         evaluations.reduce((sum, item) => sum + item.evaluation.percentage, 0) / evaluations.length,

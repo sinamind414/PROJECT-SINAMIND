@@ -1,6 +1,6 @@
-from pathlib import Path
-from typing import Optional
+import contextlib
 import logging
+from pathlib import Path
 
 import numpy as np
 
@@ -16,6 +16,7 @@ class PDFRenderer:
         key = str(pdf_path.resolve())
         if key not in self._doc_cache:
             import fitz
+
             self._doc_cache[key] = fitz.open(key)
         return self._doc_cache[key]
 
@@ -23,8 +24,9 @@ class PDFRenderer:
         doc = self._get_doc(pdf_path)
         return doc.page_count
 
-    def render_page(self, pdf_path: Path, page_index: int) -> Optional[np.ndarray]:
+    def render_page(self, pdf_path: Path, page_index: int) -> np.ndarray | None:
         import fitz
+
         doc = self._get_doc(pdf_path)
         page = doc[page_index]
         zoom = self.dpi / 72.0
@@ -35,17 +37,17 @@ class PDFRenderer:
             return np.stack([arr] * 3, axis=-1)
         if pix.n == 4:
             import cv2
+
             return cv2.cvtColor(arr, cv2.COLOR_RGBA2BGR)
         if pix.n == 3:
             import cv2
+
             return cv2.cvtColor(arr, cv2.COLOR_RGB2BGR)
         return arr
 
     def cleanup_temp(self, pdf_path: Path):
         key = str(pdf_path.resolve())
         if key in self._doc_cache:
-            try:
+            with contextlib.suppress(Exception):
                 self._doc_cache[key].close()
-            except Exception:
-                pass
             del self._doc_cache[key]

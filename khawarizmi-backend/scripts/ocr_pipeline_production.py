@@ -30,6 +30,7 @@ effective des metadonnees par page, compatibilite Agent Mode.
 from __future__ import annotations
 
 import argparse
+import contextlib
 import csv
 import json
 import logging
@@ -41,11 +42,12 @@ import sys
 import tempfile
 import time
 import traceback
+from collections.abc import Sequence
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Sequence, Set, Tuple
+from typing import Any
 
 import cv2
 import numpy as np
@@ -54,14 +56,14 @@ import numpy as np
 # Constants
 # ---------------------------------------------------------------------------
 
-IMAGE_EXTENSIONS: Set[str] = {".png", ".jpg", ".jpeg", ".tiff", ".tif", ".bmp", ".webp"}
-PDF_EXTENSIONS: Set[str] = {".pdf"}
+IMAGE_EXTENSIONS: set[str] = {".png", ".jpg", ".jpeg", ".tiff", ".tif", ".bmp", ".webp"}
+PDF_EXTENSIONS: set[str] = {".pdf"}
 SEPARATOR: str = "=" * 70
 STATE_VERSION: int = 3
 MAX_SOURCE_MB: int = 2000
 CONFIDENCE_THRESHOLD: float = 45.0
 EMPTY_PAGE_THRESHOLD: float = 0.98
-DEDUP_HASH_SIZE: Tuple[int, int] = (16, 16)
+DEDUP_HASH_SIZE: tuple[int, int] = (16, 16)
 
 LOG = logging.getLogger("ocr_pipeline_production")
 
@@ -75,8 +77,8 @@ class PageRef:
     page_no: int
     kind: str  # 'pdf' | 'image'
     source_path: str
-    pdf_index: Optional[int] = None
-    perceptual_hash: Optional[str] = None
+    pdf_index: int | None = None
+    perceptual_hash: str | None = None
 
 
 @dataclass(frozen=True)
@@ -89,22 +91,21 @@ class AttemptSpec:
 # Worker-level PDF cache
 # ---------------------------------------------------------------------------
 
-_worker_pdf_cache: Dict[str, Any] = {}
+_worker_pdf_cache: dict[str, Any] = {}
 
 
 def _get_cached_pdf_doc(pdf_path: str) -> Any:
     if pdf_path not in _worker_pdf_cache:
         import fitz
+
         _worker_pdf_cache[pdf_path] = fitz.open(pdf_path)
     return _worker_pdf_cache[pdf_path]
 
 
 def _close_worker_pdf_cache() -> None:
     for doc in _worker_pdf_cache.values():
-        try:
+        with contextlib.suppress(Exception):
             doc.close()
-        except Exception:
-            pass
     _worker_pdf_cache.clear()
 
 
@@ -113,7 +114,7 @@ def _close_worker_pdf_cache() -> None:
 # ---------------------------------------------------------------------------
 
 
-def configure_logging(log_file: Optional[Path] = None, verbose: bool = False) -> None:
+def configure_logging(log_file: Path | None = None, verbose: bool = False) -> None:
     LOG.setLevel(logging.DEBUG if verbose else logging.INFO)
     LOG.handlers.clear()
     LOG.propagate = False
@@ -136,10 +137,10 @@ def die(message: str, code: int = 1) -> None:
 
 
 def utc_now_iso() -> str:
-    return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+    return datetime.now(UTC).replace(microsecond=0).isoformat().replace("+00:00", "Z")
 
 
-def natural_key(value: str) -> List[Any]:
+def natural_key(value: str) -> list[Any]:
     return [int(part) if part.isdigit() else part.lower() for part in re.split(r"(\d+)", value)]
 
 
@@ -165,7 +166,7 @@ def _json_sanitize(obj: Any) -> Any:
     return obj
 
 
-def atomic_write_json(path: Path, data: Dict) -> None:
+def atomic_write_json(path: Path, data: dict) -> None:
     atomic_write_text(path, json.dumps(_json_sanitize(data), ensure_ascii=False, indent=2) + "\n")
 
 
@@ -183,12 +184,14 @@ def compact_len(text: str) -> int:
 
 def safe_error_text(text: str, limit: int = 500) -> str:
     return (text or "").strip().replace("\n", " ")[:limit] or "Erreur sans detail"
+
+
 # ---------------------------------------------------------------------------
 # Chemins d'artefacts
 # ---------------------------------------------------------------------------
 
 
-def compute_paths(source: Path, out_dir: Optional[str], suffix: str) -> Dict[str, Path]:
+def compute_paths(source: Path, out_dir: str | None, suffix: str) -> dict[str, Path]:
     if out_dir:
         out_root = Path(out_dir)
         out_root.mkdir(parents=True, exist_ok=True)
@@ -202,27 +205,32 @@ def compute_paths(source: Path, out_dir: Optional[str], suffix: str) -> Dict[str
         searchable_pdf = txt_out.parent / f"{source.stem}.searchable.pdf"
     bundle = txt_out.with_name(txt_out.name + ".bundle")
     return {
-        "txt_out": txt_out, "searchable_pdf": searchable_pdf, "bundle": bundle,
-        "pages_txt": bundle / "pages_txt", "pages_meta": bundle / "pages_meta",
-        "pages_pdf": bundle / "pages_pdf", "state": bundle / "run.state.json",
-        "summary": bundle / "summary.json", "pages_csv": bundle / "pages.csv",
+        "txt_out": txt_out,
+        "searchable_pdf": searchable_pdf,
+        "bundle": bundle,
+        "pages_txt": bundle / "pages_txt",
+        "pages_meta": bundle / "pages_meta",
+        "pages_pdf": bundle / "pages_pdf",
+        "state": bundle / "run.state.json",
+        "summary": bundle / "summary.json",
+        "pages_csv": bundle / "pages.csv",
         "run_log": bundle / "run.log",
     }
 
 
-def page_text_path(paths: Dict[str, Path], page_no: int) -> Path:
+def page_text_path(paths: dict[str, Path], page_no: int) -> Path:
     return paths["pages_txt"] / f"page_{page_no:06d}.txt"
 
 
-def page_meta_path(paths: Dict[str, Path], page_no: int) -> Path:
+def page_meta_path(paths: dict[str, Path], page_no: int) -> Path:
     return paths["pages_meta"] / f"page_{page_no:06d}.json"
 
 
-def page_pdf_path(paths: Dict[str, Path], page_no: int) -> Path:
+def page_pdf_path(paths: dict[str, Path], page_no: int) -> Path:
     return paths["pages_pdf"] / f"page_{page_no:06d}.pdf"
 
 
-def reset_outputs(paths: Dict[str, Path], resume: bool) -> None:
+def reset_outputs(paths: dict[str, Path], resume: bool) -> None:
     if resume:
         for key in ("bundle", "pages_txt", "pages_meta", "pages_pdf"):
             paths[key].mkdir(parents=True, exist_ok=True)
@@ -242,7 +250,7 @@ def reset_outputs(paths: Dict[str, Path], resume: bool) -> None:
 # ---------------------------------------------------------------------------
 
 
-def parse_langs(lang_spec: str) -> List[str]:
+def parse_langs(lang_spec: str) -> list[str]:
     langs = [chunk.strip() for chunk in lang_spec.split("+") if chunk.strip()]
     if not langs:
         raise ValueError("Aucune langue Tesseract valide dans --lang")
@@ -255,7 +263,7 @@ def check_tesseract_languages(lang_spec: str) -> None:
     result = subprocess.run(["tesseract", "--list-langs"], capture_output=True, text=True, check=False)
     if result.returncode != 0:
         die(f"Echec de tesseract --list-langs : {safe_error_text(result.stderr)}")
-    installed: Set[str] = set()
+    installed: set[str] = set()
     for line in (result.stdout + "\n" + result.stderr).splitlines():
         line = line.strip()
         if not line:
@@ -275,7 +283,7 @@ def check_pdf_support_if_needed(source: Path) -> None:
     if not (source.is_file() and source.suffix.lower() in PDF_EXTENSIONS):
         return
     try:
-        import fitz
+        pass
     except Exception as exc:
         die(f"Support PDF indisponible. Installez PyMuPDF (pymupdf). Detail : {exc}")
 
@@ -288,10 +296,13 @@ def check_source_file(source: Path, max_source_mb: int) -> None:
     if source.is_file():
         size_mb = source.stat().st_size / (1024 * 1024)
         if size_mb > max_source_mb:
-            die(f"Source trop volumineuse : {size_mb:.1f} Mo (limite : {max_source_mb} Mo). Ajustez avec --max-source-mb.")
+            die(
+                f"Source trop volumineuse : {size_mb:.1f} Mo (limite : {max_source_mb} Mo). Ajustez avec --max-source-mb."
+            )
     if source.is_file() and source.suffix.lower() in PDF_EXTENSIONS:
         try:
             import fitz
+
             with fitz.open(str(source)) as doc:
                 if doc.page_count == 0:
                     die(f"Le PDF ne contient aucune page : {source}")
@@ -301,18 +312,30 @@ def check_source_file(source: Path, max_source_mb: int) -> None:
 
 def validate_args(args: argparse.Namespace) -> None:
     source = Path(args.source)
-    if args.dpi <= 0: die("--dpi doit etre > 0")
-    if args.workers <= 0: die("--workers doit etre >= 1")
-    if args.timeout <= 0: die("--timeout doit etre > 0")
-    if args.start <= 0: die("--start doit etre >= 1")
-    if args.end is not None and args.end < args.start: die("--end doit etre >= --start")
-    if args.psm < 0 or args.psm > 13: die("--psm doit etre entre 0 et 13")
-    if args.oem not in (0, 1, 2, 3): die("--oem doit etre dans {0,1,2,3}")
-    if args.pdf_mode not in {"auto", "ocr", "text"}: die("--pdf-mode doit etre dans {auto, ocr, text}")
-    if args.text_threshold < 0: die("--text-threshold doit etre >= 0")
-    if args.min_chars < 0: die("--min-chars doit etre >= 0")
-    if args.retries < 0: die("--retries doit etre >= 0")
-    if args.max_source_mb <= 0: die("--max-source-mb doit etre > 0")
+    if args.dpi <= 0:
+        die("--dpi doit etre > 0")
+    if args.workers <= 0:
+        die("--workers doit etre >= 1")
+    if args.timeout <= 0:
+        die("--timeout doit etre > 0")
+    if args.start <= 0:
+        die("--start doit etre >= 1")
+    if args.end is not None and args.end < args.start:
+        die("--end doit etre >= --start")
+    if args.psm < 0 or args.psm > 13:
+        die("--psm doit etre entre 0 et 13")
+    if args.oem not in (0, 1, 2, 3):
+        die("--oem doit etre dans {0,1,2,3}")
+    if args.pdf_mode not in {"auto", "ocr", "text"}:
+        die("--pdf-mode doit etre dans {auto, ocr, text}")
+    if args.text_threshold < 0:
+        die("--text-threshold doit etre >= 0")
+    if args.min_chars < 0:
+        die("--min-chars doit etre >= 0")
+    if args.retries < 0:
+        die("--retries doit etre >= 0")
+    if args.max_source_mb <= 0:
+        die("--max-source-mb doit etre > 0")
     if source.is_file() and source.suffix.lower() not in (IMAGE_EXTENSIONS | PDF_EXTENSIONS):
         die(f"Extension non supportee : {source.suffix}")
     if source.is_dir():
@@ -322,27 +345,37 @@ def validate_args(args: argparse.Namespace) -> None:
     check_source_file(source, args.max_source_mb)
     check_tesseract_languages(args.lang)
     check_pdf_support_if_needed(source)
+
+
 # ---------------------------------------------------------------------------
 # Etat de reprise
 # ---------------------------------------------------------------------------
 
 
-def runtime_params() -> Set[str]:
+def runtime_params() -> set[str]:
     return {"workers", "timeout", "verbose", "resume", "out_dir", "suffix", "max_source_mb", "dedup"}
 
 
-def resume_identity(args: argparse.Namespace) -> Dict[str, object]:
+def resume_identity(args: argparse.Namespace) -> dict[str, object]:
     return {
-        "source": str(Path(args.source).resolve()), "dpi": args.dpi, "lang": args.lang,
-        "psm": args.psm, "oem": args.oem, "pdf_mode": args.pdf_mode,
-        "text_threshold": args.text_threshold, "no_preprocess": args.no_preprocess,
-        "min_chars": args.min_chars, "retries": args.retries,
-        "tsv_metrics": not args.no_tsv_metrics, "searchable_pdf": args.searchable_pdf,
-        "start": args.start, "end": args.end,
+        "source": str(Path(args.source).resolve()),
+        "dpi": args.dpi,
+        "lang": args.lang,
+        "psm": args.psm,
+        "oem": args.oem,
+        "pdf_mode": args.pdf_mode,
+        "text_threshold": args.text_threshold,
+        "no_preprocess": args.no_preprocess,
+        "min_chars": args.min_chars,
+        "retries": args.retries,
+        "tsv_metrics": not args.no_tsv_metrics,
+        "searchable_pdf": args.searchable_pdf,
+        "start": args.start,
+        "end": args.end,
     }
 
 
-def load_state(path: Path) -> Dict:
+def load_state(path: Path) -> dict:
     if not path.exists():
         return {}
     try:
@@ -354,39 +387,46 @@ def load_state(path: Path) -> Dict:
         die(f"Fichier d'etat illisible : {path} ({exc})")
 
 
-def save_state(path: Path, state: Dict) -> None:
+def save_state(path: Path, state: dict) -> None:
     state["updated_at"] = utc_now_iso()
     atomic_write_json(path, state)
 
 
-def ensure_state_compatible(state: Dict, args: argparse.Namespace, paths: Dict[str, Path]) -> None:
+def ensure_state_compatible(state: dict, args: argparse.Namespace, paths: dict[str, Path]) -> None:
     if not state:
         return
     if state.get("version") != STATE_VERSION:
-        die(f"Version d'etat incompatible (attendu v{STATE_VERSION}, obtenu v{state.get('version')}). Relancez sans --resume.")
+        die(
+            f"Version d'etat incompatible (attendu v{STATE_VERSION}, obtenu v{state.get('version')}). Relancez sans --resume."
+        )
     current_identity = resume_identity(args)
     saved_identity = state.get("identity", {})
     functional_keys = set(current_identity.keys()) - runtime_params()
     for key in functional_keys:
         if current_identity.get(key) != saved_identity.get(key):
-            die(f"Configuration fonctionnelle differente sur : {key} (bundle={saved_identity.get(key)!r}, actuel={current_identity.get(key)!r}). Relancez sans --resume.")
+            die(
+                f"Configuration fonctionnelle differente sur : {key} (bundle={saved_identity.get(key)!r}, actuel={current_identity.get(key)!r}). Relancez sans --resume."
+            )
     if state.get("output_txt") != str(paths["txt_out"].resolve()):
         die("Le bundle existant ne correspond pas a cette destination texte.")
 
 
-def init_state(args: argparse.Namespace, paths: Dict[str, Path], pages: Sequence[PageRef]) -> Dict:
+def init_state(args: argparse.Namespace, paths: dict[str, Path], pages: Sequence[PageRef]) -> dict:
     return {
-        "version": STATE_VERSION, "created_at": utc_now_iso(), "updated_at": utc_now_iso(),
+        "version": STATE_VERSION,
+        "created_at": utc_now_iso(),
+        "updated_at": utc_now_iso(),
         "identity": resume_identity(args),
         "output_txt": str(paths["txt_out"].resolve()),
         "output_searchable_pdf": str(paths["searchable_pdf"].resolve()) if args.searchable_pdf else None,
-        "page_count": len(pages), "pages": {},
+        "page_count": len(pages),
+        "pages": {},
         "run_config": {"workers": args.workers, "timeout": args.timeout, "verbose": args.verbose},
     }
 
 
-def completed_pages_from_state(state: Dict, paths: Dict[str, Path], valid_page_nos: Set[int]) -> Set[int]:
-    done: Set[int] = set()
+def completed_pages_from_state(state: dict, paths: dict[str, Path], valid_page_nos: set[int]) -> set[int]:
+    done: set[int] = set()
     for key, meta in state.get("pages", {}).items():
         try:
             pno = int(key)
@@ -395,7 +435,11 @@ def completed_pages_from_state(state: Dict, paths: Dict[str, Path], valid_page_n
         if pno not in valid_page_nos:
             continue
         try:
-            if meta.get("status") == "done" and page_text_path(paths, pno).exists() and page_meta_path(paths, pno).exists():
+            if (
+                meta.get("status") == "done"
+                and page_text_path(paths, pno).exists()
+                and page_meta_path(paths, pno).exists()
+            ):
                 done.add(pno)
         except Exception:
             continue
@@ -420,7 +464,7 @@ def compute_perceptual_hash(image: np.ndarray) -> str:
     return "".join("1" if val else "0" for row in diff for val in row)
 
 
-def list_pages(source: Path, start: int, end: Optional[int], dedup: bool = False) -> List[PageRef]:
+def list_pages(source: Path, start: int, end: int | None, dedup: bool = False) -> list[PageRef]:
     if source.is_dir():
         files = sorted(
             [p for p in source.iterdir() if p.is_file() and p.suffix.lower() in IMAGE_EXTENSIONS],
@@ -430,9 +474,9 @@ def list_pages(source: Path, start: int, end: Optional[int], dedup: bool = False
         last = len(files) if end is None else min(len(files), end)
         if first > last:
             die(f"Intervalle vide : start={first}, end={last}, total={len(files)}")
-        selected_files = files[first - 1:last]
-        pages: List[PageRef] = []
-        seen_hashes: Set[str] = set()
+        selected_files = files[first - 1 : last]
+        pages: list[PageRef] = []
+        seen_hashes: set[str] = set()
         for i, path in enumerate(selected_files, start=first):
             phash = None
             if dedup:
@@ -454,13 +498,17 @@ def list_pages(source: Path, start: int, end: Optional[int], dedup: bool = False
 
     if source.suffix.lower() in PDF_EXTENSIONS:
         import fitz
+
         with fitz.open(str(source)) as doc:
             total = doc.page_count
         first = max(1, start)
         last = total if end is None else min(total, end)
         if first > last:
             die(f"Intervalle vide : start={first}, end={last}, total={total}")
-        return [PageRef(page_no=pno, kind="pdf", source_path=str(source.resolve()), pdf_index=pno - 1) for pno in range(first, last + 1)]
+        return [
+            PageRef(page_no=pno, kind="pdf", source_path=str(source.resolve()), pdf_index=pno - 1)
+            for pno in range(first, last + 1)
+        ]
 
     die(f"Type de source non supporte : {source}")
     return []
@@ -480,6 +528,7 @@ def read_image(path: str) -> np.ndarray:
 
 def render_pdf_page(pdf_path: str, pdf_index: int, dpi: int) -> np.ndarray:
     import fitz
+
     doc = _get_cached_pdf_doc(pdf_path)
     page = doc[pdf_index]
     zoom = dpi / 72.0
@@ -500,7 +549,7 @@ def extract_pdf_native_text(pdf_path: str, pdf_index: int) -> str:
 
 def is_empty_page(image: np.ndarray, threshold: float = EMPTY_PAGE_THRESHOLD) -> bool:
     gray = to_gray(image)
-    unique, counts = np.unique(gray, return_counts=True)
+    _unique, counts = np.unique(gray, return_counts=True)
     return (counts.max() / gray.size) > threshold
 
 
@@ -520,10 +569,7 @@ def estimate_skew_angle(gray: np.ndarray) -> float:
     if coords.shape[0] < 200:
         return 0.0
     angle = cv2.minAreaRect(coords)[-1]
-    if angle < -45:
-        angle = -(90 + angle)
-    else:
-        angle = -angle
+    angle = -(90 + angle) if angle < -45 else -angle
     angle = float(angle)
     if abs(angle) < 0.2 or abs(angle) > 15:
         return 0.0
@@ -534,7 +580,9 @@ def rotate_image(image: np.ndarray, angle: float) -> np.ndarray:
     h, w = image.shape[:2]
     matrix = cv2.getRotationMatrix2D((w / 2.0, h / 2.0), angle, 1.0)
     border_value = 255 if image.ndim == 2 else (255, 255, 255)
-    return cv2.warpAffine(image, matrix, (w, h), flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_CONSTANT, borderValue=border_value)
+    return cv2.warpAffine(
+        image, matrix, (w, h), flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_CONSTANT, borderValue=border_value
+    )
 
 
 def normalize_gray(gray: np.ndarray) -> np.ndarray:
@@ -561,43 +609,72 @@ def preprocess_variant(image: np.ndarray, variant: str) -> np.ndarray:
     raise ValueError(f"Variant de pretraitement inconnue : {variant}")
 
 
-def build_attempt_plan(base_psm: int, no_preprocess: bool, retries: int) -> List[AttemptSpec]:
-    candidates: List[AttemptSpec] = []
+def build_attempt_plan(base_psm: int, no_preprocess: bool, retries: int) -> list[AttemptSpec]:
+    candidates: list[AttemptSpec] = []
     if no_preprocess:
         raw = [AttemptSpec("raw-gray", base_psm)]
-        if base_psm != 6: raw.append(AttemptSpec("raw-gray", 6))
-        if base_psm != 11: raw.append(AttemptSpec("raw-gray", 11))
+        if base_psm != 6:
+            raw.append(AttemptSpec("raw-gray", 6))
+        if base_psm != 11:
+            raw.append(AttemptSpec("raw-gray", 11))
         candidates.extend(raw)
     else:
-        candidates.extend([AttemptSpec("adaptive", base_psm), AttemptSpec("gray", base_psm), AttemptSpec("otsu", base_psm)])
-        if base_psm != 6: candidates.append(AttemptSpec("adaptive", 6))
-        if base_psm != 11: candidates.append(AttemptSpec("gray", 11))
-    deduped: List[AttemptSpec] = []
-    seen: Set[Tuple[str, int]] = set()
+        candidates.extend(
+            [AttemptSpec("adaptive", base_psm), AttemptSpec("gray", base_psm), AttemptSpec("otsu", base_psm)]
+        )
+        if base_psm != 6:
+            candidates.append(AttemptSpec("adaptive", 6))
+        if base_psm != 11:
+            candidates.append(AttemptSpec("gray", 11))
+    deduped: list[AttemptSpec] = []
+    seen: set[tuple[str, int]] = set()
     for item in candidates:
         key = (item.variant, item.psm)
         if key not in seen:
             seen.add(key)
             deduped.append(item)
     return deduped[: max(1, 1 + retries)]
+
+
 # ---------------------------------------------------------------------------
 # Tesseract
 # ---------------------------------------------------------------------------
 
 
-def tesseract_base_command(img_path: str, output_base: str, lang: str, psm: int, oem: int) -> List[str]:
-    return ["tesseract", img_path, output_base, "-l", lang, "--psm", str(psm), "--oem", str(oem), "-c", "preserve_interword_spaces=1"]
+def tesseract_base_command(img_path: str, output_base: str, lang: str, psm: int, oem: int) -> list[str]:
+    return [
+        "tesseract",
+        img_path,
+        output_base,
+        "-l",
+        lang,
+        "--psm",
+        str(psm),
+        "--oem",
+        str(oem),
+        "-c",
+        "preserve_interword_spaces=1",
+    ]
 
 
-def run_command(command: List[str], timeout: int) -> subprocess.CompletedProcess:
+def run_command(command: list[str], timeout: int) -> subprocess.CompletedProcess:
     env = os.environ.copy()
     env.setdefault("OMP_THREAD_LIMIT", "1")
     env.setdefault("MKL_NUM_THREADS", "1")
     env.setdefault("OPENBLAS_NUM_THREADS", "1")
-    return subprocess.run(command, capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=timeout, check=False, env=env)
+    return subprocess.run(
+        command,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+        timeout=timeout,
+        check=False,
+        env=env,
+    )
 
 
-def run_tesseract_text(image: np.ndarray, lang: str, psm: int, oem: int, timeout: int) -> Tuple[str, Optional[str]]:
+def run_tesseract_text(image: np.ndarray, lang: str, psm: int, oem: int, timeout: int) -> tuple[str, str | None]:
     with tempfile.TemporaryDirectory() as tmp_dir:
         img_path = str(Path(tmp_dir) / "page.png")
         if not cv2.imwrite(img_path, image):
@@ -612,31 +689,34 @@ def run_tesseract_text(image: np.ndarray, lang: str, psm: int, oem: int, timeout
         return result.stdout.strip(), None
 
 
-def parse_tsv_metrics(tsv_text: str) -> Tuple[Optional[float], int]:
+def parse_tsv_metrics(tsv_text: str) -> tuple[float | None, int]:
     lines = [line for line in tsv_text.splitlines() if line.strip()]
     if len(lines) <= 1:
         return None, 0
-    scores: List[float] = []
+    scores: list[float] = []
     word_count = 0
     reader = csv.DictReader(lines, delimiter="\t")
     for row in reader:
         text = (row.get("text") or "").strip()
         conf_raw = (row.get("conf") or "").strip()
-        if text: word_count += 1
+        if text:
+            word_count += 1
         if conf_raw and conf_raw not in {"-1", "nan"}:
-            try: scores.append(float(conf_raw))
-            except ValueError: pass
+            with contextlib.suppress(ValueError):
+                scores.append(float(conf_raw))
     if not scores:
         return None, word_count
     return round(sum(scores) / len(scores), 2), word_count
 
 
-def collect_tsv_metrics(image: np.ndarray, lang: str, psm: int, oem: int, timeout: int) -> Tuple[Optional[float], int, Optional[str]]:
+def collect_tsv_metrics(
+    image: np.ndarray, lang: str, psm: int, oem: int, timeout: int
+) -> tuple[float | None, int, str | None]:
     with tempfile.TemporaryDirectory() as tmp_dir:
         img_path = str(Path(tmp_dir) / "page.png")
         if not cv2.imwrite(img_path, image):
             return None, 0, "Echec d'ecriture de l'image temporaire pour TSV"
-        command = tesseract_base_command(img_path, "stdout", lang, psm, oem) + ["tsv"]
+        command = [*tesseract_base_command(img_path, "stdout", lang, psm, oem), "tsv"]
         try:
             result = run_command(command, timeout)
         except subprocess.TimeoutExpired:
@@ -647,13 +727,15 @@ def collect_tsv_metrics(image: np.ndarray, lang: str, psm: int, oem: int, timeou
         return mean_conf, words, None
 
 
-def generate_searchable_page_pdf(image: np.ndarray, lang: str, psm: int, oem: int, timeout: int, dest_path: Path) -> Optional[str]:
+def generate_searchable_page_pdf(
+    image: np.ndarray, lang: str, psm: int, oem: int, timeout: int, dest_path: Path
+) -> str | None:
     with tempfile.TemporaryDirectory() as tmp_dir:
         img_path = str(Path(tmp_dir) / "page.png")
         out_base = str(Path(tmp_dir) / "page_ocr")
         if not cv2.imwrite(img_path, image):
             return "Echec d'ecriture de l'image temporaire pour PDF"
-        command = tesseract_base_command(img_path, out_base, lang, psm, oem) + ["pdf"]
+        command = [*tesseract_base_command(img_path, out_base, lang, psm, oem), "pdf"]
         try:
             result = run_command(command, timeout)
         except subprocess.TimeoutExpired:
@@ -673,26 +755,45 @@ def generate_searchable_page_pdf(image: np.ndarray, lang: str, psm: int, oem: in
 
 
 def _build_meta(
-    page: PageRef, method: str, text: str, error: Optional[str],
-    confidence_mean: Optional[float], confidence_words: int,
-    pdf_error: Optional[str], pdf_path: Optional[Path],
-    attempts_meta: List[Dict[str, object]], selected_attempt: Optional[AttemptSpec],
-    is_empty: bool, duration_ms: float,
-) -> Dict[str, object]:
+    page: PageRef,
+    method: str,
+    text: str,
+    error: str | None,
+    confidence_mean: float | None,
+    confidence_words: int,
+    pdf_error: str | None,
+    pdf_path: Path | None,
+    attempts_meta: list[dict[str, object]],
+    selected_attempt: AttemptSpec | None,
+    is_empty: bool,
+    duration_ms: float,
+) -> dict[str, object]:
     return {
-        "page_no": page.page_no, "status": "done",
-        "source_kind": page.kind, "source_path": page.source_path, "pdf_index": page.pdf_index,
-        "method": method, "chars": len(text), "non_ws_chars": compact_len(text),
-        "attempt_count": len(attempts_meta), "attempts": attempts_meta,
-        "selected_attempt": None if selected_attempt is None else {"variant": selected_attempt.variant, "psm": selected_attempt.psm},
-        "confidence_mean": confidence_mean, "confidence_words": confidence_words,
-        "error": error, "pdf_page_error": pdf_error,
+        "page_no": page.page_no,
+        "status": "done",
+        "source_kind": page.kind,
+        "source_path": page.source_path,
+        "pdf_index": page.pdf_index,
+        "method": method,
+        "chars": len(text),
+        "non_ws_chars": compact_len(text),
+        "attempt_count": len(attempts_meta),
+        "attempts": attempts_meta,
+        "selected_attempt": None
+        if selected_attempt is None
+        else {"variant": selected_attempt.variant, "psm": selected_attempt.psm},
+        "confidence_mean": confidence_mean,
+        "confidence_words": confidence_words,
+        "error": error,
+        "pdf_page_error": pdf_error,
         "searchable_pdf_page": str(pdf_path.resolve()) if pdf_path else None,
-        "duration_ms": duration_ms, "is_empty_page": is_empty, "processed_at": utc_now_iso(),
+        "duration_ms": duration_ms,
+        "is_empty_page": is_empty,
+        "processed_at": utc_now_iso(),
     }
 
 
-def process_page(task: Dict[str, object]) -> Dict[str, object]:
+def process_page(task: dict[str, object]) -> dict[str, object]:
     cv2.setNumThreads(1)
     page = PageRef(**task["page"])
     page_no = page.page_no
@@ -713,18 +814,18 @@ def process_page(task: Dict[str, object]) -> Dict[str, object]:
     text_path = page_text_path(paths, page_no)
     meta_path = page_meta_path(paths, page_no)
     pdf_path = page_pdf_path(paths, page_no)
-    attempts_meta: List[Dict[str, object]] = []
-    selected_attempt: Optional[AttemptSpec] = None
-    selected_image: Optional[np.ndarray] = None
+    attempts_meta: list[dict[str, object]] = []
+    selected_attempt: AttemptSpec | None = None
+    selected_image: np.ndarray | None = None
     selected_text = ""
-    selected_error: Optional[str] = None
+    selected_error: str | None = None
     method = "failed"
-    confidence_mean: Optional[float] = None
+    confidence_mean: float | None = None
     confidence_words = 0
-    pdf_error: Optional[str] = None
+    pdf_error: str | None = None
     is_empty = False
 
-    def finish(meta: Dict[str, object]) -> Dict[str, object]:
+    def finish(meta: dict[str, object]) -> dict[str, object]:
         atomic_write_json(meta_path, meta)
         return meta
 
@@ -740,14 +841,20 @@ def process_page(task: Dict[str, object]) -> Dict[str, object]:
                 selected_text = native_text
                 atomic_write_text(text_path, selected_text + "\n")
                 duration_ms = round((time.perf_counter() - started) * 1000, 2)
-                return finish(_build_meta(page, method, selected_text, None, None, 0, None, None, [], None, False, duration_ms))
+                return finish(
+                    _build_meta(page, method, selected_text, None, None, 0, None, None, [], None, False, duration_ms)
+                )
             if pdf_mode == "text":
                 selected_error = f"Aucun texte natif exploitable sur la page {page_no}"
                 selected_text = f"[NO NATIVE TEXT page {page_no}]"
                 method = "native-text"
                 atomic_write_text(text_path, selected_text + "\n")
                 duration_ms = round((time.perf_counter() - started) * 1000, 2)
-                return finish(_build_meta(page, method, selected_text, selected_error, None, 0, None, None, [], None, False, duration_ms))
+                return finish(
+                    _build_meta(
+                        page, method, selected_text, selected_error, None, 0, None, None, [], None, False, duration_ms
+                    )
+                )
 
         if page.kind == "image":
             source_image = read_image(page.source_path)
@@ -762,7 +869,9 @@ def process_page(task: Dict[str, object]) -> Dict[str, object]:
             method = "empty"
             atomic_write_text(text_path, selected_text + "\n")
             duration_ms = round((time.perf_counter() - started) * 1000, 2)
-            return finish(_build_meta(page, method, selected_text, None, None, 0, None, None, [], None, True, duration_ms))
+            return finish(
+                _build_meta(page, method, selected_text, None, None, 0, None, None, [], None, True, duration_ms)
+            )
 
         best_score = -1.0
         plan = build_attempt_plan(psm, no_preprocess, retries)
@@ -775,11 +884,21 @@ def process_page(task: Dict[str, object]) -> Dict[str, object]:
                 err = str(exc)
                 processed = None
             score = compact_len(text)
-            attempt_conf: Optional[float] = None
+            attempt_conf: float | None = None
             attempt_words: int = 0
             if collect_conf and processed is not None and err is None:
                 attempt_conf, attempt_words, _conf_err = collect_tsv_metrics(processed, lang, attempt.psm, oem, timeout)
-            attempts_meta.append({"variant": attempt.variant, "psm": attempt.psm, "chars": len(text), "non_ws_chars": score, "error": err, "confidence_mean": attempt_conf, "confidence_words": attempt_words})
+            attempts_meta.append(
+                {
+                    "variant": attempt.variant,
+                    "psm": attempt.psm,
+                    "chars": len(text),
+                    "non_ws_chars": score,
+                    "error": err,
+                    "confidence_mean": attempt_conf,
+                    "confidence_words": attempt_words,
+                }
+            )
             combined_score = float(score)
             if attempt_conf is not None and attempt_conf > CONFIDENCE_THRESHOLD:
                 combined_score = score + (attempt_conf * 10)
@@ -810,7 +929,22 @@ def process_page(task: Dict[str, object]) -> Dict[str, object]:
 
         atomic_write_text(text_path, selected_text + "\n")
         duration_ms = round((time.perf_counter() - started) * 1000, 2)
-        return finish(_build_meta(page=page, method=method, text=selected_text, error=selected_error, confidence_mean=confidence_mean, confidence_words=confidence_words, pdf_error=pdf_error, pdf_path=pdf_path if pdf_path.exists() else None, attempts_meta=attempts_meta, selected_attempt=selected_attempt, is_empty=is_empty, duration_ms=duration_ms))
+        return finish(
+            _build_meta(
+                page=page,
+                method=method,
+                text=selected_text,
+                error=selected_error,
+                confidence_mean=confidence_mean,
+                confidence_words=confidence_words,
+                pdf_error=pdf_error,
+                pdf_path=pdf_path if pdf_path.exists() else None,
+                attempts_meta=attempts_meta,
+                selected_attempt=selected_attempt,
+                is_empty=is_empty,
+                duration_ms=duration_ms,
+            )
+        )
 
     except Exception as exc:
         duration_ms = round((time.perf_counter() - started) * 1000, 2)
@@ -818,16 +952,39 @@ def process_page(task: Dict[str, object]) -> Dict[str, object]:
         tb = traceback.format_exc()
         fallback_text = f"[OCR ERROR page {page_no}: {error}]\n\n{tb}"
         atomic_write_text(text_path, fallback_text + "\n")
-        meta = {"page_no": page_no, "status": "error", "source_kind": page.kind, "source_path": page.source_path, "pdf_index": page.pdf_index, "method": "failed", "chars": len(fallback_text), "non_ws_chars": compact_len(fallback_text), "attempt_count": len(attempts_meta), "attempts": attempts_meta, "selected_attempt": None, "confidence_mean": None, "confidence_words": 0, "error": error, "traceback": tb, "pdf_page_error": None, "searchable_pdf_page": None, "duration_ms": duration_ms, "is_empty_page": False, "processed_at": utc_now_iso()}
+        meta = {
+            "page_no": page_no,
+            "status": "error",
+            "source_kind": page.kind,
+            "source_path": page.source_path,
+            "pdf_index": page.pdf_index,
+            "method": "failed",
+            "chars": len(fallback_text),
+            "non_ws_chars": compact_len(fallback_text),
+            "attempt_count": len(attempts_meta),
+            "attempts": attempts_meta,
+            "selected_attempt": None,
+            "confidence_mean": None,
+            "confidence_words": 0,
+            "error": error,
+            "traceback": tb,
+            "pdf_page_error": None,
+            "searchable_pdf_page": None,
+            "duration_ms": duration_ms,
+            "is_empty_page": False,
+            "processed_at": utc_now_iso(),
+        }
         atomic_write_json(meta_path, meta)
         return meta
+
+
 # ---------------------------------------------------------------------------
 # Assemblage texte / PDF / rapports
 # ---------------------------------------------------------------------------
 
 
-def assemble_text_output(paths: Dict[str, Path], pages: Sequence[PageRef]) -> None:
-    blocks: List[str] = []
+def assemble_text_output(paths: dict[str, Path], pages: Sequence[PageRef]) -> None:
+    blocks: list[str] = []
     for page in pages:
         part = page_text_path(paths, page.page_no)
         if part.exists():
@@ -840,6 +997,7 @@ def assemble_text_output(paths: Dict[str, Path], pages: Sequence[PageRef]) -> No
 
 def append_image_as_pdf_page(doc, image_path: str) -> None:
     import fitz
+
     rect = fitz.Rect(0, 0, 595, 842)
     try:
         pix = fitz.Pixmap(image_path)
@@ -850,8 +1008,9 @@ def append_image_as_pdf_page(doc, image_path: str) -> None:
     page.insert_image(rect, filename=image_path)
 
 
-def assemble_searchable_pdf(paths: Dict[str, Path], pages: Sequence[PageRef]) -> None:
+def assemble_searchable_pdf(paths: dict[str, Path], pages: Sequence[PageRef]) -> None:
     import fitz
+
     out_doc = fitz.open()
     source_pdf_doc = None
     try:
@@ -861,8 +1020,10 @@ def assemble_searchable_pdf(paths: Dict[str, Path], pages: Sequence[PageRef]) ->
             meta_file = page_meta_path(paths, page.page_no)
             meta = {}
             if meta_file.exists():
-                try: meta = json.loads(meta_file.read_text(encoding="utf-8"))
-                except Exception: meta = {}
+                try:
+                    meta = json.loads(meta_file.read_text(encoding="utf-8"))
+                except Exception:
+                    meta = {}
             method = meta.get("method")
             page_pdf = page_pdf_path(paths, page.page_no)
             if method == "native-text" and source_pdf_doc is not None and page.pdf_index is not None:
@@ -886,37 +1047,108 @@ def assemble_searchable_pdf(paths: Dict[str, Path], pages: Sequence[PageRef]) ->
         out_doc.close()
 
 
-def generate_reports(paths: Dict[str, Path], pages: Sequence[PageRef], state: Dict, args: argparse.Namespace) -> None:
-    rows: List[Dict[str, object]] = []
-    method_counts: Dict[str, int] = {}
+def generate_reports(paths: dict[str, Path], pages: Sequence[PageRef], state: dict, args: argparse.Namespace) -> None:
+    rows: list[dict[str, object]] = []
+    method_counts: dict[str, int] = {}
     total_chars = 0
     error_count = 0
     total_duration_ms = 0.0
-    confidence_values: List[float] = []
+    confidence_values: list[float] = []
 
     for page in pages:
         meta_file = page_meta_path(paths, page.page_no)
         if not meta_file.exists():
-            rows.append({"page_no": page.page_no, "status": "missing", "method": None, "chars": 0, "non_ws_chars": 0, "duration_ms": 0, "confidence_mean": None, "confidence_words": 0, "attempt_count": 0, "error": "missing meta", "searchable_pdf_page": None, "source_kind": page.kind, "source_path": page.source_path, "pdf_index": page.pdf_index, "is_empty_page": False})
+            rows.append(
+                {
+                    "page_no": page.page_no,
+                    "status": "missing",
+                    "method": None,
+                    "chars": 0,
+                    "non_ws_chars": 0,
+                    "duration_ms": 0,
+                    "confidence_mean": None,
+                    "confidence_words": 0,
+                    "attempt_count": 0,
+                    "error": "missing meta",
+                    "searchable_pdf_page": None,
+                    "source_kind": page.kind,
+                    "source_path": page.source_path,
+                    "pdf_index": page.pdf_index,
+                    "is_empty_page": False,
+                }
+            )
             error_count += 1
             continue
         try:
             meta = json.loads(meta_file.read_text(encoding="utf-8"))
         except Exception:
-            rows.append({"page_no": page.page_no, "status": "missing", "method": None, "chars": 0, "non_ws_chars": 0, "duration_ms": 0, "confidence_mean": None, "confidence_words": 0, "attempt_count": 0, "error": "corrupted meta", "searchable_pdf_page": None, "source_kind": page.kind, "source_path": page.source_path, "pdf_index": page.pdf_index, "is_empty_page": False})
+            rows.append(
+                {
+                    "page_no": page.page_no,
+                    "status": "missing",
+                    "method": None,
+                    "chars": 0,
+                    "non_ws_chars": 0,
+                    "duration_ms": 0,
+                    "confidence_mean": None,
+                    "confidence_words": 0,
+                    "attempt_count": 0,
+                    "error": "corrupted meta",
+                    "searchable_pdf_page": None,
+                    "source_kind": page.kind,
+                    "source_path": page.source_path,
+                    "pdf_index": page.pdf_index,
+                    "is_empty_page": False,
+                }
+            )
             error_count += 1
             continue
-        rows.append({"page_no": meta.get("page_no"), "status": meta.get("status"), "method": meta.get("method"), "chars": meta.get("chars"), "non_ws_chars": meta.get("non_ws_chars"), "duration_ms": meta.get("duration_ms"), "confidence_mean": meta.get("confidence_mean"), "confidence_words": meta.get("confidence_words"), "attempt_count": meta.get("attempt_count"), "error": meta.get("error"), "searchable_pdf_page": meta.get("searchable_pdf_page"), "source_kind": meta.get("source_kind"), "source_path": meta.get("source_path"), "pdf_index": meta.get("pdf_index"), "is_empty_page": meta.get("is_empty_page", False)})
+        rows.append(
+            {
+                "page_no": meta.get("page_no"),
+                "status": meta.get("status"),
+                "method": meta.get("method"),
+                "chars": meta.get("chars"),
+                "non_ws_chars": meta.get("non_ws_chars"),
+                "duration_ms": meta.get("duration_ms"),
+                "confidence_mean": meta.get("confidence_mean"),
+                "confidence_words": meta.get("confidence_words"),
+                "attempt_count": meta.get("attempt_count"),
+                "error": meta.get("error"),
+                "searchable_pdf_page": meta.get("searchable_pdf_page"),
+                "source_kind": meta.get("source_kind"),
+                "source_path": meta.get("source_path"),
+                "pdf_index": meta.get("pdf_index"),
+                "is_empty_page": meta.get("is_empty_page", False),
+            }
+        )
         method = str(meta.get("method"))
         method_counts[method] = method_counts.get(method, 0) + 1
         total_chars += int(meta.get("chars") or 0)
         total_duration_ms += float(meta.get("duration_ms") or 0.0)
-        if meta.get("error"): error_count += 1
+        if meta.get("error"):
+            error_count += 1
         if meta.get("confidence_mean") is not None:
-            try: confidence_values.append(float(meta["confidence_mean"]))
-            except Exception: pass
+            with contextlib.suppress(Exception):
+                confidence_values.append(float(meta["confidence_mean"]))
 
-    fieldnames = ["page_no", "status", "method", "chars", "non_ws_chars", "duration_ms", "confidence_mean", "confidence_words", "attempt_count", "error", "searchable_pdf_page", "source_kind", "source_path", "pdf_index", "is_empty_page"]
+    fieldnames = [
+        "page_no",
+        "status",
+        "method",
+        "chars",
+        "non_ws_chars",
+        "duration_ms",
+        "confidence_mean",
+        "confidence_words",
+        "attempt_count",
+        "error",
+        "searchable_pdf_page",
+        "source_kind",
+        "source_path",
+        "pdf_index",
+        "is_empty_page",
+    ]
     paths["pages_csv"].parent.mkdir(parents=True, exist_ok=True)
     with paths["pages_csv"].open("w", encoding="utf-8", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames)
@@ -931,15 +1163,37 @@ def generate_reports(paths: Dict[str, Path], pages: Sequence[PageRef], state: Di
             quality_warning = f"ATTENTION: {low_conf_pages}/{len(confidence_values)} pages ont une confiance moyenne < {CONFIDENCE_THRESHOLD}"
 
     summary = {
-        "generated_at": utc_now_iso(), "source": str(Path(args.source).resolve()),
+        "generated_at": utc_now_iso(),
+        "source": str(Path(args.source).resolve()),
         "text_output": str(paths["txt_out"].resolve()),
         "searchable_pdf_output": str(paths["searchable_pdf"].resolve()) if args.searchable_pdf else None,
-        "page_count": len(pages), "method_counts": method_counts, "error_pages": error_count,
-        "total_chars": total_chars, "avg_confidence_mean": avg_confidence,
-        "total_duration_ms": round(total_duration_ms, 2), "quality_warning": quality_warning,
-        "bundle": str(paths["bundle"].resolve()), "csv_report": str(paths["pages_csv"].resolve()),
+        "page_count": len(pages),
+        "method_counts": method_counts,
+        "error_pages": error_count,
+        "total_chars": total_chars,
+        "avg_confidence_mean": avg_confidence,
+        "total_duration_ms": round(total_duration_ms, 2),
+        "quality_warning": quality_warning,
+        "bundle": str(paths["bundle"].resolve()),
+        "csv_report": str(paths["pages_csv"].resolve()),
         "state_file": str(paths["state"].resolve()),
-        "config": {"dpi": args.dpi, "lang": args.lang, "psm": args.psm, "oem": args.oem, "workers": args.workers, "timeout": args.timeout, "pdf_mode": args.pdf_mode, "text_threshold": args.text_threshold, "no_preprocess": args.no_preprocess, "min_chars": args.min_chars, "retries": args.retries, "searchable_pdf": args.searchable_pdf, "tsv_metrics": not args.no_tsv_metrics, "max_source_mb": args.max_source_mb, "dedup": args.dedup},
+        "config": {
+            "dpi": args.dpi,
+            "lang": args.lang,
+            "psm": args.psm,
+            "oem": args.oem,
+            "workers": args.workers,
+            "timeout": args.timeout,
+            "pdf_mode": args.pdf_mode,
+            "text_threshold": args.text_threshold,
+            "no_preprocess": args.no_preprocess,
+            "min_chars": args.min_chars,
+            "retries": args.retries,
+            "searchable_pdf": args.searchable_pdf,
+            "tsv_metrics": not args.no_tsv_metrics,
+            "max_source_mb": args.max_source_mb,
+            "dedup": args.dedup,
+        },
         "state_snapshot": state,
     }
     atomic_write_json(paths["summary"], summary)
@@ -950,7 +1204,7 @@ def generate_reports(paths: Dict[str, Path], pages: Sequence[PageRef], state: Di
 # ---------------------------------------------------------------------------
 
 
-def ocr_pipeline(args: argparse.Namespace, paths: Dict[str, Path]) -> str:
+def ocr_pipeline(args: argparse.Namespace, paths: dict[str, Path]) -> str:
     source = Path(args.source)
     pages = list_pages(source, args.start, args.end, dedup=args.dedup)
     valid_page_nos = {p.page_no for p in pages}
@@ -973,13 +1227,43 @@ def ocr_pipeline(args: argparse.Namespace, paths: Dict[str, Path]) -> str:
         return str(paths["txt_out"])
 
     worker_count = min(args.workers, len(pages_to_do))
-    LOG.info("%d page(s) a traiter (workers=%d, dpi=%d, psm=%d, oem=%d, pdf_mode=%s, preprocess=%s, retries=%d, dedup=%s)", len(pages_to_do), worker_count, args.dpi, args.psm, args.oem, args.pdf_mode, not args.no_preprocess, args.retries, args.dedup)
+    LOG.info(
+        "%d page(s) a traiter (workers=%d, dpi=%d, psm=%d, oem=%d, pdf_mode=%s, preprocess=%s, retries=%d, dedup=%s)",
+        len(pages_to_do),
+        worker_count,
+        args.dpi,
+        args.psm,
+        args.oem,
+        args.pdf_mode,
+        not args.no_preprocess,
+        args.retries,
+        args.dedup,
+    )
 
-    base_task = {"lang": args.lang, "psm": args.psm, "oem": args.oem, "dpi": args.dpi, "timeout": args.timeout, "pdf_mode": args.pdf_mode, "no_preprocess": args.no_preprocess, "text_threshold": args.text_threshold, "min_chars": args.min_chars, "retries": args.retries, "collect_conf": not args.no_tsv_metrics, "searchable_pdf": args.searchable_pdf, "paths": {k: str(v) for k, v in paths.items()}}
-    tasks: List[Dict[str, object]] = []
+    base_task = {
+        "lang": args.lang,
+        "psm": args.psm,
+        "oem": args.oem,
+        "dpi": args.dpi,
+        "timeout": args.timeout,
+        "pdf_mode": args.pdf_mode,
+        "no_preprocess": args.no_preprocess,
+        "text_threshold": args.text_threshold,
+        "min_chars": args.min_chars,
+        "retries": args.retries,
+        "collect_conf": not args.no_tsv_metrics,
+        "searchable_pdf": args.searchable_pdf,
+        "paths": {k: str(v) for k, v in paths.items()},
+    }
+    tasks: list[dict[str, object]] = []
     for page in pages_to_do:
         task = dict(base_task)
-        task["page"] = {"page_no": page.page_no, "kind": page.kind, "source_path": page.source_path, "pdf_index": page.pdf_index}
+        task["page"] = {
+            "page_no": page.page_no,
+            "kind": page.kind,
+            "source_path": page.source_path,
+            "pdf_index": page.pdf_index,
+        }
         tasks.append(task)
 
     total = len(tasks)
@@ -995,13 +1279,49 @@ def ocr_pipeline(args: argparse.Namespace, paths: Dict[str, Path]) -> str:
                 tb = traceback.format_exc()
                 fallback_text = f"[OCR ERROR page {page_no}: {error}]\n\n{tb}"
                 atomic_write_text(page_text_path(paths, page_no), fallback_text + "\n")
-                meta = {"page_no": page_no, "status": "error", "source_kind": None, "source_path": None, "pdf_index": None, "method": "failed", "chars": len(fallback_text), "non_ws_chars": compact_len(fallback_text), "attempt_count": 0, "attempts": [], "selected_attempt": None, "confidence_mean": None, "confidence_words": 0, "error": error, "traceback": tb, "pdf_page_error": None, "searchable_pdf_page": None, "duration_ms": 0.0, "is_empty_page": False, "processed_at": utc_now_iso()}
+                meta = {
+                    "page_no": page_no,
+                    "status": "error",
+                    "source_kind": None,
+                    "source_path": None,
+                    "pdf_index": None,
+                    "method": "failed",
+                    "chars": len(fallback_text),
+                    "non_ws_chars": compact_len(fallback_text),
+                    "attempt_count": 0,
+                    "attempts": [],
+                    "selected_attempt": None,
+                    "confidence_mean": None,
+                    "confidence_words": 0,
+                    "error": error,
+                    "traceback": tb,
+                    "pdf_page_error": None,
+                    "searchable_pdf_page": None,
+                    "duration_ms": 0.0,
+                    "is_empty_page": False,
+                    "processed_at": utc_now_iso(),
+                }
                 atomic_write_json(page_meta_path(paths, page_no), meta)
-            state["pages"][str(page_no)] = {"status": meta.get("status"), "method": meta.get("method"), "chars": meta.get("chars"), "error": meta.get("error"), "duration_ms": meta.get("duration_ms"), "processed_at": meta.get("processed_at")}
+            state["pages"][str(page_no)] = {
+                "status": meta.get("status"),
+                "method": meta.get("method"),
+                "chars": meta.get("chars"),
+                "error": meta.get("error"),
+                "duration_ms": meta.get("duration_ms"),
+                "processed_at": meta.get("processed_at"),
+            }
             save_state(paths["state"], state)
             completed += 1
             error_mark = " ERREUR" if meta.get("error") or meta.get("pdf_page_error") else ""
-            LOG.info("Page %d traitee [%d/%d] -- %s -- %d chars%s", page_no, completed, total, meta.get("method"), int(meta.get("chars") or 0), error_mark)
+            LOG.info(
+                "Page %d traitee [%d/%d] -- %s -- %d chars%s",
+                page_no,
+                completed,
+                total,
+                meta.get("method"),
+                int(meta.get("chars") or 0),
+                error_mark,
+            )
 
     assemble_text_output(paths, pages)
     if args.searchable_pdf:
@@ -1010,7 +1330,11 @@ def ocr_pipeline(args: argparse.Namespace, paths: Dict[str, Path]) -> str:
     state["assembled_at"] = utc_now_iso()
     save_state(paths["state"], state)
     generate_reports(paths, pages, state, args)
-    total_chars = sum(len(page_text_path(paths, p.page_no).read_text(encoding="utf-8", errors="replace")) for p in pages if page_text_path(paths, p.page_no).exists())
+    total_chars = sum(
+        len(page_text_path(paths, p.page_no).read_text(encoding="utf-8", errors="replace"))
+        for p in pages
+        if page_text_path(paths, p.page_no).exists()
+    )
     LOG.info("OCR termine -> %s (%d chars)", paths["txt_out"], total_chars)
     if args.searchable_pdf:
         LOG.info("PDF searchable -> %s", paths["searchable_pdf"])
@@ -1032,19 +1356,50 @@ def build_arg_parser() -> argparse.ArgumentParser:
     ap.add_argument("--timeout", type=int, default=120, help="Timeout Tesseract par page (s)")
     ap.add_argument("--psm", type=int, default=3, help="Page Segmentation Mode Tesseract")
     ap.add_argument("--oem", type=int, default=1, help="OCR Engine Mode Tesseract")
-    ap.add_argument("--workers", type=int, default=max(1, (os.cpu_count() or 2) // 2), help="Nombre de workers paralleles")
+    ap.add_argument(
+        "--workers", type=int, default=max(1, (os.cpu_count() or 2) // 2), help="Nombre de workers paralleles"
+    )
     ap.add_argument("--resume", action="store_true", help="Reprendre une run interrompue")
     ap.add_argument("--out-dir", default=None, help="Dossier de sortie")
     ap.add_argument("--suffix", default=".ocr.txt", help="Suffixe de la sortie texte")
     ap.add_argument("--lang", default="ara+fra", help="Langues Tesseract (defaut: ara+fra)")
-    ap.add_argument("--pdf-mode", choices=["auto", "ocr", "text"], default="auto", help="PDF: auto=texte natif si exploitable sinon OCR ; ocr=OCR force ; text=texte natif seul")
-    ap.add_argument("--text-threshold", type=int, default=25, help="Seuil minimal de caracteres non blancs pour accepter le texte natif PDF")
+    ap.add_argument(
+        "--pdf-mode",
+        choices=["auto", "ocr", "text"],
+        default="auto",
+        help="PDF: auto=texte natif si exploitable sinon OCR ; ocr=OCR force ; text=texte natif seul",
+    )
+    ap.add_argument(
+        "--text-threshold",
+        type=int,
+        default=25,
+        help="Seuil minimal de caracteres non blancs pour accepter le texte natif PDF",
+    )
     ap.add_argument("--no-preprocess", action="store_true", help="Desactive le pretraitement image")
-    ap.add_argument("--min-chars", type=int, default=10, help="Seuil minimal de caracteres non blancs pour accepter une tentative OCR")
-    ap.add_argument("--retries", type=int, default=2, help="Nombre de tentatives supplementaires avec variantes de pretraitement / PSM")
-    ap.add_argument("--no-tsv-metrics", action="store_true", help="Desactive la collecte de metriques TSV (confiance moyenne, nombre de mots)")
+    ap.add_argument(
+        "--min-chars",
+        type=int,
+        default=10,
+        help="Seuil minimal de caracteres non blancs pour accepter une tentative OCR",
+    )
+    ap.add_argument(
+        "--retries",
+        type=int,
+        default=2,
+        help="Nombre de tentatives supplementaires avec variantes de pretraitement / PSM",
+    )
+    ap.add_argument(
+        "--no-tsv-metrics",
+        action="store_true",
+        help="Desactive la collecte de metriques TSV (confiance moyenne, nombre de mots)",
+    )
     ap.add_argument("--searchable-pdf", action="store_true", help="Produit un PDF searchable final quand possible")
-    ap.add_argument("--max-source-mb", type=int, default=MAX_SOURCE_MB, help=f"Taille max du fichier source en Mo (defaut: {MAX_SOURCE_MB})")
+    ap.add_argument(
+        "--max-source-mb",
+        type=int,
+        default=MAX_SOURCE_MB,
+        help=f"Taille max du fichier source en Mo (defaut: {MAX_SOURCE_MB})",
+    )
     ap.add_argument("--dedup", action="store_true", help="Active la de-duplication des pages images")
     ap.add_argument("--verbose", action="store_true", help="Logs verbeux")
     return ap
