@@ -61,7 +61,9 @@ def test_webhook_invalid_signature():
         headers={"signature": "bad_sig"}
     )
     assert response.status_code == 403
-    assert response.json() == {"erreur": "Invalid signature"}
+    j = response.json()
+    assert j["erreur"] == "Invalid signature"
+    assert j["status"] == 403
 
 
 @pytest.mark.asyncio

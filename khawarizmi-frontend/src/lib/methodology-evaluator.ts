@@ -294,17 +294,7 @@ function evaluateGeneric(verb: ActionVerbRule, answer: string): MethodologyEvalu
   return finalizeEvaluation(evaluation)
 }
 
-export async function evaluateMethodologyAnswer(input: EvaluateMethodologyInput): Promise<MethodologyEvaluation> {
-  try {
-    const result = await apiClient.request<MethodologyEvaluation>("/api/action-verbs/evaluate", {
-      method: "POST",
-      body: JSON.stringify({ verb_slug: input.verbSlug, answer: input.answer }),
-    })
-    if (result && result.verbSlug) return result
-  } catch {
-    // Fallback local
-  }
-
+export function evaluateMethodologyAnswer(input: EvaluateMethodologyInput): MethodologyEvaluation {
   const verb = getActionVerb(input.verbSlug)
   if (!verb) {
     return {

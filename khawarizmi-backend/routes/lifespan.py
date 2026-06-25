@@ -59,8 +59,35 @@ async def lifespan(app: FastAPI):
     if cfg.OPENAI_API_KEY:
         from openai import AsyncOpenAI
         from services.dual_coding import DualCodingService
-        state.openai = AsyncOpenAI(api_key=cfg.OPENAI_API_KEY, base_url=cfg.openai_base_url)
+        # Auto-détection provider depuis la clé (fabuleux V4)
+        api_key = cfg.OPENAI_API_KEY
+        base_url = cfg.openai_base_url
+        model = cfg.openai_model
+        # Groq : gsk_*
+        if api_key.startswith("gsk_"):
+            base_url = "https://api.groq.com/openai/v1"
+            if model in ("gpt-4o-mini", "", None) or "gpt" in model:
+                model = "llama-3.3-70b-versatile"
+            logger.info(f"IA Provider auto-détecté: Groq ({model})")
+        # Gemini via OpenAI-compat
+        elif api_key.startswith("AIza"):
+            base_url = "https://generativelanguage.googleapis.com/v1beta/openai/"
+            if "gemini" not in model:
+                model = "gemini-2.5-flash"
+            logger.info(f"IA Provider auto-détecté: Gemini ({model})")
+        # Z.AI
+        elif len(api_key) > 20 and "z.ai" in base_url or "zai" in api_key.lower()[:10]:
+            base_url = cfg.zai_base_url or "https://api.z.ai/api/paas/v4/"
+            logger.info(f"IA Provider auto-détecté: Z.AI")
+        state.openai = AsyncOpenAI(api_key=api_key, base_url=base_url)
+        # patch config en mémoire pour que chat.py utilise le bon modèle
+        try:
+            cfg.openai_model = model
+            cfg.openai_base_url = base_url
+        except Exception:
+            pass
         state.dual_coding = DualCodingService(state.openai)
+        logger.info(f"IA initialisée: {base_url} | model={model}")
 
     if cfg.DATABASE_URL:
         try:

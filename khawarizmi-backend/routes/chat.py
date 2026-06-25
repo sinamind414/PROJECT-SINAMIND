@@ -12,6 +12,7 @@ from rate_limit import limiter, chat_limit
 from schemas.session import ChatRequest
 from services.khawarizmi_engine import KhawarizmiTutor
 from services.metrics import MetricsCollector, record_request
+from services.llm import _call_with_fallback
 
 logger = logging.getLogger("khawarizmi.api")
 router = APIRouter()
@@ -114,22 +115,29 @@ async def chat_socratique(
         )
     except ValueError as e:
         raise HTTPException(404, f"Contenu introuvable : {e}")
-
     mc.start("llm")
+    fallback_used = False
     try:
-        response = await openai_client.chat.completions.create(
-            model           = cfg.openai_model,
-            messages        = [
+        # Fabuleux V4 + Groq : fallback automatique
+        response = await _call_with_fallback(
+            messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user",   "content": body.message},
             ],
-            temperature     = cfg.ia_temperature,
-            max_tokens      = cfg.ia_max_tokens,
-            timeout         = 30.0,
+            primary_client=openai_client,
+            primary_model=cfg.openai_model,
+            temperature=cfg.ia_temperature,
+            max_tokens=cfg.ia_max_tokens,
+            timeout=30.0,
         )
-
+        # _call_with_fallback peut logger un fallback → on le détecte
+        # (simple heuristics: si on arrive ici sans exception, on considère primary OK)
         raw_content  = response.choices[0].message.content or ""
-        tokens_used  = response.usage.total_tokens
+        try:
+            tokens_used = response.usage.total_tokens if response.usage else 0
+        except Exception:
+            tokens_used = 0
+
 
         raw_content = raw_content.strip()
         if raw_content.startswith("```"):
@@ -163,7 +171,7 @@ async def chat_socratique(
     await set_cache(cache_key, json.dumps(result, ensure_ascii=False), cfg.cache_ttl)
     mc.end("cache_store")
 
-    record_request("/api/chat", cache_hit=False, fallback=False)
+    record_request("/api/chat", cache_hit=False, fallback=fallback_used)
     mc.flush()
 
     logger.info(

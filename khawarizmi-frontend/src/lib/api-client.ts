@@ -56,7 +56,7 @@ class KhawarizmiApiClient {
 
   // ── Requête HTTP générique ─────────────────────
 
-  private async request<T>(
+  async request<T>(
     endpoint: string,
     options: RequestInit = {}
   ): Promise<T> {
@@ -350,6 +350,39 @@ class KhawarizmiApiClient {
   async getWeekActivity(): Promise<WeekActivityResponse> {
     return this.request<WeekActivityResponse>("/api/week-activity")
   }
+
+
+  // ── Action Verbs ──
+  async getActionVerbs(): Promise<any> { return this.request<any>("/action_verbs") }
+  async getVerbProgress(): Promise<any> { return this.request<any>("/action_verbs/progress") }
+  async getVerbExercises(slug: string): Promise<any> { return this.request<any>(`/action_verbs/${slug}/exercises`) }
+  async evaluateVerbAnswer(payload: any, answer?: any): Promise<any> {
+    const body = typeof payload === 'string' ? { slug: payload, answer } : payload
+    return this.request<any>("/action_verbs/evaluate", { method: "POST", body: JSON.stringify(body) })
+  }
+  async reviewVerb(slug: string, rating?: any, percentage?: any, payload: any = {}): Promise<any> {
+    const body = typeof rating === 'number' ? { rating, percentage, ...payload } : (rating || payload)
+    return this.request<any>(`/action_verbs/${slug}/review`, { method: "POST", body: JSON.stringify(body || {}) })
+  }
+
+  // ── Bac Blanc ──
+  async startBac(payload: any = {}): Promise<any> { return this.request<any>("/bac_blanc/start", { method: "POST", body: JSON.stringify(payload) }) }
+  async chooseBacSubject(...args: any[]): Promise<any> { const payload = args[0] || {}; return this.request<any>("/bac_blanc/choose", { method: "POST", body: JSON.stringify(payload) }) }
+  async saveBacAnswer(...args: any[]): Promise<any> { const payload = args[0] || {}; return this.request<any>("/bac_blanc/save", { method: "POST", body: JSON.stringify(payload) }) }
+  async submitBac(payload: any = {}): Promise<any> { return this.request<any>("/bac_blanc/submit", { method: "POST", body: JSON.stringify(payload) }) }
+  async getBacCorrection(sessionId: string): Promise<any> { return this.request<any>(`/bac_blanc/${sessionId}/correction`) }
+
+  // ── Lessons ──
+  async getLesson(chapterSlug: string): Promise<any> { return this.request<any>(`/lessons/${chapterSlug}`) }
+  async checkLessonAnswer(...args: any[]): Promise<any> { const chapterSlug=args[0]; const answer=args[1]; return this.request<any>(`/lessons/${chapterSlug}/check`, { method: "POST", body: JSON.stringify(typeof answer==='string'?{answer}:answer) }) }
+
+  // ── Document Analysis ──
+  async evaluateDaAnswers(payload: any): Promise<any> { return this.request<any>("/document_analysis/evaluate", { method: "POST", body: JSON.stringify(payload) }) }
+  async getDaProgress(): Promise<any> { return this.request<any>("/document_analysis/progress") }
+  async getDaWeakSpots(): Promise<any> { return this.request<any>("/document_analysis/weak-spots") }
+
+  // ── Tuteur ──
+  async sendTuteurMessage(payload: any): Promise<any> { try { return await this.request<any>("/api/tuteur", { method: "POST", body: JSON.stringify(payload) }) } catch { return this.sendMessage(payload) } }
 
   // ── Health Check ───────────────────────────────
 

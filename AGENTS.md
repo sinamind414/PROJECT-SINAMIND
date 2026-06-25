@@ -1,4 +1,14 @@
 # AGENTS.md — IA Khawarizmi Pro
+# PATCH fabuleux V4 – 2026-06-24
+# - services/scheduler.py : + from sqlalchemy.ext.asyncio import AsyncSession
+# - tests/test_payment.py : ErrorResponse format aligné
+# - requirements.txt : numpy 2.4.2 → 1.26.4 (numba compat)
+# - khawarizmi-frontend/src/lib/api-client.ts : +18 méthodes manquantes
+# - khawarizmi-frontend/src/lib/methodology-evaluator.ts : evaluateMethodologyAnswer sync (fallback local)
+# - tsc --noEmit : 33 erreurs → 0
+# - pytest : 58 passed, 1 skipped
+#
+
 # Version : 2.1.0
 # Emplacement : Racine du projet
 # Rôle : System Prompt permanent pour tout agent IA
@@ -80,23 +90,47 @@ khawarizmi-backend/
 │   ├── reference.py
 │   └── lexique.py
 ├── routes/
-│   ├── auth.py
-│   ├── chat.py
-│   ├── evaluate.py
-│   ├── flashcards.py
-│   ├── mindmap.py
-│   ├── sessions.py
+│   ├── auth.py              # JWT
+│   ├── chat.py              # /api/chat (rate limit)
+│   ├── evaluate.py          # /api/evaluate (rate limit)
+│   ├── flashcards.py        # FSRS drill
+│   ├── mindmap.py           # mind map JSON
+│   ├── session.py           # sessions
 │   ├── health.py
 │   ├── programme.py
 │   ├── lexique.py
-│   └── payment.py
+│   ├── payment.py
+│   # --- extensions validées ---
+│   ├── cours.py
+│   ├── exercices.py
+│   ├── lessons.py
+│   ├── action_verbs.py
+│   ├── document_analysis.py
+│   ├── bac_blanc.py
+│   ├── annales.py
+│   ├── videos.py
+│   ├── progress.py
+│   ├── chatbot.py
+│   ├── tuteur.py
+│   ├── dual_coding.py
+│   └── orientation.py
 ├── services/
-│   ├── rag_service.py
-│   ├── ai_service.py
-│   ├── fsrs_service.py
+│   # piliers
+│   ├── llm.py                 # ai_service
+│   ├── chat_service.py
+│   ├── fsrs_graph.py          # fsrs_service
 │   ├── mindmap_service.py
 │   ├── payment_service.py
-│   └── khawarizmi_engine.py
+│   ├── khawarizmi_engine.py
+│   # extensions
+│   ├── scheduler.py
+│   ├── questions.py
+│   ├── correction_service.py
+│   ├── document_analysis_service.py
+│   ├── action_verbs_service.py
+│   ├── orientation_service.py
+│   ├── (... 29 fichiers au total)
+│   # voir: services/__init__.py
 ├── migrations/
 │   ├── env.py
 │   └── versions/
