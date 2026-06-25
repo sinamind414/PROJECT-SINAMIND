@@ -219,7 +219,7 @@ jobs:
         working-directory: ${{ env.BACKEND_DIR }}
         run: |
           docker build \
-            -t khawarizmi-backend:${{ github.sha }} \
+            -t khawarizmi-backend:latest \
             -f Dockerfile \
             .
       - name: Smoke test — import
@@ -229,7 +229,7 @@ jobs:
             -e DATABASE_URL="postgresql+asyncpg://postgres:test@localhost/khawarizmi_test" \
             -e ENVIRONMENT=ci \
             -e REDIS_URL=redis://localhost:6379/0 \
-            khawarizmi-backend:${{ github.sha }} \
+            khawarizmi-backend:latest \
             python -c "from main import app; print(f'Routes: {len(app.routes)}')"
 
   docker-frontend:
