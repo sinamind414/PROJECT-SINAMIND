@@ -1,3 +1,13 @@
-﻿
-# Benchmark
-data/benchmark_results.json
+﻿data/
+models/*.onnx
+models/*.zip
+models/*.bin
+models/*.pt
+__pycache__/
+*.pyc
+.env
+*.log
+.backup_*
+*.tar.gz
+*.zip
+.railway/
