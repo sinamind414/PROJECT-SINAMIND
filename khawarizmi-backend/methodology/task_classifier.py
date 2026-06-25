@@ -1,5 +1,3 @@
-import re
-
 from methodology.verb_database import _normalize, identify_verb
 
 SIMPLE_VERBS_NORM = [_normalize(v) for v in ["صف", "عرف", "استنتج", "أنجز رسما تخطيطيا", "عدد", "سم", "اذكر"]]
