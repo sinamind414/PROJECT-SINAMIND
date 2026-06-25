@@ -92,7 +92,7 @@ async def get_week_activity(
         text("""
             SELECT
                 mmc.prochaine_revision as due_date,
-                mmc.reviewed_at
+                mmc.last_review as reviewed_at
             FROM mastery_micro_concepts mmc
             WHERE mmc.user_id = :user_id
               AND mmc.prochaine_revision >= :week_start
@@ -112,7 +112,7 @@ async def get_week_activity(
     for i in range(7):
         day_date = week_start + timedelta(days=i)
         day_dues = sum(1 for r in rows if r.due_date and r.due_date.date() == day_date.date())
-        day_reviewed = sum(1 for r in rows if r.reviewed_at and r.reviewed_at.date() == day_date.date())
+        day_reviewed = sum(1 for r in rows if r.reviewed_at and r.reviewed_at.date() == day_date.date())  # noqa: reviewed_at is aliased from last_review
         total_dues += day_dues
         total_reviewed += day_reviewed
 
