@@ -10,7 +10,7 @@ from config import get_allowed_origins, get_settings
 from monitoring import setup_monitoring
 from rate_limit import limiter
 from routes.errors import generic_exception_handler, http_exception_handler, validation_exception_handler
-from routes.lifespan import lifespan
+from routes.lifespan import lifespan, state  # noqa: F401 — state imported for health.py
 from routes.openapi_config import openapi_metadata
 
 setup_monitoring()
