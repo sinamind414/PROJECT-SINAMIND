@@ -366,14 +366,48 @@ class KhawarizmiApiClient {
 
   // ── Tuteur IA (chatbot) ──────────────────────
 
+  // ── Tuteur IA (chatbot) ──────────────────────
+
   async sendTuteurMessage(payload: {
     message: string
     context?: { page_source?: string; history?: Array<{ role: string; content: string }> | string[]; chapitre?: string }
   }): Promise<TuteurResponse> {
-    return this.request<TuteurResponse>("/api/tuteur", {
-      method: "POST",
-      body: JSON.stringify(payload)
-    })
+    if (payload.message === "__init__" || payload.message === "__activate_tutor__") {
+      return {
+        reponse: "مرحبا بك يا طالب البكالوريا! كيف يمكنني مساعدتك اليوم في مادة SVT؟ 😊",
+        type: "orientation",
+        cartes: [
+          { titre: "شرح مفهوم", raison: "فهم أفضل للدرس", action: "اطلب شرح أي مفهوم في SVT", bouton: "📖 شرح" },
+          { titre: "حل تمرين", raison: "تطبيق مباشر", action: "حل تمارين البكالوريا", bouton: "✍️ تمرين" },
+        ],
+        flashcards_suggerees: [],
+        fallback_active: false,
+      }
+    }
+
+    const history = (payload.context?.history as Array<{ role: string; content: string }> | undefined) || []
+    const chatbotPayload: Record<string, unknown> = { message: payload.message, lang: "ar" }
+    if (history.length > 0) {
+      chatbotPayload.history = history.slice(-6)
+    }
+
+    try {
+      const data = await this.request<{
+        response: string; lang: string; tokens_utilises?: number; from_cache?: boolean
+      }>("/api/chatbot/ask", {
+        method: "POST",
+        body: JSON.stringify(chatbotPayload),
+      })
+      return {
+        reponse: data.response,
+        type: "socratique",
+        cartes: [],
+        flashcards_suggerees: [],
+        fallback_active: false,
+      }
+    } catch {
+      throw new Error("Chatbot indisponible")
+    }
   }
 
   // ── Bac Blanc ─────────────────────────────────
