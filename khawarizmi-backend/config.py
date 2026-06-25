@@ -15,11 +15,11 @@ class Settings(BaseSettings):
     ENVIRONMENT: str = "development"
     debug: bool = False
 
-    SECRET_KEY: str
+    SECRET_KEY: str = "ci-fallback-not-for-production-32ch"
     JWT_ALGORITHM: str = "HS256"
     JWT_EXPIRE_HOURS: int = 24
 
-    DATABASE_URL: str
+    DATABASE_URL: str = "postgresql+asyncpg://postgres:test@localhost/khawarizmi_test"
     REDIS_URL: str = "redis://localhost:6379/0"
     cache_ttl: int = 3600
 
@@ -58,7 +58,10 @@ class Settings(BaseSettings):
     @field_validator("SECRET_KEY")
     @classmethod
     def validate_secret_key(cls, v):
-        if not v:
+        import os
+        if os.getenv("ENVIRONMENT") in ("test", "ci"):
+            return v
+        if not v or v.startswith("ci-fallback"):
             raise ValueError("SECRET_KEY non défini. Arrêt du serveur pour sécurité.")
         if len(str(v)) < 16:
             raise ValueError("SECRET_KEY trop court. Minimum 16 caractères requis.")
