@@ -59,6 +59,7 @@ class Settings(BaseSettings):
     @classmethod
     def validate_secret_key(cls, v):
         import os
+
         if os.getenv("ENVIRONMENT") in ("test", "ci"):
             return v
         if not v or v.startswith("ci-fallback"):
