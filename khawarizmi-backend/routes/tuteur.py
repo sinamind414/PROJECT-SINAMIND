@@ -1,64 +1,86 @@
-"""Route Tuteur Contextuel — POST /api/tuteur.
-
-Chatbot contextuel qui :
-- Pousse l'orientation au démarrage (__init__)
-- Classifie l'intention localement (0 IA)
-- Utilise Gemini pour les réponses socratiques
-- Appelle le cerveau orientation en interne
-- Retourne des cartes cliquables pour rediriger l'élève
-"""
-
 import logging
 
-from fastapi import APIRouter, Depends, Request
-from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi import APIRouter, Depends, HTTPException, Request
+from openai import AsyncOpenAI
 
-from database import get_db
+from config import get_settings
 from deps import get_current_user, get_openai
 from rate_limit import chat_limit, limiter
-from schemas.chat import TuteurRequest, TuteurResponse
-from services.chat_service import handle_tuteur
 
-logger = logging.getLogger("khawarizmi.api")
+logger = logging.getLogger("khawarizmi.tuteur")
 router = APIRouter()
 
+SYSTEM_PROMPT = """أنت "الأستاذ خوارزمي"، أستاذ SVT للبكالوريا الجزائرية.
 
-@router.post("/api/tuteur", response_model=TuteurResponse, tags=["IA"])
+قواعد صارمة:
+- الرد بالعربية فقط
+- أسلوب تربوي +
+- استخدم أمثلة من الحياة اليومية
+- أسلوب السقراطي (اسأل الطالب بدل إعطاء الإجابة مباشرة)
+- ابق ضمن SVT فقط"""
+
+
+@router.post("/api/tuteur")
 @limiter.limit(chat_limit)
-async def tuteur_contextuel(
+async def tuteur(
     request: Request,
-    body: TuteurRequest,
+    body: dict,
     current_user: dict = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db),
-    openai_client=Depends(get_openai),
+    openai_client: AsyncOpenAI = Depends(get_openai),
 ):
-    """Tuteur contextuel — chatbot SVT avec contexte FSRS + orientation.
+    message = (body.get("message") or "").strip()
+    if not message:
+        raise HTTPException(400, "Le champ 'message' est requis")
 
-    Pipeline :
-    1. Classification locale (0ms)
-    2. RAG si concept (50ms)
-    3. Orientation si motivation/init (interne)
-    4. Gemini 2.5 Flash (1 call, 3-8s)
-    5. Fallback 3 niveaux
-    """
-    context_dict = {
-        "chapitre": body.context.chapitre,
-        "page_source": body.context.page_source,
-        "fsrs_stability": body.context.fsrs_stability,
-        "fsrs_due": body.context.fsrs_due,
-        "last_score": body.context.last_score,
-        "orientation_chapitre": body.context.orientation_chapitre,
-        "history": [{"role": m.role, "content": m.content} for m in body.context.history],
-    }
+    context = body.get("context") or {}
+    history = context.get("history", []) if isinstance(context, dict) else []
 
-    result = await handle_tuteur(
-        message=body.message,
-        context=context_dict,
-        user_id=current_user["id"],
-        db=db,
-        openai_client=openai_client,
-    )
+    if message == "__init__":
+        return {
+            "reponse": "مرحبا بك يا طالب البكالوريا! كيف يمكنني مساعدتك اليوم في مادة SVT؟ 😊",
+            "type": "orientation",
+            "cartes": [
+                {"titre": "شرح مفهوم", "raison": "فهم أفضل للدرس", "action": "اطلب شرح أي مفهوم في SVT", "bouton": "📖 شرح"},
+                {"titre": "حل تمرين", "raison": "تطبيق مباشر", "action": "حل تمارين البكالوريا", "bouton": "✍️ تمرين"},
+            ],
+            "flashcards_suggerees": [],
+            "fallback_active": False,
+        }
 
-    logger.info(f"Tuteur : user={current_user['id']} type={result['type']} fallback={result['fallback_active']}")
+    try:
+        messages = [{"role": "system", "content": SYSTEM_PROMPT}]
+        for h in (history or [])[-6:]:
+            if isinstance(h, dict) and h.get("role") in ("user", "assistant") and h.get("content"):
+                messages.append({"role": h["role"], "content": str(h["content"])[:500]})
+        messages.append({"role": "user", "content": message[:1000]})
 
-    return TuteurResponse(**result)
+        cfg = get_settings()
+        response = await openai_client.chat.completions.create(
+            model=cfg.openai_model,
+            messages=messages,
+            temperature=0.5,
+            max_tokens=600,
+            timeout=30.0,
+        )
+        ai_text = (response.choices[0].message.content or "").strip()
+        tokens_used = response.usage.total_tokens if response.usage else 0
+
+        return {
+            "reponse": ai_text,
+            "type": "socratique",
+            "cartes": [],
+            "flashcards_suggerees": [],
+            "fallback_active": False,
+            "source_rag": None,
+            "tokens_utilises": tokens_used,
+        }
+
+    except Exception as e:
+        logger.error(f"Erreur tuteur: {e}")
+        return {
+            "reponse": "عذراً، أواجه صعوبة في الاتصال حالياً. حاول مرة أخرى 🙏",
+            "type": "refus",
+            "cartes": [],
+            "flashcards_suggerees": [],
+            "fallback_active": True,
+        }

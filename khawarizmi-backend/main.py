@@ -52,6 +52,7 @@ from routes import (
     programme,
     progress,
     session,
+    tuteur,
     videos,
 )
 
@@ -70,6 +71,7 @@ routers = [
     programme.router,
     progress.router,
     lexique.router,
+    tuteur.router,
     videos.router,
     annales.router,
     dual_coding.router,
