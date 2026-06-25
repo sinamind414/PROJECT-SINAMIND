@@ -9,8 +9,6 @@ __pycache__
 node_modules
 tests/
 scripts/
-data/
-migrations/
 *.pdf
 *.zip
 *.tar.gz
