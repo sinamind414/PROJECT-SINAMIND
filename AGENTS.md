@@ -543,7 +543,33 @@ obligatoires pour détecter des régressions silencieuses :
   (vérifie que les variables UPPER_CASE du .env sont lues)
 
 ##############################################################
-# FIN — AGENTS.md v2.1.0 — IA KHAWARIZMI PRO
+# SECTION 13 — VARIABLES RAILWAY OBLIGATOIRES
+##############################################################
+
+Variables à configurer dans Railway Dashboard (PROJECT-SINAMIND → Variables) :
+
+## Groq (remplace Gemini comme IA principale)
+- OPENAI_API_KEY       = gsk_...    (clé Groq, auto-détectée par préfixe gsk_)
+- OPENAI_BASE_URL      = https://api.groq.com/openai/v1
+- OPENAI_MODEL         = llama-3.3-70b-versatile
+- AI_MODEL_PRIMARY     = llama-3.3-70b-versatile
+
+## Base de données
+- DATABASE_URL  = postgresql+asyncpg://...(injecté par Railway Postgres)
+- REDIS_URL     = redis://...(injecté par Railway Redis)
+
+## Sécurité
+- SECRET_KEY    = <min 32 caractères, généré aléatoirement>
+- ENVIRONMENT   = production
+
+## Version (ne PAS définir sauf override explicite)
+- VERSION       = 2.0.0-rc.1  (optionnel — sinon lu depuis config.py)
+
+## Monitoring
+- SENTRY_DSN    = <Sentry DSN> (optionnel)
+
+##############################################################
+# FIN — AGENTS.md v2.1.1 — IA KHAWARIZMI PRO
 # Ce fichier est la source de vérité du projet.
 # Toute décision de développement s'y réfère.
 ##############################################################

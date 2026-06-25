@@ -27,16 +27,16 @@ app.add_exception_handler(422, validation_exception_handler)
 app.add_middleware(SlowAPIMiddleware)
 
 from routes import (
-    annales, auth, chat, chatbot, cours, dual_coding, evaluate,
-    exercices, flashcards, health, lexique, mindmap, payment,
-    programme, progress, session, videos,
+    annales, auth, bac_blanc, chat, chatbot, cours, dual_coding,
+    evaluate, exercices, flashcards, health, lexique, mindmap,
+    payment, programme, progress, session, videos,
 )
 
-routers = [health.router, auth.router, chat.router, chatbot.router,
-    cours.router, exercices.router, flashcards.router, mindmap.router,
-    evaluate.router, session.router, payment.router, programme.router,
-    progress.router, lexique.router, videos.router, annales.router,
-    dual_coding.router]
+routers = [health.router, auth.router, bac_blanc.router, chat.router,
+    chatbot.router, cours.router, exercices.router, flashcards.router,
+    mindmap.router, evaluate.router, session.router, payment.router,
+    programme.router, progress.router, lexique.router, videos.router,
+    annales.router, dual_coding.router]
 
 for router in routers:
     app.include_router(router)
