@@ -25,12 +25,12 @@ Champs ajoutés :
 - user_exercise_responses.hints_used         : compteur d'indices
 - user_exercise_responses.evaluated_at       : timestamp de la correction
 
-Idempotente grâce à IF NOT EXISTS — peut être ré-exécutée sans erreur.
+Idempotente : ADD COLUMN IF NOT EXISTS pour max_score (déjà créé en 014),
+indexes CREATE IF NOT EXISTS. Peut être ré-exécutée sans erreur.
 """
-from alembic import op
 import sqlalchemy as sa
-from sqlalchemy.dialects.postgresql import JSONB, ARRAY
-
+from alembic import op
+from sqlalchemy.dialects.postgresql import ARRAY, JSONB
 
 revision = "016"
 down_revision = "015"
@@ -88,9 +88,9 @@ def upgrade() -> None:
     )
 
     # ── user_exercise_responses (colonnes additionnelles) ────────────
-    op.add_column(
-        "user_exercise_responses",
-        sa.Column("max_score", sa.Integer(), nullable=True),
+    op.execute(
+        "ALTER TABLE user_exercise_responses "
+        "ADD COLUMN IF NOT EXISTS max_score INTEGER"
     )
     op.add_column(
         "user_exercise_responses",
