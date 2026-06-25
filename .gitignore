@@ -46,6 +46,10 @@ khawarizmi-backend/models/*
 logs/
 
 
+# Outils IA temporaires
+.agents/
+.superpowers/
+
 # Archive sinamind
 ARCHIVE_SINAMIND/
 

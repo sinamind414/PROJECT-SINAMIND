@@ -1,36 +1,47 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Khawarizmi Frontend
 
-## Getting Started
+Interface utilisateur de la plateforme IA Khawarizmi Pro — Bac SVT Algérie.
 
-First, run the development server:
+## Stack technique
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- **Framework** : Next.js 16 (App Router)
+- **UI** : React 19 + TailwindCSS 4
+- **Animations** : Framer Motion
+- **Langue** : Arabe (RTL)
+- **Design system** : Glassmorphism, mint/orange palette
+
+## Structure
+
+```
+src/
+├── app/           → Pages (dashboard, cours, mindmap, exercises...)
+├── components/    → Composants réutilisables (layout, ui, features)
+├── lib/           → Auth context, API client, hooks
+├── styles/        → Globaux CSS
+└── public/        → Assets statiques
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Commandes
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm run dev       # Développement
+npm run build     # Production
+npm run lint      # Linting
+npm run typecheck # TypeScript
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Design system
 
-## Learn More
+Le projet utilise :
+- `mint` / `mint-soft` / `teal` — Couleurs primaires (vert scientifique)
+- `orange` — Accents et alertes
+- `slate-deep` / `slate-300` — Fonds et textes
+- RTL (`dir="rtl"`) — Arabe comme langue principale
 
-To learn more about Next.js, take a look at the following resources:
+## Références
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- `AGENTS.md` — Règles et conventions du projet
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+**Projet :** IA Khawarizmi Pro — Bac Sciences Naturelles Algérie

@@ -1,38 +1,51 @@
-from methodology.verb_database import _normalize, identify_verb
+"""
+Classificateur de tâches — Methodology Evaluator V2
 
-SIMPLE_VERBS_NORM = [_normalize(v) for v in ["صف", "عرف", "استنتج", "أنجز رسما تخطيطيا", "عدد", "سم", "اذكر"]]
-COMPLEX_VERBS_RAW = ["وضّح في نص علمي", "أثبت", "برّر", "فسر", "اقترح فرضية", "ناقش", "حلل", "قارن"]
-COMPLEX_VERBS_NORM = [_normalize(v) for v in COMPLEX_VERBS_RAW]
-COMPLEX_VERBS_MAP = dict(zip(COMPLEX_VERBS_NORM, COMPLEX_VERBS_RAW))
+Classe les consignes en 'simple' ou 'complex' selon le verbe
+et le contexte de l'instruction.
+"""
+from __future__ import annotations
+
+from .verb_database import get_verb, get_complex_verbs
+
+# Mots-clés indiquant une tâche complexe (hors verbes)
+COMPLEX_KEYWORDS: list[str] = [
+    "نص علمي",
+    "فرضية",
+    "تحليل",
+    "نقد",
+    "مقارنة",
+    "برهان",
+    "استنتاج",
+    "منهجية",
+    " TEXT",
+    "schema",
+]
 
 
-def classify_task(instruction: str) -> dict:
-    found_verb = None
-    verb_data = None
+def classify_task(instruction: str, verb_info: dict | None = None) -> str:
+    """
+    Classe la tâche en 'simple' ou 'complex'.
 
-    verb_data = identify_verb(instruction)
+    Args:
+        instruction: Texte complet de la consigne
+        verb_info: Sortie de get_verb() (optionnel)
 
-    if verb_data:
-        found_verb = verb_data["arabic"]
-        task_type = verb_data["type"]
-    else:
-        norm_inst = _normalize(instruction)
-        for nv, raw in COMPLEX_VERBS_MAP.items():
-            if nv in norm_inst:
-                found_verb = raw
-                task_type = "complex"
-                break
-        if not found_verb:
-            for nv in SIMPLE_VERBS_NORM:
-                if nv in norm_inst:
-                    task_type = "simple"
-                    break
-            else:
-                task_type = "unknown"
+    Returns:
+        "simple" ou "complex"
+    """
+    # 1. Si verb_info fourni et type déjà connu
+    if verb_info and verb_info.get("type") == "complex":
+        return "complex"
 
-    return {
-        "verb": found_verb,
-        "task_type": task_type,
-        "is_complex": task_type == "complex",
-        "is_simple": task_type == "simple",
-    }
+    # 2. Chercher le verbe dans l'instruction
+    found_verb = get_verb(instruction)
+    if found_verb and found_verb["type"] == "complex":
+        return "complex"
+
+    # 3. Vérifier les mots-clés contextuels
+    for keyword in COMPLEX_KEYWORDS:
+        if keyword in instruction:
+            return "complex"
+
+    return "simple"

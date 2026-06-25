@@ -1,7 +1,9 @@
 """
-Validateur de structure du texte scientifique — Methodology Evaluator V2
+Analyseur de structure texte scientifique — Couche 3
+Bac Blanc Intelligent V2
 
-Vérifie si la réponse suit la structure Introduction → Développement → Conclusion.
+Vérifie si l'élève a structuré sa réponse en parties
+(logique Introduction → Développement → Conclusion).
 """
 from __future__ import annotations
 
@@ -15,7 +17,6 @@ _INTRO_MARKERS: list[str] = [
     "نقرأ في",
     "وفقاً لـ",
     "بناءً على",
-    "نعلم أن",
 ]
 
 _DEV_MARKERS: list[str] = [
@@ -29,8 +30,6 @@ _DEV_MARKERS: list[str] = [
     "تبين النتائج",
     "حسب الوثيقة",
     "بناءً على",
-    "أيضاً",
-    "إلى ذلك",
 ]
 
 _CONCLUSION_MARKERS: list[str] = [
@@ -39,10 +38,9 @@ _CONCLUSION_MARKERS: list[str] = [
     "نستنتج",
     "نتيجة",
     "النتيجة",
+    "归纳",
     "باختصار",
     "مما سبق",
-    "归纳",
-    "نخلص",
 ]
 
 
@@ -51,7 +49,7 @@ def _has_marker(text: str, markers: list[str]) -> bool:
     return any(marker in text for marker in markers)
 
 
-def validate_text_structure(answer: str) -> dict:
+def analyze_text_structure(answer: str) -> dict:
     """
     Analyse la structure du texte scientifique de la réponse.
 
@@ -66,7 +64,7 @@ def validate_text_structure(answer: str) -> dict:
     Returns:
         dict avec keys :
             structure_score, has_intro, has_development,
-            has_conclusion, details
+            has_conclusion, feedback
     """
     has_intro = _has_marker(answer, _INTRO_MARKERS)
     has_development = _has_marker(answer, _DEV_MARKERS)
@@ -85,18 +83,18 @@ def validate_text_structure(answer: str) -> dict:
         "has_intro": has_intro,
         "has_development": has_development,
         "has_conclusion": has_conclusion,
-        "details": _generate_structure_details(
+        "feedback": _generate_structure_feedback(
             has_intro, has_development, has_conclusion
         ),
     }
 
 
-def _generate_structure_details(
+def _generate_structure_feedback(
     has_intro: bool,
     has_development: bool,
     has_conclusion: bool,
 ) -> str:
-    """Détaille les lacunes structurelles."""
+    """Génère un feedback ciblé sur les lacunes structurelles."""
     missing: list[str] = []
     if not has_intro:
         missing.append("une introduction claire (problématique ou objectif)")
@@ -109,7 +107,7 @@ def _generate_structure_details(
         return "Structure méthodologiquement correcte."
 
     return (
-        "Manque : " + ", ".join(missing) + ". "
+        "Ta réponse manque de : " + ", ".join(missing) + ". "
         "Pour les tâches complexes, la structure "
         "Introduction → Développement → Conclusion est indispensable."
     )

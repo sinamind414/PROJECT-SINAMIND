@@ -1,127 +1,156 @@
-VERB_FEEDBACK_TEMPLATES = {
-    "وضّح في نص علمي": {
-        "strength": "Tu as bien compris le phénomène scientifique.",
-        "weakness_intro": "Il manque une introduction qui pose le problème scientifique.",
-        "weakness_dev": "Le développement n'est pas assez structuré. Utilise des connecteurs logiques (أولاً, ثانياً, من جهة...).",
-        "weakness_conclusion": "Absence de conclusion. Termine par un résumé qui répond au problème posé.",
-        "advice_structure": "Structure ta réponse en 3 parties : Introduction (problème) → Développement (explication) → Conclusion (réponse).",
-    },
-    "صف": {
-        "strength": "Tu as identifié les éléments importants.",
-        "weakness_general": "La description est trop générale. Sois plus précis et utilise les termes scientifiques appropriés.",
-        "advice": "Pour le verbe 'صف', décris avec précision en utilisant le vocabulaire scientifique exact.",
-    },
-    "عرف": {
-        "strength": "Tu as capté l'essentiel du concept.",
-        "weakness": "La définition manque de précision ou contient des informations inutiles. Reste concis et donne uniquement les caractéristiques essentielles.",
-        "advice": "Une définition doit être courte et précise : donne les limites exactes du concept.",
-    },
-    "أثبت": {
-        "strength": "Tu as bien compris ce qu'il fallait démontrer.",
-        "weakness_arg": "Les arguments ne sont pas assez clairs ou ne sont pas liés aux documents.",
-        "weakness_conclusion": "Il manque une conclusion qui valide ou infirme l'affirmation.",
-        "advice": "Structure ta réponse : présente des arguments clairs appuyés par les documents, puis conclus.",
-    },
-    "برّر": {
-        "strength": "Tu as identifié le phénomène à justifier.",
-        "weakness": "La justification n'est pas assez appuyée par des preuves scientifiques.",
-        "advice": "Pour justifier, donne au moins 2 raisons scientifiques appuyées par les documents ou le cours.",
-    },
-    "استنتج": {
-        "strength": "Bon début de raisonnement.",
-        "weakness": "La conclusion n'est pas suffisamment appuyée par les documents.",
-        "advice": "Ta conclusion doit découler logiquement des données fournies. Cite les éléments qui t'ont permis de conclure.",
-    },
-    "فسر": {
-        "strength": "Tu as identifié le résultat à expliquer.",
-        "weakness": "L'explication est trop descriptive. Il faut interpréter scientifiquement le résultat.",
-        "advice": "Relie le résultat observé à ses causes scientifiques en utilisant tes connaissances.",
-    },
-    "اقترح فرضية": {
-        "strength": "Tu as compris le contexte du problème.",
-        "weakness": "L'hypothèse n'est pas assez scientifique ou n'est pas en lien avec le contexte.",
-        "advice": "Une hypothèse doit être une proposition scientifique testable, en lien direct avec le problème posé.",
-    },
-    "ناقش": {
-        "strength": "Tu as présenté plusieurs aspects du sujet.",
-        "weakness_analysis": "L'analyse des arguments n'est pas assez équilibrée. Présente les différents points de vue.",
-        "weakness_position": "Il manque une prise de position personnelle argumentée.",
-        "advice": "Structure ta discussion : présente les arguments pour et contre, puis prends position clairement.",
-    },
-    "أنجز رسما تخطيطيا": {
-        "strength": "Le schéma est globalement correct.",
-        "weakness": "Le schéma manque de légendes ou n'est pas assez clair.",
-        "advice": "Un bon schéma doit être clair, légendé et respecter les conventions scientifiques.",
-    },
-}
+"""
+Générateur de feedback ultra-spécifique — Methodology Evaluator V2
+
+Templates de feedback par verbe, avec forces, faiblesses, recommandations.
+"""
+from __future__ import annotations
+
+from typing import Any
+
+from .verb_database import get_verb
 
 
 def generate_feedback(
-    verb: dict | None,
-    task_classification: dict,
-    structure_result: dict | None,
-    weaknesses: list[str],
-) -> dict:
-    if not verb:
-        return {
-            "feedback_principal": "Analyse méthodologique non disponible pour cette question.",
-            "points_forts": [],
-            "points_faibles": [],
-            "recommandation": "",
-        }
+    verb_info: dict[str, Any],
+    task_type: str,
+    student_answer: str,
+    structure_score: int = 0,
+    structure_max: int = 16,
+    doc_usage_quality: str = "unknown",
+) -> dict[str, Any]:
+    """
+    Génère un feedback structuré ultra-spécifique.
 
-    verb_key = verb["arabic"]
-    templates = VERB_FEEDBACK_TEMPLATES.get(verb_key, {})
-    strengths = []
-    feedback_lines = []
-    recommendations = []
+    Args:
+        verb_info: Sortie de get_verb()
+        task_type: "simple" ou "complex"
+        student_answer: Réponse de l'élève
+        structure_score: Score de structure (0-16)
+        structure_max: Score max de structure
+        doc_usage_quality: Qualité d'exploitation des documents
 
-    if templates.get("strength"):
-        strengths.append(templates["strength"])
+    Returns:
+        dict avec keys :
+            verb, task_type, score, max_score, message,
+            strengths, weaknesses, recommendation
+    """
+    verb_arabic = verb_info.get("arabic", "inconnu")
+    verb_french = verb_info.get("french", "")
+    max_score = verb_info.get("max_score", 10)
+    criteria = verb_info.get("criteria", [])
+    common_mistakes = verb_info.get("common_mistakes", [])
 
-    if structure_result and verb["type"] == "complex":
-        if structure_result["found"] == structure_result["total"]:
-            strengths.append("La réponse respecte la structure attendue pour ce type de tâche.")
+    strengths: list[str] = []
+    weaknesses: list[str] = []
+    recommendation_parts: list[str] = []
+
+    # --- Analyse de la structure (tâches complexes) ---
+    if task_type == "complex":
+        if structure_score >= 12:
+            strengths.append("Bonne structuration de la réponse")
+        elif structure_score >= 8:
+            weaknesses.append("Structure partielle (introduction ou conclusion manquante)")
+            recommendation_parts.append("Complète la structure : Introduction → Développement → Conclusion")
         else:
-            missing_parts = [p for p, found in structure_result["parts"].items() if not found]
-            for part in missing_parts:
-                key = f"weakness_{part}"
-                if key in templates:
-                    feedback_lines.append(templates[key])
-            if "advice_structure" in templates:
-                recommendations.append(templates["advice_structure"])
+            weaknesses.append("Absence de structure scientifique")
+            recommendation_parts.append("Pour ce type de tâche, structure ta réponse en 3 parties")
 
-    for w in weaknesses:
-        if w == "too_general" and "weakness_general" in templates:
-            feedback_lines.append(templates["weakness_general"])
-        elif w == "missing_conclusion" and "weakness_conclusion" in templates:
-            feedback_lines.append(templates["weakness_conclusion"])
-        elif w == "missing_intro" and "weakness_intro" in templates:
-            feedback_lines.append(templates["weakness_intro"])
-        elif w == "weak_analysis" and "weakness_analysis" in templates:
-            feedback_lines.append(templates["weakness_analysis"])
-        elif w == "weak_argumentation" and "weakness_arg" in templates:
-            feedback_lines.append(templates["weakness_arg"])
+    # --- Analyse des documents ---
+    if doc_usage_quality in ("excellent", "good"):
+        strengths.append("Exploitation correcte des documents")
+    elif doc_usage_quality in ("weak", "very_weak", "none"):
+        weaknesses.append("Exploitation insuffisante des documents fournis")
+        recommendation_parts.append("Relis les documents et identifie les données clés")
 
-    if templates.get("advice"):
-        recommendations.append(templates["advice"])
+    # --- Évaluation du contenu ---
+    answer_length = len(student_answer.split())
+    if answer_length < 10:
+        weaknesses.append("Réponse trop courte")
+        recommendation_parts.append("Développe davantage ta réponse avec des arguments")
+    elif answer_length > 100:
+        strengths.append("Réponse développée")
 
-    if not feedback_lines and "weakness" in templates:
-        feedback_lines.append(templates["weakness"])
+    # --- Score final ---
+    score = _compute_score(
+        verb_info, task_type, structure_score, doc_usage_quality, answer_length
+    )
 
-    # Si aucun feedback spécifique, message générique
-    if not feedback_lines and not recommendations:
-        if verb["type"] == "complex":
-            feedback_lines.append("La réponse peut être améliorée sur le plan méthodologique.")
-            recommendations.append("Entraîne-toi à structurer ta réponse selon les exigences du verbe d'action.")
-        else:
-            feedback_lines.append("La réponse est correcte mais peut être plus précise.")
+    # --- Message principal ---
+    message = _build_message(verb_arabic, task_type, score, max_score, weaknesses)
 
-    feedback_principal = " ".join(feedback_lines) if feedback_lines else "Réponse globalement correcte."
+    # --- Recommandation ---
+    recommendation = (
+        " ; ".join(recommendation_parts)
+        if recommendation_parts
+        else "Continue comme ça !"
+    )
 
     return {
-        "feedback_principal": feedback_principal,
-        "points_forts": strengths,
-        "points_faibles": feedback_lines,
-        "recommandation": " ".join(recommendations) if recommendations else "",
+        "verb": verb_arabic,
+        "verb_french": verb_french,
+        "task_type": task_type,
+        "score": score,
+        "max_score": max_score,
+        "message": message,
+        "strengths": strengths,
+        "weaknesses": weaknesses,
+        "recommendation": recommendation,
+        "criteria": criteria,
+        "common_mistakes": common_mistakes,
     }
+
+
+def _compute_score(
+    verb_info: dict,
+    task_type: str,
+    structure_score: int,
+    doc_usage_quality: str,
+    answer_length: int,
+) -> int:
+    """Calcule un score sur le max du verbe."""
+    max_score = verb_info.get("max_score", 10)
+
+    # Base : 50% si réponse non vide
+    base = max_score * 0.3 if answer_length < 5 else max_score * 0.5
+
+    # Bonus structure (tâches complexes)
+    struct_bonus = 0
+    if task_type == "complex":
+        struct_ratio = structure_score / 16
+        struct_bonus = max_score * 0.3 * struct_ratio
+
+    # Bonus documents
+    doc_map = {"excellent": 0.2, "good": 0.15, "weak": 0.05, "very_weak": 0.02, "none": 0}
+    doc_bonus = max_score * doc_map.get(doc_usage_quality, 0)
+
+    return min(max_score, int(base + struct_bonus + doc_bonus))
+
+
+def _build_message(
+    verb: str,
+    task_type: str,
+    score: int,
+    max_score: int,
+    weaknesses: list[str],
+) -> str:
+    """Construit le message principal du feedback."""
+    ratio = score / max_score if max_score > 0 else 0
+
+    if ratio >= 0.8:
+        return (
+            f"Excellente réponse au verbe '{verb}'. "
+            f"Ta réponse est méthodologiquement solide."
+        )
+    if ratio >= 0.5:
+        return (
+            f"Bonne réponse au verbe '{verb}'. "
+            f"Quelques améliorations méthodologiques sont possibles."
+        )
+    if weaknesses:
+        return (
+            f"Ta réponse au verbe '{verb}' présente des lacunes. "
+            f"{' '.join(weaknesses[:2])}"
+        )
+    return (
+        f"Ta réponse au verbe '{verb}' nécessite des améliorations."
+    )

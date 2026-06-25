@@ -1,0 +1,171 @@
+{
+  "verbs": [
+    {
+      "id": 1,
+      "arabic": "وضّح في نص علمي",
+      "french": "Expliquer dans un texte scientifique",
+      "type": "complex",
+      "max_score": 20,
+      "definition": "Rédiger un texte structuré (Introduction → Développement → Conclusion) qui explique un phénomène.",
+      "criteria": [
+        "Introduction qui pose le problème scientifique",
+        "Développement structuré et argumenté",
+        "Conclusion qui répond au problème",
+        "Utilisation des mots-clés du contexte"
+      ],
+      "common_mistakes": [
+        "Réponse sous forme de liste ou description simple",
+        "Absence de conclusion",
+        "Mélange des idées sans structure"
+      ]
+    },
+    {
+      "id": 2,
+      "arabic": "صف",
+      "french": "Décrire / Caractériser",
+      "type": "simple",
+      "max_score": 10,
+      "definition": "Décrire avec précision les caractéristiques, la structure ou les propriétés d'un élément.",
+      "criteria": [
+        "Description détaillée et précise",
+        "Utilisation des termes scientifiques corrects",
+        "Exhaustivité des éléments demandés"
+      ],
+      "common_mistakes": [
+        "Réponse trop générale ou trop courte",
+        "Confusion avec le verbe 'عرف'"
+      ]
+    },
+    {
+      "id": 3,
+      "arabic": "عرف",
+      "french": "Définir",
+      "type": "simple",
+      "max_score": 10,
+      "definition": "Donner les limites précises d'un concept (caractéristiques essentielles).",
+      "criteria": [
+        "Définition concise et précise",
+        "Mention des caractéristiques essentielles",
+        "Absence d'informations inutiles"
+      ],
+      "common_mistakes": [
+        "Définition trop longue ou trop vague",
+        "Confusion avec le verbe 'صف'"
+      ]
+    },
+    {
+      "id": 4,
+      "arabic": "أثبت",
+      "french": "Prouver / Démontrer",
+      "type": "complex",
+      "max_score": 15,
+      "definition": "Apporter des preuves et des arguments logiques pour valider une affirmation.",
+      "criteria": [
+        "Arguments clairs et logiques",
+        "Exploitation pertinente des documents",
+        "Lien explicite entre preuves et conclusion"
+      ],
+      "common_mistakes": [
+        "Arguments sans lien avec les documents",
+        "Conclusion sans preuves"
+      ]
+    },
+    {
+      "id": 5,
+      "arabic": "برّر",
+      "french": "Justifier",
+      "type": "complex",
+      "max_score": 15,
+      "definition": "Expliquer pourquoi un phénomène se produit en apportant des justifications.",
+      "criteria": [
+        "Justification appuyée par des preuves",
+        "Lien avec le contexte de l'exercice"
+      ],
+      "common_mistakes": [
+        "Justification sans preuve",
+        "Réponse trop générale"
+      ]
+    },
+    {
+      "id": 6,
+      "arabic": "استنتج",
+      "french": "Conclure / Déduire",
+      "type": "simple",
+      "max_score": 10,
+      "definition": "Tirer une conclusion logique à partir des données et des documents fournis.",
+      "criteria": [
+        "Conclusion logique et cohérente",
+        "Appui sur les documents fournis"
+      ],
+      "common_mistakes": [
+        "Conclusion non justifiée",
+        "Conclusion hors sujet"
+      ]
+    },
+    {
+      "id": 7,
+      "arabic": "فسر",
+      "french": "Expliquer / Interpréter",
+      "type": "complex",
+      "max_score": 15,
+      "definition": "Donner une explication scientifique d'un résultat ou d'un phénomène observé.",
+      "criteria": [
+        "Explication scientifique claire",
+        "Lien avec les données du document"
+      ],
+      "common_mistakes": [
+        "Explication trop descriptive",
+        "Absence de lien avec les données"
+      ]
+    },
+    {
+      "id": 8,
+      "arabic": "اقترح فرضية",
+      "french": "Proposer une hypothèse",
+      "type": "complex",
+      "max_score": 10,
+      "definition": "Formuler une ou plusieurs hypothèses logiques et scientifiques pour expliquer un phénomène.",
+      "criteria": [
+        "Hypothèse logique et scientifique",
+        "Cohérente avec le contexte"
+      ],
+      "common_mistakes": [
+        "Hypothèse non scientifique",
+        "Hypothèse hors contexte"
+      ]
+    },
+    {
+      "id": 9,
+      "arabic": "ناقش",
+      "french": "Discuter",
+      "type": "complex",
+      "max_score": 15,
+      "definition": "Analyser différents points de vue ou arguments et prendre position de manière argumentée.",
+      "criteria": [
+        "Analyse équilibrée des arguments",
+        "Prise de position argumentée"
+      ],
+      "common_mistakes": [
+        "Position sans argumentation",
+        "Analyse trop superficielle"
+      ]
+    },
+    {
+      "id": 10,
+      "arabic": "أنجز رسما تخطيطيا",
+      "french": "Réaliser un schéma",
+      "type": "simple",
+      "max_score": 10,
+      "definition": "Réaliser un schéma clair, légendé et fonctionnel.",
+      "criteria": [
+        "Schéma clair et lisible",
+        "Légendes correctes et complètes",
+        "Respect des conventions"
+      ],
+      "common_mistakes": [
+        "Schéma illisible",
+        "Légendes manquantes ou incorrectes"
+      ]
+    }
+  ]
+}

@@ -28,7 +28,7 @@ export default function Home() {
       <section className="relative px-6 py-10 lg:px-14 lg:py-16">
         <div className="relative max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-[1.05fr_0.95fr] gap-10 items-center">
           <div>
-            <div className="inline-flex items-center gap-2 rounded-full border border-mint/20 bg-mint/10 px-4 py-2 text-mint-soft text-sm font-bold mb-6">
+            <div className="inline-flex items-center gap-2 rounded-full border-2 border-mint/40 bg-mint/15 px-5 py-2.5 text-mint text-sm font-black mb-8 shadow-lg shadow-mint/20">
               🧬 SINAMIND · منهجية العلوم للبكالوريا
             </div>
 
@@ -41,18 +41,18 @@ export default function Home() {
               ليس موقع دروس طويل وممل. SINAMIND يحوّل أخطاءك المنهجية إلى مهام قصيرة، تصحيح فوري، XP، شارات، وستريك يومي يجعلك ترجع كل يوم.
             </p>
 
-            <div className="flex flex-wrap gap-3 mb-8">
-              <Link href="/auth/register" className="px-6 py-3 rounded-2xl bg-mint text-slate-deep font-black hover:bg-mint-soft transition shadow-xl shadow-black/20">
+            <div className="flex flex-wrap gap-4 mb-10">
+              <Link href="/auth/register" className="px-8 py-4 rounded-2xl bg-mint text-slate-deep font-black hover:bg-mint-soft transition shadow-xl shadow-black/20 text-lg">
                 ابدأ رحلتك الآن 🚀
               </Link>
-              <Link href="/auth/login" className="px-6 py-3 rounded-2xl bg-white/10 border border-white/10 text-white font-bold hover:bg-white/15 transition">
+              <Link href="/auth/login" className="px-8 py-4 rounded-2xl bg-white/10 border border-white/10 text-white font-bold hover:bg-white/15 transition text-lg">
                 تسجيل الدخول
               </Link>
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 max-w-3xl">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {MISSIONS.map((mission) => (
-                <div key={mission} className="rounded-2xl bg-white/[0.06] border border-white/[0.08] p-3 text-sm text-slate-200">
+                <div key={mission} className="rounded-2xl bg-white/[0.06] border-2 border-white/[0.08] p-4 text-sm text-slate-200 font-bold hover:bg-white/[0.10] hover:border-white/20 transition-all">
                   ✅ {mission}
                 </div>
               ))}
@@ -111,7 +111,7 @@ export default function Home() {
       <section className="px-6 pb-14 lg:px-14">
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-5">
           {STEPS.map((step) => (
-            <div key={step.title} className="rounded-3xl glass-soft border border-mint/10 p-6">
+            <div key={step.title} className="rounded-3xl glass border border-mint/15 p-7 hover:border-mint/30 transition-all shadow-lg shadow-black/10">
               <div className="text-4xl mb-4">{step.icon}</div>
               <h3 className="text-xl font-black mb-2">{step.title}</h3>
               <p className="text-slate-400 text-sm leading-relaxed">{step.text}</p>

@@ -1,12 +1,184 @@
-VERB_DATABASE = {
-    "وضّح في نص علمي": {
+"""
+Base de données des verbes d'action Bac SVT Algérie
+Source : Livre Manhajiya Bac SVT + METHODOLOGY-EVALUATOR-V2
+
+25+ verbes avec définitions, critères, erreurs fréquentes.
+"""
+from __future__ import annotations
+
+from typing import Any
+
+VERB_DATABASE: list[dict[str, Any]] = [
+    # ===== TÂCHES SIMPLEX =====
+    {
         "id": 1,
+        "arabic": " صف",
+        "french": "Décrire / Caractériser",
+        "type": "simple",
+        "max_score": 10,
+        "definition": "Décrire avec précision les caractéristiques, la structure ou les propriétés d'un élément.",
+        "criteria": [
+            "Description détaillée et précise",
+            "Utilisation des termes scientifiques corrects",
+            "Exhaustivité des éléments demandés",
+        ],
+        "common_mistakes": [
+            "Réponse trop générale ou trop courte",
+            "Confusion avec le verbe 'عرف'",
+        ],
+    },
+    {
+        "id": 2,
+        "arabic": "عرف",
+        "french": "Définir",
+        "type": "simple",
+        "max_score": 10,
+        "definition": "Donner les limites précises d'un concept (caractéristiques essentielles).",
+        "criteria": [
+            "Définition concise et précise",
+            "Mention des caractéristiques essentielles",
+            "Absence d'informations inutiles",
+        ],
+        "common_mistakes": [
+            "Définition trop longue ou trop vague",
+            "Confusion avec le verbe 'صف'",
+        ],
+    },
+    {
+        "id": 3,
+        "arabic": " اذكر",
+        "french": "Citer / Énumérer",
+        "type": "simple",
+        "max_score": 4,
+        "definition": "Lister des éléments de manière exhaustive et organisée.",
+        "criteria": [
+            "Liste complète",
+            "Ordre logique",
+            "Termes exacts",
+        ],
+        "common_mistakes": [
+            "Éléments manquants",
+            "Ordre désordonné",
+        ],
+    },
+    {
+        "id": 4,
+        "arabic": "عدد",
+        "french": "Dénombrer",
+        "type": "simple",
+        "max_score": 4,
+        "definition": "Indiquer le nombre exact d'éléments.",
+        "criteria": [
+            "Nombre correct",
+            "Énumération complète",
+        ],
+        "common_mistakes": [
+            "Compte incorrect",
+            "Oubli d'éléments",
+        ],
+    },
+    {
+        "id": 5,
+        "arabic": "سمّ",
+        "french": "Nommer",
+        "type": "simple",
+        "max_score": 2,
+        "definition": "Donner le nom exact d'un élément.",
+        "criteria": [
+            "Nom correct et exact",
+        ],
+        "common_mistakes": [
+            "Nom approximatif",
+        ],
+    },
+    {
+        "id": 6,
+        "arabic": "حدد",
+        "french": "Délimiter / Identifier",
+        "type": "simple",
+        "max_score": 4,
+        "definition": "Repérer et délimiter précisément un élément dans un ensemble.",
+        "criteria": [
+            "Identification précise",
+            "Localisation exacte",
+        ],
+        "common_mistakes": [
+            "Identification vague",
+        ],
+    },
+    {
+        "id": 7,
+        "arabic": "استخرج",
+        "french": "Extraire",
+        "type": "simple",
+        "max_score": 4,
+        "definition": "Tirer une information d'un document ou d'un ensemble de données.",
+        "criteria": [
+            "Information exacte",
+            "Source identifiée",
+        ],
+        "common_mistakes": [
+            "Information inexacte",
+            "Source non citée",
+        ],
+    },
+    {
+        "id": 8,
+        "arabic": "استعمل",
+        "french": "Utiliser / Appliquer",
+        "type": "simple",
+        "max_score": 4,
+        "definition": "Employer un outil, une méthode ou un concept pour résoudre un problème.",
+        "criteria": [
+            "Choix approprié de l'outil",
+            "Application correcte",
+        ],
+        "common_mistakes": [
+            "Outil inadapté",
+            "Mauvaise application",
+        ],
+    },
+    {
+        "id": 9,
+        "arabic": "رتب",
+        "french": "Classer / Ordonner",
+        "type": "simple",
+        "max_score": 4,
+        "definition": "Organiser des éléments selon un critère donné.",
+        "criteria": [
+            "Critère de classement identifié",
+            "Ordre correct",
+        ],
+        "common_mistakes": [
+            "Critère absent",
+            "Ordre incorrect",
+        ],
+    },
+    {
+        "id": 10,
+        "arabic": "استنتج",
+        "french": "Conclure / Déduire",
+        "type": "simple",
+        "max_score": 10,
+        "definition": "Tirer une conclusion logique à partir des données et des documents fournis.",
+        "criteria": [
+            "Conclusion logique et cohérente",
+            "Appui sur les documents fournis",
+        ],
+        "common_mistakes": [
+            "Conclusion non justifiée",
+            "Conclusion hors sujet",
+        ],
+    },
+
+    # ===== TÂCHES COMPLEXES =====
+    {
+        "id": 11,
         "arabic": "وضّح في نص علمي",
         "french": "Expliquer dans un texte scientifique",
         "type": "complex",
         "max_score": 20,
-        "priority": "P0",
-        "definition": "Rédiger un texte structuré (Introduction → Développement → Conclusion) qui explique un phénomène scientifique.",
+        "definition": "Rédiger un texte structuré (Introduction → Développement → Conclusion) qui explique un phénomène.",
         "criteria": [
             "Introduction qui pose le problème scientifique",
             "Développement structuré et argumenté",
@@ -18,60 +190,13 @@ VERB_DATABASE = {
             "Absence de conclusion",
             "Mélange des idées sans structure",
         ],
-        "required_structure": ["introduction", "development", "conclusion"],
-        "structure_labels": {
-            "introduction": "Introduction : poser le problème scientifique",
-            "development": "Développement : explication structurée et argumentée",
-            "conclusion": "Conclusion : répondre au problème posé",
-        },
     },
-    "صف": {
-        "id": 2,
-        "arabic": "صف",
-        "french": "Décrire / Caractériser",
-        "type": "simple",
-        "max_score": 10,
-        "priority": "P0",
-        "definition": "Décrire avec précision les caractéristiques, la structure ou les propriétés d'un élément.",
-        "criteria": [
-            "Description détaillée et précise",
-            "Utilisation des termes scientifiques corrects",
-            "Exhaustivité des éléments demandés",
-        ],
-        "common_mistakes": [
-            "Réponse trop générale ou trop courte",
-            "Confusion avec le verbe 'عرف'",
-        ],
-        "required_structure": [],
-        "structure_labels": {},
-    },
-    "عرف": {
-        "id": 3,
-        "arabic": "عرف",
-        "french": "Définir",
-        "type": "simple",
-        "max_score": 10,
-        "priority": "P0",
-        "definition": "Donner les limites précises d'un concept (caractéristiques essentielles).",
-        "criteria": [
-            "Définition concise et précise",
-            "Mention des caractéristiques essentielles",
-            "Absence d'informations inutiles",
-        ],
-        "common_mistakes": [
-            "Définition trop longue ou trop vague",
-            "Confusion avec le verbe 'صف'",
-        ],
-        "required_structure": [],
-        "structure_labels": {},
-    },
-    "أثبت": {
-        "id": 4,
+    {
+        "id": 12,
         "arabic": "أثبت",
         "french": "Prouver / Démontrer",
         "type": "complex",
         "max_score": 15,
-        "priority": "P0",
         "definition": "Apporter des preuves et des arguments logiques pour valider une affirmation.",
         "criteria": [
             "Arguments clairs et logiques",
@@ -82,19 +207,13 @@ VERB_DATABASE = {
             "Arguments sans lien avec les documents",
             "Conclusion sans preuves",
         ],
-        "required_structure": ["argumentation", "conclusion"],
-        "structure_labels": {
-            "argumentation": "Argumentation : présenter les preuves et arguments",
-            "conclusion": "Conclusion : valider ou infirmer l'affirmation",
-        },
     },
-    "برّر": {
-        "id": 5,
+    {
+        "id": 13,
         "arabic": "برّر",
         "french": "Justifier",
         "type": "complex",
         "max_score": 15,
-        "priority": "P1",
         "definition": "Expliquer pourquoi un phénomène se produit en apportant des justifications.",
         "criteria": [
             "Justification appuyée par des preuves",
@@ -104,37 +223,13 @@ VERB_DATABASE = {
             "Justification sans preuve",
             "Réponse trop générale",
         ],
-        "required_structure": ["justification"],
-        "structure_labels": {
-            "justification": "Justification : expliquer les causes avec des preuves",
-        },
     },
-    "استنتج": {
-        "id": 6,
-        "arabic": "استنتج",
-        "french": "Conclure / Déduire",
-        "type": "simple",
-        "max_score": 10,
-        "priority": "P1",
-        "definition": "Tirer une conclusion logique à partir des données et des documents fournis.",
-        "criteria": [
-            "Conclusion logique et cohérente",
-            "Appui sur les documents fournis",
-        ],
-        "common_mistakes": [
-            "Conclusion non justifiée",
-            "Conclusion hors sujet",
-        ],
-        "required_structure": [],
-        "structure_labels": {},
-    },
-    "فسر": {
-        "id": 7,
+    {
+        "id": 14,
         "arabic": "فسر",
         "french": "Expliquer / Interpréter",
         "type": "complex",
         "max_score": 15,
-        "priority": "P1",
         "definition": "Donner une explication scientifique d'un résultat ou d'un phénomène observé.",
         "criteria": [
             "Explication scientifique claire",
@@ -144,18 +239,13 @@ VERB_DATABASE = {
             "Explication trop descriptive",
             "Absence de lien avec les données",
         ],
-        "required_structure": ["explanation"],
-        "structure_labels": {
-            "explanation": "Explication : interpréter scientifiquement les données",
-        },
     },
-    "اقترح فرضية": {
-        "id": 8,
+    {
+        "id": 15,
         "arabic": "اقترح فرضية",
         "french": "Proposer une hypothèse",
         "type": "complex",
         "max_score": 10,
-        "priority": "P1",
         "definition": "Formuler une ou plusieurs hypothèses logiques et scientifiques pour expliquer un phénomène.",
         "criteria": [
             "Hypothèse logique et scientifique",
@@ -165,16 +255,13 @@ VERB_DATABASE = {
             "Hypothèse non scientifique",
             "Hypothèse hors contexte",
         ],
-        "required_structure": [],
-        "structure_labels": {},
     },
-    "ناقش": {
-        "id": 9,
+    {
+        "id": 16,
         "arabic": "ناقش",
         "french": "Discuter",
         "type": "complex",
         "max_score": 15,
-        "priority": "P2",
         "definition": "Analyser différents points de vue ou arguments et prendre position de manière argumentée.",
         "criteria": [
             "Analyse équilibrée des arguments",
@@ -184,75 +271,104 @@ VERB_DATABASE = {
             "Position sans argumentation",
             "Analyse trop superficielle",
         ],
-        "required_structure": ["analysis", "position"],
-        "structure_labels": {
-            "analysis": "Analyse : présenter les différents arguments",
-            "position": "Position : prendre position de manière argumentée",
-        },
     },
-    "أنجز رسما تخطيطيا": {
-        "id": 10,
+    {
+        "id": 17,
+        "arabic": "حلّل",
+        "french": "Analyser",
+        "type": "complex",
+        "max_score": 10,
+        "definition": "Décomposer un sujet en ses éléments constitutifs pour les étudier séparément.",
+        "criteria": [
+            "Décomposition méthodique",
+            "Étude de chaque composante",
+            "Synthèse des résultats",
+        ],
+        "common_mistakes": [
+            "Description au lieu d'analyse",
+            "Pas de synthèse",
+        ],
+    },
+    {
+        "id": 18,
+        "arabic": "قيّم",
+        "french": "Évaluer / Apprécier",
+        "type": "complex",
+        "max_score": 10,
+        "definition": "Porter un jugement argumenté sur la validité, la pertinence ou la qualité de quelque chose.",
+        "criteria": [
+            "Jugement fondé sur des critères",
+            "Arguments pour et contre",
+        ],
+        "common_mistakes": [
+            "Jugement sans argument",
+            "Absence de critères",
+        ],
+    },
+    {
+        "id": 19,
+        "arabic": "اقارن",
+        "french": "Comparer",
+        "type": "complex",
+        "max_score": 10,
+        "definition": "Mettre en parallel deux ou plusieurs éléments pour identifier ressemblances et différences.",
+        "criteria": [
+            "Critères de comparaison clairs",
+            "Éléments comparés identifiés",
+            "Ressemblances et différences",
+        ],
+        "common_mistakes": [
+            "Un seul élément décrit",
+            "Pas de critères de comparaison",
+        ],
+    },
+    {
+        "id": 20,
         "arabic": "أنجز رسما تخطيطيا",
         "french": "Réaliser un schéma",
-        "type": "simple",
+        "type": "complex",
         "max_score": 10,
-        "priority": "P2",
         "definition": "Réaliser un schéma clair, légendé et fonctionnel.",
         "criteria": [
             "Schéma clair et lisible",
             "Légendes correctes et complètes",
-            "Respect des conventions scientifiques",
+            "Respect des conventions",
         ],
         "common_mistakes": [
             "Schéma illisible",
             "Légendes manquantes ou incorrectes",
         ],
-        "required_structure": [],
-        "structure_labels": {},
     },
-}
+]
 
 
-def get_verb(arabic: str) -> dict | None:
-    for key, data in VERB_DATABASE.items():
-        if key == arabic:
-            return data
+def get_verb(arabic_text: str) -> dict[str, Any] | None:
+    """Cherche un verbe par son texte arabe (correspondance partielle)."""
+    sorted_verbs = sorted(VERB_DATABASE, key=lambda v: len(v["arabic"]), reverse=True)
+    for verb in sorted_verbs:
+        if verb["arabic"] in arabic_text:
+            return verb
     return None
 
 
-def get_all_verbs() -> list[dict]:
-    return list(VERB_DATABASE.values())
-
-
-_ARABIC_DIACRITICS = str.maketrans(
-    {
-        chr(0x064B): "",
-        chr(0x064C): "",
-        chr(0x064D): "",
-        chr(0x064E): "",
-        chr(0x064F): "",
-        chr(0x0650): "",
-        chr(0x0651): "",
-        chr(0x0652): "",
-        chr(0x0670): "",
-        chr(0x0640): "",
-    }
-)
-_ALEF_MAP = str.maketrans({"أ": "ا", "إ": "ا", "آ": "ا", "ٱ": "ا"})
-_TA_MAP = str.maketrans({"ة": "ه"})
-
-
-def _normalize(text: str) -> str:
-    t = text.translate(_ARABIC_DIACRITICS)
-    t = t.translate(_ALEF_MAP)
-    t = t.translate(_TA_MAP)
-    return t.strip()
-
-
-def identify_verb(instruction: str) -> dict | None:
-    norm_instruction = _normalize(instruction)
-    for verb_key in VERB_DATABASE:
-        norm_verb = _normalize(verb_key)
-        if norm_verb in norm_instruction:
-            return VERB_DATABASE[verb_key]
+def get_verb_by_id(verb_id: int) -> dict[str, Any] | None:
+    """Cherche un verbe par son ID."""
+    for verb in VERB_DATABASE:
+        if verb["id"] == verb_id:
+            return verb
     return None
+
+
+def get_all_verbs() -> list[dict[str, Any]]:
+    """Retourne tous les verbes de la base."""
+    return VERB_DATABASE
+
+
+def get_complex_verbs() -> list[dict[str, Any]]:
+    """Retourne uniquement les verbes complexes."""
+    return [v for v in VERB_DATABASE if v["type"] == "complex"]
+
+
+def get_simple_verbs() -> list[dict[str, Any]]:
+    """Retourne uniquement les verbes simples."""
+    return [v for v in VERB_DATABASE if v["type"] == "simple"]

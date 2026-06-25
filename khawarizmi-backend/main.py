@@ -27,8 +27,8 @@ app.add_middleware(
     allow_origins=get_allowed_origins(),
     allow_origin_regex=r"https://.*\.vercel\.app",
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE"],
+    allow_headers=["Authorization", "Content-Type"],
 )
 app.state.limiter = limiter
 app.add_exception_handler(429, _rate_limit_exceeded_handler)
