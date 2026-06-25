@@ -51,3 +51,7 @@ ARCHIVE_SINAMIND/
 
 # Benchmark results
 khawarizmi-backend/data/benchmark_results.json
+
+# Outils IA temporaires
+.agents/
+.superpowers/
