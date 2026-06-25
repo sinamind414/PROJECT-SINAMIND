@@ -31,7 +31,7 @@ jobs:
       - name: TruffleHog — scan secrets
         uses: trufflesecurity/trufflehog@main
         with:
-          extra_args: --results=verified,unknown --debug
+          extra_args: --only-verified --debug
       - name: Verifier .gitignore UTF-8
         run: file --mime-encoding .gitignore | grep -v utf-16 || (echo ".gitignore pas en UTF-8" && exit 1)
       - name: Verifier .env non commite
