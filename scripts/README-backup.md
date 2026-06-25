@@ -50,7 +50,7 @@ Variables d'environnement (ou `.env`) :
 docker stop khawarizmi_backend
 
 # 2. Restaurer la base
-export DATABASE_URL="postgresql://user:__PASSWORD__@db:5432/khawarizmi"
+export DATABASE_URL="postgresql://localhost:5432/khawarizmi"
 bash scripts/restore.sh backup.sql.gz
 
 # 3. Forcer la version Alembic (si nécessaire)
