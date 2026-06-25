@@ -225,9 +225,18 @@ def get_all_verbs() -> list[dict]:
 
 
 _ARABIC_DIACRITICS = str.maketrans(
-    {chr(0x064B): "", chr(0x064C): "", chr(0x064D): "", chr(0x064E): "",
-     chr(0x064F): "", chr(0x0650): "", chr(0x0651): "", chr(0x0652): "",
-     chr(0x0670): "", chr(0x0640): ""}
+    {
+        chr(0x064B): "",
+        chr(0x064C): "",
+        chr(0x064D): "",
+        chr(0x064E): "",
+        chr(0x064F): "",
+        chr(0x0650): "",
+        chr(0x0651): "",
+        chr(0x0652): "",
+        chr(0x0670): "",
+        chr(0x0640): "",
+    }
 )
 _ALEF_MAP = str.maketrans({"أ": "ا", "إ": "ا", "آ": "ا", "ٱ": "ا"})
 _TA_MAP = str.maketrans({"ة": "ه"})
