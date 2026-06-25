@@ -27,10 +27,9 @@ Champs ajoutés :
 
 Idempotente grâce à IF NOT EXISTS — peut être ré-exécutée sans erreur.
 """
-from alembic import op
 import sqlalchemy as sa
-from sqlalchemy.dialects.postgresql import JSONB, ARRAY
-
+from alembic import op
+from sqlalchemy.dialects.postgresql import ARRAY, JSONB
 
 revision = "016"
 down_revision = "015"
@@ -88,10 +87,7 @@ def upgrade() -> None:
     )
 
     # ── user_exercise_responses (colonnes additionnelles) ────────────
-    op.add_column(
-        "user_exercise_responses",
-        sa.Column("max_score", sa.Integer(), nullable=True),
-    )
+    # max_score existe déjà depuis migration 014 (Float) — on ne le ré-ajoute pas
     op.add_column(
         "user_exercise_responses",
         sa.Column("percentage", sa.Float(), nullable=True),
@@ -146,7 +142,7 @@ def downgrade() -> None:
     op.drop_column("user_exercise_responses", "evaluation_details")
     op.drop_column("user_exercise_responses", "is_correct")
     op.drop_column("user_exercise_responses", "percentage")
-    op.drop_column("user_exercise_responses", "max_score")
+    # max_score droppé par migration 014, pas par 016
     op.drop_column("exercises", "tags")
     op.drop_column("exercises", "is_active")
     op.drop_column("exercises", "success_count")
