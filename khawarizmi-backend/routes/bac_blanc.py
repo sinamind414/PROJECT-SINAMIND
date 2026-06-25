@@ -34,6 +34,7 @@ from schemas.bac_blanc import (
     VerbScore,
 )
 from services.document_analysis_service import evaluate_answer
+from methodology.evaluator import evaluate_methodology
 
 logger = logging.getLogger("khawarizmi.api")
 router = APIRouter(prefix="/api/bac-blanc", tags=["Bac Blanc"])
@@ -285,6 +286,20 @@ async def submit_bac(
             score = evaluation["score"]
             percentage = evaluation["percentage"]
             feedback = evaluation["advice"]
+
+            try:
+                methodo = await evaluate_methodology(
+                    context=ex.get("context_ar", ""),
+                    instruction=ex.get("instruction_ar", ex.get("title_ar", "")),
+                    student_answer=answer_text,
+                    documents=ex.get("documents", []),
+                )
+                methodo_feedback = methodo.get("feedback", {})
+                methodo_note = methodo_feedback.get("message", "")
+                if methodo_note:
+                    feedback += f" | Méthodo: {methodo_note}"
+            except Exception:
+                pass
 
         score_max = ex.get("points", 5)
         total_score += score

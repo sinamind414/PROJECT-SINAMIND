@@ -8,6 +8,7 @@
 *.key
 *.p12
 secrets/
+opencode.json
 
 # Backups et données lourdes
 *.backup_*
@@ -54,4 +55,7 @@ logs/
 ARCHIVE_SINAMIND/
 
 # Benchmark results
-khawarizmi-backend/data/benchmark_results.json
+khawarizmi-backend/data/
+
+# Local Netlify folder
+.netlify

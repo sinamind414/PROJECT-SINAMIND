@@ -21,6 +21,7 @@ from services.chat_prompt import (
     build_motivation_prompt,
     build_socratique_prompt,
 )
+from services.methodology_local_responses import detect_verb_from_message, get_local_methodology_response
 from services.metrics import MetricsCollector, record_request
 from services.orientation_service import calculer_orientation
 from services.remediation import build_due_concept_question, get_due_concept_for_question
@@ -67,7 +68,13 @@ async def handle_tuteur(
 
     logger.info(f"Tuteur : user={user_id} intent={intent} type={resp_type}")
 
-    # ── 2. Cas spécial : refus de triche (0 appel IA) ──
+    # ── 2. Interception méthodologique locale (0 tokens) ──
+    verb = detect_verb_from_message(message)
+    if verb:
+        logger.info(f"Tuteur local methodology | user={user_id} verb={verb}")
+        return get_local_methodology_response(verb)
+
+    # ── 3. Cas spécial : refus de triche (0 appel IA) ──
     if resp_type == "refus":
         return {
             "reponse": "لا أستطيع إعطاءك الحل جاهزا. لكن يمكنني مساعدتك على إيجاده بنفسك. ما الذي فهمته من الوثيقة؟",
@@ -80,7 +87,7 @@ async def handle_tuteur(
             "fallback_active": False,
         }
 
-    # ── 3. Cas spécial : navigation (0 appel IA) ──
+    # ── 4. Cas spécial : navigation (0 appel IA) ──
     if resp_type == "navigation":
         chapitre = context.get("chapitre", "")
         return {
@@ -107,7 +114,7 @@ async def handle_tuteur(
             "fallback_active": False,
         }
 
-    # ── 4. Cas : orientation ou init → appeler le cerveau ──
+    # ── 5. Cas : orientation ou init → appeler le cerveau ──
     if resp_type == "orientation" or is_init:
         orientation = await calculer_orientation(db, user_id)
         cartes = _build_cartes_from_orientation(orientation)
@@ -159,7 +166,7 @@ async def handle_tuteur(
             "fallback_active": False,
         }
 
-    # ── 5. Cas : motivation → appeler le cerveau + Gemini ──
+    # ── 6. Cas : motivation → appeler le cerveau + Gemini ──
     if resp_type == "motivation":
         chapitre = context.get("chapitre", "general")
 
@@ -190,7 +197,7 @@ async def handle_tuteur(
         await set_semantic_cache(message, result, chapitre)
         return result
 
-    # ── 6. Cas : feedback → Gemini ──
+    # ── 7. Cas : feedback → Gemini ──
     if resp_type == "feedback":
         chapitre = context.get("chapitre", "general")
 
@@ -219,7 +226,7 @@ async def handle_tuteur(
         await set_semantic_cache(message, result, chapitre)
         return result
 
-    # ── 7. Cas : sos_concept ou explication → RAG + Gemini ──
+    # ── 8. Cas : sos_concept ou explication → RAG + Gemini ──
     stability = context.get("fsrs_stability", 0)
     is_explication = stability is not None and stability < 3.0
     chapitre = context.get("chapitre", "general")

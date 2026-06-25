@@ -16,6 +16,7 @@ _INTRO_MARKERS: list[str] = [
     "وفقاً لـ",
     "بناءً على",
     "نعلم أن",
+    "يتمثل",
 ]
 
 _DEV_MARKERS: list[str] = [
@@ -31,6 +32,8 @@ _DEV_MARKERS: list[str] = [
     "بناءً على",
     "أيضاً",
     "إلى ذلك",
+    "لأن",
+    "بسبب",
 ]
 
 _CONCLUSION_MARKERS: list[str] = [
@@ -41,7 +44,8 @@ _CONCLUSION_MARKERS: list[str] = [
     "النتيجة",
     "باختصار",
     "مما سبق",
-    "归纳",
+    "لذلك",
+    "يتبين",
     "نخلص",
 ]
 

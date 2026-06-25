@@ -324,15 +324,16 @@ async def evaluate(
                 instruction=question_texte,
                 student_answer=req.reponse_eleve,
             )
+            fb = methodo.get("feedback", {})
             methodology_result = MethodologyResponse(
-                note_methodologie=methodo["note_methodologie"],
-                note_max=methodo["note_max"],
-                verb_identifie=methodo["verb_identifie"],
-                type_tache=methodo["type_tache"],
-                points_forts=methodo["points_forts"],
-                points_faibles=methodo["points_faibles"],
-                feedback_principal=methodo["feedback_principal"],
-                recommandation=methodo["recommandation"],
+                note_methodologie=methodo.get("score", 0),
+                note_max=methodo.get("max_score", 10),
+                verb_identifie=methodo.get("verb", None),
+                type_tache=methodo.get("task_type", "unknown"),
+                points_forts=fb.get("strengths", []),
+                points_faibles=fb.get("weaknesses", []),
+                feedback_principal=fb.get("message", ""),
+                recommandation=fb.get("recommendation", ""),
             )
         except Exception as e:
             logger.warning(f"Methodology eval skipped: {e}")

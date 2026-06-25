@@ -247,3 +247,94 @@ def _generate_recommendations(level: str, errors: list[str]) -> list[str]:
         recs.append("Continue comme ça !")
 
     return recs
+
+
+# ═════════════════════════════════════════════
+# Semaine 3 — Nouvelles fonctions Couche 3
+# ═════════════════════════════════════════════
+
+import json
+from pathlib import Path
+
+_PROFILES_PATH = Path(__file__).parent / "error_profiles.json"
+
+with open(_PROFILES_PATH, "r", encoding="utf-8") as _f:
+    _ERROR_PROFILES_JSON = json.load(_f)["profiles"]
+
+
+def _find_profile(profile_id: str) -> dict[str, Any]:
+    for p in _ERROR_PROFILES_JSON:
+        if p["id"] == profile_id:
+            return p
+    # fallback vers ERROR_PROFILES hardcodé
+    for p in ERROR_PROFILES:
+        if p["id"] == profile_id:
+            return p
+    return {"id": profile_id, "name": profile_id, "recommendation": ""}
+
+
+def detect_verb_confusion(instruction: str, verb_detected: str) -> bool:
+    complex_verbs = ["وضّح في نص علمي", "أثبت", "برّر", "فسر", "ناقش"]
+    simple_verbs = ["صف", "عرف", "استنتج"]
+    if any(v in instruction for v in complex_verbs) and verb_detected in simple_verbs:
+        return True
+    return False
+
+
+def detect_error_profiles(
+    verb: str,
+    task_type: str,
+    structure: dict,
+    doc_usage: dict,
+    student_answer: str,
+) -> list[dict[str, Any]]:
+    detected = []
+    if detect_verb_confusion(verb, verb):
+        detected.append(_find_profile("verb_confusion"))
+    if task_type == "complex" and structure.get("structure_score", 0) < 8:
+        detected.append(_find_profile("weak_structure"))
+    if doc_usage.get("usage_quality") in ("weak", "very_weak", "none"):
+        detected.append(_find_profile("poor_document_usage"))
+    if task_type == "complex" and not structure.get("has_conclusion"):
+        detected.append(_find_profile("no_conclusion"))
+    return detected
+
+
+def calculate_methodology_maturity(answers: list[dict]) -> dict[str, Any]:
+    if not answers:
+        return {"level": "Débutant", "score": 0, "total_answers": 0}
+    total_score = sum(a.get("structure_score", 0) for a in answers)
+    avg_score = total_score / len(answers)
+    if avg_score >= 14:
+        level = "Expert"
+    elif avg_score >= 11:
+        level = "Avancé"
+    elif avg_score >= 7:
+        level = "Intermédiaire"
+    else:
+        level = "Débutant"
+    return {"level": level, "score": round(avg_score, 1), "total_answers": len(answers), "max_possible": 16}
+
+
+def generate_diagnostic_report(
+    verb: str,
+    task_type: str,
+    structure: dict,
+    doc_usage: dict,
+    student_answer: str,
+    previous_answers: list[dict] | None = None,
+) -> dict[str, Any]:
+    if previous_answers is None:
+        previous_answers = []
+    error_profiles = detect_error_profiles(verb, task_type, structure, doc_usage, student_answer)
+    maturity = calculate_methodology_maturity(previous_answers + [{"structure_score": structure.get("structure_score", 0)}])
+    return {
+        "verb": verb,
+        "task_type": task_type,
+        "error_profiles": error_profiles,
+        "maturity_level": maturity["level"],
+        "maturity_score": maturity["score"],
+        "recommendations": [p["recommendation"] for p in error_profiles],
+        "structure_analysis": structure,
+        "document_usage": doc_usage,
+    }

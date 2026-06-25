@@ -12,7 +12,7 @@ VERB_DATABASE: list[dict[str, Any]] = [
     # ===== TÂCHES SIMPLEX =====
     {
         "id": 1,
-        "arabic": " صف",
+        "arabic": "صف",
         "french": "Décrire / Caractériser",
         "type": "simple",
         "max_score": 10,
@@ -46,7 +46,7 @@ VERB_DATABASE: list[dict[str, Any]] = [
     },
     {
         "id": 3,
-        "arabic": " اذكر",
+        "arabic": "اذكر",
         "french": "Citer / Énumérer",
         "type": "simple",
         "max_score": 4,

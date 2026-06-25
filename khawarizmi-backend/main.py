@@ -54,6 +54,13 @@ from routes import (
     session,
     tuteur,
     videos,
+    # === Methodology Intelligence (Semaines 1-8) ===
+    bac_blanc_intelligent,
+    diagnostic,
+    methodology,
+    methodology_flashcards,
+    mindmap_methodology,
+    tutor,
 )
 
 routers = [
@@ -75,6 +82,13 @@ routers = [
     videos.router,
     annales.router,
     dual_coding.router,
+    # === Methodology Intelligence Routers (Semaines 1-8) ===
+    bac_blanc_intelligent.router,
+    diagnostic.router,
+    methodology.router,
+    methodology_flashcards.router,
+    mindmap_methodology.router,
+    tutor.router,
 ]
 
 for router in routers:
