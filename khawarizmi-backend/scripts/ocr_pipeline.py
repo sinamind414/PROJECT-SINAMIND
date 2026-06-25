@@ -39,7 +39,6 @@ import sys
 import tempfile
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from pathlib import Path
-from typing import List, Optional, Tuple
 
 import cv2
 import numpy as np
@@ -146,7 +145,7 @@ def preprocess_image(img_array: np.ndarray) -> np.ndarray:
 # ---------------------------------------------------------------------------
 # OCR d'une page (worker)
 # ---------------------------------------------------------------------------
-def _ocr_single(args: Tuple) -> Tuple[int, str, Optional[str]]:
+def _ocr_single(args: tuple) -> tuple[int, str, str | None]:
     page_no, img_array, psm, oem, timeout = args
     error = None
     text = ""
@@ -211,7 +210,7 @@ def _already_done_pages(out_path: Path) -> set:
 IMAGE_EXTENSIONS = {".png", ".jpg", ".jpeg", ".tiff", ".tif", ".bmp", ".webp"}
 
 
-def _load_pages(source: Path, dpi: int, start: int, end: Optional[int]) -> List[Tuple[int, np.ndarray]]:
+def _load_pages(source: Path, dpi: int, start: int, end: int | None) -> list[tuple[int, np.ndarray]]:
     pages = []
 
     if source.is_dir():
@@ -266,13 +265,13 @@ def ocr_pipeline(
     source: str,
     dpi: int = 300,
     start: int = 1,
-    end: Optional[int] = None,
+    end: int | None = None,
     timeout: int = 120,
     psm: int = 3,
     oem: int = 1,
     workers: int = 2,
     resume: bool = False,
-    out_dir: Optional[str] = None,
+    out_dir: str | None = None,
     suffix: str = ".ocr.txt",
 ) -> str:
     src = Path(source)
@@ -306,7 +305,7 @@ def ocr_pipeline(
     worker_args = [(pno, img, psm, oem, timeout) for pno, img in pages_to_do]
 
     results: dict = {}
-    errors_summary: List[Tuple[int, str]] = []
+    errors_summary: list[tuple[int, str]] = []
 
     with ProcessPoolExecutor(max_workers=workers) as executor:
         futures = {executor.submit(_ocr_single, arg): arg[0] for arg in worker_args}
@@ -357,25 +356,25 @@ if __name__ == "__main__":
     )
     ap.add_argument("source",
                     help="PDF, image (PNG/JPG/TIFF/BMP/WEBP) ou dossier d'images")
-    ap.add_argument("--dpi",     type=int, default=300,
+    ap.add_argument("--dpi", type=int, default=300,
                     help="Résolution de rendu PDF (défaut: 300)")
-    ap.add_argument("--start",   type=int, default=1,
+    ap.add_argument("--start", type=int, default=1,
                     help="Première page PDF (défaut: 1)")
-    ap.add_argument("--end",     type=int, default=None,
+    ap.add_argument("--end", type=int, default=None,
                     help="Dernière page PDF (défaut: fin du document)")
     ap.add_argument("--timeout", type=int, default=120,
                     help="Timeout Tesseract par page en secondes (défaut: 120)")
-    ap.add_argument("--psm",     type=int, default=3,
+    ap.add_argument("--psm", type=int, default=3,
                     help="Page Segmentation Mode Tesseract (défaut: 3)")
-    ap.add_argument("--oem",     type=int, default=1,
+    ap.add_argument("--oem", type=int, default=1,
                     help="OCR Engine Mode (défaut: 1=LSTM)")
     ap.add_argument("--workers", type=int, default=2,
                     help="Nombre de workers parallèles (défaut: 2)")
-    ap.add_argument("--resume",  action="store_true",
+    ap.add_argument("--resume", action="store_true",
                     help="Reprendre : ignorer les pages déjà traitées")
     ap.add_argument("--out-dir", default=None,
                     help="Dossier de sortie (défaut: même dossier que la source)")
-    ap.add_argument("--suffix",  default=".ocr.txt",
+    ap.add_argument("--suffix", default=".ocr.txt",
                     help="Extension du fichier de sortie (défaut: .ocr.txt)")
     args = ap.parse_args()
 

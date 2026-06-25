@@ -1,4 +1,3 @@
-from typing import Optional
 import logging
 
 import cv2
@@ -15,17 +14,12 @@ class ImagePreprocessor:
             gray = self._rotate(gray, angle)
         clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
         normalized = clahe.apply(gray)
-        denoised = cv2.fastNlMeansDenoising(
-            normalized, h=7, templateWindowSize=7, searchWindowSize=21
-        )
+        denoised = cv2.fastNlMeansDenoising(normalized, h=7, templateWindowSize=7, searchWindowSize=21)
         return denoised
 
     def binarize_adaptive(self, image: np.ndarray) -> np.ndarray:
         gray = self._to_gray(image)
-        return cv2.adaptiveThreshold(
-            gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
-            cv2.THRESH_BINARY, 31, 11
-        )
+        return cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 31, 11)
 
     def binarize_otsu(self, image: np.ndarray) -> np.ndarray:
         gray = self._to_gray(image)
@@ -60,8 +54,5 @@ class ImagePreprocessor:
         matrix = cv2.getRotationMatrix2D((w / 2.0, h / 2.0), angle, 1.0)
         border_value = 255 if image.ndim == 2 else (255, 255, 255)
         return cv2.warpAffine(
-            image, matrix, (w, h),
-            flags=cv2.INTER_CUBIC,
-            borderMode=cv2.BORDER_CONSTANT,
-            borderValue=border_value
+            image, matrix, (w, h), flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_CONSTANT, borderValue=border_value
         )

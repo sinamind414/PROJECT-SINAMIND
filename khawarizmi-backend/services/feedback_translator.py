@@ -8,12 +8,14 @@ import logging
 
 logger = logging.getLogger("khawarizmi.feedback_translator")
 
+
 def translate_feedback(text_fr: str, lang: str = "ar") -> str:
     """Traduit un feedback du français vers l'arabe via LLM."""
     if not text_fr or lang != "ar":
         return text_fr
 
     from main import state
+
     llm = state.openai or state.tutor
     if not llm:
         return text_fr

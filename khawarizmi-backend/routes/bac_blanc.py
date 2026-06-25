@@ -9,8 +9,7 @@ GET  /api/bac-blanc/{sid}/correction → correction détaillée
 
 import json
 import logging
-from datetime import datetime, timezone
-from typing import Dict, List
+from datetime import UTC, datetime
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import text
@@ -19,20 +18,20 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from database import get_db
 from deps import get_current_user
 from schemas.bac_blanc import (
-    StartBacRequest,
-    StartBacResponse,
+    BacExercise,
+    BacSubjectDetail,
     BacSubjectSummary,
     ChooseSubjectRequest,
     ChooseSubjectResponse,
-    BacSubjectDetail,
-    BacExercise,
+    CorrectionAnswer,
+    CorrectionResponse,
+    ExerciseScore,
     SaveAnswerRequest,
+    StartBacRequest,
+    StartBacResponse,
     SubmitBacRequest,
     SubmitBacResponse,
-    ExerciseScore,
     VerbScore,
-    CorrectionResponse,
-    CorrectionAnswer,
 )
 from services.document_analysis_service import evaluate_answer
 
@@ -43,7 +42,7 @@ router = APIRouter(prefix="/api/bac-blanc", tags=["Bac Blanc"])
 @router.post("/start", response_model=StartBacResponse)
 async def start_bac(
     body: StartBacRequest,
-    current_user: Dict = Depends(get_current_user),
+    current_user: dict = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
     """Démarre une session de bac blanc et retourne les 2 sujets au choix."""
@@ -66,13 +65,15 @@ async def start_bac(
         exercises = m["exercises"]
         if isinstance(exercises, str):
             exercises = json.loads(exercises)
-        subjects.append(BacSubjectSummary(
-            subject_number=m["subject_number"],
-            title_ar=m["title_ar"],
-            themes_ar=m["themes_ar"] if isinstance(m["themes_ar"], list) else json.loads(m["themes_ar"] or "[]"),
-            estimated_minutes=m["estimated_minutes"],
-            nb_exercises=len(exercises) if isinstance(exercises, list) else 0,
-        ))
+        subjects.append(
+            BacSubjectSummary(
+                subject_number=m["subject_number"],
+                title_ar=m["title_ar"],
+                themes_ar=m["themes_ar"] if isinstance(m["themes_ar"], list) else json.loads(m["themes_ar"] or "[]"),
+                estimated_minutes=m["estimated_minutes"],
+                nb_exercises=len(exercises) if isinstance(exercises, list) else 0,
+            )
+        )
 
     session_result = await db.execute(
         text("""
@@ -96,7 +97,7 @@ async def start_bac(
 @router.post("/choose", response_model=ChooseSubjectResponse)
 async def choose_subject(
     body: ChooseSubjectRequest,
-    current_user: Dict = Depends(get_current_user),
+    current_user: dict = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
     """Verrouille le choix du sujet et retourne le détail."""
@@ -159,7 +160,7 @@ async def choose_subject(
 @router.post("/save")
 async def save_answer(
     body: SaveAnswerRequest,
-    current_user: Dict = Depends(get_current_user),
+    current_user: dict = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
     """Sauvegarde automatique d'une réponse pendant l'épreuve."""
@@ -204,13 +205,13 @@ async def save_answer(
         )
 
     await db.commit()
-    return {"status": "saved", "saved_at": datetime.now(timezone.utc).isoformat()}
+    return {"status": "saved", "saved_at": datetime.now(UTC).isoformat()}
 
 
 @router.post("/submit", response_model=SubmitBacResponse)
 async def submit_bac(
     body: SubmitBacRequest,
-    current_user: Dict = Depends(get_current_user),
+    current_user: dict = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
     """Soumet définitivement le bac blanc + évalue les réponses."""
@@ -229,7 +230,7 @@ async def submit_bac(
         raise HTTPException(400, "Déjà soumis")
 
     sm = sess_row._mapping
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     started = sm["started_at"]
     time_used = int((now - started).total_seconds()) if started else 0
 
@@ -260,12 +261,12 @@ async def submit_bac(
             "skipped": am["skipped"],
         }
 
-    exercise_scores: List[ExerciseScore] = []
-    verb_scores_map: Dict[str, List[int]] = {}
+    exercise_scores: list[ExerciseScore] = []
+    verb_scores_map: dict[str, list[int]] = {}
     total_score = 0
     total_max = 0
     skipped_count = 0
-    corrections: List[CorrectionAnswer] = []
+    corrections: list[CorrectionAnswer] = []
 
     for ex in exercises_data:
         ex_id = ex["exercise_id"]
@@ -289,32 +290,36 @@ async def submit_bac(
         total_score += score
         total_max += score_max
 
-        exercise_scores.append(ExerciseScore(
-            exercise_id=ex_id,
-            title_ar=ex["title_ar"],
-            score=score,
-            score_max=score_max,
-            percentage=percentage,
-            skipped=is_skipped,
-        ))
+        exercise_scores.append(
+            ExerciseScore(
+                exercise_id=ex_id,
+                title_ar=ex["title_ar"],
+                score=score,
+                score_max=score_max,
+                percentage=percentage,
+                skipped=is_skipped,
+            )
+        )
 
         verb_scores_map.setdefault(verb, [0, 0])
         verb_scores_map[verb][0] += score
         verb_scores_map[verb][1] += score_max
 
-        corrections.append(CorrectionAnswer(
-            exercise_id=ex_id,
-            question_id=ex_id,
-            title_ar=ex["title_ar"],
-            verb_slug=verb,
-            student_answer=answer_text,
-            model_answer=ex.get("model_answer_ar", ""),
-            score=score,
-            score_max=score_max,
-            percentage=percentage,
-            feedback=feedback,
-            skipped=is_skipped,
-        ))
+        corrections.append(
+            CorrectionAnswer(
+                exercise_id=ex_id,
+                question_id=ex_id,
+                title_ar=ex["title_ar"],
+                verb_slug=verb,
+                student_answer=answer_text,
+                model_answer=ex.get("model_answer_ar", ""),
+                score=score,
+                score_max=score_max,
+                percentage=percentage,
+                feedback=feedback,
+                skipped=is_skipped,
+            )
+        )
 
         await db.execute(
             text("""
@@ -379,7 +384,7 @@ async def submit_bac(
 @router.get("/{session_id}/correction", response_model=CorrectionResponse)
 async def get_correction(
     session_id: str,
-    current_user: Dict = Depends(get_current_user),
+    current_user: dict = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
     """Retourne la correction détaillée après soumission."""
@@ -417,18 +422,20 @@ async def get_correction(
     for ex in exercises_data:
         ex_id = ex["exercise_id"]
         ans = answers_map.get(ex_id, {})
-        corrections.append(CorrectionAnswer(
-            exercise_id=ex_id,
-            question_id=ex_id,
-            title_ar=ex["title_ar"],
-            verb_slug=ex.get("verb_slug", ""),
-            student_answer=ans.get("answer_text", ""),
-            model_answer=ex.get("model_answer_ar", ""),
-            score=ans.get("score", 0),
-            score_max=ex.get("points", 5),
-            percentage=round((ans.get("score", 0) / max(ex.get("points", 5), 1)) * 100),
-            feedback=ans.get("feedback", ""),
-            skipped=ans.get("skipped", False),
-        ))
+        corrections.append(
+            CorrectionAnswer(
+                exercise_id=ex_id,
+                question_id=ex_id,
+                title_ar=ex["title_ar"],
+                verb_slug=ex.get("verb_slug", ""),
+                student_answer=ans.get("answer_text", ""),
+                model_answer=ex.get("model_answer_ar", ""),
+                score=ans.get("score", 0),
+                score_max=ex.get("points", 5),
+                percentage=round((ans.get("score", 0) / max(ex.get("points", 5), 1)) * 100),
+                feedback=ans.get("feedback", ""),
+                skipped=ans.get("skipped", False),
+            )
+        )
 
     return CorrectionResponse(session_id=session_id, corrections=corrections)

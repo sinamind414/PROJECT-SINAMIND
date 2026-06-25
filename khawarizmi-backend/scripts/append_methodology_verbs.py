@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 append_methodology_verbs.py
 ───────────────────────────

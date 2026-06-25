@@ -6,8 +6,9 @@ Endpoint testé :
   POST /api/evaluate — évaluation avec fallbacks L1/L2/L3
 """
 
+from unittest.mock import patch
+
 import pytest
-from unittest.mock import AsyncMock, patch
 
 
 def _evaluate_request(question_id="q_test_001", answer="Ma réponse", language="fr"):
@@ -19,6 +20,7 @@ def _evaluate_request(question_id="q_test_001", answer="Ma réponse", language="
 
 
 # ── /api/evaluate ───────────────────────────────────────────────────
+
 
 @pytest.mark.asyncio
 async def test_evaluate_requires_auth(client):

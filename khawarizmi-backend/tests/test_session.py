@@ -7,8 +7,9 @@ Endpoints testés :
   POST /api/session/random — question aléatoire
 """
 
-import pytest
 from unittest.mock import patch
+
+import pytest
 
 
 def _session_request(max_cards=5, lang="fr", exclude=None):
@@ -20,6 +21,7 @@ def _session_request(max_cards=5, lang="fr", exclude=None):
 
 
 # ── /api/session/next ───────────────────────────────────────────────
+
 
 @pytest.mark.asyncio
 async def test_session_next_requires_auth(client):

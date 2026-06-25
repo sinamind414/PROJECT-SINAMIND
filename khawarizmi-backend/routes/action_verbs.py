@@ -6,22 +6,24 @@ du BAC algérien via pratique guidée + répétition espacée FSRS.
 
 import json
 import logging
-from datetime import datetime, timezone
-from typing import Dict
+from datetime import UTC, datetime
+
 from fastapi import APIRouter, Depends, HTTPException
+from fsrs import Card
+from fsrs import Rating as FsrsRating
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
+
 from database import get_db
 from deps import get_current_user, get_scheduler
 from schemas.action_verb import (
     EvaluateRequest,
     EvaluateResponse,
-    VerbReviewRequest,
     VerbProgressItem,
     VerbProgressResponse,
+    VerbReviewRequest,
 )
 from services.action_verbs_service import evaluate_answer, score_to_fsrs_rating
-from fsrs import Card, Rating as FsrsRating
 
 logger = logging.getLogger("khawarizmi.api")
 router = APIRouter(prefix="/api/action-verbs", tags=["Action Verbs"])
@@ -29,9 +31,10 @@ router = APIRouter(prefix="/api/action-verbs", tags=["Action Verbs"])
 
 # ── 1. GET /api/action-verbs — liste des verbes ──
 
+
 @router.get("")
 async def lister_verbes(
-    current_user: Dict = Depends(get_current_user),
+    current_user: dict = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
     """Retourne la liste de tous les verbes d'action (résumé)."""
@@ -50,10 +53,11 @@ async def lister_verbes(
 
 # ── 2. GET /api/action-verbs/{slug} — détail ──
 
+
 @router.get("/{slug}")
 async def detail_verbe(
     slug: str,
-    current_user: Dict = Depends(get_current_user),
+    current_user: dict = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
     """Retourne le détail complet d'un verbe (méthodologie, marqueurs, exemples)."""
@@ -77,10 +81,11 @@ async def detail_verbe(
 
 # ── 3. GET /api/action-verbs/{slug}/exercises — exercices ──
 
+
 @router.get("/{slug}/exercises")
 async def exercices_verbe(
     slug: str,
-    current_user: Dict = Depends(get_current_user),
+    current_user: dict = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
     """Retourne les exercices d'un verbe."""
@@ -97,18 +102,16 @@ async def exercices_verbe(
     rows = result.fetchall()
     if not rows:
         return []
-    return [
-        {**dict(r._mapping), "id": str(r._mapping["id"])}
-        for r in rows
-    ]
+    return [{**dict(r._mapping), "id": str(r._mapping["id"])} for r in rows]
 
 
 # ── 4. POST /api/action-verbs/evaluate — évaluer ──
 
+
 @router.post("/evaluate", response_model=EvaluateResponse)
 async def evaluer_reponse(
     body: EvaluateRequest,
-    current_user: Dict = Depends(get_current_user),
+    current_user: dict = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
     """Évalue la réponse d'un élève pour un verbe donné."""
@@ -137,19 +140,17 @@ async def evaluer_reponse(
         percentage=evaluation["percentage"],
     )
 
-    logger.info(
-        f"Action verb eval : user={current_user['id']} "
-        f"verb={body.verb_slug} score={evaluation['percentage']}%"
-    )
+    logger.info(f"Action verb eval : user={current_user['id']} verb={body.verb_slug} score={evaluation['percentage']}%")
 
     return EvaluateResponse(**evaluation)
 
 
 # ── 5. GET /api/action-verbs/progress — progression FSRS ──
 
+
 @router.get("/progress", response_model=VerbProgressResponse)
 async def progression_verbes(
-    current_user: Dict = Depends(get_current_user),
+    current_user: dict = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
     """Retourne la progression FSRS de l'élève sur tous les verbes."""
@@ -166,28 +167,29 @@ async def progression_verbes(
     )
     rows = result.fetchall()
 
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     verbs: list[VerbProgressItem] = []
     dues = 0
 
     for r in rows:
         m = r._mapping
-        est_due = (
-            m["prochaine_revision"] is not None
-            and m["prochaine_revision"] <= now
-        ) or m["prochaine_revision"] is None
+        est_due = (m["prochaine_revision"] is not None and m["prochaine_revision"] <= now) or m[
+            "prochaine_revision"
+        ] is None
         if est_due:
             dues += 1
-        verbs.append(VerbProgressItem(
-            verb_slug=m["verb_slug"],
-            stability=m["stability"] or 0.0,
-            difficulty=m["difficulty"] or 0.0,
-            last_score=m["last_score"] or 0,
-            attempts=m["attempts"] or 0,
-            est_due=est_due,
-            prochaine_revision=m["prochaine_revision"].isoformat() if m["prochaine_revision"] else None,
-            interval_jours=m["interval_jours"] or 0.0,
-        ))
+        verbs.append(
+            VerbProgressItem(
+                verb_slug=m["verb_slug"],
+                stability=m["stability"] or 0.0,
+                difficulty=m["difficulty"] or 0.0,
+                last_score=m["last_score"] or 0,
+                attempts=m["attempts"] or 0,
+                est_due=est_due,
+                prochaine_revision=m["prochaine_revision"].isoformat() if m["prochaine_revision"] else None,
+                interval_jours=m["interval_jours"] or 0.0,
+            )
+        )
 
     return VerbProgressResponse(
         user_id=str(current_user["id"]),
@@ -199,11 +201,12 @@ async def progression_verbes(
 
 # ── 6. POST /api/action-verbs/{slug}/review — révision FSRS ──
 
+
 @router.post("/{slug}/review")
 async def reviser_verbe(
     slug: str,
     body: VerbReviewRequest,
-    current_user: Dict = Depends(get_current_user),
+    current_user: dict = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
     """Marque une révision FSRS pour un verbe et programme la prochaine."""
@@ -238,18 +241,20 @@ async def reviser_verbe(
     fsrs_rating = FsrsRating(rating)
     new_card = scheduler.review_card(card, fsrs_rating)
 
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     next_review = now + __import__("datetime").timedelta(days=new_card.scheduled_days)
 
-    fsrs_json = json.dumps({
-        "stability": new_card.stability,
-        "difficulty": new_card.difficulty,
-        "scheduled_days": new_card.scheduled_days,
-        "reps": new_card.reps,
-        "lapses": new_card.lapses,
-        "state": str(new_card.state),
-        "last_review": now.isoformat(),
-    })
+    fsrs_json = json.dumps(
+        {
+            "stability": new_card.stability,
+            "difficulty": new_card.difficulty,
+            "scheduled_days": new_card.scheduled_days,
+            "reps": new_card.reps,
+            "lapses": new_card.lapses,
+            "state": str(new_card.state),
+            "last_review": now.isoformat(),
+        }
+    )
 
     await db.execute(
         text("""
@@ -284,8 +289,7 @@ async def reviser_verbe(
     await db.commit()
 
     logger.info(
-        f"Action verb review : user={current_user['id']} "
-        f"verb={slug} rating={rating} next={next_review.isoformat()}"
+        f"Action verb review : user={current_user['id']} verb={slug} rating={rating} next={next_review.isoformat()}"
     )
 
     return {
@@ -299,6 +303,7 @@ async def reviser_verbe(
 
 
 # ── Helper : enregistrer tentative ────────────────
+
 
 async def _enregistrer_tentative(
     db: AsyncSession,

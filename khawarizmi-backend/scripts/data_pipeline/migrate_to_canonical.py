@@ -20,6 +20,7 @@ LEGACY_PATTERNS = [
     r"tutor\.programme_sciences",
 ]
 
+
 def main():
     print("=== Migration vers données canoniques ===")
     for rel in TARGET_FILES:
@@ -33,6 +34,7 @@ def main():
                     print(f"[!] {rel} contient encore du legacy : {pattern}")
             if not found:
                 print(f"[OK] {rel}")
+
 
 if __name__ == "__main__":
     main()

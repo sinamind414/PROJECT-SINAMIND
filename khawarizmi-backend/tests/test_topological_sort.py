@@ -1,6 +1,5 @@
 """Tests for topological sort of concept dependencies."""
 
-import pytest
 from services.scheduler import _topological_sort
 
 

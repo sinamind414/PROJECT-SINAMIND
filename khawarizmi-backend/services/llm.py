@@ -1,11 +1,14 @@
 import json
 import logging
 import re
+
 from openai import AsyncOpenAI
 from tenacity import retry, stop_after_attempt, wait_exponential
+
 from config import get_settings
 
 logger = logging.getLogger("khawarizmi.llm")
+
 
 def _get_glm47_client():
     """Retourne un client AsyncOpenAI pointant vers Z.AI (GLM-4.7) si configuré."""
@@ -32,49 +35,60 @@ async def _call_with_fallback(
     # Fallback 1 : Gemini 2.5 Flash (gratuit, 15 req/min)
     cfg = get_settings()
     if cfg.GEMINI_API_KEY and cfg.GEMINI_API_KEY != "test-gemini-key":
-        providers.append((
-            "Gemini 2.5 Flash",
-            AsyncOpenAI(
-                api_key=cfg.GEMINI_API_KEY,
-                base_url="https://generativelanguage.googleapis.com/v1beta/openai/",
-            ),
-            "gemini-2.5-flash",
-        ))
+        providers.append(
+            (
+                "Gemini 2.5 Flash",
+                AsyncOpenAI(
+                    api_key=cfg.GEMINI_API_KEY,
+                    base_url="https://generativelanguage.googleapis.com/v1beta/openai/",
+                ),
+                "gemini-2.5-flash",
+            )
+        )
 
     # Fallback 2 : Cloudflare GLM-5.2 (gratuit, 10K neurons/jour)
     if cfg.CLOUDFLARE_API_TOKEN:
-        providers.append((
-            "Cloudflare GLM-5.2",
-            AsyncOpenAI(
-                api_key=cfg.CLOUDFLARE_API_TOKEN,
-                base_url=f"https://api.cloudflare.com/client/v4/accounts/{cfg.CLOUDFLARE_ACCOUNT_ID}/ai/v1",
-            ),
-            "@cf/zai-org/glm-5.2",
-        ))
+        providers.append(
+            (
+                "Cloudflare GLM-5.2",
+                AsyncOpenAI(
+                    api_key=cfg.CLOUDFLARE_API_TOKEN,
+                    base_url=f"https://api.cloudflare.com/client/v4/accounts/{cfg.CLOUDFLARE_ACCOUNT_ID}/ai/v1",
+                ),
+                "@cf/zai-org/glm-5.2",
+            )
+        )
 
     # Fallback 3 : GLM-4.7 (Z.AI)
     glm_client = _get_glm47_client()
     if glm_client:
-        providers.append((
-            "GLM-4.7",
-            glm_client,
-            cfg.zai_model,
-        ))
+        providers.append(
+            (
+                "GLM-4.7",
+                glm_client,
+                cfg.zai_model,
+            )
+        )
 
     # Fallback 4 : OpenAI gpt-4o-mini
     fallback_key = cfg.OPENAI_FALLBACK_API_KEY or cfg.REAL_OPENAI_API_KEY
     if fallback_key:
-        providers.append((
-            "OpenAI gpt-4o-mini",
-            AsyncOpenAI(api_key=fallback_key, base_url="https://api.openai.com/v1"),
-            "gpt-4o-mini",
-        ))
+        providers.append(
+            (
+                "OpenAI gpt-4o-mini",
+                AsyncOpenAI(api_key=fallback_key, base_url="https://api.openai.com/v1"),
+                "gpt-4o-mini",
+            )
+        )
 
     # Tentative principale
     try:
         return await primary_client.chat.completions.create(
-            model=primary_model, temperature=temperature,
-            max_tokens=max_tokens, timeout=timeout, messages=messages,
+            model=primary_model,
+            temperature=temperature,
+            max_tokens=max_tokens,
+            timeout=timeout,
+            messages=messages,
         )
     except Exception as e:
         is_rate_limit = "429" in str(e) or "quota" in str(e).lower()
@@ -86,8 +100,11 @@ async def _call_with_fallback(
         try:
             logger.warning(f"⚠️ Fallback vers {name}...")
             resp = await client.chat.completions.create(
-                model=model, temperature=temperature,
-                max_tokens=max_tokens, timeout=timeout, messages=messages,
+                model=model,
+                temperature=temperature,
+                max_tokens=max_tokens,
+                timeout=timeout,
+                messages=messages,
             )
             logger.info(f"✅ Fallback {name} réussi.")
             return resp
@@ -283,6 +300,7 @@ FEEDBACK LANGUAGE:
 - Provide BOTH feedback_fr and feedback_ar.
 """
 
+
 def extract_json_from_gemini(raw_text: str) -> dict:
     """
     Gemini 2.5 Flash retourne parfois :
@@ -297,8 +315,8 @@ def extract_json_from_gemini(raw_text: str) -> dict:
     text = raw_text.strip()
 
     # Étape 1 : Nettoyer les backticks Markdown
-    text = re.sub(r'^```(?:json)?\s*', '', text, flags=re.MULTILINE)
-    text = re.sub(r'\s*```$', '', text, flags=re.MULTILINE)
+    text = re.sub(r"^```(?:json)?\s*", "", text, flags=re.MULTILINE)
+    text = re.sub(r"\s*```$", "", text, flags=re.MULTILINE)
     text = text.strip()
 
     # Étape 2 : Essai parsing direct
@@ -308,25 +326,26 @@ def extract_json_from_gemini(raw_text: str) -> dict:
         pass
 
     # Étape 3 : Extraire le premier objet JSON valide
-    brace_start = text.find('{')
+    brace_start = text.find("{")
     if brace_start != -1:
         # Chercher la fermeture correcte
         depth = 0
         for i, char in enumerate(text[brace_start:], start=brace_start):
-            if char == '{': depth += 1
-            elif char == '}':
+            if char == "{":
+                depth += 1
+            elif char == "}":
                 depth -= 1
                 if depth == 0:
                     try:
-                        return json.loads(text[brace_start:i+1])
+                        return json.loads(text[brace_start : i + 1])
                     except json.JSONDecodeError:
                         break
 
     # Étape 4 : JSON tronqué — tenter la réparation
     # Compter les accolades ouvertes non fermées
-    open_braces = text.count('{') - text.count('}')
-    open_brackets = text.count('[') - text.count(']')
-    repaired = text + (']' * max(0, open_brackets)) + ('}' * max(0, open_braces))
+    open_braces = text.count("{") - text.count("}")
+    open_brackets = text.count("[") - text.count("]")
+    repaired = text + ("]" * max(0, open_brackets)) + ("}" * max(0, open_braces))
     try:
         return json.loads(repaired)
     except json.JSONDecodeError:
@@ -335,17 +354,9 @@ def extract_json_from_gemini(raw_text: str) -> dict:
     return {}
 
 
-@retry(
-    stop=stop_after_attempt(3),
-    wait=wait_exponential(multiplier=1, min=1, max=4)
-)
-async def call_gpt4o_evaluator(
-    client: AsyncOpenAI,
-    question: dict,
-    reponse: str,
-    tentative: int
-) -> dict:
-    
+@retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=1, max=4))
+async def call_gpt4o_evaluator(client: AsyncOpenAI, question: dict, reponse: str, tentative: int) -> dict:
+
     concepts = question.get("concepts_requis", [])
     if not concepts and question.get("concept_cle"):
         concepts = [question["concept_cle"]]
@@ -353,6 +364,7 @@ async def call_gpt4o_evaluator(
 
     # Calibrage ONEC : injecter des exemples few-shot du Golden Set
     from services.eval_calibration import build_calibrated_prompt
+
     chapitre = question.get("chapitre_id", question.get("chapitre", ""))
     few_shot_block = build_calibrated_prompt(
         chapitre=chapitre,
@@ -363,21 +375,18 @@ async def call_gpt4o_evaluator(
     if few_shot_block:
         calibrated_system_prompt = SYSTEM_PROMPT + "\n" + few_shot_block
 
-    user_message = f"""QUESTION: {question.get('texte', '')}
-REPONSE_ATTENDUE: {question.get('reponse_attendue', '')}
-CONCEPT_CLE: {question.get('concept_cle', '')}
+    user_message = f"""QUESTION: {question.get("texte", "")}
+REPONSE_ATTENDUE: {question.get("reponse_attendue", "")}
+CONCEPT_CLE: {question.get("concept_cle", "")}
 CONCEPTS_ATTENDUS: {concepts_str}
-PATTERN_RECHERCHE: {question.get('pattern_recherche', '')}
+PATTERN_RECHERCHE: {question.get("pattern_recherche", "")}
 TENTATIVE: {tentative}
 REPONSE_ELEVE: {reponse}"""
 
     # Timeout de 8 secondes passé directement à l'appel réseau
     _model = get_settings().openai_model
-    
-    messages = [
-        {"role": "system", "content": calibrated_system_prompt},
-        {"role": "user",   "content": user_message}
-    ]
+
+    messages = [{"role": "system", "content": calibrated_system_prompt}, {"role": "user", "content": user_message}]
 
     response = await _call_with_fallback(
         messages=messages,
@@ -387,23 +396,23 @@ REPONSE_ELEVE: {reponse}"""
 
     content = response.choices[0].message.content or ""
     result = extract_json_from_gemini(content)
-    
+
     if not result:
-        raise ValueError(f"Échec de l'extraction JSON de la réponse : {repr(content)}")
+        raise ValueError(f"Échec de l'extraction JSON de la réponse : {content!r}")
 
     # Validation et mapping pour compatibilité avec l'ancienne structure de retour
     global_score = float(result.get("global_score", 0.0))
     score_10 = int(round(global_score * 10))
-    
+
     if global_score >= 0.85:
         statut = "CORRECT"
     elif global_score >= 0.35:
         statut = "PARTIEL"
     else:
         statut = "FAUX"
-        
+
     # Choisir le feedback en fonction de la langue de la réponse
-    has_arabic = any(u'\u0600' <= c <= u'\u06FF' for c in reponse)
+    has_arabic = any("\u0600" <= c <= "\u06ff" for c in reponse)
     feedback = result.get("feedback_ar") if has_arabic and result.get("feedback_ar") else result.get("feedback_fr")
     if not feedback:
         feedback = result.get("feedback_fr") or result.get("feedback_ar") or "Pas de feedback disponible."
@@ -415,7 +424,7 @@ REPONSE_ELEVE: {reponse}"""
         "manquant": result.get("missing_concepts", []),
         "scores_concepts": result.get("concept_scores", {}),
         "feedback_fr": result.get("feedback_fr", ""),
-        "feedback_ar": result.get("feedback_ar", "")
+        "feedback_ar": result.get("feedback_ar", ""),
     }
 
     # S'assurer que tous les concepts attendus ont au moins une note par défaut

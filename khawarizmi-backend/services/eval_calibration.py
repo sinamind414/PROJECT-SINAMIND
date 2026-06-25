@@ -18,15 +18,14 @@ Gain attendu :
 import json
 import logging
 import pathlib
-from typing import List, Dict, Optional
 
 logger = logging.getLogger("khawarizmi.eval_calibration")
 
 # Cache du Golden Set en mémoire
-_golden_set_cache: Optional[Dict] = None
+_golden_set_cache: dict | None = None
 
 
-def _load_golden_set() -> Dict:
+def _load_golden_set() -> dict:
     """Charge le Golden Set en mémoire (avec cache)."""
     global _golden_set_cache
     if _golden_set_cache is not None:
@@ -37,7 +36,7 @@ def _load_golden_set() -> Dict:
         logger.warning(f"Golden Set introuvable: {golden_path}")
         return {"questions": []}
 
-    with open(golden_path, "r", encoding="utf-8") as f:
+    with open(golden_path, encoding="utf-8") as f:
         _golden_set_cache = json.load(f)
     logger.info(f"Golden Set chargé: {len(_golden_set_cache.get('questions', []))} questions")
     return _golden_set_cache
@@ -48,7 +47,7 @@ def select_few_shot_examples(
     niveau: str = None,
     question_text: str = "",
     max_examples: int = 3,
-) -> List[Dict]:
+) -> list[dict]:
     """Sélectionne les exemples few-shot les plus pertinents.
 
     Stratégie de sélection :
@@ -74,7 +73,7 @@ def select_few_shot_examples(
     # Filtrer par chapitre (match souple)
     chapitre_lower = chapitre.lower() if chapitre else ""
     same_chapter = [q for q in questions if chapitre_lower and chapitre_lower in q.get("chapitre", "").lower()]
-    
+
     if not same_chapter:
         # Pas d'exemples du même chapitre → prendre des exemples variés
         same_chapter = questions
@@ -96,7 +95,7 @@ def select_few_shot_examples(
     return selected
 
 
-def format_few_shot_prompt(examples: List[Dict]) -> str:
+def format_few_shot_prompt(examples: list[dict]) -> str:
     """Formate les exemples few-shot pour injection dans le prompt d'évaluation.
 
     Format :
@@ -111,7 +110,9 @@ def format_few_shot_prompt(examples: List[Dict]) -> str:
     if not examples:
         return ""
 
-    parts = ["═══════════════════════════════════════════════\nEXEMLES DE CORRECTION OFFICIELLE ONEC (FEW-SHOT)\n═══════════════════════════════════════════════"]
+    parts = [
+        "═══════════════════════════════════════════════\nEXEMLES DE CORRECTION OFFICIELLE ONEC (FEW-SHOT)\n═══════════════════════════════════════════════"
+    ]
 
     for i, ex in enumerate(examples, 1):
         niveau = ex.get("niveau", "?")
@@ -170,7 +171,7 @@ def build_calibrated_prompt(
     return few_shot_block
 
 
-def get_calibration_stats() -> Dict:
+def get_calibration_stats() -> dict:
     """Retourne les statistiques du Golden Set pour monitoring."""
     golden = _load_golden_set()
     questions = golden.get("questions", [])

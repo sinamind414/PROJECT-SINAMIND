@@ -17,15 +17,11 @@ from __future__ import annotations
 import argparse
 import json
 import logging
-import os
 import re
-import shutil
 import subprocess
 import sys
-import time
 from collections import Counter
 from pathlib import Path
-from typing import Dict, List, Optional, Set, Tuple
 
 logging.basicConfig(
     level=logging.INFO,
@@ -64,7 +60,7 @@ Q_PATTERN = re.compile(
     re.IGNORECASE,
 )
 
-MC_MAP: Dict[str, str] = {
+MC_MAP: dict[str, str] = {
     "استنساخ": "mc_prot_01", "نسخ": "mc_prot_01", "transcription": "mc_prot_01",
     "ADN": "mc_prot_01", "ARNm": "mc_prot_04", "الرنا الرسول": "mc_prot_04",
     "ترجمة": "mc_prot_02", "traduction": "mc_prot_02",
@@ -101,6 +97,7 @@ MC_MAP: Dict[str, str] = {
 # Utilitaires texte
 # ---------------------------------------------------------------------------
 
+
 def clean_arabic(text: str) -> str:
     t = re.sub(r"\s+", " ", text).strip()
     t = re.sub(r"[|¦•●]", "", t)
@@ -135,10 +132,10 @@ def tag_concept(text: str):
 # Extraction des questions depuis un fichier .ocr.txt
 # ---------------------------------------------------------------------------
 
-def extract_questions_from_ocr_text(text: str, source_label: str, serie: int, vol_num: int, page_no: int) -> List[Dict]:
+def extract_questions_from_ocr_text(text: str, source_label: str, serie: int, vol_num: int, page_no: int) -> list[dict]:
     questions = []
     lines = text.split("\n")
-    current_q: List[str] = []
+    current_q: list[str] = []
     in_question = False
 
     for line in lines:
@@ -149,7 +146,7 @@ def extract_questions_from_ocr_text(text: str, source_label: str, serie: int, vo
                 cleaned = clean_arabic(raw)
                 if len(cleaned) > 10:
                     main, sec, av = tag_concept(cleaned)
-                    qid = f"q_khelifa{serie}_v{vol_num:02d}_p{page_no:02d}_{len(questions)+1:02d}"
+                    qid = f"q_khelifa{serie}_v{vol_num:02d}_p{page_no:02d}_{len(questions) + 1:02d}"
                     questions.append({
                         "id": qid,
                         "texte_brut": raw[:500],
@@ -175,7 +172,7 @@ def extract_questions_from_ocr_text(text: str, source_label: str, serie: int, vo
                 cleaned = clean_arabic(raw)
                 if len(cleaned) > 10:
                     main, sec, av = tag_concept(cleaned)
-                    qid = f"q_khelifa{serie}_v{vol_num:02d}_p{page_no:02d}_{len(questions)+1:02d}"
+                    qid = f"q_khelifa{serie}_v{vol_num:02d}_p{page_no:02d}_{len(questions) + 1:02d}"
                     questions.append({
                         "id": qid,
                         "texte_brut": raw[:500],
@@ -201,7 +198,7 @@ def extract_questions_from_ocr_text(text: str, source_label: str, serie: int, vo
         cleaned = clean_arabic(raw)
         if len(cleaned) > 10:
             main, sec, av = tag_concept(cleaned)
-            qid = f"q_khelifa{serie}_v{vol_num:02d}_p{page_no:02d}_{len(questions)+1:02d}"
+            qid = f"q_khelifa{serie}_v{vol_num:02d}_p{page_no:02d}_{len(questions) + 1:02d}"
             questions.append({
                 "id": qid,
                 "texte_brut": raw[:500],
@@ -221,11 +218,11 @@ def extract_questions_from_ocr_text(text: str, source_label: str, serie: int, vo
     return questions
 
 
-def parse_ocr_pages(ocr_text: str) -> Dict[int, str]:
+def parse_ocr_pages(ocr_text: str) -> dict[int, str]:
     """Extrait le texte par page depuis le format assemble de ocr_pipeline_production."""
-    pages: Dict[int, str] = {}
+    pages: dict[int, str] = {}
     current_page = None
-    current_lines: List[str] = []
+    current_lines: list[str] = []
 
     page_header = re.compile(r"^={70,}\nPAGE (\d+)\n={70,}", re.MULTILINE)
 
@@ -247,13 +244,13 @@ def parse_ocr_pages(ocr_text: str) -> Dict[int, str]:
     return pages
 
 
-def process_ocr_file(ocr_path: Path, serie: int, vol_num: int) -> Tuple[List[Dict], Dict]:
+def process_ocr_file(ocr_path: Path, serie: int, vol_num: int) -> tuple[list[dict], dict]:
     """Convertit un fichier .ocr.txt en questions structurées."""
     text = ocr_path.read_text(encoding="utf-8", errors="replace")
     pages = parse_ocr_pages(text)
 
-    all_questions: List[Dict] = []
-    volume_pages: List[Dict] = []
+    all_questions: list[dict] = []
+    volume_pages: list[dict] = []
 
     for page_no in sorted(pages.keys()):
         page_text = pages[page_no]
@@ -278,6 +275,7 @@ def process_ocr_file(ocr_path: Path, serie: int, vol_num: int) -> Tuple[List[Dic
 # ---------------------------------------------------------------------------
 # Étape 1 : OCR (appelle ocr_pipeline_production.py)
 # ---------------------------------------------------------------------------
+
 
 def ocr_stem(pdf_path: Path) -> str:
     """Nom du fichier de sortie produit par ocr_pipeline_production (basé sur le nom du PDF)."""
@@ -343,7 +341,7 @@ def extract_volume_questions(serie: int, vol: int, pdf_path: Path, ocr_dir: Path
 
 def consolidate_questions(q_dir: Path) -> None:
     log.info("Consolidation des questions…")
-    all_q: List[Dict] = []
+    all_q: list[dict] = []
     for qfile in sorted(q_dir.glob("*_questions.json")):
         try:
             all_q.extend(json.loads(qfile.read_text(encoding="utf-8")))
@@ -363,6 +361,7 @@ def consolidate_questions(q_dir: Path) -> None:
 # ---------------------------------------------------------------------------
 # Pipeline principal
 # ---------------------------------------------------------------------------
+
 
 def run_pipeline(args: argparse.Namespace) -> None:
     OCR_OUT_DIR.mkdir(parents=True, exist_ok=True)

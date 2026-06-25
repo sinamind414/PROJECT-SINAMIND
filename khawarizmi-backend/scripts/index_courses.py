@@ -1,13 +1,13 @@
-# -*- coding: utf-8 -*-
 """
 scripts/index_courses.py - Ingests SVT course documents into the PostgreSQL vector database (RAG).
 """
 
+import asyncio
 import os
 import sys
 import uuid
-import asyncio
 from pathlib import Path
+
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import create_async_engine
 
@@ -38,7 +38,7 @@ async def index_chapter(file_path: Path, metadata: dict, engine):
         return
 
     print(f"Reading course: {file_path.name}")
-    with open(file_path, "r", encoding="utf-8") as f:
+    with open(file_path, encoding="utf-8") as f:
         content = f.read()
 
     chunks = chunk_text(content)

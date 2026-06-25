@@ -10,9 +10,10 @@ from pathlib import Path
 ROOT = Path(__file__).parent.parent
 sys.path.insert(0, str(ROOT))
 
-from sqlalchemy import text  # noqa: E402
-from sqlalchemy.ext.asyncio import create_async_engine  # noqa: E402
-from config import get_settings  # noqa: E402
+from sqlalchemy import text
+from sqlalchemy.ext.asyncio import create_async_engine
+
+from config import get_settings
 
 SEED_FILES = [
     ROOT / "data" / "action_verbs_seed.json",

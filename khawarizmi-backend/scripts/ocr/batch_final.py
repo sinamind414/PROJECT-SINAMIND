@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Batch final — FINAL BAC (V4-V6) + KHELIFA1 (V07-V15) GPU DPI 36."""
-import json, sys, time
+import json
+import sys
+import time
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -11,6 +13,7 @@ K1 = r"C:\Users\zakaria\Documents\projet khawarizmi A\LIVRES SCOLAIRES\ANALES SC
 FB = r"C:\Users\zakaria\Documents\projet khawarizmi A\LIVRES SCOLAIRES\ANALES SCIENCES\LIVRES ANNALES SVT BAC\DOSSIER ANNALES KHELIFA\FINAL BAC\VOLUMES_FINALBAC"
 OUT = ROOT / "data" / "annales_workspace" / "OCR_PROD"
 LOG = ROOT / "data" / "batch_final_log.json"
+
 
 def process(name, pdf, dpi):
     sp = OUT / name / "summary.json"
@@ -26,6 +29,7 @@ def process(name, pdf, dpi):
         return r
     except Exception as e:
         return {"volume": name, "status": "error", "error": str(e), "elapsed_sec": round(time.time() - t0, 1)}
+
 
 results = []
 # FINALBAC V4-V6

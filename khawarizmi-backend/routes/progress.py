@@ -15,7 +15,7 @@ router = APIRouter()
 @router.get("/api/progress", tags=["Progression"])
 async def get_progression(
     current_user: dict = Depends(get_current_user),
-    db:           AsyncSession = Depends(get_db),
+    db: AsyncSession = Depends(get_db),
 ):
     result = await db.execute(
         text("""
@@ -32,14 +32,14 @@ async def get_progression(
             WHERE mmc.user_id = :user_id
             ORDER BY mc.matiere, mc.chapitre_id
         """),
-        {"user_id": current_user["id"]}
+        {"user_id": current_user["id"]},
     )
     rows = result.fetchall()
 
     if not rows:
         return {
-            "message":   "Aucune progression enregistrée",
-            "concepts":  [],
+            "message": "Aucune progression enregistrée",
+            "concepts": [],
             "prediction_bac": None,
         }
 
@@ -57,33 +57,35 @@ async def get_progression(
         cards_par_matiere.setdefault(matiere, []).append(card)
         retrievability = scheduler._get_retrievability(card)
 
-        concepts.append({
-            "matiere":           matiere,
-            "chapitre_id":       chapitre_id,
-            "stability":         round(stability or 0.0, 3),
-            "difficulty":        round(difficulty or 0.0, 3),
-            "retrievability":    retrievability,
-            "prochaine_revision": next_rev.isoformat() if next_rev else None,
-            "interval_jours":    interval,
-            "est_due":           next_rev <= datetime.now(UTC) if next_rev else True,
-        })
+        concepts.append(
+            {
+                "matiere": matiere,
+                "chapitre_id": chapitre_id,
+                "stability": round(stability or 0.0, 3),
+                "difficulty": round(difficulty or 0.0, 3),
+                "retrievability": retrievability,
+                "prochaine_revision": next_rev.isoformat() if next_rev else None,
+                "interval_jours": interval,
+                "est_due": next_rev <= datetime.now(UTC) if next_rev else True,
+            }
+        )
 
     prediction = scheduler.predire_score_bac(cards_par_matiere)
     dues_auj = sum(1 for c in concepts if c["est_due"])
 
     return {
-        "user_id":          current_user["id"],
-        "nb_concepts":      len(concepts),
+        "user_id": current_user["id"],
+        "nb_concepts": len(concepts),
         "dues_aujourd_hui": dues_auj,
-        "prediction_bac":   prediction,
-        "concepts":         concepts,
+        "prediction_bac": prediction,
+        "concepts": concepts,
     }
 
 
 @router.get("/api/week-activity", tags=["Progression"])
 async def get_week_activity(
     current_user: dict = Depends(get_current_user),
-    db:           AsyncSession = Depends(get_db),
+    db: AsyncSession = Depends(get_db),
 ):
     now = datetime.now(UTC)
     week_start = now - timedelta(days=now.weekday())
@@ -103,7 +105,7 @@ async def get_week_activity(
             "user_id": current_user["id"],
             "week_start": week_start,
             "week_end": week_start + timedelta(days=7),
-        }
+        },
     )
     rows = result.fetchall()
 
@@ -133,16 +135,18 @@ async def get_week_activity(
         elif day_dues > 0:
             load = 1
 
-        days.append({
-            "date": day_date.isoformat(),
-            "day_index": i,
-            "dues_count": day_dues,
-            "reviewed_count": day_reviewed,
-            "status": status,
-            "primary_task": None,
-            "primary_chapter": None,
-            "load": load,
-        })
+        days.append(
+            {
+                "date": day_date.isoformat(),
+                "day_index": i,
+                "dues_count": day_dues,
+                "reviewed_count": day_reviewed,
+                "status": status,
+                "primary_task": None,
+                "primary_chapter": None,
+                "load": load,
+            }
+        )
 
     return {
         "user_id": current_user["id"],

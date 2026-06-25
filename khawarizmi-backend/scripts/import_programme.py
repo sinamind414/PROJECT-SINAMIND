@@ -15,8 +15,7 @@ ROOT = Path(__file__).parent.parent
 sys.path.insert(0, str(ROOT))
 
 from sqlalchemy import text
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
-
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 DB_URL = os.environ.get(
     "DATABASE_URL",
@@ -39,10 +38,11 @@ def normalize_text(text: str) -> str:
         return text
     return unicodedata.normalize("NFC", text).strip()
 
+
 async def import_programme(file_path: Path):
     print(f"\nImport : {file_path.name}")
 
-    with open(file_path, "r", encoding="utf-8") as f:
+    with open(file_path, encoding="utf-8") as f:
         data = json.load(f)
 
     matiere = normalize_text(data["matiere"])

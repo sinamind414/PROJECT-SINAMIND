@@ -1,14 +1,14 @@
 import json
 import logging
-from typing import Dict
-from fastapi import APIRouter, HTTPException, Depends, Request
-from fastapi.responses import JSONResponse
-from sqlalchemy.ext.asyncio import AsyncSession
+
+from fastapi import APIRouter, Depends, HTTPException, Request
 from openai import AsyncOpenAI
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from cache import get_cache, make_cache_key, set_cache
 from config import get_settings
-from cache import get_cache, set_cache, make_cache_key
-from deps import get_current_user, get_tutor, get_openai, get_db
-from rate_limit import limiter, chat_limit
+from deps import get_current_user, get_db, get_openai, get_tutor
+from rate_limit import chat_limit, limiter
 from schemas.session import ChatRequest
 from services.khawarizmi_engine import KhawarizmiTutor
 from services.metrics import MetricsCollector, record_request
@@ -20,21 +20,18 @@ router = APIRouter()
 @router.post("/api/chat", tags=["IA"])
 @limiter.limit(chat_limit)
 async def chat_socratique(
-    request:      Request,
-    body:         ChatRequest,
-    current_user: Dict        = Depends(get_current_user),
-    tutor:        KhawarizmiTutor = Depends(get_tutor),
-    openai_client:AsyncOpenAI = Depends(get_openai),
-    db:           AsyncSession = Depends(get_db),
+    request: Request,
+    body: ChatRequest,
+    current_user: dict = Depends(get_current_user),
+    tutor: KhawarizmiTutor = Depends(get_tutor),
+    openai_client: AsyncOpenAI = Depends(get_openai),
+    db: AsyncSession = Depends(get_db),
 ):
     cfg = get_settings()
     mc = MetricsCollector(user_id=str(current_user["id"]), endpoint="/api/chat")
 
     mc.start("cache_lookup")
-    cache_key = make_cache_key(
-        "chat", body.sujet_id, body.question_id,
-        body.message, body.mode_force or "auto"
-    )
+    cache_key = make_cache_key("chat", body.sujet_id, body.question_id, body.message, body.mode_force or "auto")
     cached = await get_cache(cache_key)
     mc.end("cache_lookup")
     mc.set("cache_hit", cached is not None)
@@ -57,7 +54,9 @@ async def chat_socratique(
 
     # ─── Calcul du Contexte Temporel & FSRS ──────────────
     from datetime import date
+
     from sqlalchemy import text as sa_text
+
     today = date.today()
     year = today.year
     if today.month > 6 or (today.month == 6 and today.day > 10):
@@ -83,34 +82,30 @@ async def chat_socratique(
                 FROM mastery_micro_concepts
                 WHERE user_id = :uid
             """),
-            {"uid": current_user["id"]}
+            {"uid": current_user["id"]},
         )
         row_stats = result_stats.fetchone()
         if row_stats:
             user_stats = {
                 "total": row_stats[0],
                 "mastered": row_stats[1],
-                "avg_stability": round(row_stats[2] or 0.0, 1)
+                "avg_stability": round(row_stats[2] or 0.0, 1),
             }
     except Exception as e:
         logger.error(f"Erreur stats chat FSRS: {e}")
 
-    calendar_context = {
-        "days_to_bac": days_to_bac,
-        "phase": phase_label,
-        "user_stats": user_stats
-    }
+    calendar_context = {"days_to_bac": days_to_bac, "phase": phase_label, "user_stats": user_stats}
 
     try:
         system_prompt = tutor.build_system_prompt(
-            sujet_id      = body.sujet_id,
-            question_id   = body.question_id,
-            student_input = body.message,
-            pre_analyse   = pre_analyse,
-            niveau_sm2    = body.niveau_sm2,
-            score_actuel  = body.score_actuel,
-            mode_force    = body.mode_force or 'ANNALES_COMPLEXES',
-            calendar_context = calendar_context,
+            sujet_id=body.sujet_id,
+            question_id=body.question_id,
+            student_input=body.message,
+            pre_analyse=pre_analyse,
+            niveau_sm2=body.niveau_sm2,
+            score_actuel=body.score_actuel,
+            mode_force=body.mode_force or "ANNALES_COMPLEXES",
+            calendar_context=calendar_context,
         )
     except ValueError as e:
         raise HTTPException(404, f"Contenu introuvable : {e}")
@@ -122,7 +117,7 @@ async def chat_socratique(
         response = await _call_with_fallback(
             messages=[
                 {"role": "system", "content": system_prompt},
-                {"role": "user",   "content": body.message},
+                {"role": "user", "content": body.message},
             ],
             primary_client=openai_client,
             primary_model=cfg.openai_model,
@@ -131,8 +126,8 @@ async def chat_socratique(
             timeout=30.0,
         )
 
-        raw_content  = response.choices[0].message.content or ""
-        tokens_used  = response.usage.total_tokens
+        raw_content = response.choices[0].message.content or ""
+        tokens_used = response.usage.total_tokens
 
         raw_content = raw_content.strip()
         if raw_content.startswith("```"):
@@ -140,7 +135,7 @@ async def chat_socratique(
             if len(lines) >= 2 and lines[0].startswith("```") and lines[-1].startswith("```"):
                 raw_content = "\n".join(lines[1:-1]).strip()
 
-        ia_result    = json.loads(raw_content)
+        ia_result = json.loads(raw_content)
 
     except json.JSONDecodeError:
         logger.error(f"Réponse IA non-JSON : {raw_content[:200]}")
@@ -156,10 +151,10 @@ async def chat_socratique(
 
     result = {
         **ia_result,
-        "pre_analyse":     pre_analyse,
+        "pre_analyse": pre_analyse,
         "tokens_utilises": tokens_used,
         "economie_tokens": pre_analyse.get("economie_tokens", 0) if pre_analyse else 0,
-        "from_cache":      False,
+        "from_cache": False,
     }
 
     mc.start("cache_store")
@@ -169,26 +164,22 @@ async def chat_socratique(
     record_request("/api/chat", cache_hit=False, fallback=False)
     mc.flush()
 
-    logger.info(
-        f"Chat : user={current_user['id']} "
-        f"sujet={body.sujet_id} q={body.question_id} "
-        f"tokens={tokens_used}"
-    )
+    logger.info(f"Chat : user={current_user['id']} sujet={body.sujet_id} q={body.question_id} tokens={tokens_used}")
 
     return result
 
 
 @router.get("/api/chapitres/{matiere}", tags=["Contenu"])
 async def get_chapitres(
-    matiere:      str,
-    current_user: Dict = Depends(get_current_user),
-    tutor:        KhawarizmiTutor = Depends(get_tutor),
+    matiere: str,
+    current_user: dict = Depends(get_current_user),
+    tutor: KhawarizmiTutor = Depends(get_tutor),
 ):
-    if hasattr(tutor, 'programme_canonical') and tutor.programme_canonical:
+    if hasattr(tutor, "programme_canonical") and tutor.programme_canonical:
         programme = tutor.programme_canonical
     else:
         programme = {
-            "maths":    tutor.programme_maths,
+            "maths": tutor.programme_maths,
             "physique": tutor.programme_physique,
             "sciences": tutor.programme_sciences,
         }.get(matiere)
@@ -199,12 +190,12 @@ async def get_chapitres(
     chapitres = programme.get("chapitres", [])
 
     return {
-        "matiere":    matiere,
+        "matiere": matiere,
         "nb_chapitres": len(chapitres),
-        "chapitres":  [
+        "chapitres": [
             {
-                "id":   ch.get("id"),
-                "nom":  ch.get("nom"),
+                "id": ch.get("id"),
+                "nom": ch.get("nom"),
                 "nb_micro_concepts": len(ch.get("micro_concepts", [])),
             }
             for ch in chapitres

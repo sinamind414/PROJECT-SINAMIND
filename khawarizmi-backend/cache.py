@@ -1,13 +1,13 @@
 import hashlib
-from typing import Optional
 
 
 def _get_state():
     from main import state
+
     return state
 
 
-async def get_cache(key: str) -> Optional[str]:
+async def get_cache(key: str) -> str | None:
     s = _get_state()
     if not s.redis:
         return None

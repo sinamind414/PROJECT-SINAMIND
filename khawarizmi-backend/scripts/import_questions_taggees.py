@@ -18,7 +18,7 @@ ROOT = Path(__file__).parent.parent
 sys.path.insert(0, str(ROOT))
 
 from sqlalchemy import text
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from config import get_settings
 
@@ -133,10 +133,10 @@ async def main():
     print("=" * 60)
 
     # Chargement des fichiers JSON
-    with open(MICRO_CONCEPTS_PATH, "r", encoding="utf-8") as f:
+    with open(MICRO_CONCEPTS_PATH, encoding="utf-8") as f:
         mc_data = json.load(f)
 
-    with open(QUESTIONS_TAGGEES_PATH, "r", encoding="utf-8") as f:
+    with open(QUESTIONS_TAGGEES_PATH, encoding="utf-8") as f:
         questions = json.load(f)
 
     print(f"\n  Micro-concepts a importer : {len(mc_data['micro_concepts'])}")

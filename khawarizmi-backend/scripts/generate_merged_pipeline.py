@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
 """Generate the merged OCR pipeline: EasyOCR GPU + OpenCV preprocessing."""
-import shutil
 import os
 
 src = r'C:\Users\zakaria\Documents\PROJET KHAWARIZMI IA\khawarizmi-backend\scripts\run_khelifa_ocr_colab.py'
 dst = r'C:\Users\zakaria\Documents\PROJET KHAWARIZMI IA\khawarizmi-backend\scripts\ocr_khelifa_pipeline.py'
 
 # Read the Colab script as base
-with open(src, 'r', encoding='utf-8') as f:
+with open(src, encoding='utf-8') as f:
     content = f.read()
 
 # Add OpenCV preprocessing imports after the imports section
@@ -147,7 +146,7 @@ new_source = '''                    "source": f"KHELIFA {serie} - Volume {vol_nu
 
 content = content.replace(old_source, new_source)
 
-# Update notes 
+# Update notes
 content = content.replace('"notes": "OCR auto"', '"notes": "OCR auto + preprocessing"')
 
 # Add source_page field

@@ -1,20 +1,27 @@
-﻿from pathlib import Path
-from typing import Optional, Callable, List
-import time
 import logging
+from collections.abc import Callable
+from pathlib import Path
 
+from .bundle import BundleManager
 from .config import get_config
 from .models import PageResult, VolumeSummary, WordBox
-from .bundle import BundleManager
 
 logger = logging.getLogger(__name__)
 config = get_config()
 
 
 class VolumeProcessor:
-    def __init__(self, dpi=None, psm=None, oem=None, retries=None,
-                 enable_hocr=True, use_parallel=False, max_workers=2,
-                 use_gpu=False):
+    def __init__(
+        self,
+        dpi=None,
+        psm=None,
+        oem=None,
+        retries=None,
+        enable_hocr=True,
+        use_parallel=False,
+        max_workers=2,
+        use_gpu=False,
+    ):
         self.dpi = dpi or config.default_dpi
         self.psm = psm or config.default_psm
         self.oem = oem or config.default_oem
@@ -27,14 +34,19 @@ class VolumeProcessor:
     def _get_ocr_backend(self):
         if self.use_gpu:
             from .gpu_ocr import GpuOCR
+
             return GpuOCR()
         from .tesseract_ocr import TesseractOCR
+
         return TesseractOCR(self.psm, self.oem)
 
-    def process_volume(self, pdf_path: Path,
-                       use_parallel: bool = False,
-                       progress_callback: Optional[Callable] = None,
-                       resume: bool = False) -> VolumeSummary:
+    def process_volume(
+        self,
+        pdf_path: Path,
+        use_parallel: bool = False,
+        progress_callback: Callable | None = None,
+        resume: bool = False,
+    ) -> VolumeSummary:
         from .pdf_renderer import PDFRenderer
         from .preprocessor import ImagePreprocessor
 
@@ -44,7 +56,7 @@ class VolumeProcessor:
         bundle = BundleManager(pdf_path)
 
         total_pages = renderer.get_page_count(pdf_path)
-        results: List[PageResult] = []
+        results: list[PageResult] = []
         errors = 0
         total_chars = 0
         confidences = []
@@ -58,6 +70,7 @@ class VolumeProcessor:
                 if meta_path.exists() and txt_path.exists():
                     try:
                         import json
+
                         meta = json.loads(meta_path.read_text(encoding="utf-8"))
                         if meta.get("status") == "success":
                             pr = PageResult(
@@ -65,8 +78,7 @@ class VolumeProcessor:
                                 text=meta.get("text", ""),
                                 char_count=meta.get("char_count", 0),
                                 confidence=meta.get("confidence", 0.0),
-                                words=[WordBox(w["text"], w["conf"], w["bbox"])
-                                       for w in meta.get("words", [])]
+                                words=[WordBox(w["text"], w["conf"], w["bbox"]) for w in meta.get("words", [])],
                             )
                             results.append(pr)
                             total_chars += pr.char_count
@@ -95,7 +107,7 @@ class VolumeProcessor:
                     text=text,
                     char_count=len(text),
                     confidence=conf,
-                    words=[WordBox(w["text"], w["conf"], w["bbox"]) for w in (words or [])]
+                    words=[WordBox(w["text"], w["conf"], w["bbox"]) for w in (words or [])],
                 )
                 results.append(pr)
                 total_chars += len(text)
@@ -122,7 +134,7 @@ class VolumeProcessor:
             total_characters=total_chars,
             avg_confidence=round(avg, 2),
             quality_warning="None" if errors == 0 else "Check sequences",
-            bundle_dir=str(bundle.get_bundle_path())
+            bundle_dir=str(bundle.get_bundle_path()),
         )
         bundle.write_summary(summary)
         renderer.cleanup_temp(pdf_path)

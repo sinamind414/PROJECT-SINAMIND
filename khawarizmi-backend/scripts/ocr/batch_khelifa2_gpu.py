@@ -30,7 +30,7 @@ for v in range(1, 16):
         print(f"[MISS] {pdf}")
         continue
 
-    print(f"\n{'='*60}")
+    print(f"\n{'=' * 60}")
     print(f"[START] {name}")
     t0 = time.time()
     try:
@@ -51,6 +51,6 @@ for v in range(1, 16):
 
 LOG_FILE.parent.mkdir(parents=True, exist_ok=True)
 LOG_FILE.write_text(json.dumps(results, ensure_ascii=False, indent=2), encoding="utf-8")
-print(f"\n{'='*60}")
+print(f"\n{'=' * 60}")
 print(f"BATCH COMPLETE — {len(results)} volumes processed")
 print(f"Log: {LOG_FILE}")

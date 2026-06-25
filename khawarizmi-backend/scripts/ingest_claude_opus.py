@@ -2,7 +2,11 @@
 # Ingeste le fichier PROGRAMME NATIONAL SVT généré par Claude Opus
 # dans la table rag_chunks pour le RAG.
 
-import os, re, sys, uuid, asyncio
+import asyncio
+import os
+import re
+import sys
+import uuid
 from pathlib import Path
 
 os.environ["OMP_NUM_THREADS"] = "1"
@@ -17,6 +21,7 @@ sys.path.insert(0, str(ROOT))
 
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import create_async_engine
+
 from config import get_settings
 from services.embedder import embedder
 
@@ -66,7 +71,7 @@ def chunk_section(content: str, min_chars: int = 100):
         if len(p) < min_chars:
             continue
         if len(p) > 2000:
-            sub = [p[i:i+1500] for i in range(0, len(p), 1500)]
+            sub = [p[i:i + 1500] for i in range(0, len(p), 1500)]
             chunks.extend(sub)
         else:
             chunks.append(p)
@@ -82,7 +87,7 @@ async def ingest():
         print(f"ERREUR: Fichier introuvable : {COURSE_FILE}")
         return
 
-    with open(COURSE_FILE, "r", encoding="utf-8") as f:
+    with open(COURSE_FILE, encoding="utf-8") as f:
         content = f.read()
 
     units = parse_units(content)

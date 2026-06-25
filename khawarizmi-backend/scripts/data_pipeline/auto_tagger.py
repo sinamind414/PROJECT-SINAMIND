@@ -9,10 +9,9 @@ Utilisation :
     python auto_tagger.py --batch questions.txt --output tagged.json
 """
 
-import json
 import argparse
+import json
 from pathlib import Path
-from typing import List, Dict, Optional
 
 BASE = Path(__file__).parent.parent.parent
 REF_PATH = BASE / "data" / "official" / "micro_concepts_reference.json"
@@ -87,7 +86,7 @@ KEYWORD_MAP = {
 }
 
 
-def suggest_micro_concepts(text: str, top_k: int = 3) -> List[Dict]:
+def suggest_micro_concepts(text: str, top_k: int = 3) -> list[dict]:
     """Retourne les meilleurs micro-concepts pour un texte donné."""
     if not text or not MICRO_CONCEPTS:
         return []
@@ -127,7 +126,7 @@ def suggest_micro_concepts(text: str, top_k: int = 3) -> List[Dict]:
     ]
 
 
-def process_batch(input_path: Path, output_path: Optional[Path] = None) -> List[Dict]:
+def process_batch(input_path: Path, output_path: Path | None = None) -> list[dict]:
     """Traite un fichier texte (une question par ligne)."""
     results = []
     with open(input_path, encoding="utf-8") as f:

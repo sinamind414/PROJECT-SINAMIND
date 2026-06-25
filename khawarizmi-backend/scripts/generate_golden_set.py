@@ -117,9 +117,9 @@ def main():
     print(f"Golden Set généré: {len(QUESTIONS)} questions")
     print(f"Fichier: {output_path}")
     print(f"Chapitres: {len(set(q['chapitre'] for q in QUESTIONS))}")
-    print(f"Niveaux: L1={sum(1 for q in QUESTIONS if q['niveau']=='L1')}, "
-          f"L2={sum(1 for q in QUESTIONS if q['niveau']=='L2')}, "
-          f"L3={sum(1 for q in QUESTIONS if q['niveau']=='L3')}")
+    print(f"Niveaux: L1={sum(1 for q in QUESTIONS if q['niveau'] == 'L1')}, "
+          f"L2={sum(1 for q in QUESTIONS if q['niveau'] == 'L2')}, "
+          f"L3={sum(1 for q in QUESTIONS if q['niveau'] == 'L3')}")
 
 
 if __name__ == "__main__":

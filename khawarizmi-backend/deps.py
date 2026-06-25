@@ -1,22 +1,24 @@
 from __future__ import annotations
 
-from typing import Dict, Any
+from typing import Any
 
 from fastapi import Depends, HTTPException, Request, status
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import text
 from jose import JWTError, jwt
+from sqlalchemy import text
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from config import get_settings
 
 
 def _get_state():
     from main import state
+
     return state
 
 
 async def get_db() -> AsyncSession:
     from database import get_db as _get_db
+
     async for session in _get_db():
         yield session
 
@@ -52,7 +54,7 @@ def get_dual_coding():
 async def get_current_user(
     request: Request,
     db: AsyncSession = Depends(get_db),
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     cfg = get_settings()
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,

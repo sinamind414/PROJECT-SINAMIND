@@ -2,7 +2,10 @@
 """
 OCR LIVRE SCOLAIRE SVT 3AS — GPU RTX 3060 / EasyOCR
 """
-import json, logging, sys, time
+import json
+import logging
+import sys
+import time
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -13,6 +16,7 @@ from services.ocr.bundle import BundleManager
 
 PDF_PATH = r"C:\Users\zakaria\Documents\projet khawarizmi A\LIVRES SCOLAIRES\LIVRE SCOLAIRE SCIENCE BAC\livre_scolaire_3as_sciences_se.pdf"
 OUT_DIR = ROOT / "data" / "ocr_livre_scolaire"
+
 
 def main():
     pdf = Path(PDF_PATH)
@@ -30,6 +34,7 @@ def main():
     import fitz; doc = fitz.open(str(pdf)); total_pages = doc.page_count; doc.close(); print(f"Total pages: {total_pages}")
     t0 = time.time()
     last_log = [t0]
+
     def progress_cb(info):
         now = time.time()
         if now - last_log[0] >= 30:
@@ -47,10 +52,10 @@ def main():
     summary = processor.process_volume(pdf, resume=True, progress_callback=progress_cb)
     elapsed = round(time.time() - t0, 1)
 
-    print(f"\n{'='*60}")
+    print(f"\n{'=' * 60}")
     print(f"OCR COMPLETE — {elapsed}s")
     print(json.dumps(summary.to_dict(), ensure_ascii=False, indent=2))
-    print(f"{'='*60}")
+    print(f"{'=' * 60}")
 
     bundle = BundleManager(pdf)
     ocr_txt = bundle.export_combined_txt(suffix=".ocr_livre_scolaire.txt")
@@ -63,6 +68,7 @@ def main():
         encoding="utf-8",
     )
     print(f"Summary → {summary_out}")
+
 
 if __name__ == "__main__":
     main()

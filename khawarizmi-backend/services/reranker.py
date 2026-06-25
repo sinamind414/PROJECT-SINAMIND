@@ -16,10 +16,9 @@ Gain attendu : +30% de précision sur les termes scientifiques techniques
 (ARN polymérase, ATP, etc.) que le bi-encoder manque parfois.
 """
 
-import re
-import math
 import logging
-from typing import List, Dict
+import math
+import re
 
 logger = logging.getLogger("khawarizmi.reranker")
 
@@ -35,26 +34,94 @@ BM25_B = 0.75
 # Stop-words arabes + français (mots fréquents à ignorer)
 STOP_WORDS = {
     # Arabe
-    "ما", "هو", "هي", "في", "من", "إلى", "على", "عن", "مع", "هذا", "هذه",
-    "التي", "الذي", "كان", "كانت", "قد", "لقد", "بين", "كل", "بعض", "أو",
-    "ثم", "و", "أو", "لا", "نعم", "كيف", "أين", "متى", "لماذا", "ماذا",
-    "اشرح", "حدد", "بين", "صف", "حلل", "قارن", "استنتج", "اذكر", "عرف",
+    "ما",
+    "هو",
+    "هي",
+    "في",
+    "من",
+    "إلى",
+    "على",
+    "عن",
+    "مع",
+    "هذا",
+    "هذه",
+    "التي",
+    "الذي",
+    "كان",
+    "كانت",
+    "قد",
+    "لقد",
+    "بين",
+    "كل",
+    "بعض",
+    "أو",
+    "ثم",
+    "و",
+    "لا",
+    "نعم",
+    "كيف",
+    "أين",
+    "متى",
+    "لماذا",
+    "ماذا",
+    "اشرح",
+    "حدد",
+    "صف",
+    "حلل",
+    "قارن",
+    "استنتج",
+    "اذكر",
+    "عرف",
     # Français
-    "le", "la", "les", "un", "une", "des", "de", "du", "et", "ou", "mais",
-    "dans", "sur", "pour", "par", "avec", "sans", "ce", "cette", "ces",
-    "qui", "que", "quoi", "dont", "où", "est", "sont", "a", "the", "is",
-    "what", "how", "why", "where", "explain", "define",
+    "le",
+    "la",
+    "les",
+    "un",
+    "une",
+    "des",
+    "de",
+    "du",
+    "et",
+    "ou",
+    "mais",
+    "dans",
+    "sur",
+    "pour",
+    "par",
+    "avec",
+    "sans",
+    "ce",
+    "cette",
+    "ces",
+    "qui",
+    "que",
+    "quoi",
+    "dont",
+    "où",
+    "est",
+    "sont",
+    "a",
+    "the",
+    "is",
+    "what",
+    "how",
+    "why",
+    "where",
+    "explain",
+    "define",
 }
 
 
-def _tokenize(text: str) -> List[str]:
+def _tokenize(text: str) -> list[str]:
     """Tokenisation simple : split sur espaces et ponctuation, lowercase."""
     # Supprimer la ponctuation et splitter
     tokens = re.findall(r"[\u0600-\u06FF\u0750-\u077F\w]+", text.lower())
     return [t for t in tokens if len(t) > 1 and t not in STOP_WORDS]
 
 
-def _bm25_score(query_tokens: List[str], chunk_text: str, avg_doc_len: float, doc_freq: Dict[str, int], total_docs: int) -> float:
+def _bm25_score(
+    query_tokens: list[str], chunk_text: str, avg_doc_len: float, doc_freq: dict[str, int], total_docs: int
+) -> float:
     """Score BM25 pour un chunk donné.
 
     BM25 = sum over query terms of:
@@ -90,7 +157,7 @@ def _bm25_score(query_tokens: List[str], chunk_text: str, avg_doc_len: float, do
     return score
 
 
-def _keyword_coverage_score(query_tokens: List[str], chunk_text: str) -> float:
+def _keyword_coverage_score(query_tokens: list[str], chunk_text: str) -> float:
     """Score de couverture : % des mots de la question présents dans le chunk."""
     if not query_tokens:
         return 0.0
@@ -101,9 +168,9 @@ def _keyword_coverage_score(query_tokens: List[str], chunk_text: str) -> float:
 
 def rerank(
     query: str,
-    chunks: List[Dict],
+    chunks: list[dict],
     top_k: int = 5,
-) -> List[Dict]:
+) -> list[dict]:
     """Re-ranke les chunks récupérés par pgvector.
 
     Args:
@@ -148,14 +215,16 @@ def rerank(
         # b) BM25
         bm25 = _bm25_score(query_tokens, chunk.get("content", ""), avg_doc_len, doc_freq, total_docs)
         # Normaliser BM25 sur [0, 1]
-        max_bm25 = max([_bm25_score(query_tokens, c.get("content", ""), avg_doc_len, doc_freq, total_docs) for c in chunks] or [1])
+        max_bm25 = max(
+            [_bm25_score(query_tokens, c.get("content", ""), avg_doc_len, doc_freq, total_docs) for c in chunks] or [1]
+        )
         bm25_norm = bm25 / max(max_bm25, 1e-9)
 
         # c) Couverture mots-clés
         kw_cov = _keyword_coverage_score(query_tokens, chunk.get("content", ""))
 
         # Score combiné
-        final_score = (W_COSINE * cos_norm + W_BM25 * bm25_norm + W_KEYWORD * kw_cov)
+        final_score = W_COSINE * cos_norm + W_BM25 * bm25_norm + W_KEYWORD * kw_cov
 
         chunk_copy = {**chunk}
         chunk_copy["score_rerank"] = round(final_score, 4)

@@ -1,13 +1,14 @@
 """Schémas Pydantic pour le Bac Blanc immersif."""
 
-from typing import List, Literal
+from typing import Literal
+
 from pydantic import BaseModel
 
 
 class BacSubjectSummary(BaseModel):
     subject_number: int
     title_ar: str
-    themes_ar: List[str] = []
+    themes_ar: list[str] = []
     estimated_minutes: int = 120
     nb_exercises: int = 0
 
@@ -26,9 +27,9 @@ class BacExercise(BaseModel):
 class BacSubjectDetail(BaseModel):
     subject_number: int
     title_ar: str
-    themes_ar: List[str] = []
+    themes_ar: list[str] = []
     estimated_minutes: int = 120
-    exercises: List[BacExercise] = []
+    exercises: list[BacExercise] = []
 
 
 class StartBacRequest(BaseModel):
@@ -37,7 +38,7 @@ class StartBacRequest(BaseModel):
 
 class StartBacResponse(BaseModel):
     session_id: str
-    subjects: List[BacSubjectSummary] = []
+    subjects: list[BacSubjectSummary] = []
 
 
 class ChooseSubjectRequest(BaseModel):
@@ -83,8 +84,8 @@ class SubmitBacResponse(BaseModel):
     session_id: str
     score_global: int
     time_used_sec: int
-    scores_by_exercise: List[ExerciseScore] = []
-    scores_by_verb: List[VerbScore] = []
+    scores_by_exercise: list[ExerciseScore] = []
+    scores_by_verb: list[VerbScore] = []
     exercises_skipped: int = 0
     debrief_message: str = ""
 
@@ -105,4 +106,4 @@ class CorrectionAnswer(BaseModel):
 
 class CorrectionResponse(BaseModel):
     session_id: str
-    corrections: List[CorrectionAnswer] = []
+    corrections: list[CorrectionAnswer] = []

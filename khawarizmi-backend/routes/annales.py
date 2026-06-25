@@ -2,6 +2,7 @@
 
 import json
 from pathlib import Path
+
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -75,10 +76,7 @@ async def obtenir_annale(
     current_user: dict = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    result = await db.execute(
-        text("SELECT * FROM annales WHERE id = :id"),
-        {"id": annale_id}
-    )
+    result = await db.execute(text("SELECT * FROM annales WHERE id = :id"), {"id": annale_id})
     row = result.fetchone()
     if not row:
         raise HTTPException(404, "Annale introuvable")
@@ -94,7 +92,7 @@ async def seed_annales(
     if not seed_path.exists():
         raise HTTPException(404, "Fichier seed introuvable")
 
-    with open(seed_path, "r", encoding="utf-8") as f:
+    with open(seed_path, encoding="utf-8") as f:
         data = json.load(f)
 
     count = 0
@@ -120,7 +118,7 @@ async def seed_annales(
                 "fichier_correction": annale.get("fichier_correction"),
                 "tags": annale.get("tags", []),
                 "difficulte": annale.get("difficulté", 3),
-            }
+            },
         )
         count += 1
 

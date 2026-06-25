@@ -1,26 +1,26 @@
 # tests/conftest.py
 # Khawarizmi Pro — Fixtures globales pytest
 
-import pytest
 import asyncio
-import sys
 import os
+import sys
+from collections.abc import AsyncGenerator
 from pathlib import Path
-from typing import AsyncGenerator
-from httpx import AsyncClient, ASGITransport
 from unittest.mock import AsyncMock, patch
+
+import pytest
+from httpx import ASGITransport, AsyncClient
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 os.environ.setdefault("SECRET_KEY", "test-secret-key-khawarizmi-2026")
-os.environ.setdefault("DATABASE_URL",
-    "postgresql+asyncpg://postgres:testpass@localhost/khawarizmi_test")
+os.environ.setdefault("DATABASE_URL", "postgresql+asyncpg://postgres:testpass@localhost/khawarizmi_test")
 os.environ.setdefault("REDIS_URL", "redis://localhost:6379/1")
 os.environ.setdefault("GEMINI_API_KEY", "test-gemini-key")
 os.environ.setdefault("ENVIRONMENT", "test")
 
-from main import app
 from deps import get_db
+from main import app
 
 TEST_PWD_HASH = "$2b$12$7.cA3KDwXgXygLhjVDrNl.fZPK3kqUcd5.LXeRZ2b0Yf7TkPwdjea"
 
@@ -76,7 +76,7 @@ class MockAsyncSession:
             "password_hash": TEST_PWD_HASH,
             "prenom": "Test",
             "plan": "free",
-            "created_at": "2026-01-01"
+            "created_at": "2026-01-01",
         }
 
     async def __aenter__(self):
@@ -86,21 +86,21 @@ class MockAsyncSession:
         pass
 
     async def execute(self, statement, *args, **kwargs):
-        sql = str(statement) if hasattr(statement, '__str__') else str(statement)
+        sql = str(statement) if hasattr(statement, "__str__") else str(statement)
         params = args[0] if args else kwargs
 
         if "INSERT INTO users" in sql:
-            email = (params.get("email", "") if isinstance(params, dict)
-                     else getattr(params, "get", lambda x: "")("email", ""))
+            email = (
+                params.get("email", "")
+                if isinstance(params, dict)
+                else getattr(params, "get", lambda x: "")("email", "")
+            )
             _inserted_emails.add(email)
             return MockAsyncExecResult([{"id": 1}])
 
         if "SELECT" in sql:
             if "users" in sql:
-                if isinstance(params, dict):
-                    query_email = params.get("email", "")
-                else:
-                    query_email = ""
+                query_email = params.get("email", "") if isinstance(params, dict) else ""
                 if not query_email:
                     return MockAsyncExecResult([self._user_data])
                 if "email" in sql and query_email not in _inserted_emails:
@@ -153,16 +153,14 @@ def override_deps():
 @pytest.fixture
 async def client() -> AsyncGenerator:
     transport = ASGITransport(app=app)
-    async with AsyncClient(
-        transport=transport,
-        base_url="http://test"
-    ) as ac:
+    async with AsyncClient(transport=transport, base_url="http://test") as ac:
         yield ac
 
 
 @pytest.fixture
 def auth_headers() -> dict:
     from auth import create_access_token
+
     token = create_access_token({"sub": 1, "email": "eleve@bac.dz", "plan": "free"})
     return {"Authorization": f"Bearer {token}"}
 
@@ -170,9 +168,7 @@ def auth_headers() -> dict:
 @pytest.fixture
 def mock_gemini():
     with patch("services.llm.call_gpt4o_evaluator") as mock:
-        mock.return_value = AsyncMock(return_value={
-            "response": "Réponse simulée",
-            "model_used": "gemini-2.5-flash",
-            "fallback_active": False
-        })
+        mock.return_value = AsyncMock(
+            return_value={"response": "Réponse simulée", "model_used": "gemini-2.5-flash", "fallback_active": False}
+        )
         yield mock

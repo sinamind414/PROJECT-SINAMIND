@@ -48,7 +48,7 @@ for name, pdf in volumes:
         results.append({"volume": name, "status": "missing", "error": str(pdf)})
         continue
 
-    print(f"\n{'='*60}")
+    print(f"\n{'=' * 60}")
     print(f"[START] {name} — {pdf.parent.name}")
     t0 = time.time()
     try:
@@ -75,6 +75,6 @@ for name, pdf in volumes:
 total_p = sum(r.get("pages_processed", 0) for r in results if "pages_processed" in r)
 total_c = sum(r.get("total_characters", 0) for r in results if "total_characters" in r)
 total_t = sum(r.get("elapsed_sec", 0) for r in results)
-print(f"\n{'='*60}")
+print(f"\n{'=' * 60}")
 print(f"BATCH COMPLETE — {len(volumes)} volumes, {total_p} pages, {total_c} chars, {total_t:.0f}s")
 print(f"Log: {LOG_FILE}")
