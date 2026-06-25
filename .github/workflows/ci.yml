@@ -224,7 +224,11 @@ jobs:
             .
       - name: Smoke test — import
         run: |
-          docker run --rm khawarizmi-backend:${{ github.sha }} \
+          docker run --rm \
+            -e SECRET_KEY=ci-test-secret-key-khawarizmi-2026-min-32chars \
+            -e DATABASE_URL="postgresql+asyncpg://postgres:test@localhost/khawarizmi_test" \
+            -e ENVIRONMENT=test \
+            khawarizmi-backend:${{ github.sha }} \
             python -c "from main import app; print(f'Routes: {len(app.routes)}')"
 
   docker-frontend:
