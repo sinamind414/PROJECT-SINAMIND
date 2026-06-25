@@ -1,11 +1,12 @@
 from fastapi import Request
+from jose import jwt
 from slowapi import Limiter
 from slowapi.util import get_remote_address
-from jose import jwt
 
 
 def _get_cfg():
     from main import get_settings
+
     return get_settings()
 
 

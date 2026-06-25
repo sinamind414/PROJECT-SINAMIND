@@ -1,7 +1,8 @@
 # routes/health.py
 # Khawarizmi Pro — Endpoint de santé
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
+
 from fastapi import APIRouter
 from sqlalchemy import text
 
@@ -12,6 +13,7 @@ router = APIRouter()
 
 def _get_state():
     from main import state
+
     return state
 
 
@@ -37,7 +39,7 @@ async def health_check():
         except Exception:
             pass
 
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     backup_info = _check_backup_status()
 
     return {
@@ -49,12 +51,14 @@ async def health_check():
         "fallback_active": not db_ok or not redis_ok,
         "backup": backup_info,
         "environment": cfg.ENVIRONMENT,
-        "timestamp": now.isoformat()
+        "timestamp": now.isoformat(),
     }
 
 
 def _check_backup_status():
-    import os, pathlib
+    import os
+    import pathlib
+
     backup_dir = pathlib.Path(os.environ.get("BACKUP_DIR", "backups"))
     if not backup_dir.exists():
         backup_dir = pathlib.Path(__file__).parent.parent / "backups"
@@ -66,13 +70,13 @@ def _check_backup_status():
         return {"status": "no_backups", "last_backup": None}
 
     latest = backups[0]
-    age_hours = (datetime.now(timezone.utc) - datetime.fromtimestamp(latest.stat().st_mtime, tz=timezone.utc)).total_seconds() / 3600
+    age_hours = (datetime.now(UTC) - datetime.fromtimestamp(latest.stat().st_mtime, tz=UTC)).total_seconds() / 3600
     return {
         "status": "ok" if age_hours < 30 else "stale",
         "last_backup": latest.name,
         "age_hours": round(age_hours, 1),
         "count": len(backups),
-        "directory": str(backup_dir.absolute())
+        "directory": str(backup_dir.absolute()),
     }
 
 
@@ -96,17 +100,13 @@ async def data_foundation_debug():
 async def get_metrics():
     """Métriques d'observabilité — cache hit rate, fallback rate, compteurs."""
     from services.metrics import get_global_stats
-    return {
-        "timestamp": datetime.now(timezone.utc).isoformat(),
-        "stats": get_global_stats()
-    }
+
+    return {"timestamp": datetime.now(UTC).isoformat(), "stats": get_global_stats()}
 
 
 @router.get("/api/calibration/stats", tags=["Système"])
 async def get_calibration_stats():
     """Statistiques du calibrage Eval — Golden Set ONEC."""
     from services.eval_calibration import get_calibration_stats
-    return {
-        "timestamp": datetime.now(timezone.utc).isoformat(),
-        "golden_set": get_calibration_stats()
-    }
+
+    return {"timestamp": datetime.now(UTC).isoformat(), "golden_set": get_calibration_stats()}

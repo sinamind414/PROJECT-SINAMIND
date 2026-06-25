@@ -6,7 +6,6 @@ basées sur l'agrégation de toutes les données FSRS.
 """
 
 import logging
-from typing import Dict
 
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -21,7 +20,7 @@ router = APIRouter(prefix="/api/orientation", tags=["Orientation"])
 
 @router.get("")
 async def orienter_eleve(
-    current_user: Dict = Depends(get_current_user),
+    current_user: dict = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
     """Retourne les recommandations pédagogiques priorisées pour l'élève.

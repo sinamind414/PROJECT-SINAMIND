@@ -1,10 +1,10 @@
 # services/payment_service.py
 # Point d'entrée Paiement — centralise la logique métier
 
-from typing import Optional
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import text
 import logging
+
+from sqlalchemy import text
+from sqlalchemy.ext.asyncio import AsyncSession
 
 logger = logging.getLogger("khawarizmi.payment")
 
@@ -28,7 +28,7 @@ async def activate_premium(checkout_id: str, db: AsyncSession) -> bool:
     return True
 
 
-async def get_payment_status(checkout_id: str, db: AsyncSession) -> Optional[str]:
+async def get_payment_status(checkout_id: str, db: AsyncSession) -> str | None:
     result = await db.execute(
         text("SELECT status FROM payment_checkouts WHERE checkout_id = :cid"),
         {"cid": checkout_id},
@@ -46,8 +46,9 @@ async def is_premium(user_id: int, db: AsyncSession) -> bool:
     return bool(row[0]) if row else False
 
 
-async def create_checkout(user_id: int, amount: float, db: AsyncSession) -> Optional[str]:
+async def create_checkout(user_id: int, amount: float, db: AsyncSession) -> str | None:
     import uuid
+
     checkout_id = str(uuid.uuid4())
     await db.execute(
         text("""

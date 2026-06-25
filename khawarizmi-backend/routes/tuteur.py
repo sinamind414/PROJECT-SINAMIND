@@ -9,14 +9,13 @@ Chatbot contextuel qui :
 """
 
 import logging
-from typing import Dict
 
 from fastapi import APIRouter, Depends, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from database import get_db
 from deps import get_current_user, get_openai
-from rate_limit import limiter, chat_limit
+from rate_limit import chat_limit, limiter
 from schemas.chat import TuteurRequest, TuteurResponse
 from services.chat_service import handle_tuteur
 
@@ -29,7 +28,7 @@ router = APIRouter()
 async def tuteur_contextuel(
     request: Request,
     body: TuteurRequest,
-    current_user: Dict = Depends(get_current_user),
+    current_user: dict = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
     openai_client=Depends(get_openai),
 ):
@@ -49,10 +48,7 @@ async def tuteur_contextuel(
         "fsrs_due": body.context.fsrs_due,
         "last_score": body.context.last_score,
         "orientation_chapitre": body.context.orientation_chapitre,
-        "history": [
-            {"role": m.role, "content": m.content}
-            for m in body.context.history
-        ],
+        "history": [{"role": m.role, "content": m.content} for m in body.context.history],
     }
 
     result = await handle_tuteur(
@@ -63,9 +59,6 @@ async def tuteur_contextuel(
         openai_client=openai_client,
     )
 
-    logger.info(
-        f"Tuteur : user={current_user['id']} type={result['type']} "
-        f"fallback={result['fallback_active']}"
-    )
+    logger.info(f"Tuteur : user={current_user['id']} type={result['type']} fallback={result['fallback_active']}")
 
     return TuteurResponse(**result)

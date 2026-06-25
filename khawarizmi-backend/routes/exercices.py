@@ -1,9 +1,11 @@
 import json
 import logging
 from pathlib import Path
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
+
 from database import get_db
 from deps import get_current_user
 
@@ -11,7 +13,7 @@ logger = logging.getLogger("khawarizmi.api")
 router = APIRouter(prefix="/api/exercices", tags=["Exercices"])
 
 MAPPING_PATH = Path(__file__).resolve().parent.parent / "data" / "chapter_mapping.json"
-with open(MAPPING_PATH, "r", encoding="utf-8") as f:
+with open(MAPPING_PATH, encoding="utf-8") as f:
     CHAPTER_MAPPING = json.load(f)
 
 
@@ -33,9 +35,7 @@ async def get_exercices(
     decoded = chapitre.replace("%20", " ").replace("+", " ")
     keywords = get_keywords(decoded)
 
-    conditions = " OR ".join(
-        f"LOWER(chapitre) LIKE LOWER(:kw{i})" for i in range(len(keywords))
-    )
+    conditions = " OR ".join(f"LOWER(chapitre) LIKE LOWER(:kw{i})" for i in range(len(keywords)))
     params = {f"kw{i}": f"%{k}%" for i, k in enumerate(keywords)}
     params["source"] = "svt_bac_complet.md"
 
@@ -103,21 +103,25 @@ async def get_exercices(
         "nb_sections": len(rows),
     }
 
+
 from pydantic import BaseModel
+
 from models.exercise import Exercise, UserExerciseResponse
-from services.language_service import ensure_arabic_version
 from services.correction_service import correct_student_answer
+from services.language_service import ensure_arabic_version
+
 
 class CorrectionRequest(BaseModel):
     answer: str
     language: str = "ar"
+
 
 @router.post("/{exercise_id}/correct")
 async def correct_exercise(
     exercise_id: int,
     request: CorrectionRequest,
     current_user: dict = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
 ):
     exercise = await db.get(Exercise, exercise_id)
     if not exercise:
@@ -126,10 +130,7 @@ async def correct_exercise(
     question = exercise.get_question(request.language)
 
     result = await correct_student_answer(
-        question=question,
-        student_answer=request.answer,
-        points=exercise.points,
-        language=request.language
+        question=question, student_answer=request.answer, points=exercise.points, language=request.language
     )
 
     user_response = UserExerciseResponse(
@@ -139,7 +140,7 @@ async def correct_exercise(
         language=request.language,
         score=result["score"],
         feedback=result["explication"],
-        corrected_answer=result["reponse_correcte"]
+        corrected_answer=result["reponse_correcte"],
     )
     db.add(user_response)
     await db.commit()
@@ -148,10 +149,7 @@ async def correct_exercise(
 
 
 @router.post("/{exercise_id}/ensure-arabic")
-async def ensure_arabic(
-    exercise_id: int,
-    db: AsyncSession = Depends(get_db)
-):
+async def ensure_arabic(exercise_id: int, db: AsyncSession = Depends(get_db)):
     exercise = await db.get(Exercise, exercise_id)
     if not exercise:
         raise HTTPException(status_code=404, detail="Exercice non trouvé")

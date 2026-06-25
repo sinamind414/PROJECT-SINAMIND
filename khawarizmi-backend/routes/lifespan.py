@@ -3,7 +3,7 @@
 import asyncio
 import logging
 import pathlib
-from contextlib import asynccontextmanager
+from contextlib import asynccontextmanager, suppress
 from dataclasses import dataclass
 from typing import Any
 
@@ -38,6 +38,7 @@ async def lifespan(app: FastAPI):
     data_dir = cfg.data_dir or str(pathlib.Path(__file__).parent.parent / "data")
 
     from services.khawarizmi_engine import KhawarizmiTutor
+
     state.tutor = KhawarizmiTutor(data_dir=data_dir)
 
     try:
@@ -51,14 +52,18 @@ async def lifespan(app: FastAPI):
         logger.error(f"Failed to report data foundation: {e}")
 
     from services.scheduler import KhawarizmiScheduler
+
     state.scheduler = KhawarizmiScheduler()
 
     from services.interleaving import InterleavingSession
+
     state.interleaving = InterleavingSession()
 
     if cfg.OPENAI_API_KEY:
         from openai import AsyncOpenAI
+
         from services.dual_coding import DualCodingService
+
         # Auto-détection provider depuis la clé (fabuleux V4)
         api_key = cfg.OPENAI_API_KEY
         base_url = cfg.openai_base_url
@@ -76,9 +81,9 @@ async def lifespan(app: FastAPI):
                 model = "gemini-2.5-flash"
             logger.info(f"IA Provider auto-détecté: Gemini ({model})")
         # Z.AI
-        elif len(api_key) > 20 and "z.ai" in base_url or "zai" in api_key.lower()[:10]:
+        elif (len(api_key) > 20 and "z.ai" in base_url) or "zai" in api_key.lower()[:10]:
             base_url = cfg.zai_base_url or "https://api.z.ai/api/paas/v4/"
-            logger.info(f"IA Provider auto-détecté: Z.AI")
+            logger.info("IA Provider auto-détecté: Z.AI")
         state.openai = AsyncOpenAI(api_key=api_key, base_url=base_url)
         # patch config en mémoire pour que chat.py utilise le bon modèle
         try:
@@ -91,7 +96,9 @@ async def lifespan(app: FastAPI):
 
     if cfg.DATABASE_URL:
         try:
-            db_url = cfg.DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://", 1).replace("postgres://", "postgresql+asyncpg://", 1)
+            db_url = cfg.DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://", 1).replace(
+                "postgres://", "postgresql+asyncpg://", 1
+            )
             state.db_engine = create_async_engine(db_url, pool_size=10, max_overflow=20, pool_pre_ping=True)
             state.db_session = async_sessionmaker(state.db_engine, class_=AsyncSession, expire_on_commit=False)
         except Exception as e:
@@ -105,6 +112,7 @@ async def lifespan(app: FastAPI):
             logger.warning(f"Redis indisponible: {e}")
 
     from services.reconciliation_queue import process_review_queue
+
     state.reconciliation_task = asyncio.create_task(process_review_queue())
 
     logger.info(f"Khawarizmi API prete [{cfg.ENVIRONMENT}]")
@@ -112,7 +120,9 @@ async def lifespan(app: FastAPI):
 
     if state.reconciliation_task:
         state.reconciliation_task.cancel()
-        try: await state.reconciliation_task
-        except asyncio.CancelledError: pass
-    if state.redis: await state.redis.aclose()
-    if state.db_engine: await state.db_engine.dispose()
+        with suppress(asyncio.CancelledError):
+            await state.reconciliation_task
+    if state.redis:
+        await state.redis.aclose()
+    if state.db_engine:
+        await state.db_engine.dispose()

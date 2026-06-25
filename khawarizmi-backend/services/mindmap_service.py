@@ -1,14 +1,10 @@
-import os
-import uuid
 import json
-import re
 import logging
-import asyncio
-from datetime import datetime, timedelta, timezone
-from typing import Optional
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
+import uuid
+from datetime import UTC, datetime, timedelta
+
 from sqlalchemy import text
-from sqlalchemy.ext.asyncio import AsyncEngine
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 logger = logging.getLogger("khawarizmi.mindmap_service")
 
@@ -21,13 +17,7 @@ logger = logging.getLogger("khawarizmi.mindmap_service")
 #   4. POST /expand    → lazy loading des sous-nœuds à la demande
 
 
-async def create_task(
-    user_id: str,
-    matiere: str,
-    chapitre: str,
-    filiere: str,
-    db: AsyncSession
-) -> str:
+async def create_task(user_id: str, matiere: str, chapitre: str, filiere: str, db: AsyncSession) -> str:
     """Crée une entrée mindmap_tasks et retourne le task_id."""
     task_id = str(uuid.uuid4())
     await db.execute(
@@ -37,13 +27,7 @@ async def create_task(
             VALUES
                 (:id, :user_id, :chapitre, :matiere, :filiere, 'pending', 'init', NOW(), NOW())
         """),
-        {
-            "id": task_id,
-            "user_id": int(user_id),
-            "chapitre": chapitre,
-            "matiere": matiere,
-            "filiere": filiere
-        }
+        {"id": task_id, "user_id": int(user_id), "chapitre": chapitre, "matiere": matiere, "filiere": filiere},
     )
     await db.commit()
     return task_id
@@ -52,10 +36,10 @@ async def create_task(
 async def _update_task(
     task_id: str,
     status: str,
-    progress: str = None,
-    error: str = None,
-    mindmap_id: str = None,
-    db: AsyncSession = None
+    progress: str | None = None,
+    error: str | None = None,
+    mindmap_id: str | None = None,
+    db: AsyncSession = None,
 ) -> None:
     """Met à jour le statut d'une tâche."""
     sets = ["status = :status", "updated_at = NOW()"]
@@ -69,10 +53,7 @@ async def _update_task(
     if mindmap_id:
         sets.append("mindmap_id = :mindmap_id")
         params["mindmap_id"] = mindmap_id
-    await db.execute(
-        text(f"UPDATE mindmap_tasks SET {', '.join(sets)} WHERE id = :id"),
-        params
-    )
+    await db.execute(text(f"UPDATE mindmap_tasks SET {', '.join(sets)} WHERE id = :id"), params)
     await db.commit()
 
 
@@ -84,7 +65,7 @@ async def get_task_status(task_id: str, user_id: str, db: AsyncSession) -> dict:
             FROM mindmap_tasks
             WHERE id = :id AND user_id = :user_id
         """),
-        {"id": task_id, "user_id": int(user_id)}
+        {"id": task_id, "user_id": int(user_id)},
     )
     row = result.fetchone()
     if not row:
@@ -95,7 +76,7 @@ async def get_task_status(task_id: str, user_id: str, db: AsyncSession) -> dict:
         "error": row[2],
         "mindmap_id": row[3],
         "chapitre": row[4],
-        "created_at": str(row[5]) if row[5] else None
+        "created_at": str(row[5]) if row[5] else None,
     }
 
 
@@ -109,7 +90,7 @@ async def run_generation_background(
     db_url: str,
     openai_api_key: str,
     openai_base_url: str,
-    openai_model: str
+    openai_model: str,
 ) -> None:
     """Tâche d'arrière-plan : génère le Mind Map hors de la requête HTTP.
 
@@ -127,6 +108,7 @@ async def run_generation_background(
             # 1. Recherche RAG + re-ranking hybride
             from services.embedder import embedder
             from services.reranker import rerank
+
             query_text = f"Chapitre: {chapitre} - Matiere: {matiere} - Filiere: {filiere}"
             query_vector = embedder.encode([query_text])[0]
             res_chunks = await db.execute(
@@ -140,7 +122,7 @@ async def run_generation_background(
                     ORDER BY embedding <=> CAST(:emb AS vector)
                     LIMIT 20
                 """),
-                {"matiere": matiere, "chapitre": chapitre, "emb": str(query_vector.tolist())}
+                {"matiere": matiere, "chapitre": chapitre, "emb": str(query_vector.tolist())},
             )
             raw_chunks = [
                 {
@@ -159,18 +141,21 @@ async def run_generation_background(
             # Re-ranking : garder les 5 meilleurs chunks
             chunks = rerank(query_text, raw_chunks, top_k=5)
             context_text = "\n\n".join([f"Source: {c['source']}\n{c['content']}" for c in chunks])
-            source_names = ", ".join(list(set([c["source"] for c in chunks])))
+            source_names = ", ".join(list({c["source"] for c in chunks}))
 
             # 2. Génération LLM (racine + niveau 1 seulement = lazy loading)
             await _update_task(task_id, "running", progress="llm", db=db)
 
-            from services.llm import extract_json_from_gemini
             from openai import AsyncOpenAI
+
+            from services.llm import extract_json_from_gemini
 
             openai_client = AsyncOpenAI(api_key=openai_api_key, base_url=openai_base_url)
 
             # Prompt pour génération superficielle (racine + niveau 1 uniquement)
-            lazy_prompt = MINDMAP_SYSTEM_PROMPT + """
+            lazy_prompt = (
+                MINDMAP_SYSTEM_PROMPT
+                + """
 
 GÉNÉRATION PROGRESSIVE (LAZY LOADING) :
 - Génère UNIQUEMENT la racine (niveau 0) et ses enfants directs (niveau 1).
@@ -178,6 +163,7 @@ GÉNÉRATION PROGRESSIVE (LAZY LOADING) :
 - Les enfants de niveau 1 auront leurs sous-nœuds générés à la demande.
 - Chaque nœud de niveau 1 doit avoir un champ "has_children": true si des sous-nœuds existent.
 """
+            )
 
             user_prompt = f"""
             CONTEXTE DES COURS OFFICIELS :
@@ -195,10 +181,7 @@ GÉNÉRATION PROGRESSIVE (LAZY LOADING) :
                     temperature=0.2,
                     max_tokens=1200,
                     timeout=20.0,
-                    messages=[
-                        {"role": "system", "content": lazy_prompt},
-                        {"role": "user", "content": user_prompt}
-                    ]
+                    messages=[{"role": "system", "content": lazy_prompt}, {"role": "user", "content": user_prompt}],
                 )
                 content = response.choices[0].message.content or ""
                 generated_data = extract_json_from_gemini(content)
@@ -207,10 +190,7 @@ GÉNÉRATION PROGRESSIVE (LAZY LOADING) :
                 generated_data = {}
 
             if not generated_data or "racine" not in generated_data:
-                generated_data = {
-                    "racine": _build_default_racine(chapitre, matiere),
-                    "liens_transversaux": []
-                }
+                generated_data = {"racine": _build_default_racine(chapitre, matiere), "liens_transversaux": []}
 
             # 3. Formatage + sauvegarde
             await _update_task(task_id, "running", progress="save", db=db)
@@ -225,9 +205,7 @@ GÉNÉRATION PROGRESSIVE (LAZY LOADING) :
                 if importance not in ["critique", "haute", "moyenne"]:
                     node["importance"] = "moyenne"
                     importance = "moyenne"
-                node["couleur"] = {
-                    "critique": "#E74C3C", "haute": "#F39C12", "moyenne": "#3498DB"
-                }[importance]
+                node["couleur"] = {"critique": "#E74C3C", "haute": "#F39C12", "moyenne": "#3498DB"}[importance]
                 if "flashcard_auto" not in node:
                     node["flashcard_auto"] = importance in ["critique", "haute"]
                 node["enfants"] = node.get("enfants", [])
@@ -247,21 +225,19 @@ GÉNÉRATION PROGRESSIVE (LAZY LOADING) :
                 "racine": generated_data["racine"],
                 "liens_transversaux": generated_data.get("liens_transversaux", []),
                 "metadata": {
-                    "genere_le": datetime.now(timezone.utc).isoformat(),
+                    "genere_le": datetime.now(UTC).isoformat(),
                     "version": "2.0",
                     "source_rag": source_names,
                     "user_id": user_id,
-                    "lazy_loading": True
-                }
+                    "lazy_loading": True,
+                },
             }
 
             await save_mindmap(mindmap_data, user_id, db)
 
             # 4. Flashcards FSRS
             await _update_task(task_id, "running", progress="flashcards", db=db)
-            flashcards = await _generate_auto_flashcards(
-                mindmap_data["racine"], matiere, chapitre, user_id, db
-            )
+            flashcards = await _generate_auto_flashcards(mindmap_data["racine"], matiere, chapitre, user_id, db)
             if flashcards:
                 await persist_flashcards_to_fsrs(flashcards, matiere, chapitre, user_id, db)
 
@@ -277,22 +253,16 @@ GÉNÉRATION PROGRESSIVE (LAZY LOADING) :
 
 
 async def expand_node(
-    node_id: str,
-    node_label: str,
-    chapitre: str,
-    matiere: str,
-    user_id: str,
-    db: AsyncSession,
-    openai_client
+    node_id: str, node_label: str, chapitre: str, matiere: str, user_id: str, db: AsyncSession, openai_client
 ) -> dict:
     """Lazy loading : génère les sous-nœuds d'un nœud à la demande.
 
     Évite de générer l'arbre complet en une seule fois.
     """
+    from config import get_settings
     from services.embedder import embedder
     from services.llm import extract_json_from_gemini
     from services.reranker import rerank
-    from config import get_settings
 
     # 1. RAG ciblé sur le nœud spécifique + re-ranking
     query_text = f"{matiere} {chapitre} {node_label}"
@@ -311,10 +281,11 @@ async def expand_node(
                 LIMIT 10
             """),
             {
-                "matiere": matiere, "chapitre": chapitre,
+                "matiere": matiere,
+                "chapitre": chapitre,
                 "keyword": f"%{node_label[:30]}%",
-                "emb": str(query_vector.tolist())
-            }
+                "emb": str(query_vector.tolist()),
+            },
         )
         raw_chunks = [
             {
@@ -350,17 +321,17 @@ async def expand_node(
     Réponds UNIQUEMENT avec le JSON.
     """
 
-    _model = get_settings().openai_model
+    model = get_settings().openai_model
     try:
         response = await openai_client.chat.completions.create(
-            model=_model,
+            model=model,
             temperature=0.2,
             max_tokens=800,
             timeout=15.0,
             messages=[
                 {"role": "system", "content": "Tu génères des sous-nœuds pédagogiques en JSON."},
-                {"role": "user", "content": expand_prompt}
-            ]
+                {"role": "user", "content": expand_prompt},
+            ],
         )
         content = response.choices[0].message.content or ""
         data = extract_json_from_gemini(content)
@@ -376,17 +347,12 @@ async def expand_node(
         child["niveau"] = 2
         child["maitrise_eleve"] = 0
         importance = child.get("importance", "moyenne")
-        child["couleur"] = {
-            "critique": "#E74C3C", "haute": "#F39C12", "moyenne": "#3498DB"
-        }.get(importance, "#3498DB")
+        child["couleur"] = {"critique": "#E74C3C", "haute": "#F39C12", "moyenne": "#3498DB"}.get(importance, "#3498DB")
         child["flashcard_auto"] = importance in ["critique", "haute"]
         child["enfants"] = []
         child["expanded"] = False
 
     return {"node_id": node_id, "enfants": enfants}
-
-
-
 
 
 MINDMAP_SYSTEM_PROMPT = """
@@ -435,49 +401,36 @@ Réponds UNIQUEMENT avec le JSON. Aucun texte autour.
 
 
 async def generate_mindmap(
-    matiere: str,
-    chapitre: str,
-    filiere: str,
-    niveau_detail: str,
-    user_id: str,
-    db: AsyncSession,
-    openai_client
+    matiere: str, chapitre: str, filiere: str, niveau_detail: str, user_id: str, db: AsyncSession, openai_client
 ) -> dict:
     u_id = int(user_id)
-    
+
     # 1. Vérifier si un Mind Map existe déjà pour ce chapitre/utilisateur
     result = await db.execute(
         text("""
             SELECT data FROM mindmaps
             WHERE user_id = :user_id AND LOWER(chapitre) = LOWER(:chapitre)
         """),
-        {"user_id": u_id, "chapitre": chapitre}
+        {"user_id": u_id, "chapitre": chapitre},
     )
     row = result.fetchone()
     if row:
         logger.info(f"Mind Map existant trouve pour le chapitre : {chapitre}")
         mindmap_data = json.loads(row[0])
-        flashcards = await _generate_auto_flashcards(
-            mindmap_data["racine"],
-            matiere,
-            chapitre,
-            user_id,
-            db
-        )
+        flashcards = await _generate_auto_flashcards(mindmap_data["racine"], matiere, chapitre, user_id, db)
         if flashcards:
-            await persist_flashcards_to_fsrs(
-                flashcards, matiere, chapitre, user_id, db
-            )
+            await persist_flashcards_to_fsrs(flashcards, matiere, chapitre, user_id, db)
         return {
             "status": "success",
             "mindmap": mindmap_data,
             "flashcards_generees": flashcards,
-            "source_rag": mindmap_data.get("metadata", {}).get("source_rag", "")
+            "source_rag": mindmap_data.get("metadata", {}).get("source_rag", ""),
         }
 
     # 2. Recherche vectorielle dans rag_chunks + re-ranking
     from services.embedder import embedder
     from services.reranker import rerank
+
     query_text = f"Chapitre: {chapitre} - Matiere: {matiere} - Filiere: {filiere}"
     try:
         query_vector = embedder.encode([query_text])[0]
@@ -492,11 +445,7 @@ async def generate_mindmap(
                 ORDER BY embedding <=> CAST(:emb AS vector)
                 LIMIT 20
             """),
-            {
-                "matiere": matiere,
-                "chapitre": chapitre,
-                "emb": str(query_vector.tolist())
-            }
+            {"matiere": matiere, "chapitre": chapitre, "emb": str(query_vector.tolist())},
         )
         raw_chunks = [
             {
@@ -511,6 +460,7 @@ async def generate_mindmap(
     except Exception as e:
         logger.error(f"Erreur recherche RAG: {type(e).__name__}: {e}")
         import traceback
+
         logger.error(traceback.format_exc())
         chunks = []
 
@@ -519,38 +469,35 @@ async def generate_mindmap(
         logger.warning(f"RAG STRICT: Aucun contexte trouve pour le chapitre '{chapitre}'")
         return {
             "status": "no_context",
-            "message": "Je n'ai pas trouve cette information dans la base. Consulte ton manuel officiel."
+            "message": "Je n'ai pas trouve cette information dans la base. Consulte ton manuel officiel.",
         }
 
     context_text = "\n\n".join([f"Source: {c['source']}\n{c['content']}" for c in chunks])
-    source_names = ", ".join(list(set([c["source"] for c in chunks])))
+    source_names = ", ".join(list({c["source"] for c in chunks}))
 
     # 3. Interroger le LLM pour générer l'arborescence JSON
     user_prompt = f"""
     CONTEXTE DES COURS OFFICIELS :
     {context_text}
-    
+
     CHAPITRE : {chapitre}
     MATIERE : {matiere}
     FILIERE : {filiere}
     NIVEAU DE DETAIL : {niveau_detail}
     """
 
+    from config import get_settings
     from services.llm import extract_json_from_gemini
 
-    from config import get_settings
-    _model = get_settings().openai_model
-    logger.info(f"Generation du Mind Map via le modele {_model}...")
+    model = get_settings().openai_model
+    logger.info(f"Generation du Mind Map via le modele {model}...")
     try:
         response = await openai_client.chat.completions.create(
-            model=_model,
+            model=model,
             temperature=0.2,
             max_tokens=2000,
             timeout=25.0,
-            messages=[
-                {"role": "system", "content": MINDMAP_SYSTEM_PROMPT},
-                {"role": "user", "content": user_prompt}
-            ]
+            messages=[{"role": "system", "content": MINDMAP_SYSTEM_PROMPT}, {"role": "user", "content": user_prompt}],
         )
         content = response.choices[0].message.content or ""
         generated_data = extract_json_from_gemini(content)
@@ -561,10 +508,7 @@ async def generate_mindmap(
     # Structure de fallback si le JSON LLM est invalide
     if not generated_data or "racine" not in generated_data:
         logger.warning("Structure JSON générée invalide. Utilisation du fallback statique.")
-        generated_data = {
-            "racine": _build_default_racine(chapitre, matiere),
-            "liens_transversaux": []
-        }
+        generated_data = {"racine": _build_default_racine(chapitre, matiere), "liens_transversaux": []}
 
     # 4. Formater récursivement l'arbre généré pour typage et clés uniques
     def format_node_recursive(node: dict, level=0):
@@ -573,21 +517,17 @@ async def generate_mindmap(
         node["niveau"] = level
         if "maitrise_eleve" not in node:
             node["maitrise_eleve"] = 0
-            
+
         importance = node.get("importance", "moyenne")
         if importance not in ["critique", "haute", "moyenne"]:
             node["importance"] = "moyenne"
             importance = "moyenne"
-            
-        node["couleur"] = {
-            "critique": "#E74C3C",
-            "haute": "#F39C12",
-            "moyenne": "#3498DB"
-        }[importance]
-        
+
+        node["couleur"] = {"critique": "#E74C3C", "haute": "#F39C12", "moyenne": "#3498DB"}[importance]
+
         if "flashcard_auto" not in node:
             node["flashcard_auto"] = node["importance"] in ["critique", "haute"]
-            
+
         node["enfants"] = node.get("enfants", [])
         for child in node["enfants"]:
             format_node_recursive(child, level + 1)
@@ -605,37 +545,24 @@ async def generate_mindmap(
         "racine": generated_data["racine"],
         "liens_transversaux": generated_data.get("liens_transversaux", []),
         "metadata": {
-            "genere_le": datetime.now(timezone.utc).isoformat(),
+            "genere_le": datetime.now(UTC).isoformat(),
             "version": "2.0",
             "source_rag": source_names,
-            "user_id": user_id
-        }
+            "user_id": user_id,
+        },
     }
 
     # 6. Enregistrer dans la base de données
     await save_mindmap(mindmap_data, user_id, db)
 
     # 7. Générer les flashcards
-    flashcards = await _generate_auto_flashcards(
-        mindmap_data["racine"],
-        matiere,
-        chapitre,
-        user_id,
-        db
-    )
+    flashcards = await _generate_auto_flashcards(mindmap_data["racine"], matiere, chapitre, user_id, db)
 
     # 8. Persister les flashcards dans FSRS (Mind Map ↔ FSRS)
     if flashcards:
-        await persist_flashcards_to_fsrs(
-            flashcards, matiere, chapitre, user_id, db
-        )
+        await persist_flashcards_to_fsrs(flashcards, matiere, chapitre, user_id, db)
 
-    return {
-        "status": "success",
-        "mindmap": mindmap_data,
-        "flashcards_generees": flashcards,
-        "source_rag": source_names
-    }
+    return {"status": "success", "mindmap": mindmap_data, "flashcards_generees": flashcards, "source_rag": source_names}
 
 
 def _build_default_racine(chapitre: str, matiere: str) -> dict:
@@ -650,17 +577,12 @@ def _build_default_racine(chapitre: str, matiere: str) -> dict:
         "maitrise_eleve": 0,
         "couleur": "#E74C3C",
         "enfants": [],
-        "liens": []
+        "liens": [],
     }
 
 
 async def _generate_auto_flashcards(
-    node: dict,
-    matiere: str,
-    chapitre: str,
-    user_id: str,
-    db: AsyncSession,
-    flashcards: list = None
+    node: dict, matiere: str, chapitre: str, user_id: str, db: AsyncSession, flashcards: list | None = None
 ) -> list:
     if flashcards is None:
         flashcards = []
@@ -671,61 +593,60 @@ async def _generate_auto_flashcards(
             "verso": f"Voir chapitre : {chapitre}",
             "type": node.get("type", "concept"),
             "importance": node.get("importance", "moyenne"),
-            "node_id": node["id"]
+            "node_id": node["id"],
         }
         flashcards.append(card)
 
     for child in node.get("enfants", []):
-        await _generate_auto_flashcards(
-            child, matiere, chapitre, user_id, db, flashcards
-        )
+        await _generate_auto_flashcards(child, matiere, chapitre, user_id, db, flashcards)
 
     return flashcards
 
 
 async def persist_flashcards_to_fsrs(
-    flashcards: list,
-    matiere: str,
-    chapitre: str,
-    user_id: str,
-    db: AsyncSession
+    flashcards: list, matiere: str, chapitre: str, user_id: str, db: AsyncSession
 ) -> list:
     u_id = int(user_id)
     saved = []
 
-    from fsrs import Card, Rating
-    from services.fsrs_config import get_fsrs_scheduler
-    from services.fsrs_graph import run_fsrs_step
-    from datetime import timezone
     import json as _json
 
+    from fsrs import Card, Rating
+
+    from services.fsrs_config import get_fsrs_scheduler
+    from services.fsrs_graph import run_fsrs_step
+
     scheduler_inst = get_fsrs_scheduler()
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     default_card = Card()
 
     for card in flashcards:
         card_id = f"mm_{card['node_id']}"
         updated_card = run_fsrs_step(default_card, Rating.Good, now, scheduler_inst)
 
-        due_date = updated_card.due if hasattr(updated_card, 'due') else now + timedelta(days=1)
-        interval = updated_card.scheduled_days if hasattr(updated_card, 'scheduled_days') else 1
+        due_date = updated_card.due if hasattr(updated_card, "due") else now + timedelta(days=1)
+        interval = updated_card.scheduled_days if hasattr(updated_card, "scheduled_days") else 1
 
-        fsrs_json = _json.dumps({
-            "stability": updated_card.stability,
-            "difficulty": updated_card.difficulty,
-            "scheduled_days": interval,
-            "reps": getattr(updated_card, "reps", 0),
-            "lapses": getattr(updated_card, "lapses", 0),
-            "state": str(updated_card.state),
-            "last_review": now.isoformat(),
-            "review_history": [{
-                "rating": Rating.Good.value,
-                "reviewed_at": now.isoformat(),
-                "elapsed_days": 0,
+        fsrs_json = _json.dumps(
+            {
+                "stability": updated_card.stability,
+                "difficulty": updated_card.difficulty,
                 "scheduled_days": interval,
-                "state_before": str(default_card.state),
-            }],
-        })
+                "reps": getattr(updated_card, "reps", 0),
+                "lapses": getattr(updated_card, "lapses", 0),
+                "state": str(updated_card.state),
+                "last_review": now.isoformat(),
+                "review_history": [
+                    {
+                        "rating": Rating.Good.value,
+                        "reviewed_at": now.isoformat(),
+                        "elapsed_days": 0,
+                        "scheduled_days": interval,
+                        "state_before": str(default_card.state),
+                    }
+                ],
+            }
+        )
 
         result = await db.execute(
             text("""
@@ -755,7 +676,7 @@ async def persist_flashcards_to_fsrs(
                 "interval": interval,
                 "fsrs_state": fsrs_json,
                 "last_review": now,
-            }
+            },
         )
         row = result.fetchone()
         saved.append({**card, "fsrs_id": row[0] if row else None})
@@ -772,7 +693,7 @@ async def persist_flashcards_to_fsrs(
                 "node_id": card["node_id"],
                 "user_id": u_id,
                 "updated_at": now,
-            }
+            },
         )
 
     await db.commit()
@@ -780,11 +701,7 @@ async def persist_flashcards_to_fsrs(
     return saved
 
 
-async def save_mindmap(
-    mindmap: dict,
-    user_id: str,
-    db: AsyncSession
-) -> None:
+async def save_mindmap(mindmap: dict, user_id: str, db: AsyncSession) -> None:
     u_id = int(user_id)
     await db.execute(
         text("""
@@ -805,8 +722,8 @@ async def save_mindmap(
             "filiere": mindmap["filiere"],
             "chapitre": mindmap["chapitre"],
             "data": json.dumps(mindmap, ensure_ascii=False),
-            "created_at": datetime.now(timezone.utc)
-        }
+            "created_at": datetime.now(UTC),
+        },
     )
 
     async def save_node_recursive(node: dict):
@@ -835,9 +752,9 @@ async def save_mindmap(
                 "bac_frequent": node.get("bac_frequent", False),
                 "fsrs_card_id": node.get("fsrs_card_id"),
                 "maitrise_eleve": node.get("maitrise_eleve", 0),
-                "created_at": datetime.now(timezone.utc),
-                "updated_at": datetime.now(timezone.utc)
-            }
+                "created_at": datetime.now(UTC),
+                "updated_at": datetime.now(UTC),
+            },
         )
         for child in node.get("enfants", []):
             await save_node_recursive(child)
@@ -846,12 +763,7 @@ async def save_mindmap(
     await db.commit()
 
 
-async def update_node_maitrise(
-    node_id: str,
-    maitrise: int,
-    user_id: str,
-    db: AsyncSession
-) -> dict:
+async def update_node_maitrise(node_id: str, maitrise: int, user_id: str, db: AsyncSession) -> dict:
     if maitrise not in [0, 1, 2]:
         raise ValueError("maitrise doit être 0, 1 ou 2")
 
@@ -859,10 +771,12 @@ async def update_node_maitrise(
 
     # Récupérer le fsrs_card_id avant mise à jour
     node_result = await db.execute(
-        text("SELECT id, fsrs_card_id, chapitre FROM mindmap_nodes mn "
-             "JOIN mindmaps m ON m.id = mn.mindmap_id "
-             "WHERE mn.id = :node_id AND mn.user_id = :user_id"),
-        {"node_id": node_id, "user_id": u_id}
+        text(
+            "SELECT id, fsrs_card_id, chapitre FROM mindmap_nodes mn "
+            "JOIN mindmaps m ON m.id = mn.mindmap_id "
+            "WHERE mn.id = :node_id AND mn.user_id = :user_id"
+        ),
+        {"node_id": node_id, "user_id": u_id},
     )
     node_row = node_result.fetchone()
 
@@ -876,12 +790,7 @@ async def update_node_maitrise(
             AND user_id = :user_id
             RETURNING id, maitrise_eleve
         """),
-        {
-            "node_id": node_id,
-            "maitrise": maitrise,
-            "user_id": u_id,
-            "updated_at": datetime.now(timezone.utc)
-        }
+        {"node_id": node_id, "maitrise": maitrise, "user_id": u_id, "updated_at": datetime.now(UTC)},
     )
     row = result.fetchone()
 
@@ -889,17 +798,19 @@ async def update_node_maitrise(
         raise ValueError(f"Nœud {node_id} non trouvé")
 
     # Mettre à jour l'état FSRS via le vrai scheduler calibré
+    import json
+
     from fsrs import Card, Rating
+
     from services.fsrs_config import get_fsrs_scheduler
     from services.fsrs_graph import run_fsrs_step
-    import json
 
     fsrs_card_id = f"mm_{node_id}"
 
     # Charger l'état actuel de la carte si elle existe
     mc_result = await db.execute(
         text("SELECT fsrs_state FROM mastery_micro_concepts WHERE micro_concept_id = :mc_id AND user_id = :uid"),
-        {"mc_id": fsrs_card_id, "uid": u_id}
+        {"mc_id": fsrs_card_id, "uid": u_id},
     )
     mc_row = mc_result.fetchone()
 
@@ -924,40 +835,41 @@ async def update_node_maitrise(
     fsrs_rating = rating_map[maitrise]
 
     # Récupérer la configuration FSRS de l'élève
-    res_config = await db.execute(
-        text("SELECT fsrs_config FROM users WHERE id = :uid"),
-        {"uid": u_id}
-    )
+    res_config = await db.execute(text("SELECT fsrs_config FROM users WHERE id = :uid"), {"uid": u_id})
     config_row = res_config.fetchone()
     user_fsrs_config = config_row[0] if config_row else None
 
     # Appliquer le scheduler calibré
     scheduler_inst = get_fsrs_scheduler(user_fsrs_config)
-    now_utc = datetime.now(timezone.utc)
+    now_utc = datetime.now(UTC)
     updated_card = run_fsrs_step(card, fsrs_rating, now_utc, scheduler_inst)
 
-    due_date = updated_card.due if hasattr(updated_card, 'due') else now_utc + timedelta(days=1)
-    interval = updated_card.scheduled_days if hasattr(updated_card, 'scheduled_days') else 1
+    due_date = updated_card.due if hasattr(updated_card, "due") else now_utc + timedelta(days=1)
+    interval = updated_card.scheduled_days if hasattr(updated_card, "scheduled_days") else 1
 
     # Préserver l'historique des révisions
-    review_history.append({
-        "rating": fsrs_rating.value if hasattr(fsrs_rating, 'value') else maitrise,
-        "reviewed_at": now_utc.isoformat(),
-        "elapsed_days": 0,
-        "scheduled_days": interval,
-        "state_before": str(card.state),
-    })
+    review_history.append(
+        {
+            "rating": fsrs_rating.value if hasattr(fsrs_rating, "value") else maitrise,
+            "reviewed_at": now_utc.isoformat(),
+            "elapsed_days": 0,
+            "scheduled_days": interval,
+            "state_before": str(card.state),
+        }
+    )
 
-    fsrs_json = json.dumps({
-        "stability": updated_card.stability,
-        "difficulty": updated_card.difficulty,
-        "scheduled_days": interval,
-        "reps": getattr(updated_card, "reps", 0),
-        "lapses": getattr(updated_card, "lapses", 0),
-        "state": str(updated_card.state),
-        "last_review": now_utc.isoformat(),
-        "review_history": review_history,
-    })
+    fsrs_json = json.dumps(
+        {
+            "stability": updated_card.stability,
+            "difficulty": updated_card.difficulty,
+            "scheduled_days": interval,
+            "reps": getattr(updated_card, "reps", 0),
+            "lapses": getattr(updated_card, "lapses", 0),
+            "state": str(updated_card.state),
+            "last_review": now_utc.isoformat(),
+            "review_history": review_history,
+        }
+    )
 
     await db.execute(
         text("""
@@ -992,21 +904,17 @@ async def update_node_maitrise(
             "due_date": due_date,
             "next_rev": due_date,
             "interval": interval,
-            "state": updated_card.state.value if hasattr(updated_card.state, 'value') else int(updated_card.state),
+            "state": updated_card.state.value if hasattr(updated_card.state, "value") else int(updated_card.state),
             "last_review": now_utc,
             "updated_at": now_utc,
-        }
+        },
     )
 
     await db.commit()
     return {"id": row[0], "maitrise_eleve": row[1]}
 
 
-async def get_weak_nodes(
-    mindmap_id: str,
-    user_id: str,
-    db: AsyncSession
-) -> list:
+async def get_weak_nodes(mindmap_id: str, user_id: str, db: AsyncSession) -> list:
     u_id = int(user_id)
     result = await db.execute(
         text("""
@@ -1023,7 +931,7 @@ async def get_weak_nodes(
                     WHEN 'moyenne' THEN 3
                 END
         """),
-        {"mindmap_id": mindmap_id, "user_id": u_id}
+        {"mindmap_id": mindmap_id, "user_id": u_id},
     )
     rows = result.fetchall()
     return [dict(r._mapping) for r in rows]

@@ -2,9 +2,11 @@ import json
 import logging
 import re
 from pathlib import Path
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
+
 from database import get_db
 from deps import get_current_user
 
@@ -12,7 +14,7 @@ logger = logging.getLogger("khawarizmi.api")
 router = APIRouter(prefix="/api/cours", tags=["Cours"])
 
 MAPPING_PATH = Path(__file__).resolve().parent.parent / "data" / "chapter_mapping.json"
-with open(MAPPING_PATH, "r", encoding="utf-8") as f:
+with open(MAPPING_PATH, encoding="utf-8") as f:
     CHAPTER_MAPPING = json.load(f)
 
 # Source de vérité du cours (markdown canonique de 10 000 lignes).
@@ -32,9 +34,7 @@ def score_match(chapitre: str, keywords: list[str]) -> int:
 
 def clean_ascii_tables(content: str) -> str:
     lines = content.split("\n")
-    decorative_pattern = re.compile(
-        r"^\s*[╔╗╚╝═║╠╣╦╩╬─│┌┐└┘├┤┬┴┼╞╡╪╫╤╧╨╥╙╘╒╓╫╪▐▌▀▄█▓▒░]+\s*$"
-    )
+    decorative_pattern = re.compile(r"^\s*[╔╗╚╝═║╠╣╦╩╬─│┌┐└┘├┤┬┴┼╞╡╪╫╤╧╨╥╙╘╒╓╫╪▐▌▀▄█▓▒░]+\s*$")
     cleaned = [line for line in lines if not decorative_pattern.match(line)]
     return "\n".join(cleaned)
 
@@ -44,9 +44,7 @@ def convert_ascii_table_to_markdown(content: str) -> str:
     result = []
     in_table = False
     table_buffer = []
-    header_separator_pattern = re.compile(
-        r"^\|[\s═─║╞╪╫╬]+\|$"
-    )
+    header_separator_pattern = re.compile(r"^\|[\s═─║╞╪╫╬]+\|$")
 
     def flush_table():
         if len(table_buffer) >= 1:
@@ -66,11 +64,7 @@ def convert_ascii_table_to_markdown(content: str) -> str:
         # normaliser les bordures unicode en pipe standard
         normalized = stripped.replace("║", "|").replace("║", "|")
         # ligne de tableau : commence et finit par |, au moins 3 pipes
-        is_table = (
-            normalized.startswith("|")
-            and normalized.endswith("|")
-            and normalized.count("|") >= 3
-        )
+        is_table = normalized.startswith("|") and normalized.endswith("|") and normalized.count("|") >= 3
         if is_table:
             # nettoyer les caractères décoratifs dans les cellules
             clean_line = re.sub(r"[═─║╞╪╫╬╔╗╚╝╠╣╦╩]", " ", line)
@@ -130,11 +124,7 @@ def fix_markdown_tables(content: str) -> str:
             i += 1
             continue
 
-        is_table_row = (
-            stripped.startswith("|")
-            and stripped.endswith("|")
-            and stripped.count("|") >= 3
-        )
+        is_table_row = stripped.startswith("|") and stripped.endswith("|") and stripped.count("|") >= 3
 
         if is_table_row:
             nb_cols = stripped.count("|") - 1
@@ -195,7 +185,7 @@ def split_flat_tables(content: str) -> str:
                 nb_cols = 3
                 table_lines = []
                 for i in range(0, len(cells), nb_cols):
-                    row_cells = cells[i:i + nb_cols]
+                    row_cells = cells[i : i + nb_cols]
                     if len(row_cells) == nb_cols:
                         table_lines.append("| " + " | ".join(row_cells) + " |")
                 if table_lines:
@@ -216,7 +206,18 @@ def convert_numbered_lists(content: str) -> str:
     for line in lines:
         match = re.match(r"^\s*([①②③④⑤⑥⑦⑧⑨⑩])\s*(.+)$", line)
         if match:
-            number_map = {"①": "1", "②": "2", "③": "3", "④": "4", "⑤": "5", "⑥": "6", "⑦": "7", "⑧": "8", "⑨": "9", "⑩": "10"}
+            number_map = {
+                "①": "1",
+                "②": "2",
+                "③": "3",
+                "④": "4",
+                "⑤": "5",
+                "⑥": "6",
+                "⑦": "7",
+                "⑧": "8",
+                "⑨": "9",
+                "⑩": "10",
+            }
             num = number_map.get(match.group(1), "1")
             text = match.group(2)
             result.append(f"{num}. {text}")
@@ -265,7 +266,7 @@ def fix_inline_tables(content: str) -> str:
                         cells.append("")
                 table_lines = []
                 for i in range(0, len(cells), best_nb_cols):
-                    row = cells[i:i + best_nb_cols]
+                    row = cells[i : i + best_nb_cols]
                     table_lines.append("| " + " | ".join(row) + " |")
                 if len(table_lines) >= 2:
                     separator = "|" + "|".join(["---"] * best_nb_cols) + "|"
@@ -285,14 +286,30 @@ SECTION_KEYWORDS = {
     "Rappel des acquis": ["تذكير", "Rappel", "القسم الأول", "المكتسبات القبلية"],
     "Rappel des acquis (conditions et manifestations de la photosynthese)": ["تذكير", "Rappel", "photosynth"],
     "Siege de la synthese des proteines": ["مقر تركيب البروتين", "Siège", "الريبوزوم", "Ribosome", "القسم الثاني"],
-    "Transcription de l'information genetique au niveau de l'ADN": ["الاستنساخ", "Transcription", "ADN", "القسم الثالث"],
+    "Transcription de l'information genetique au niveau de l'ADN": [
+        "الاستنساخ",
+        "Transcription",
+        "ADN",
+        "القسم الثالث",
+    ],
     "La traduction": ["الترجمة", "Translation", "القسم الرابع"],
     "Les etapes de la traduction": ["مراحل الترجمة", "les étapes", "القسم الخامس"],
     "Notion d'enzyme et son importance": ["مفهوم الإنزيم", "Notion d'enzyme", "Enzyme"],
-    "L'activite enzymatique et sa relation avec la structure de l'enzyme": ["النشاط الإنزيمي", "activité enzymatique", "Site actif"],
+    "L'activite enzymatique et sa relation avec la structure de l'enzyme": [
+        "النشاط الإنزيمي",
+        "activité enzymatique",
+        "Site actif",
+    ],
     "Etude de l'influence de la temperature sur l'activite enzymatique": ["température", "temperature", "dénaturation"],
     "Etude de l'influence du pH du milieu sur l'activite enzymatique": ["pH"],
-    "Niveaux de la structure spatiale des proteines": ["Structure spatiale", "Niveaux", "البنية", "primaire", "secondaire", "tertiaire"],
+    "Niveaux de la structure spatiale des proteines": [
+        "Structure spatiale",
+        "Niveaux",
+        "البنية",
+        "primaire",
+        "secondaire",
+        "tertiaire",
+    ],
     "Relation entre structure et fonction de la proteine": ["Structure", "Fonction", "Relation"],
     "Representation de la structure tridimensionnelle de la proteine": ["tridimensionnelle", "3D"],
     "Le soi et le non-soi": ["Soi", "non-soi", "الذات", "Antigène"],
@@ -312,21 +329,37 @@ SECTION_KEYWORDS = {
     "Mecanisme de l'integration nerveuse": ["intégration nerveuse", "integration", "sommation"],
     "Effet des drogues au niveau des synapses": ["drogues", "synapses", "drogue"],
     "Siege de la photosynthese - Ultrastructure du chloroplaste": ["chloroplaste", "Photosynthèse", "photosynth"],
-    "Reactions de la phase photochimique (phase claire)": ["phase photochimique", "phase claire", "photophosphorylation"],
+    "Reactions de la phase photochimique (phase claire)": [
+        "phase photochimique",
+        "phase claire",
+        "photophosphorylation",
+    ],
     "Reactions de la phase chimique (cycle de Calvin - phase sombre)": ["Calvin", "phase sombre", "cycle de Calvin"],
     "La glycolyse": ["glycolyse", "Glycolyse", "glucose"],
     "Siege de l'oxydation respiratoire": ["mitochondrie", "oxydation respiratoire"],
-    "Etapes de degradation de l'acide pyruvique (reactions du cycle de Krebs)": ["Krebs", "pyruvique", "cycle de Krebs"],
+    "Etapes de degradation de l'acide pyruvique (reactions du cycle de Krebs)": [
+        "Krebs",
+        "pyruvique",
+        "cycle de Krebs",
+    ],
     "La phosphorylation oxydative": ["phosphorylation oxydative", "ATP", "ATP synthase"],
     "Les transformations energetiques au niveau cellulaire": ["Transformations Énergétiques", "énergétique"],
-    "Mecanismes de conversion en milieu anaerobie (fermentation)": ["fermentation", "anaérobie", "fermentation lactique"],
+    "Mecanismes de conversion en milieu anaerobie (fermentation)": [
+        "fermentation",
+        "anaérobie",
+        "fermentation lactique",
+    ],
     "Identification des plaques tectoniques": ["plaques tectoniques", "Identification", "lithosphère"],
     "Mouvements des plaques tectoniques": ["plaques tectoniques", "Mouvements", "plaques"],
     "Les ondes sismiques": ["ondes sismiques", "Sismique", "séisme"],
     "Indices d'un ancien ocean (ophiolites)": ["ophiolite", "ancien océan", "océanique"],
     "Indices du raccourcissement": ["raccourcissement", "plis", "failles"],
     "Phenomenes lies a la subduction": ["subduction", "plongement", "fosse"],
-    "Disparition de la plaque oceanique et phenomenes lies a la subduction": ["plaque océanique", "subduction", "disparition"],
+    "Disparition de la plaque oceanique et phenomenes lies a la subduction": [
+        "plaque océanique",
+        "subduction",
+        "disparition",
+    ],
     "Le magmatisme et la formation de la plaque oceanique": ["magmatisme", "plaque océanique", "dorsale"],
     "Caracteristiques des dorsales medio-oceaniques": ["dorsale", "médio-océanique"],
     "Formation des roches caracteristiques de la dorsale medio-oceanique": ["dorsale", "roches", "basalte"],
@@ -431,9 +464,7 @@ async def get_cours(
     keywords = CHAPTER_MAPPING.get(decoded, None)
 
     if keywords:
-        conditions = " OR ".join(
-            f"LOWER(chapitre) LIKE LOWER(:kw{i})" for i in range(len(keywords))
-        )
+        conditions = " OR ".join(f"LOWER(chapitre) LIKE LOWER(:kw{i})" for i in range(len(keywords)))
         params = {f"kw{i}": f"%{k}%" for i, k in enumerate(keywords)}
         params["source"] = COURSE_SOURCE
 
@@ -529,10 +560,7 @@ async def get_cours(
                 )
                 chapters_found = result.fetchall()
                 if chapters_found:
-                    scored = [
-                        (score_match(r.chapitre, mots), r.nb, r.chapitre)
-                        for r in chapters_found
-                    ]
+                    scored = [(score_match(r.chapitre, mots), r.nb, r.chapitre) for r in chapters_found]
                     scored.sort(key=lambda x: (-x[0], -x[1]))
                     best_chapitre = scored[0][2]
                     result = await db.execute(

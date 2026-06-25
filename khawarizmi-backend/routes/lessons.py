@@ -5,7 +5,6 @@ POST /api/lessons/{chapter_slug}/check  → vérifie une réponse + progression
 """
 
 import logging
-from typing import Dict
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import text
@@ -28,7 +27,7 @@ router = APIRouter(prefix="/api/lessons", tags=["Active Lessons"])
 @router.get("/{chapter_slug}", response_model=LessonResponse)
 async def get_lesson(
     chapter_slug: str,
-    current_user: Dict = Depends(get_current_user),
+    current_user: dict = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
     """Retourne les blocs d'une leçon active (sans les réponses)."""
@@ -52,6 +51,7 @@ async def get_lesson(
         qc_data = m["quick_check"]
         if isinstance(qc_data, str):
             import json
+
             qc_data = json.loads(qc_data)
 
         qc = QuickCheck(
@@ -63,15 +63,17 @@ async def get_lesson(
             explanation_ar=qc_data.get("explanation_ar", ""),
         )
 
-        blocks.append(LessonBlock(
-            id=str(m["id"]),
-            block_type=m["block_type"],
-            sort_order=m["sort_order"],
-            title_ar=m["title_ar"],
-            body_ar=m["body_ar"],
-            visual_hint=m["visual_hint"],
-            quick_check=qc,
-        ))
+        blocks.append(
+            LessonBlock(
+                id=str(m["id"]),
+                block_type=m["block_type"],
+                sort_order=m["sort_order"],
+                title_ar=m["title_ar"],
+                body_ar=m["body_ar"],
+                visual_hint=m["visual_hint"],
+                quick_check=qc,
+            )
+        )
 
     return LessonResponse(
         chapter_slug=chapter_slug,
@@ -84,7 +86,7 @@ async def get_lesson(
 async def check_answer(
     chapter_slug: str,
     body: CheckAnswerRequest,
-    current_user: Dict = Depends(get_current_user),
+    current_user: dict = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
     """Vérifie la réponse à un quick check et met à jour la progression."""
@@ -100,6 +102,7 @@ async def check_answer(
         raise HTTPException(404, "Bloc introuvable")
 
     import json
+
     qc = row._mapping["quick_check"]
     if isinstance(qc, str):
         qc = json.loads(qc)

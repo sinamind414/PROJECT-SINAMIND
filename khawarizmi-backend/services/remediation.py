@@ -16,8 +16,7 @@ Lien 3 (Eval → Verbe d'action) :
 """
 
 import logging
-from datetime import datetime, timezone
-from typing import Dict, Optional, List
+from datetime import UTC, datetime
 
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -27,10 +26,11 @@ logger = logging.getLogger("khawarizmi.remediation")
 
 # ── Lien 1 : FSRS → Question auto ────────────────────────────────────────────
 
+
 async def get_due_concept_for_question(
     db: AsyncSession,
     user_id: str,
-) -> Optional[Dict]:
+) -> dict | None:
     """Détecte le concept FSRS le plus critique dû aujourd'hui.
 
     Retourne le concept avec la plus faible stabilité parmi ceux dus.
@@ -39,7 +39,7 @@ async def get_due_concept_for_question(
     Returns:
         Dict avec chapter, concept_id, stability, difficulty, ou None.
     """
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     try:
         result = await db.execute(
             text("""
@@ -51,7 +51,7 @@ async def get_due_concept_for_question(
                 ORDER BY stability ASC, difficulty DESC
                 LIMIT 1
             """),
-            {"uid": int(user_id), "now": now}
+            {"uid": int(user_id), "now": now},
         )
         row = result.fetchone()
         if not row:
@@ -69,7 +69,7 @@ async def get_due_concept_for_question(
         return None
 
 
-def build_due_concept_question(concept: Dict) -> Dict:
+def build_due_concept_question(concept: dict) -> dict:
     """Construit une question guide sur le concept dû.
 
     Ne donne pas la réponse — guide l'élève vers la réflexion (Pilier 2: Rappel Actif).
@@ -85,15 +85,12 @@ def build_due_concept_question(concept: Dict) -> Dict:
     if stability < 1.0:
         # Concept très fragile — question de restitution (L1)
         message = f"لديك مفهوم بحاجة لمراجعة عاجلة: {concept_id}. هل تذكر ما هو دوره الأساسي؟"
-        question_type = "recall_urgent"
     elif stability < 3.0:
         # Concept fragile — question d'application (L2)
         message = f"مفهوم {concept_id} يحتاج لتثبيت. اشرح باختصار كيف يعمل في سياق {chapter}؟"
-        question_type = "recall_stabilize"
     else:
         # Concept en déclin — question de type Bac (L3)
         message = f"مراجعة دورية: حلل دور {concept_id} في {chapter} كما في امتحان البكالوريا."
-        question_type = "recall_maintenance"
 
     return {
         "reponse": message,
@@ -124,12 +121,13 @@ def build_due_concept_question(concept: Dict) -> Dict:
 
 # ── Lien 2 : Eval → MindMap color ────────────────────────────────────────────
 
+
 async def update_mindmap_after_eval(
     db: AsyncSession,
     user_id: str,
     concept_id: str,
     score: int,
-    chapter: str = None,
+    chapter: str | None = None,
 ) -> None:
     """Met à jour le nœud MindMap correspondant après évaluation.
 
@@ -163,7 +161,7 @@ async def update_mindmap_after_eval(
                        OR id = :concept_id
                     RETURNING id, label
                 """),
-                {"maitrise": maitrise, "card_id": card_id, "concept_id": concept_id}
+                {"maitrise": maitrise, "card_id": card_id, "concept_id": concept_id},
             )
             rows = result.fetchall()
             if rows:
@@ -189,12 +187,10 @@ ERROR_TO_VERB = {
     "missing_comparison": {"verb_slug": "قارن", "verb_fr": "comparer", "reason_ar": "تفتقد المقارنة"},
     "missing_causality": {"verb_slug": "فسر", "verb_fr": "expliquer", "reason_ar": "تفتقد التفسير السببي"},
     "missing_relation": {"verb_slug": "حدد", "verb_fr": "identifier", "reason_ar": "تفتقد تحديد العلاقة"},
-
     # Erreurs conceptuelles
     "wrong_terminology": {"verb_slug": "عرف", "verb_fr": "définir", "reason_ar": "مصطلحات غير دقيقة"},
     "conceptual_error": {"verb_slug": "وضح", "verb_fr": "expliquer", "reason_ar": "خطأ مفاهيمي"},
     "incomplete_answer": {"verb_slug": "اذكر", "verb_fr": "citer", "reason_ar": "إجابة غير كاملة"},
-
     # Erreurs de structure
     "no_structure": {"verb_slug": "حلل", "verb_fr": "analyser", "reason_ar": "تفتقد البنية المنهجية"},
     "off_topic": {"verb_slug": "حدد", "verb_fr": "identifier", "reason_ar": "إجابة خارج الموضوع"},
@@ -213,11 +209,11 @@ CHAPTER_TO_VERB = {
 
 
 def suggest_action_verb(
-    error_type: str = None,
-    chapter: str = None,
+    error_type: str | None = None,
+    chapter: str | None = None,
     score: int = 0,
-    missing_concepts: List[str] = None,
-) -> Optional[Dict]:
+    missing_concepts: list[str] | None = None,
+) -> dict | None:
     """Suggère un verbe d'action pour la remédiation.
 
     Priorité :

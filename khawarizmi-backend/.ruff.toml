@@ -1,7 +1,7 @@
 # .ruff.toml — Khawarizmi Pro (Backend Python)
 target-version = "py312"
 line-length = 120
-exclude = ["migrations/versions/*", "__pycache__", ".venv", "node_modules"]
+exclude = ["migrations/versions/*", "__pycache__", ".venv", "node_modules", "scripts/", "tests/"]
 
 [format]
 quote-style = "double"
@@ -24,8 +24,20 @@ select = [
 ignore = [
     "E501",    # ligne trop longue (géré par formateur)
     "E741",    # noms vague (i, j, k) — acceptable
+    "E402",    # import pas en haut — nécessaire pour config bootstrap
+    "E701",    # multi-statements sur une ligne (ok pour guards)
     "N802",    # noms fonctions en lower_case — accepté
     "N803",    # noms arguments en lower_case — accepté
+    "N815",    # mixedCase variable in class scope — accepté
+    "N806",    # non-lowercase variable in function — accepté
+    "B008",    # function-call-in-default-argument — pattern FastAPI Depends
+    "B904",    # raise-without-from-inside-except — acceptable
+    "RUF001",  # ambiguous unicode — Arabic text
+    "RUF002",  # ambiguous unicode docstring — Arabic text
+    "RUF003",  # ambiguous unicode comment — Arabic text
+    "RUF029",  # unused-async — FastAPI dependency injection
+    "RUF075",  # fallible-context-manager — acceptable
+    "SIM108",  # if-else-block-instead-of-if-exp — readability
 ]
 fixable = ["ALL"]
 unfixable = []

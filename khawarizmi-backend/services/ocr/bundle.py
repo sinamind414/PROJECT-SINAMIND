@@ -1,7 +1,6 @@
 import json
-from pathlib import Path
-from typing import Dict, Any, Optional
 import logging
+from pathlib import Path
 
 from .config import get_config
 
@@ -49,9 +48,9 @@ class BundleManager:
         with out_path.open("w", encoding="utf-8") as f:
             for p in pages:
                 page_num = p.stem.replace("page_", "")
-                f.write(f"\n{'='*60}\n")
+                f.write(f"\n{'=' * 60}\n")
                 f.write(f"PAGE {page_num}\n")
-                f.write(f"{'='*60}\n")
+                f.write(f"{'=' * 60}\n")
                 f.write(p.read_text(encoding="utf-8"))
                 f.write("\n")
         logger.info("Exported combined text (%d pages) → %s", len(pages), out_path.name)

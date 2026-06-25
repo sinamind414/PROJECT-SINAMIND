@@ -1,13 +1,14 @@
+import contextlib
 import hashlib
-from typing import Optional
 
 
 def _get_state():
     from main import state
+
     return state
 
 
-async def get_cache(key: str) -> Optional[str]:
+async def get_cache(key: str) -> str | None:
     s = _get_state()
     if not s.redis:
         return None
@@ -21,10 +22,8 @@ async def set_cache(key: str, value: str, ttl: int = 3600):
     s = _get_state()
     if not s.redis:
         return
-    try:
+    with contextlib.suppress(Exception):
         await s.redis.setex(key, ttl, value)
-    except Exception:
-        pass
 
 
 def make_cache_key(*parts) -> str:

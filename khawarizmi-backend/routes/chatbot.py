@@ -6,15 +6,15 @@ Body : { message: str, history?: [{role, content}], lang?: "fr"|"ar" }
 Auth : JWT Bearer requis
 Réponse : { response: str, sources?: [], from_cache: false }
 """
-import json
+
 import logging
-from typing import Dict, List, Optional
+
 from fastapi import APIRouter, Depends, HTTPException, Request
 from openai import AsyncOpenAI
 
 from config import get_settings
 from deps import get_current_user, get_openai
-from rate_limit import limiter, chat_limit
+from rate_limit import chat_limit, limiter
 
 logger = logging.getLogger("khawarizmi.chatbot")
 router = APIRouter(prefix="/api/chatbot", tags=["Chatbot"])
@@ -58,8 +58,8 @@ SYSTEM_PROMPT_FR = """Tu es "Professeur Khawarizmi", assistant intelligent pour 
 @limiter.limit(chat_limit)
 async def ask_chatbot(
     request: Request,
-    body: Dict,
-    current_user: Dict = Depends(get_current_user),
+    body: dict,
+    current_user: dict = Depends(get_current_user),
     openai_client: AsyncOpenAI = Depends(get_openai),
 ):
     """
@@ -104,7 +104,7 @@ async def ask_chatbot(
         tokens_used = response.usage.total_tokens if response.usage else 0
 
         # Garantir que la réponse est en arabe (même si query en FR)
-        if lang == "fr" and not any("\u0600" <= c <= "\u06FF" for c in ai_text[:50]):
+        if lang == "fr" and not any("\u0600" <= c <= "\u06ff" for c in ai_text[:50]):
             # Pas d'arabe → forcer
             ai_text = "عذراً، أعد صياغة سؤالك بالعربية من فضلك. 🇩🇿"
 

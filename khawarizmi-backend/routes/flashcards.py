@@ -1,16 +1,16 @@
 import json
 import logging
-from datetime import datetime, timezone, timedelta
-from typing import Dict, List
-from fastapi import APIRouter, Depends, HTTPException
+from datetime import UTC, datetime, timedelta
+
+from fastapi import APIRouter, Depends
+from fsrs import Card
+from fsrs import Rating as FsrsRating
+from fsrs import Scheduler as CardScheduler
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
+
 from deps import get_current_user, get_db, get_scheduler
-from schemas.flashcard import (
-    DrillRequest, ScheduleRequest,
-    FlashcardCreateRequest, FlashcardReviewRequest
-)
-from fsrs import Card, Rating as FsrsRating, Scheduler as CardScheduler
+from schemas.flashcard import DrillRequest, FlashcardCreateRequest, FlashcardReviewRequest, ScheduleRequest
 
 logger = logging.getLogger("khawarizmi.api")
 router = APIRouter()
@@ -18,11 +18,14 @@ router = APIRouter()
 
 def _get_state():
     from main import state
+
     if state.interleaving is None:
         from services.interleaving import InterleavingSession
+
         state.interleaving = InterleavingSession()
     if state.scheduler is None:
         from services.scheduler import KhawarizmiScheduler
+
         state.scheduler = KhawarizmiScheduler()
     return state
 
@@ -41,17 +44,17 @@ _MATIERE_ALIASES = {
 
 @router.post("/api/drill/session", tags=["Drill"])
 async def generer_session_drill(
-    body:         DrillRequest,
-    current_user: Dict          = Depends(get_current_user),
-    db:           AsyncSession  = Depends(get_db),
+    body: DrillRequest,
+    current_user: dict = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
 ):
     s = _get_state()
     matiere = _MATIERE_ALIASES.get(body.matiere.lower().strip(), body.matiere)
     session = await s.interleaving.generer_session(
-        user_id      = current_user["id"],
-        db           = db,
-        matiere      = matiere,
-        nb_questions = body.nb_questions,
+        user_id=current_user["id"],
+        db=db,
+        matiere=matiere,
+        nb_questions=body.nb_questions,
     )
 
     if current_user["plan"] == "free":
@@ -59,38 +62,35 @@ async def generer_session_drill(
         session["nb_questions"] = len(session["questions"])
         session["quota_atteint"] = len(session["questions"]) == 5
 
-    logger.info(
-        f"Drill : user={current_user['id']} "
-        f"matiere={body.matiere} "
-        f"questions={session['nb_questions']}"
-    )
+    logger.info(f"Drill : user={current_user['id']} matiere={body.matiere} questions={session['nb_questions']}")
 
     return session
 
 
 @router.post("/api/drill/result", tags=["Drill"])
 async def soumettre_resultat_drill(
-    body:         ScheduleRequest,
-    current_user: Dict           = Depends(get_current_user),
-    db:           AsyncSession   = Depends(get_db),
+    body: ScheduleRequest,
+    current_user: dict = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
 ):
     scheduler = get_scheduler()
 
-    fsrs_state = body.fsrs_state or {}
     card = Card()
 
     result = scheduler.calculer_prochain_intervalle(card, body.score_percent)
     new_card = result["card"]
 
-    fsrs_json = json.dumps({
-        "stability":      new_card.stability,
-        "difficulty":     new_card.difficulty,
-        "scheduled_days": new_card.scheduled_days,
-        "reps":           new_card.reps,
-        "lapses":         new_card.lapses,
-        "state":          str(new_card.state),
-        "last_review":    datetime.now(timezone.utc).isoformat(),
-    })
+    fsrs_json = json.dumps(
+        {
+            "stability": new_card.stability,
+            "difficulty": new_card.difficulty,
+            "scheduled_days": new_card.scheduled_days,
+            "reps": new_card.reps,
+            "lapses": new_card.lapses,
+            "state": str(new_card.state),
+            "last_review": datetime.now(UTC).isoformat(),
+        }
+    )
 
     await db.execute(
         text("""
@@ -110,14 +110,14 @@ async def soumettre_resultat_drill(
                 updated_at         = NOW()
         """),
         {
-            "user_id":    current_user["id"],
-            "mc_id":      body.micro_concept_id,
-            "next_rev":   result["prochaine_revision"],
-            "interval":   result["interval_jours"],
+            "user_id": current_user["id"],
+            "mc_id": body.micro_concept_id,
+            "next_rev": result["prochaine_revision"],
+            "interval": result["interval_jours"],
             "difficulty": result["difficulty"],
-            "stability":  result["stability"],
+            "stability": result["stability"],
             "fsrs_state": fsrs_json,
-        }
+        },
     )
 
     logger.info(
@@ -129,9 +129,9 @@ async def soumettre_resultat_drill(
 
     return {
         "prochaine_revision": result["prochaine_revision"].isoformat(),
-        "interval_jours":     result["interval_jours"],
-        "retrievability":     result["retrievability"],
-        "rating":             result["rating"],
+        "interval_jours": result["interval_jours"],
+        "retrievability": result["retrievability"],
+        "rating": result["rating"],
     }
 
 
@@ -140,10 +140,10 @@ async def soumettre_resultat_drill(
 
 @router.get("/api/flashcards/due", tags=["Flashcards"])
 async def get_due_cards(
-    current_user: Dict         = Depends(get_current_user),
-    db:           AsyncSession = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
 ):
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     result = await db.execute(
         text("""
             SELECT id, micro_concept_id, concept_id, chapter,
@@ -156,35 +156,37 @@ async def get_due_cards(
             ORDER BY due_date ASC, stability ASC
             LIMIT 20
         """),
-        {"uid": current_user["id"], "now": now}
+        {"uid": current_user["id"], "now": now},
     )
     rows = result.fetchall()
 
     cards = []
     for r in rows:
-        cards.append({
-            "id": str(r[0]),
-            "micro_concept_id": r[1],
-            "concept_id": r[2],
-            "chapter": r[3],
-            "difficulty": r[4],
-            "stability": r[5],
-            "state": r[6],
-            "due_date": r[7].isoformat() if r[7] else None,
-            "next_review": r[8].isoformat() if r[8] else None,
-            "interval_jours": r[9],
-        })
+        cards.append(
+            {
+                "id": str(r[0]),
+                "micro_concept_id": r[1],
+                "concept_id": r[2],
+                "chapter": r[3],
+                "difficulty": r[4],
+                "stability": r[5],
+                "state": r[6],
+                "due_date": r[7].isoformat() if r[7] else None,
+                "next_review": r[8].isoformat() if r[8] else None,
+                "interval_jours": r[9],
+            }
+        )
 
     return {"cards": cards, "total": len(cards)}
 
 
 @router.post("/api/flashcards", tags=["Flashcards"])
 async def create_flashcard(
-    body:         FlashcardCreateRequest,
-    current_user: Dict               = Depends(get_current_user),
-    db:           AsyncSession       = Depends(get_db),
+    body: FlashcardCreateRequest,
+    current_user: dict = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
 ):
-    card_id = f"fc_{current_user['id']}_{datetime.now(timezone.utc).timestamp()}"
+    card_id = f"fc_{current_user['id']}_{datetime.now(UTC).timestamp()}"
     mc_id = card_id
 
     await db.execute(
@@ -211,10 +213,10 @@ async def create_flashcard(
             "difficulty": {"critique": 7.0, "haute": 5.0, "moyenne": 3.0}[body.importance],
             "stability": 0.0,
             "state": 0,
-            "now": datetime.now(timezone.utc),
-            "next_rev": datetime.now(timezone.utc),
+            "now": datetime.now(UTC),
+            "next_rev": datetime.now(UTC),
             "interval": 1,
-        }
+        },
     )
     await db.commit()
 
@@ -234,33 +236,34 @@ async def create_flashcard(
 
 @router.post("/api/flashcards/{card_id}/review", tags=["Flashcards"])
 async def review_flashcard(
-    card_id:      str,
-    body:         FlashcardReviewRequest,
-    current_user: Dict                   = Depends(get_current_user),
-    db:           AsyncSession           = Depends(get_db),
+    card_id: str,
+    body: FlashcardReviewRequest,
+    current_user: dict = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
 ):
-    rating_map = {1: FsrsRating.Again, 2: FsrsRating.Hard,
-                  3: FsrsRating.Good, 4: FsrsRating.Easy}
+    rating_map = {1: FsrsRating.Again, 2: FsrsRating.Hard, 3: FsrsRating.Good, 4: FsrsRating.Easy}
     fsrs_rating = rating_map[body.rating]
 
     card = Card()
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     scheduler = CardScheduler()
     scheduling_cards = scheduler.repeat(card, now)
     new_card = scheduling_cards[fsrs_rating].card
 
-    due_date = new_card.due if hasattr(new_card, 'due') else now + timedelta(days=1)
-    interval = new_card.scheduled_days if hasattr(new_card, 'scheduled_days') else 1
+    due_date = new_card.due if hasattr(new_card, "due") else now + timedelta(days=1)
+    interval = new_card.scheduled_days if hasattr(new_card, "scheduled_days") else 1
 
-    fsrs_json = json.dumps({
-        "stability": new_card.stability,
-        "difficulty": new_card.difficulty,
-        "scheduled_days": new_card.scheduled_days,
-        "reps": new_card.reps,
-        "lapses": new_card.lapses,
-        "state": str(new_card.state),
-        "last_review": now.isoformat(),
-    })
+    fsrs_json = json.dumps(
+        {
+            "stability": new_card.stability,
+            "difficulty": new_card.difficulty,
+            "scheduled_days": new_card.scheduled_days,
+            "reps": new_card.reps,
+            "lapses": new_card.lapses,
+            "state": str(new_card.state),
+            "last_review": now.isoformat(),
+        }
+    )
 
     await db.execute(
         text("""
@@ -293,7 +296,7 @@ async def review_flashcard(
             "fsrs_state": fsrs_json,
             "due_date": due_date,
             "last_review": now,
-        }
+        },
     )
     await db.commit()
 
@@ -301,7 +304,7 @@ async def review_flashcard(
         "id": card_id,
         "stability": new_card.stability,
         "difficulty": new_card.difficulty,
-        "due_date": due_date.isoformat() if hasattr(due_date, 'isoformat') else str(due_date),
+        "due_date": due_date.isoformat() if hasattr(due_date, "isoformat") else str(due_date),
         "interval_jours": interval,
         "rating": body.rating,
     }
