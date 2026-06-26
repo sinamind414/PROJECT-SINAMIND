@@ -22,18 +22,18 @@ app = FastAPI(
     redoc_url="/redoc",
 )
 
+app.state.limiter = limiter
+app.add_exception_handler(429, _rate_limit_exceeded_handler)
+app.add_exception_handler(422, validation_exception_handler)
+app.add_middleware(SlowAPIMiddleware)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=get_allowed_origins(),
     allow_origin_regex=r"https://.*\.(vercel|netlify)\.app",
     allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE"],
-    allow_headers=["Authorization", "Content-Type"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+    allow_headers=["*"],
 )
-app.state.limiter = limiter
-app.add_exception_handler(429, _rate_limit_exceeded_handler)
-app.add_exception_handler(422, validation_exception_handler)
-app.add_middleware(SlowAPIMiddleware)
 
 from routes import (
     annales,
