@@ -13,7 +13,7 @@ scripts/
 *.zip
 *.tar.gz
 *.gguf
-models/
+models/minilm_onnx_int8/
 logs/
 *.log
 .coverage
