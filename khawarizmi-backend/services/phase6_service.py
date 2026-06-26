@@ -219,3 +219,97 @@ async def get_top_performers(limit: int = 10, db: AsyncSession | None = None) ->
         ]
     except Exception:
         return []
+
+
+async def track_event(
+    db: AsyncSession,
+    user_id: int,
+    session_id: str,
+    event_type: str,
+    feature: str | None = None,
+    chapter: str | None = None,
+    metadata: dict | None = None,
+) -> dict:
+    try:
+        await db.execute(
+            text(
+                "INSERT INTO analytics_events "
+                "(user_id, session_id, event_type, feature, chapter, metadata, created_at) "
+                "VALUES (:uid, :sid, :evt, :feat, :chap, :meta, NOW())"
+            ),
+            {
+                "uid": user_id,
+                "sid": session_id,
+                "evt": event_type,
+                "feat": feature,
+                "chap": chapter,
+                "meta": "{}" if metadata is None else str(metadata),
+            },
+        )
+        await db.commit()
+        return {"status": "ok", "event_type": event_type}
+    except Exception:
+        return {"status": "error", "event_type": event_type}
+
+
+async def get_funnel_metrics(db: AsyncSession) -> dict:
+    try:
+        total = await db.execute(text("SELECT COUNT(*) FROM analytics_events"))
+        total_events = total.scalar() or 0
+
+        sessions = await db.execute(
+            text("SELECT COUNT(DISTINCT session_id) FROM analytics_events")
+        )
+        distinct_sessions = sessions.scalar() or 0
+
+        registrations = await db.execute(text("SELECT COUNT(*) FROM users"))
+        registered = registrations.scalar() or 0
+
+        first_actions = await db.execute(
+            text(
+                "SELECT COUNT(DISTINCT user_id) FROM analytics_events "
+                "WHERE event_type = 'first_action'"
+            )
+        )
+        activated = first_actions.scalar() or 0
+
+        retained = await db.execute(
+            text(
+                "SELECT COUNT(DISTINCT user_id) FROM analytics_events "
+                "WHERE event_type = 'session_start' "
+                "AND created_at >= NOW() - INTERVAL '7 days'"
+            )
+        )
+        retained_7d = retained.scalar() or 0
+
+        conversions = await db.execute(
+            text(
+                "SELECT COUNT(DISTINCT user_id) FROM analytics_events "
+                "WHERE event_type = 'challenge_completed' "
+                "OR (event_type = 'exercise_answer' AND metadata::text LIKE '%success%')"
+            )
+        )
+        converted = conversions.scalar() or 0
+
+        return {
+            "total_events": total_events,
+            "distinct_sessions": distinct_sessions,
+            "funnel": {
+                "registered": registered,
+                "activated": activated,
+                "retained_7d": retained_7d,
+                "converted": converted,
+            },
+            "conversion_rate": round((converted / activated * 100) if activated > 0 else 0, 1),
+            "activation_rate": round((activated / registered * 100) if registered > 0 else 0, 1),
+            "retention_rate_7d": round((retained_7d / activated * 100) if activated > 0 else 0, 1),
+        }
+    except Exception:
+        return {
+            "total_events": 0,
+            "distinct_sessions": 0,
+            "funnel": {"registered": 0, "activated": 0, "retained_7d": 0, "converted": 0},
+            "conversion_rate": 0,
+            "activation_rate": 0,
+            "retention_rate_7d": 0,
+        }
