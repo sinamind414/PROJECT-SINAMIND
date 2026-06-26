@@ -38,29 +38,39 @@ app.add_middleware(SlowAPIMiddleware)
 from routes import (
     annales,
     auth,
+    avatar,
+    # === Methodology Intelligence (Semaines 1-8) ===
+    bac_blanc_intelligent,
+    badges,
     chat,
     chatbot,
     cours,
+    diagnostic,
     dual_coding,
     evaluate,
     exercices,
     flashcards,
+    gamification,
     health,
     lexique,
+    methodology,
+    methodology_flashcards,
     mindmap,
+    mindmap_methodology,
+    mystery_box,
     payment,
+    phase1,
+    phase2,
+    phase3,
+    phase4,
+    phase5,
+    phase6,
     programme,
     progress,
     session,
     tuteur,
-    videos,
-    # === Methodology Intelligence (Semaines 1-8) ===
-    bac_blanc_intelligent,
-    diagnostic,
-    methodology,
-    methodology_flashcards,
-    mindmap_methodology,
     tutor,
+    videos,
 )
 
 routers = [
@@ -82,6 +92,23 @@ routers = [
     videos.router,
     annales.router,
     dual_coding.router,
+    # === Gamification (Phase 0) ===
+    gamification.router,
+    mystery_box.router,
+    avatar.router,
+    # === Phase 1 — One More Click Loop ===
+    phase1.router,
+    # === Phase 2 — Mystery Box + Social + Badges ===
+    phase2.router,
+    badges.router,
+    # === Phase 3 — Avatar Avancé + Live Stats ===
+    phase3.router,
+    # === Phase 4 — Méthodologie + Gamification ===
+    phase4.router,
+    # === Phase 5 — Social + Live Classroom ===
+    phase5.router,
+    # === Phase 6 — Analytics & Optimisation ===
+    phase6.router,
     # === Methodology Intelligence Routers (Semaines 1-8) ===
     bac_blanc_intelligent.router,
     diagnostic.router,

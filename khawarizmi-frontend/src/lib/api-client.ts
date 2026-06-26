@@ -540,6 +540,75 @@ class KhawarizmiApiClient {
     )
   }
 
+  // ── Gamification (Phase 0 + Phase 1) ──────────
+
+  async updateStreak() {
+    return this.request<{ current_streak: number; longest_streak: number; updated: boolean }>(
+      "/api/gamification/streak/update",
+      { method: "POST" }
+    )
+  }
+
+  async getStreak() {
+    return this.request<{ current_streak: number; longest_streak: number }>(
+      "/api/gamification/streak"
+    )
+  }
+
+  async addPoints(points: number) {
+    return this.request<{ total_points: number }>(
+      `/api/gamification/points/add?points=${points}`,
+      { method: "POST" }
+    )
+  }
+
+  async getAvatar() {
+    return this.request<{ user_id: number; level: number; xp: number }>(
+      "/api/avatar/"
+    )
+  }
+
+  async addAvatarXp(xp: number) {
+    return this.request<{ level: number; xp: number; leveled_up: boolean }>(
+      `/api/avatar/add-xp?xp=${xp}`,
+      { method: "POST" }
+    )
+  }
+
+  async openMysteryBox(boxId: string) {
+    return this.request<{ type: string; value: number; message: string }>(
+      "/api/mystery-box/open",
+      { method: "POST", body: JSON.stringify({ box_id: boxId }) }
+    )
+  }
+
+  async createMysteryBox(rarity: string) {
+    return this.request<{ id: string; rarity: string; opened: boolean }>(
+      `/api/mystery-box/create?rarity=${rarity}`,
+      { method: "POST" }
+    )
+  }
+
+  async getAvailableBoxes() {
+    return this.request<{ boxes: Array<{ id: string; rarity: string }> }>(
+      "/api/mystery-box/available"
+    )
+  }
+
+  async getNextActions(lastAction: string) {
+    return this.request<{ actions: Array<{ title: string; action: string; icon: string; points: number }> }>(
+      "/api/phase1/next-actions",
+      { method: "POST", body: JSON.stringify({ last_action: lastAction }) }
+    )
+  }
+
+  async updateCombo(success: boolean) {
+    return this.request<{ multiplier: number; points_earned: number; combo_count: number; message: string }>(
+      "/api/phase1/combo",
+      { method: "POST", body: JSON.stringify({ success }) }
+    )
+  }
+
   // ── Health Check ───────────────────────────────
 
   async healthCheck(): Promise<HealthCheck> {

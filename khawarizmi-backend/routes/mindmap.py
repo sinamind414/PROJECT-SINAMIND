@@ -13,6 +13,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from config import get_settings
 from deps import get_current_user, get_db, get_openai
+from services.mindmap_methodology_service import generate_methodological_mindmap
 from services.mindmap_service import (
     create_task,
     expand_node,
@@ -45,6 +46,30 @@ class ExpandNodeRequest(BaseModel):
 
 
 # ── Génération asynchrone (non-bloquante) ────────────────────────────────────
+
+
+class MethodologyMindMapRequest(BaseModel):
+    matiere: str = Field(..., min_length=2, max_length=50)
+    chapitre: str = Field(..., min_length=2, max_length=100)
+    filiere: str = Field(..., min_length=2, max_length=50)
+
+
+@router.post("/generate-methodological")
+async def generate_methodological_endpoint(
+    request: MethodologyMindMapRequest,
+    current_user: dict = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+    openai_client=Depends(get_openai),
+):
+    mindmap = await generate_methodological_mindmap(
+        matiere=request.matiere,
+        chapitre=request.chapitre,
+        filiere=request.filiere,
+        user_id=current_user["id"],
+        db=db,
+        openai_client=openai_client,
+    )
+    return mindmap
 
 
 @router.post("/generate")

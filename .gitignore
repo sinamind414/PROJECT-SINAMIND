@@ -35,8 +35,9 @@ dist/
 *.swp
 *.swo
 
-# Modèles IA lourds
+# Modèles IA lourds (fichiers binaires uniquement)
 khawarizmi-backend/models/*
+!khawarizmi-backend/models/**/*.py
 !khawarizmi-backend/models/minilm_onnx_int8/
 *.zip
 *.tar.gz
