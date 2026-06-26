@@ -121,9 +121,13 @@ export function ChatBubble() {
   }
 
   function handleCardClick(action: string) {
-    if (action && action !== "#") {
+    if (!action || action === "#") return
+    if (action.startsWith("/")) {
       router.push(action)
       setIsOpen(false)
+    } else {
+      setInput(action)
+      sendMessage()
     }
   }
 

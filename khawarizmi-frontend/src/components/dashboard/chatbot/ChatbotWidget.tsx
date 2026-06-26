@@ -29,9 +29,13 @@ export function ChatbotWidget() {
   } = useChatbot()
 
   function handleCardClick(action: string) {
-    if (action && action !== "#") {
+    if (!action || action === "#") return
+    if (action.startsWith("/")) {
       router.push(action)
       closeChat()
+    } else {
+      setInput(action)
+      sendMessage()
     }
   }
 
