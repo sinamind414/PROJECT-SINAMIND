@@ -35,8 +35,8 @@ export function SubjectChoiceCard({ subject, index, onChoose }: SubjectChoiceCar
 
       <div className="text-xs text-slate-400 space-y-1">
         <p>⏱ {subject.estimatedMinutes} دقيقة · {subject.exercises.length} تمارين</p>
-        <p>📄 {subject.exercises.reduce((a, e) => a + e.questions.length, 0)} questions</p>
-        <p>🎯 Verbes : {subject.linkedVerbs.join(" · ")}</p>
+        <p>📄 {subject.exercises.reduce((a, e) => a + e.questions.length, 0)} أسئلة</p>
+        <p>🎯 الأفعال: {subject.linkedVerbs.join(" · ")}</p>
       </div>
 
       <div className="flex flex-wrap gap-1.5">

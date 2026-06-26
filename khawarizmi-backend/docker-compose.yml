@@ -38,20 +38,20 @@ services:
   # ═══ BACKEND FASTAPI ════════════════════════════════
   backend:
     build:
-      context: .
-      dockerfile: Dockerfile
+      context: ..
+      dockerfile: khawarizmi-backend/Dockerfile
     container_name: khawarizmi_backend
     env_file:
       - .env
     environment:
-      DATA_DIR: "/app"
+      DATA_DIR: "/app/data"
       DATABASE_URL: "postgresql+asyncpg://${POSTGRES_USER:-khawarizmi_user}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-khawarizmi}"
       REDIS_URL: "redis://redis:6379/0"
     ports:
       - "8000:8000"
     volumes:
       - ./services:/app/services
-      - "C:/Users/zakaria/Documents/RESSOURCES_KHAWARIZMI/LIVRES SCOLAIRES:/app/data:ro"
+      - "C:/Users/zakaria/Documents/RESSOURCES_KHAWARIZMI/LIVRES SCOLAIRES:/app/ressources:ro"
     depends_on:
       db:
         condition: service_healthy

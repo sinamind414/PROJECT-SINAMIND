@@ -57,6 +57,9 @@ async def generate_methodological_mindmap(
         openai_client=openai_client,
     )
 
+    if base_mindmap.get("status") in ("no_context", "failed"):
+        return base_mindmap
+
     mindmap_data = base_mindmap.get("mindmap", {})
     enriched = await enrich_mindmap_with_methodology(mindmap_data)
 

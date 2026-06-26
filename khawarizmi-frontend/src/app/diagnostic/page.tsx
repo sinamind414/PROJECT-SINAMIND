@@ -228,7 +228,6 @@ export default function DiagnosticHubPage() {
                                 </span>
                               </div>
                               <h4 className="text-white font-bold text-sm leading-relaxed mb-1">{ch.chapterAr}</h4>
-                              <p className="text-gray-500 text-xs mb-2 line-clamp-1" dir="ltr">{ch.chapterFr}</p>
                               {ch.chapterType && (
                                 <span className={`px-2 py-0.5 rounded-full text-[10px] ${CHAPTER_TYPE_COLORS[ch.chapterType] || ""}`}>
                                   {ch.chapterType === "concept" ? "مفهوم" : ch.chapterType === "processus" ? "عملية" : ch.chapterType === "experience" ? "تجربة" : ch.chapterType === "rappel" ? "تذكير" : "تركيب"}

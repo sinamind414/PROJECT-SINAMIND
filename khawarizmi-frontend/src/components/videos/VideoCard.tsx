@@ -1,5 +1,6 @@
 "use client"
 
+import Image from "next/image"
 import { useState } from "react"
 
 interface Video {
@@ -33,10 +34,12 @@ export function VideoCard({ video }: { video: Video }) {
           />
         ) : (
           <>
-            <img
+            <Image
               src={thumbnailUrl}
               alt={video.titre}
-              className="w-full h-full object-cover"
+              fill
+              className="object-cover"
+              unoptimized
             />
             <button
               onClick={() => setIsPlaying(true)}

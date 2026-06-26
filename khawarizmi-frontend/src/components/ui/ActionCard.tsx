@@ -23,6 +23,7 @@ export function ActionCard({
     <Link
       href={href}
       className="glass-soft rounded-2xl p-5 transition-all duration-200 hover:-translate-y-0.5 block card-hover"
+      style={accent ? { boxShadow: `inset 0 0 0 1px ${accent}` } : undefined}
     >
       <h3 className="text-white font-bold text-base">{title}</h3>
       {subtitle && <p className="text-slate-500 text-xs mt-0.5">{subtitle}</p>}

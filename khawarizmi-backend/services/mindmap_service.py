@@ -488,7 +488,7 @@ async def generate_mindmap(
     logger.info(f"Generation du Mind Map via le modele {_model}...")
     try:
         response = await openai_client.chat.completions.create(
-            model=model,
+            model=_model,
             temperature=0.2,
             max_tokens=2000,
             timeout=25.0,

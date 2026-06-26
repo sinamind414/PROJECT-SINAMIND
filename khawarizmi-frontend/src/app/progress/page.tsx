@@ -127,7 +127,6 @@ export default function ProgressPage() {
             <div key={skill.code} className="grid grid-cols-[160px_1fr_80px] gap-4 items-center">
               <div>
                 <p className="text-white font-bold text-sm">{skill.labelAr}</p>
-                <p className="text-gray-500 text-xs" dir="ltr">{skill.labelFr}</p>
               </div>
               <div className="h-2.5 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.05)" }}>
                 <div className="h-full rounded-full" style={{ width: `${skill.level}%`, background: color(skill.level) }} />
@@ -149,7 +148,6 @@ export default function ProgressPage() {
               <div key={item.code} className="flex items-start justify-between gap-4 rounded-xl p-3" style={{ background: "rgba(255,255,255,0.02)" }}>
                 <div>
                   <p className="text-white font-bold text-sm">{index + 1}. {item.labelAr}</p>
-                  <p className="text-gray-500 text-xs" dir="ltr">{item.labelFr}</p>
                 </div>
                 <PillChip label={`${item.count} مرة`} color="#F87171" bg="rgba(248,113,113,0.1)" />
               </div>

@@ -92,8 +92,8 @@ export function Sidebar() {
             <span className="absolute -bottom-1 -left-1 bg-orange text-slate-deep text-[10px] font-black px-1.5 py-0.5 rounded-md border border-slate-deep">2026</span>
           </div>
           <div className="min-w-0">
-            <h2 className="font-extrabold text-lg leading-tight truncate text-white">{user?.nom || "أحمد Demo"}</h2>
-            <p className="text-xs text-mint-soft/80 font-semibold">BAC 2026 · {user?.filiere || "علوم الطبيعة والحياة"}</p>
+            <h2 className="font-extrabold text-lg leading-tight truncate text-white">{user?.nom || "طالب البكالوريا"}</h2>
+            <p className="text-xs text-mint-soft/80 font-semibold">بكالوريا 2026 · علوم تجريبية</p>
           </div>
         </div>
         <div className="flex items-center gap-2 mt-4 relative z-10">

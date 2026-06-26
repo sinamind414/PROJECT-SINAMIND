@@ -55,7 +55,7 @@ export default function ActionVerbsPage() {
         <main className="flex-1 p-6 lg:p-8 overflow-auto">
           <div className="max-w-6xl mx-auto space-y-6">
             <header className="rounded-3xl p-7 glass border border-mint/10">
-              <p className="text-white/70 text-sm mb-2">SINAMIND V1 · المنهجية أولا</p>
+              <p className="text-white/70 text-sm mb-2">سينامايند · المنهجية أولا</p>
               <h1 className="text-3xl font-bold text-white mb-2">الأفعال الأدائية</h1>
               <p className="text-white/80 max-w-2xl leading-relaxed">
                 كل فعل في سؤال البكالوريا يفرض طريقة إجابة. من لا يفرق بين حلّل وفسّر واستنتج يخسر نقاطا حتى لو كان يحفظ الدرس.

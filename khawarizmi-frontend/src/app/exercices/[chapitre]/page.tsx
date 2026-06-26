@@ -20,7 +20,7 @@ export default function ExercicesPage() {
     if (!chapitreTitle) return
     apiClient.getExercices(chapitreTitle)
       .then(setData)
-      .catch((e: Error) => setError(e.message || "Erreur de chargement"))
+      .catch((e: Error) => setError(e.message || "خطأ في التحميل"))
       .finally(() => setLoading(false))
   }, [chapitreTitle])
 

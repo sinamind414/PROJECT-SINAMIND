@@ -22,7 +22,7 @@ export default function LoginPage() {
       await login(email, password)
       router.push("/dashboard")
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Erreur de connexion"
+      const msg = err instanceof Error ? err.message : "تعذر تسجيل الدخول"
       setError(msg)
     } finally {
       setLoading(false)

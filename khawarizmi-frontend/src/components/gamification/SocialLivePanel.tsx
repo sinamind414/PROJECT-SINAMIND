@@ -116,7 +116,7 @@ export default function SocialLivePanel({ chapter = "proteines" }: { chapter?: s
       const result = await apiClient.challengeFriend("demo-friend");
       setChallengeMessage(result.message);
     } catch {
-      setChallengeMessage("Défi prêt, connexion live indisponible pour le moment.");
+      setChallengeMessage("التحدي جاهز، الاتصال المباشر غير متاح حالياً.");
     } finally {
       setSendingChallenge(false);
     }
@@ -126,9 +126,9 @@ export default function SocialLivePanel({ chapter = "proteines" }: { chapter?: s
     setActionMsg(null);
     try {
       const result = await apiClient.sendFriendRequestToUser(user.id);
-      setActionMsg(`Demande envoyée à ${user.name}`);
+      setActionMsg(`تم إرسال الطلب إلى ${user.name}`);
     } catch {
-      setActionMsg(`Erreur : impossible d'envoyer la demande à ${user.name}`);
+      setActionMsg(`خطأ: تعذر إرسال الطلب إلى ${user.name}`);
     }
     setTimeout(() => setActionMsg(null), 3000);
   }
@@ -137,9 +137,9 @@ export default function SocialLivePanel({ chapter = "proteines" }: { chapter?: s
     setActionMsg(null);
     try {
       const result = await apiClient.challengeUser(user.id);
-      setActionMsg(`Défi envoyé à ${user.name}`);
+      setActionMsg(`تم إرسال التحدي إلى ${user.name}`);
     } catch {
-      setActionMsg(`Erreur : impossible de défier ${user.name}`);
+      setActionMsg(`خطأ: تعذر تحدي ${user.name}`);
     }
     setTimeout(() => setActionMsg(null), 3000);
   }
@@ -157,25 +157,25 @@ export default function SocialLivePanel({ chapter = "proteines" }: { chapter?: s
 
       <div className="relative z-10 flex items-center justify-between gap-3">
         <div>
-          <p className="text-[11px] text-mint-soft/80 font-black tracking-wide">Phase 3 + Phase 5</p>
+          <p className="text-[11px] text-mint-soft/80 font-black tracking-wide">المرحلة 3 + المرحلة 5</p>
           <h2 className="text-xl font-black text-white mt-1 flex items-center gap-2">
-            <Radio className="w-5 h-5 text-mint" /> Live Classroom
+            <Radio className="w-5 h-5 text-mint" /> القسم المباشر
           </h2>
         </div>
         <div className="rounded-full bg-emerald-500/10 border border-emerald-400/20 px-3 py-1 text-[11px] text-emerald-300 font-bold">
-          {loading ? "sync..." : "live"}
+          {loading ? "مزامنة..." : "مباشر"}
         </div>
       </div>
 
       <div className="relative z-10 grid grid-cols-3 gap-2">
-        <LiveMetric icon={<Users className="w-4 h-4" />} label="actifs" value={phase3.active_users || phase5.active_students} />
-        <LiveMetric icon={<Activity className="w-4 h-4" />} label="réponses" value={phase5.questions_answered} />
-        <LiveMetric icon={<Trophy className="w-4 h-4" />} label="terminés" value={phase3.completed_today} />
+        <LiveMetric icon={<Users className="w-4 h-4" />} label="نشطون" value={phase3.active_users || phase5.active_students} />
+        <LiveMetric icon={<Activity className="w-4 h-4" />} label="إجابات" value={phase5.questions_answered} />
+        <LiveMetric icon={<Trophy className="w-4 h-4" />} label="مكتملون" value={phase3.completed_today} />
       </div>
 
       <div className="relative z-10 rounded-2xl bg-white/[0.035] border border-white/[0.08] p-4">
         <div className="flex items-center justify-between mb-3">
-          <p className="text-white font-black text-sm">Top 3 du jour</p>
+          <p className="text-white font-black text-sm">أفضل 3 اليوم</p>
           <Trophy className="w-4 h-4 text-orange" />
         </div>
         <div className="space-y-2">
@@ -186,13 +186,13 @@ export default function SocialLivePanel({ chapter = "proteines" }: { chapter?: s
               <span className="text-xs text-mint font-black tnum">{player.score}</span>
             </div>
           )) : (
-            <p className="text-xs text-slate-500">Aucun classement live pour le moment.</p>
+            <p className="text-xs text-slate-500">لا يوجد تصنيف مباشر حالياً.</p>
           )}
         </div>
       </div>
 
       <div className="relative z-10 rounded-2xl bg-white/[0.035] border border-white/[0.08] p-4">
-        <p className="text-white font-black text-sm mb-3">Activité des amis</p>
+        <p className="text-white font-black text-sm mb-3">نشاط الأصدقاء</p>
         <div className="space-y-2">
           {activities.length ? activities.map((activity, index) => (
             <div key={`${activity.name}-${activity.time}-${index}`} className="rounded-xl bg-white/[0.03] px-3 py-2">
@@ -206,13 +206,13 @@ export default function SocialLivePanel({ chapter = "proteines" }: { chapter?: s
               <p className="text-[10px] text-mint-soft/70 mt-1">{activity.time}</p>
             </div>
           )) : (
-            <p className="text-xs text-slate-500">Aucune activité récente.</p>
+            <p className="text-xs text-slate-500">لا يوجد نشاط حديث.</p>
           )}
         </div>
       </div>
 
       <div className="relative z-10 rounded-2xl bg-white/[0.035] border border-white/[0.08] p-4">
-        <p className="text-white font-black text-sm mb-3">Trouver un ami</p>
+        <p className="text-white font-black text-sm mb-3">ابحث عن صديق</p>
         <div className="relative">
           <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
           <input
@@ -220,11 +220,11 @@ export default function SocialLivePanel({ chapter = "proteines" }: { chapter?: s
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Rechercher par nom ou email..."
+            placeholder="بحث بالاسم أو البريد..."
             className="w-full rounded-xl bg-white/[0.05] border border-white/[0.1] text-white text-sm px-3 py-2.5 pr-10 placeholder:text-slate-500 focus:outline-none focus:border-mint/50"
           />
         </div>
-        {searching && <p className="text-xs text-slate-400 mt-2">Recherche en cours...</p>}
+        {searching && <p className="text-xs text-slate-400 mt-2">جاري البحث...</p>}
         {searchResults.length > 0 && (
           <div className="mt-2 space-y-1 max-h-40 overflow-y-auto">
             {searchResults.map((user) => (
@@ -236,14 +236,14 @@ export default function SocialLivePanel({ chapter = "proteines" }: { chapter?: s
                 <button
                   onClick={() => handleAddFriend(user)}
                   className="rounded-lg bg-mint/15 text-mint p-1.5 hover:bg-mint/25 transition"
-                  title="Ajouter en ami"
+                  title="إضافة كصديق"
                 >
                   <UserPlus className="w-3.5 h-3.5" />
                 </button>
                 <button
                   onClick={() => handleChallengeUser(user)}
                   className="rounded-lg bg-orange/15 text-orange p-1.5 hover:bg-orange/25 transition"
-                  title="Défier"
+                  title="تحدي"
                 >
                   <Zap className="w-3.5 h-3.5" />
                 </button>
@@ -266,7 +266,7 @@ export default function SocialLivePanel({ chapter = "proteines" }: { chapter?: s
           className="w-full rounded-2xl bg-mint text-slate-deep font-black py-3 flex items-center justify-center gap-2 hover:bg-mint-soft transition disabled:opacity-60"
         >
           <Send className="w-4 h-4" />
-          {sendingChallenge ? "Envoi..." : "Défier un ami"}
+          {sendingChallenge ? "جاري الإرسال..." : "تحدي صديق"}
         </button>
         {challengeMessage && (
           <p className="mt-2 rounded-xl bg-mint/10 border border-mint/20 px-3 py-2 text-xs text-mint-soft font-bold">

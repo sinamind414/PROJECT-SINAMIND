@@ -98,12 +98,12 @@ const STREAK_KEY = "sinamind.streak.count"
 const LAST_VISIT_KEY = "sinamind.streak.lastVisit"
 
 const LEVELS = [
-  { level: 1, titleAr: "مبتدئ — Observateur", xp: 0 },
-  { level: 2, titleAr: "متدرب — Apprenti méthodologue", xp: 500 },
-  { level: 3, titleAr: "محلل — Analyste", xp: 1200 },
-  { level: 4, titleAr: "باحث — Chercheur", xp: 2400 },
-  { level: 5, titleAr: "خبير — Expert Manhadjiya", xp: 4200 },
-  { level: 6, titleAr: "أستاذ — Maître de la méthode", xp: 7000 },
+  { level: 1, titleAr: "مبتدئ", xp: 0 },
+  { level: 2, titleAr: "متدرب في المنهجية", xp: 500 },
+  { level: 3, titleAr: "محلل", xp: 1200 },
+  { level: 4, titleAr: "باحث", xp: 2400 },
+  { level: 5, titleAr: "خبير منهجية", xp: 4200 },
+  { level: 6, titleAr: "أستاذ المنهجية", xp: 7000 },
 ]
 
 const BADGE_CATALOG: Record<string, Omit<Badge, "earnedAt">> = {

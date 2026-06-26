@@ -20,7 +20,6 @@ export function ActiveLessonHero({ lesson }: { lesson: ActiveLesson }) {
         <span className="text-white/50 text-xs">{lesson.unitAr}</span>
       </div>
       <h1 className="text-3xl font-bold text-white mb-2">{lesson.chapterAr}</h1>
-      <p className="text-white/50 text-sm mb-3" dir="ltr">{lesson.chapterFr}</p>
       <div className="flex flex-wrap items-center gap-3">
         <span className={`px-3 py-1 rounded-full text-xs font-bold border ${badge.color}`}>{badge.label}</span>
         {lesson.chapterType && (

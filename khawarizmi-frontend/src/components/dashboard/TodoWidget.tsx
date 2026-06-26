@@ -35,8 +35,8 @@ export function TodoWidget() {
             detail: card.chapitre || "مراجعة",
             subject: "علم الأحياء",
             date: card.due_date
-              ? new Date(card.due_date).toLocaleDateString("fr-FR", { day: "numeric", month: "short" })
-              : "aujourd'hui",
+              ? new Date(card.due_date).toLocaleDateString("ar-DZ", { day: "numeric", month: "short" })
+              : "اليوم",
             done: false,
             cardId: card.id,
           })))

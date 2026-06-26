@@ -149,6 +149,11 @@ export interface MindMap {
   }
 }
 
+export type MindMapGenerateResponse =
+  | { status: "success"; mindmap: MindMap; flashcards_generees: Flashcard[]; source_rag: string; cached?: boolean; mindmap_id?: string }
+  | { status: "pending"; task_id: string; message: string }
+  | { status: "no_context"; message: string }
+
 export interface MindMapGeneratePayload {
   matiere: string
   chapitre: string
@@ -767,6 +772,12 @@ export interface ChatCard {
   bouton: string
 }
 
+export interface ChatSource {
+  source: string
+  chapter?: string
+  excerpt: string
+}
+
 export interface TuteurRequest {
   message: string
   context?: ChatContext
@@ -780,6 +791,7 @@ export interface TuteurResponse {
   flashcards_suggerees: string[]
   redirect?: string
   source_rag?: string
+  sources?: ChatSource[]
   fallback_active: boolean
 }
 

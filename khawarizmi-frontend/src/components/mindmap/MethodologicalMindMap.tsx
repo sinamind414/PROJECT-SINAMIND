@@ -46,7 +46,7 @@ export default function MethodologicalMindMap({ mindmap, onNodeClick }: Methodol
     return (
       <div key={node.id} className="ml-4">
         <div
-          className={`flex items-center gap-2 p-2 rounded-lg hover:bg-slate-80 cursor-pointer ${depth === 0 ? "font-bold" : ""}`}
+          className={`flex items-center gap-2 p-2 rounded-lg hover:bg-slate-800 cursor-pointer ${depth === 0 ? "font-bold" : ""}`}
           onClick={() => {
             if (hasChildren) toggleNode(node.id);
             onNodeClick?.(node);
@@ -79,10 +79,10 @@ export default function MethodologicalMindMap({ mindmap, onNodeClick }: Methodol
   return (
     <div className="bg-slate-900 rounded-2xl p-6">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="font-bold text-xl">Mind Map Méthodologique</h3>
+        <h3 className="font-bold text-xl">الخريطة المنهجية</h3>
         {mindmap.methodology?.verbes_detectes && (
           <div className="text-sm text-indigo-400">
-            {mindmap.methodology.verbes_detectes.length} verbes détectés
+            {mindmap.methodology.verbes_detectes.length} أفعال مكتشفة
           </div>
         )}
       </div>

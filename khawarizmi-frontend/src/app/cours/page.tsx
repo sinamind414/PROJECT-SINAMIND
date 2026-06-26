@@ -18,6 +18,13 @@ const DOMAIN_EMOJIS: Record<number, string> = {
   3: "🌍",
 }
 
+const VERB_LABELS: Record<string, string> = {
+  analyse: "حلّل", interpret: "فسّر", deduce: "استنتج", justify: "علّل",
+  hypothesis: "فرضية", "validate-hypothesis": "تحقق", discuss: "ناقش",
+  "scientific-text": "نص علمي", compare: "قارن", relationship: "حدد العلاقة",
+  define: "عرّف", name: "سمّ", cite: "اذكر", validate: "تحقق",
+}
+
 function getDomainOrder(domainAr: string): number {
   if (domainAr.includes("التخصص")) return 1
   if (domainAr.includes("تحويل")) return 2
@@ -94,7 +101,7 @@ export default function CoursHubPage() {
                   <div className="flex items-center gap-3 mb-4">
                     <span className="text-2xl">{emoji}</span>
                     <h2 className="text-2xl font-bold text-white">{domain.domainAr}</h2>
-                    <span className="text-gray-500 text-sm hidden lg:inline" dir="ltr">/ {domain.domainFr}</span>
+
                   </div>
 
                   <div className="space-y-5">
@@ -127,10 +134,9 @@ export default function CoursHubPage() {
                                     </span>
                                   </div>
                                   <h4 className="text-white font-bold text-sm leading-relaxed mb-1">{lesson.chapterAr}</h4>
-                                  <p className="text-gray-500 text-xs mb-2 line-clamp-1" dir="ltr">{lesson.chapterFr}</p>
                                   <div className="flex flex-wrap gap-1 mt-2">
                                     {lesson.linkedVerbs.slice(0, 3).map((v) => (
-                                      <span key={v} className="px-1.5 py-0.5 rounded-md bg-mint/10 text-mint text-[10px]">{v}</span>
+                                      <span key={v} className="px-1.5 py-0.5 rounded-md bg-mint/10 text-mint text-[10px]">{VERB_LABELS[v] || v}</span>
                                     ))}
                                   </div>
                                   <div className="mt-2 text-xs text-mint font-bold">

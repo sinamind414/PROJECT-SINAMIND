@@ -19,14 +19,10 @@ export default function RootLayout({
       dir="rtl"
       className="h-full antialiased"
       style={{ fontFamily: "'Cairo', 'Tajawal', sans-serif" }}
+      suppressHydrationWarning
     >
-      <head>
-        <link
-          href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Tajawal:wght@400;500;700;800&display=swap"
-          rel="stylesheet"
-        />
-      </head>
-      <body className="min-h-full flex flex-col">
+
+      <body className="min-h-full flex flex-col" suppressHydrationWarning>
         <Providers>{children}</Providers>
       </body>
     </html>

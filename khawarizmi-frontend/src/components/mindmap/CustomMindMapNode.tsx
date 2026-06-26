@@ -2,14 +2,17 @@ import { Handle, Position } from "@xyflow/react"
 import { MindMapNode, TYPE_EMOJI, MAITRISE_COLORS } from "@/lib/types"
 import { UI_AR, trAr } from "@/lib/translations"
 
+export type NodeAction = "quiz" | "flashcard" | "ask" | "mastery_up" | "mastery_down"
+
 interface CustomMindMapNodeProps {
   data: {
     node: MindMapNode
+    onAction?: (action: NodeAction, node: MindMapNode) => void
   }
 }
 
 export function CustomMindMapNode({ data }: CustomMindMapNodeProps) {
-  const { node } = data
+  const { node, onAction } = data
 
   if (!node) return null
 
@@ -17,6 +20,19 @@ export function CustomMindMapNode({ data }: CustomMindMapNodeProps) {
   const masteryColor = MAITRISE_COLORS[node.maitrise_eleve] || "#64748b"
   const masteryLabels = [UI_AR.non, UI_AR.en_cours, UI_AR.maitrisee]
   const masteryLabel = masteryLabels[node.maitrise_eleve] || UI_AR.non
+
+  const actions: { icon: string; action: NodeAction; color: string; title: string }[] = [
+    { icon: "⚡", action: "quiz", color: "#8B5CF6", title: "اختبار سريع" },
+    { icon: "🎴", action: "flashcard", color: "#F59E0B", title: "بطاقة مراجعة" },
+    { icon: "🤖", action: "ask", color: "#3B82F6", title: "اسأل الخوارزمي" },
+    { icon: "✅", action: "mastery_up", color: "#10B981", title: "أتقن" },
+    { icon: "❌", action: "mastery_down", color: "#EF4444", title: "أتعثر" },
+  ]
+
+  const handleAction = (e: React.MouseEvent, act: NodeAction) => {
+    e.stopPropagation()
+    onAction?.(act, node)
+  }
 
   return (
     <div
@@ -68,6 +84,25 @@ export function CustomMindMapNode({ data }: CustomMindMapNodeProps) {
             {masteryLabel}
           </span>
         </div>
+
+        {/* Gen Z action buttons */}
+        {onAction && (
+          <div className="flex items-center justify-center gap-1 pt-1 border-t border-slate-800/60">
+            {actions.map((a) => (
+              <button
+                key={a.action}
+                className="nodrag nopan w-7 h-7 flex items-center justify-center rounded-lg
+                           bg-slate-800/50 hover:bg-slate-700/80 text-sm transition-all
+                           cursor-pointer hover:scale-110"
+                style={{ color: a.color }}
+                title={a.title}
+                onClick={(e) => handleAction(e, a.action)}
+              >
+                {a.icon}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       {node.enfants && node.enfants.length > 0 && (

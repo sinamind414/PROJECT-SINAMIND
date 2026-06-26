@@ -14,6 +14,8 @@ import {
   HealthCheck,
   MindMap,
   MindMapGeneratePayload,
+  MindMapGenerateResponse,
+  MindMapTaskStatus,
   Rating,
   RegisterPayload,
   User,
@@ -37,7 +39,14 @@ import {
   CheckAnswerResponse,
 } from "./types"
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || ""
+// Toujours utiliser des paths relatifs — le proxy Next.js (/api/:path*)
+// dans next.config.ts forwards vers le backend Railway.
+// Évite les erreurs CORS cross-origin.
+const API_BASE_URL = ""
+
+type ApiRequestOptions = RequestInit & {
+  skipAuthRedirect?: boolean
+}
 
 // ── Classe Client API ──────────────────────────────
 
@@ -61,23 +70,28 @@ class KhawarizmiApiClient {
 
   async request<T>(
     endpoint: string,
-    options: RequestInit = {}
+    options: ApiRequestOptions = {}
   ): Promise<T> {
+    const { skipAuthRedirect, ...fetchOptions } = options
+
     const headers: HeadersInit = {
       "Content-Type": "application/json",
-      ...options.headers
+      ...fetchOptions.headers
     }
 
     const response = await fetch(
       `${API_BASE_URL}${endpoint}`,
-      { ...options, headers, credentials: "include" }
+      { ...fetchOptions, headers, credentials: "include" }
     )
 
-    // Token expiré → déconnexion
+    // Token expiré → déconnexion (sauf si skip ou déjà sur auth)
     if (response.status === 401) {
       this.clearToken()
-      if (typeof window !== "undefined") {
-        window.location.href = "/auth/login"
+      if (typeof window !== "undefined" && !skipAuthRedirect) {
+        const currentPath = window.location.pathname
+        if (!currentPath.startsWith("/auth/")) {
+          window.location.href = "/auth/login"
+        }
       }
       throw new Error(UI_AR.session_expiree)
     }
@@ -142,7 +156,7 @@ class KhawarizmiApiClient {
       filiere?: string
       plan?: "free" | "premium"
     }
-    const rawUser = await this.request<BackendUser>("/api/auth/me")
+    const rawUser = await this.request<BackendUser>("/api/auth/me", { skipAuthRedirect: true })
     return {
       id: String(rawUser.id),
       email: rawUser.email,
@@ -171,16 +185,58 @@ class KhawarizmiApiClient {
   // ── Mind Map ───────────────────────────────────
 
   async generateMindMap(payload: MindMapGeneratePayload) {
-    return this.request<{
-      status: string
-      mindmap: MindMap
-      flashcards_generees: Flashcard[]
-      source_rag: string
-      message?: string
-    }>("/api/mindmap/generate", {
+    return this.request<MindMapGenerateResponse>("/api/mindmap/generate", {
       method: "POST",
       body: JSON.stringify(payload)
     })
+  }
+
+  async getMindMapTaskStatus(taskId: string) {
+    return this.request<MindMapTaskStatus>(`/api/mindmap/task/${taskId}`)
+  }
+
+  async generateMindMapAndWait(
+    payload: MindMapGeneratePayload,
+    onProgress?: (progress: string) => void
+  ): Promise<{ status: string; mindmap: MindMap; flashcards_generees: Flashcard[]; source_rag: string }> {
+    const initial = await this.generateMindMap(payload)
+
+    if (initial.status === "no_context") {
+      throw new Error((initial as { status: "no_context"; message: string }).message || "Aucun contexte trouvé")
+    }
+
+    if (initial.status !== "pending") {
+      return initial as { status: string; mindmap: MindMap; flashcards_generees: Flashcard[]; source_rag: string }
+    }
+
+    const taskId = (initial as { status: "pending"; task_id: string }).task_id
+    const maxAttempts = 60
+    const pollInterval = 2000
+
+    for (let i = 0; i < maxAttempts; i++) {
+      const taskStatus = await this.getMindMapTaskStatus(taskId)
+
+      if (taskStatus.status === "completed" && taskStatus.mindmap) {
+        return {
+          status: "success",
+          mindmap: taskStatus.mindmap,
+          flashcards_generees: [],
+          source_rag: taskStatus.mindmap.metadata?.source_rag || ""
+        }
+      }
+
+      if (taskStatus.status === "failed") {
+        throw new Error(taskStatus.error || "Échec de la génération du Mind Map")
+      }
+
+      if (taskStatus.progress && onProgress) {
+        onProgress(taskStatus.progress)
+      }
+
+      await new Promise(resolve => setTimeout(resolve, pollInterval))
+    }
+
+    throw new Error("Délai de génération du Mind Map dépassé")
   }
 
   async getMindMap(mindmapId: string): Promise<MindMap> {
@@ -378,16 +434,24 @@ class KhawarizmiApiClient {
     try {
       const data = await this.request<{
         response: string; lang: string; tokens_utilises?: number; from_cache?: boolean
+        fallback_active?: boolean
+        cartes?: Array<{ titre: string; raison: string; action: string; bouton: string }>
+        sources?: Array<{ source: string; chapter?: string; excerpt: string }>
+        source_rag?: string
+        type?: string
       }>("/api/chatbot/ask", {
         method: "POST",
         body: JSON.stringify(chatbotPayload),
       })
+      const d = data as Record<string, unknown>
       return {
-        reponse: data.response,
-        type: "socratique",
-        cartes: [],
-        flashcards_suggerees: [],
-        fallback_active: false,
+        reponse: (d.response as string) || (d.reponse as string) || "لم تصلني إجابة واضحة. أعد المحاولة من فضلك.",
+        type: ((d.type as TuteurResponse["type"]) || "socratique") as TuteurResponse["type"],
+        cartes: (d.cartes as TuteurResponse["cartes"]) || [],
+        flashcards_suggerees: (d.flashcards_suggerees as string[]) || [],
+        sources: (d.sources as TuteurResponse["sources"]) || [],
+        source_rag: d.source_rag as string | undefined,
+        fallback_active: Boolean(d.fallback_active),
       }
     } catch {
       throw new Error("Chatbot indisponible")
@@ -400,6 +464,73 @@ class KhawarizmiApiClient {
     mode?: "quick" | "tutor"
   }): Promise<TuteurResponse> {
     return this.sendTuteurMessage({ message: payload.message, context: payload.context })
+  }
+
+  async getChatbotState(): Promise<{
+    status: string
+    memory?: { last_topic?: string; last_chapter?: string; preferred_mode?: string; total_messages?: number; last_interaction_at?: string }
+    socratic_streak?: { current_streak: number; longest_streak: number; last_interaction_at?: string }
+    weak_concepts?: Array<{ concept: string; chapter?: string; weakness_score: number; occurrences: number }>
+    daily_mission?: { id?: number; mission_type: string; mission_data?: Record<string, unknown>; completed: boolean }
+  }> {
+    return this.request("/api/chatbot/state")
+  }
+
+  async sendChatbotFeedback(feedback: string, chapitre?: string): Promise<{ status: string }> {
+    return this.request("/api/chatbot/feedback", {
+      method: "POST",
+      body: JSON.stringify({ feedback, chapitre }),
+    })
+  }
+
+  async completeChatbotDailyMission(missionId: number): Promise<{ status: string; mission_id: number; completed: boolean }> {
+    return this.request("/api/chatbot/daily-mission/complete", {
+      method: "POST",
+      body: JSON.stringify({ mission_id: missionId }),
+    })
+  }
+
+  async detectChatbotConfusion(text: string, feedbackType?: string): Promise<{
+    concept: string; confusion_type: string; strategy: string; scores: Record<string, number>
+  }> {
+    return this.request("/api/chatbot/confusion/detect", {
+      method: "POST",
+      body: JSON.stringify({ text, feedback_type: feedbackType || "confused" }),
+    })
+  }
+
+  async explainBack(concept: string, answer: string): Promise<{
+    clarity_score: number; scientific_terms_score: number; structure_score: number
+    total_score: number; feedback: string
+  }> {
+    return this.request("/api/chatbot/explain-back", {
+      method: "POST",
+      body: JSON.stringify({ concept, answer }),
+    })
+  }
+
+  async startBossFight(chapter: string): Promise<{
+    boss_fight_id: string; chapter: string; status: string; questions: Array<Record<string, unknown>>
+  }> {
+    return this.request("/api/chatbot/boss-fight/start", {
+      method: "POST",
+      body: JSON.stringify({ chapter }),
+    })
+  }
+
+  async submitBossFight(bossFightId: string, answers: Record<string, string>): Promise<{
+    status: string; score: number; passed: boolean; details: Array<Record<string, unknown>>
+  }> {
+    return this.request(`/api/chatbot/boss-fight/${bossFightId}/submit`, {
+      method: "POST",
+      body: JSON.stringify({ answers }),
+    })
+  }
+
+  async openChatbotMysteryBox(): Promise<{
+    rarity: string; reward_type: string; reward_value: number; reward_data: Record<string, unknown>
+  }> {
+    return this.request("/api/chatbot/mystery-box/open", { method: "POST" })
   }
 
   // ── Bac Blanc ─────────────────────────────────

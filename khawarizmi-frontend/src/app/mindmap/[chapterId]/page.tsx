@@ -30,7 +30,16 @@ import {
   Programme,
   MAITRISE_COLORS
 } from "@/lib/types"
-import CustomMindMapNode from "@/components/mindmap/CustomMindMapNode"
+import CustomMindMapNode, { type NodeAction } from "@/components/mindmap/CustomMindMapNode"
+
+const PROGRESS_LABELS: Record<string, string> = {
+  init: "جاري التهيئة...",
+  rag: "البحث في الدروس...",
+  llm: "التوليد بالذكاء الاصطناعي...",
+  save: "جاري الحفظ...",
+  flashcards: "إنشاء البطاقات...",
+  done: "تم !"
+}
 
 // Define custom node types for React Flow
 const nodeTypes = {
@@ -43,7 +52,8 @@ function layoutTree(
   x = 0,
   yStart = 0,
   spacingX = 320,
-  spacingY = 110
+  spacingY = 110,
+  onAction?: (action: NodeAction, node: MindMapNode) => void
 ): { nodes: Node[]; edges: Edge[]; nextY: number } {
   const nodes: Node[] = []
   const edges: Edge[] = []
@@ -51,10 +61,10 @@ function layoutTree(
 
   if (children.length > 0) {
     let currentY = yStart
-    
+
     // Layout all children first
     for (const child of children) {
-      const result = layoutTree(child, x + spacingX, currentY, spacingX, spacingY)
+      const result = layoutTree(child, x + spacingX, currentY, spacingX, spacingY, onAction)
       nodes.push(...result.nodes)
       edges.push(...result.edges)
 
@@ -82,7 +92,7 @@ function layoutTree(
       id: node.id,
       type: "mindMapNode",
       position: { x, y: parentY },
-      data: { node }
+      data: { node, onAction }
     })
 
     return { nodes, edges, nextY: currentY }
@@ -92,7 +102,7 @@ function layoutTree(
       id: node.id,
       type: "mindMapNode",
       position: { x, y: yStart },
-      data: { node }
+      data: { node, onAction }
     })
     return { nodes, edges, nextY: yStart + spacingY }
   }
@@ -145,14 +155,116 @@ function MindMapContent() {
   const [loading, setLoading] = useState(true)
   const [generating, setGenerating] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  
+  const [progress, setProgress] = useState<string>("init")
+
   const [chapter, setChapter] = useState<Chapter | null>(null)
   const [mindmap, setMindmap] = useState<MindMapType | null>(null)
   const [selectedNode, setSelectedNode] = useState<MindMapNode | null>(null)
-  
+  const [activeAction, setActiveAction] = useState<{ type: NodeAction; result?: string; loading: boolean; feedback?: string } | null>(null)
+
   // React Flow state
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([])
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([])
+
+  const pollTask = useCallback(async (taskId: string): Promise<MindMapType> => {
+    const maxAttempts = 60
+    for (let i = 0; i < maxAttempts; i++) {
+      const task = await apiClient.getMindMapTaskStatus(taskId)
+      setProgress(task.progress || "running")
+      if (task.status === "completed" && task.mindmap) {
+        return task.mindmap
+      }
+      if (task.status === "failed") {
+        throw new Error(task.error || "تعذر إنشاء الخريطة الذهنية")
+      }
+      await new Promise(r => setTimeout(r, 2000))
+    }
+    throw new Error("انتهت مهلة الانتظار للخريطة الذهنية")
+  }, [])
+
+  // Handle node selection click on the canvas
+  const handleNodeClick = (_event: React.MouseEvent, node: Node) => {
+    const rawNode = node.data?.node as MindMapNode
+    if (rawNode) {
+      setSelectedNode(rawNode)
+    }
+  }
+
+  // Reset active action when selected node changes
+  useEffect(() => {
+    setActiveAction(null)
+  }, [selectedNode?.id])
+
+  // Update mastery level of the selected node (standalone, no callback)
+  const handleUpdateMaitrise = useCallback(async (newMaitrise: 0 | 1 | 2) => {
+    if (!mindmap || !selectedNode) return
+
+    try {
+      await apiClient.updateNodeMaitrise(selectedNode.id, newMaitrise)
+
+      const updatedTree = { ...mindmap.racine }
+      updateNodeInTree(updatedTree, selectedNode.id, newMaitrise)
+
+      setSelectedNode((prev) => prev ? { ...prev, maitrise_eleve: newMaitrise } : null)
+
+      const updatedMindmap = { ...mindmap, racine: updatedTree }
+      setMindmap(updatedMindmap)
+
+      const layout = layoutTree(updatedTree)
+      const transversalEdges: Edge[] = (updatedMindmap.liens_transversaux || []).map((link, idx) => ({
+        id: `transversal-${idx}`,
+        source: link.source,
+        target: link.target,
+        label: link.relation,
+        type: "bezier",
+        animated: true,
+        style: { stroke: "#e2e8f0", strokeWidth: 1.5, strokeDasharray: "4 4" },
+        labelStyle: { fill: "#94a3b8", fontSize: 9, fontWeight: 500 }
+      }))
+      setNodes(layout.nodes)
+      setEdges([...layout.edges, ...transversalEdges])
+
+    } catch {
+      alert(UI_AR.erreur_mise_a_jour_maitrise)
+    }
+  }, [mindmap, selectedNode, setNodes, setEdges])
+
+  // Handle Gen Z actions from node buttons
+  const handleNodeAction = useCallback(async (action: NodeAction, node: MindMapNode) => {
+    if (action === "mastery_up") {
+      await handleUpdateMaitrise(2)
+      setActiveAction({ type: "mastery_up", feedback: "+25 نقطة · تم تثبيت العقدة ✅", loading: false })
+      return
+    }
+    if (action === "mastery_down") {
+      await handleUpdateMaitrise(0)
+      setActiveAction({ type: "mastery_down", feedback: "أُضيف إلى نقاط الضعف ❌", loading: false })
+      return
+    }
+    if (action === "quiz") {
+      setActiveAction({ type: "quiz", loading: false })
+      return
+    }
+    if (action === "flashcard") {
+      setActiveAction({ type: "flashcard", loading: false })
+      return
+    }
+    if (action === "ask") {
+      setActiveAction({ type: "ask", loading: true, result: "" })
+      try {
+        const res = await apiClient.sendTuteurMessage({
+          message: `Explique-moi simplement le concept "${node.label}" dans le contexte SVT. Importance: ${node.importance}.`,
+          context: {
+            page_source: "/mindmap",
+            chapitre: chapter?.titre_fr
+          }
+        })
+        setActiveAction({ type: "ask", loading: false, result: res.reponse })
+      } catch {
+        setActiveAction({ type: "ask", loading: false, result: "تعذر الاتصال بالخوارزمي." })
+      }
+    }
+  }, [chapter, handleUpdateMaitrise])
 
   // Load chapter information and the mindmap
   const loadChapterAndMindmap = useCallback(async () => {
@@ -183,6 +295,7 @@ function MindMapContent() {
 
       // 2. Request/Generate mindmap for this chapter
       setGenerating(true)
+      setProgress("init")
       const res = await apiClient.generateMindMap({
         matiere,
         filiere,
@@ -194,13 +307,24 @@ function MindMapContent() {
         throw new Error(res.message || UI_AR.aucun_contenu_mindmap)
       }
 
-      setMindmap(res.mindmap)
-      
+      let mindmapData: MindMapType
+      if (res.status === "pending") {
+        mindmapData = await pollTask(res.task_id)
+      } else {
+        mindmapData = res.mindmap
+      }
+
+      if (!mindmapData || !mindmapData.racine) {
+        throw new Error("بنية الخريطة الذهنية غير صالحة")
+      }
+
+      setMindmap(mindmapData)
+
       // Compute positions and load React Flow structures
-      const layout = layoutTree(res.mindmap.racine)
-      
+      const layout = layoutTree(mindmapData.racine, 0, 0, 320, 110, handleNodeAction)
+
       // Connect transversal semantic links
-      const transversalEdges: Edge[] = (res.mindmap.liens_transversaux || []).map((link, idx) => ({
+      const transversalEdges: Edge[] = (mindmapData.liens_transversaux || []).map((link, idx) => ({
         id: `transversal-${idx}`,
         source: link.source,
         target: link.target,
@@ -215,7 +339,7 @@ function MindMapContent() {
       setEdges([...layout.edges, ...transversalEdges])
 
       // Auto select root node
-      setSelectedNode(res.mindmap.racine)
+      setSelectedNode(mindmapData.racine)
 
     } catch {
       setError(UI_AR.erreur_chargement_mindmap)
@@ -223,60 +347,13 @@ function MindMapContent() {
       setLoading(false)
       setGenerating(false)
     }
-  }, [user, chapterId, setEdges, setNodes])
+  }, [user, chapterId, setEdges, setNodes, pollTask, handleNodeAction])
 
   useEffect(() => {
     if (user && chapterId) {
       void loadChapterAndMindmap()
     }
   }, [user, chapterId, loadChapterAndMindmap])
-
-  // Handle node selection click on the canvas
-  const handleNodeClick = (_event: React.MouseEvent, node: Node) => {
-    const rawNode = node.data?.node as MindMapNode
-    if (rawNode) {
-      setSelectedNode(rawNode)
-    }
-  }
-
-  // Update mastery level of the selected node
-  const handleUpdateMaitrise = async (newMaitrise: 0 | 1 | 2) => {
-    if (!mindmap || !selectedNode) return
-
-    try {
-      // Update backend
-      await apiClient.updateNodeMaitrise(selectedNode.id, newMaitrise)
-
-      // Recursively update locally in the tree
-      const updatedTree = { ...mindmap.racine }
-      updateNodeInTree(updatedTree, selectedNode.id, newMaitrise)
-      
-      // Update selected node state locally
-      setSelectedNode((prev) => prev ? { ...prev, maitrise_eleve: newMaitrise } : null)
-
-      // Refresh overall mindmap root state
-      const updatedMindmap = { ...mindmap, racine: updatedTree }
-      setMindmap(updatedMindmap)
-
-      // Re-layout and push to React Flow state
-      const layout = layoutTree(updatedTree)
-      const transversalEdges: Edge[] = (updatedMindmap.liens_transversaux || []).map((link, idx) => ({
-        id: `transversal-${idx}`,
-        source: link.source,
-        target: link.target,
-        label: link.relation,
-        type: "bezier",
-        animated: true,
-        style: { stroke: "#e2e8f0", strokeWidth: 1.5, strokeDasharray: "4 4" },
-        labelStyle: { fill: "#94a3b8", fontSize: 9, fontWeight: 500 }
-      }))
-      setNodes(layout.nodes)
-      setEdges([...layout.edges, ...transversalEdges])
-
-    } catch {
-      alert(UI_AR.erreur_mise_a_jour_maitrise)
-    }
-  }
 
   const importanceLabels: Record<string, string> = {
     critique: UI_AR.critique,
@@ -311,6 +388,14 @@ function MindMapContent() {
         <p className="text-slate-400 text-sm font-medium">
           {generating ? UI_AR.generation_mindmap_ia : UI_AR.chargement}
         </p>
+        {generating && (
+          <div className="flex items-center gap-2 mt-2">
+            <span className="w-2 h-2 bg-mint rounded-full animate-pulse" />
+            <span className="text-xs text-slate-500">
+              {PROGRESS_LABELS[progress] || progress}
+            </span>
+          </div>
+        )}
       </div>
     )
   }
@@ -466,6 +551,110 @@ function MindMapContent() {
                     })}
                   </div>
                 </div>
+
+                {/* 3. Gen Z Action Panel */}
+                {activeAction && (
+                  <section className="space-y-3 pt-2">
+                    {activeAction.feedback && (
+                      <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-3 text-center text-xs text-emerald-400 font-medium">
+                        {activeAction.feedback}
+                      </div>
+                    )}
+
+                    {activeAction.type === "quiz" && (
+                      <div className="bg-slate-900/50 border border-violet-500/20 rounded-xl p-4 space-y-3">
+                        <div className="flex items-center gap-2 text-violet-400">
+                          <span>⚡</span>
+                          <span className="text-xs font-bold uppercase tracking-wider">اختبار سريع</span>
+                        </div>
+                        <p className="text-sm text-slate-300">
+                          اشرح بصوت عاليمفهوم <strong>{trAr(selectedNode.label)}</strong> في 10 ثوانٍ.
+                        </p>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => handleUpdateMaitrise(2)}
+                            className="flex-1 py-2 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold hover:bg-emerald-500/20 transition"
+                          >
+                            ✅ أعرف
+                          </button>
+                          <button
+                            onClick={() => handleUpdateMaitrise(0)}
+                            className="flex-1 py-2 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-bold hover:bg-red-500/20 transition"
+                          >
+                            ❌ أتعثر
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
+                    {activeAction.type === "flashcard" && (
+                      <div className="bg-slate-900/50 border border-amber-500/20 rounded-xl p-4 space-y-3">
+                        <div className="flex items-center gap-2 text-amber-400">
+                          <span>🎴</span>
+                          <span className="text-xs font-bold uppercase tracking-wider">Flashcard</span>
+                        </div>
+                        <div className="bg-slate-800/50 rounded-lg p-3 border border-slate-700/50">
+                          <p className="text-sm text-slate-200 font-medium">{trAr(selectedNode.label)}</p>
+                          <p className="text-xs text-slate-500 mt-1">الظهر: {chapter?.titre_fr || "..."}</p>
+                        </div>
+                        <button
+                          onClick={async () => {
+                            try {
+                              await apiClient.createFlashcard({
+                                recto: selectedNode.label,
+                                verso: `الدرس: ${chapter?.titre_fr || "N/A"} — Importance: ${selectedNode.importance}`,
+                                type: selectedNode.type as "definition" | "formule" | "processus" | "exception",
+                                importance: selectedNode.importance
+                              })
+                              setActiveAction({ type: "flashcard", feedback: "+10 نقطة · تم إنشاء البطاقة 🎴", loading: false })
+                            } catch {
+                              setActiveAction({ type: "flashcard", feedback: "تعذر الإنشاء", loading: false })
+                            }
+                          }}
+                          className="w-full py-2 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-bold hover:bg-amber-500/20 transition"
+                        >
+                          🎴 إنشاء البطاقة
+                        </button>
+                      </div>
+                    )}
+
+                    {activeAction.type === "ask" && (
+                      <div className="bg-slate-900/50 border border-blue-500/20 rounded-xl p-4 space-y-3">
+                        <div className="flex items-center gap-2 text-blue-400">
+                          <span>🤖</span>
+                          <span className="text-xs font-bold uppercase tracking-wider">Khawarizmi</span>
+                        </div>
+                        {activeAction.loading ? (
+                          <div className="flex items-center gap-2 py-4 justify-center">
+                            <div className="w-5 h-5 border-2 border-blue-400 border-t-transparent rounded-full animate-spin" />
+                            <span className="text-xs text-slate-400">جاري التفكير...</span>
+                          </div>
+                        ) : (
+                          <p className="text-sm text-slate-300 leading-relaxed">{activeAction.result}</p>
+                        )}
+                      </div>
+                    )}
+
+                    {activeAction.type === "mastery_up" && (
+                      <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-4 text-center">
+                        <p className="text-sm text-emerald-400 font-bold">✅ +25 نقطة · تم تثبيت العقدة</p>
+                      </div>
+                    )}
+
+                    {activeAction.type === "mastery_down" && (
+                      <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 text-center">
+                        <p className="text-sm text-red-400 font-bold">❌ أُضيف إلى نقاط الضعف</p>
+                      </div>
+                    )}
+
+                    <button
+                      onClick={() => setActiveAction(null)}
+                      className="w-full py-1.5 text-[10px] text-slate-500 hover:text-slate-300 transition"
+                    >
+                      إغلاق
+                    </button>
+                  </section>
+                )}
               </section>
             ) : (
               <div className="bg-slate-900/40 border border-slate-800/50 rounded-xl p-4 text-center text-sm text-slate-500">

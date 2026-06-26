@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react"
 import { apiClient } from "@/lib/api-client"
-import type { TuteurResponse, ChatCard, ChatHistoryMessage } from "@/lib/types"
+import type { TuteurResponse, ChatCard, ChatHistoryMessage, ChatSource } from "@/lib/types"
 
 export type FeedbackType = "understood" | "partial" | "confused" | "example" | "quiz"
 
@@ -9,6 +9,7 @@ export type DisplayMessage = {
   role: "user" | "assistant"
   content: string
   cartes?: ChatCard[]
+  sources?: ChatSource[]
   type?: string
   fallback?: boolean
   feedbackGiven?: FeedbackType
@@ -31,6 +32,7 @@ export interface UseChatbotReturn {
   isTutorMode: boolean
   achievements: UserAchievements
   newBadge: string | null
+  chatbotState: ChatbotEngagementState | null
   scrollRef: React.RefObject<HTMLDivElement | null>
   setInput: (v: string) => void
   sendMessage: (text?: string) => Promise<void>
@@ -40,6 +42,16 @@ export interface UseChatbotReturn {
   toggleTutorMode: () => void
   handleSuggestion: (text: string) => void
   dismissBadge: () => void
+  completeDailyMission: () => Promise<boolean>
+  refreshChatbotState: () => Promise<void>
+  runAdvancedAction: (action: "confusion" | "explain" | "boss" | "box") => Promise<void>
+}
+
+export interface ChatbotEngagementState {
+  memory?: { last_topic?: string; last_chapter?: string; preferred_mode?: string; total_messages?: number }
+  socratic_streak?: { current_streak: number; longest_streak: number }
+  weak_concepts?: Array<{ concept: string; chapter?: string; weakness_score: number; occurrences: number }>
+  daily_mission?: { id?: number; mission_type: string; mission_data?: Record<string, unknown>; completed: boolean }
 }
 
 const ACHIEVEMENTS_KEY = "khawarizmi-achievements"
@@ -147,6 +159,7 @@ export function useChatbot(): UseChatbotReturn {
   const historyRef = useRef<ChatHistoryMessage[]>([])
   const initSent = useRef(false)
   const messageIdRef = useRef(0)
+  const [chatbotState, setChatbotState] = useState<ChatbotEngagementState | null>(null)
 
   function nextMessageId() {
     messageIdRef.current += 1
@@ -155,10 +168,11 @@ export function useChatbot(): UseChatbotReturn {
 
   const addAssistantMessage = useCallback((resp: TuteurResponse) => {
     const display: DisplayMessage = {
-      id: Date.now() + 1,
+      id: nextMessageId(),
       role: "assistant",
       content: resp.reponse,
       cartes: resp.cartes,
+      sources: resp.sources,
       type: resp.type,
       fallback: resp.fallback_active,
     }
@@ -194,6 +208,7 @@ export function useChatbot(): UseChatbotReturn {
   const openChat = useCallback(() => {
     setIsOpen(true)
     setBadge(0)
+    refreshChatbotState()
     if (!initSent.current) {
       initSent.current = true
       sendInit()
@@ -203,6 +218,27 @@ export function useChatbot(): UseChatbotReturn {
   const closeChat = useCallback(() => {
     setIsOpen(false)
   }, [])
+
+  const refreshChatbotState = useCallback(async () => {
+    try {
+      const state = await apiClient.getChatbotState()
+      setChatbotState(state)
+    } catch {
+      // silencieux
+    }
+  }, [])
+
+  const completeDailyMission = useCallback(async (): Promise<boolean> => {
+    const mission = chatbotState?.daily_mission
+    if (!mission || mission.completed || !mission.id) return false
+    try {
+      await apiClient.completeChatbotDailyMission(mission.id)
+      await refreshChatbotState()
+      return true
+    } catch {
+      return false
+    }
+  }, [chatbotState, refreshChatbotState])
 
   const sendMessage = useCallback(async (text?: string) => {
     const msg = (text ?? input).trim()
@@ -394,6 +430,62 @@ export function useChatbot(): UseChatbotReturn {
     setNewBadge(null)
   }, [])
 
+  const runAdvancedAction = useCallback(async (action: "confusion" | "explain" | "boss" | "box") => {
+    setLoading(true)
+    try {
+      if (action === "confusion") {
+        const lastMsg = messages.filter(m => m.role === "assistant").pop()
+        const text = lastMsg?.content || "لم أفهم"
+        const result = await apiClient.detectChatbotConfusion(text)
+        addAssistantMessage({
+          reponse: `🤔 ${result.confusion_type}\n\n${result.strategy}`,
+          type: "orientation",
+          cartes: [],
+          flashcards_suggerees: [],
+          fallback_active: false,
+        })
+      } else if (action === "explain") {
+        addAssistantMessage({
+          reponse: "اشرح لي المفهوم الذي تعلمته بكلماتك الخاصة:",
+          type: "socratique",
+          cartes: [],
+          flashcards_suggerees: [],
+          fallback_active: false,
+        })
+      } else if (action === "boss") {
+        const result = await apiClient.startBossFight("synthese_proteines")
+        const questionsText = result.questions.map((q, i) => `${i + 1}. ${q.question_ar}`).join("\n")
+        addAssistantMessage({
+          reponse: `👑 **Boss Bac!** أجب على هذه الأسئلة:\n\n${questionsText}`,
+          type: "orientation",
+          cartes: [],
+          flashcards_suggerees: [],
+          fallback_active: false,
+        })
+      } else if (action === "box") {
+        const result = await apiClient.openChatbotMysteryBox()
+        const msg = (result.reward_data?.message_ar as string) || "🎁 صندوق المفاجآت!"
+        addAssistantMessage({
+          reponse: `🎁 **${result.rarity}**\n\n${msg}`,
+          type: "motivation",
+          cartes: [],
+          flashcards_suggerees: [],
+          fallback_active: false,
+        })
+      }
+    } catch {
+      addAssistantMessage({
+        reponse: "عذراً، حدث خطأ. حاول مرة أخرى.",
+        type: "refus",
+        cartes: [],
+        flashcards_suggerees: [],
+        fallback_active: true,
+      })
+    } finally {
+      setLoading(false)
+    }
+  }, [messages, addAssistantMessage])
+
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight
@@ -409,6 +501,7 @@ export function useChatbot(): UseChatbotReturn {
     isTutorMode,
     achievements,
     newBadge,
+    chatbotState,
     scrollRef,
     setInput,
     sendMessage,
@@ -418,6 +511,9 @@ export function useChatbot(): UseChatbotReturn {
     toggleTutorMode,
     handleSuggestion,
     dismissBadge,
+    completeDailyMission,
+    refreshChatbotState,
+    runAdvancedAction,
   }
 }
 

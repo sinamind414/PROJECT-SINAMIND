@@ -19,7 +19,6 @@ export function DiagnosticUnitCard({ unit }: { unit: UnitConfig }) {
         </div>
         <div className="flex-1 min-w-0">
           <h3 className="text-white font-bold text-sm mb-1">{unit.unitAr}</h3>
-          <p className="text-gray-500 text-xs mb-2" dir="ltr">{unit.unitFr}</p>
           <div className="flex items-center gap-3 text-xs text-gray-500">
             <span>المجال {unit.domainNumero}</span>
             <span>·</span>

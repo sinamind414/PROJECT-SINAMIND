@@ -105,11 +105,11 @@ export default function DocumentAnalysisHubPage() {
           <div className="flex items-center gap-2">
             <span className="text-2xl">🧠</span>
             <div>
-              <p className="text-white font-bold text-sm">FSRS — Répétition espacée</p>
+              <p className="text-white font-bold text-sm">FSRS — التكرار المتباعد</p>
               <p className="text-gray-400 text-xs">
-                {duesCount > 0 && `${duesCount} compétence(s) à réviser aujourd'hui`}
+                {duesCount > 0 && `${duesCount} مهارة تحتاج مراجعة اليوم`}
                 {duesCount > 0 && weakCount > 0 && " · "}
-                {weakCount > 0 && `${weakCount} point(s) faible(s) détecté(s)`}
+                {weakCount > 0 && `${weakCount} نقطة ضعف مكتشفة`}
               </p>
             </div>
           </div>
@@ -189,7 +189,6 @@ export default function DocumentAnalysisHubPage() {
                           />
                         </div>
                         <h4 className="text-white font-bold text-sm leading-relaxed mb-1">{ch.chapterAr}</h4>
-                        <p className="text-gray-500 text-xs mb-2 line-clamp-1" dir="ltr">{ch.chapterFr}</p>
                         {ch.chapterType && (
                           <PillChip
                             label={CHAPTER_TYPE_LABELS[ch.chapterType] || ch.chapterType}

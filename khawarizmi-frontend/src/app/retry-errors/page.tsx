@@ -99,7 +99,7 @@ export default function RetryErrorsPage() {
                             <span className="text-lg">🔴</span>
                             <h3 className="text-white font-bold text-base">{error.labelAr}</h3>
                           </div>
-                          <p className="text-gray-400 text-xs" dir="ltr">{error.labelFr}</p>
+
                         </div>
                         <div className="text-left">
                           <span className="text-red-400 font-bold text-2xl">{error.count}</span>

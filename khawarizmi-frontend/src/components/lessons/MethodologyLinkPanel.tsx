@@ -3,6 +3,13 @@
 import Link from "next/link"
 import type { ActiveLesson } from "@/lib/active-lessons"
 
+const VERB_LABELS: Record<string, string> = {
+  analyse: "حلّل", interpret: "فسّر", deduce: "استنتج", justify: "علّل",
+  hypothesis: "فرضية", "validate-hypothesis": "تحقق", discuss: "ناقش",
+  "scientific-text": "نص علمي", compare: "قارن", relationship: "حدد العلاقة",
+  define: "عرّف", name: "سمّ", cite: "اذكر", validate: "تحقق",
+}
+
 export function MethodologyLinkPanel({ lesson }: { lesson: ActiveLesson }) {
   return (
     <section>
@@ -19,7 +26,7 @@ export function MethodologyLinkPanel({ lesson }: { lesson: ActiveLesson }) {
             {lesson.linkedVerbs.length > 0 && (
               <div className="mt-2 flex flex-wrap gap-1.5">
                 {lesson.linkedVerbs.map((v) => (
-                  <span key={v} className="px-2 py-0.5 rounded-full bg-mint/10 text-mint-soft text-xs">{v}</span>
+                  <span key={v} className="px-2 py-0.5 rounded-full bg-mint/10 text-mint-soft text-xs">{VERB_LABELS[v] || v}</span>
                 ))}
               </div>
             )}

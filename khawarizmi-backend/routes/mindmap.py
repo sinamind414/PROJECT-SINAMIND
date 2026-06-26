@@ -81,7 +81,6 @@ async def generate_mindmap_endpoint(
     background_tasks: BackgroundTasks,
     current_user: dict = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-    openai_client=Depends(get_openai),
 ):
     """Démarre la génération asynchrone d'un Mind Map.
 

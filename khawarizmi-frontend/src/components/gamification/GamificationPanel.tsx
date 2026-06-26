@@ -94,7 +94,7 @@ export default function GamificationPanel({ profile }: { profile?: { xp?: number
   return (
     <div className="rounded-2xl bg-slate-900/80 border border-slate-800 p-4 space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-bold text-slate-300">Gamification</h3>
+        <h3 className="text-sm font-bold text-slate-300">التحفيز</h3>
         {rewardMessage && (
           <motion.span initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} className="text-emerald-400 text-xs font-bold">
             {rewardMessage}
@@ -104,7 +104,7 @@ export default function GamificationPanel({ profile }: { profile?: { xp?: number
 
       <div className="flex items-center gap-4">
         {streak && <StreakFire count={streak.current_streak} isActive={streak.current_streak > 0} />}
-        {avatar && <EvolvingAvatar level={avatar.level} xp={avatar.xp} maxXp={avatar.level * 200} name="Élève" />}
+        {avatar && <EvolvingAvatar level={avatar.level} xp={avatar.xp} maxXp={avatar.level * 200} name="الطالب" />}
         <div className="text-right">
           <p className="text-white font-bold text-lg">{points} pts</p>
         </div>
@@ -123,7 +123,7 @@ export default function GamificationPanel({ profile }: { profile?: { xp?: number
 
       {nextActions.length > 0 && (
         <div className="space-y-2">
-          <p className="text-xs text-slate-400 font-semibold">Actions suggérées</p>
+          <p className="text-xs text-slate-400 font-semibold">إجراءات مقترحة</p>
           {nextActions.map((act, i) => (
             <button
               key={i}
@@ -149,10 +149,10 @@ export default function GamificationPanel({ profile }: { profile?: { xp?: number
 
       {nextActions.length === 0 && (
         <button
-          onClick={() => handleAction({ title: "Première action", description: "Commence par une action", action: "start", icon: "🚀", points: 10 })}
+          onClick={() => handleAction({ title: "الإجراء الأول", description: "ابدأ بإجراء واحد", action: "start", icon: "🚀", points: 10 })}
           className="w-full py-2 rounded-xl bg-indigo-600/20 border border-indigo-600/30 text-indigo-400 text-sm font-bold hover:bg-indigo-600/30 transition"
         >
-          🚀 Commencer
+          🚀 ابدأ
         </button>
       )}
     </div>

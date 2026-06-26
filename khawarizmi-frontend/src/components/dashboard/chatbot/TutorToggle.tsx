@@ -24,8 +24,8 @@ export default function TutorToggle({ isTutorMode, onToggle }: TutorToggleProps)
           : "opacity-60 hover:opacity-100 bg-transparent hover:bg-gray-100"
         }
       `}
-      title={isTutorMode ? "Mode Tuteur: Activé" : "Mode Tuteur: Désactivé"}
-      aria-label={isTutorMode ? "Désactiver le mode tuteur" : "Activer le mode tuteur"}
+      title={isTutorMode ? "وضع الأستاذ: مفعّل" : "وضع الأستاذ: معطّل"}
+      aria-label={isTutorMode ? "تعطيل وضع الأستاذ" : "تفعيل وضع الأستاذ"}
     >
       {isTutorMode && (
         <span

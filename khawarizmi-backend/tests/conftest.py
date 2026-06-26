@@ -19,6 +19,7 @@ os.environ.setdefault("REDIS_URL", "redis://localhost:6379/1")
 os.environ.setdefault("GEMINI_API_KEY", "test-gemini-key")
 os.environ.setdefault("ENVIRONMENT", "test")
 
+from database import get_db as db_get_db
 from deps import get_db
 from main import app
 
@@ -38,6 +39,7 @@ class MockRow:
     def __bool__(self):
         return bool(self._data)
 
+    @property
     def _mapping(self):
         return self._data
 
@@ -111,6 +113,20 @@ class MockAsyncSession:
             return ("user_badges", 1)
         if "combo_states" in sql:
             return ("combo_states", 1)
+        if "chatbot_boss_fights" in sql:
+            return ("chatbot_boss_fights", 1)
+        if "chatbot_explain_back_attempts" in sql:
+            return ("chatbot_explain_back_attempts", 1)
+        if "chatbot_mystery_boxes" in sql:
+            return ("chatbot_mystery_boxes", 1)
+        if "chatbot_memory" in sql:
+            return ("chatbot_memory", 1)
+        if "chatbot_weak_concepts" in sql:
+            return ("chatbot_weak_concepts", 1)
+        if "chatbot_socratic_streaks" in sql:
+            return ("chatbot_socratic_streaks", 1)
+        if "chatbot_daily_missions" in sql:
+            return ("chatbot_daily_missions", 1)
         return None
 
     def _store_key_for_obj(self, obj):
@@ -156,9 +172,27 @@ class MockAsyncSession:
                 return MockAsyncExecResult([_mock_orm_store[store_key]])
             return MockAsyncExecResult()
 
+        if "INSERT INTO" in sql:
+            store_key = self._store_key_for_sql(sql)
+            row_data: dict = {"id": 1}
+            if isinstance(params, dict):
+                row_data.update(params)
+            if "chatbot_boss_fights" in sql:
+                row_data.setdefault("status", "started")
+                row_data.setdefault("questions", [])
+            if "chatbot_daily_missions" in sql:
+                row_data.setdefault("completed", False)
+            if store_key:
+                _mock_orm_store[store_key] = row_data
+            return MockAsyncExecResult([row_data])
+
         if "UPDATE" in sql or "DELETE" in sql:
             return MockAsyncExecResult([{"id": 1}])
 
+        # Catch-all for any other SQL
+        store_key = self._store_key_for_sql(sql)
+        if store_key and store_key in _mock_orm_store:
+            return MockAsyncExecResult([_mock_orm_store[store_key]])
         return MockAsyncExecResult()
 
     def add(self, obj):
@@ -203,6 +237,7 @@ def override_deps():
     _inserted_emails.clear()
     _mock_orm_store.clear()
     app.dependency_overrides[get_db] = override_get_db
+    app.dependency_overrides[db_get_db] = override_get_db
     yield
     app.dependency_overrides.clear()
 

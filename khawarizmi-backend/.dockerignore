@@ -4,7 +4,13 @@ __pycache__/
 *.pyc
 .env
 *.log
-data/
+data/annales_workspace/
+data/ocr_production/
+data/ocr_test_prod/
+data/ocr_livre_scolaire/
+data/ocr_output/
+data/*.bundle/
+data/*.pdf
 models/*.onnx
 models/*.zip
 models/*.pt

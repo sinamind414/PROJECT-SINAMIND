@@ -53,7 +53,7 @@ export default function AnalyticsPanel() {
       <div className="rounded-2xl bg-gradient-to-br from-slate-900 to-slate-800 border border-slate-700/50 p-4">
         <div className="flex items-center gap-2 mb-3">
           <BarChart3 className="w-4 h-4 text-purple-400" />
-          <h3 className="text-sm font-bold text-white">Analytics</h3>
+          <h3 className="text-sm font-bold text-white">التحليلات</h3>
         </div>
         <div className="space-y-2">
           {[1, 2, 3].map(i => (
@@ -72,30 +72,30 @@ export default function AnalyticsPanel() {
     >
       <div className="flex items-center gap-2 mb-3">
         <BarChart3 className="w-4 h-4 text-purple-400" />
-        <h3 className="text-sm font-bold text-white">Analytics</h3>
+        <h3 className="text-sm font-bold text-white">التحليلات</h3>
       </div>
 
       <div className="grid grid-cols-2 gap-2 mb-3">
-        <StatCard icon={<Users className="w-3.5 h-3.5" />} label="DAU" value={metrics.daily_active_users} color="bg-blue-500/20 text-blue-400" />
-        <StatCard icon={<Flame className="w-3.5 h-3.5" />} label="Rétention J+7" value={`${metrics.streak_retention_j7}%`} color="bg-orange-500/20 text-orange-400" />
-        <StatCard icon={<Zap className="w-3.5 h-3.5" />} label="Clics/session" value={metrics.average_clicks_per_session} color="bg-yellow-500/20 text-yellow-400" />
-        <StatCard icon={<Target className="w-3.5 h-3.5" />} label="Ouverture Box" value={`${metrics.mystery_box_open_rate}%`} color="bg-green-500/20 text-green-400" />
+        <StatCard icon={<Users className="w-3.5 h-3.5" />} label="المستخدمون النشطون" value={metrics.daily_active_users} color="bg-blue-500/20 text-blue-400" />
+        <StatCard icon={<Flame className="w-3.5 h-3.5" />} label="الاحتفاظ يوم 7" value={`${metrics.streak_retention_j7}%`} color="bg-orange-500/20 text-orange-400" />
+        <StatCard icon={<Zap className="w-3.5 h-3.5" />} label="نقرات/جلسة" value={metrics.average_clicks_per_session} color="bg-yellow-500/20 text-yellow-400" />
+        <StatCard icon={<Target className="w-3.5 h-3.5" />} label="فتح الصناديق" value={`${metrics.mystery_box_open_rate}%`} color="bg-green-500/20 text-green-400" />
       </div>
 
       <div className="grid grid-cols-2 gap-2 mb-3">
-        <StatCard icon={<Zap className="w-3.5 h-3.5" />} label="Points total" value={metrics.total_points_awarded.toLocaleString()} color="bg-purple-500/20 text-purple-400" />
-        <StatCard icon={<Trophy className="w-3.5 h-3.5" />} label="Challenges finis" value={metrics.completed_challenges} color="bg-emerald-500/20 text-emerald-400" />
+        <StatCard icon={<Zap className="w-3.5 h-3.5" />} label="مجموع النقاط" value={metrics.total_points_awarded.toLocaleString()} color="bg-purple-500/20 text-purple-400" />
+        <StatCard icon={<Trophy className="w-3.5 h-3.5" />} label="التحديات المكتملة" value={metrics.completed_challenges} color="bg-emerald-500/20 text-emerald-400" />
       </div>
 
       {topPerformers.length > 0 && (
         <div className="mt-2">
-          <p className="text-[10px] text-slate-400 uppercase tracking-wider mb-1.5">Top Performers</p>
+          <p className="text-[10px] text-slate-400 uppercase tracking-wider mb-1.5">الأفضل أداءً</p>
           <div className="space-y-1">
             {topPerformers.map((p, i) => (
               <div key={i} className="flex items-center gap-2 text-xs">
                 <span className="text-yellow-400 font-bold w-4">{i + 1}</span>
                 <span className="text-white truncate flex-1">{p.name}</span>
-                <span className="text-slate-400">{p.points.toLocaleString()} pts</span>
+                <span className="text-slate-400">{p.points.toLocaleString()} نقطة</span>
               </div>
             ))}
           </div>

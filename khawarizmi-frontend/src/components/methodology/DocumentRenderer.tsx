@@ -153,7 +153,7 @@ function LineChart({ doc }: { doc: LineChartDocument }) {
   const width = 520
   const height = 220
   const padding = 34
-  const { min, max, range } = computeChartBounds(doc.points)
+  const { min, range } = computeChartBounds(doc.points)
   const stepX = doc.points.length > 1 ? (width - padding * 2) / (doc.points.length - 1) : 0
   const coords = doc.points.map((point, index) => ({
     x: padding + index * stepX,
@@ -193,7 +193,7 @@ function MultiLineChart({ doc }: { doc: MultiLineChartDocument }) {
   const height = 220
   const padding = 34
   const allPoints = doc.series.flatMap((s) => s.points)
-  const { min, max, range } = computeChartBounds(allPoints)
+  const { min, range } = computeChartBounds(allPoints)
 
   const seriesPaths = doc.series.map((series) => {
     const stepX = series.points.length > 1 ? (width - padding * 2) / (series.points.length - 1) : 0

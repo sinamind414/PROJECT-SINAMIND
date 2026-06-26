@@ -61,8 +61,8 @@ function DetailContent() {
               <span>📅 {sujet.annee}</span>
               <span>⏱ {sujet.duree} min</span>
               <span>📄 {sujet.exercices.length} تمارين</span>
-              <span>💡 {totalQuestions} questions</span>
-              <span>🏆 {totalPoints} points</span>
+              <span>💡 {totalQuestions} أسئلة</span>
+              <span>🏆 {totalPoints} نقاط</span>
               <span>📁 {sujet.session === "normale" ? "دورة عادية" : "دورة استدراكية"}</span>
             </div>
 
@@ -122,7 +122,7 @@ function DetailContent() {
                   <h3 className="font-semibold text-white">التمرين {i + 1} : {ex.titre}</h3>
                   <span className="text-xs text-slate-500">⏱ {ex.duree_minutes} min · {ex.points} pts</span>
                 </div>
-                <p className="text-xs text-slate-500">{ex.questions.length} questions · {ex.documents.length} document(s)</p>
+                <p className="text-xs text-slate-500">{ex.questions.length} أسئلة · {ex.documents.length} وثائق</p>
               </div>
             ))}
           </div>

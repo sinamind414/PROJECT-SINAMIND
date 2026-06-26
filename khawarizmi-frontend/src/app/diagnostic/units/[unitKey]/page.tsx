@@ -65,7 +65,6 @@ export default function DiagnosticUnitPage() {
                 <span className="text-3xl">{unitConfig.emoji}</span>
                 <h1 className="text-3xl font-bold text-white">{unitConfig.unitAr}</h1>
               </div>
-              <p className="text-white/50 text-sm" dir="ltr">{unitConfig.unitFr}</p>
               <p className="text-white/70 max-w-3xl leading-relaxed mt-2 text-sm">
                 {unitConfig.chapters.length} فصول · {scenario?.documents.length || 0} وثائق منهجية
               </p>
@@ -113,8 +112,6 @@ export default function DiagnosticUnitPage() {
                           )}
                         </div>
                         <h3 className="text-white font-bold text-sm">{ch.chapterAr}</h3>
-                        <p className="text-gray-500 text-xs mt-0.5" dir="ltr">{ch.chapterFr}</p>
-
                         {/* Recommended verbs */}
                         {ch.recommendedVerbs && ch.recommendedVerbs.length > 0 && (
                           <div className="flex flex-wrap gap-1.5 mt-2">

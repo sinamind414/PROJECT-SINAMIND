@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { AuthGuard } from "@/components/auth/AuthGuard"
 import { AppShell } from "@/components/layout/AppShell"
 import Header from "@/components/drive-design/Header"
@@ -21,7 +21,7 @@ export default function DashboardPage() {
   const data = useDriveDashboard()
   const [state, setState] = useState<DashboardData>(data)
 
-  if (data !== state) setState(data)
+  useEffect(() => { setState(data) }, [data])
 
   const dailyMission = state.missions.find(m => m.status === 'pending') || state.missions[0]
 
@@ -45,14 +45,58 @@ export default function DashboardPage() {
     setState(prev => ({ ...prev, mistakes: prev.mistakes.map(m => m.id === id ? { ...m, reviewed } : m) }))
   }
 
+  const totalExercises = state.exercises.length
+  const doneExercises = state.exercises.filter(e => e.completed).length
+  const totalMistakes = state.mistakes.length
+  const reviewedMistakes = state.mistakes.filter(m => m.reviewed).length
+
   return (
     <AuthGuard>
       <AppShell>
         <main className="flex-1 p-3 md:p-5 overflow-x-hidden">
           <div className="max-w-7xl mx-auto space-y-4">
             <Header profile={state.profile} onContinueAction={() => {}} />
+
+            {/* ابدأ من هنا — raccourcis */}
+            <div className="bg-slate-900/50 border border-slate-800/50 rounded-2xl p-4">
+              <h3 className="text-sm font-bold text-white mb-3">ابدأ من هنا</h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                <a href="/cours" className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-mint/10 border border-mint/30 text-mint text-xs font-bold hover:bg-mint/20 transition">
+                  <span>📖</span> درس سريع
+                </a>
+                <a href="/mindmap" className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-violet-500/10 border border-violet-500/30 text-violet-400 text-xs font-bold hover:bg-violet-500/20 transition">
+                  <span>🧠</span> خريطة ذهنية
+                </a>
+                <a href="/drill" className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-bold hover:bg-amber-500/20 transition">
+                  <span>🔄</span> مراجعة سريعة
+                </a>
+                <a href="/exercises" className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-blue-500/10 border border-blue-500/30 text-blue-400 text-xs font-bold hover:bg-blue-500/20 transition">
+                  <span>✍️</span> تمارين
+                </a>
+              </div>
+            </div>
+
             <LevelXp profile={state.profile} />
             <ProgressCluster profile={state.profile} />
+
+            {/* ملخص اليوم */}
+            <div className="bg-slate-900/50 border border-slate-800/50 rounded-2xl p-4">
+              <h3 className="text-sm font-bold text-white mb-3">ملخص اليوم</h3>
+              <div className="grid grid-cols-3 gap-3">
+                <div className="bg-slate-800/50 rounded-xl p-3 text-center">
+                  <p className="text-lg font-black text-mint">{state.missions.length}</p>
+                  <p className="text-[10px] text-slate-400 font-semibold">مهام اليوم</p>
+                </div>
+                <div className="bg-slate-800/50 rounded-xl p-3 text-center">
+                  <p className="text-lg font-black text-amber-400">{doneExercises}/{totalExercises}</p>
+                  <p className="text-[10px] text-slate-400 font-semibold">التمارين</p>
+                </div>
+                <div className="bg-slate-800/50 rounded-xl p-3 text-center">
+                  <p className="text-lg font-black text-red-400">{totalMistakes - reviewedMistakes}</p>
+                  <p className="text-[10px] text-slate-400 font-semibold">نقاط تحتاج مراجعة</p>
+                </div>
+              </div>
+            </div>
 
             <div className="grid lg:grid-cols-3 gap-4">
               <div className="lg:col-span-2 space-y-4">
@@ -60,9 +104,6 @@ export default function DashboardPage() {
                 <DailyMission mission={dailyMission} onDoneAction={updateMission} />
               </div>
               <div className="space-y-4">
-                <GamificationPanel profile={state.profile} />
-                <SocialLivePanel chapter="proteines" />
-                <AnalyticsPanel />
                 <TopicsPanel topics={state.topics} />
               </div>
             </div>
@@ -70,6 +111,13 @@ export default function DashboardPage() {
             <div className="grid md:grid-cols-2 gap-4">
               <ExercisesPanel exercises={state.exercises} onToggleAction={updateExercise} />
               <MistakesPanel mistakes={state.mistakes} onToggleAction={updateMistake} />
+            </div>
+
+            {/* Section bonus — التحفيز / القسم المباشر / التحليلات */}
+            <div className="grid lg:grid-cols-3 gap-4 pt-4 border-t border-slate-800/50">
+              <GamificationPanel profile={state.profile} />
+              <SocialLivePanel chapter="proteines" />
+              <AnalyticsPanel />
             </div>
 
           </div>

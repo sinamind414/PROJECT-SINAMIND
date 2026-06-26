@@ -6,6 +6,7 @@ import { SuggestionChips } from "./SuggestionChips"
 import TutorToggle from "./TutorToggle"
 import AchievementPopup from "./AchievementPopup"
 import { FeedbackButtons, type FeedbackType } from "./FeedbackButtons"
+import type { ChatSource } from "@/lib/types"
 
 export function ChatbotWidget() {
   const router = useRouter()
@@ -17,6 +18,7 @@ export function ChatbotWidget() {
     isOpen,
     isTutorMode,
     newBadge,
+    chatbotState,
     scrollRef,
     setInput,
     sendMessage,
@@ -26,6 +28,8 @@ export function ChatbotWidget() {
     toggleTutorMode,
     handleSuggestion,
     dismissBadge,
+    completeDailyMission,
+    runAdvancedAction,
   } = useChatbot()
 
   function handleCardClick(action: string) {
@@ -80,6 +84,72 @@ export function ChatbotWidget() {
 
           {/* Messages */}
           <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-3" dir="rtl">
+            {messages.length === 0 && !loading && chatbotState?.daily_mission && (
+              <div className="rounded-xl p-3 space-y-2" style={{ background: "rgba(251,191,36,0.08)", border: "1px solid rgba(251,191,36,0.2)" }}>
+                <p className="text-yellow-400 font-bold text-sm">🎯 مهمة اليوم</p>
+                <p className="text-gray-300 text-xs">
+                  {((chatbotState.daily_mission.mission_data as Record<string, unknown>)?.description_ar as string) || "أرسل 5 رسائل اليوم"}
+                </p>
+                {chatbotState.socratic_streak && (
+                  <p className="text-orange-400 text-xs">🔥 التتابع: {chatbotState.socratic_streak.current_streak} يوم</p>
+                )}
+                {!chatbotState.daily_mission.completed && chatbotState.daily_mission.id && (
+                  <button
+                    onClick={completeDailyMission}
+                    className="w-full text-center rounded-lg py-1.5 text-xs font-bold transition-all hover:scale-[1.02]"
+                    style={{ background: "#F59E0B", color: "#0C151A" }}
+                  >
+                    إنهاء المهمة
+                  </button>
+                )}
+                {chatbotState.daily_mission.completed && (
+                  <p className="text-green-400 text-xs text-center">✅ تم إكمال مهمة اليوم!</p>
+                )}
+              </div>
+            )}
+
+            {messages.length === 0 && !loading && chatbotState?.weak_concepts && chatbotState.weak_concepts.length > 0 && (
+              <div className="rounded-xl p-3" style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)" }}>
+                <p className="text-red-400 font-bold text-xs">⚠️ مفاهيم تحتاج مراجعة</p>
+                {chatbotState.weak_concepts.slice(0, 2).map((wc, i) => (
+                  <p key={i} className="text-gray-400 text-xs mt-1">• {wc.concept} ({wc.weakness_score.toFixed(1)})</p>
+                ))}
+              </div>
+            )}
+
+            {messages.length === 0 && !loading && (
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  onClick={() => runAdvancedAction("confusion")}
+                  className="rounded-xl p-2.5 text-xs font-bold text-white transition-all hover:scale-[1.02] text-center"
+                  style={{ background: "linear-gradient(135deg, #8B5CF6, #6D28D9)" }}
+                >
+                  🔎 كشف الارتباك
+                </button>
+                <button
+                  onClick={() => runAdvancedAction("explain")}
+                  className="rounded-xl p-2.5 text-xs font-bold text-white transition-all hover:scale-[1.02] text-center"
+                  style={{ background: "linear-gradient(135deg, #3B82F6, #2563EB)" }}
+                >
+                  🗣️ اشرح لي
+                </button>
+                <button
+                  onClick={() => runAdvancedAction("boss")}
+                  className="rounded-xl p-2.5 text-xs font-bold text-white transition-all hover:scale-[1.02] text-center"
+                  style={{ background: "linear-gradient(135deg, #EF4444, #DC2626)" }}
+                >
+                  👑 Boss Bac
+                </button>
+                <button
+                  onClick={() => runAdvancedAction("box")}
+                  className="rounded-xl p-2.5 text-xs font-bold text-white transition-all hover:scale-[1.02] text-center"
+                  style={{ background: "linear-gradient(135deg, #F59E0B, #D97706)" }}
+                >
+                  🎁 صندوق
+                </button>
+              </div>
+            )}
+
             {messages.length === 0 && !loading && (
               <SuggestionChips onSelect={handleSuggestion} />
             )}
@@ -164,6 +234,26 @@ export function ChatbotWidget() {
                       {msg.feedbackGiven === "confused" && "❌ إعادة شرح"}
                       {msg.feedbackGiven === "example" && "💡 طلب مثال"}
                       {msg.feedbackGiven === "quiz" && "🧪 اختبار"}
+                    </div>
+                  )}
+
+                  {/* Sources RAG */}
+                  {isAssistant && msg.sources && msg.sources.length > 0 && (
+                    <div className="ml-8 space-y-1">
+                      <p className="text-xs text-gray-500 font-bold">المصادر</p>
+                      {msg.sources.map((src: ChatSource, i: number) => (
+                        <div
+                          key={i}
+                          className="rounded-lg px-3 py-2 text-xs"
+                          style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)" }}
+                        >
+                          <span className="text-mint font-bold">{src.source}</span>
+                          {src.chapter && (
+                            <span className="text-gray-500 mx-1">/ {src.chapter}</span>
+                          )}
+                          <p className="text-gray-400 mt-1 line-clamp-2">{src.excerpt}</p>
+                        </div>
+                      ))}
                     </div>
                   )}
                 </div>

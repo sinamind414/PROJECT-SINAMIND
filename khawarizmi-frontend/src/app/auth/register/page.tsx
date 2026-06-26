@@ -25,7 +25,7 @@ export default function RegisterPage() {
       await register({ email, password, nom, filiere })
       router.push("/dashboard")
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Erreur d'inscription"
+      const msg = err instanceof Error ? err.message : "تعذر إنشاء الحساب"
       setError(msg)
     } finally {
       setLoading(false)

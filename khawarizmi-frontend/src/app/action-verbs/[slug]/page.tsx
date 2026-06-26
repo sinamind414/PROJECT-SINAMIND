@@ -52,10 +52,10 @@ export default function ActionVerbDetailPage() {
         score_max: totalPoints || 1,
         percentage: 0,
         success: [],
-        errors: [err instanceof Error ? err.message : "Erreur d'evaluation"],
+        errors: [err instanceof Error ? err.message : "تعذر التقييم"],
         missing_markers: [],
         forbidden_found: [],
-        advice: "Reessaye.",
+        advice: "حاول مرة أخرى.",
         allow_second_attempt: true,
       })
     } finally {
@@ -292,7 +292,7 @@ export default function ActionVerbDetailPage() {
                 )}
 
                 <div className="rounded-3xl p-5 bg-mint/10 border border-mint/20">
-                  <h2 className="text-mint font-bold mb-2">Feedback تلقائي</h2>
+                  <h2 className="text-mint font-bold mb-2">ملاحظات تلقائية</h2>
                   <p className="text-gray-200 text-sm leading-relaxed">{verb.feedbackTemplateAr}</p>
                 </div>
 
