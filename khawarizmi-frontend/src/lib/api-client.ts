@@ -594,6 +594,41 @@ class KhawarizmiApiClient {
     )
   }
 
+  // ── Social / Live Classroom (Phase 3 + Phase 5) ─
+
+  async getPhase3LiveStats(chapter: string) {
+    return this.request<{ active_users: number; completed_today: number; top_3: string[] }>(
+      `/api/phase3/live-stats/${encodeURIComponent(chapter)}`
+    )
+  }
+
+  async getPhase3FriendsActivity() {
+    return this.request<Array<{ name: string; action: string; time: string }>>(
+      "/api/phase3/friends-activity"
+    )
+  }
+
+  async getPhase5LiveStats(chapter: string) {
+    return this.request<{
+      active_students: number
+      questions_answered: number
+      top_3: Array<{ name: string; score: number }>
+    }>(`/api/phase5/live-stats/${encodeURIComponent(chapter)}`)
+  }
+
+  async getPhase5FriendsActivity() {
+    return this.request<Array<{ name: string; action: string; time: string }>>(
+      "/api/phase5/friends-activity"
+    )
+  }
+
+  async challengeFriend(friendId: string) {
+    return this.request<{ challenge_id: string; status: string; message: string }>(
+      `/api/phase5/challenge/${encodeURIComponent(friendId)}`,
+      { method: "POST" }
+    )
+  }
+
   // ── Health Check ───────────────────────────────
 
   async healthCheck(): Promise<HealthCheck> {

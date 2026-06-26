@@ -11,6 +11,8 @@ import DailyMission from "@/components/drive-design/DailyMission"
 import TopicsPanel from "@/components/drive-design/TopicsPanel"
 import ExercisesPanel from "@/components/drive-design/ExercisesPanel"
 import MistakesPanel from "@/components/drive-design/MistakesPanel"
+import GamificationPanel from "@/components/gamification/GamificationPanel"
+import SocialLivePanel from "@/components/gamification/SocialLivePanel"
 import { useDriveDashboard } from "@/hooks/useDriveDashboard"
 import type { DashboardData } from "@/components/drive-design/api-types"
 
@@ -57,6 +59,8 @@ export default function DashboardPage() {
                 <DailyMission mission={dailyMission} onDoneAction={updateMission} />
               </div>
               <div className="space-y-4">
+                <GamificationPanel profile={state.profile} />
+                <SocialLivePanel chapter="proteines" />
                 <TopicsPanel topics={state.topics} />
               </div>
             </div>

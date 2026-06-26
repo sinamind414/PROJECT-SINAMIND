@@ -103,6 +103,12 @@ class MockAsyncSession:
             return ("user_points", 1)
         if "user_avatars" in sql:
             return ("user_avatars", 1)
+        if "mystery_boxes" in sql:
+            return ("mystery_boxes", 1)
+        if "badges" in sql:
+            return ("badges", 1)
+        if "user_badges" in sql:
+            return ("user_badges", 1)
         if "combo_states" in sql:
             return ("combo_states", 1)
         return None
