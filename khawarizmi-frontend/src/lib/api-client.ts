@@ -688,6 +688,43 @@ class KhawarizmiApiClient {
     )
   }
 
+  // ── Phase 6 — Analytics ────────────────────────
+
+  async getPhase6Metrics() {
+    return this.request<{
+      daily_active_users: number
+      total_users: number
+      streak_retention_j3: number
+      streak_retention_j7: number
+      average_clicks_per_session: number
+      mystery_box_open_rate: number
+      one_more_click_conversion: number
+      average_session_duration: number
+      total_points_awarded: number
+      answered_today: number
+      pending_challenges: number
+      completed_challenges: number
+      challenge_completion_rate: number
+    }>("/api/phase6/metrics")
+  }
+
+  async getPhase6UserEngagement() {
+    return this.request<{
+      current_streak: number
+      total_points: number
+      level: number
+      boxes_opened: number
+      badges_count: number
+      total_exercises: number
+    }>("/api/phase6/user-engagement")
+  }
+
+  async getPhase6TopPerformers() {
+    return this.request<{ name: string; points: number; level: number }[]>(
+      "/api/phase6/top-performers"
+    )
+  }
+
   // ── Health Check ───────────────────────────────
 
   async healthCheck(): Promise<HealthCheck> {

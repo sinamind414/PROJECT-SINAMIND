@@ -13,7 +13,7 @@ class TestPhase6:
         response = await client.get("/api/phase6/user-engagement", headers=auth_headers)
         assert response.status_code == 200
         data = response.json()
-        assert "total_sessions" in data
+        assert "current_streak" in data
 
     async def test_top_performers(self, client: AsyncClient):
         response = await client.get("/api/phase6/top-performers")
