@@ -14,12 +14,12 @@ import json
 import os
 import re
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 try:
-    from sqlalchemy import text, create_engine
+    from sqlalchemy import create_engine, text
 except ImportError:
     print("Installe sqlalchemy : pip install sqlalchemy psycopg2-binary")
     sys.exit(1)
@@ -31,7 +31,7 @@ DATABASE_URL = os.environ.get("DATABASE_URL", "")
 
 def extract_ts_array(filepath: str, var_name: str) -> list:
     """Extrait un tableau TypeScript const var_name: Type = [...] depuis un fichier."""
-    with open(filepath, "r", encoding="utf-8") as f:
+    with open(filepath, encoding="utf-8") as f:
         content = f.read()
 
     pattern = re.compile(
@@ -47,7 +47,7 @@ def extract_ts_array(filepath: str, var_name: str) -> list:
     raw = re.sub(r"/\*.*?\*/", "", raw, flags=re.DOTALL)
     raw = re.sub(r"(?<!\w)(readonly\s+)", "", raw)
     raw = re.sub(r",\s*([}\]])", r"\1", raw)
-    raw = re.sub(r"'", '"', raw)
+    raw = raw.replace(r"'", '"')
     raw = re.sub(r'"(\w+)"\s*:', r"'\1':", raw)
     raw = raw.replace("'", '"')
 
@@ -104,7 +104,7 @@ def import_annales(engine):
                     "chapitres": json.dumps(sujet.get("chapitres", [])),
                     "url_pdf": sujet.get("url_pdf", ""),
                     "url_corrige": sujet.get("url_corrige", ""),
-                    "created_at": datetime.now(timezone.utc),
+                    "created_at": datetime.now(UTC),
                 },
             )
             print(f"  IMPORTE : {slug} ({sujet.get('annee')})")
@@ -147,7 +147,7 @@ def import_methodology_documents(engine):
                     "subtitle_ar": scenario.get("subtitle", ""),
                     "context_ar": scenario.get("contextAr", ""),
                     "dominant_skills": json.dumps(scenario.get("dominantSkills", [])),
-                    "created_at": datetime.now(timezone.utc),
+                    "created_at": datetime.now(UTC),
                 },
             )
 
@@ -166,7 +166,7 @@ def import_methodology_documents(engine):
                         "title": doc.get("title", ""),
                         "caption": doc.get("caption", ""),
                         "content": json.dumps(doc),
-                        "created_at": datetime.now(timezone.utc),
+                        "created_at": datetime.now(UTC),
                     },
                 )
 
@@ -194,7 +194,7 @@ def import_methodology_documents(engine):
                         "placeholder": q.get("placeholder", ""),
                         "model_answer": q.get("modelAnswer", ""),
                         "learning_focus": q.get("learningFocus", ""),
-                        "created_at": datetime.now(timezone.utc),
+                        "created_at": datetime.now(UTC),
                     },
                 )
 

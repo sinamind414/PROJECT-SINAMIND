@@ -15,7 +15,7 @@ class Settings(BaseSettings):
     ENVIRONMENT: str = "development"
     debug: bool = False
 
-    SECRET_KEY: str = "ci-fallback-not-for-production-32ch"
+    SECRET_KEY: str = ""
     JWT_ALGORITHM: str = "HS256"
     JWT_EXPIRE_HOURS: int = 24
 
@@ -60,8 +60,9 @@ class Settings(BaseSettings):
     def validate_secret_key(cls, v):
         import os
 
-        if os.getenv("ENVIRONMENT") in ("test", "ci"):
-            return v
+        env = os.getenv("ENVIRONMENT", "")
+        if env in ("test", "ci"):
+            return v or "ci-test-key-for-smoke-tests-only"
         if not v or v.startswith("ci-fallback"):
             raise ValueError("SECRET_KEY non défini. Arrêt du serveur pour sécurité.")
         if len(str(v)) < 16:
@@ -105,6 +106,7 @@ def get_allowed_origins() -> list[str]:
         "http://127.0.0.1:3000",
         "https://khawarizmi-ia.vercel.app",
         "https://khawarizmi.vercel.app",
+        "https://khawarizmi-ia.netlify.app",
         "https://ia-khawarizmi.dz",
         "https://www.ia-khawarizmi.dz",
     ]

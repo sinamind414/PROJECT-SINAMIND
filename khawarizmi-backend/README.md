@@ -1,49 +1,55 @@
-# Khawarizmi Pro — Backend
+# Khawarizmi Backend
 
-API FastAPI de la plateforme éducative IA.
+API REST de la plateforme IA Khawarizmi Pro — Bac SVT Algérie.
 
-## Stack
+## Stack technique
 
 - **Framework** : FastAPI (Python 3.12)
-- **Base** : PostgreSQL 16 + pgvector
+- **Base de données** : PostgreSQL 16 + pgvector
 - **Cache** : Redis 7
+- **IA** : Gemini 2.5 Flash / OpenAI GPT (fallback)
 - **Auth** : JWT (python-jose + bcrypt)
-- **ORM** : SQLAlchemy 2.0 (async) + Alembic
-- **IA** : Gemini 2.5 Flash / Groq Llama / OpenAI GPT
+- **Répétition** : FSRS Graph
+- **Deploy** : Railway (Docker)
 
 ## Structure
 
 ```
-main.py       ← Entrypoint (max 100 lignes)
-config.py     ← Settings Pydantic
-auth.py       ← JWT uniquement
-database.py   ← Connexion DB
-cache.py      ← Redis
-routes/       ← Endpoints API
-services/     ← Logique métier
-models/       ← Modèles SQLAlchemy
-schemas/      ← Schémas Pydantic
-migrations/   ← Alembic
-tests/        ← Pytest
+khawarizmi-backend/
+├── main.py            → Entrypoint (< 100 lignes)
+├── config.py           → Settings Pydantic
+├── auth.py             → JWT uniquement
+├── database.py         → PostgreSQL asyncpg
+├── cache.py            → Redis
+├── models/             → SQLAlchemy ORM
+├── schemas/            → Pydantic validation
+├── routes/             → Endpoints REST
+├── services/           → Logique métier
+├── methodology/        → Moteur méthodologique
+├── bac_blanc/          → Évaluation intelligente
+├── migrations/         → Alembic
+└── tests/              → Pytest (≥ 50% coverage)
 ```
 
-## Sécurité
+## Règles de sécurité
 
-- JWT vérifié sur chaque endpoint protégé
-- Rate limiting sur /api/chat et /api/evaluate (slowapi)
-- SECRET_KEY requis en production
-- Aucune clé API exposée dans le code
+- **JWT uniquement** — Pas de double système d'auth
+- **SECRET_KEY** — Obligatoire (ValueError si absent en prod)
+- **Rate limiting** — SlowAPI sur les endpoints IA
+- **CORS restreint** — Méthodes et headers limités
 
 ## Commandes
 
 ```bash
-uvicorn main:app --reload --port 8000
-alembic upgrade head          # Migrations
-pytest tests/ -v --tb=short   # Tests
-ruff check .                  # Lint
-mypy .                        # Typecheck
+uvicorn main:app --reload        # Développement
+pytest tests/ -v                  # Tests
+alembic upgrade head              # Migrations
 ```
 
-## Documentation
+## Références
 
-Voir `AGENTS.md` pour les règles de contribution.
+- `AGENTS.md` — Règles absolues du projet
+
+---
+
+**Projet :** IA Khawarizmi Pro — Bac Sciences Naturelles Algérie

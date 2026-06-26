@@ -113,7 +113,8 @@ async def chat_socratique(
     mc.start("llm")
     fallback_used = False
     try:
-        # Fabuleux V4 + Groq : fallback automatique
+        from services.llm import _call_with_fallback
+
         response = await _call_with_fallback(
             messages=[
                 {"role": "system", "content": system_prompt},
@@ -125,13 +126,9 @@ async def chat_socratique(
             max_tokens=cfg.ia_max_tokens,
             timeout=30.0,
         )
-        # _call_with_fallback peut logger un fallback → on le détecte
-        # (simple heuristics: si on arrive ici sans exception, on considère primary OK)
+
         raw_content = response.choices[0].message.content or ""
-        try:
-            tokens_used = response.usage.total_tokens if response.usage else 0
-        except Exception:
-            tokens_used = 0
+        tokens_used = response.usage.total_tokens
 
         raw_content = raw_content.strip()
         if raw_content.startswith("```"):

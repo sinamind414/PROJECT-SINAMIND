@@ -1,0 +1,177 @@
+{
+  "version": "2.0",
+  "last_updated": "2026-06-25",
+  "profiles": [
+    {
+      "id": "verb_confusion",
+      "name": "Confusion entre verbes d'action",
+      "description": "L'élève ne distingue pas les verbes simples des verbes complexes",
+      "examples": [
+        "Utilise 'صف' alors que l'instruction demande 'وضّح في نص علمي'",
+        "Donne une définition ('عرف') au lieu de justifier ('برّر')"
+      ],
+      "recommendation": "Entraîne-toi à identifier le verbe principal avant de répondre",
+      "severity": "high"
+    },
+    {
+      "id": "missing_structure",
+      "name": "Absence de structure dans les tâches complexes",
+      "description": "L'élève ne structure pas sa réponse en Introduction/Développement/Conclusion",
+      "examples": [
+        "Réponse sous forme de liste pour 'وضّح في نص علمي'",
+        "Absence de conclusion pour 'أثبت'"
+      ],
+      "recommendation": "Pour les tâches complexes, structure toujours en 3 parties",
+      "severity": "high"
+    },
+    {
+      "id": "weak_context_reading",
+      "name": "Lecture insuffisante du contexte",
+      "description": "L'élève ne prend pas en compte le contexte et les documents fournis",
+      "examples": [
+        "Réponse générique sans référence au document",
+        "Ignorer les données du contexte"
+      ],
+      "recommendation": "Relis le contexte et repère les mots-clés avant de répondre",
+      "severity": "high"
+    },
+    {
+      "id": "superficial_analysis",
+      "name": "Analyse trop superficielle des documents",
+      "description": "L'élève mentionne les documents sans les exploiter réellement",
+      "examples": [
+        "Cite le document sans en tirer de conclusion",
+        "Pas de lien entre les données et la réponse"
+      ],
+      "recommendation": "Pour chaque document, identifie la donnée clé et relie-la à ta réponse",
+      "severity": "medium"
+    },
+    {
+      "id": "no_argumentation",
+      "name": "Absence d'argumentation",
+      "description": "L'élève donne des réponses sans les justifier",
+      "examples": [
+        "Affirmation sans preuve pour 'أثبت'",
+        "Justification vide pour 'برّر'"
+      ],
+      "recommendation": "Chaque affirmation doit être suivie d'une preuve ou d'un argument",
+      "severity": "high"
+    },
+    {
+      "id": "keyword_absence",
+      "name": "Absence de mots-clés scientifiques",
+      "description": "L'élève n'utilise pas les termes exacts du programme",
+      "examples": [
+        "Utilise 'le truc qui fait' au lieu du terme scientifique",
+        "Vocabulaire approximatif"
+      ],
+      "recommendation": "Repère les termes scientifiques dans le contexte et utilise-les",
+      "severity": "medium"
+    },
+    {
+      "id": "confusion_description_explanation",
+      "name": "Confusion entre description et explication",
+      "description": "L'élève décrit au lieu d'expliquer (ou inversement)",
+      "examples": [
+        "Décrit les étapes sans expliquer pourquoi ('وضّح')",
+        "Explique quand l'instruction demande de décrire ('صف')"
+      ],
+      "recommendation": "Vérifie le verbe : 'صف' = décrire, 'وضّح' = expliquer",
+      "severity": "medium"
+    },
+    {
+      "id": "incomplete_response",
+      "name": "Réponse incomplète",
+      "description": "L'élève ne traite qu'une partie de la question",
+      "examples": [
+        "Oublie une sous-question",
+        "Ne répond qu'à la première partie"
+      ],
+      "recommendation": "Relis l'instruction et vérifie que tu as traité chaque partie",
+      "severity": "medium"
+    },
+    {
+      "id": "hors_sujet",
+      "name": "Réponse hors sujet",
+      "description": "L'élève répond à une question différente de celle posée",
+      "examples": [
+        "Répond à 'Qu'est-ce que ?' alors que l'instruction est 'Pourquoi ?'",
+        "Sujet connexe mais non demandé"
+      ],
+      "recommendation": "Relis l'instruction et assure-toi que ta réponse correspond exactement",
+      "severity": "high"
+    },
+    {
+      "id": "no_conclusion",
+      "name": "Absence de conclusion",
+      "description": "L'élève termine sans synthèse pour les tâches complexes",
+      "examples": [
+        "Réponse qui s'arrête après le développement",
+        "Pas de réponse finale à la problématique"
+      ],
+      "recommendation": "Termine toujours par une conclusion qui répond à la question",
+      "severity": "medium"
+    },
+    {
+      "id": "weak_structure",
+      "name": "Structure insuffisante",
+      "description": "L'élève ne structure pas correctement les réponses complexes",
+      "examples": [
+        "Réponse sans introduction ni conclusion",
+        "Mélange des idées sans organisation"
+      ],
+      "recommendation": "Pour les tâches complexes, utilise toujours : Introduction → Développement → Conclusion",
+      "severity": "high"
+    },
+    {
+      "id": "poor_document_usage",
+      "name": "Exploitation faible des documents",
+      "description": "L'élève ne cite pas ou n'utilise pas les documents fournis",
+      "examples": [
+        "Réponse uniquement basée sur les connaissances personnelles"
+      ],
+      "recommendation": "Appuie systématiquement tes réponses sur les documents fournis.",
+      "severity": "high"
+    },
+    {
+      "id": "too_descriptive",
+      "name": "Réponse trop descriptive",
+      "description": "L'élève décrit au lieu d'expliquer ou d'argumenter",
+      "examples": [
+        "Utilise 'صف' au lieu de 'فسر' ou 'برّر'"
+      ],
+      "recommendation": "Passe de la description à l'explication ou à la justification.",
+      "severity": "medium"
+    },
+    {
+      "id": "missing_arguments",
+      "name": "Arguments insuffisants",
+      "description": "L'élève ne fournit pas assez de preuves ou d'arguments",
+      "examples": [
+        "Réponse très courte pour un verbe 'أثبت' ou 'ناقش'"
+      ],
+      "recommendation": "Développe tes arguments avec des preuves issues des documents.",
+      "severity": "high"
+    },
+    {
+      "id": "hypothesis_not_scientific",
+      "name": "Hypothèse non scientifique",
+      "description": "L'élève propose une hypothèse non logique ou non scientifique",
+      "examples": [
+        "Hypothèse sans lien avec les données du document"
+      ],
+      "recommendation": "Base tes hypothèses sur les observations et les données scientifiques.",
+      "severity": "medium"
+    },
+    {
+      "id": "no_position",
+      "name": "Absence de prise de position",
+      "description": "L'élève n'exprime pas de position claire dans une discussion",
+      "examples": [
+        "Analyse équilibrée mais sans conclusion personnelle"
+      ],
+      "recommendation": "Termine par une prise de position argumentée.",
+      "severity": "medium"
+    }
+  ]
+}

@@ -10,7 +10,7 @@ from config import get_allowed_origins, get_settings
 from monitoring import setup_monitoring
 from rate_limit import limiter
 from routes.errors import generic_exception_handler, http_exception_handler, validation_exception_handler
-from routes.lifespan import lifespan, state  # noqa: F401 — state imported for health.py
+from routes.lifespan import lifespan, state  # noqa: F401 — re-exported for deps.py
 from routes.openapi_config import openapi_metadata
 
 setup_monitoring()
@@ -25,7 +25,7 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=get_allowed_origins(),
-    allow_origin_regex=r"https://.*\.vercel\.app",
+    allow_origin_regex=r"https://.*\.(vercel|netlify)\.app",
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE"],
     allow_headers=["Authorization", "Content-Type"],
@@ -38,28 +38,44 @@ app.add_middleware(SlowAPIMiddleware)
 from routes import (
     annales,
     auth,
-    bac_blanc,
+    avatar,
+    # === Methodology Intelligence (Semaines 1-8) ===
+    bac_blanc_intelligent,
+    badges,
     chat,
     chatbot,
     cours,
+    diagnostic,
     dual_coding,
     evaluate,
     exercices,
     flashcards,
+    gamification,
     health,
     lexique,
+    methodology,
+    methodology_flashcards,
     mindmap,
+    mindmap_methodology,
+    mystery_box,
     payment,
+    phase1,
+    phase2,
+    phase3,
+    phase4,
+    phase5,
+    phase6,
     programme,
     progress,
     session,
+    tuteur,
+    tutor,
     videos,
 )
 
 routers = [
     health.router,
     auth.router,
-    bac_blanc.router,
     chat.router,
     chatbot.router,
     cours.router,
@@ -72,9 +88,34 @@ routers = [
     programme.router,
     progress.router,
     lexique.router,
+    tuteur.router,
     videos.router,
     annales.router,
     dual_coding.router,
+    # === Gamification (Phase 0) ===
+    gamification.router,
+    mystery_box.router,
+    avatar.router,
+    # === Phase 1 — One More Click Loop ===
+    phase1.router,
+    # === Phase 2 — Mystery Box + Social + Badges ===
+    phase2.router,
+    badges.router,
+    # === Phase 3 — Avatar Avancé + Live Stats ===
+    phase3.router,
+    # === Phase 4 — Méthodologie + Gamification ===
+    phase4.router,
+    # === Phase 5 — Social + Live Classroom ===
+    phase5.router,
+    # === Phase 6 — Analytics & Optimisation ===
+    phase6.router,
+    # === Methodology Intelligence Routers (Semaines 1-8) ===
+    bac_blanc_intelligent.router,
+    diagnostic.router,
+    methodology.router,
+    methodology_flashcards.router,
+    mindmap_methodology.router,
+    tutor.router,
 ]
 
 for router in routers:

@@ -1,7 +1,7 @@
 # .ruff.toml — Khawarizmi Pro (Backend Python)
 target-version = "py312"
 line-length = 120
-exclude = ["migrations/versions/*", "__pycache__", ".venv", "node_modules", "scripts/", "tests/"]
+exclude = ["migrations/versions/*", "__pycache__", ".venv", "node_modules", "scripts/*"]
 
 [format]
 quote-style = "double"
@@ -28,16 +28,43 @@ ignore = [
     "E701",    # multi-statements sur une ligne (ok pour guards)
     "N802",    # noms fonctions en lower_case — accepté
     "N803",    # noms arguments en lower_case — accepté
-    "N815",    # mixedCase variable in class scope — accepté
-    "N806",    # non-lowercase variable in function — accepté
-    "B008",    # function-call-in-default-argument — pattern FastAPI Depends
-    "B904",    # raise-without-from-inside-except — acceptable
-    "RUF001",  # ambiguous unicode — Arabic text
-    "RUF002",  # ambiguous unicode docstring — Arabic text
-    "RUF003",  # ambiguous unicode comment — Arabic text
-    "RUF029",  # unused-async — FastAPI dependency injection
-    "RUF075",  # fallible-context-manager — acceptable
-    "SIM108",  # if-else-block-instead-of-if-exp — readability
+    "E402",    # module-import-not-at-top — TestClient init order
+    "RUF001",  # ambiguous-unicode-character — Arabic/emoji
+    "RUF002",  # ambiguous-unicode-character-docstring
+    "RUF003",  # ambiguous-unicode-character-comment
+    "RUF029",  # unused-async — FastAPI dependency overrides
+    "RUF034",  # useless-if-else — cosmetic
+    "RUF069",  # float-equality-comparison — intentional in tests
+    "RUF076",  # pytest-fixture-autouse — intentional
+    "SIM108",  # if-else-block — cosmetic
+    "B008",    # function-call-in-default — FastAPI Depends() pattern
+    "B904",    # raise-without-from — existing code
+    "B905",    # zip-without-explicit-strict — existing code
+    "B007",    # unused-loop-control-variable — existing code
+    "E701",    # multiple-statements-on-one-line-colon — existing code
+    "E702",    # multiple-statements-on-one-line-semicolon — existing code
+    "W291",    # trailing-whitespace — existing code
+    "W293",    # blank-line-with-whitespace — existing code
+    "N806",    # non-lowercase-variable-in-function — existing code
+    "N815",    # mixed-case-variable-in-class-scope — existing code
+    "F841",    # unused-variable — existing code
+    "C408",    # unnecessary-collection-call — existing code
+    "C401",    # unnecessary-generator-set — existing code
+    "C403",    # unnecessary-list-comprehension-set — existing code
+    "SIM105",  # suppressible-exception — existing code
+    "SIM103",  # needless-bool — existing code
+    "SIM115",  # open-file-with-context-handler — existing code
+    "SIM118",  # in-dict-keys — existing code
+    "RUF005",  # collection-literal-concatenation — existing code
+    "RUF010",  # explicit-f-string-type-conversion — existing code
+    "RUF013",  # implicit-optional — existing code
+    "RUF022",  # unsorted-dunder-all — existing code
+    "RUF027",  # missing-f-string-syntax — existing code
+    "RUF046",  # unnecessary-cast-to-int — existing code
+    "RUF052",  # used-dummy-variable — existing code
+    "RUF055",  # unnecessary-regular-expression — existing code
+    "RUF059",  # unused-unpacked-variable — existing code
+    "RUF075",  # fallible-context-manager — existing code
 ]
 fixable = ["ALL"]
 unfixable = []

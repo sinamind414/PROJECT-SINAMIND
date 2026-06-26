@@ -2,7 +2,7 @@
 import json
 
 path = "data/lexique_svt_terminale_complet.json"
-with open(path, "r", encoding="utf-8") as f:
+with open(path, encoding="utf-8") as f:
     raw = f.read()
 
 print("=== ENCODING ===")
@@ -32,7 +32,7 @@ for di, dom in enumerate(d["domaines"]):
                 "importance", "chapitre_principal"
             ]:
                 if not t.get(field):
-                    errors.append(f"{t.get('id','?')} missing {field}")
+                    errors.append(f"{t.get('id', '?')} missing {field}")
             if t.get("type") not in [
                 "molecule", "enzyme", "concept", "processus",
                 "cellule", "organite", "structure", "mecanisme"
@@ -43,7 +43,7 @@ for di, dom in enumerate(d["domaines"]):
                     f"{t.get('id')} invalid importance: {t.get('importance')}"
                 )
 
-print(f"\n=== VALIDATION ===")
+print("\n=== VALIDATION ===")
 print(f"Total terms: {len(all_terms)}")
 print(f"Errors: {len(errors)}")
 for e in errors[:10]:
@@ -63,6 +63,7 @@ print(f"Cross-links: {len(d['liens_transversaux'])}")
 
 # Sample
 import random
+
 print("\n=== SAMPLE ===")
 for t in random.sample(all_terms, min(5, len(all_terms))):
     print(f"  {t['id']}: {t['terme_fr']} ({t['terme_ar']}) [{t['importance']}]")

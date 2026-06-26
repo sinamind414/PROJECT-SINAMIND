@@ -34,12 +34,7 @@ async def create_task(user_id: str, matiere: str, chapitre: str, filiere: str, d
 
 
 async def _update_task(
-    task_id: str,
-    status: str,
-    progress: str | None = None,
-    error: str | None = None,
-    mindmap_id: str | None = None,
-    db: AsyncSession = None,
+    task_id: str, status: str, progress: str = None, error: str = None, mindmap_id: str = None, db: AsyncSession = None
 ) -> None:
     """Met à jour le statut d'une tâche."""
     sets = ["status = :status", "updated_at = NOW()"]
@@ -489,8 +484,8 @@ async def generate_mindmap(
     from config import get_settings
     from services.llm import extract_json_from_gemini
 
-    model = get_settings().openai_model
-    logger.info(f"Generation du Mind Map via le modele {model}...")
+    _model = get_settings().openai_model
+    logger.info(f"Generation du Mind Map via le modele {_model}...")
     try:
         response = await openai_client.chat.completions.create(
             model=model,
@@ -582,7 +577,7 @@ def _build_default_racine(chapitre: str, matiere: str) -> dict:
 
 
 async def _generate_auto_flashcards(
-    node: dict, matiere: str, chapitre: str, user_id: str, db: AsyncSession, flashcards: list | None = None
+    node: dict, matiere: str, chapitre: str, user_id: str, db: AsyncSession, flashcards: list = None
 ) -> list:
     if flashcards is None:
         flashcards = []

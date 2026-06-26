@@ -1,12 +1,12 @@
-# -*- coding: utf-8 -*-
 """
 scripts/ingest_chapter1.py - Ingestion des chunks du manuel scolaire pour le RAG.
 """
 
+import asyncio
+import json
 import os
 import sys
-import json
-import asyncio
+
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import create_async_engine
 
@@ -174,23 +174,24 @@ CHAPTER1_CHUNKS = [
     }
 ]
 
+
 async def ingest_chapter1():
     # Charger la configuration
     cfg = get_settings()
     db_url = cfg.DATABASE_URL
     if not db_url:
         db_url = os.getenv("DATABASE_URL")
-        
+
     if not db_url:
         print("Error: DATABASE_URL not set in environment or settings.")
         return
-        
+
     if db_url.startswith("postgres://"):
         db_url = db_url.replace("postgres://", "postgresql+asyncpg://", 1)
     elif db_url.startswith("postgresql://"):
         db_url = db_url.replace("postgresql://", "postgresql+asyncpg://", 1)
-        
-    print(f"Connecting to database...")
+
+    print("Connecting to database...")
     engine = create_async_engine(db_url, echo=False)
 
     print(f"Ingestion de {len(CHAPTER1_CHUNKS)} chunks — Chapitre 1")
@@ -240,11 +241,12 @@ async def ingest_chapter1():
             text("SELECT COUNT(*) FROM reference_embeddings WHERE source = 'livre_scolaire_ch1'")
         )
         count = res.scalar()
-        print(f"\n{'='*60}")
+        print(f"\n{'=' * 60}")
         print(f"  Résultat : {count} chunks ingérés pour le chapitre 1")
-        print(f"  Priorité 1 (bareme) : الحصيلة المعرفية ⭐")
+        print("  Priorité 1 (bareme) : الحصيلة المعرفية ⭐")
 
     await engine.dispose()
+
 
 if __name__ == "__main__":
     asyncio.run(ingest_chapter1())

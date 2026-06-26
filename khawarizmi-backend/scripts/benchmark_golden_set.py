@@ -16,12 +16,12 @@ Output :
     - data/benchmark_results.json : résultats détaillés
 """
 
+import argparse
 import asyncio
 import json
-import time
-import argparse
 import pathlib
 import sys
+import time
 
 # Ajouter le répertoire backend au path
 sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
@@ -29,10 +29,11 @@ sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 
 async def benchmark_rag_only(questions: list) -> dict:
     """Benchmark RAG uniquement (sans appel LLM) — mesure la couverture."""
-    from services.embedder import embedder
-    from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
     from sqlalchemy import text
+    from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+
     from config import get_settings
+    from services.embedder import embedder
 
     cfg = get_settings()
     if not cfg.DATABASE_URL:
@@ -134,12 +135,12 @@ async def benchmark_rag_only(questions: list) -> dict:
 
 async def benchmark_full(questions: list) -> dict:
     """Benchmark complet RAG + LLM — mesure la qualité des réponses."""
-    from services.embedder import embedder
-    from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
-    from sqlalchemy import text
-    from config import get_settings
     from openai import AsyncOpenAI
-    from services.llm import extract_json_from_gemini
+    from sqlalchemy import text
+    from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+
+    from config import get_settings
+    from services.embedder import embedder
 
     cfg = get_settings()
     if not cfg.DATABASE_URL:
@@ -167,7 +168,7 @@ async def benchmark_full(questions: list) -> dict:
             reponse_attendue = q["reponse_attendue"]
             mots_cles = q["mots_cles_attendus"]
 
-            print(f"  [{i+1}/{len(questions)}] {q_id} — {chapitre}...", end=" ", flush=True)
+            print(f"  [{i + 1}/{len(questions)}] {q_id} — {chapitre}...", end=" ", flush=True)
 
             # 1. Embedding
             t0 = time.perf_counter()
@@ -313,14 +314,14 @@ def print_summary(stats: dict, full: bool = False):
         print(f"LLM succès     : {stats.get('llm_success_rate', 0):.1%} ({stats.get('llm_success', 0)}/{stats['total_questions']})")
         print(f"Keyword coverage moyen : {stats.get('avg_keyword_coverage', 0):.1%}")
 
-    print(f"\nLatences :")
+    print("\nLatences :")
     print(f"  Embedding : {stats['avg_embedding_ms']:.1f} ms (moyenne)")
     print(f"  RAG       : {stats['avg_rag_ms']:.1f} ms (moyenne)")
     if full:
         print(f"  LLM       : {stats.get('avg_llm_ms', 0):.1f} ms (moyenne)")
 
     # Détail par chapitre
-    print(f"\nPar chapitre :")
+    print("\nPar chapitre :")
     chapitre_stats = {}
     for r in stats.get("results", []):
         ch = r.get("chapitre", "?")
@@ -353,7 +354,7 @@ async def main():
         print("Génère-le d'abord: python scripts/generate_golden_set.py")
         return
 
-    with open(golden_path, "r", encoding="utf-8") as f:
+    with open(golden_path, encoding="utf-8") as f:
         golden = json.load(f)
 
     questions = golden["questions"]

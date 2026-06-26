@@ -10,7 +10,7 @@ from fsrs import Scheduler
 logger = logging.getLogger("khawarizmi.fsrs_config")
 
 
-def get_fsrs_scheduler(user_fsrs_config: dict | None = None) -> Scheduler:
+def get_fsrs_scheduler(user_fsrs_config: dict = None) -> Scheduler:
     """
     Retourne un scheduler FSRS (Scheduler) calibré.
     Si user_fsrs_config contient desired_retention ou d'autres paramètres, on les applique,

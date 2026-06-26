@@ -88,10 +88,7 @@ def upgrade() -> None:
     )
 
     # ── user_exercise_responses (colonnes additionnelles) ────────────
-    op.execute(
-        "ALTER TABLE user_exercise_responses "
-        "ADD COLUMN IF NOT EXISTS max_score INTEGER"
-    )
+    # max_score existe déjà depuis migration 014 (Float) — on ne le ré-ajoute pas
     op.add_column(
         "user_exercise_responses",
         sa.Column("percentage", sa.Float(), nullable=True),
@@ -146,7 +143,7 @@ def downgrade() -> None:
     op.drop_column("user_exercise_responses", "evaluation_details")
     op.drop_column("user_exercise_responses", "is_correct")
     op.drop_column("user_exercise_responses", "percentage")
-    op.drop_column("user_exercise_responses", "max_score")
+    # max_score droppé par migration 014, pas par 016
     op.drop_column("exercises", "tags")
     op.drop_column("exercises", "is_active")
     op.drop_column("exercises", "success_count")

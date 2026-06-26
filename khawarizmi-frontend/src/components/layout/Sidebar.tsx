@@ -18,20 +18,58 @@ import {
   Flame,
   Microscope,
   Network,
+  Repeat,
 } from "lucide-react"
 
-const MENU = [
-  { href: "/dashboard", icon: LayoutDashboard, labelAr: "لوحة التحكم" },
-  { href: "/cours", icon: BookOpen, labelAr: "الدروس النشطة" },
-  { href: "/diagnostic", icon: ListChecks, labelAr: "التشخيص" },
-  { href: "/annales", icon: BookMarked, labelAr: "مواضيع البكالوريا" },
-  { href: "/action-verbs", icon: Zap, labelAr: "أفعال الأداء" },
-  { href: "/document-analysis", icon: Search, labelAr: "استغلال الوثائق" },
-  { href: "/mindmap", icon: Network, labelAr: "الخريطة الذهنية" },
-  { href: "/simulation", icon: Microscope, labelAr: "محاكاة تفاعلية" },
-  { href: "/retry-errors", icon: AlertTriangle, labelAr: "إصلاح الأخطاء" },
-  { href: "/exercises", icon: Dumbbell, labelAr: "التمارين" },
-  { href: "/progress", icon: TrendingUp, labelAr: "التقدم" },
+type MenuItem = {
+  href: string
+  icon: any
+  labelAr: string
+}
+
+type Phase = {
+  label: string
+  items: MenuItem[]
+}
+
+const MENU_PHASES: Phase[] = [
+  {
+    label: "التعلّم",
+    items: [
+      { href: "/dashboard", icon: LayoutDashboard, labelAr: "لوحة التحكم" },
+      { href: "/cours", icon: BookOpen, labelAr: "الدروس النشطة" },
+      { href: "/mindmap", icon: Network, labelAr: "الخريطة الذهنية" },
+    ],
+  },
+  {
+    label: "التدريب",
+    items: [
+      { href: "/simulation", icon: Microscope, labelAr: "محاكاة تفاعلية" },
+      { href: "/exercises", icon: Dumbbell, labelAr: "التمارين" },
+      { href: "/retry-errors", icon: AlertTriangle, labelAr: "إصلاح الأخطاء" },
+      { href: "/drill", icon: Repeat, labelAr: "مراجعة سريعة" },
+    ],
+  },
+  {
+    label: "المنهجية",
+    items: [
+      { href: "/action-verbs", icon: Zap, labelAr: "أفعال الأداء" },
+      { href: "/document-analysis", icon: Search, labelAr: "استغلال الوثائق" },
+    ],
+  },
+  {
+    label: "التقييم",
+    items: [
+      { href: "/diagnostic", icon: ListChecks, labelAr: "التشخيص" },
+      { href: "/annales", icon: BookMarked, labelAr: "مواضيع البكالوريا" },
+    ],
+  },
+  {
+    label: "المتابعة",
+    items: [
+      { href: "/progress", icon: TrendingUp, labelAr: "التقدم" },
+    ],
+  },
 ]
 
 export function Sidebar() {
@@ -71,31 +109,49 @@ export function Sidebar() {
 
       <div className="divider-glow mx-5" />
 
-      {/* Nav */}
-      <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-1">
-        {MENU.map((item, i) => {
-          const Icon = item.icon
-          const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`)
-          return (
-            <motion.div
-              key={item.href}
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.05 * i }}
-            >
-              <Link
-                href={item.href}
-                className={`w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-bold transition-all group ${isActive ? 'bg-mint/15 border border-mint/40 text-mint' : 'text-slate-300 hover:bg-white/5 hover:text-mint-soft border border-transparent'}`}
-              >
-                <span className={`w-9 h-9 rounded-lg flex items-center justify-center transition-all ${isActive ? 'bg-mint/20 text-mint shadow-md shadow-mint/20' : 'bg-white/5 text-slate-400 group-hover:text-mint'}`}>
-                  <Icon className="w-4.5 h-4.5" strokeWidth={2.2} />
-                </span>
-                <span className="flex-1 text-right">{item.labelAr}</span>
-                {isActive && <span className="w-1.5 h-1.5 rounded-full bg-mint pulse-glow" />}
-              </Link>
-            </motion.div>
-          )
-        })}
+      {/* Nav with phases */}
+      <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-6">
+        {MENU_PHASES.map((phase, phaseIndex) => (
+          <div key={phaseIndex} className="space-y-1">
+            {/* Phase Separator */}
+            <div className="px-3.5 py-1 text-[10px] font-black tracking-widest text-mint/60 uppercase">
+              {phase.label}
+            </div>
+
+            {phase.items.map((item, itemIndex) => {
+              const Icon = item.icon
+              const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`)
+
+              return (
+                <motion.div
+                  key={item.href}
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.03 * (phaseIndex * 4 + itemIndex) }}
+                >
+                  <Link
+                    href={item.href}
+                    className={`w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-bold transition-all group ${
+                      isActive 
+                        ? 'bg-mint/15 border border-mint/40 text-mint' 
+                        : 'text-slate-300 hover:bg-white/5 hover:text-mint-soft border border-transparent'
+                    }`}
+                  >
+                    <span className={`w-9 h-9 rounded-lg flex items-center justify-center transition-all ${
+                      isActive 
+                        ? 'bg-mint/20 text-mint shadow-md shadow-mint/20' 
+                        : 'bg-white/5 text-slate-400 group-hover:text-mint'
+                    }`}>
+                      <Icon className="w-4.5 h-4.5" strokeWidth={2.2} />
+                    </span>
+                    <span className="flex-1 text-right">{item.labelAr}</span>
+                    {isActive && <span className="w-1.5 h-1.5 rounded-full bg-mint pulse-glow" />}
+                  </Link>
+                </motion.div>
+              )
+            })}
+          </div>
+        ))}
       </nav>
 
       <div className="divider-glow mx-5" />

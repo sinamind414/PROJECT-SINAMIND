@@ -708,7 +708,7 @@ Type d'erreur non identifié.
         Méthode principale : construit le prompt ET appelle l'IA.
         Actuellement ce lien est absent du fichier.
         """
-        self.build_system_prompt(sujet_id, question_id, student_input, **kwargs)
+        prompt = self.build_system_prompt(sujet_id, question_id, student_input, **kwargs)
         # Appel à connecter ici avec le service LLM
         raise NotImplementedError("Connecter ici openai / anthropic / google-generativeai")
 

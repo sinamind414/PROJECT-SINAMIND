@@ -64,33 +64,25 @@ async def lifespan(app: FastAPI):
 
         from services.dual_coding import DualCodingService
 
-        # Auto-détection provider depuis la clé (fabuleux V4)
         api_key = cfg.OPENAI_API_KEY
         base_url = cfg.openai_base_url
         model = cfg.openai_model
-        # Groq : gsk_*
+
+        # Auto-détection Groq : gsk_* prefix
         if api_key.startswith("gsk_"):
             base_url = "https://api.groq.com/openai/v1"
-            if model in ("gpt-4o-mini", "", None) or "gpt" in model:
+            if not model or model in ("gpt-4o-mini",) or "gpt" in model:
                 model = "llama-3.3-70b-versatile"
             logger.info(f"IA Provider auto-détecté: Groq ({model})")
-        # Gemini via OpenAI-compat
+
+        # Auto-détection Gemini : AIza* prefix
         elif api_key.startswith("AIza"):
             base_url = "https://generativelanguage.googleapis.com/v1beta/openai/"
-            if "gemini" not in model:
+            if not model or "gpt" in model:
                 model = "gemini-2.5-flash"
             logger.info(f"IA Provider auto-détecté: Gemini ({model})")
-        # Z.AI
-        elif (len(api_key) > 20 and "z.ai" in base_url) or "zai" in api_key.lower()[:10]:
-            base_url = cfg.zai_base_url or "https://api.z.ai/api/paas/v4/"
-            logger.info("IA Provider auto-détecté: Z.AI")
+
         state.openai = AsyncOpenAI(api_key=api_key, base_url=base_url)
-        # patch config en mémoire pour que chat.py utilise le bon modèle
-        try:
-            cfg.openai_model = model
-            cfg.openai_base_url = base_url
-        except Exception:
-            pass
         state.dual_coding = DualCodingService(state.openai)
         logger.info(f"IA initialisée: {base_url} | model={model}")
 
@@ -120,8 +112,10 @@ async def lifespan(app: FastAPI):
 
     if state.reconciliation_task:
         state.reconciliation_task.cancel()
-        with suppress(asyncio.CancelledError):
+        try:
             await state.reconciliation_task
+        except asyncio.CancelledError:
+            pass
     if state.redis:
         await state.redis.aclose()
     if state.db_engine:

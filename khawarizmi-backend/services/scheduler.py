@@ -80,7 +80,7 @@ class KhawarizmiScheduler:
 
     def _verify_fsrs_api(self):
         """Détecte la version de l'API fsrs installée."""
-        Card()
+        test_card = Card()
         if hasattr(self.fsrs, "review_card"):
             self._api_version = "new"  # fsrs >= 4.0
             logger.info("fsrs API v4.0+ détectée (review_card)")

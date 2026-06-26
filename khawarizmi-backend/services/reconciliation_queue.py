@@ -65,7 +65,7 @@ async def correct_fsrs_scores(student_id: str, question_id: str, corrected_score
                 logger.error(f"Question {question_id} non trouvée lors de la correction.")
                 return
 
-            question.get("chapitre_id", "ch_inconnu")
+            chapter = question.get("chapitre_id", "ch_inconnu")
             concept_ids = list(corrected_scores.keys())
 
             # 2. Charger l'état FSRS des concepts
@@ -102,7 +102,9 @@ async def correct_fsrs_scores(student_id: str, question_id: str, corrected_score
             mapping = QuestionConceptMapping(question_id=question_id, concepts=dict.fromkeys(concept_ids, 1.0))
 
             l1_eval_result = {
-                "score": round(sum(corrected_scores.values()) / len(corrected_scores) * 10) if corrected_scores else 0,
+                "score": int(round(sum(corrected_scores.values()) / len(corrected_scores) * 10))
+                if corrected_scores
+                else 0,
                 "statut": "CORRECT" if any(s >= 0.6 for s in corrected_scores.values()) else "FAUX",
                 "feedback": "Correction asynchrone.",
                 "manquant": [],

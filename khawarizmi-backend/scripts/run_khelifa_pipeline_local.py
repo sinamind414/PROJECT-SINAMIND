@@ -31,7 +31,6 @@ import sys
 import time
 from collections import Counter
 from pathlib import Path
-from typing import List, Optional
 
 import cv2
 import numpy as np
@@ -61,7 +60,7 @@ KHELIFA2_DIR = ANNALES_DIR / "KHELIFA_2" / "VOLUMES_KHELIFA2"
 _reader = None
 
 
-def get_reader(gpu: bool = True) -> "easyocr.Reader":
+def get_reader(gpu: bool = True) -> easyocr.Reader:
     global _reader
     if _reader is None:
         import easyocr
@@ -154,6 +153,7 @@ MC_MAP: dict[str, str] = {
 # Fonctions OCR et extraction
 # ---------------------------------------------------------------------------
 
+
 def ocr_page(pix, reader, use_preprocess: bool = True) -> list[dict]:
     tmp = f"/tmp/ocr_{os.urandom(4).hex()}.png"
     if use_preprocess:
@@ -239,6 +239,7 @@ def clean_arabic(text: str) -> str:
 # Traitement d'un volume
 # ---------------------------------------------------------------------------
 
+
 def process_volume(
     pdf_path: Path,
     serie: int,
@@ -275,7 +276,7 @@ def process_volume(
             main, sec, av = tag_concept(cleaned)
             avg_conf = round(sum(b["confidence"] for b in q["blocks"]) / len(q["blocks"]), 2)
             qd = {
-                "id": f"q_khelifa{serie}_v{vol_num:02d}_p{page_no:02d}_{qi+1:02d}",
+                "id": f"q_khelifa{serie}_v{vol_num:02d}_p{page_no:02d}_{qi + 1:02d}",
                 "texte_brut": q["texte_brut"][:500],
                 "texte_corrige": cleaned[:500],
                 "micro_concept_id": main,
@@ -304,6 +305,7 @@ def process_volume(
 # ---------------------------------------------------------------------------
 # Volumes déjà traités (détection automatique)
 # ---------------------------------------------------------------------------
+
 
 def already_processed(set_ids: set[str]) -> set[str]:
     """Retourne les IDs de volumes déjà présents dans ocr_output."""

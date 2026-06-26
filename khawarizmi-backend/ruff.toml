@@ -1,0 +1,13 @@
+[lint]
+select = ["E", "F", "W", "I", "UP", "B", "SIM"]
+ignore = [
+    "E402",     # module-import-not-at-top — TestClient init order
+    "E501",     # line-too-long — tests
+    "E741",     # ambiguous-variable-name — tests
+    "RUF001",   # ambiguous-unicode-character — Arabic/emoji
+    "RUF029",   # unused-async — FastAPI dependency overrides
+    "RUF034",   # useless-if-else — cosmetic
+    "RUF069",   # float-equality-comparison — intentional in tests
+    "RUF076",   # pytest-fixture-autouse — intentional
+    "SIM108",   # if-else-block — cosmetic
+]

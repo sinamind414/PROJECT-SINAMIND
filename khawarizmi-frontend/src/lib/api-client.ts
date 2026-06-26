@@ -23,6 +23,19 @@ import {
   ProgressResponse,
   OrientationResponse,
   WeekActivityResponse,
+  StartBacResponse,
+  ChooseSubjectResponse,
+  SubmitBacResponse,
+  CorrectionResponse,
+  ActionVerbSummary,
+  ActionVerbExercise,
+  VerbEvaluateResponse,
+  VerbProgressResponse,
+  DaProgressResponse,
+  DaWeakSpotsResponse,
+  TuteurResponse,
+  LessonResponse,
+  CheckAnswerResponse,
 } from "./types"
 
 const API_BASE_URL = ""
@@ -351,38 +364,250 @@ class KhawarizmiApiClient {
     return this.request<WeekActivityResponse>("/api/week-activity")
   }
 
+  // ── Tuteur IA (chatbot) ──────────────────────
 
-  // ── Action Verbs ──
-  async getActionVerbs(): Promise<any> { return this.request<any>("/action_verbs") }
-  async getVerbProgress(): Promise<any> { return this.request<any>("/action_verbs/progress") }
-  async getVerbExercises(slug: string): Promise<any> { return this.request<any>(`/action_verbs/${slug}/exercises`) }
-  async evaluateVerbAnswer(payload: any, answer?: any): Promise<any> {
-    const body = typeof payload === 'string' ? { slug: payload, answer } : payload
-    return this.request<any>("/action_verbs/evaluate", { method: "POST", body: JSON.stringify(body) })
+  // ── Tuteur IA (chatbot) ──────────────────────
+
+  async sendTuteurMessage(payload: {
+    message: string
+    context?: { page_source?: string; history?: Array<{ role: string; content: string }> | string[]; chapitre?: string }
+  }): Promise<TuteurResponse> {
+    if (payload.message === "__init__" || payload.message === "__activate_tutor__") {
+      return {
+        reponse: "مرحبا بك يا طالب البكالوريا! كيف يمكنني مساعدتك اليوم في مادة SVT؟ 😊",
+        type: "orientation",
+        cartes: [
+          { titre: "شرح مفهوم", raison: "فهم أفضل للدرس", action: "اطلب شرح أي مفهوم في SVT", bouton: "📖 شرح" },
+          { titre: "حل تمرين", raison: "تطبيق مباشر", action: "حل تمارين البكالوريا", bouton: "✍️ تمرين" },
+        ],
+        flashcards_suggerees: [],
+        fallback_active: false,
+      }
+    }
+
+    const history = (payload.context?.history as Array<{ role: string; content: string }> | undefined) || []
+    const chatbotPayload: Record<string, unknown> = { message: payload.message, lang: "ar" }
+    if (history.length > 0) {
+      chatbotPayload.history = history.slice(-6)
+    }
+
+    try {
+      const data = await this.request<{
+        response: string; lang: string; tokens_utilises?: number; from_cache?: boolean
+      }>("/api/chatbot/ask", {
+        method: "POST",
+        body: JSON.stringify(chatbotPayload),
+      })
+      return {
+        reponse: data.response,
+        type: "socratique",
+        cartes: [],
+        flashcards_suggerees: [],
+        fallback_active: false,
+      }
+    } catch {
+      throw new Error("Chatbot indisponible")
+    }
   }
-  async reviewVerb(slug: string, rating?: any, percentage?: any, payload: any = {}): Promise<any> {
-    const body = typeof rating === 'number' ? { rating, percentage, ...payload } : (rating || payload)
-    return this.request<any>(`/action_verbs/${slug}/review`, { method: "POST", body: JSON.stringify(body || {}) })
+
+  // ── Bac Blanc ─────────────────────────────────
+
+  async startBac(annaleSlug: string): Promise<StartBacResponse> {
+    return this.request<StartBacResponse>(
+      "/api/bac-blanc/start",
+      { method: "POST", body: JSON.stringify({ annale_slug: annaleSlug }) }
+    )
   }
 
-  // ── Bac Blanc ──
-  async startBac(payload: any = {}): Promise<any> { return this.request<any>("/bac_blanc/start", { method: "POST", body: JSON.stringify(payload) }) }
-  async chooseBacSubject(...args: any[]): Promise<any> { const payload = args[0] || {}; return this.request<any>("/bac_blanc/choose", { method: "POST", body: JSON.stringify(payload) }) }
-  async saveBacAnswer(...args: any[]): Promise<any> { const payload = args[0] || {}; return this.request<any>("/bac_blanc/save", { method: "POST", body: JSON.stringify(payload) }) }
-  async submitBac(payload: any = {}): Promise<any> { return this.request<any>("/bac_blanc/submit", { method: "POST", body: JSON.stringify(payload) }) }
-  async getBacCorrection(sessionId: string): Promise<any> { return this.request<any>(`/bac_blanc/${sessionId}/correction`) }
+  async chooseBacSubject(sessionId: string, num: 1 | 2): Promise<ChooseSubjectResponse> {
+    return this.request<ChooseSubjectResponse>(
+      "/api/bac-blanc/choose",
+      { method: "POST", body: JSON.stringify({ session_id: sessionId, subject_choice: num }) }
+    )
+  }
 
-  // ── Lessons ──
-  async getLesson(chapterSlug: string): Promise<any> { return this.request<any>(`/lessons/${chapterSlug}`) }
-  async checkLessonAnswer(...args: any[]): Promise<any> { const chapterSlug=args[0]; const answer=args[1]; return this.request<any>(`/lessons/${chapterSlug}/check`, { method: "POST", body: JSON.stringify(typeof answer==='string'?{answer}:answer) }) }
+  async saveBacAnswer(
+    sessionId: string,
+    exerciseId: string,
+    questionId: string,
+    answerText: string,
+    skipped: boolean
+  ) {
+    return this.request<{ status: string; saved_at: string }>(
+      "/api/bac-blanc/save",
+      { method: "POST", body: JSON.stringify({ session_id: sessionId, exercise_id: exerciseId, question_id: questionId, answer_text: answerText, skipped }) }
+    )
+  }
 
-  // ── Document Analysis ──
-  async evaluateDaAnswers(payload: any): Promise<any> { return this.request<any>("/document_analysis/evaluate", { method: "POST", body: JSON.stringify(payload) }) }
-  async getDaProgress(): Promise<any> { return this.request<any>("/document_analysis/progress") }
-  async getDaWeakSpots(): Promise<any> { return this.request<any>("/document_analysis/weak-spots") }
+  async submitBac(sessionId: string): Promise<SubmitBacResponse> {
+    return this.request<SubmitBacResponse>(
+      "/api/bac-blanc/submit",
+      { method: "POST", body: JSON.stringify({ session_id: sessionId }) }
+    )
+  }
 
-  // ── Tuteur ──
-  async sendTuteurMessage(payload: any): Promise<any> { try { return await this.request<any>("/api/tuteur", { method: "POST", body: JSON.stringify(payload) }) } catch { return this.sendMessage(payload) } }
+  async getBacCorrection(sessionId: string): Promise<CorrectionResponse> {
+    return this.request<CorrectionResponse>(
+      `/api/bac-blanc/${sessionId}/correction`
+    )
+  }
+
+  // ── Document Analysis ─────────────────────────
+
+  async evaluateDaAnswers(payload: {
+    scenario_id: string
+    chapter_slug?: string
+    answers: Array<{ question_id: string; verb_slug?: string; answer: string }>
+  }) {
+    return this.request<{
+      evaluations: Array<{
+        question_id: string
+        verb_slug: string
+        score: number
+        score_max: number
+        percentage: number
+        success: string[]
+        errors: string[]
+        missing_markers: string[]
+        forbidden_found: string[]
+        advice: string
+        dominant_error_code?: string
+      }>
+    }>("/api/document-analysis/evaluate", {
+      method: "POST",
+      body: JSON.stringify(payload)
+    })
+  }
+
+  async getDaProgress(): Promise<DaProgressResponse> {
+    return this.request<DaProgressResponse>(
+      "/api/document-analysis/progress"
+    )
+  }
+
+  async getDaWeakSpots(): Promise<DaWeakSpotsResponse> {
+    return this.request<DaWeakSpotsResponse>(
+      "/api/document-analysis/weak-spots"
+    )
+  }
+
+  // ── Lessons ───────────────────────────────────
+
+  async getLesson(chapterSlug: string): Promise<LessonResponse> {
+    return this.request<LessonResponse>(
+      `/api/lessons/${encodeURIComponent(chapterSlug)}`
+    )
+  }
+
+  async checkLessonAnswer(chapterSlug: string, blockId: string, answer: string): Promise<CheckAnswerResponse> {
+    return this.request<CheckAnswerResponse>(
+      `/api/lessons/${encodeURIComponent(chapterSlug)}/check`,
+      { method: "POST", body: JSON.stringify({ block_id: blockId, answer }) }
+    )
+  }
+
+  // ── Action Verbs ──────────────────────────────
+
+  async getActionVerbs(): Promise<ActionVerbSummary[]> {
+    return this.request<ActionVerbSummary[]>(
+      "/api/action-verbs"
+    )
+  }
+
+  async getVerbProgress(): Promise<VerbProgressResponse> {
+    return this.request<VerbProgressResponse>(
+      "/api/action-verbs/progress"
+    )
+  }
+
+  async getVerbExercises(slug: string): Promise<ActionVerbExercise[]> {
+    return this.request<ActionVerbExercise[]>(
+      `/api/action-verbs/${encodeURIComponent(slug)}/exercises`
+    )
+  }
+
+  async evaluateVerbAnswer(payload: { verb_slug: string; answer: string }): Promise<VerbEvaluateResponse> {
+    return this.request<VerbEvaluateResponse>(
+      "/api/action-verbs/evaluate",
+      { method: "POST", body: JSON.stringify(payload) }
+    )
+  }
+
+  async reviewVerb(slug: string, rating: 1 | 2 | 3 | 4, percentage?: number) {
+    return this.request<{ status: string }>(
+      `/api/action-verbs/${encodeURIComponent(slug)}/review`,
+      { method: "POST", body: JSON.stringify({ rating, percentage }) }
+    )
+  }
+
+  // ── Gamification (Phase 0 + Phase 1) ──────────
+
+  async updateStreak() {
+    return this.request<{ current_streak: number; longest_streak: number; updated: boolean }>(
+      "/api/gamification/streak/update",
+      { method: "POST" }
+    )
+  }
+
+  async getStreak() {
+    return this.request<{ current_streak: number; longest_streak: number }>(
+      "/api/gamification/streak"
+    )
+  }
+
+  async addPoints(points: number) {
+    return this.request<{ total_points: number }>(
+      `/api/gamification/points/add?points=${points}`,
+      { method: "POST" }
+    )
+  }
+
+  async getAvatar() {
+    return this.request<{ user_id: number; level: number; xp: number }>(
+      "/api/avatar/"
+    )
+  }
+
+  async addAvatarXp(xp: number) {
+    return this.request<{ level: number; xp: number; leveled_up: boolean }>(
+      `/api/avatar/add-xp?xp=${xp}`,
+      { method: "POST" }
+    )
+  }
+
+  async openMysteryBox(boxId: string) {
+    return this.request<{ type: string; value: number; message: string }>(
+      "/api/mystery-box/open",
+      { method: "POST", body: JSON.stringify({ box_id: boxId }) }
+    )
+  }
+
+  async createMysteryBox(rarity: string) {
+    return this.request<{ id: string; rarity: string; opened: boolean }>(
+      `/api/mystery-box/create?rarity=${rarity}`,
+      { method: "POST" }
+    )
+  }
+
+  async getAvailableBoxes() {
+    return this.request<{ boxes: Array<{ id: string; rarity: string }> }>(
+      "/api/mystery-box/available"
+    )
+  }
+
+  async getNextActions(lastAction: string) {
+    return this.request<{ actions: Array<{ title: string; action: string; icon: string; points: number }> }>(
+      "/api/phase1/next-actions",
+      { method: "POST", body: JSON.stringify({ last_action: lastAction }) }
+    )
+  }
+
+  async updateCombo(success: boolean) {
+    return this.request<{ multiplier: number; points_earned: number; combo_count: number; message: string }>(
+      "/api/phase1/combo",
+      { method: "POST", body: JSON.stringify({ success }) }
+    )
+  }
 
   // ── Health Check ───────────────────────────────
 

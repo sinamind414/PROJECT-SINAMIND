@@ -8,6 +8,7 @@
 *.key
 *.p12
 secrets/
+opencode.json
 
 # Backups et données lourdes
 *.backup_*
@@ -34,8 +35,9 @@ dist/
 *.swp
 *.swo
 
-# Modèles IA lourds
+# Modèles IA lourds (fichiers binaires uniquement)
 khawarizmi-backend/models/*
+!khawarizmi-backend/models/**/*.py
 !khawarizmi-backend/models/minilm_onnx_int8/
 *.zip
 *.tar.gz
@@ -46,12 +48,15 @@ khawarizmi-backend/models/*
 logs/
 
 
+# Outils IA temporaires
+.agents/
+.superpowers/
+
 # Archive sinamind
 ARCHIVE_SINAMIND/
 
 # Benchmark results
-khawarizmi-backend/data/benchmark_results.json
+khawarizmi-backend/data/
 
-# Outils IA temporaires
-.agents/
-.superpowers/
+# Local Netlify folder
+.netlify

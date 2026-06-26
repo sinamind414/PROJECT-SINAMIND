@@ -77,7 +77,10 @@ def concept_present_without_negation(text_normalized: str, pattern_normalized: s
     # Vérifier l'absence de négation dans la fenêtre
     if re.search(NEGATION_MARKERS_FR, window, re.IGNORECASE):
         return False
-    return not re.search(NEGATION_MARKERS_AR, window)
+    if re.search(NEGATION_MARKERS_AR, window):
+        return False
+
+    return True
 
 
 # ── Table de synonymes normalisés ─────────────────────────
@@ -355,7 +358,7 @@ def compute_tfidf_similarity(reponse_eleve: str, reponses_reference: list[str]) 
     normalized_refs = [_normalize_ar_fr(r) for r in reponses_reference]
     normalized_eleve = _normalize_ar_fr(reponse_eleve)
 
-    all_texts = [*normalized_refs, normalized_eleve]
+    all_texts = normalized_refs + [normalized_eleve]
 
     # Analyseur par n-grammes de caractères de 3 à 5
     vectorizer = TfidfVectorizer(analyzer="char_wb", ngram_range=(3, 5))

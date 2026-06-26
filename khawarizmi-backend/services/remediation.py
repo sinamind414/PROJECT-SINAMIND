@@ -212,7 +212,7 @@ def suggest_action_verb(
     error_type: str | None = None,
     chapter: str | None = None,
     score: int = 0,
-    missing_concepts: list[str] | None = None,
+    missing_concepts: list[str] = None,
 ) -> dict | None:
     """Suggère un verbe d'action pour la remédiation.
 

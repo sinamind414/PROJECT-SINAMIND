@@ -1,9 +1,13 @@
 """Create lexique_termes table and import JSON data."""
-import json, sys, os
+import json
+import os
+import sys
+
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
-from config import get_settings
 from sqlalchemy import create_engine, text
+
+from config import get_settings
 
 SETTINGS = get_settings()
 ENGINE = create_engine(SETTINGS.DATABASE_URL)
@@ -11,8 +15,9 @@ ENGINE = create_engine(SETTINGS.DATABASE_URL)
 JSON_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)),
                          "data", "lexique_svt_terminale_complet.json")
 
-with open(JSON_PATH, "r", encoding="utf-8") as f:
+with open(JSON_PATH, encoding="utf-8") as f:
     lexique = json.load(f)
+
 
 def create_table():
     with ENGINE.connect() as conn:
@@ -60,6 +65,7 @@ def create_table():
         conn.execute(text("CREATE INDEX ix_lexique_search ON lexique_termes (importance, chapitre_principal, type)"))
         conn.commit()
         print("Table lexique_termes created successfully")
+
 
 def import_data():
     rows = []
@@ -128,6 +134,7 @@ def import_data():
         result = conn.execute(text("SELECT COUNT(*) FROM lexique_termes"))
         count = result.scalar()
         print(f"\nTotal rows in DB: {count}")
+
 
 if __name__ == "__main__":
     print("Creating table...")

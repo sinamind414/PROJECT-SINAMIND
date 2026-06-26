@@ -13,6 +13,7 @@ import logging
 import pathlib
 
 from sqlalchemy import text
+
 from database import get_db
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")

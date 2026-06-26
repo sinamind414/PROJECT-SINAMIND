@@ -384,7 +384,7 @@ TENTATIVE: {tentative}
 REPONSE_ELEVE: {reponse}"""
 
     # Timeout de 8 secondes passé directement à l'appel réseau
-    model = get_settings().openai_model
+    _model = get_settings().openai_model
 
     messages = [{"role": "system", "content": calibrated_system_prompt}, {"role": "user", "content": user_message}]
 
@@ -402,7 +402,7 @@ REPONSE_ELEVE: {reponse}"""
 
     # Validation et mapping pour compatibilité avec l'ancienne structure de retour
     global_score = float(result.get("global_score", 0.0))
-    score_10 = round(global_score * 10)
+    score_10 = int(round(global_score * 10))
 
     if global_score >= 0.85:
         statut = "CORRECT"

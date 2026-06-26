@@ -8,6 +8,7 @@ from sqlalchemy import bindparam, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from deps import get_current_user, get_db, get_openai
+from methodology.evaluator import evaluate_methodology
 from rate_limit import evaluate_limit, limiter
 from services.fallback_v2 import evaluate_l2
 from services.llm import call_gpt4o_evaluator
@@ -38,6 +39,19 @@ class EvaluateRequest(BaseModel):
     reponse_eleve: str
     tentative: int = 1
     lang: str = "fr"
+    include_methodology: bool = True
+
+
+class MethodologyResponse(BaseModel):
+    note_methodologie: int = 0
+    note_max: int = 10
+    verb_identifie: str | None = None
+    type_tache: str = "unknown"
+    points_forts: list[str] = []
+    points_faibles: list[str] = []
+    feedback_principal: str = ""
+    recommandation: str = ""
+
 
 
 class EvaluateResponse(BaseModel):
@@ -47,6 +61,8 @@ class EvaluateResponse(BaseModel):
     manquant: list[str]
     next_review_date: str | None = None
     source: str
+    methodology: MethodologyResponse | None = None
+
 
 
 # ═══════════════════════════════
@@ -301,6 +317,29 @@ async def evaluate(
 
         eval_result["feedback"] = translate_feedback(eval_result.get("feedback", ""))
 
+    # Évaluation méthodologique
+    methodology_result = None
+    if req.include_methodology:
+        try:
+            question_texte = question.get("texte", "") or question.get("texte_ar", "")
+            methodo = await evaluate_methodology(
+                instruction=question_texte,
+                student_answer=req.reponse_eleve,
+            )
+            fb = methodo.get("feedback", {})
+            methodology_result = MethodologyResponse(
+                note_methodologie=methodo.get("score", 0),
+                note_max=methodo.get("max_score", 10),
+                verb_identifie=methodo.get("verb", None),
+                type_tache=methodo.get("task_type", "unknown"),
+                points_forts=fb.get("strengths", []),
+                points_faibles=fb.get("weaknesses", []),
+                feedback_principal=fb.get("message", ""),
+                recommandation=fb.get("recommendation", ""),
+            )
+        except Exception as e:
+            logger.warning(f"Methodology eval skipped: {e}")
+
     return EvaluateResponse(
         score=eval_result["score"],
         statut=eval_result["statut"],
@@ -308,6 +347,7 @@ async def evaluate(
         manquant=eval_result["manquant"],
         next_review_date=next_review_date,
         source=eval_result["source"],
+        methodology=methodology_result,
     )
 
 

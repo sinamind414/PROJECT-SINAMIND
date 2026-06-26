@@ -111,7 +111,7 @@ async def get_next_session(
     res_seen = await db.execute(
         text("SELECT concept_id FROM mastery_micro_concepts WHERE user_id = :uid"), {"uid": user_id}
     )
-    seen_ids = {row[0] for row in res_seen.fetchall()}
+    seen_ids = set(row[0] for row in res_seen.fetchall())
     exclude_set = set(req.exclude or [])
     all_q_ids = get_all_question_ids()
 

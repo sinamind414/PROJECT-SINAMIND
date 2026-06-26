@@ -1,11 +1,8 @@
 import json
 import os
-from datetime import UTC, date
 from unittest.mock import MagicMock, patch
 
 from fastapi.testclient import TestClient
-
-from deps import get_current_user, get_db, get_openai, get_scheduler
 
 # Force OPENAI_API_KEY environment variable to avoid config failure
 os.environ["OPENAI_API_KEY"] = "sk-fake-key-for-testing"
@@ -14,6 +11,10 @@ from main import app
 from services.questions import questions_db
 
 client = TestClient(app)
+
+from datetime import UTC
+
+from deps import get_current_user, get_db, get_openai, get_scheduler
 
 
 def override_get_current_user():
@@ -41,6 +42,7 @@ async def override_get_db():
 
     await asyncio.sleep(0)
     yield MockAsyncSession()
+
 
 
 class MockCard:
@@ -237,14 +239,14 @@ if __name__ == "__main__":
                 # S'assurer que les appels à date(...) fonctionnent normalement
                 mock_date.side_effect = lambda *args, **kwargs: date(*args, **kwargs)
                 scheduler = get_fsrs_scheduler()
-                assert abs(scheduler.desired_retention - 0.82) < 1e-6
+                assert scheduler.desired_retention == 0.82
 
             # Phase 2 : Avril - Mai (ex: 2026-04-15) -> desired_retention = 0.87
             with patch("services.fsrs_config.date") as mock_date:
                 mock_date.today.return_value = date(2026, 4, 15)
                 mock_date.side_effect = lambda *args, **kwargs: date(*args, **kwargs)
                 scheduler = get_fsrs_scheduler()
-                assert abs(scheduler.desired_retention - 0.87) < 1e-6
+                assert scheduler.desired_retention == 0.87
 
             # Phase 3 : Juin (ex: 2026-06-01) -> desired_retention = 0.90
             with patch("services.fsrs_config.date") as mock_date:

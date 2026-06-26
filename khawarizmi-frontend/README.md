@@ -1,43 +1,47 @@
-# Khawarizmi Pro — Frontend
+# Khawarizmi Frontend
 
-Interface utilisateur de la plateforme éducative IA, construite avec Next.js 16.
+Interface utilisateur de la plateforme IA Khawarizmi Pro — Bac SVT Algérie.
 
-## Stack
+## Stack technique
 
-- **Framework** : Next.js 16 + React 19
-- **Style** : TailwindCSS 4
-- **Langue** : Arabe (RTL) / Français
-- **API** : Axios vers backend FastAPI
-- **Mobile** : React Native + Expo 56 (projet séparé)
+- **Framework** : Next.js 16 (App Router)
+- **UI** : React 19 + TailwindCSS 4
+- **Animations** : Framer Motion
+- **Langue** : Arabe (RTL)
+- **Design system** : Glassmorphism, mint/orange palette
 
 ## Structure
 
 ```
 src/
-├── app/          ← Pages (App Router)
-├── components/   ← Composants réutilisables
-├── lib/          ← Utilitaires, API client
-├── hooks/        ← Custom hooks
-└── styles/       ← Styles globaux
+├── app/           → Pages (dashboard, cours, mindmap, exercises...)
+├── components/    → Composants réutilisables (layout, ui, features)
+├── lib/           → Auth context, API client, hooks
+├── styles/        → Globaux CSS
+└── public/        → Assets statiques
 ```
 
 ## Commandes
 
 ```bash
-npm install       # Installer les dépendances
-npm run dev       # Lancement développement (port 3000)
-npm run build     # Build production
-npm run lint      # ESLint
-npx tsc --noEmit  # TypeScript check
+npm run dev       # Développement
+npm run build     # Production
+npm run lint      # Linting
+npm run typecheck # TypeScript
 ```
 
-## Design
+## Design system
 
-- Support RTL (arabe)
-- Thème sombre/clair via TailwindCSS
-- Composants réutilisables dans `components/`
-- Page d'accueil avec étapes pédagogiques (Feynman → FSRS → Bac)
+Le projet utilise :
+- `mint` / `mint-soft` / `teal` — Couleurs primaires (vert scientifique)
+- `orange` — Accents et alertes
+- `slate-deep` / `slate-300` — Fonds et textes
+- RTL (`dir="rtl"`) — Arabe comme langue principale
 
-## Documentation
+## Références
 
-Voir `AGENTS.md` pour les règles de contribution.
+- `AGENTS.md` — Règles et conventions du projet
+
+---
+
+**Projet :** IA Khawarizmi Pro — Bac Sciences Naturelles Algérie

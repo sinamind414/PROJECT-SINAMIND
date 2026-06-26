@@ -13,32 +13,12 @@ const eslintConfig = defineConfig([
   ]),
   {
     rules: {
+      "react-compiler/react-compiler": "off",
       "react-hooks/set-state-in-effect": "off",
       "react-hooks/purity": "warn",
-    },
-  },
-  {
-    files: ["src/lib/api-client.ts"],
-    rules: {
-      "@typescript-eslint/no-explicit-any": "off",
-    },
-  },
-  {
-    files: ["src/components/simulation/*.tsx"],
-    rules: {
-      "react/no-unescaped-entities": "off",
-    },
-  },
-  {
-    files: ["src/app/mindmap/page.tsx", "src/components/methodology/ScenarioRunner.tsx"],
-    rules: {
-      "@typescript-eslint/no-explicit-any": "off",
-    },
-  },
-  {
-    files: ["src/components/dashboard/chatbot/AchievementPopup.tsx"],
-    rules: {
-      "prefer-const": "off",
+      "react/no-unescaped-entities": "warn",
+      "prefer-const": "warn",
+      "@typescript-eslint/no-unused-vars": "warn",
     },
   },
 ]);
