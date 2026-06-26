@@ -394,6 +394,14 @@ class KhawarizmiApiClient {
     }
   }
 
+  async sendChatbotMessage(payload: {
+    message: string
+    context?: { page_source?: string; history?: Array<{ role: string; content: string }> | string[]; chapitre?: string }
+    mode?: "quick" | "tutor"
+  }): Promise<TuteurResponse> {
+    return this.sendTuteurMessage({ message: payload.message, context: payload.context })
+  }
+
   // ── Bac Blanc ─────────────────────────────────
 
   async startBac(annaleSlug: string): Promise<StartBacResponse> {

@@ -146,6 +146,12 @@ export function useChatbot(): UseChatbotReturn {
   const scrollRef = useRef<HTMLDivElement | null>(null)
   const historyRef = useRef<ChatHistoryMessage[]>([])
   const initSent = useRef(false)
+  const messageIdRef = useRef(0)
+
+  function nextMessageId() {
+    messageIdRef.current += 1
+    return messageIdRef.current
+  }
 
   const addAssistantMessage = useCallback((resp: TuteurResponse) => {
     const display: DisplayMessage = {
@@ -162,7 +168,7 @@ export function useChatbot(): UseChatbotReturn {
   const sendInit = useCallback(async () => {
     setLoading(true)
     try {
-      const resp = await apiClient.sendTuteurMessage({
+      const resp = await apiClient.sendChatbotMessage({
         message: "__init__",
         context: {
           page_source: typeof window !== "undefined" ? window.location.pathname : undefined,
@@ -204,7 +210,7 @@ export function useChatbot(): UseChatbotReturn {
     setInput("")
 
     const userDisplay: DisplayMessage = {
-      id: Date.now(),
+      id: nextMessageId(),
       role: "user",
       content: msg,
     }
@@ -220,13 +226,14 @@ export function useChatbot(): UseChatbotReturn {
 
     setLoading(true)
     try {
-      const resp = await apiClient.sendTuteurMessage({
+      const resp = await apiClient.sendChatbotMessage({
         message: msg,
         context: {
           page_source: typeof window !== "undefined" ? window.location.pathname : undefined,
           chapitre: topic ?? undefined,
           history: newHistory.slice(-6),
         },
+        mode: isTutorMode ? "tutor" : "quick",
       })
       addAssistantMessage(resp)
       historyRef.current = [
@@ -270,7 +277,7 @@ export function useChatbot(): UseChatbotReturn {
 
     const feedbackText = FEEDBACK_MESSAGES[type]
     const userDisplay: DisplayMessage = {
-      id: Date.now(),
+      id: nextMessageId(),
       role: "user",
       content: feedbackText,
     }
@@ -284,12 +291,13 @@ export function useChatbot(): UseChatbotReturn {
 
     setLoading(true)
     try {
-      const resp = await apiClient.sendTuteurMessage({
+      const resp = await apiClient.sendChatbotMessage({
         message: feedbackText,
         context: {
           page_source: typeof window !== "undefined" ? window.location.pathname : undefined,
           history: newHistory.slice(-6),
         },
+        mode: isTutorMode ? "tutor" : "quick",
       })
       addAssistantMessage(resp)
       historyRef.current = [
@@ -313,11 +321,12 @@ export function useChatbot(): UseChatbotReturn {
     if (!isTutorMode) {
       setLoading(true)
       try {
-        await apiClient.sendTuteurMessage({
+        await apiClient.sendChatbotMessage({
           message: "__activate_tutor__",
           context: {
             page_source: typeof window !== "undefined" ? window.location.pathname : undefined,
           },
+          mode: "tutor",
         })
         setIsTutorMode(true)
         addAssistantMessage({
@@ -342,7 +351,7 @@ export function useChatbot(): UseChatbotReturn {
       setIsTutorMode(false)
       const exitMsg = "خرجت من وضع المدرس الشخصي"
       const userDisplay: DisplayMessage = {
-        id: Date.now(),
+        id: nextMessageId(),
         role: "user",
         content: exitMsg,
       }
@@ -353,12 +362,13 @@ export function useChatbot(): UseChatbotReturn {
       ]
       setLoading(true)
       try {
-        const resp = await apiClient.sendTuteurMessage({
+        const resp = await apiClient.sendChatbotMessage({
           message: exitMsg,
           context: {
             page_source: typeof window !== "undefined" ? window.location.pathname : undefined,
             history: historyRef.current.slice(-6),
           },
+          mode: "quick",
         })
         addAssistantMessage(resp)
       } catch {
