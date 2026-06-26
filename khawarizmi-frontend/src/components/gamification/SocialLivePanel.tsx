@@ -1,8 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { motion } from "framer-motion";
-import { Activity, Radio, Send, Trophy, Users } from "lucide-react";
+import { Activity, Radio, Search, Send, Trophy, UserPlus, Users, Zap } from "lucide-react";
 
 import apiClient from "@/lib/api-client";
 
@@ -21,7 +21,15 @@ type Phase5LiveStats = {
 type FriendActivity = {
   name: string;
   action: string;
+  activity_type?: string;
   time: string;
+};
+
+type SearchUser = {
+  id: number;
+  email: string;
+  name: string;
+  filiere?: string;
 };
 
 const FALLBACK_PHASE3: Phase3LiveStats = {
@@ -43,6 +51,12 @@ export default function SocialLivePanel({ chapter = "proteines" }: { chapter?: s
   const [loading, setLoading] = useState(true);
   const [challengeMessage, setChallengeMessage] = useState<string | null>(null);
   const [sendingChallenge, setSendingChallenge] = useState(false);
+
+  const searchRef = useRef<HTMLInputElement>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<SearchUser[]>([]);
+  const [searching, setSearching] = useState(false);
+  const [actionMsg, setActionMsg] = useState<string | null>(null);
 
   const mergedTop = useMemo(() => {
     const fromPhase5 = phase5.top_3.map((item) => ({ name: item.name, score: item.score }));
@@ -76,6 +90,25 @@ export default function SocialLivePanel({ chapter = "proteines" }: { chapter?: s
     void loadLiveData();
   }, [loadLiveData]);
 
+  useEffect(() => {
+    if (searchQuery.trim().length < 2) {
+      setSearchResults([]);
+      return;
+    }
+    const timer = setTimeout(async () => {
+      setSearching(true);
+      try {
+        const result = await apiClient.searchUsers(searchQuery);
+        setSearchResults(result.users);
+      } catch {
+        setSearchResults([]);
+      } finally {
+        setSearching(false);
+      }
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
   async function sendChallenge() {
     setSendingChallenge(true);
     setChallengeMessage(null);
@@ -87,6 +120,28 @@ export default function SocialLivePanel({ chapter = "proteines" }: { chapter?: s
     } finally {
       setSendingChallenge(false);
     }
+  }
+
+  async function handleAddFriend(user: SearchUser) {
+    setActionMsg(null);
+    try {
+      const result = await apiClient.sendFriendRequestToUser(user.id);
+      setActionMsg(`Demande envoyée à ${user.name}`);
+    } catch {
+      setActionMsg(`Erreur : impossible d'envoyer la demande à ${user.name}`);
+    }
+    setTimeout(() => setActionMsg(null), 3000);
+  }
+
+  async function handleChallengeUser(user: SearchUser) {
+    setActionMsg(null);
+    try {
+      const result = await apiClient.challengeUser(user.id);
+      setActionMsg(`Défi envoyé à ${user.name}`);
+    } catch {
+      setActionMsg(`Erreur : impossible de défier ${user.name}`);
+    }
+    setTimeout(() => setActionMsg(null), 3000);
   }
 
   return (
@@ -141,7 +196,12 @@ export default function SocialLivePanel({ chapter = "proteines" }: { chapter?: s
         <div className="space-y-2">
           {activities.length ? activities.map((activity, index) => (
             <div key={`${activity.name}-${activity.time}-${index}`} className="rounded-xl bg-white/[0.03] px-3 py-2">
-              <p className="text-sm text-white font-bold">{activity.name}</p>
+              <div className="flex items-center gap-2">
+                <p className="text-sm text-white font-bold">{activity.name}</p>
+                {activity.activity_type && (
+                  <span className="text-[10px] rounded-full bg-mint/10 px-2 py-0.5 text-mint-soft">{activity.activity_type}</span>
+                )}
+              </div>
               <p className="text-xs text-slate-400 mt-0.5">{activity.action}</p>
               <p className="text-[10px] text-mint-soft/70 mt-1">{activity.time}</p>
             </div>
@@ -149,6 +209,53 @@ export default function SocialLivePanel({ chapter = "proteines" }: { chapter?: s
             <p className="text-xs text-slate-500">Aucune activité récente.</p>
           )}
         </div>
+      </div>
+
+      <div className="relative z-10 rounded-2xl bg-white/[0.035] border border-white/[0.08] p-4">
+        <p className="text-white font-black text-sm mb-3">Trouver un ami</p>
+        <div className="relative">
+          <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+          <input
+            ref={searchRef}
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Rechercher par nom ou email..."
+            className="w-full rounded-xl bg-white/[0.05] border border-white/[0.1] text-white text-sm px-3 py-2.5 pr-10 placeholder:text-slate-500 focus:outline-none focus:border-mint/50"
+          />
+        </div>
+        {searching && <p className="text-xs text-slate-400 mt-2">Recherche en cours...</p>}
+        {searchResults.length > 0 && (
+          <div className="mt-2 space-y-1 max-h-40 overflow-y-auto">
+            {searchResults.map((user) => (
+              <div key={user.id} className="flex items-center gap-2 rounded-xl bg-white/[0.03] px-3 py-2">
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm text-white font-bold truncate">{user.name}</p>
+                  <p className="text-[10px] text-slate-400 truncate">{user.email}</p>
+                </div>
+                <button
+                  onClick={() => handleAddFriend(user)}
+                  className="rounded-lg bg-mint/15 text-mint p-1.5 hover:bg-mint/25 transition"
+                  title="Ajouter en ami"
+                >
+                  <UserPlus className="w-3.5 h-3.5" />
+                </button>
+                <button
+                  onClick={() => handleChallengeUser(user)}
+                  className="rounded-lg bg-orange/15 text-orange p-1.5 hover:bg-orange/25 transition"
+                  title="Défier"
+                >
+                  <Zap className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+        {actionMsg && (
+          <p className="mt-2 rounded-xl bg-mint/10 border border-mint/20 px-3 py-2 text-xs text-mint-soft font-bold">
+            {actionMsg}
+          </p>
+        )}
       </div>
 
       <div className="relative z-10">
