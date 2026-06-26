@@ -22,23 +22,25 @@ def _cookie_secure() -> bool:
 
 
 def _set_auth_cookie(response: Response, token: str) -> None:
+    secure = _cookie_secure()
     response.set_cookie(
         key=AUTH_COOKIE_NAME,
         value=token,
         httponly=True,
-        secure=_cookie_secure(),
-        samesite="lax",
+        secure=secure,
+        samesite="none" if secure else "lax",
         max_age=get_settings().JWT_EXPIRE_HOURS * 3600,
         path="/",
     )
 
 
 def _clear_auth_cookie(response: Response) -> None:
+    secure = _cookie_secure()
     response.delete_cookie(
         key=AUTH_COOKIE_NAME,
         httponly=True,
-        secure=_cookie_secure(),
-        samesite="lax",
+        secure=secure,
+        samesite="none" if secure else "lax",
         path="/",
     )
 
