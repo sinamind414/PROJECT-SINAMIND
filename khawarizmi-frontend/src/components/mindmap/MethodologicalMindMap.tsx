@@ -2,21 +2,31 @@
 
 import { useState } from "react";
 
-interface MethodologyInfo {
+export interface MethodologyInfo {
   verbe?: string;
   type?: string;
   conseil?: string;
 }
 
-interface MindMapNode {
+export interface MindMapNode {
   id: string;
   label: string;
   methodology?: MethodologyInfo;
   enfants?: MindMapNode[];
 }
 
+export interface MethodologicalMindMapData {
+  titre?: string;
+  methodology?: {
+    verbes_detectes?: string[];
+    points_methodologie?: number;
+    structure_recommandee?: string;
+  };
+  racine?: MindMapNode;
+}
+
 interface MethodologicalMindMapProps {
-  mindmap: any;
+  mindmap: MethodologicalMindMapData;
   onNodeClick?: (node: MindMapNode) => void;
 }
 

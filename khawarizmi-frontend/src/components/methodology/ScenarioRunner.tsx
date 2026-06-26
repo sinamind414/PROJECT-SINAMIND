@@ -171,7 +171,7 @@ export function ScenarioRunner({
       const resp = await apiClient.evaluateDaAnswers(payload)
 
       const evaluations = questions.map((question) => {
-        const evalData = resp.evaluations.find((e: any) => e.verb_slug === question.verbSlug)
+        const evalData = resp.evaluations.find((e) => e.verb_slug === question.verbSlug)
         const evaluation: MethodologyEvaluation = evalData
           ? {
               verbSlug: evalData.verb_slug,

@@ -3,17 +3,22 @@
 import { useState } from "react";
 
 import apiClient from "@/lib/api-client";
-import MethodologicalMindMap from "@/components/mindmap/MethodologicalMindMap";
+import MethodologicalMindMap, { type MethodologicalMindMapData } from "@/components/mindmap/MethodologicalMindMap";
 import ActionButton from "@/components/gamification/ActionButton";
 
+type MethodologicalMindMapResponse = {
+  status: string;
+  mindmap: MethodologicalMindMapData;
+};
+
 export default function MindMapMethodologyPage() {
-  const [mindmap, setMindmap] = useState<any>(null);
+  const [mindmap, setMindmap] = useState<MethodologicalMindMapData | null>(null);
   const [loading, setLoading] = useState(false);
 
   const generateMethodologicalMindMap = async () => {
     setLoading(true);
     try {
-      const data = await apiClient.request<any>("/api/mindmap/generate-methodological", {
+      const data = await apiClient.request<MethodologicalMindMapResponse>("/api/mindmap/generate-methodological", {
         method: "POST",
         body: JSON.stringify({
           matiere: "SVT",
@@ -60,9 +65,9 @@ export default function MindMapMethodologyPage() {
       {mindmap && (
         <div className="space-y-6">
           <MethodologicalMindMap mindmap={mindmap} />
-          {mindmap.methodology?.points_methodologie > 0 && (
+          {(mindmap.methodology?.points_methodologie ?? 0) > 0 && (
             <div className="bg-emerald-600/10 border border-emerald-600/30 rounded-2xl p-4 text-emerald-400">
-              🎉 +{mindmap.methodology.points_methodologie} points méthodologiques !
+              🎉 +{mindmap.methodology?.points_methodologie ?? 0} points méthodologiques !
             </div>
           )}
         </div>

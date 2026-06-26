@@ -4,6 +4,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useAuth } from "@/lib/auth-context"
 import { motion } from "framer-motion"
+import type { LucideIcon } from "lucide-react"
 import {
   LayoutDashboard,
   BookOpen,
@@ -23,7 +24,7 @@ import {
 
 type MenuItem = {
   href: string
-  icon: any
+  icon: LucideIcon
   labelAr: string
 }
 
