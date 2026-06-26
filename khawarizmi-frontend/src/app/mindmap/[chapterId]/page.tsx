@@ -4,7 +4,7 @@
 "use client"
 
 import { useEffect, useState, useMemo, useCallback } from "react"
-import { useParams, useRouter } from "next/navigation"
+import { useParams } from "next/navigation"
 import Link from "next/link"
 
 import {
@@ -138,7 +138,6 @@ export default function MindMapPage() {
 }
 
 function MindMapContent() {
-  const router = useRouter()
   const { chapterId } = useParams()
   const { user } = useAuth()
 
@@ -218,16 +217,13 @@ function MindMapContent() {
       // Auto select root node
       setSelectedNode(res.mindmap.racine)
 
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : UI_AR.erreur_chargement_mindmap
-      setError(msg)
+    } catch {
+      setError(UI_AR.erreur_chargement_mindmap)
     } finally {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- async data fetching
       setLoading(false)
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- async data fetching
       setGenerating(false)
     }
-  }, [user, chapterId])
+  }, [user, chapterId, setEdges, setNodes])
 
   useEffect(() => {
     if (user && chapterId) {
@@ -277,7 +273,7 @@ function MindMapContent() {
       setNodes(layout.nodes)
       setEdges([...layout.edges, ...transversalEdges])
 
-    } catch (err) {
+    } catch {
       alert(UI_AR.erreur_mise_a_jour_maitrise)
     }
   }

@@ -7,9 +7,7 @@ import { apiClient } from "@/lib/api-client"
 import type { CorrectionResponse } from "@/lib/types"
 
 function CorrectionContent() {
-  const params = useParams()
   const searchParams = useSearchParams()
-  const slug = params.slug as string
   const sessionId = searchParams.get("session") || ""
 
   const [correction, setCorrection] = useState<CorrectionResponse | null>(null)

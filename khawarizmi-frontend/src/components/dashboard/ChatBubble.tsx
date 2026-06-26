@@ -24,6 +24,12 @@ export function ChatBubble() {
   const [history, setHistory] = useState<ChatHistoryMessage[]>([])
   const scrollRef = useRef<HTMLDivElement>(null)
   const initSent = useRef(false)
+  const messageIdRef = useRef(0)
+
+  function nextMessageId() {
+    messageIdRef.current += 1
+    return messageIdRef.current
+  }
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -72,7 +78,7 @@ export function ChatBubble() {
     setInput("")
 
     const userDisplay: DisplayMessage = {
-      id: Date.now(),
+      id: nextMessageId(),
       role: "user",
       content: userMsg,
     }
@@ -110,7 +116,7 @@ export function ChatBubble() {
 
   function addAssistantMessage(resp: TuteurResponse) {
     const display: DisplayMessage = {
-      id: Date.now() + 1,
+      id: nextMessageId(),
       role: "assistant",
       content: resp.reponse,
       cartes: resp.cartes,

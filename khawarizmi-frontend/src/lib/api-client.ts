@@ -12,7 +12,6 @@ import {
   ExercicesResponse,
   Flashcard,
   HealthCheck,
-  LoginPayload,
   MindMap,
   MindMapGeneratePayload,
   Rating,

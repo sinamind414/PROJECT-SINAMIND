@@ -82,7 +82,7 @@ export function BacBlancImmersif({ annaleSlug }: { annaleSlug: string }) {
       setTimeLeft((t) => {
         if (t <= 1) {
           clearInterval(timerRef.current)
-          doSubmit()
+          void doSubmit()
           return 0
         }
         return t - 1
@@ -90,7 +90,7 @@ export function BacBlancImmersif({ annaleSlug }: { annaleSlug: string }) {
     }, 1000)
 
     saveRef.current = setInterval(() => {
-      saveAll()
+      void saveAll()
     }, 30000)
 
     return () => {

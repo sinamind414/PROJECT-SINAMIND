@@ -4,8 +4,7 @@ import { useMemo, useState } from "react"
 import Link from "next/link"
 import { AuthGuard } from "@/components/auth/AuthGuard"
 import { AppShell } from "@/components/layout/AppShell"
-import { activeLessons, groupLessonsByDomain, type ActiveLesson } from "@/lib/active-lessons"
-import { methodologyChapterLinks } from "@/lib/methodology-chapters"
+import { activeLessons, type ActiveLesson } from "@/lib/active-lessons"
 
 const IMPORTANCE_COLORS: Record<string, string> = {
   critique: "bg-red-500/15 text-red-200 border-red-500/30",
@@ -40,25 +39,6 @@ export default function CoursHubPage() {
         domainFr: lessons[0].domainFr,
         lessons,
         order: getDomainOrder(domainAr),
-      }))
-      .sort((a, b) => a.order - b.order)
-  }, [])
-
-  const unitGroups = useMemo(() => {
-    const groups = new Map<string, ActiveLesson[]>()
-    for (const lesson of activeLessons) {
-      const key = `${lesson.domainAr}||${lesson.unitAr}`
-      if (!groups.has(key)) groups.set(key, [])
-      groups.get(key)!.push(lesson)
-    }
-    return Array.from(groups.entries())
-      .map(([key, lessons]) => ({
-        domainAr: lessons[0].domainAr,
-        domainFr: lessons[0].domainFr,
-        unitAr: lessons[0].unitAr,
-        unitFr: lessons[0].unitFr,
-        lessons,
-        order: getDomainOrder(lessons[0].domainAr) * 100 + lessons[0].unitNumero,
       }))
       .sort((a, b) => a.order - b.order)
   }, [])

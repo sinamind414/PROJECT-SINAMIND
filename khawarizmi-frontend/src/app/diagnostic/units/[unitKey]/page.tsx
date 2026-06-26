@@ -5,7 +5,6 @@ import Link from "next/link"
 import { notFound } from "next/navigation"
 import { AuthGuard } from "@/components/auth/AuthGuard"
 import { AppShell } from "@/components/layout/AppShell"
-import { ScenarioRunner } from "@/components/methodology/ScenarioRunner"
 import { getUnitConfig } from "@/lib/methodology-chapters"
 import { getMethodologyScenario } from "@/lib/methodology-documents"
 

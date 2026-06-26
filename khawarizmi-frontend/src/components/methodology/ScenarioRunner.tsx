@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react"
 import { DocumentSetRenderer } from "@/components/methodology/DocumentRenderer"
 import { evaluateMethodologyAnswer, type MethodologyEvaluation } from "@/lib/methodology-evaluator"
-import { awardXP, claimBadge, saveMethodologyEvaluations, type GamificationAward } from "@/lib/progress-store"
+import { awardXP, saveMethodologyEvaluations, type GamificationAward } from "@/lib/progress-store"
 import { apiClient } from "@/lib/api-client"
 import type { MethodologyScenario, MethodologyQuestion } from "@/lib/methodology-documents"
 import type { MethodologyChapterLink } from "@/lib/methodology-chapters"

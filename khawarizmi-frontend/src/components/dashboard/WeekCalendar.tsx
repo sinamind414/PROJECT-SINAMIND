@@ -1,6 +1,5 @@
 "use client"
 
-import Link from "next/link"
 import type { WeekDay } from "@/lib/daily-dashboard/types"
 
 const STATUS_STYLES: Record<string, { bg: string; text: string; icon: string }> = {

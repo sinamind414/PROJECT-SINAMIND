@@ -14,13 +14,10 @@ import { BacLinkPanel } from "@/components/lessons/BacLinkPanel"
 import { MethodologyLinkPanel } from "@/components/lessons/MethodologyLinkPanel"
 import { getActiveLessonByChapterParam } from "@/lib/active-lessons"
 import { VideosWidget } from "@/components/videos/VideosWidget"
-import { UI_AR } from "@/lib/translations"
 import { apiClient } from "@/lib/api-client"
 import type { CoursResponse } from "@/lib/types"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
-
-type CoursPageMode = "active" | "fallback-markdown" | "loading" | "empty"
 
 function FallbackMarkdown({ chapitreParam }: { chapitreParam: string }) {
   const [cours, setCours] = useState<CoursResponse | null>(null)
