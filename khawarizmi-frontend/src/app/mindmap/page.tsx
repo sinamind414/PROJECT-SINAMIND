@@ -4,7 +4,7 @@ import { useState } from "react";
 
 import apiClient from "@/lib/api-client";
 import MethodologicalMindMap from "@/components/mindmap/MethodologicalMindMap";
-import { ActionButton } from "@/components/gamification/ActionButton";
+import ActionButton from "@/components/gamification/ActionButton";
 
 export default function MindMapMethodologyPage() {
   const [mindmap, setMindmap] = useState<any>(null);
