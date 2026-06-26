@@ -46,26 +46,43 @@ class MockAsyncExecResult:
     def __init__(self, rows=None):
         self._rows = rows or []
 
+    def _as_row(self, value):
+        return MockRow(value) if isinstance(value, dict) else value
+
     def fetchone(self):
-        return MockRow(self._rows[0]) if self._rows else None
+        return self._as_row(self._rows[0]) if self._rows else None
 
     def fetchall(self):
-        return [MockRow(r) if isinstance(r, dict) else MockRow({}) for r in self._rows]
+        return [self._as_row(r) for r in self._rows]
 
     def first(self):
-        return MockRow(self._rows[0]) if self._rows else None
+        return self._as_row(self._rows[0]) if self._rows else None
 
     def all(self):
-        return [MockRow(r) if isinstance(r, dict) else MockRow({}) for r in self._rows]
+        return [self._as_row(r) for r in self._rows]
 
     def scalars(self):
         return self
+
+    def scalar_one_or_none(self):
+        if not self._rows:
+            return None
+        return self._rows[0]
+
+    def scalar(self):
+        if not self._rows:
+            return None
+        first = self._rows[0]
+        if isinstance(first, dict):
+            return next(iter(first.values()), None)
+        return first
 
     def __iter__(self):
         return iter(self._rows)
 
 
 _inserted_emails = set()
+_mock_orm_store = {}
 
 
 class MockAsyncSession:
@@ -78,6 +95,27 @@ class MockAsyncSession:
             "plan": "free",
             "created_at": "2026-01-01",
         }
+
+    def _store_key_for_sql(self, sql: str):
+        if "user_streaks" in sql:
+            return ("user_streaks", 1)
+        if "user_points" in sql:
+            return ("user_points", 1)
+        if "user_avatars" in sql:
+            return ("user_avatars", 1)
+        if "combo_states" in sql:
+            return ("combo_states", 1)
+        return None
+
+    def _store_key_for_obj(self, obj):
+        table = getattr(getattr(obj, "__table__", None), "name", None)
+        user_id = getattr(obj, "user_id", None)
+        if table and user_id is not None:
+            return (table, user_id)
+        obj_id = getattr(obj, "id", None)
+        if table and obj_id is not None:
+            return (table, obj_id)
+        return None
 
     async def __aenter__(self):
         return self
@@ -106,12 +144,24 @@ class MockAsyncSession:
                 if "email" in sql and query_email not in _inserted_emails:
                     return MockAsyncExecResult()
                 return MockAsyncExecResult([self._user_data])
+
+            store_key = self._store_key_for_sql(sql)
+            if store_key and store_key in _mock_orm_store:
+                return MockAsyncExecResult([_mock_orm_store[store_key]])
             return MockAsyncExecResult()
 
         if "UPDATE" in sql or "DELETE" in sql:
             return MockAsyncExecResult([{"id": 1}])
 
         return MockAsyncExecResult()
+
+    def add(self, obj):
+        store_key = self._store_key_for_obj(obj)
+        if store_key:
+            _mock_orm_store[store_key] = obj
+
+    async def refresh(self, obj):
+        return None
 
     async def commit(self):
         pass
@@ -145,6 +195,7 @@ async def override_get_db():
 @pytest.fixture(autouse=True)
 def override_deps():
     _inserted_emails.clear()
+    _mock_orm_store.clear()
     app.dependency_overrides[get_db] = override_get_db
     yield
     app.dependency_overrides.clear()

@@ -59,8 +59,11 @@ async def generate_methodological_endpoint(
     request: MethodologyMindMapRequest,
     current_user: dict = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-    openai_client=Depends(get_openai),
 ):
+    try:
+        openai_client = get_openai()
+    except HTTPException:
+        openai_client = None
     mindmap = await generate_methodological_mindmap(
         matiere=request.matiere,
         chapitre=request.chapitre,

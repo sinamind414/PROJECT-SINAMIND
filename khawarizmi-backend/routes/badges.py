@@ -7,13 +7,25 @@ from services.badge_service import check_and_award_badges, get_all_badges
 router = APIRouter(prefix="/api/badges", tags=["Badges"])
 
 
+async def _list_badges_response() -> dict:
+    badges = await get_all_badges()
+    return {"badges": badges}
+
+
+@router.get("")
+async def list_badges_no_slash(
+    current_user: dict = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    return await _list_badges_response()
+
+
 @router.get("/")
 async def list_badges(
     current_user: dict = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    badges = await get_all_badges()
-    return {"badges": badges}
+    return await _list_badges_response()
 
 
 @router.post("/check")
