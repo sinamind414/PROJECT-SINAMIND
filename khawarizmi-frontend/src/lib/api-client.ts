@@ -622,10 +622,69 @@ class KhawarizmiApiClient {
     )
   }
 
+  async challengeUser(friendUserId: number) {
+    return this.request<{ challenge_id: string; status: string; message: string; friend_user_id: number }>(
+      `/api/phase5/challenge/user/${friendUserId}`,
+      { method: "POST" }
+    )
+  }
+
   async challengeFriend(friendId: string) {
     return this.request<{ challenge_id: string; status: string; message: string }>(
       `/api/phase5/challenge/${encodeURIComponent(friendId)}`,
       { method: "POST" }
+    )
+  }
+
+  async searchUsers(query: string) {
+    return this.request<{ users: Array<{ id: number; email: string; name: string; filiere?: string }> }>(
+      `/api/phase5/users/search?q=${encodeURIComponent(query)}`
+    )
+  }
+
+  async getFriends() {
+    return this.request<{ friends: Array<{ friend_id: string; name: string; since: string }> }>(
+      "/api/phase5/friends"
+    )
+  }
+
+  async sendFriendRequestToUser(friendUserId: number) {
+    return this.request<{ request_id: string; friend_user_id: number; status: string }>(
+      `/api/phase5/friend-requests/user/${friendUserId}`,
+      { method: "POST" }
+    )
+  }
+
+  async sendFriendRequest(friendId: string) {
+    return this.request<{ request_id: string; friend_id: string; status: string }>(
+      `/api/phase5/friend-requests/${encodeURIComponent(friendId)}`,
+      { method: "POST" }
+    )
+  }
+
+  async getFriendRequests() {
+    return this.request<{ requests: Array<{ request_id: string; requester_id: number; friend_id: string; status: string }> }>(
+      "/api/phase5/friend-requests"
+    )
+  }
+
+  async respondFriendRequest(requestId: string, accept: boolean) {
+    return this.request<{ request_id: string; status: string }>(
+      `/api/phase5/friend-requests/${encodeURIComponent(requestId)}/respond`,
+      { method: "POST", body: JSON.stringify({ accept }) }
+    )
+  }
+
+  async submitChallengeResult(challengeId: string, payload: { score: number; correct_answers: number; total_questions: number; duration_seconds: number }) {
+    return this.request<{ challenge_id: string; points_awarded: number; status: string }>(
+      `/api/phase5/challenge/${encodeURIComponent(challengeId)}/result`,
+      { method: "POST", body: JSON.stringify(payload) }
+    )
+  }
+
+  async getChallengeResults(challengeId: string) {
+    return this.request<{ challenge_id: string; results: Array<{ rank: number; name: string; points_awarded: number }>; winner: unknown }>(
+      `/api/phase5/challenge/${encodeURIComponent(challengeId)}/results`
     )
   }
 
