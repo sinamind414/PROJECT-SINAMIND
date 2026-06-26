@@ -35,9 +35,10 @@ export const FILIERES: Filiere[] = [
 // ── Auth ────────────────────────────────────────
 
 export interface AuthResponse {
-  access_token: string
-  token_type: string
-  expires_in: number
+  access_token?: string | null
+  token_type?: string
+  expires_in?: number
+  user?: User
 }
 
 export interface LoginPayload {

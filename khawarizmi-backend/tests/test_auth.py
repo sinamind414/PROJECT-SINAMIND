@@ -58,6 +58,14 @@ class TestToken:
         response = await client.get("/api/auth/me", headers=auth_headers)
         assert response.status_code in [200, 401]
 
+    async def test_cookie_token_accepted(self, client: AsyncClient):
+        from auth import create_access_token
+
+        token = create_access_token({"sub": 1, "email": "eleve@bac.dz", "plan": "free"})
+        client.cookies.set("khawarizmi_access_token", token)
+        response = await client.get("/api/auth/me")
+        assert response.status_code == 200
+
     async def test_missing_token_rejected(self, client: AsyncClient):
         response = await client.get("/api/auth/me")
         assert response.status_code in [401, 404]

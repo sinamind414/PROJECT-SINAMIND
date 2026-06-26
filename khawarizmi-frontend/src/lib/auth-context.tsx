@@ -35,11 +35,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // Charger l'utilisateur au montage
   const loadUser = useCallback(async () => {
-    if (!apiClient.isAuthenticated()) {
-      setLoading(() => false)
-      return
-    }
-
     try {
       const userData = await apiClient.getMe()
       setUser(userData)

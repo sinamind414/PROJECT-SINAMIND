@@ -62,7 +62,9 @@ async def get_current_user(
         headers={"WWW-Authenticate": "Bearer"},
     )
 
-    token = request.headers.get("Authorization", "").replace("Bearer ", "")
+    token = request.cookies.get("khawarizmi_access_token")
+    if not token:
+        token = request.headers.get("Authorization", "").replace("Bearer ", "")
     if not token:
         raise credentials_exception
 

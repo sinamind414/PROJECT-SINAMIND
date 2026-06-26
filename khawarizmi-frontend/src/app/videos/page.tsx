@@ -30,11 +30,10 @@ function VideosContent() {
 
   const loadVideos = useCallback(async () => {
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
-      const token = typeof window !== "undefined" ? localStorage.getItem("token") : null
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || ""
 
       const response = await fetch(`${apiUrl}/api/videos/all`, {
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
+        credentials: "include",
       })
 
       if (response.ok) {

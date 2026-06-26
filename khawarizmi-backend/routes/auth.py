@@ -1,16 +1,46 @@
 import logging
 import secrets
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from auth import create_access_token, hash_password, verify_password
+from config import get_settings
 from deps import get_current_user, get_db
 from schemas.user import AuthResponse, LoginRequest, RegisterRequest, WaitlistRequest
 
 logger = logging.getLogger("khawarizmi.api")
 router = APIRouter()
+
+
+AUTH_COOKIE_NAME = "khawarizmi_access_token"
+
+
+def _cookie_secure() -> bool:
+    return get_settings().ENVIRONMENT == "production"
+
+
+def _set_auth_cookie(response: Response, token: str) -> None:
+    response.set_cookie(
+        key=AUTH_COOKIE_NAME,
+        value=token,
+        httponly=True,
+        secure=_cookie_secure(),
+        samesite="lax",
+        max_age=get_settings().JWT_EXPIRE_HOURS * 3600,
+        path="/",
+    )
+
+
+def _clear_auth_cookie(response: Response) -> None:
+    response.delete_cookie(
+        key=AUTH_COOKIE_NAME,
+        httponly=True,
+        secure=_cookie_secure(),
+        samesite="lax",
+        path="/",
+    )
 
 
 def _get_state():
@@ -20,7 +50,7 @@ def _get_state():
 
 
 @router.post("/api/waitlist", status_code=201)
-async def add_to_waitlist(entry: WaitlistRequest):
+async def add_to_waitlist(entry: WaitlistRequest, response: Response):
     s = _get_state()
     try:
         if not s.db_engine:
@@ -66,14 +96,13 @@ async def add_to_waitlist(entry: WaitlistRequest):
             await session.commit()
 
         token = create_access_token({"sub": user_id, "plan": "free"})
+        _set_auth_cookie(response, token)
 
         logger.info(f"✅ Waitlist + AutoAuth : {entry.email} (user_id={user_id})")
         return {
             "status": "success",
             "message": "Inscription réussie",
             "email": entry.email,
-            "access_token": token,
-            "token_type": "bearer",
         }
 
     except Exception as e:
@@ -98,6 +127,7 @@ async def get_waitlist_count():
 @router.post("/api/auth/register", response_model=AuthResponse, tags=["Auth"])
 async def register(
     body: RegisterRequest,
+    response: Response,
     db: AsyncSession = Depends(get_db),
 ):
     result = await db.execute(text("SELECT id FROM users WHERE email = :email"), {"email": body.email})
@@ -122,10 +152,11 @@ async def register(
     user = result.fetchone()
 
     token = create_access_token({"sub": user[0], "plan": user[3]})
+    _set_auth_cookie(response, token)
     logger.info(f"Nouvel élève inscrit : {body.email} (wilaya={body.wilaya})")
 
     return AuthResponse(
-        access_token=token,
+        access_token=None,
         user={
             "id": user[0],
             "email": user[1],
@@ -138,6 +169,7 @@ async def register(
 @router.post("/api/auth/login", response_model=AuthResponse, tags=["Auth"])
 async def login(
     body: LoginRequest,
+    response: Response,
     db: AsyncSession = Depends(get_db),
 ):
     result = await db.execute(
@@ -154,9 +186,10 @@ async def login(
     await db.execute(text("UPDATE users SET last_active = NOW() WHERE id = :id"), {"id": user[0]})
 
     token = create_access_token({"sub": user[0], "plan": user[4]})
+    _set_auth_cookie(response, token)
 
     return AuthResponse(
-        access_token=token,
+        access_token=None,
         user={
             "id": user[0],
             "email": user[1],
@@ -164,6 +197,12 @@ async def login(
             "plan": user[4],
         },
     )
+
+
+@router.post("/api/auth/logout", tags=["Auth"])
+async def logout(response: Response):
+    _clear_auth_cookie(response)
+    return {"status": "success"}
 
 
 @router.get("/api/auth/me", tags=["Auth"])

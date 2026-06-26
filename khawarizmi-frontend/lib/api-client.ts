@@ -61,28 +61,18 @@ export interface ChatMessage {
 
 class KhawarizmiApiClient {
   private getHeaders(): HeadersInit {
-    const token = this.getToken()
     return {
-      "Content-Type": "application/json",
-      ...(token && { "Authorization": `Bearer ${token}` })
+      "Content-Type": "application/json"
     }
   }
 
-  private getToken(): string | null {
-    if (typeof window === "undefined") return null
-    return localStorage.getItem("khawarizmi_token")
-  }
-
-  setToken(token: string): void {
-    localStorage.setItem("khawarizmi_token", token)
-  }
-
   clearToken(): void {
+    if (typeof window === "undefined") return
     localStorage.removeItem("khawarizmi_token")
   }
 
   isAuthenticated(): boolean {
-    return !!this.getToken()
+    return false
   }
 
   private async request<T>(
@@ -96,7 +86,8 @@ class KhawarizmiApiClient {
         headers: {
           ...this.getHeaders(),
           ...options.headers
-        }
+        },
+        credentials: "include"
       }
     )
 
@@ -134,7 +125,6 @@ class KhawarizmiApiClient {
       method: "POST",
       body: JSON.stringify({ email, password })
     })
-    this.setToken(data.access_token)
     return data
   }
 
@@ -151,7 +141,6 @@ class KhawarizmiApiClient {
       method: "POST",
       body: JSON.stringify({ email, password, nom, filiere })
     })
-    this.setToken(data.access_token)
     return data
   }
 

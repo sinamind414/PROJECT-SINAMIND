@@ -40,31 +40,22 @@ import {
 
 const API_BASE_URL = ""
 
-const TOKEN_KEY = "khawarizmi_token"
-
 // ── Classe Client API ──────────────────────────────
 
 class KhawarizmiApiClient {
 
-  // ── Gestion Token ──────────────────────────────
-
-  getToken(): string | null {
-    if (typeof window === "undefined") return null
-    return localStorage.getItem(TOKEN_KEY)
-  }
-
-  setToken(token: string): void {
-    if (typeof window === "undefined") return
-    localStorage.setItem(TOKEN_KEY, token)
-  }
+  // ── Auth cookie HttpOnly ──────────────────────
 
   clearToken(): void {
+    // Migration cleanup only: JWT is now stored in an HttpOnly cookie,
+    // unreadable from JavaScript. Remove any legacy localStorage token.
     if (typeof window === "undefined") return
-    localStorage.removeItem(TOKEN_KEY)
+    localStorage.removeItem("khawarizmi_token")
   }
 
   isAuthenticated(): boolean {
-    return !!this.getToken()
+    // The HttpOnly cookie cannot be inspected client-side. Use getMe().
+    return false
   }
 
   // ── Requête HTTP générique ─────────────────────
@@ -73,21 +64,14 @@ class KhawarizmiApiClient {
     endpoint: string,
     options: RequestInit = {}
   ): Promise<T> {
-    const token = this.getToken()
-
     const headers: HeadersInit = {
       "Content-Type": "application/json",
       ...options.headers
     }
 
-    if (token) {
-      ;(headers as Record<string, string>)["Authorization"] =
-        `Bearer ${token}`
-    }
-
     const response = await fetch(
       `${API_BASE_URL}${endpoint}`,
-      { ...options, headers }
+      { ...options, headers, credentials: "include" }
     )
 
     // Token expiré → déconnexion
@@ -129,7 +113,7 @@ class KhawarizmiApiClient {
         body: JSON.stringify({ email, password })
       }
     )
-    this.setToken(data.access_token)
+    this.clearToken()
     return data
   }
 
@@ -146,7 +130,7 @@ class KhawarizmiApiClient {
         })
       }
     )
-    this.setToken(data.access_token)
+    this.clearToken()
     return data
   }
 
@@ -173,6 +157,7 @@ class KhawarizmiApiClient {
 
   logout(): void {
     this.clearToken()
+    void this.request<{ status: string }>("/api/auth/logout", { method: "POST" }).catch(() => undefined)
   }
 
   // ── Chat (Tuteur IA) ───────────────────────────

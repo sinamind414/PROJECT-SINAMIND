@@ -1,6 +1,6 @@
 // src/middleware.ts
 // Protection routes désactivée — auth gérée côté client par AuthProvider
-// Le token est dans localStorage (invisible pour le middleware server-side)
+// Le JWT est stocké dans un cookie HttpOnly et validé par le backend
 
 export function middleware() {
   return undefined
