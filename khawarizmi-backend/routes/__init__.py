@@ -2,13 +2,17 @@
 # Registry centralisé de tous les routers API
 
 from . import (
+    ai_chat,
+    ai_evaluate,
     annales,
     auth,
     avatar,
     bac_blanc_intelligent,
     badges,
+    chapitres,
     chat,
     chatbot,
+    chatbot_engagement,
     cours,
     diagnostic,
     dual_coding,
@@ -43,6 +47,7 @@ ALL_ROUTERS = [
     # ── Core ──
     health.router,
     auth.router,
+    chapitres.router,
     chat.router,
     chatbot.router,
     cours.router,
@@ -72,6 +77,10 @@ ALL_ROUTERS = [
     phase4.router,
     phase5.router,
     phase6.router,
+    chatbot_engagement.router,
+    # ── AI Orchestrator ──
+    ai_chat.router,
+    ai_evaluate.router,
     # ── Methodology Intelligence ──
     bac_blanc_intelligent.router,
     diagnostic.router,

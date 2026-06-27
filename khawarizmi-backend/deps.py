@@ -44,6 +44,11 @@ def get_openai():
     return s.openai
 
 
+def get_openai_optional():
+    s = _get_state()
+    return s.openai
+
+
 def get_dual_coding():
     s = _get_state()
     if not s.dual_coding:

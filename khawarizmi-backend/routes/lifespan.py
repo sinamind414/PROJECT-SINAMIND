@@ -141,6 +141,24 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         logger.error(f"❌ Reconciliation task init failed: {e}")
 
+    try:
+        from services.eval_calibration import get_calibration_stats
+        cal_stats = get_calibration_stats()
+        if cal_stats["total_questions"] == 0:
+            logger.error(
+                "GOLDEN_SET_ABSENT | "
+                "Évaluations sans calibration ONEC. "
+                "Vérifier data/golden_set_onec.json"
+            )
+        else:
+            logger.info(
+                f"GOLDEN_SET_OK | "
+                f"{cal_stats['total_questions']} exemples chargés | "
+                f"chapitres={list(cal_stats['by_chapter'].keys())}"
+            )
+    except Exception as e:
+        logger.warning(f"GOLDEN_SET_CHECK_FAILED | {e}")
+
     logger.info(f"Khawarizmi API prete [{cfg.ENVIRONMENT}]")
     yield
 

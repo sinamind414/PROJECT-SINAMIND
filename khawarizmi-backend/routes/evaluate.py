@@ -10,12 +10,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from deps import get_current_user, get_db, get_openai
 from methodology.evaluator import evaluate_methodology
 from rate_limit import evaluate_limit, limiter
+from services.evaluation_utils import normalize_result
 from services.fallback_v2 import evaluate_l2
 from services.llm import call_gpt4o_evaluator
 
 
 def _safe_json_fallback() -> dict:
-    """Niveau 3 — JSON de secours absolu, retourné en cas d'erreur d'évaluateur."""
     return {
         "score": 0,
         "statut": "ERREUR",
@@ -69,57 +69,6 @@ class EvaluateResponse(BaseModel):
 # ENDPOINT PRINCIPAL
 # ═══════════════════════════════
 
-# ═══════════════════════════════════════════════
-# HELPER : Cohérence score/statut
-# ═══════════════════════════════════════════════
-
-
-_MANDATORY_CONCEPTS = [
-    "ARN polymerase",
-    "polimerase",
-    "بوليميراز",
-    "brin transcrit",
-    "الخيط المنقول",
-    "القالب",
-    "liaison peptidique",
-    "الرابطة الببتيدية",
-    "replication",
-    "تضاعف",
-    "mitose",
-    "انقسام خيطي",
-]
-
-
-def _is_mandatory(concept: str) -> bool:
-    c = concept.lower().strip()
-    return any(m.lower() in c for m in _MANDATORY_CONCEPTS)
-
-
-def normalize_result(result: dict) -> dict:
-    """
-    Garantit la cohérence entre score, statut et manquants.
-    Un CORRECT avec des concepts obligatoires manquants → PARTIEL.
-    """
-    manquant = result.get("manquant", [])
-    mandatory_missing = [m for m in manquant if _is_mandatory(m)]
-
-    if mandatory_missing and result.get("statut") == "CORRECT":
-        result["statut"] = "PARTIEL"
-        result["score"] = min(result.get("score", 10), 6)
-        result["feedback"] = result.get("feedback", "").replace("Excellent", "Bien")
-
-    # Score 0 doit être FAUX
-    if result.get("score", 0) == 0 and result.get("statut") != "FAUX":
-        result["statut"] = "FAUX"
-
-    # RETRY (common_mistakes) reste inchangé
-    return result
-
-
-# ═══════════════════════════════
-# ENDPOINT PRINCIPAL
-# ═══════════════════════════════
-
 
 @router.post("/api/evaluate", response_model=EvaluateResponse)
 @limiter.limit(evaluate_limit)
@@ -144,67 +93,38 @@ async def evaluate(
     next_review_date = None
 
     if eval_result["source"] in ["GPT4O", "FALLBACK_L2"]:
-        # Charger les mappings concepts pour cette question
-        res_mapping = await db.execute(
-            text("SELECT micro_concept AS concept_id, weight FROM question_concept_map WHERE question_id = :qid"),
-            {"qid": req.question_id},
+        from services.fsrs_graph import (
+            QuestionConceptMapping,
+            load_concept_graph,
+            update_concept_graph,
         )
-        mapping_rows = res_mapping.fetchall()
+        from services.fsrs_persistence import (
+            get_concept_mapping,
+            get_concept_states,
+            save_concept_updates,
+        )
 
-        # Si aucun mapping n'existe encore en base, on crée un mapping par défaut sur le concept_cle
-        if not mapping_rows:
+        concepts_dict = await get_concept_mapping(db, req.question_id)
+        if not concepts_dict:
             concept_cle = question.get("concept_cle", "concept_general")
             concepts_dict = {concept_cle: 1.0}
-        else:
-            concepts_dict = {row[0]: row[1] for row in mapping_rows}
-
-        from services.fsrs_graph import QuestionConceptMapping, update_concept_graph
 
         mapping = QuestionConceptMapping(question_id=req.question_id, concepts=concepts_dict)
 
-        # Charger l'état actuel de ces concepts pour l'utilisateur
-        concept_ids = list(concepts_dict.keys())
-        concept_states = {}
+        concept_graph = await load_concept_graph(db)
 
-        if concept_ids:
-            # Safe tuple injection in query — asyncpg requires `expanding` for IN
-            cids_param = tuple(concept_ids) if len(concept_ids) > 1 else (concept_ids[0],)
-            stmt = text(
-                "SELECT concept_id, fsrs_state FROM mastery_micro_concepts WHERE user_id = :uid AND concept_id IN :cids"
-            ).bindparams(bindparam("cids", expanding=True))
-            res_states = await db.execute(stmt, {"uid": user_id, "cids": cids_param})
+        all_concept_ids = list(concepts_dict.keys())
+        for c_id in list(all_concept_ids):
+            for prereq in concept_graph.get(c_id, []):
+                if prereq not in all_concept_ids:
+                    all_concept_ids.append(prereq)
 
-            from fsrs import Card
+        concept_states = await get_concept_states(db, user_id, all_concept_ids)
 
-            for row in res_states.fetchall():
-                c_id = row[0]
-                fsrs_state_dict = row[1] if row[1] else {}
-                card = Card()
-                if fsrs_state_dict:
-                    try:
-                        card.stability = fsrs_state_dict.get("stability", card.stability)
-                        card.difficulty = fsrs_state_dict.get("difficulty", card.difficulty)
-                        # Utiliser setattr pour les attributs facultatifs
-                        for attr in ["scheduled_days", "reps", "lapses"]:
-                            if hasattr(card, attr) and attr in fsrs_state_dict:
-                                setattr(card, attr, fsrs_state_dict[attr])
-                    except Exception as e:
-                        logger.error(f"Erreur hydratation FSRS: {e}")
-                concept_states[c_id] = card
-
-        # Remplir par des cartes par défaut pour ceux non commencés
-        for c_id in concept_ids:
-            if c_id not in concept_states:
-                from fsrs import Card
-
-                concept_states[c_id] = Card()
-
-        # Charger la configuration FSRS de l'élève
         res_config = await db.execute(text("SELECT fsrs_config FROM users WHERE id = :uid"), {"uid": user_id})
         config_row = res_config.fetchone()
         user_fsrs_config = config_row[0] if config_row else None
 
-        # Mettre à jour le graphe
         updates = update_concept_graph(
             user_id=user_id,
             question_id=req.question_id,
@@ -213,67 +133,11 @@ async def evaluate(
             concept_states=concept_states,
             now=datetime.now(UTC),
             user_fsrs_config=user_fsrs_config,
+            graph=concept_graph,
         )
 
-        chapter = question.get("chapitre_id", "ch_inconnu")
-        for c_id, upd in updates.items():
-            new_card = upd["card"]
-            # Récupérer les jours planifiés de manière sécurisée ( scheduled_days ou calcul par rapport à due )
-            sched_days = getattr(new_card, "scheduled_days", 0)
-            if not sched_days and new_card.due and new_card.last_review:
-                sched_days = (new_card.due - new_card.last_review).days
+        next_review_date = await save_concept_updates(db, user_id, question, updates, eval_result)
 
-            fsrs_json = json.dumps(
-                {
-                    "stability": new_card.stability,
-                    "difficulty": new_card.difficulty,
-                    "scheduled_days": sched_days,
-                    "reps": getattr(new_card, "reps", 0),
-                    "lapses": getattr(new_card, "lapses", 0),
-                    "state": str(new_card.state),
-                    "last_review": new_card.last_review.isoformat() if new_card.last_review else None,
-                }
-            )
-
-            # Sauvegarde DB
-            await db.execute(
-                text("""
-                    INSERT INTO mastery_micro_concepts
-                        (user_id, concept_id, chapter, due_date,
-                         interval_jours, difficulty, stability, fsrs_state, pending_real_evaluation, updated_at)
-                    VALUES
-                        (:user_id, :c_id, :chapter, :due,
-                         :interval, :difficulty, :stability, :fsrs_state::jsonb, :pending_eval, NOW())
-                    ON CONFLICT (user_id, concept_id)
-                    DO UPDATE SET
-                        due_date           = EXCLUDED.due_date,
-                        interval_jours     = EXCLUDED.interval_jours,
-                        difficulty         = EXCLUDED.difficulty,
-                        stability          = EXCLUDED.stability,
-                        fsrs_state         = EXCLUDED.fsrs_state,
-                        pending_real_evaluation = EXCLUDED.pending_real_evaluation,
-                        updated_at         = NOW()
-                """),
-                {
-                    "user_id": user_id,
-                    "c_id": c_id,
-                    "chapter": chapter,
-                    "due": upd["due"],
-                    "interval": sched_days,
-                    "difficulty": new_card.difficulty,
-                    "stability": new_card.stability,
-                    "fsrs_state": fsrs_json,
-                    "pending_eval": eval_result.get("needs_l1_review", False),
-                },
-            )
-
-            # Utiliser la date du concept clé principal comme date de retour principale de l'API
-            if c_id == question.get("concept_cle"):
-                next_review_date = upd["due"].isoformat()
-
-        await db.commit()
-
-        # Enfiler pour réévaluation L1 si le score L2 est ambigu (dans la zone grise 0.40 - 0.70)
         if eval_result.get("needs_l1_review"):
             from services.reconciliation_queue import PendingReview, enque_for_l1_review
 
