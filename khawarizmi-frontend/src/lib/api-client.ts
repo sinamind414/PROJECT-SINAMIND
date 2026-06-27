@@ -39,9 +39,12 @@ import {
   CheckAnswerResponse,
 } from "./types"
 
-// En dev: proxy Next.js (même domaine). En prod: backend Railway direct (CORS).
+// En dev: paths relatifs (proxy Next.js). En prod: Railway direct (CORS).
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL || ""
+
+// JWT stocké en mémoire (pas de localStorage — AGENTS.md section 1.1)
+let _khawarizmiToken: string | null = null
 
 type ApiRequestOptions = RequestInit & {
   skipAuthRedirect?: boolean
@@ -51,18 +54,22 @@ type ApiRequestOptions = RequestInit & {
 
 class KhawarizmiApiClient {
 
-  // ── Auth cookie HttpOnly ──────────────────────
+  // ── Gestion du token JWT (mémoire uniquement) ──
+
+  setToken(token: string): void {
+    _khawarizmiToken = token
+  }
 
   clearToken(): void {
-    // Migration cleanup only: JWT is now stored in an HttpOnly cookie,
-    // unreadable from JavaScript. Remove any legacy localStorage token.
-    if (typeof window === "undefined") return
-    localStorage.removeItem("khawarizmi_token")
+    _khawarizmiToken = null
   }
 
   isAuthenticated(): boolean {
-    // The HttpOnly cookie cannot be inspected client-side. Use getMe().
-    return false
+    return _khawarizmiToken !== null
+  }
+
+  getToken(): string | null {
+    return _khawarizmiToken
   }
 
   // ── Requête HTTP générique ─────────────────────
@@ -76,6 +83,10 @@ class KhawarizmiApiClient {
     const headers: HeadersInit = {
       "Content-Type": "application/json",
       ...fetchOptions.headers
+    }
+
+    if (_khawarizmiToken) {
+      (headers as Record<string, string>)["Authorization"] = `Bearer ${_khawarizmiToken}`
     }
 
     const response = await fetch(
@@ -125,7 +136,9 @@ class KhawarizmiApiClient {
         body: JSON.stringify({ email, password })
       }
     )
-    this.clearToken()
+    if (data.access_token) {
+      this.setToken(data.access_token)
+    }
     return data
   }
 
@@ -142,7 +155,9 @@ class KhawarizmiApiClient {
         })
       }
     )
-    this.clearToken()
+    if (data.access_token) {
+      this.setToken(data.access_token)
+    }
     return data
   }
 

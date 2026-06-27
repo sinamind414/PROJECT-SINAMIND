@@ -158,7 +158,7 @@ async def register(
     logger.info(f"Nouvel élève inscrit : {body.email} (wilaya={body.wilaya})")
 
     return AuthResponse(
-        access_token=None,
+        access_token=token,
         user={
             "id": user[0],
             "email": user[1],
@@ -191,7 +191,7 @@ async def login(
     _set_auth_cookie(response, token)
 
     return AuthResponse(
-        access_token=None,
+        access_token=token,
         user={
             "id": user[0],
             "email": user[1],
