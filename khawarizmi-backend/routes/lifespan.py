@@ -39,7 +39,11 @@ async def lifespan(app: FastAPI):
 
     from services.khawarizmi_engine import KhawarizmiTutor
 
-    state.tutor = KhawarizmiTutor(data_dir=data_dir)
+    try:
+        state.tutor = KhawarizmiTutor(data_dir=data_dir)
+    except Exception as e:
+        logger.error(f"❌ KhawarizmiTutor init failed: {e} — tutor disabled")
+        state.tutor = None
 
     try:
         report = state.tutor.loader.get_data_foundation_report()
@@ -51,40 +55,51 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         logger.error(f"Failed to report data foundation: {e}")
 
-    from services.scheduler import KhawarizmiScheduler
+    try:
+        from services.scheduler import KhawarizmiScheduler
 
-    state.scheduler = KhawarizmiScheduler()
+        state.scheduler = KhawarizmiScheduler()
+    except Exception as e:
+        logger.error(f"❌ Scheduler init failed: {e} — scheduler disabled")
+        state.scheduler = None
 
-    from services.interleaving import InterleavingSession
+    try:
+        from services.interleaving import InterleavingSession
 
-    state.interleaving = InterleavingSession()
+        state.interleaving = InterleavingSession()
+    except Exception as e:
+        logger.error(f"❌ Interleaving init failed: {e} — interleaving disabled")
+        state.interleaving = None
 
     if cfg.OPENAI_API_KEY:
-        from openai import AsyncOpenAI
+        try:
+            from openai import AsyncOpenAI
 
-        from services.dual_coding import DualCodingService
+            from services.dual_coding import DualCodingService
 
-        api_key = cfg.OPENAI_API_KEY
-        base_url = cfg.openai_base_url
-        model = cfg.openai_model
+            api_key = cfg.OPENAI_API_KEY
+            base_url = cfg.openai_base_url
+            model = cfg.openai_model
 
-        # Auto-détection Groq : gsk_* prefix
-        if api_key.startswith("gsk_"):
-            base_url = "https://api.groq.com/openai/v1"
-            if not model or model in ("gpt-4o-mini",) or "gpt" in model:
-                model = "llama-3.3-70b-versatile"
-            logger.info(f"IA Provider auto-détecté: Groq ({model})")
+            # Auto-détection Groq : gsk_* prefix
+            if api_key.startswith("gsk_"):
+                base_url = "https://api.groq.com/openai/v1"
+                if not model or model in ("gpt-4o-mini",) or "gpt" in model:
+                    model = "llama-3.3-70b-versatile"
+                logger.info(f"IA Provider auto-détecté: Groq ({model})")
 
-        # Auto-détection Gemini : AIza* prefix
-        elif api_key.startswith("AIza"):
-            base_url = "https://generativelanguage.googleapis.com/v1beta/openai/"
-            if not model or "gpt" in model:
-                model = "gemini-2.5-flash"
-            logger.info(f"IA Provider auto-détecté: Gemini ({model})")
+            # Auto-détection Gemini : AIza* prefix
+            elif api_key.startswith("AIza"):
+                base_url = "https://generativelanguage.googleapis.com/v1beta/openai/"
+                if not model or "gpt" in model:
+                    model = "gemini-2.5-flash"
+                logger.info(f"IA Provider auto-détecté: Gemini ({model})")
 
-        state.openai = AsyncOpenAI(api_key=api_key, base_url=base_url)
-        state.dual_coding = DualCodingService(state.openai)
-        logger.info(f"IA initialisée: {base_url} | model={model}")
+            state.openai = AsyncOpenAI(api_key=api_key, base_url=base_url)
+            state.dual_coding = DualCodingService(state.openai)
+            logger.info(f"IA initialisée: {base_url} | model={model}")
+        except Exception as e:
+            logger.error(f"❌ IA init failed: {e} — IA désactivée")
 
     if cfg.DATABASE_URL:
         try:
@@ -118,9 +133,13 @@ async def lifespan(app: FastAPI):
         except Exception as e:
             logger.warning(f"Redis indisponible: {e}")
 
-    from services.reconciliation_queue import process_review_queue
+    try:
+        from services.reconciliation_queue import process_review_queue
 
-    state.reconciliation_task = asyncio.create_task(process_review_queue())
+        state.reconciliation_task = asyncio.create_task(process_review_queue())
+        logger.info("✅ Reconciliation task started")
+    except Exception as e:
+        logger.error(f"❌ Reconciliation task init failed: {e}")
 
     logger.info(f"Khawarizmi API prete [{cfg.ENVIRONMENT}]")
     yield

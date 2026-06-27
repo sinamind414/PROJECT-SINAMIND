@@ -48,7 +48,9 @@ class DataLoader:
             self._loaded_from["programme"] = str(old_path) + " (DEPRECATED)"
             return data
 
-        raise FileNotFoundError("No programme found (canonical or legacy)")
+        logger.error("❌ No programme found (canonical or legacy) — returning empty dict")
+        self._programme_canonical = {}
+        return {}
 
     def get_programme(self) -> dict:
         if not self._programme_canonical:
