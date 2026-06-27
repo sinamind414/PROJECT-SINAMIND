@@ -16,6 +16,29 @@ logger = logging.getLogger("khawarizmi.api")
 router = APIRouter()
 
 
+def _rehydrate_fsrs_card(fsrs_state: dict | str | None) -> Card:
+    """Reconstruit une Card FSRS depuis le JSON stocké en base."""
+    card = Card()
+
+    if not fsrs_state:
+        return card
+
+    try:
+        state = fsrs_state if isinstance(fsrs_state, dict) else json.loads(fsrs_state)
+    except Exception:
+        logger.warning("FSRS state illisible, fallback sur Card() vierge")
+        return card
+
+    for field in ["stability", "difficulty", "scheduled_days", "reps", "lapses"]:
+        if field in state and state[field] is not None:
+            try:
+                setattr(card, field, state[field])
+            except Exception:
+                logger.warning(f"Impossible de restaurer le champ FSRS {field}")
+
+    return card
+
+
 def _get_state():
     from main import state
 
@@ -74,75 +97,90 @@ async def soumettre_resultat_drill(
     db: AsyncSession = Depends(get_db),
 ):
     scheduler = get_scheduler()
+    user_id = current_user["id"]
 
-    # ── CHARGER l'état FSRS existant ──────────────────────
     existing = await db.execute(
         text("""
             SELECT fsrs_state FROM mastery_micro_concepts
-            WHERE user_id = :uid AND micro_concept_id = :mc_id
+            WHERE user_id = :user_id AND micro_concept_id = :mc_id
+            LIMIT 1
         """),
-        {"uid": current_user["id"], "mc_id": body.micro_concept_id},
+        {"user_id": user_id, "mc_id": body.micro_concept_id},
     )
     row = existing.fetchone()
+    existing_state = row[0] if row else None
 
-    card = Card()
-    if row and row[0]:
-        state_data = row[0] if isinstance(row[0], dict) else json.loads(row[0])
-        card.stability = state_data.get("stability", card.stability)
-        card.difficulty = state_data.get("difficulty", card.difficulty)
-        card.reps = state_data.get("reps", card.reps)
-        card.lapses = state_data.get("lapses", card.lapses)
-        card.scheduled_days = state_data.get("scheduled_days", card.scheduled_days)
-
-    # ── Calculer le prochain intervalle ───────────────────
+    card = _rehydrate_fsrs_card(existing_state)
     result = scheduler.calculer_prochain_intervalle(card, body.score_percent)
     new_card = result["card"]
 
-    fsrs_json = json.dumps(
-        {
-            "stability": new_card.stability,
-            "difficulty": new_card.difficulty,
-            "scheduled_days": new_card.scheduled_days,
-            "reps": new_card.reps,
-            "lapses": new_card.lapses,
-            "state": str(new_card.state),
-            "last_review": datetime.now(UTC).isoformat(),
-        }
-    )
+    now = datetime.now(UTC)
+    fsrs_payload = {
+        "stability": new_card.stability,
+        "difficulty": new_card.difficulty,
+        "scheduled_days": new_card.scheduled_days,
+        "reps": new_card.reps,
+        "lapses": new_card.lapses,
+        "state": str(new_card.state),
+        "last_review": now.isoformat(),
+    }
+    fsrs_json = json.dumps(fsrs_payload)
 
     await db.execute(
         text("""
             INSERT INTO mastery_micro_concepts
-                (user_id, micro_concept_id, prochaine_revision,
-                 interval_jours, difficulty, stability, fsrs_state)
+                (user_id, micro_concept_id, concept_id, prochaine_revision,
+                 interval_jours, difficulty, stability, fsrs_state,
+                 due_date, last_review, reps, lapses, state,
+                 total_reviews, avg_score, updated_at)
             VALUES
-                (:user_id, :mc_id, :next_rev,
-                 :interval, :difficulty, :stability, :fsrs_state::jsonb)
+                (:user_id, :mc_id, :concept_id, :next_rev,
+                 :interval, :difficulty, :stability, :fsrs_state::jsonb,
+                 :due_date, :last_review, :reps, :lapses, :state,
+                 1, :avg_score, NOW())
             ON CONFLICT (user_id, micro_concept_id)
             DO UPDATE SET
+                concept_id = COALESCE(mastery_micro_concepts.concept_id, EXCLUDED.concept_id),
                 prochaine_revision = EXCLUDED.prochaine_revision,
-                interval_jours     = EXCLUDED.interval_jours,
-                difficulty         = EXCLUDED.difficulty,
-                stability          = EXCLUDED.stability,
-                fsrs_state         = EXCLUDED.fsrs_state,
-                updated_at         = NOW()
+                interval_jours = EXCLUDED.interval_jours,
+                difficulty = EXCLUDED.difficulty,
+                stability = EXCLUDED.stability,
+                fsrs_state = EXCLUDED.fsrs_state,
+                due_date = EXCLUDED.due_date,
+                last_review = EXCLUDED.last_review,
+                reps = EXCLUDED.reps,
+                lapses = EXCLUDED.lapses,
+                state = EXCLUDED.state,
+                total_reviews = COALESCE(mastery_micro_concepts.total_reviews, 0) + 1,
+                avg_score = (
+                    (COALESCE(mastery_micro_concepts.avg_score, 0)
+                     * COALESCE(mastery_micro_concepts.total_reviews, 0))
+                    + :avg_score
+                ) / NULLIF(COALESCE(mastery_micro_concepts.total_reviews, 0) + 1, 0),
+                updated_at = NOW()
         """),
         {
-            "user_id": current_user["id"],
+            "user_id": user_id,
             "mc_id": body.micro_concept_id,
+            "concept_id": body.micro_concept_id,
             "next_rev": result["prochaine_revision"],
             "interval": result["interval_jours"],
             "difficulty": result["difficulty"],
             "stability": result["stability"],
             "fsrs_state": fsrs_json,
+            "due_date": result["prochaine_revision"],
+            "last_review": now,
+            "reps": new_card.reps,
+            "lapses": new_card.lapses,
+            "state": int(getattr(new_card.state, "value", 0)) if hasattr(new_card.state, "value") else 0,
+            "avg_score": body.score_percent,
         },
     )
+    await db.commit()
 
     logger.info(
-        f"FSRS update : user={current_user['id']} "
-        f"mc={body.micro_concept_id} "
-        f"score={body.score_percent}% "
-        f"→ {result['interval_jours']}j"
+        f"FSRS drill update: user={user_id} mc={body.micro_concept_id} "
+        f"score={body.score_percent}% reps={new_card.reps} interval={result['interval_jours']}j"
     )
 
     return {
@@ -150,6 +188,10 @@ async def soumettre_resultat_drill(
         "interval_jours": result["interval_jours"],
         "retrievability": result["retrievability"],
         "rating": result["rating"],
+        "reps": new_card.reps,
+        "lapses": new_card.lapses,
+        "stability": new_card.stability,
+        "difficulty": new_card.difficulty,
     }
 
 
@@ -262,7 +304,17 @@ async def review_flashcard(
     rating_map = {1: FsrsRating.Again, 2: FsrsRating.Hard, 3: FsrsRating.Good, 4: FsrsRating.Easy}
     fsrs_rating = rating_map[body.rating]
 
-    card = Card()
+    existing = await db.execute(
+        text("""
+            SELECT fsrs_state FROM mastery_micro_concepts
+            WHERE user_id = :uid AND micro_concept_id = :mc_id
+            LIMIT 1
+        """),
+        {"uid": current_user["id"], "mc_id": card_id},
+    )
+    row = existing.fetchone()
+    card = _rehydrate_fsrs_card(row[0] if row else None)
+
     now = datetime.now(UTC)
     scheduler = CardScheduler()
     scheduling_cards = scheduler.repeat(card, now)

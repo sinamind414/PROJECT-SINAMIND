@@ -47,6 +47,15 @@ const nodeTypes = {
   mindMapNode: CustomMindMapNode
 }
 
+function slugifyChapter(value: string): string {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+}
+
 // Layout helper: Dynamic horizontal tree placement
 function layoutTree(
   node: MindMapNode,
@@ -140,6 +149,24 @@ function flattenNodes(node: MindMapNode, list: MindMapNode[] = []): MindMapNode[
   return list
 }
 
+function resolveMindmapErrorMessage(error: unknown): string {
+  const message = error instanceof Error ? error.message : ""
+
+  if (message.includes("no_context")) {
+    return "لا توجد بيانات كافية لهذا الفصل بعد. جرّب فصلا آخر مثل تركيب البروتينات."
+  }
+  if (message.includes("chapitre") || message.includes("introuvable")) {
+    return "تعذر العثور على الفصل المطلوب. تحقق من الرابط أو من بيانات البرنامج."
+  }
+  if (message.includes("timeout") || message.includes("timeout_mindmap_generation")) {
+    return "الخريطة قيد الإنشاء في الخلفية. أعد تحميل الصفحة بعد 30 ثانية."
+  }
+  if (message.includes("503") || message.includes("Service IA non configuré")) {
+    return "خدمة الذكاء الاصطناعي غير مهيأة حاليا. تحقق من مفاتيح API."
+  }
+  return UI_AR.erreur_chargement_mindmap
+}
+
 export default function MindMapPage() {
   return (
     <AuthGuard>
@@ -180,7 +207,7 @@ function MindMapContent() {
       }
       await new Promise(r => setTimeout(r, 2000))
     }
-    throw new Error("انتهت مهلة الانتظار للخريطة الذهنية")
+    throw new Error("timeout_mindmap_generation")
   }, [])
 
   // Handle node selection click on the canvas
@@ -277,14 +304,16 @@ function MindMapContent() {
       const filiere = user?.filiere || "Sciences Experimentales"
       const prog: Programme = await apiClient.getProgramme(matiere, filiere)
 
+      const routeChapterId = String(chapterId)
+
       let foundChapter: Chapter | null = null
       for (const d of prog.domains) {
         for (const u of d.units) {
-          const match = u.chapters.find(
-            (c) => c.id === chapterId
-              || c.titre_fr.toLowerCase().replace(/\s+/g, "-") === chapterId
-              || c.titre_fr.toLowerCase().replace(/[^a-z0-9]+/g, "-") === chapterId
-          )
+          const match = u.chapters.find((c) => {
+            const idMatch = String(c.id) === routeChapterId
+            const slugMatch = slugifyChapter(c.titre_fr) === routeChapterId
+            return idMatch || slugMatch
+          })
           if (match) {
             foundChapter = match
             break
@@ -324,7 +353,7 @@ function MindMapContent() {
       })
 
       if (res.status === "no_context") {
-        throw new Error("لا توجد بيانات RAG لهذا الفصل بعد. جرّب فصلا آخر مثل تركيب البروتينات.")
+        throw new Error(`no_context: لا توجد بيانات RAG لهذا الفصل بعد.`)
       }
 
       let mindmapData: MindMapType
@@ -369,17 +398,9 @@ function MindMapContent() {
       // Auto select root node
       setSelectedNode(mindmapData.racine)
 
-    } catch (e) {
-      const msg = e instanceof Error ? e.message : ""
-      if (msg.includes("RAG") || msg.includes("بيانات")) {
-        setError(msg)
-      } else if (msg.includes("إنشاء") || msg.includes("الخلفية")) {
-        setError(msg)
-      } else if (msg.includes("تحميل")) {
-        setError("تعذر تحميل البرنامج. تحقق من اتصالك بالإنترنت.")
-      } else {
-        setError(UI_AR.erreur_chargement_mindmap)
-      }
+    } catch (err) {
+      console.error("Mindmap load failed", err)
+      setError(resolveMindmapErrorMessage(err))
     } finally {
       setLoading(false)
       setGenerating(false)

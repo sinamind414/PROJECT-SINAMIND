@@ -60,26 +60,35 @@ except Exception as e:
 
 logger.info(f"📊 Total questions en mémoire : {len(questions_db)}")
 
-# --- Filtrer les questions OCR illisibles (texte < 20 chars) ---
-_before_filter = len(questions_db)
+def _is_question_usable(q: dict[str, Any]) -> bool:
+    text_value = (q.get("texte_ar") or q.get("texte") or "").strip()
+    if len(text_value) < 12:
+        return False
+    if text_value in {"-", "_", "..."}:
+        return False
+    return True
+
+
+_total_before_filter = len(questions_db)
 questions_db = {
     qid: q
     for qid, q in questions_db.items()
-    if len((q.get("texte", "") or q.get("texte_ar", "")).strip()) >= 20
+    if _is_question_usable(q)
 }
-_rejected = _before_filter - len(questions_db)
-if _rejected:
-    logger.warning(f"⚠️ {_rejected} questions rejetées (texte OCR trop court/corrompu)")
-logger.info(f"📊 Questions valides après filtrage : {len(questions_db)}")
+_total_after_filter = len(questions_db)
+
+logger.info(
+    f"📊 Total questions en mémoire : {_total_after_filter} "
+    f"(filtrées: {_total_before_filter - _total_after_filter})"
+)
 
 
-def get_question(question_id: str) -> dict[str, Any]:
+def get_question(question_id: str) -> dict[str, Any] | None:
     q = questions_db.get(question_id)
     if q:
-        # Garantir les champs bilingues (texte_ar initial = texte si pas encore traduit)
-        if "texte_ar" not in q:
+        if not q.get("texte_ar"):
             q["texte_ar"] = q.get("texte", "")
-        if "concept_cle_ar" not in q:
+        if not q.get("concept_cle_ar"):
             q["concept_cle_ar"] = q.get("concept_cle", "")
     return q
 
