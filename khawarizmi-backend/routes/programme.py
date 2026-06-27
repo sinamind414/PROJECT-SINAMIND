@@ -1,7 +1,17 @@
 # routes/programme.py
-"""Routes pour le programme officiel."""
+"""Routes pour le programme officiel.
 
+Strategie de resolution :
+  1. Tentative DB (tables domains -> units -> chapters)
+  2. Si DB vide -> fallback JSON (data/programmes/svt_sciences_experimentales.json)
+  3. Si JSON absent -> 404
+"""
+
+import json
+import logging
 import unicodedata
+from pathlib import Path
+from uuid import uuid4
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import text
@@ -11,28 +21,120 @@ from database import get_db
 from deps import get_current_user
 
 router = APIRouter(prefix="/api/programme", tags=["Programme"])
+logger = logging.getLogger(__name__)
+
+# ════════════════════════════════════════════════════════════════
+# Normalisation filiere
+# ════════════════════════════════════════════════════════════════
+
+_FILIERE_ALIASES: dict[str, str] = {
+    "sciences naturelles": "Sciences Experimentales",
+    "sciences experimentales": "Sciences Experimentales",
+    "se": "Sciences Experimentales",
+    "snv": "Sciences Experimentales",
+}
 
 
 def normalize_filiere(filiere: str) -> str:
-    """Normalise la filière pour matcher la DB."""
-    # NFC garantit cohérence des accents
+    """Normalise la filiere pour matcher la DB."""
     f = unicodedata.normalize("NFC", filiere).strip()
-    if f.lower() == "sciences naturelles":
-        return "Sciences Experimentales"
-    return f
+    return _FILIERE_ALIASES.get(f.lower(), f)
 
+
+# ════════════════════════════════════════════════════════════════
+# Fallback JSON (charge 1x au demarrage)
+# ════════════════════════════════════════════════════════════════
+
+_JSON_PATH = Path(__file__).parent.parent / "data" / "programmes" / "svt_sciences_experimentales.json"
+
+_programme_cache: dict | None = None
+
+
+def _load_programme_fallback() -> dict:
+    """Charge le programme depuis JSON. Cache en memoire (dict module-level)."""
+    global _programme_cache
+    if _programme_cache is not None:
+        return _programme_cache
+
+    if not _JSON_PATH.exists():
+        logger.error("Programme fallback JSON not found: %s", _JSON_PATH)
+        _programme_cache = {}
+        return _programme_cache
+
+    try:
+        with open(_JSON_PATH, encoding="utf-8") as f:
+            raw = json.load(f)
+        logger.info("Programme fallback JSON loaded from %s", _JSON_PATH)
+        _programme_cache = raw
+        return _programme_cache
+    except (json.JSONDecodeError, OSError) as exc:
+        logger.error("Programme fallback JSON error: %s", exc)
+        _programme_cache = {}
+        return _programme_cache
+
+
+def _restructure_json_to_response(raw: dict) -> dict:
+    """Convertit le format JSON import en format reponse API (avec UUID)."""
+    domains_out = []
+    for d in raw.get("domains", []):
+        domain_id = str(uuid4())
+        units_out = []
+        for u in d.get("units", []):
+            unit_id = str(uuid4())
+            chapters_out = []
+            for ch in u.get("chapters", []):
+                chapters_out.append({
+                    "id": str(uuid4()),
+                    "numero": ch["numero"],
+                    "titre_fr": ch["titre_fr"],
+                    "titre_ar": ch.get("titre_ar"),
+                    "page": ch.get("page"),
+                    "type": ch.get("type"),
+                    "importance": ch.get("importance", "moyenne"),
+                })
+            units_out.append({
+                "id": unit_id,
+                "numero": u["numero"],
+                "titre_fr": u["titre_fr"],
+                "titre_ar": u.get("titre_ar"),
+                "page": u.get("page"),
+                "chapters": chapters_out,
+            })
+        domains_out.append({
+            "id": domain_id,
+            "numero": d["numero"],
+            "titre_fr": d["titre_fr"],
+            "titre_ar": d.get("titre_ar"),
+            "units": units_out,
+        })
+
+    return {
+        "matiere": raw.get("matiere", ""),
+        "filiere": raw.get("filiere", ""),
+        "domains": domains_out,
+        "total_chapters": sum(
+            len(ch) for d in domains_out for u in d["units"] for ch in [u["chapters"]]
+        ),
+    }
+
+
+# ════════════════════════════════════════════════════════════════
+# Route principale
+# ════════════════════════════════════════════════════════════════
 
 @router.get("/{matiere}/{filiere}")
 async def get_programme(
-    matiere: str, filiere: str, current_user: dict = Depends(get_current_user), db: AsyncSession = Depends(get_db)
+    matiere: str,
+    filiere: str,
+    current_user: dict = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
 ):
-    """Retourne le programme complet d'une matière/filière."""
+    """Retourne le programme complet d'une matiere/filiere."""
 
-    # Normaliser pour cohérence
     matiere = normalize_filiere(matiere)
     filiere = normalize_filiere(filiere)
 
-    # Query avec UNACCENT pour matcher sans/avec accents
+    # 1. Tentative DB
     result = await db.execute(
         text("""
             SELECT
@@ -58,8 +160,8 @@ async def get_programme(
             WHERE LOWER(d.matiere) = LOWER(:matiere)
             AND (
                 LOWER(d.filiere) = LOWER(:filiere)
-                OR LOWER(REPLACE(d.filiere, 'é', 'e')) =
-                   LOWER(REPLACE(:filiere, 'é', 'e'))
+                OR LOWER(REPLACE(d.filiere, '\u00e9', 'e')) =
+                   LOWER(REPLACE(:filiere, '\u00e9', 'e'))
             )
             ORDER BY d.numero, u.numero, c.numero
         """),
@@ -68,10 +170,28 @@ async def get_programme(
 
     rows = result.fetchall()
 
-    if not rows:
-        raise HTTPException(status_code=404, detail=f"Aucun programme trouvé pour {matiere} - {filiere}")
+    if rows:
+        return _restructure_db_rows(rows, matiere, filiere)
 
-    # Restructurer en hiérarchie
+    # 2. Fallback JSON
+    logger.warning(
+        "Programme DB empty for matiere=%s filiere=%s -- using JSON fallback",
+        matiere,
+        filiere,
+    )
+
+    raw = _load_programme_fallback()
+    if not raw or not raw.get("domains"):
+        raise HTTPException(
+            status_code=404,
+            detail=f"Aucun programme trouve pour {matiere} - {filiere}",
+        )
+
+    return _restructure_json_to_response(raw)
+
+
+def _restructure_db_rows(rows, matiere: str, filiere: str) -> dict:
+    """Convertit les rows DB en format reponse hiérarchique."""
     domains_map = {}
 
     for row in rows:
@@ -113,7 +233,6 @@ async def get_programme(
                     }
                 )
 
-    # Convertir units dict en list
     domains = []
     for d in domains_map.values():
         d["units"] = list(d["units"].values())
@@ -126,6 +245,10 @@ async def get_programme(
         "total_chapters": sum(len(u["chapters"]) for d in domains for u in d["units"]),
     }
 
+
+# ════════════════════════════════════════════════════════════════
+# Endpoint critique (inchangé)
+# ════════════════════════════════════════════════════════════════
 
 @router.get("/{matiere}/{filiere}/chapters/critical")
 async def get_critical_chapters(
@@ -149,8 +272,8 @@ async def get_critical_chapters(
             WHERE LOWER(d.matiere) = LOWER(:matiere)
             AND (
                 LOWER(d.filiere) = LOWER(:filiere)
-                OR LOWER(REPLACE(d.filiere, 'é', 'e')) =
-                   LOWER(REPLACE(:filiere, 'é', 'e'))
+                OR LOWER(REPLACE(d.filiere, '\u00e9', 'e')) =
+                   LOWER(REPLACE(:filiere, '\u00e9', 'e'))
             )
             AND c.importance = 'critique'
             ORDER BY d.numero, u.numero, c.numero
@@ -161,3 +284,31 @@ async def get_critical_chapters(
     chapters = [dict(r._mapping) for r in result.fetchall()]
 
     return {"matiere": matiere, "filiere": filiere, "critical_chapters": chapters, "total": len(chapters)}
+
+
+# ════════════════════════════════════════════════════════════════
+# Debug endpoint (a supprimer apres validation)
+# ════════════════════════════════════════════════════════════════
+
+@router.get("/_debug/status")
+async def debug_status(
+    db: AsyncSession = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    """Diagnostic : etat DB + JSON fallback."""
+    try:
+        result = await db.execute(text("SELECT COUNT(*) FROM domains"))
+        db_count = result.scalar_one()
+    except Exception as exc:
+        db_count = f"ERROR: {exc}"
+
+    raw = _load_programme_fallback()
+    json_domain_count = len(raw.get("domains", [])) if raw else 0
+
+    return {
+        "db_domains_count": db_count,
+        "json_fallback_loaded": bool(raw),
+        "json_domain_count": json_domain_count,
+        "json_path": str(_JSON_PATH),
+        "filiere_aliases": _FILIERE_ALIASES,
+    }
