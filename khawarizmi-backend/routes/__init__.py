@@ -48,13 +48,13 @@ ALL_ROUTERS = [
     health.router,
     auth.router,
     chapitres.router,
-    chat.router,
+    # chat.router,          # DEPRECATED — migré vers /api/ai/chat
     chatbot.router,
     cours.router,
     exercices.router,
     flashcards.router,
     mindmap.router,
-    evaluate.router,
+    # evaluate.router,      # DEPRECATED — migré vers /api/ai/evaluate
     session.router,
     payment.router,
     programme.router,
