@@ -119,6 +119,34 @@ def _restructure_json_to_response(raw: dict) -> dict:
 
 
 # ════════════════════════════════════════════════════════════════
+# Debug endpoint (AVANT le catch-all pour ne pas etre intercepte)
+# ════════════════════════════════════════════════════════════════
+
+@router.get("/_debug/status")
+async def debug_status(
+    db: AsyncSession = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    """Diagnostic : etat DB + JSON fallback."""
+    try:
+        result = await db.execute(text("SELECT COUNT(*) FROM domains"))
+        db_count = result.scalar_one()
+    except Exception as exc:
+        db_count = f"ERROR: {exc}"
+
+    raw = _load_programme_fallback()
+    json_domain_count = len(raw.get("domains", [])) if raw else 0
+
+    return {
+        "db_domains_count": db_count,
+        "json_fallback_loaded": bool(raw),
+        "json_domain_count": json_domain_count,
+        "json_path": str(_JSON_PATH),
+        "filiere_aliases": _FILIERE_ALIASES,
+    }
+
+
+# ════════════════════════════════════════════════════════════════
 # Route principale
 # ════════════════════════════════════════════════════════════════
 
@@ -284,31 +312,3 @@ async def get_critical_chapters(
     chapters = [dict(r._mapping) for r in result.fetchall()]
 
     return {"matiere": matiere, "filiere": filiere, "critical_chapters": chapters, "total": len(chapters)}
-
-
-# ════════════════════════════════════════════════════════════════
-# Debug endpoint (a supprimer apres validation)
-# ════════════════════════════════════════════════════════════════
-
-@router.get("/_debug/status")
-async def debug_status(
-    db: AsyncSession = Depends(get_db),
-    current_user: dict = Depends(get_current_user),
-):
-    """Diagnostic : etat DB + JSON fallback."""
-    try:
-        result = await db.execute(text("SELECT COUNT(*) FROM domains"))
-        db_count = result.scalar_one()
-    except Exception as exc:
-        db_count = f"ERROR: {exc}"
-
-    raw = _load_programme_fallback()
-    json_domain_count = len(raw.get("domains", [])) if raw else 0
-
-    return {
-        "db_domains_count": db_count,
-        "json_fallback_loaded": bool(raw),
-        "json_domain_count": json_domain_count,
-        "json_path": str(_JSON_PATH),
-        "filiere_aliases": _FILIERE_ALIASES,
-    }
