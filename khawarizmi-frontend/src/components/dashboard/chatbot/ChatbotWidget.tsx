@@ -48,7 +48,7 @@ export function ChatbotWidget() {
       {/* Panel */}
       {isOpen && (
         <div
-          className="fixed bottom-24 left-6 w-96 max-w-[calc(100vw-3rem)] z-50 rounded-2xl shadow-2xl overflow-hidden flex flex-col"
+          className="fixed bottom-24 lg:bottom-24 left-4 lg:left-6 w-[calc(100vw-2rem)] lg:w-96 max-w-[calc(100vw-2rem)] lg:max-w-[calc(100vw-3rem)] z-50 rounded-2xl shadow-2xl overflow-hidden flex flex-col"
           style={{
             background: "#182730",
             border: "1px solid rgba(255,255,255,0.08)",
@@ -294,7 +294,7 @@ export function ChatbotWidget() {
       {/* FAB */}
       <button
         onClick={() => (isOpen ? closeChat() : openChat())}
-        className="fixed bottom-6 left-6 w-14 h-14 rounded-full shadow-2xl flex items-center justify-center z-50 transition-all hover:scale-110"
+        className="fixed bottom-24 lg:bottom-6 left-4 lg:left-6 w-14 h-14 rounded-full shadow-2xl flex items-center justify-center z-50 transition-all hover:scale-110"
         style={{
           background: "linear-gradient(135deg, #2DD4BF, #14B8A6, #F59E0B)",
           boxShadow: "0 8px 24px rgba(45,212,191,0.4)",
