@@ -113,9 +113,10 @@ class KhawarizmiScheduler:
             raise
 
         retrievability = self._get_retrievability(result_card)
+        sched_days = getattr(result_card, "scheduled_days", 0)
 
         logger.debug(
-            f"FSRS: rating={rating.name} → {result_card.scheduled_days}j stability={result_card.stability:.2f}"
+            f"FSRS: rating={rating.name} → {sched_days}j stability={result_card.stability:.2f}"
         )
 
         return {
@@ -124,7 +125,7 @@ class KhawarizmiScheduler:
             "difficulty": round(result_card.difficulty, 3),
             "stability": round(result_card.stability, 3),
             "retrievability": retrievability,
-            "interval_jours": result_card.scheduled_days,
+            "interval_jours": sched_days,
             "rating": rating.name,
         }
 
