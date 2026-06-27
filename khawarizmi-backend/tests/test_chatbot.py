@@ -43,7 +43,6 @@ class TestChatbotAsk:
         assert "sources" in data
 
     async def test_chatbot_returns_sources_in_fallback(self, client: AsyncClient, auth_headers: dict, monkeypatch):
-        """Vérifie que /api/chatbot/ask retourne des sources RAG même en fallback."""
         from routes import chatbot
 
         async def fake_rag(db, message, chapter=None, limit=3):
@@ -55,7 +54,7 @@ class TestChatbotAsk:
                 "score_rerank": 0.92,
             }]
 
-        monkeypatch.setattr(chatbot, "_rag_search", fake_rag)
+        monkeypatch.setattr(chatbot, "rag_search", fake_rag)
 
         response = await client.post(
             "/api/chatbot/ask",
@@ -71,13 +70,12 @@ class TestChatbotAsk:
         assert data["sources"][0]["source"] == "manuel_svt"
 
     async def test_chatbot_empty_rag_returns_empty_sources(self, client: AsyncClient, auth_headers: dict, monkeypatch):
-        """Vérifie que sources est vide quand le RAG ne trouve rien."""
         from routes import chatbot
 
         async def fake_rag(db, message, chapter=None, limit=3):
             return []
 
-        monkeypatch.setattr(chatbot, "_rag_search", fake_rag)
+        monkeypatch.setattr(chatbot, "rag_search", fake_rag)
 
         response = await client.post(
             "/api/chatbot/ask",
@@ -91,7 +89,6 @@ class TestChatbotAsk:
         assert data["sources"] == []
 
     async def test_chatbot_source_rag_field(self, client: AsyncClient, auth_headers: dict, monkeypatch):
-        """Vérifie que source_rag est la source du premier chunk."""
         from routes import chatbot
 
         async def fake_rag(db, message, chapter=None, limit=3):
@@ -103,7 +100,7 @@ class TestChatbotAsk:
                 "score_rerank": 0.85,
             }]
 
-        monkeypatch.setattr(chatbot, "_rag_search", fake_rag)
+        monkeypatch.setattr(chatbot, "rag_search", fake_rag)
 
         response = await client.post(
             "/api/chatbot/ask",
@@ -129,8 +126,7 @@ class TestChatbotAsk:
         assert isinstance(data["cartes"], list)
 
     async def test_merge_chunks_deduplicates(self):
-        """Vérifie que _merge_chunks déduplique et marque hybrid."""
-        from routes.chatbot import _merge_chunks
+        from services.rag_service import merge_chunks
 
         vector = [
             {"content": "Chunk A content here", "source": "manuel", "chapter": "ch1", "retrieval": "vector"},
@@ -141,7 +137,7 @@ class TestChatbotAsk:
             {"content": "Chunk C content here", "source": "annales", "chapter": "ch3", "retrieval": "keyword"},
         ]
 
-        merged = _merge_chunks(vector, keyword)
+        merged = merge_chunks(vector, keyword)
 
         assert len(merged) == 3
         chunk_a = next(c for c in merged if "Chunk A" in c["content"])
@@ -152,15 +148,14 @@ class TestChatbotAsk:
         assert chunk_c["retrieval"] == "keyword"
 
     async def test_source_cards_deduplicates(self):
-        """Vérifie que _source_cards déduplique par (source, chapter)."""
-        from routes.chatbot import _source_cards
+        from services.rag_service import source_cards
 
         chunks = [
             {"content": "Content 1", "source": "manuel", "chapter": "ch1"},
             {"content": "Content 2", "source": "manuel", "chapter": "ch1"},
             {"content": "Content 3", "source": "manuel", "chapter": "ch2"},
         ]
-        cards = _source_cards(chunks)
+        cards = source_cards(chunks)
         assert len(cards) == 2
         assert cards[0]["chapter"] == "ch1"
         assert cards[1]["chapter"] == "ch2"
@@ -174,13 +169,12 @@ class TestChatbotEngagement:
     async def test_chatbot_state_feedback_and_daily_mission_contract(
         self, client: AsyncClient, auth_headers: dict, monkeypatch
     ):
-        """Vérifie que les 3 endpoints engagement fonctionnent ensemble (mock RAG + get_openai)."""
         from routes import chatbot
 
         async def fake_rag(db, message, chapter=None, limit=3):
             return []
 
-        monkeypatch.setattr(chatbot, "_rag_search", fake_rag)
+        monkeypatch.setattr(chatbot, "rag_search", fake_rag)
 
         # 1. GET /state
         resp = await client.get("/api/chatbot/state", headers=auth_headers)

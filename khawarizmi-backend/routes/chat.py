@@ -11,7 +11,6 @@ from deps import get_current_user, get_db, get_openai, get_tutor
 from rate_limit import chat_limit, limiter
 from schemas.session import ChatRequest
 from services.khawarizmi_engine import KhawarizmiTutor
-from services.llm import _call_with_fallback
 from services.metrics import MetricsCollector, record_request
 
 logger = logging.getLogger("khawarizmi.api")
@@ -53,107 +52,34 @@ async def chat_socratique(
     )
     mc.end("pre_analyse")
 
-    # ─── Calcul du Contexte Temporel & FSRS ──────────────
-    from datetime import date
+    from services.calendar_context import get_calendar_context
 
-    from sqlalchemy import text as sa_text
+    calendar_context = await get_calendar_context(db, current_user["id"])
 
-    today = date.today()
-    year = today.year
-    if today.month > 6 or (today.month == 6 and today.day > 10):
-        year += 1
-    bac_date = date(year, 6, 5)
-    days_to_bac = (bac_date - today).days
-
-    if days_to_bac > 90:
-        phase_label = "Phase 1 : Apprentissage progressif (Septembre - Mars)"
-    elif days_to_bac > 15:
-        phase_label = "Phase 2 : Révisions intensives (Avril - Mai)"
-    else:
-        phase_label = "Phase 3 : Sprint final (J-15 avant le BAC)"
-
-    user_stats = {"mastered": 0, "total": 0, "avg_stability": 0.0}
+    mc.start("llm")
     try:
-        result_stats = await db.execute(
-            sa_text("""
-                SELECT
-                    COUNT(*) as total,
-                    COUNT(*) FILTER (WHERE stability > 10.0) as mastered,
-                    COALESCE(AVG(stability), 0.0) as avg_stability
-                FROM mastery_micro_concepts
-                WHERE user_id = :uid
-            """),
-            {"uid": current_user["id"]},
-        )
-        row_stats = result_stats.fetchone()
-        if row_stats:
-            user_stats = {
-                "total": row_stats[0],
-                "mastered": row_stats[1],
-                "avg_stability": round(row_stats[2] or 0.0, 1),
-            }
-    except Exception as e:
-        logger.error(f"Erreur stats chat FSRS: {e}")
-
-    calendar_context = {"days_to_bac": days_to_bac, "phase": phase_label, "user_stats": user_stats}
-
-    try:
-        system_prompt = tutor.build_system_prompt(
+        ia_result = await tutor.interroger_ia(
             sujet_id=body.sujet_id,
             question_id=body.question_id,
             student_input=body.message,
+            openai_client=openai_client,
+            cfg=cfg,
             pre_analyse=pre_analyse,
             niveau_sm2=body.niveau_sm2,
             score_actuel=body.score_actuel,
-            mode_force=body.mode_force or "ANNALES_COMPLEXES",
+            mode_force=body.mode_force,
             calendar_context=calendar_context,
         )
     except ValueError as e:
         raise HTTPException(404, f"Contenu introuvable : {e}")
-    mc.start("llm")
-    fallback_used = False
-    try:
-        from services.llm import _call_with_fallback
-
-        response = await _call_with_fallback(
-            messages=[
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": body.message},
-            ],
-            primary_client=openai_client,
-            primary_model=cfg.openai_model,
-            temperature=cfg.ia_temperature,
-            max_tokens=cfg.ia_max_tokens,
-            timeout=30.0,
-        )
-
-        raw_content = response.choices[0].message.content or ""
-        tokens_used = response.usage.total_tokens
-
-        raw_content = raw_content.strip()
-        if raw_content.startswith("```"):
-            lines = raw_content.splitlines()
-            if len(lines) >= 2 and lines[0].startswith("```") and lines[-1].startswith("```"):
-                raw_content = "\n".join(lines[1:-1]).strip()
-
-        ia_result = json.loads(raw_content)
-
-    except json.JSONDecodeError:
-        logger.error(f"Réponse IA non-JSON : {raw_content[:200]}")
-        raise HTTPException(500, "Réponse IA malformée")
     except Exception as e:
-        logger.error(f"Erreur OpenAI : {e}")
+        logger.error(f"Erreur IA : {e}")
         raise HTTPException(502, f"Service IA temporairement indisponible : {e}")
     mc.end("llm")
-
-    mc.set("tokens_total", tokens_used)
-    mc.set("tokens_input", response.usage.prompt_tokens if response.usage else 0)
-    mc.set("tokens_output", response.usage.completion_tokens if response.usage else 0)
 
     result = {
         **ia_result,
         "pre_analyse": pre_analyse,
-        "tokens_utilises": tokens_used,
         "economie_tokens": pre_analyse.get("economie_tokens", 0) if pre_analyse else 0,
         "from_cache": False,
     }
@@ -162,10 +88,10 @@ async def chat_socratique(
     await set_cache(cache_key, json.dumps(result, ensure_ascii=False), cfg.cache_ttl)
     mc.end("cache_store")
 
-    record_request("/api/chat", cache_hit=False, fallback=fallback_used)
+    record_request("/api/chat", cache_hit=False, fallback=False)
     mc.flush()
 
-    logger.info(f"Chat : user={current_user['id']} sujet={body.sujet_id} q={body.question_id} tokens={tokens_used}")
+    logger.info(f"Chat : user={current_user['id']} sujet={body.sujet_id} q={body.question_id} tokens={ia_result.get('tokens_utilises', 0)}")
 
     return result
 

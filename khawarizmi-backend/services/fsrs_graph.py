@@ -3,6 +3,7 @@ services/fsrs_graph.py - Répétition espacée par graphe de micro-concepts
 Recommandé par Claude 3 Opus.
 """
 
+import copy
 import logging
 import time
 from dataclasses import dataclass, field
@@ -92,28 +93,28 @@ def determine_concept_ratings(
             score = float(scores_concepts[concept_id])
             concept_ratings[concept_id] = score_to_fsrs_rating(score)
         else:
-            # Fallback sur l'ancien comportement si le concept n'est pas spécifiquement noté
             concepts_trouves = set(evaluation_result.get("concepts_trouves", []))
             concepts_errones = set(evaluation_result.get("concepts_errones", []))
-            score_global = evaluation_result.get("score", 0.0)  # sur 10
-            score_percent = score_global * 10.0
+            score_global_raw = evaluation_result.get("score", 0)
+            score_global_normalized = (
+                score_global_raw / 10.0
+                if score_global_raw > 1.0
+                else float(score_global_raw)
+            )
 
-            if not concepts_trouves and score_percent >= 60.0:
+            if not concepts_trouves and score_global_normalized >= 0.60:
                 concepts_trouves = set(mapping.concepts.keys())
 
             if concept_id in concepts_errones:
-                concept_ratings[concept_id] = Rating.Again  # 1
+                concept_ratings[concept_id] = Rating.Again
             elif concept_id not in concepts_trouves:
-                if poids >= 0.20:  # Concept central
-                    concept_ratings[concept_id] = Rating.Again  # 1
-                else:
-                    concept_ratings[concept_id] = Rating.Hard  # 2
-            elif score_percent >= 85.0 and poids >= 0.25:
-                concept_ratings[concept_id] = Rating.Easy  # 4
-            elif score_percent >= 60.0:
-                concept_ratings[concept_id] = Rating.Good  # 3
+                concept_ratings[concept_id] = Rating.Again if poids >= 0.20 else Rating.Hard
+            elif score_global_normalized >= 0.85 and poids >= 0.25:
+                concept_ratings[concept_id] = Rating.Easy
+            elif score_global_normalized >= 0.60:
+                concept_ratings[concept_id] = Rating.Good
             else:
-                concept_ratings[concept_id] = Rating.Hard  # 2
+                concept_ratings[concept_id] = Rating.Hard
 
     return concept_ratings
 
@@ -170,10 +171,15 @@ def update_concept_graph(
             logger.error(f"Erreur FSRS sur le concept {concept_id}: {e}")
 
     active_graph = graph if graph is not None else get_concept_graph()
-    # ── Propagation aux prérequis (haut niveau échoue → prérequis immédiatement dû) ──
-    _propagate_prerequisite_penalties(ratings, concept_states, updates, now, active_graph)
+    if not active_graph:
+        logger.warning(
+            f"FSRS_GRAPH_EMPTY | user={user_id} | q={question_id} | "
+            f"Propagation prérequis ignorée. "
+            f"Appeler load_concept_graph(db) avant update_concept_graph."
+        )
+        return updates
 
-    # ── Propagation aux concepts dépendants (prérequis échoue → stabilité dépendante réduite de 15%) ──
+    _propagate_prerequisite_penalties(ratings, concept_states, updates, now, active_graph)
     _propagate_dependent_penalties(ratings, concept_states, updates, active_graph)
 
     return updates
@@ -193,8 +199,7 @@ def _propagate_prerequisite_penalties(
         if rating == Rating.Again and concept_id in graph:
             for prereq_id in graph[concept_id]:
                 if prereq_id not in updates:
-                    # Rendre le prérequis immédiatement dû pour vérification des bases
-                    prereq_card = concept_states.get(prereq_id, Card())
+                    prereq_card = copy.deepcopy(concept_states.get(prereq_id, Card()))
                     prereq_card.due = now
 
                     updates[prereq_id] = {
@@ -223,8 +228,7 @@ def _propagate_dependent_penalties(
         if rating == Rating.Again:
             for dependent_concept, prereqs in graph.items():
                 if failed_concept in prereqs and dependent_concept not in updates:
-                    card = concept_states.get(dependent_concept, Card())
-                    # Réduire la stabilité de 15%
+                    card = copy.deepcopy(concept_states.get(dependent_concept, Card()))
                     card.stability *= 1.0 - penalty
 
                     updates[dependent_concept] = {

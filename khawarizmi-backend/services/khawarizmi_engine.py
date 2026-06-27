@@ -703,14 +703,59 @@ Type d'erreur non identifié.
 
         return methodes.get(type_erreur, methodes["INCONNU"])
 
-    async def interroger_ia(self, sujet_id: str, question_id: str, student_input: str, **kwargs) -> str:
-        """
-        Méthode principale : construit le prompt ET appelle l'IA.
-        Actuellement ce lien est absent du fichier.
-        """
-        prompt = self.build_system_prompt(sujet_id, question_id, student_input, **kwargs)
-        # Appel à connecter ici avec le service LLM
-        raise NotImplementedError("Connecter ici openai / anthropic / google-generativeai")
+    async def interroger_ia(
+        self,
+        sujet_id: str,
+        question_id: str,
+        student_input: str,
+        openai_client,
+        cfg,
+        pre_analyse: dict | None = None,
+        niveau_sm2: int = 0,
+        score_actuel: float = 0.0,
+        mode_force: str | None = None,
+        calendar_context: dict | None = None,
+    ) -> dict:
+        from services.llm import _call_with_fallback
+        from services.llm_parser import parse_llm_json
+
+        system_prompt = self.build_system_prompt(
+            sujet_id=sujet_id,
+            question_id=question_id,
+            student_input=student_input,
+            pre_analyse=pre_analyse,
+            niveau_sm2=niveau_sm2,
+            score_actuel=score_actuel,
+            mode_force=mode_force or "ANNALES_COMPLEXES",
+            calendar_context=calendar_context,
+        )
+
+        response = await _call_with_fallback(
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": student_input},
+            ],
+            primary_client=openai_client,
+            primary_model=cfg.openai_model,
+            temperature=cfg.ia_temperature,
+            max_tokens=cfg.ia_max_tokens,
+            timeout=30.0,
+        )
+
+        raw = response.choices[0].message.content or ""
+        tokens = response.usage.total_tokens if response.usage else 0
+
+        try:
+            result = parse_llm_json(raw)
+        except (ValueError, Exception):
+            raise ValueError(f"Réponse IA non-JSON : {raw[:200]}")
+
+        return {
+            **result,
+            "tokens_utilises": tokens,
+            "tokens_input": response.usage.prompt_tokens if response.usage else 0,
+            "tokens_output": response.usage.completion_tokens if response.usage else 0,
+        }
 
 
 _instance = None
