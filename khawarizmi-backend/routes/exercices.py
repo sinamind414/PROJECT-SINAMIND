@@ -13,8 +13,16 @@ logger = logging.getLogger("khawarizmi.api")
 router = APIRouter(prefix="/api/exercices", tags=["Exercices"])
 
 MAPPING_PATH = Path(__file__).resolve().parent.parent / "data" / "chapter_mapping.json"
-with open(MAPPING_PATH, encoding="utf-8") as f:
-    CHAPTER_MAPPING = json.load(f)
+try:
+    with open(MAPPING_PATH, encoding="utf-8") as f:
+        CHAPTER_MAPPING = json.load(f)
+    logger.info(f"✅ Exercices chapter mapping chargé ({len(CHAPTER_MAPPING)} entrées)")
+except FileNotFoundError:
+    logger.warning(f"⚠️ chapter_mapping.json introuvable ({MAPPING_PATH}), fallback vide")
+    CHAPTER_MAPPING = {}
+except Exception as e:
+    logger.error(f"❌ Erreur exercices chapter_mapping: {e}")
+    CHAPTER_MAPPING = {}
 
 
 def get_keywords(chapitre: str) -> list[str]:

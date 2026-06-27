@@ -14,8 +14,16 @@ logger = logging.getLogger("khawarizmi.api")
 router = APIRouter(prefix="/api/cours", tags=["Cours"])
 
 MAPPING_PATH = Path(__file__).resolve().parent.parent / "data" / "chapter_mapping.json"
-with open(MAPPING_PATH, encoding="utf-8") as f:
-    CHAPTER_MAPPING = json.load(f)
+try:
+    with open(MAPPING_PATH, encoding="utf-8") as f:
+        CHAPTER_MAPPING = json.load(f)
+    logger.info(f"✅ Chapter mapping chargé ({len(CHAPTER_MAPPING)} entrées)")
+except FileNotFoundError:
+    logger.warning(f"⚠️ chapter_mapping.json introuvable ({MAPPING_PATH}), fallback vide")
+    CHAPTER_MAPPING = {}
+except Exception as e:
+    logger.error(f"❌ Erreur chapter_mapping.json: {e}")
+    CHAPTER_MAPPING = {}
 
 # Source de vérité du cours (markdown canonique de 10 000 lignes).
 # La table rag_chunks est censée le contenir, mais l'ingest
