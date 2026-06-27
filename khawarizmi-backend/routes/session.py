@@ -206,13 +206,10 @@ async def get_next_question(current_user: dict = Depends(get_current_user), db: 
 
     q_data = get_question(result["question_id"])
     if not q_data:
-        # Fallback question standard
-        return {
-            "question_id": "q_test",
-            "texte": "Quel est le rôle de l'ARN polymérase ?",
-            "concept_id": "transcription",
-            "type": "FALLBACK",
-        }
+        raise HTTPException(
+            status_code=404,
+            detail="QuestionFSRS introuvable dans la base"
+        )
 
     return {
         "question_id": result["question_id"],

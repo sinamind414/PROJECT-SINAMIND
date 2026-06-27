@@ -1,3 +1,18 @@
+"""
+services/llm.py — Moteur d'évaluation IA avec fallback multi-provider.
+
+CHAÎNE DE FALLBACK (dans l'ordre) :
+1. Provider principal (OPENAI_API_KEY + openai_base_url)
+   → Auto-détecté : gsk_* → Groq, AIza* → Gemini, sinon OpenAI
+2. Gemini 2.5 Flash (GEMINI_API_KEY) — 15 req/min gratuites
+3. Cloudflare GLM-5.2 (CLOUDFLARE_API_TOKEN) — 10K neurons/jour
+4. Z.AI GLM-4.7 (ZAI_API_KEY)
+5. OpenAI gpt-4o-mini (OPENAI_FALLBACK_API_KEY ou REAL_OPENAI_API_KEY)
+
+Un fallback ne se déclenche QUE sur rate limit (429/quota).
+Les erreurs réseau/non-429 remontent directement.
+"""
+
 import json
 import logging
 import re
@@ -391,7 +406,7 @@ REPONSE_ELEVE: {reponse}"""
     response = await _call_with_fallback(
         messages=messages,
         primary_client=client,
-        primary_model=model,
+        primary_model=_model,
     )
 
     content = response.choices[0].message.content or ""

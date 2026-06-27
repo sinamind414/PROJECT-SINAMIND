@@ -346,7 +346,7 @@ class KhawarizmiScheduler:
             row_fb = res_fallback.fetchone()
             if row_fb:
                 return {"question_id": row_fb[0], "concept_id": row_fb[1], "type": "NEW_FALLBACK"}
-            return {"question_id": "q_test", "concept_id": "transcription", "type": "DEFAULT"}
+            return None
 
         concept_ids = [c["concept_id"] for c in due_concepts]
         concept_stability = {c["concept_id"]: c["stability"] for c in due_concepts}
@@ -359,8 +359,7 @@ class KhawarizmiScheduler:
         res_mappings = await db.execute(query_mappings, {"cids": cids_param})
         mappings = res_mappings.fetchall()
         if not mappings:
-            concept_fb = concept_ids[0]
-            return {"question_id": "q_test", "concept_id": concept_fb, "type": "DUE_FALLBACK"}
+            return None
 
         question_scores = {}
         question_concept_assoc = {}

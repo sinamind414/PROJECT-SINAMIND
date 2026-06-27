@@ -21,7 +21,10 @@ try:
         for sujet in annales:
             for exercice in sujet.get("exercices", []):
                 for q in exercice.get("questions", []):
-                    questions_db[q["question_id"]] = q
+                    qid = q["question_id"]
+                    if qid in questions_db:
+                        logger.warning(f"Collision question_id détectée (annales): {qid}")
+                    questions_db[qid] = q
     logger.info(f"✅ {len(questions_db)} questions chargées depuis {ANNALES_PATH}")
 except Exception as e:
     logger.error(f"❌ Erreur lors du chargement des annales ({ANNALES_PATH}): {e}")
@@ -34,6 +37,8 @@ try:
         for q in taggees:
             # Normalisation vers le format attendu par le backend
             question_id = q["id"]
+            if question_id in questions_db:
+                logger.warning(f"Collision question_id détectée (taggées): {question_id} → écrasé")
             questions_db[question_id] = {
                 "question_id": question_id,
                 "texte": q.get("texte_corrige", ""),

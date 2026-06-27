@@ -42,6 +42,25 @@ async def health_check():
     now = datetime.now(UTC)
     backup_info = _check_backup_status()
 
+    # Santé métier
+    from services.questions import questions_db
+    business = {
+        "questions_loaded": len(questions_db),
+        "openai_configured": s.openai is not None,
+        "scheduler_initialized": s.scheduler is not None,
+        "tutor_initialized": s.tutor is not None,
+        "dual_coding_configured": s.dual_coding is not None,
+    }
+
+    # rag_chunks count (si DB disponible)
+    if db_ok and s.db_session:
+        try:
+            async with s.db_session() as db:
+                result = await db.execute(text("SELECT COUNT(*) FROM rag_chunks"))
+                business["rag_chunks_count"] = result.scalar() or 0
+        except Exception:
+            business["rag_chunks_count"] = -1  # table inexistante
+
     return {
         "status": "healthy" if (db_ok and redis_ok) else "degraded",
         "version": cfg.VERSION,
@@ -50,6 +69,7 @@ async def health_check():
         "ai_model": cfg.AI_MODEL_PRIMARY,
         "fallback_active": not db_ok or not redis_ok,
         "backup": backup_info,
+        "business": business,
         "environment": cfg.ENVIRONMENT,
         "timestamp": now.isoformat(),
     }

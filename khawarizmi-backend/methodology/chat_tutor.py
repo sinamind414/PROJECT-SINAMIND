@@ -36,9 +36,28 @@ async def tutor_methodology_mode(
         }
 
     elif mode == "diagnose":
+        if not student_answer:
+            return {"error": "Réponse élève requise pour le diagnostic"}
+        evaluation = await evaluate_methodology(
+            context="",
+            instruction=instruction,
+            student_answer=student_answer,
+        )
+        verb_info = get_verb_explanation(instruction)
         return {
             "mode": "diagnose",
-            "message": "Mode diagnostic en cours de développement",
+            "verb": instruction,
+            "verb_expected": verb_info,
+            "task_type": evaluation.get("task_type", "unknown"),
+            "structure": evaluation.get("structure", {}),
+            "document_usage": evaluation.get("document_usage", {}),
+            "score": evaluation.get("score", 0),
+            "max_score": evaluation.get("max_score", 10),
+            "feedback": evaluation.get("feedback", {}),
+            "message": (
+                f"Diagnostic du verbe '{instruction}' — "
+                f"Score : {evaluation.get('score', 0)}/{evaluation.get('max_score', 10)}"
+            ),
         }
 
     return {"error": "Mode inconnu"}

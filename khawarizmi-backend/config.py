@@ -23,12 +23,18 @@ class Settings(BaseSettings):
     REDIS_URL: str = "redis://localhost:6379/0"
     cache_ttl: int = 3600
 
-    GEMINI_API_KEY: str = ""
+    # ── IA — Configuration ────────────────────────────────────────
+    # Convention : OPENAI_API_KEY + openai_base_url + openai_model
+    # Auto-détection dans lifespan.py :
+    #   - gsk_*  → Groq (base_url override)
+    #   - AIza*  → Gemini (base_url override)
+    # Les anciens GEMINI_API_KEY / REAL_OPENAI_API_KEY sont legacy.
+    GEMINI_API_KEY: str = ""  # DEPRECATED — utiliser OPENAI_API_KEY + AIza*
     OPENAI_API_KEY: str = ""
     openai_base_url: str = "https://api.openai.com/v1"
     openai_model: str = "gpt-4o-mini"
     OPENAI_FALLBACK_API_KEY: str = ""
-    REAL_OPENAI_API_KEY: str = ""
+    REAL_OPENAI_API_KEY: str = ""  # DEPRECATED — utiliser OPENAI_API_KEY
     ia_temperature: float = 0.3
     ia_max_tokens: int = 600
     AI_MODEL_PRIMARY: str = "gemini-2.5-flash"

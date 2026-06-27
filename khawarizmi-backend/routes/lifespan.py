@@ -101,7 +101,13 @@ async def lifespan(app: FastAPI):
                     "ALTER TABLE mastery_micro_concepts "
                     "DROP CONSTRAINT IF EXISTS mastery_micro_concepts_micro_concept_id_fkey"
                 ))
-            logger.info("Migration 013: FK mastery_micro_concepts dropped")
+                # Normaliser concept_id : fallback sur micro_concept_id si vide
+                await conn.execute(text(
+                    "UPDATE mastery_micro_concepts "
+                    "SET concept_id = micro_concept_id "
+                    "WHERE concept_id IS NULL OR concept_id = ''"
+                ))
+            logger.info("Migration 013+014: FK dropped + concept_id normalized")
         except Exception as e:
             logger.error(f"PostgreSQL init error: {e}")
 
