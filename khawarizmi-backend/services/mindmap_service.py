@@ -129,9 +129,10 @@ async def run_generation_background(
             ]
 
             if not raw_chunks:
-                await _update_task(task_id, "failed", error="no_context", db=db)
-                logger.warning(f"MINDMAP_ASYNC | Aucun contexte RAG pour '{chapitre}'")
-                return
+                # Fallback: generate mindmap with LLM alone (no RAG context)
+                logger.warning(f"MINDMAP_ASYNC | Aucun contexte RAG pour '{chapitre}', génération LLM seule")
+                context_text = f"Chapitre: {chapitre}, Matière: {matiere}, Filière: {filiere}"
+                source_names = "LLM seul (pas de RAG)"
 
             # Re-ranking : garder les 5 meilleurs chunks
             chunks = rerank(query_text, raw_chunks, top_k=5)
@@ -459,16 +460,16 @@ async def generate_mindmap(
         logger.error(traceback.format_exc())
         chunks = []
 
-    # Pilier RAG Strict : si aucun contexte n'est trouvé, renvoyer l'erreur configurée
+    # Fallback: si aucun contexte RAG, générer avec LLM seul
     if not chunks:
-        logger.warning(f"RAG STRICT: Aucun contexte trouve pour le chapitre '{chapitre}'")
-        return {
-            "status": "no_context",
-            "message": "Je n'ai pas trouve cette information dans la base. Consulte ton manuel officiel.",
-        }
+        logger.warning(f"FALLBACK LLM SEUL: Aucun contexte RAG pour '{chapitre}', génération basique")
+        context_text = f"Chapitre: {chapitre}, Matière: {matiere}, Filière: {filiere}"
+        source_names = "LLM seul (pas de RAG)"
 
-    context_text = "\n\n".join([f"Source: {c['source']}\n{c['content']}" for c in chunks])
-    source_names = ", ".join(list({c["source"] for c in chunks}))
+    if chunks:
+        context_text = "\n\n".join([f"Source: {c['source']}\n{c['content']}" for c in chunks])
+        source_names = ", ".join(list({c["source"] for c in chunks}))
+    # else: context_text and source_names already set by fallback above
 
     # 3. Interroger le LLM pour générer l'arborescence JSON
     user_prompt = f"""

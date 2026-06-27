@@ -78,8 +78,29 @@ export default function RegisterPage() {
               onChange={(e) => setPassword(e.target.value)}
               className="w-full bg-slate-800 border border-slate-700 rounded-lg p-3 text-white text-sm focus:outline-none focus:border-mint"
               required
-              dir="ltr"
+              minLength={8}
             />
+            {password.length > 0 && (
+              <div className="mt-1.5 flex gap-1">
+                {[1, 2, 3, 4].map((i) => (
+                  <div
+                    key={i}
+                    className={`h-1 flex-1 rounded-full ${
+                      password.length >= i * 3
+                        ? password.length >= 12
+                          ? "bg-emerald-400"
+                          : password.length >= 8
+                          ? "bg-amber-400"
+                          : "bg-red-400"
+                        : "bg-slate-700"
+                    }`}
+                  />
+                ))}
+              </div>
+            )}
+            {password.length > 0 && password.length < 8 && (
+              <p className="text-[10px] text-red-400 mt-1">8 أحرف على الأقل</p>
+            )}
           </div>
 
           <div>

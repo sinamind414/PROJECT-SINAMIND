@@ -60,6 +60,18 @@ except Exception as e:
 
 logger.info(f"📊 Total questions en mémoire : {len(questions_db)}")
 
+# --- Filtrer les questions OCR illisibles (texte < 20 chars) ---
+_before_filter = len(questions_db)
+questions_db = {
+    qid: q
+    for qid, q in questions_db.items()
+    if len((q.get("texte", "") or q.get("texte_ar", "")).strip()) >= 20
+}
+_rejected = _before_filter - len(questions_db)
+if _rejected:
+    logger.warning(f"⚠️ {_rejected} questions rejetées (texte OCR trop court/corrompu)")
+logger.info(f"📊 Questions valides après filtrage : {len(questions_db)}")
+
 
 def get_question(question_id: str) -> dict[str, Any]:
     q = questions_db.get(question_id)

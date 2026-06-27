@@ -23,6 +23,7 @@ import apiClient from "@/lib/api-client"
 import { useAuth } from "@/lib/auth-context"
 import { AuthGuard } from "@/components/auth/AuthGuard"
 import { UI_AR, trAr } from "@/lib/translations"
+import { getActiveLessonByChapterSlug } from "@/lib/active-lessons"
 import {
   MindMap as MindMapType,
   MindMapNode,
@@ -279,13 +280,32 @@ function MindMapContent() {
       let foundChapter: Chapter | null = null
       for (const d of prog.domains) {
         for (const u of d.units) {
-          const match = u.chapters.find((c) => c.id === chapterId)
+          const match = u.chapters.find(
+            (c) => c.id === chapterId
+              || c.titre_fr.toLowerCase().replace(/\s+/g, "-") === chapterId
+              || c.titre_fr.toLowerCase().replace(/[^a-z0-9]+/g, "-") === chapterId
+          )
           if (match) {
             foundChapter = match
             break
           }
         }
         if (foundChapter) break
+      }
+
+      if (!foundChapter) {
+        // Fallback: try activeLessons by slug
+        const activeLesson = getActiveLessonByChapterSlug(chapterId as string)
+        if (activeLesson) {
+          foundChapter = {
+            id: chapterId as string,
+            titre_fr: activeLesson.chapterFr,
+            titre_ar: activeLesson.chapterAr,
+            numero: activeLesson.chapterNumero,
+            importance: activeLesson.chapterImportance,
+            type: activeLesson.chapterType || "concept",
+          } as Chapter
+        }
       }
 
       if (!foundChapter) {
@@ -304,12 +324,20 @@ function MindMapContent() {
       })
 
       if (res.status === "no_context") {
-        throw new Error(res.message || UI_AR.aucun_contenu_mindmap)
+        throw new Error("لا توجد بيانات RAG لهذا الفصل بعد. جرّب فصلا آخر مثل تركيب البروتينات.")
       }
 
       let mindmapData: MindMapType
       if (res.status === "pending") {
-        mindmapData = await pollTask(res.task_id)
+        try {
+          mindmapData = await pollTask(res.task_id)
+        } catch (e) {
+          const msg = e instanceof Error ? e.message : ""
+          if (msg.includes("مهلة") || msg.includes("timeout")) {
+            throw new Error("الخريطة قيد الإنشاء في الخلفية. أعد تحميل الصفحة بعد 30 ثانية.")
+          }
+          throw e
+        }
       } else {
         mindmapData = res.mindmap
       }
@@ -341,8 +369,17 @@ function MindMapContent() {
       // Auto select root node
       setSelectedNode(mindmapData.racine)
 
-    } catch {
-      setError(UI_AR.erreur_chargement_mindmap)
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : ""
+      if (msg.includes("RAG") || msg.includes("بيانات")) {
+        setError(msg)
+      } else if (msg.includes("إنشاء") || msg.includes("الخلفية")) {
+        setError(msg)
+      } else if (msg.includes("تحميل")) {
+        setError("تعذر تحميل البرنامج. تحقق من اتصالك بالإنترنت.")
+      } else {
+        setError(UI_AR.erreur_chargement_mindmap)
+      }
     } finally {
       setLoading(false)
       setGenerating(false)

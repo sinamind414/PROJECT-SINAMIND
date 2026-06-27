@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react"
 import { PageShell } from "@/components/ui/PageShell"
 import { PageHero } from "@/components/ui/PageHero"
 import { VideoCard } from "@/components/videos/VideoCard"
+import apiClient from "@/lib/api-client"
 
 interface Video {
   id: number
@@ -30,16 +31,8 @@ function VideosContent() {
 
   const loadVideos = useCallback(async () => {
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || ""
-
-      const response = await fetch(`${apiUrl}/api/videos/all`, {
-        credentials: "include",
-      })
-
-      if (response.ok) {
-        const data = (await response.json()) as Video[]
-        setVideos(data)
-      }
+      const data = await apiClient.getVideos()
+      setVideos(data as unknown as Video[])
     } catch (err) {
       console.error(err)
     } finally {

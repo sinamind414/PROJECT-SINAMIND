@@ -93,6 +93,15 @@ async def lifespan(app: FastAPI):
             )
             state.db_engine = create_async_engine(db_url, pool_size=10, max_overflow=20, pool_pre_ping=True)
             state.db_session = async_sessionmaker(state.db_engine, class_=AsyncSession, expire_on_commit=False)
+
+            # Auto-migration : supprimer la FK qui bloque les inserts drill
+            async with state.db_engine.begin() as conn:
+                from sqlalchemy import text
+                await conn.execute(text(
+                    "ALTER TABLE mastery_micro_concepts "
+                    "DROP CONSTRAINT IF EXISTS mastery_micro_concepts_micro_concept_id_fkey"
+                ))
+            logger.info("Migration 013: FK mastery_micro_concepts dropped")
         except Exception as e:
             logger.error(f"PostgreSQL init error: {e}")
 

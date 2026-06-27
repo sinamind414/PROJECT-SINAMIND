@@ -350,6 +350,12 @@ class KhawarizmiApiClient {
     return this.request<ExercicesResponse>(`/api/exercices/${encoded}`)
   }
 
+  // ── Vidéos ─────────────────────────────────────
+
+  async getVideos(): Promise<Record<string, unknown>[]> {
+    return this.request<Record<string, unknown>[]>("/api/videos/all")
+  }
+
   // ── Session / Drill ────────────────────────────
 
   async getNextSession(maxCards = 5): Promise<{ session_queue: Record<string, unknown>[] }> {

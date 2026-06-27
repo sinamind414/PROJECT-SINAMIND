@@ -8,6 +8,7 @@ import ProgressCluster from "@/components/drive-design/ProgressCluster"
 import WeeklyPlan from "@/components/drive-design/WeeklyPlan"
 import LevelXp from "@/components/drive-design/LevelXp"
 import DailyMission from "@/components/drive-design/DailyMission"
+import SprintTimer from "@/components/gamification/SprintTimer"
 import TopicsPanel from "@/components/drive-design/TopicsPanel"
 import ExercisesPanel from "@/components/drive-design/ExercisesPanel"
 import MistakesPanel from "@/components/drive-design/MistakesPanel"
@@ -57,6 +58,15 @@ export default function DashboardPage() {
           <div className="max-w-7xl mx-auto space-y-4">
             <Header profile={state.profile} onContinueAction={() => {}} />
 
+            {/* XP + Mission du jour — en haut, visible immédiatement */}
+            <div className="grid md:grid-cols-2 gap-4">
+              <LevelXp profile={state.profile} />
+              <DailyMission mission={dailyMission} onDoneAction={updateMission} />
+            </div>
+
+            {/* Sprint 15 min */}
+            <SprintTimer />
+
             {/* ابدأ من هنا — raccourcis */}
             <div className="bg-slate-900/50 border border-slate-800/50 rounded-2xl p-4">
               <h3 className="text-sm font-bold text-white mb-3">ابدأ من هنا</h3>
@@ -76,12 +86,14 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            <LevelXp profile={state.profile} />
             <ProgressCluster profile={state.profile} />
 
             {/* ملخص اليوم */}
             <div className="bg-slate-900/50 border border-slate-800/50 rounded-2xl p-4">
-              <h3 className="text-sm font-bold text-white mb-3">ملخص اليوم</h3>
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-sm font-bold text-white">ملخص اليوم</h3>
+                <span className="text-[10px] text-mint font-bold cursor-pointer hover:underline">🏆 شوف الترتيب</span>
+              </div>
               <div className="grid grid-cols-3 gap-3">
                 <div className="bg-slate-800/50 rounded-xl p-3 text-center">
                   <p className="text-lg font-black text-mint">{state.missions.length}</p>
@@ -101,7 +113,6 @@ export default function DashboardPage() {
             <div className="grid lg:grid-cols-3 gap-4">
               <div className="lg:col-span-2 space-y-4">
                 <WeeklyPlan days={state.weekly} onToggleAction={updateWeek} />
-                <DailyMission mission={dailyMission} onDoneAction={updateMission} />
               </div>
               <div className="space-y-4">
                 <TopicsPanel topics={state.topics} />

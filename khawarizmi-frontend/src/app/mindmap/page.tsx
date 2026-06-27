@@ -1,100 +1,63 @@
-"use client";
+"use client"
 
-import { useState } from "react";
+import { useMemo } from "react"
+import Link from "next/link"
+import { AuthGuard } from "@/components/auth/AuthGuard"
+import { AppShell } from "@/components/layout/AppShell"
+import { groupLessonsByDomain } from "@/lib/active-lessons"
 
-import apiClient from "@/lib/api-client";
-import { AuthGuard } from "@/components/auth/AuthGuard";
-import { AppShell } from "@/components/layout/AppShell";
-import MethodologicalMindMap, { type MethodologicalMindMapData } from "@/components/mindmap/MethodologicalMindMap";
-import ActionButton from "@/components/gamification/ActionButton";
+const IMPORTANCE_BADGE: Record<string, { bg: string; text: string; label: string }> = {
+  critique: { bg: "bg-red-500/10 border-red-500/25", text: "text-red-400", label: "⚡ جد مهم" },
+  haute: { bg: "bg-amber-500/10 border-amber-500/25", text: "text-amber-400", label: "🔥 مهم" },
+  moyenne: { bg: "bg-blue-500/10 border-blue-500/25", text: "text-blue-400", label: "📖 عادي" },
+}
 
-type MethodologicalMindMapResponse = {
-  status: string;
-  mindmap: MethodologicalMindMapData;
-};
-
-export default function MindMapMethodologyPage() {
-  const [mindmap, setMindmap] = useState<MethodologicalMindMapData | null>(null);
-  const [loading, setLoading] = useState(false);
-
-  const generateMethodologicalMindMap = async () => {
-    setLoading(true);
-    try {
-      const data = await apiClient.request<MethodologicalMindMapResponse>("/api/mindmap/generate-methodological", {
-        method: "POST",
-        body: JSON.stringify({
-          matiere: "SVT",
-          chapitre: "Les Protéines",
-          filiere: "Sciences Expérimentales",
-        }),
-      });
-      if (data.status === "success" && data.mindmap) {
-        setMindmap(data.mindmap);
-      }
-    } catch {
-      const fallback: MethodologicalMindMapData = {
-        titre: "البروتينات",
-        racine: {
-          id: "root",
-          label: "البروتينات",
-          enfants: [
-            { id: "acides-amines", label: "الأحماض الأمينية" },
-            { id: "liaisons-peptidiques", label: "الروابط الببتيدية" },
-            { id: "structures", label: "التركيب (1° إلى 4°)" },
-            { id: "roles", label: "الأدوار البيولوجية" },
-          ],
-        },
-      };
-      setMindmap(fallback);
-    } finally {
-      setLoading(false);
-    }
-  };
+export default function MindMapHubPage() {
+  const domainGroups = useMemo(() => groupLessonsByDomain(), [])
 
   return (
     <AuthGuard>
       <AppShell>
-        <div className="p-6 max-w-5xl mx-auto">
-          <div className="flex justify-between items-center mb-8">
-            <div>
-              <h1 className="text-3xl font-black">الخريطة المنهجية</h1>
-              <p className="text-slate-400">إنشاء خريطة ذهنية مُثرّاة بأفعال البكالوريا</p>
-            </div>
+        <main className="flex-1 p-6 lg:p-8 overflow-auto">
+          <div className="max-w-6xl mx-auto space-y-6">
+            <header className="rounded-3xl p-7 glass border border-[#2dd4bf]/10">
+              <h1 className="text-3xl font-bold text-white mb-2">🧠 الخريطة الذهنية</h1>
+              <p className="text-white/80">اختر فصلا لإنشاء خريطته الذهنية التفاعلية</p>
+            </header>
 
-            <ActionButton
-              label="إنشاء خريطة ذهنية منهجية"
-              icon="🧠"
-              onClick={generateMethodologicalMindMap}
-              variant="primary"
-            />
-          </div>
-
-          {loading && (
-            <div className="text-center py-12">
-              <div className="animate-spin w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full mx-auto mb-4" />
-              <p>جاري إنشاء الخريطة المنهجية...</p>
-            </div>
-          )}
-
-          {!loading && !mindmap && (
-            <div className="text-center py-12 text-slate-400">
-              <p>لم يتم إنشاء خريطة منهجية بعد.</p>
-              <p className="mt-2">اضغط على الزر لإنشاء واحدة.</p>
-            </div>
-          )}
-
-          {mindmap && mindmap.racine && (
-            <div className="space-y-6">
-              <MethodologicalMindMap mindmap={mindmap} />
-              {(mindmap.methodology?.points_methodologie ?? 0) > 0 && (
-                <div className="bg-emerald-600/10 border border-emerald-600/30 rounded-2xl p-4 text-emerald-400">
-                  🎉 +{mindmap.methodology?.points_methodologie ?? 0} نقاط منهجية !
+            {Array.from(domainGroups.entries()).map(([domainAr, lessons]) => (
+              <section key={domainAr}>
+                <h2 className="text-xl font-bold text-white mb-3">{domainAr}</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                  {lessons.map((l) => {
+                    const badge = IMPORTANCE_BADGE[l.chapterImportance] || IMPORTANCE_BADGE.moyenne
+                    return (
+                      <Link
+                        key={l.chapterSlug}
+                        href={`/mindmap/${l.chapterSlug}`}
+                        className="rounded-xl p-4 glass border border-[#2dd4bf]/10 hover:border-[#2dd4bf]/30 transition group"
+                      >
+                        <div className="flex items-start justify-between gap-2 mb-2">
+                          <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded border ${badge.bg} ${badge.text}`}>
+                            {badge.label}
+                          </span>
+                          <span className="text-[10px] text-slate-500">الوحدة {l.unitNumero}</span>
+                        </div>
+                        <p className="text-white font-bold text-sm leading-snug group-hover:text-[#2dd4bf] transition">
+                          {l.chapterAr}
+                        </p>
+                        <p className="text-[#2dd4bf] text-xs mt-2 opacity-0 group-hover:opacity-100 transition">
+                          إنشاء الخريطة ←
+                        </p>
+                      </Link>
+                    )
+                  })}
                 </div>
-              )}
-            </div>
-          )}
-        </div>
+              </section>
+            ))}
+          </div>
+        </main>
       </AppShell>
     </AuthGuard>
-  );
+  )
 }

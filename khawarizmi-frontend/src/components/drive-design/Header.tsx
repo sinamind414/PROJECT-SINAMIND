@@ -19,7 +19,7 @@ export default function Header({ profile, onContinueAction }: { profile: Profile
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-2">
             <Microscope className="w-5 h-5 text-mint" />
-            <span className="text-xs font-bold text-mint-soft/80 tracking-wide">منصة المراجعة الذكية</span>
+            <span className="text-xs font-bold text-mint-soft/80 tracking-wide">مرحبا {profile.name} 👋</span>
           </div>
           <h1 className="text-3xl md:text-4xl font-black text-glow-mint leading-tight">علوم الطبيعة والحياة</h1>
           <p className="text-sm text-slate-400 mt-1.5 font-semibold">استعدّ لامتحان البكالوريا بكفاءة — خطّط، راجع، تقدّم.</p>

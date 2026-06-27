@@ -75,8 +75,26 @@ async def soumettre_resultat_drill(
 ):
     scheduler = get_scheduler()
 
-    card = Card()
+    # ── CHARGER l'état FSRS existant ──────────────────────
+    existing = await db.execute(
+        text("""
+            SELECT fsrs_state FROM mastery_micro_concepts
+            WHERE user_id = :uid AND micro_concept_id = :mc_id
+        """),
+        {"uid": current_user["id"], "mc_id": body.micro_concept_id},
+    )
+    row = existing.fetchone()
 
+    card = Card()
+    if row and row[0]:
+        state_data = row[0] if isinstance(row[0], dict) else json.loads(row[0])
+        card.stability = state_data.get("stability", card.stability)
+        card.difficulty = state_data.get("difficulty", card.difficulty)
+        card.reps = state_data.get("reps", card.reps)
+        card.lapses = state_data.get("lapses", card.lapses)
+        card.scheduled_days = state_data.get("scheduled_days", card.scheduled_days)
+
+    # ── Calculer le prochain intervalle ───────────────────
     result = scheduler.calculer_prochain_intervalle(card, body.score_percent)
     new_card = result["card"]
 

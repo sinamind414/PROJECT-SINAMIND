@@ -9,6 +9,7 @@ import { SectionHeader } from "@/components/ui/SectionHeader"
 import { AlertBanner } from "@/components/ui/AlertBanner"
 import apiClient from "@/lib/api-client"
 import type { Programme } from "@/lib/types"
+import type { ExercicesResponse } from "@/lib/types"
 
 const MODES = [
   { title: "تدريب قصير", subtitle: "مهارة واحدة", duration: "3–7 دقائق", description: "مهارة واحدة فقط: قيم عددية، ملاحظة، مقارنة، أو استنتاج.", href: "/document-analysis", accent: "rgba(52,211,153,0.2)" },
@@ -21,6 +22,7 @@ const FILTERS = ["تحليل", "تفسير", "استنتاج", "فرضية", "ن
 
 export default function ExercisesPage() {
   const [stats, setStats] = useState<{ totalChapters: number; totalExercices: number } | null>(null)
+  const [activeFilter, setActiveFilter] = useState<string | null>(null)
 
   useEffect(() => {
     let cancelled = false
@@ -29,15 +31,12 @@ export default function ExercisesPage() {
         const prog: Programme = await apiClient.getProgramme("SVT", "Sciences Experimentales")
         if (cancelled) return
         const chapters = prog.domains.flatMap((d) => d.units.flatMap((u) => u.chapters))
-        let totalEx = 0
-        for (const ch of chapters) {
-          try {
-            const ex = await apiClient.getExercices(ch.titre_fr)
-            totalEx += ex.nb_exercices || 0
-          } catch {
-            // skip chapitre sans exercices
-          }
-        }
+        const results = await Promise.allSettled(
+          chapters.map((ch) => apiClient.getExercices(ch.titre_fr))
+        )
+        const totalEx = results
+          .filter((r): r is PromiseFulfilledResult<ExercicesResponse> => r.status === "fulfilled")
+          .reduce((sum, r) => sum + (r.value.nb_exercices || 0), 0)
         if (!cancelled) {
           setStats({ totalChapters: chapters.length, totalExercices: totalEx })
         }
@@ -78,15 +77,23 @@ export default function ExercisesPage() {
       <SurfaceCard>
         <SectionHeader title="فلاتر حسب المهارة" />
         <div className="flex flex-wrap gap-2 mb-4">
-          {FILTERS.map((filter) => (
-            <button
-              key={filter}
-              className="px-3 py-1.5 rounded-lg text-sm transition-colors"
-              style={{ background: "rgba(255,255,255,0.04)", color: "#94A3B8" }}
-            >
-              {filter}
-            </button>
-          ))}
+          {FILTERS.map((filter) => {
+            const active = activeFilter === filter
+            return (
+              <button
+                key={filter}
+                onClick={() => setActiveFilter(active ? null : filter)}
+                className="px-3 py-1.5 rounded-lg text-sm transition-colors"
+                style={{
+                  background: active ? "rgba(45,212,191,0.2)" : "rgba(255,255,255,0.04)",
+                  color: active ? "#2dd4bf" : "#94A3B8",
+                  border: active ? "1px solid rgba(45,212,191,0.4)" : "1px solid transparent",
+                }}
+              >
+                {filter}
+              </button>
+            )
+          })}
         </div>
         <AlertBanner
           title="تنبيه قاسٍ لكنه ضروري"

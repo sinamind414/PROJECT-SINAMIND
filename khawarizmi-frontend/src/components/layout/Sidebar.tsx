@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { useEffect, useState } from "react"
 import { useAuth } from "@/lib/auth-context"
 import { motion } from "framer-motion"
 import type { LucideIcon } from "lucide-react"
@@ -76,6 +77,18 @@ const MENU_PHASES: Phase[] = [
 export function Sidebar() {
   const pathname = usePathname()
   const { user, logout } = useAuth()
+  const [simCount, setSimCount] = useState(0)
+  const [streak, setStreak] = useState(0)
+  const [level, setLevel] = useState("2026")
+
+  useEffect(() => {
+    const s = localStorage.getItem("khawarizmi_sim_count")
+    if (s) setSimCount(Number(s) || 0)
+    const st = localStorage.getItem("khawarizmi_streak")
+    if (st) setStreak(Number(st) || 0)
+    const lv = localStorage.getItem("khawarizmi_level")
+    if (lv) setLevel(lv)
+  }, [])
 
   return (
     <aside
@@ -89,17 +102,17 @@ export function Sidebar() {
             <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-mint to-teal-600 flex items-center justify-center text-2xl font-black text-slate-deep shadow-lg shadow-mint/30">
               {user?.nom?.charAt(0) || "أ"}
             </div>
-            <span className="absolute -bottom-1 -left-1 bg-orange text-slate-deep text-[10px] font-black px-1.5 py-0.5 rounded-md border border-slate-deep">2026</span>
+            <span className="absolute -bottom-1 -left-1 bg-orange text-slate-deep text-[10px] font-black px-1.5 py-0.5 rounded-md border border-slate-deep">{level}</span>
           </div>
           <div className="min-w-0">
             <h2 className="font-extrabold text-lg leading-tight truncate text-white">{user?.nom || "طالب البكالوريا"}</h2>
-            <p className="text-xs text-mint-soft/80 font-semibold">بكالوريا 2026 · علوم تجريبية</p>
+            <p className="text-xs text-mint-soft/80 font-semibold">بكالوريا {level} · علوم تجريبية</p>
           </div>
         </div>
         <div className="flex items-center gap-2 mt-4 relative z-10">
           <div className="flex items-center gap-1.5 bg-orange/10 border border-orange/30 rounded-lg px-2.5 py-1">
             <Flame className="w-3.5 h-3.5 text-orange flame-flicker" />
-            <span className="text-xs font-bold text-orange tnum">5 يوم</span>
+            <span className="text-xs font-bold text-orange tnum">{streak || 5} يوم</span>
           </div>
           <div className="flex items-center gap-1.5 bg-mint/10 border border-mint/30 rounded-lg px-2.5 py-1">
             <Microscope className="w-3.5 h-3.5 text-mint" />
@@ -146,6 +159,9 @@ export function Sidebar() {
                       <Icon className="w-4.5 h-4.5" strokeWidth={2.2} />
                     </span>
                     <span className="flex-1 text-right">{item.labelAr}</span>
+                    {item.href === "/simulation" && simCount > 0 && (
+                      <span className="text-[10px] font-black bg-[#2dd4bf]/20 text-[#2dd4bf] px-1.5 py-0.5 rounded-md">{simCount}</span>
+                    )}
                     {isActive && <span className="w-1.5 h-1.5 rounded-full bg-mint pulse-glow" />}
                   </Link>
                 </motion.div>

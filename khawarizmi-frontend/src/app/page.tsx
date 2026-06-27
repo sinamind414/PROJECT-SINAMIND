@@ -1,4 +1,9 @@
+"use client"
+
 import Link from "next/link"
+import { useEffect } from "react"
+import { useAuth } from "@/lib/auth-context"
+import { useRouter } from "next/navigation"
 
 const STEPS = [
   {
@@ -21,6 +26,12 @@ const STEPS = [
 const MISSIONS = ["حلّل دون استعمال لأن", "استخرج القيم العددية", "صغ فرضية قابلة للاختبار", "اكتب استنتاجا في جملة واحدة"]
 
 export default function Home() {
+  const { isAuthenticated } = useAuth()
+  const router = useRouter()
+  useEffect(() => {
+    if (isAuthenticated) router.replace("/dashboard")
+  }, [isAuthenticated, router])
+
   return (
     <main className="min-h-screen overflow-hidden bg-slate-deep text-white" dir="rtl">
       <div className="bio-bg" />
