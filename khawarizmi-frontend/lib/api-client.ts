@@ -1,8 +1,10 @@
 // khawarizmi-frontend/lib/api-client.ts
-// Client API centralisé — Khawarizmi Pro
+// Client API centralis — Khawarizmi Pro
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ||
                      "https://khawarizmi-backend.railway.app"
+
+let _token: string | null = null
 
 export interface MindMapNode {
   id: string
@@ -60,33 +62,36 @@ export interface ChatMessage {
 }
 
 class KhawarizmiApiClient {
-  private getHeaders(): HeadersInit {
-    return {
-      "Content-Type": "application/json"
-    }
+  setToken(token: string): void {
+    _token = token
   }
 
   clearToken(): void {
-    if (typeof window === "undefined") return
-    localStorage.removeItem("khawarizmi_token")
+    _token = null
   }
 
   isAuthenticated(): boolean {
-    return false
+    return _token !== null
   }
 
   private async request<T>(
     endpoint: string,
     options: RequestInit = {}
   ): Promise<T> {
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+      ...(options.headers as Record<string, string> || {})
+    }
+
+    if (_token) {
+      headers["Authorization"] = `Bearer ${_token}`
+    }
+
     const response = await fetch(
       `${API_BASE_URL}${endpoint}`,
       {
         ...options,
-        headers: {
-          ...this.getHeaders(),
-          ...options.headers
-        },
+        headers,
         credentials: "include"
       }
     )
@@ -96,14 +101,14 @@ class KhawarizmiApiClient {
       if (typeof window !== "undefined") {
         window.location.href = "/login"
       }
-      throw new Error("Session expirée. Reconnecte-toi.")
+      throw new Error("Session expire. Reconnecte-toi.")
     }
 
     if (response.status === 429) {
       const data = await response.json()
       throw new Error(
         data.detail ||
-        "Limite de requêtes atteinte. Réessaie dans une heure."
+        "Limite de requ tes atteinte. R essaie dans une heure."
       )
     }
 
@@ -125,6 +130,9 @@ class KhawarizmiApiClient {
       method: "POST",
       body: JSON.stringify({ email, password })
     })
+    if (data.access_token) {
+      this.setToken(data.access_token)
+    }
     return data
   }
 
@@ -141,6 +149,9 @@ class KhawarizmiApiClient {
       method: "POST",
       body: JSON.stringify({ email, password, nom, filiere })
     })
+    if (data.access_token) {
+      this.setToken(data.access_token)
+    }
     return data
   }
 
@@ -177,7 +188,7 @@ class KhawarizmiApiClient {
     matiere: string,
     chapitre: string,
     filiere: string,
-    niveau_detail: "standard" | "détaillé" = "standard"
+    niveau_detail: "standard" | "d taill " = "standard"
   ) {
     return this.request<{
       status: string

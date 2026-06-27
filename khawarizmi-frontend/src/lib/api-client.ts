@@ -190,9 +190,12 @@ class KhawarizmiApiClient {
   // ── Chat (Tuteur IA) ───────────────────────────
 
   async sendMessage(payload: ChatMessage): Promise<ChatResponse> {
-    return this.request<ChatResponse>("/api/chat", {
+    return this.request<ChatResponse>("/api/ai/chat", {
       method: "POST",
-      body: JSON.stringify(payload)
+      body: JSON.stringify({
+        mode: "guided",
+        ...payload
+      })
     })
   }
 
@@ -453,21 +456,24 @@ class KhawarizmiApiClient {
 
     try {
       const data = await this.request<{
-        response: string; lang: string; tokens_utilises?: number; from_cache?: boolean
+        content: string; lang: string; tokens_used?: number; from_cache?: boolean
         fallback_active?: boolean
-        cartes?: Array<{ titre: string; raison: string; action: string; bouton: string }>
+        cards?: Array<{ titre: string; raison: string; action: string; bouton: string }>
         sources?: Array<{ source: string; chapter?: string; excerpt: string }>
         source_rag?: string
         type?: string
-      }>("/api/chatbot/ask", {
+      }>("/api/ai/chat", {
         method: "POST",
-        body: JSON.stringify(chatbotPayload),
+        body: JSON.stringify({
+          mode: "free",
+          ...chatbotPayload
+        }),
       })
       const d = data as Record<string, unknown>
       return {
-        reponse: (d.response as string) || (d.reponse as string) || "لم تصلني إجابة واضحة. أعد المحاولة من فضلك.",
+        reponse: (d.content as string) || (d.response as string) || (d.reponse as string) || "لم تصلني إجابة واضحة. أعد المحاولة من فضلك.",
         type: ((d.type as TuteurResponse["type"]) || "socratique") as TuteurResponse["type"],
-        cartes: (d.cartes as TuteurResponse["cartes"]) || [],
+        cartes: ((d.cards as TuteurResponse["cartes"]) || (d.cartes as TuteurResponse["cartes"]) || []),
         flashcards_suggerees: (d.flashcards_suggerees as string[]) || [],
         sources: (d.sources as TuteurResponse["sources"]) || [],
         source_rag: d.source_rag as string | undefined,

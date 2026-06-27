@@ -62,6 +62,8 @@ export interface ChatMessage {
 }
 
 export interface ChatResponse {
+  mode?: "guided" | "free"
+  pre_analyse?: Record<string, unknown>
   explication: string
   points_cles: string[]
   questions_rappel: QuestionRappel[]
@@ -69,6 +71,9 @@ export interface ChatResponse {
   plan_structure?: string
   rag_context_found: boolean
   source_rag?: string
+  from_cache?: boolean
+  fallback_active?: boolean
+  tokens_used?: number
 }
 
 export interface QuestionRappel {
@@ -793,5 +798,8 @@ export interface TuteurResponse {
   source_rag?: string
   sources?: ChatSource[]
   fallback_active: boolean
+  lang?: string
+  tokens_used?: number
+  from_cache?: boolean
 }
 
