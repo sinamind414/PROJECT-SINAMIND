@@ -39,10 +39,9 @@ import {
   CheckAnswerResponse,
 } from "./types"
 
-// Toujours utiliser des paths relatifs — le proxy Next.js (/api/:path*)
-// dans next.config.ts forwards vers le backend Railway.
-// Évite les erreurs CORS cross-origin.
-const API_BASE_URL = ""
+// En dev: proxy Next.js (même domaine). En prod: backend Railway direct (CORS).
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL || ""
 
 type ApiRequestOptions = RequestInit & {
   skipAuthRedirect?: boolean
