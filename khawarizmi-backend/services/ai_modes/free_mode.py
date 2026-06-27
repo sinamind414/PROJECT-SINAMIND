@@ -56,7 +56,7 @@ async def handle_free_chat(
             mode, sources, source_rag, fallback=True,
         )
 
-    system_prompt = build_free_prompt(lang, rag_context)
+    system_prompt = build_free_prompt(lang, rag_context, user_message=message)
     messages = [{"role": "system", "content": system_prompt}]
 
     for h in history[-6:]:
