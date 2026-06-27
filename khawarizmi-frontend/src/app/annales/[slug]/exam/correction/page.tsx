@@ -1,73 +1,169 @@
 "use client"
 
-import { useState, useEffect, Suspense } from "react"
 import { useParams, useSearchParams } from "next/navigation"
-import { PageShell } from "@/components/ui/PageShell"
+import { useEffect, useState } from "react"
+import { AuthGuard } from "@/components/auth/AuthGuard"
+import { AppShell } from "@/components/layout/AppShell"
 import { apiClient } from "@/lib/api-client"
-import type { CorrectionResponse } from "@/lib/types"
+import type { SubmitBacResponse } from "@/lib/types"
 
-function CorrectionContent() {
+/* ------------------------------------------------------------------ */
+/*  Page "Correction" — Accessible UNIQUEMENT après l'examen        */
+/* ------------------------------------------------------------------ */
+export default function CorrectionPage() {
+  const { slug } = useParams<{ slug: string }>()
+  
+  // ✅ CORRECTION ICI : pas de [], useSearchParams retourne l'objet direct
   const searchParams = useSearchParams()
-  const sessionId = searchParams.get("session") || ""
+  const rawSessionId = searchParams.get("session")
 
-  const [correction, setCorrection] = useState<CorrectionResponse | null>(null)
+  const [result, setResult] = useState<SubmitBacResponse | null>(null)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState("")
+
+  if (!rawSessionId) {
+    return (
+      <AuthGuard>
+        <AppShell>
+          <main className="flex-1 flex items-center justify-center p-6">
+            <div className="text-center space-y-4 max-w-md">
+              <div className="text-6xl">🚫</div>
+              <h2 className="text-2xl font-bold text-white">وصول ممنوع</h2>
+              <p className="text-red-400">⚠️ Aucune session trouvée. Vous devez d'abord passer l'examen.</p>
+              <a href={`/annales/${slug}/exam`} className="inline-block px-6 py-3 bg-mint text-slate-deep rounded-xl font-semibold hover:bg-mint-soft transition">
+                اذهب إلى الامتحان
+              </a>
+            </div>
+          </main>
+        </AppShell>
+      </AuthGuard>
+    )
+  }
+
+  const sessionId = rawSessionId
 
   useEffect(() => {
-    if (!sessionId) return
-    apiClient.getBacCorrection(sessionId)
-      .then(setCorrection)
-      .catch(() => setCorrection(null))
-      .finally(() => setLoading(false))
+
+    /* Récupérer les résultats depuis le backend */
+    async function fetchResult() {
+      try {
+        const resp = await apiClient.getBacCorrection(sessionId)
+        setResult(resp)
+      } catch (err: any) {
+        setError(err.message || "Erreur lors de la récupération des résultats.")
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchResult()
   }, [sessionId])
 
+  /* ---- Affichage ---- */
   if (loading) {
-    return <div className="text-center text-gray-500 py-20">جاري التحميل...</div>
+    return (
+      <AuthGuard>
+        <AppShell>
+          <main className="flex-1 flex items-center justify-center">
+            <div className="text-center space-y-4">
+              <div className="w-12 h-12 border-4 border-mint border-t-transparent rounded-full animate-spin mx-auto" />
+              <p className="text-slate-400">⏳ جاري تحميل النتائج...</p>
+            </div>
+          </main>
+        </AppShell>
+      </AuthGuard>
+    )
   }
 
-  if (!correction) {
-    return <div className="text-center text-gray-500 py-20">لا توجد تصحيح متاح.</div>
+  if (error) {
+    return (
+      <AuthGuard>
+        <AppShell>
+          <main className="flex-1 flex items-center justify-center p-6">
+            <div className="text-center space-y-4 max-w-md">
+              <div className="text-6xl">🚫</div>
+              <h2 className="text-2xl font-bold text-white">وصول ممنوع</h2>
+              <p className="text-red-400">{error}</p>
+              <a
+                href={`/annales/${slug}/exam`}
+                className="inline-block px-6 py-3 bg-mint text-slate-deep rounded-xl font-semibold hover:bg-mint-soft transition"
+              >
+                اذهب إلى الامتحان
+              </a>
+            </div>
+          </main>
+        </AppShell>
+      </AuthGuard>
+    )
   }
 
+  if (!result) {
+    return null
+  }
+
+  /* ---- Afficher la correction ---- */
+  const scoreColor =
+    result.score_global >= 75 ? "#2DD4BF" :
+    result.score_global >= 50 ? "#F59E0B" : "#EF4444"
+
   return (
-    <div dir="rtl" className="space-y-5">
-      <h1 className="text-2xl font-bold text-white">التصحيح المفصل</h1>
-
-      {correction.corrections.map((c, i) => (
-        <div key={c.exercise_id} className="rounded-2xl p-5 bg-[#182730] border border-white/[0.06] space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-white font-bold text-sm">{i + 1}. {c.title_ar}</h3>
-            <span className={`px-3 py-1 rounded-lg text-sm font-bold ${c.percentage >= 75 ? "bg-emerald-500/15 text-emerald-300" : c.percentage >= 50 ? "bg-amber-500/15 text-amber-300" : "bg-red-500/15 text-red-300"}`}>
-              {c.skipped ? "متخطّى" : `${c.percentage}%`}
-            </span>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <div className="rounded-xl p-4 bg-white/[0.03] border border-white/[0.05]">
-              <p className="text-gray-400 text-xs font-bold mb-2">إجابتك</p>
-              <p className="text-gray-200 text-sm leading-relaxed whitespace-pre-wrap">{c.student_answer || "إجابة فارغة"}</p>
+    <AuthGuard>
+      <AppShell>
+        <main className="flex-1 overflow-auto p-6">
+          <div className="max-w-3xl mx-auto space-y-6">
+            {/* Score global */}
+            <div
+              className="rounded-3xl p-8 text-center space-y-4"
+              style={{
+                background: "linear-gradient(135deg, rgba(45,212,191,0.12), rgba(251,191,36,0.06))",
+              }}
+            >
+              <p className="text-4xl">🎉</p>
+              <h1 className="text-2xl font-bold text-white">نتائج الامتحان</h1>
+              <p className="text-6xl font-bold" style={{ color: scoreColor }}>
+                {result.score_global}%
+              </p>
+              <p className="text-gray-400 text-sm">
+                الوقت المستخدم: {Math.floor(result.time_used_sec / 60)} دقيقة
+              </p>
             </div>
-            <div className="rounded-xl p-4 bg-emerald-500/10 border border-emerald-500/20">
-              <p className="text-emerald-300 text-xs font-bold mb-2">الإجابة النموذجية</p>
-              <p className="text-gray-100 text-sm leading-relaxed whitespace-pre-wrap">{c.model_answer}</p>
+
+            {/* Détail par exercice */}
+            <div className="rounded-2xl p-5 bg-[#182730] border border-white/[0.06] space-y-3">
+              <h2 className="text-white font-bold">النتائج حسب التمرين</h2>
+              {result.scores_by_exercise.map((ex) => (
+                <div key={ex.exercise_id} className="flex items-center justify-between">
+                  <span className={`text-sm ${ex.skipped ? "text-amber-400" : "text-gray-300"}`}>
+                    {ex.title_ar} {ex.skipped && "(متخطى)"}
+                  </span>
+                  <span className="text-white font-bold text-sm">{ex.percentage}%</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Détail par verbe méthodologique */}
+            <div className="rounded-2xl p-5 bg-[#182730] border border-white/[0.06] space-y-3">
+              <h2 className="text-white font-bold">النتائج حسب المهارة</h2>
+              {result.scores_by_verb.map((v) => (
+                <div key={v.verb_slug} className="flex items-center justify-between">
+                  <span className="text-gray-300 text-sm">{v.verb_slug}</span>
+                  <span className="text-white font-bold text-sm">{v.percentage}%</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Bouton retour */}
+            <div className="text-center">
+              <a
+                href="/dashboard"
+                className="inline-block px-6 py-3 bg-white/[0.05] text-gray-200 rounded-xl font-semibold hover:bg-white/[0.08] transition"
+              >
+                العودة إلى لوحة التحكم
+              </a>
             </div>
           </div>
-
-          <div className="rounded-xl p-3 bg-mint/5 border border-mint/15">
-            <p className="text-gray-300 text-xs leading-relaxed">{c.feedback}</p>
-          </div>
-        </div>
-      ))}
-    </div>
-  )
-}
-
-export default function CorrectionPage() {
-  return (
-    <PageShell wide>
-      <Suspense fallback={<div className="text-center text-gray-500 py-20">جاري التحميل...</div>}>
-        <CorrectionContent />
-      </Suspense>
-    </PageShell>
+        </main>
+      </AppShell>
+    </AuthGuard>
   )
 }

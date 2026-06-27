@@ -1,4 +1,4 @@
-// src/lib/annales-bac.ts
+﻿// src/lib/annales-bac.ts
 // Types et données — Annales immersives Bac SVT SE (10 sujets, 2 sous-sujets chacun)
 
 export type ExerciceType = "qcm" | "analyse_document" | "raisonnement" | "schema" | "argumentation"
@@ -58,25 +58,36 @@ export interface SujetBac {
 
 const SUJETS: SujetBac[] = [
   {
+    slug: "bac-svt-se-2026",
+    annee: 2026, session: "normale", matiere: "علوم الطبيعة والحياة", filiere: "Sciences Expérimentales",
+    titre: "موضوع بكالوريا 2026", titreAr: "موضوع بكالوريا علوم الطبيعة والحياة 2026", difficulte: "moyen", duree: 180,
+    totalPages: 10,
+    chapitres: ["الوراثة", "المناعة", "الجهاز العصبي"],
+    url_pdf: "/pdfs/bac-svt/bac-svt-sujet-2026.pdf",
+    url_corrige: "/pdfs/bac-svt/bac-svt-correction-2026.pdf",
+    exercices: [],
+    subjects: []
+  },
+  {
     slug: "bac-svt-se-2025",
     annee: 2025,
     session: "normale",
-    matiere: "SVT",
+    matiere: "علوم الطبيعة والحياة",
     filiere: "Sciences Expérimentales",
-    titre: "موضوع بكالوريا علوم تجريبية 2025",
-    titreAr: "موضوع بكالوريا SVT علوم تجريبية 2025",
+    titre: "موضوع بكالوريا 2025",
+    titreAr: "موضوع بكالوريا علوم الطبيعة والحياة 2025",
     difficulte: "moyen",
     duree: 180,
     totalPages: 10,
-    chapitres: ["Génétique", "Immunologie", "Système nerveux"],
-    url_pdf: "https://www.dzexams.com/fr/sujets/bac-svt-se-2025",
-    url_corrige: "https://www.dzexams.com/fr/sujets/bac-svt-se-2025-corrige",
+    chapitres: ["الوراثة", "المناعة", "الجهاز العصبي"],
+    url_pdf: "/pdfs/bac-svt/bac-svt-sujet-2025.pdf",
+    url_corrige: "/pdfs/bac-svt/bac-svt-correction-2025.pdf",
     exercices: [],
     subjects: [
       {
         id: "subject-1", titleAr: "الموضوع الأول: الآليات الجزيئية للوراثة",
         estimatedPages: 5, estimatedMinutes: 90,
-        linkedChapters: ["Génétique"], linkedVerbs: ["وصف", "مقارنة"],
+        linkedChapters: ["الوراثة"], linkedVerbs: ["وصف", "مقارنة"],
         difficulty: "moyen",
         exercises: [
           {
@@ -102,7 +113,7 @@ const SUJETS: SujetBac[] = [
       {
         id: "subject-2", titleAr: "الموضوع الثاني: المناعة والدفاع عن الذات",
         estimatedPages: 5, estimatedMinutes: 90,
-        linkedChapters: ["Immunologie"], linkedVerbs: ["تحليل", "شرح"],
+        linkedChapters: ["المناعة"], linkedVerbs: ["تحليل", "شرح"],
         difficulty: "moyen",
         exercises: [
           {
@@ -129,18 +140,18 @@ const SUJETS: SujetBac[] = [
   },
   {
     slug: "bac-svt-se-2024",
-    annee: 2024, session: "normale", matiere: "SVT", filiere: "Sciences Expérimentales",
-    titre: "موضوع بكالوريا علوم تجريبية 2024", titreAr: "موضوع بكالوريا SVT علوم تجريبية 2024", difficulte: "moyen", duree: 180,
+    annee: 2024, session: "normale", matiere: "علوم الطبيعة والحياة", filiere: "Sciences Expérimentales",
+    titre: "موضوع بكالوريا 2024", titreAr: "موضوع بكالوريا علوم الطبيعة والحياة 2024", difficulte: "moyen", duree: 180,
     totalPages: 10,
-    chapitres: ["Génétique", "Immunologie", "Système nerveux"],
-    url_pdf: "https://www.dzexams.com/fr/sujets/bac-svt-se-2024",
-    url_corrige: "https://www.dzexams.com/fr/sujets/bac-svt-se-2024-corrige",
+    chapitres: ["الوراثة", "المناعة", "الجهاز العصبي"],
+    url_pdf: "/pdfs/bac-svt/bac-svt-sujet-2024.pdf",
+    url_corrige: "/pdfs/bac-svt/bac-svt-correction-2024.pdf",
     exercices: [],
     subjects: [
       {
         id: "subject-1", titleAr: "الموضوع الأول: بنية المادة الوراثية",
         estimatedPages: 5, estimatedMinutes: 90,
-        linkedChapters: ["Génétique"], linkedVerbs: ["وصف", "شرح"],
+        linkedChapters: ["الوراثة"], linkedVerbs: ["وصف", "شرح"],
         difficulty: "moyen",
         exercises: [
           {
@@ -166,7 +177,7 @@ const SUJETS: SujetBac[] = [
       {
         id: "subject-2", titleAr: "الموضوع الثاني: نقص المناعة المكتسب",
         estimatedPages: 5, estimatedMinutes: 90,
-        linkedChapters: ["Immunologie"], linkedVerbs: ["تحليل", "اقتراح"],
+        linkedChapters: ["المناعة"], linkedVerbs: ["تحليل", "اقتراح"],
         difficulty: "moyen",
         exercises: [
           {
@@ -193,17 +204,17 @@ const SUJETS: SujetBac[] = [
   },
   {
     slug: "bac-svt-se-2023",
-    annee: 2023, session: "normale", matiere: "SVT", filiere: "Sciences Expérimentales",
-    titre: "موضوع بكالوريا علوم تجريبية 2023", titreAr: "موضوع بكالوريا SVT علوم تجريبية 2023", difficulte: "moyen", duree: 180,
+    annee: 2023, session: "normale", matiere: "علوم الطبيعة والحياة", filiere: "Sciences Expérimentales",
+    titre: "موضوع بكالوريا 2023", titreAr: "موضوع بكالوريا علوم الطبيعة والحياة 2023", difficulte: "moyen", duree: 180,
     totalPages: 10,
-    chapitres: ["Génétique", "Immunologie", "Enzymologie"],
-    url_pdf: "https://www.dzexams.com/fr/sujets/bac-svt-se-2023",
+    chapitres: ["الوراثة", "المناعة", "الإنزيمات"],
+    url_pdf: "/pdfs/bac-svt/bac-svt-sujet-2023.pdf",
     exercices: [],
     subjects: [
       {
         id: "subject-1", titleAr: "الموضوع الأول: الأنزيمات والتنظيم",
         estimatedPages: 5, estimatedMinutes: 90,
-        linkedChapters: ["Enzymologie"], linkedVerbs: ["تعريف", "شرح"],
+        linkedChapters: ["الإنزيمات"], linkedVerbs: ["تعريف", "شرح"],
         difficulty: "moyen",
         exercises: [
           {
@@ -229,7 +240,7 @@ const SUJETS: SujetBac[] = [
       {
         id: "subject-2", titleAr: "الموضوع الثاني: المناعة الخلطية",
         estimatedPages: 5, estimatedMinutes: 90,
-        linkedChapters: ["Immunologie"], linkedVerbs: ["شرح", "وصف"],
+        linkedChapters: ["المناعة"], linkedVerbs: ["شرح", "وصف"],
         difficulty: "moyen",
         exercises: [
           {
@@ -256,18 +267,18 @@ const SUJETS: SujetBac[] = [
   },
   {
     slug: "bac-svt-se-2022",
-    annee: 2022, session: "normale", matiere: "SVT", filiere: "Sciences Expérimentales",
-    titre: "موضوع بكالوريا علوم تجريبية 2022", titreAr: "موضوع بكالوريا SVT علوم تجريبية 2022", difficulte: "difficile", duree: 180,
+    annee: 2022, session: "normale", matiere: "علوم الطبيعة والحياة", filiere: "Sciences Expérimentales",
+    titre: "موضوع بكالوريا 2022", titreAr: "موضوع بكالوريا علوم الطبيعة والحياة 2022", difficulte: "difficile", duree: 180,
     totalPages: 10,
-    chapitres: ["Génétique", "Immunologie", "Système nerveux", "Enzymologie"],
-    url_pdf: "https://www.dzexams.com/fr/sujets/bac-svt-se-2022",
-    url_corrige: "https://www.dzexams.com/fr/sujets/bac-svt-se-2022-corrige",
+    chapitres: ["الوراثة", "المناعة", "الجهاز العصبي", "الإنزيمات"],
+    url_pdf: "/pdfs/bac-svt/bac-svt-sujet-2022.pdf",
+    url_corrige: "/pdfs/bac-svt/bac-svt-correction-2022.pdf",
     exercices: [],
     subjects: [
       {
         id: "subject-1", titleAr: "الموضوع الأول: التشابك العصبي",
         estimatedPages: 5, estimatedMinutes: 90,
-        linkedChapters: ["Système nerveux"], linkedVerbs: ["تمثيل", "شرح"],
+        linkedChapters: ["الجهاز العصبي"], linkedVerbs: ["تمثيل", "شرح"],
         difficulty: "difficile",
         exercises: [
           {
@@ -320,17 +331,17 @@ const SUJETS: SujetBac[] = [
   },
   {
     slug: "bac-svt-se-2021",
-    annee: 2021, session: "normale", matiere: "SVT", filiere: "Sciences Expérimentales",
-    titre: "موضوع بكالوريا علوم تجريبية 2021", titreAr: "موضوع بكالوريا SVT علوم تجريبية 2021", difficulte: "facile", duree: 180,
+    annee: 2021, session: "normale", matiere: "علوم الطبيعة والحياة", filiere: "Sciences Expérimentales",
+    titre: "موضوع بكالوريا 2021", titreAr: "موضوع بكالوريا علوم الطبيعة والحياة 2021", difficulte: "facile", duree: 180,
     totalPages: 10,
-    chapitres: ["Génétique", "Immunologie"],
-    url_pdf: "https://www.dzexams.com/fr/sujets/bac-svt-se-2021",
+    chapitres: ["الوراثة", "المناعة"],
+    url_pdf: "/pdfs/bac-svt/bac-svt-sujet-2021.pdf",
     exercices: [],
     subjects: [
       {
         id: "subject-1", titleAr: "الموضوع الأول: الشيفرة الوراثية",
         estimatedPages: 5, estimatedMinutes: 90,
-        linkedChapters: ["Génétique"], linkedVerbs: ["تعريف", "ذكر"],
+        linkedChapters: ["الوراثة"], linkedVerbs: ["تعريف", "ذكر"],
         difficulty: "facile",
         exercises: [
           {
@@ -356,7 +367,7 @@ const SUJETS: SujetBac[] = [
       {
         id: "subject-2", titleAr: "الموضوع الثاني: الاستجابة الالتهابية",
         estimatedPages: 5, estimatedMinutes: 90,
-        linkedChapters: ["Immunologie"], linkedVerbs: ["وصف", "شرح"],
+        linkedChapters: ["المناعة"], linkedVerbs: ["وصف", "شرح"],
         difficulty: "facile",
         exercises: [
           {
@@ -383,17 +394,17 @@ const SUJETS: SujetBac[] = [
   },
   {
     slug: "bac-svt-se-2020",
-    annee: 2020, session: "normale", matiere: "SVT", filiere: "Sciences Expérimentales",
-    titre: "موضوع بكالوريا علوم تجريبية 2020", titreAr: "موضوع بكالوريا SVT علوم تجريبية 2020", difficulte: "moyen", duree: 180,
+    annee: 2020, session: "normale", matiere: "علوم الطبيعة والحياة", filiere: "Sciences Expérimentales",
+    titre: "موضوع بكالوريا 2020", titreAr: "موضوع بكالوريا علوم الطبيعة والحياة 2020", difficulte: "moyen", duree: 180,
     totalPages: 10,
-    chapitres: ["Système nerveux", "Immunologie", "Génétique"],
-    url_pdf: "https://www.dzexams.com/fr/sujets/bac-svt-se-2020",
+    chapitres: ["الجهاز العصبي", "المناعة", "الوراثة"],
+    url_pdf: "/pdfs/bac-svt/bac-svt-sujet-2020.pdf",
     exercices: [],
     subjects: [
       {
         id: "subject-1", titleAr: "الموضوع الأول: السيالة العصبية",
         estimatedPages: 5, estimatedMinutes: 90,
-        linkedChapters: ["Système nerveux"], linkedVerbs: ["وصف", "شرح"],
+        linkedChapters: ["الجهاز العصبي"], linkedVerbs: ["وصف", "شرح"],
         difficulty: "moyen",
         exercises: [
           {
@@ -446,18 +457,18 @@ const SUJETS: SujetBac[] = [
   },
   {
     slug: "bac-svt-se-2019",
-    annee: 2019, session: "normale", matiere: "SVT", filiere: "Sciences Expérimentales",
-    titre: "موضوع بكالوريا علوم تجريبية 2019", titreAr: "موضوع بكالوريا SVT علوم تجريبية 2019", difficulte: "difficile", duree: 180,
+    annee: 2019, session: "normale", matiere: "علوم الطبيعة والحياة", filiere: "Sciences Expérimentales",
+    titre: "موضوع بكالوريا 2019", titreAr: "موضوع بكالوريا علوم الطبيعة والحياة 2019", difficulte: "difficile", duree: 180,
     totalPages: 10,
     chapitres: ["Génétique", "Enzymologie", "Système nerveux"],
-    url_pdf: "https://www.dzexams.com/fr/sujets/bac-svt-se-2019",
-    url_corrige: "https://www.dzexams.com/fr/sujets/bac-svt-se-2019-corrige",
+    url_pdf: "/pdfs/bac-svt/bac-svt-sujet-2019.pdf",
+    url_corrige: "/pdfs/bac-svt/bac-svt-correction-2019.pdf",
     exercices: [],
     subjects: [
       {
         id: "subject-1", titleAr: "الموضوع الأول: الطفرات الوراثية",
         estimatedPages: 5, estimatedMinutes: 90,
-        linkedChapters: ["Génétique"], linkedVerbs: ["تعريف", "مقارنة"],
+        linkedChapters: ["الوراثة"], linkedVerbs: ["تعريف", "مقارنة"],
         difficulty: "difficile",
         exercises: [
           {
@@ -510,17 +521,18 @@ const SUJETS: SujetBac[] = [
   },
   {
     slug: "bac-svt-se-2018",
-    annee: 2018, session: "normale", matiere: "SVT", filiere: "Sciences Expérimentales",
-    titre: "موضوع بكالوريا علوم تجريبية 2018", titreAr: "موضوع بكالوريا SVT علوم تجريبية 2018", difficulte: "facile", duree: 180,
+    annee: 2018, session: "normale", matiere: "علوم الطبيعة والحياة", filiere: "Sciences Expérimentales",
+    titre: "موضوع بكالوريا 2018", titreAr: "موضوع بكالوريا علوم الطبيعة والحياة 2018", difficulte: "facile", duree: 180,
     totalPages: 10,
-    chapitres: ["Immunologie", "Génétique"],
-    url_pdf: "https://www.dzexams.com/fr/sujets/bac-svt-se-2018",
+    chapitres: ["المناعة", "الوراثة"],
+    url_pdf: "/pdfs/bac-svt/bac-svt-sujet-2018.pdf",
+    url_corrige: "/pdfs/bac-svt/bac-svt-correction-2018.pdf",
     exercices: [],
     subjects: [
       {
         id: "subject-1", titleAr: "الموضوع الأول: بنية الأجسام المضادة",
         estimatedPages: 5, estimatedMinutes: 90,
-        linkedChapters: ["Immunologie"], linkedVerbs: ["وصف", "شرح"],
+        linkedChapters: ["المناعة"], linkedVerbs: ["وصف", "شرح"],
         difficulty: "facile",
         exercises: [
           {
@@ -546,7 +558,7 @@ const SUJETS: SujetBac[] = [
       {
         id: "subject-2", titleAr: "الموضوع الثاني: الأمراض الوراثية",
         estimatedPages: 5, estimatedMinutes: 90,
-        linkedChapters: ["Génétique"], linkedVerbs: ["شرح", "تحليل"],
+        linkedChapters: ["الوراثة"], linkedVerbs: ["شرح", "تحليل"],
         difficulty: "facile",
         exercises: [
           {
@@ -573,17 +585,17 @@ const SUJETS: SujetBac[] = [
   },
   {
     slug: "bac-svt-se-2017",
-    annee: 2017, session: "normale", matiere: "SVT", filiere: "Sciences Expérimentales",
-    titre: "موضوع بكالوريا علوم تجريبية 2017", titreAr: "موضوع بكالوريا SVT علوم تجريبية 2017", difficulte: "moyen", duree: 180,
+    annee: 2017, session: "normale", matiere: "علوم الطبيعة والحياة", filiere: "Sciences Expérimentales",
+    titre: "موضوع بكالوريا 2017", titreAr: "موضوع بكالوريا علوم الطبيعة والحياة 2017", difficulte: "moyen", duree: 180,
     totalPages: 10,
-    chapitres: ["Système nerveux", "Immunologie", "Génétique", "Enzymologie"],
-    url_pdf: "https://www.dzexams.com/fr/sujets/bac-svt-se-2017",
+    chapitres: ["الجهاز العصبي", "المناعة", "الوراثة", "الإنزيمات"],
+    url_pdf: "/pdfs/bac-svt/bac-svt-sujet-2017.pdf",
     exercices: [],
     subjects: [
       {
         id: "subject-1", titleAr: "الموضوع الأول: المشبك العصبي",
         estimatedPages: 5, estimatedMinutes: 90,
-        linkedChapters: ["Système nerveux"], linkedVerbs: ["تمثيل", "شرح"],
+        linkedChapters: ["الجهاز العصبي"], linkedVerbs: ["تمثيل", "شرح"],
         difficulty: "moyen",
         exercises: [
           {
@@ -636,18 +648,17 @@ const SUJETS: SujetBac[] = [
   },
   {
     slug: "bac-svt-se-2016",
-    annee: 2016, session: "normale", matiere: "SVT", filiere: "Sciences Expérimentales",
-    titre: "موضوع بكالوريا علوم تجريبية 2016", titreAr: "موضوع بكالوريا SVT علوم تجريبية 2016", difficulte: "facile", duree: 180,
+    annee: 2016, session: "normale", matiere: "علوم الطبيعة والحياة", filiere: "Sciences Expérimentales",
+    titre: "موضوع بكالوريا 2016", titreAr: "موضوع بكالوريا علوم الطبيعة والحياة 2016", difficulte: "facile", duree: 180,
     totalPages: 10,
-    chapitres: ["Génétique", "Immunologie"],
-    url_pdf: "https://www.dzexams.com/fr/sujets/bac-svt-se-2016",
-    url_corrige: "https://www.dzexams.com/fr/sujets/bac-svt-se-2016-corrige",
+    chapitres: ["الوراثة", "المناعة"],
+    url_pdf: "/pdfs/bac-svt/bac-svt-sujet-2016.pdf",
     exercices: [],
     subjects: [
       {
         id: "subject-1", titleAr: "الموضوع الأول: تخليق البروتين",
         estimatedPages: 5, estimatedMinutes: 90,
-        linkedChapters: ["Génétique"], linkedVerbs: ["وصف", "شرح"],
+        linkedChapters: ["الوراثة"], linkedVerbs: ["وصف", "شرح"],
         difficulty: "facile",
         exercises: [
           {
@@ -673,7 +684,7 @@ const SUJETS: SujetBac[] = [
       {
         id: "subject-2", titleAr: "الموضوع الثاني: طرق الوقاية والعلاج المناعي",
         estimatedPages: 5, estimatedMinutes: 90,
-        linkedChapters: ["Immunologie"], linkedVerbs: ["مقارنة", "Argumenter"],
+        linkedChapters: ["المناعة"], linkedVerbs: ["مقارنة", "Argumenter"],
         difficulty: "facile",
         exercises: [
           {
@@ -697,6 +708,201 @@ const SUJETS: SujetBac[] = [
         ]
       },
     ]
+  },
+  {
+    slug: "bac-svt-se-2011",
+    annee: 2011, session: "normale", matiere: "علوم الطبيعة والحياة", filiere: "Sciences Expérimentales",
+    titre: "موضوع بكالوريا 2011", titreAr: "موضوع بكالорيا SVT علوم تجريبية 2011", difficulte: "difficile", duree: 180,
+    totalPages: 10,
+    chapitres: ["الوراثة", "المناعة", "الجهاز العصبي"],
+    url_pdf: "/pdfs/bac-svt/bac-svt-sujet-2011.pdf",
+    exercices: [],
+    subjects: []
+  },
+  {
+    slug: "bac-svt-se-2010",
+    annee: 2010, session: "normale", matiere: "علوم الطبيعة والحياة", filiere: "Sciences Expérimentales",
+    titre: "موضوع بكالوريا 2010", titreAr: "موضوع بكالوريا علوم الطبيعة والحياة 2010", difficulte: "moyen", duree: 180,
+    totalPages: 10,
+    chapitres: ["الوراثة", "المناعة"],
+    url_pdf: "/pdfs/bac-svt/bac-svt-sujet-2010.pdf",
+    exercices: [],
+    subjects: []
+  },
+  {
+    slug: "bac-svt-se-2009",
+    annee: 2009, session: "normale", matiere: "علوم الطبيعة والحياة", filiere: "Sciences Expérimentales",
+    titre: "موضوع بكالوريا 2009", titreAr: "موضوع بكالوريا علوم الطبيعة والحياة 2009", difficulte: "moyen", duree: 180,
+    totalPages: 10,
+    chapitres: ["الوراثة", "الجهاز العصبي"],
+    url_pdf: "/pdfs/bac-svt/bac-svt-sujet-2009.pdf",
+    exercices: [],
+    subjects: []
+  },
+  {
+    slug: "bac-svt-se-2008",
+    annee: 2008, session: "normale", matiere: "علوم الطبيعة والحياة", filiere: "Sciences Expérimentales",
+    titre: "موضوع بكالوريا 2008", titreAr: "موضوع بكالوريا علوم الطبيعة والحياة 2008", difficulte: "moyen", duree: 180,
+    totalPages: 10,
+    chapitres: ["الوراثة", "المناعة"],
+    url_pdf: "/pdfs/bac-svt/bac-svt-sujet-2008.pdf",
+    exercices: [],
+    subjects: []
+  },
+
+  // ═══════════════════════════════════════════════════════════════
+  // SVT — Filière Mathématiques (شعبة رياضيات — مادة علوم الطبيعية)
+  // ═══════════════════════════════════════════════════════════════
+
+  {
+    slug: "bac-svt-math-2026",
+    annee: 2026, session: "normale", matiere: "علوم الطبيعة والحياة", filiere: "Mathématiques",
+    titre: "موضوع بكالوريا علوم طبيعية شعبة رياضيات 2026",
+    titreAr: "موضوع بكالوريا علوم طبيعية شعبة رياضيات 2026",
+    difficulte: "moyen", duree: 180, totalPages: 8,
+    chapitres: ["الوراثة", "البيئة"],
+    url_pdf: "/pdfs/bac-svt-math/bac-svt-math-2026.pdf",
+    exercices: [], subjects: []
+  },
+  {
+    slug: "bac-svt-math-2025",
+    annee: 2025, session: "normale", matiere: "علوم الطبيعة والحياة", filiere: "Mathématiques",
+    titre: "موضوع بكالوريا علوم طبيعية شعبة رياضيات 2025",
+    titreAr: "موضوع بكالوريا علوم طبيعية شعبة رياضيات 2025",
+    difficulte: "moyen", duree: 180, totalPages: 8,
+    chapitres: ["الوراثة", "المناعة"],
+    url_pdf: "/pdfs/bac-svt-math/bac-svt-math-2025.pdf",
+    exercices: [], subjects: []
+  },
+  {
+    slug: "bac-svt-math-2024",
+    annee: 2024, session: "normale", matiere: "علوم الطبيعة والحياة", filiere: "Mathématiques",
+    titre: "موضوع بكالوريا علوم طبيعية شعبة رياضيات 2024",
+    titreAr: "موضوع بكالوريا علوم طبيعية شعبة رياضيات 2024",
+    difficulte: "moyen", duree: 180, totalPages: 8,
+    chapitres: ["الوراثة", "الجهاز العصبي"],
+    url_pdf: "/pdfs/bac-svt-math/bac-svt-math-2024.pdf",
+    exercices: [], subjects: []
+  },
+  {
+    slug: "bac-svt-math-2023",
+    annee: 2023, session: "normale", matiere: "علوم الطبيعة والحياة", filiere: "Mathématiques",
+    titre: "موضوع بكالوريا علوم طبيعية شعبة رياضيات 2023",
+    titreAr: "موضوع بكالوريا علوم طبيعية شعبة رياضيات 2023",
+    difficulte: "moyen", duree: 180, totalPages: 8,
+    chapitres: ["المناعة", "الإنزيمات"],
+    url_pdf: "/pdfs/bac-svt-math/bac-svt-math-2023.pdf",
+    exercices: [], subjects: []
+  },
+  {
+    slug: "bac-svt-math-2022",
+    annee: 2022, session: "normale", matiere: "علوم الطبيعة والحياة", filiere: "Mathématiques",
+    titre: "موضوع بكالوريا علوم طبيعية شعبة رياضيات 2022",
+    titreAr: "موضوع بكالوريا علوم طبيعية شعبة رياضيات 2022",
+    difficulte: "moyen", duree: 180, totalPages: 8,
+    chapitres: ["الوراثة", "البيئة"],
+    url_pdf: "/pdfs/bac-svt-math/bac-svt-math-2022.pdf",
+    exercices: [], subjects: []
+  },
+  {
+    slug: "bac-svt-math-2021",
+    annee: 2021, session: "normale", matiere: "علوم الطبيعة والحياة", filiere: "Mathématiques",
+    titre: "موضوع بكالوريا علوم طبيعية شعبة رياضيات 2021",
+    titreAr: "موضوع بكالوريا علوم طبيعية شعبة رياضيات 2021",
+    difficulte: "moyen", duree: 180, totalPages: 8,
+    chapitres: ["الوراثة", "الجهاز العصبي"],
+    url_pdf: "/pdfs/bac-svt-math/bac-svt-math-2021.pdf",
+    exercices: [], subjects: []
+  },
+  {
+    slug: "bac-svt-math-2020",
+    annee: 2020, session: "normale", matiere: "علوم الطبيعة والحياة", filiere: "Mathématiques",
+    titre: "موضوع بكالوريا علوم طبيعية شعبة رياضيات 2020",
+    titreAr: "موضوع بكالوريا علوم طبيعية شعبة رياضيات 2020",
+    difficulte: "moyen", duree: 180, totalPages: 8,
+    chapitres: ["الوراثة", "المناعة"],
+    url_pdf: "/pdfs/bac-svt-math/bac-svt-math-2020.pdf",
+    exercices: [], subjects: []
+  },
+  {
+    slug: "bac-svt-math-2019",
+    annee: 2019, session: "normale", matiere: "علوم الطبيعة والحياة", filiere: "Mathématiques",
+    titre: "موضوع بكالوريا علوم طبيعية شعبة رياضيات 2019",
+    titreAr: "موضوع بكالوريا علوم طبيعية شعبة رياضيات 2019",
+    difficulte: "moyen", duree: 180, totalPages: 8,
+    chapitres: ["الوراثة", "البيئة"],
+    url_pdf: "/pdfs/bac-svt-math/bac-svt-math-2019.pdf",
+    exercices: [], subjects: []
+  },
+  {
+    slug: "bac-svt-math-2018",
+    annee: 2018, session: "normale", matiere: "علوم الطبيعة والحياة", filiere: "Mathématiques",
+    titre: "موضوع بكالوريا علوم طبيعية شعبة رياضيات 2018",
+    titreAr: "موضوع بكالوريا علوم طبيعية شعبة رياضيات 2018",
+    difficulte: "moyen", duree: 180, totalPages: 8,
+    chapitres: ["الوراثة", "الجهاز العصبي"],
+    url_pdf: "/pdfs/bac-svt-math/bac-svt-math-2018.pdf",
+    exercices: [], subjects: []
+  },
+  {
+    slug: "bac-svt-math-2017",
+    annee: 2017, session: "normale", matiere: "علوم الطبيعة والحياة", filiere: "Mathématiques",
+    titre: "موضوع بكالوريا علوم طبيعية شعبة رياضيات 2017",
+    titreAr: "موضوع بكالوريا علوم طبيعية شعبة رياضيات 2017",
+    difficulte: "moyen", duree: 180, totalPages: 8,
+    chapitres: ["الوراثة", "المناعة"],
+    url_pdf: "/pdfs/bac-svt-math/bac-svt-math-2017.pdf",
+    exercices: [], subjects: []
+  },
+  {
+    slug: "bac-svt-math-2016",
+    annee: 2016, session: "normale", matiere: "علوم الطبيعة والحياة", filiere: "Mathématiques",
+    titre: "موضوع بكالوريا علوم طبيعية شعبة رياضيات 2016",
+    titreAr: "موضوع بكالوريا علوم طبيعية شعبة رياضيات 2016",
+    difficulte: "moyen", duree: 180, totalPages: 8,
+    chapitres: ["الوراثة", "البيئة"],
+    url_pdf: "/pdfs/bac-svt-math/bac-svt-math-2016.pdf",
+    exercices: [], subjects: []
+  },
+  {
+    slug: "bac-svt-math-2015",
+    annee: 2015, session: "normale", matiere: "علوم الطبيعة والحياة", filiere: "Mathématiques",
+    titre: "موضوع بكالوريا علوم طبيعية شعبة رياضيات 2015",
+    titreAr: "موضوع بكالوريا علوم طبيعية شعبة رياضيات 2015",
+    difficulte: "moyen", duree: 180, totalPages: 8,
+    chapitres: ["الوراثة", "الجهاز العصبي"],
+    url_pdf: "/pdfs/bac-svt-math/bac-svt-math-2015.pdf",
+    exercices: [], subjects: []
+  },
+  {
+    slug: "bac-svt-math-2014",
+    annee: 2014, session: "normale", matiere: "علوم الطبيعة والحياة", filiere: "Mathématiques",
+    titre: "موضوع بكالوريا علوم طبيعية شعبة رياضيات 2014",
+    titreAr: "موضوع بكالوريا علوم طبيعية شعبة رياضيات 2014",
+    difficulte: "moyen", duree: 180, totalPages: 8,
+    chapitres: ["الوراثة", "المناعة"],
+    url_pdf: "/pdfs/bac-svt-math/bac-svt-math-2014.pdf",
+    exercices: [], subjects: []
+  },
+  {
+    slug: "bac-svt-math-2013",
+    annee: 2013, session: "normale", matiere: "علوم الطبيعة والحياة", filiere: "Mathématiques",
+    titre: "موضوع بكالوريا علوم طبيعية شعبة رياضيات 2013",
+    titreAr: "موضوع بكالوريا علوم طبيعية شعبة رياضيات 2013",
+    difficulte: "moyen", duree: 180, totalPages: 8,
+    chapitres: ["الوراثة", "البيئة"],
+    url_pdf: "/pdfs/bac-svt-math/bac-svt-math-2013.pdf",
+    exercices: [], subjects: []
+  },
+  {
+    slug: "bac-svt-math-2008",
+    annee: 2008, session: "normale", matiere: "علوم الطبيعة والحياة", filiere: "Mathématiques",
+    titre: "موضوع بكالوريا علوم طبيعية شعبة رياضيات 2008",
+    titreAr: "موضوع بكالوريا علوم طبيعية شعبة رياضيات 2008",
+    difficulte: "moyen", duree: 180, totalPages: 8,
+    chapitres: ["الوراثة", "الجهاز العصبي"],
+    url_pdf: "/pdfs/bac-svt-math/bac-svt-math-2008.pdf",
+    exercices: [], subjects: []
   },
 ]
 

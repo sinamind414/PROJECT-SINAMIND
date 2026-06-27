@@ -47,6 +47,7 @@ function AnnalesContent() {
   const [sujets, setSujets] = useState<SujetBac[]>([])
   const [loading, setLoading] = useState(true)
   const [source, setSource] = useState<"api" | "local">("local")
+  const [filiere, setFiliere] = useState<"all" | "SE" | "Math">("all")
 
   useEffect(() => {
     let cancelled = false
@@ -74,12 +75,18 @@ function AnnalesContent() {
   }, [])
 
   const visible = !search.trim()
-    ? sujets
+    ? sujets.filter((s) => {
+        if (filiere === "SE") return s.filiere === "Sciences Expérimentales"
+        if (filiere === "Math") return s.filiere === "Mathématiques"
+        return true
+      })
     : sujets.filter(
         (s) =>
-          s.titre.toLowerCase().includes(search.toLowerCase()) ||
+          (filiere === "all" || (filiere === "SE" && s.filiere === "Sciences Expérimentales") || (filiere === "Math" && s.filiere === "Mathématiques")) &&
+          (s.titre.toLowerCase().includes(search.toLowerCase()) ||
+          s.titreAr.includes(search) ||
           s.chapitres.some((c) => c.toLowerCase().includes(search.toLowerCase())) ||
-          String(s.annee).includes(search)
+          String(s.annee).includes(search))
       )
 
   return (
@@ -90,9 +97,9 @@ function AnnalesContent() {
             <div>
               <h1 className="text-2xl font-bold text-white">مواضيع البكالوريا</h1>
               <p className="text-sm text-slate-400 mt-1">
-                {loading ? "جاري التحميل..." : `${sujets.length} مواضيع بكالوريا علوم الطبيعة والحياة — 3 طرق للمراجعة`}
+                {loading ? "جاري التحميل..." : `${visible.length} موضوع — ${filiere === "SE" ? "شعبة علوم تجريبية" : filiere === "Math" ? "شعبة رياضيات" : "جميع الشعب"}`}
                 {source === "local" && !loading && (
-                  <span className="text-amber-500/70 text-[10px] mr-2">(وضع عدم الاتصال — بيانات محلية)</span>
+                  <span className="text-amber-500/70 text-[10px] mr-2">(بيانات محلية)</span>
                 )}
               </p>
             </div>
@@ -103,6 +110,50 @@ function AnnalesContent() {
               onChange={(e) => setSearch(e.target.value)}
               className="bg-slate-900/50 border border-mint/15 rounded-xl px-4 py-2.5 text-sm text-white placeholder:text-slate-500 w-full sm:w-56 focus:border-mint/40 focus:outline-none"
             />
+          </div>
+
+          {/* Filière Tabs */}
+          <div className="flex gap-3">
+            <button
+              onClick={() => setFiliere("all")}
+              className={`flex items-center gap-2 px-5 py-3 rounded-xl border text-sm font-bold transition-all ${
+                filiere === "all"
+                  ? "bg-mint/15 border-mint/30 text-mint-soft"
+                  : "bg-slate-900/30 border-slate-700/50 text-slate-400 hover:border-slate-600"
+              }`}
+            >
+              <span className="text-lg">📚</span>
+              <span>جميع الشعب</span>
+              <span className="text-[10px] bg-slate-800/80 px-1.5 py-0.5 rounded-full">{sujets.length}</span>
+            </button>
+            <button
+              onClick={() => setFiliere("SE")}
+              className={`flex items-center gap-2 px-5 py-3 rounded-xl border text-sm font-bold transition-all ${
+                filiere === "SE"
+                  ? "bg-emerald-500/15 border-emerald-500/30 text-emerald-400"
+                  : "bg-slate-900/30 border-slate-700/50 text-slate-400 hover:border-slate-600"
+              }`}
+            >
+              <span className="text-lg">🔬</span>
+              <span>🔬 شعبة علوم تجريبية</span>
+              <span className="text-[10px] bg-slate-800/80 px-1.5 py-0.5 rounded-full">
+                {sujets.filter((s) => s.filiere === "Sciences Expérimentales").length}
+              </span>
+            </button>
+            <button
+              onClick={() => setFiliere("Math")}
+              className={`flex items-center gap-2 px-5 py-3 rounded-xl border text-sm font-bold transition-all ${
+                filiere === "Math"
+                  ? "bg-amber-500/15 border-amber-500/30 text-amber-400"
+                  : "bg-slate-900/30 border-slate-700/50 text-slate-400 hover:border-slate-600"
+              }`}
+            >
+              <span className="text-lg">📐</span>
+              <span>📐 شعبة رياضيات</span>
+              <span className="text-[10px] bg-slate-800/80 px-1.5 py-0.5 rounded-full">
+                {sujets.filter((s) => s.filiere === "Mathématiques").length}
+              </span>
+            </button>
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
@@ -121,6 +172,7 @@ function AnnalesContent() {
 }
 
 function SujetCard({ sujet }: { sujet: SujetBac }) {
+  const isSE = sujet.filiere === "Sciences Expérimentales"
   return (
     <div className="card-hover glass-soft border border-mint/10 rounded-2xl overflow-hidden group">
       <Link
@@ -129,13 +181,18 @@ function SujetCard({ sujet }: { sujet: SujetBac }) {
       >
         <div className="flex items-start justify-between gap-3">
           <div>
+            <div className="flex items-center gap-2 mb-1">
+              <span className={`text-[10px] px-2 py-0.5 rounded-full border font-bold ${
+                isSE
+                  ? "bg-emerald-500/15 text-emerald-400 border-emerald-500/25"
+                  : "bg-amber-500/15 text-amber-400 border-amber-500/25"
+              }`}>
+                {isSE ? "🔬 شعبة علوم تجريبية" : "📐 شعبة رياضيات"}
+              </span>
+            </div>
             <h3 className="text-white font-bold text-base group-hover:text-mint-soft transition-colors">
-              {sujet.titreAr}
-            </h3>
-            <p className="text-xs text-slate-500 mt-0.5" dir="ltr">{sujet.titre}</p>
-            <p className="text-xs text-slate-500 mt-0.5">
               {sujet.annee} · {sujet.session === "normale" ? "دورة عادية" : "دورة استدراكية"}
-            </p>
+            </h3>
           </div>
           <span
             className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${DIFFICULTE_COLORS[sujet.difficulte]}`}
