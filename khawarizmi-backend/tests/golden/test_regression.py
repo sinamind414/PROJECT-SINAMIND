@@ -26,9 +26,9 @@ async def test_guided_mode_returns_format(client: AsyncClient):
 
 
 @pytest.mark.asyncio
-async def test_legacy_chat_route_still_works(client: AsyncClient):
+async def test_legacy_chat_route_deprecated(client: AsyncClient):
     old = await client.post("/api/chat", json=FIXTURE_GUIDED)
-    assert old.status_code in (200, 401, 503, 422, 429)
+    assert old.status_code == 404
 
 
 @pytest.mark.asyncio
@@ -60,7 +60,7 @@ async def test_evaluate_fsrs_persisted(client: AsyncClient):
 
 
 @pytest.mark.asyncio
-async def test_evaluate_legacy_route_still_works(client: AsyncClient):
+async def test_evaluate_legacy_route_deprecated(client: AsyncClient):
     response = await client.post(
         "/api/evaluate",
         json={
@@ -69,4 +69,4 @@ async def test_evaluate_legacy_route_still_works(client: AsyncClient):
             "tentative": 1,
         },
     )
-    assert response.status_code in (200, 401, 503, 422)
+    assert response.status_code == 404

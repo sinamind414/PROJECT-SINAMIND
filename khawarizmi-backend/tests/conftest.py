@@ -20,7 +20,7 @@ os.environ.setdefault("GEMINI_API_KEY", "test-gemini-key")
 os.environ.setdefault("ENVIRONMENT", "test")
 
 from database import get_db as db_get_db
-from deps import get_db
+from deps import get_db, get_openai
 from main import app
 
 TEST_PWD_HASH = "$2b$12$7.cA3KDwXgXygLhjVDrNl.fZPK3kqUcd5.LXeRZ2b0Yf7TkPwdjea"
@@ -238,6 +238,7 @@ def override_deps():
     _mock_orm_store.clear()
     app.dependency_overrides[get_db] = override_get_db
     app.dependency_overrides[db_get_db] = override_get_db
+    app.dependency_overrides[get_openai] = lambda: AsyncMock()
     yield
     app.dependency_overrides.clear()
 

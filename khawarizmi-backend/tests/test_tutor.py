@@ -53,6 +53,7 @@ class TestTutorMethodologyMode:
     async def test_diagnose_mode(self):
         r = await tutor_methodology_mode(
             instruction="أثبت",
+            student_answer="الخلية تحتوي على جدار خلوي يتكون من السليلوز",
             mode="diagnose",
         )
         assert r["mode"] == "diagnose"
