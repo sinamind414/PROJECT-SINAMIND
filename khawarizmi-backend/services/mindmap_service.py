@@ -613,7 +613,7 @@ async def persist_flashcards_to_fsrs(
     from services.fsrs_graph import run_fsrs_step
 
     scheduler_inst = get_fsrs_scheduler()
-    now = datetime.now(UTC)
+    now = datetime.now(UTC).replace(tzinfo=None)
     default_card = Card()
 
     for card in flashcards:
@@ -621,6 +621,8 @@ async def persist_flashcards_to_fsrs(
         updated_card = run_fsrs_step(default_card, Rating.Good, now, scheduler_inst)
 
         due_date = updated_card.due if hasattr(updated_card, "due") else now + timedelta(days=1)
+        if hasattr(due_date, "tzinfo") and due_date.tzinfo is not None:
+            due_date = due_date.replace(tzinfo=None)
         interval = updated_card.scheduled_days if hasattr(updated_card, "scheduled_days") else 1
 
         fsrs_json = _json.dumps(
@@ -783,7 +785,7 @@ async def update_node_maitrise(node_id: str, maitrise: int, user_id: str, db: As
             AND user_id = :user_id
             RETURNING id, maitrise_eleve
         """),
-        {"node_id": node_id, "maitrise": maitrise, "user_id": u_id, "updated_at": datetime.now(UTC)},
+        {"node_id": node_id, "maitrise": maitrise, "user_id": u_id, "updated_at": datetime.now(UTC).replace(tzinfo=None)},
     )
     row = result.fetchone()
 
@@ -834,10 +836,12 @@ async def update_node_maitrise(node_id: str, maitrise: int, user_id: str, db: As
 
     # Appliquer le scheduler calibré
     scheduler_inst = get_fsrs_scheduler(user_fsrs_config)
-    now_utc = datetime.now(UTC)
+    now_utc = datetime.now(UTC).replace(tzinfo=None)
     updated_card = run_fsrs_step(card, fsrs_rating, now_utc, scheduler_inst)
 
     due_date = updated_card.due if hasattr(updated_card, "due") else now_utc + timedelta(days=1)
+    if hasattr(due_date, "tzinfo") and due_date.tzinfo is not None:
+        due_date = due_date.replace(tzinfo=None)
     interval = updated_card.scheduled_days if hasattr(updated_card, "scheduled_days") else 1
 
     # Préserver l'historique des révisions
