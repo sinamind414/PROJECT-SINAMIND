@@ -14,7 +14,7 @@ COPY khawarizmi-backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY khawarizmi-backend/ .
-RUN ls -la /app/data/ && ls -la /app/data/official/ && echo "✅ Data files verified"
+RUN (ls -la /app/data/ && ls -la /app/data/official/ && echo "Data files verified") || echo "data/ not in Docker image, using JSON fallback at runtime"
 
 EXPOSE 8000
 
