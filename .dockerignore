@@ -1,7 +1,7 @@
-# Dockerignore pour Railway build (root context)
-# Le Dockerfile COPY khawarizmi-backend/ . depuis la racine
+# Exclude frontend (not needed in backend image)
+khawarizmi-frontend/
 
-# Données lourdes à exclure
+# Exclude heavy data (use JSON fallback at runtime)
 khawarizmi-backend/data/ANNALES_SVT_BAC_ALGERIE/
 khawarizmi-backend/data/annales_workspace/
 khawarizmi-backend/data/ocr_production/
@@ -12,13 +12,7 @@ khawarizmi-backend/data/ocr_output/
 # Python
 **/__pycache__/
 **/*.pyc
-**/*.pyo
 **/.pytest_cache/
-**/.coverage
-
-# Git
-**/.git
-**/.gitignore
 
 # Env
 **/.env
@@ -27,31 +21,3 @@ khawarizmi-backend/data/ocr_output/
 # IDE
 **/.vscode/
 **/.idea/
-
-# Node (frontend)
-khawarizmi-frontend/node_modules/
-khawarizmi-frontend/.next/
-khawarizmi-frontend/dist/
-khawarizmi-frontend/.expo/
-
-# Models lourds
-**/models/*.onnx
-**/models/*.zip
-**/models/*.pt
-**/models/*.pth
-**/models/*.bin
-**/*.zip
-**/*.tar.gz
-**/*.bundle
-
-# Logs
-**/*.log
-**/logs/
-
-# Backups
-**/.backup_*
-**/*.backup_*
-
-# Dockerfiles
-**/Dockerfile
-**/.dockerignore
