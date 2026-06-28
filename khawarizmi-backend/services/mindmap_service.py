@@ -144,7 +144,7 @@ async def run_generation_background(
 
             from openai import AsyncOpenAI
 
-            from services.llm import extract_json_from_gemini
+            from services.llm_parser import parse_llm_json as extract_json_from_gemini
 
             openai_client = AsyncOpenAI(api_key=openai_api_key, base_url=openai_base_url)
 
@@ -257,7 +257,7 @@ async def expand_node(
     """
     from config import get_settings
     from services.embedder import embedder
-    from services.llm import extract_json_from_gemini
+    from services.llm_parser import parse_llm_json as extract_json_from_gemini
     from services.reranker import rerank
 
     # 1. RAG ciblé sur le nœud spécifique + re-ranking
@@ -483,7 +483,7 @@ async def generate_mindmap(
     """
 
     from config import get_settings
-    from services.llm import extract_json_from_gemini
+    from services.llm_parser import parse_llm_json as extract_json_from_gemini
 
     _model = get_settings().openai_model
     logger.info(f"Generation du Mind Map via le modele {_model}...")
