@@ -51,6 +51,11 @@ class Settings(BaseSettings):
     CLOUDFLARE_ACCOUNT_ID: str = ""
     CLOUDFLARE_API_TOKEN: str = ""
 
+    # ── ZenMux GLM ──────────────────────────────────────────────
+    ZENMUX_API_KEY: str = ""
+    zenmux_base_url: str = "https://zenmux.ai/api/v1"
+    zenmux_model: str = "z-ai/glm-5.2-free"
+
     SENTRY_DSN: str = ""
 
     ALLOWED_ORIGINS: str = ""

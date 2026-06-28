@@ -72,6 +72,13 @@ async def _call_with_fallback(
     if glm_client:
         providers.append(("GLM-4.7", glm_client, cfg.zai_model))
 
+    if cfg.ZENMUX_API_KEY:
+        providers.append((
+            "ZenMux GLM-5.2",
+            AsyncOpenAI(api_key=cfg.ZENMUX_API_KEY, base_url=cfg.zenmux_base_url),
+            cfg.zenmux_model,
+        ))
+
     fallback_key = cfg.OPENAI_FALLBACK_API_KEY or cfg.REAL_OPENAI_API_KEY
     if fallback_key:
         providers.append((
