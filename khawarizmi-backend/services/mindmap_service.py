@@ -613,7 +613,8 @@ async def persist_flashcards_to_fsrs(
     from services.fsrs_graph import run_fsrs_step
 
     scheduler_inst = get_fsrs_scheduler()
-    now = datetime.now(UTC).replace(tzinfo=None)
+    now = datetime.now(UTC)
+    now_naive = now.replace(tzinfo=None)
     default_card = Card()
 
     for card in flashcards:
@@ -621,8 +622,10 @@ async def persist_flashcards_to_fsrs(
         updated_card = run_fsrs_step(default_card, Rating.Good, now, scheduler_inst)
 
         due_date = updated_card.due if hasattr(updated_card, "due") else now + timedelta(days=1)
-        if hasattr(due_date, "tzinfo") and due_date.tzinfo is not None:
-            due_date = due_date.replace(tzinfo=None)
+        if due_date.tzinfo is not None:
+            due_date_naive = due_date.replace(tzinfo=None)
+        else:
+            due_date_naive = due_date
         interval = updated_card.scheduled_days if hasattr(updated_card, "scheduled_days") else 1
 
         fsrs_json = _json.dumps(
@@ -669,11 +672,11 @@ async def persist_flashcards_to_fsrs(
                 "difficulty": updated_card.difficulty,
                 "stability": updated_card.stability,
                 "state": 1,
-                "due_date": due_date,
-                "next_rev": due_date,
+                "due_date": due_date_naive,
+                "next_rev": due_date_naive,
                 "interval": interval,
                 "fsrs_state": fsrs_json,
-                "last_review": now,
+                "last_review": now_naive,
             },
         )
         row = result.fetchone()
@@ -690,7 +693,7 @@ async def persist_flashcards_to_fsrs(
                 "fsrs_id": card_id,
                 "node_id": card["node_id"],
                 "user_id": u_id,
-                "updated_at": now,
+                "updated_at": now_naive,
             },
         )
 
@@ -836,12 +839,15 @@ async def update_node_maitrise(node_id: str, maitrise: int, user_id: str, db: As
 
     # Appliquer le scheduler calibré
     scheduler_inst = get_fsrs_scheduler(user_fsrs_config)
-    now_utc = datetime.now(UTC).replace(tzinfo=None)
+    now_utc = datetime.now(UTC)
+    now_naive_sql = now_utc.replace(tzinfo=None)
     updated_card = run_fsrs_step(card, fsrs_rating, now_utc, scheduler_inst)
 
     due_date = updated_card.due if hasattr(updated_card, "due") else now_utc + timedelta(days=1)
-    if hasattr(due_date, "tzinfo") and due_date.tzinfo is not None:
-        due_date = due_date.replace(tzinfo=None)
+    if due_date.tzinfo is not None:
+        due_date_naive = due_date.replace(tzinfo=None)
+    else:
+        due_date_naive = due_date
     interval = updated_card.scheduled_days if hasattr(updated_card, "scheduled_days") else 1
 
     # Préserver l'historique des révisions
@@ -898,12 +904,12 @@ async def update_node_maitrise(node_id: str, maitrise: int, user_id: str, db: As
             "difficulty": updated_card.difficulty,
             "stability": updated_card.stability,
             "fsrs_state": fsrs_json,
-            "due_date": due_date,
-            "next_rev": due_date,
+            "due_date": due_date_naive,
+            "next_rev": due_date_naive,
             "interval": interval,
             "state": updated_card.state.value if hasattr(updated_card.state, "value") else int(updated_card.state),
-            "last_review": now_utc,
-            "updated_at": now_utc,
+            "last_review": now_naive_sql,
+            "updated_at": now_naive_sql,
         },
     )
 
