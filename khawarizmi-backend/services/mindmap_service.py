@@ -706,7 +706,7 @@ async def save_mindmap(mindmap: dict, user_id: str, db: AsyncSession) -> None:
                  chapitre, data, created_at)
             VALUES
                 (:id, :user_id, :titre, :matiere, :filiere,
-                 :chapitre, :data, :created_at)
+                 :chapitre, :data, NOW())
             ON CONFLICT (id) DO UPDATE
             SET data = EXCLUDED.data
         """),
@@ -718,39 +718,36 @@ async def save_mindmap(mindmap: dict, user_id: str, db: AsyncSession) -> None:
             "filiere": mindmap["filiere"],
             "chapitre": mindmap["chapitre"],
             "data": json.dumps(mindmap, ensure_ascii=False),
-            "created_at": datetime.now(UTC),
         },
     )
 
     async def save_node_recursive(node: dict):
         await db.execute(
             text("""
-                INSERT INTO mindmap_nodes
-                    (id, mindmap_id, user_id, label, type, importance,
-                     bac_frequent, fsrs_card_id, maitrise_eleve, created_at, updated_at)
-                VALUES
-                    (:id, :mindmap_id, :user_id, :label, :type, :importance,
-                     :bac_frequent, :fsrs_card_id, :maitrise_eleve, :created_at, :updated_at)
-                ON CONFLICT (id) DO UPDATE
-                SET label = EXCLUDED.label,
-                    type = EXCLUDED.type,
-                    importance = EXCLUDED.importance,
-                    bac_frequent = EXCLUDED.bac_frequent,
-                    updated_at = EXCLUDED.updated_at
-            """),
-            {
-                "id": node["id"],
-                "mindmap_id": mindmap["id"],
-                "user_id": u_id,
-                "label": node.get("label", ""),
-                "type": node.get("type", "concept"),
-                "importance": node.get("importance", "moyenne"),
-                "bac_frequent": node.get("bac_frequent", False),
-                "fsrs_card_id": node.get("fsrs_card_id"),
-                "maitrise_eleve": node.get("maitrise_eleve", 0),
-                "created_at": datetime.now(UTC),
-                "updated_at": datetime.now(UTC),
-            },
+            INSERT INTO mindmap_nodes
+                (id, mindmap_id, user_id, label, type, importance,
+                 bac_frequent, fsrs_card_id, maitrise_eleve, created_at, updated_at)
+            VALUES
+                (:id, :mindmap_id, :user_id, :label, :type, :importance,
+                 :bac_frequent, :fsrs_card_id, :maitrise_eleve, NOW(), NOW())
+            ON CONFLICT (id) DO UPDATE
+            SET label = EXCLUDED.label,
+                type = EXCLUDED.type,
+                importance = EXCLUDED.importance,
+                bac_frequent = EXCLUDED.bac_frequent,
+                updated_at = EXCLUDED.updated_at
+        """),
+        {
+            "id": node["id"],
+            "mindmap_id": mindmap["id"],
+            "user_id": u_id,
+            "label": node.get("label", ""),
+            "type": node.get("type", "concept"),
+            "importance": node.get("importance", "moyenne"),
+            "bac_frequent": node.get("bac_frequent", False),
+            "fsrs_card_id": node.get("fsrs_card_id"),
+            "maitrise_eleve": node.get("maitrise_eleve", 0),
+        },
         )
         for child in node.get("enfants", []):
             await save_node_recursive(child)

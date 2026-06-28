@@ -126,3 +126,38 @@ class TestInTupleRegression:
 
     def test_reconciliation_queue_no_in_tuple(self):
         self._check_file_no_in_tuple("services/reconciliation_queue.py", "reconciliation_queue.py")
+
+
+class TestRagChunksSchema:
+    """Détecte l'usage de `chapter` au lieu de `chapitre` dans les requêtes SQL rag_chunks.
+
+    RÈGLE : La colonne DB est `chapitre` (français), pas `chapter` (anglais).
+    Les requêtes SQL doivent utiliser `chapitre AS chapter` pour aliasser proprement.
+    """
+
+    _SQL_FILES: list[str] = [
+        "services/rag_service.py",
+    ]
+
+    def _check_file_no_chapter_in_sql(self, filepath: str, filename: str):
+        path = os.path.join(os.path.dirname(__file__), "..", filepath)
+        if not os.path.exists(path):
+            pytest.skip(f"Fichier introuvable: {path}")
+        with open(path, encoding="utf-8") as f:
+            content = f.read()
+        # Toute requête SQL SELECT FROM rag_chunks ne doit pas référencer `chapter` sans `AS`
+        lines = content.split("\n")
+        for i, line in enumerate(lines, 1):
+            stripped = line.strip()
+            if "rag_chunks" not in stripped:
+                continue
+            # Vérifie les SELECT qui utilisent `chapter` sans alias `AS chapter`
+            if "SELECT" in stripped.upper() and "chapter" in stripped and "chapitre" not in stripped and "AS chapter" not in stripped:
+                pytest.fail(
+                    f"{filename}:{i} utilise `chapter` sans alias `chapitre AS chapter` "
+                    f"dans une requête rag_chunks.\n→ Ligne : {stripped[:120]}"
+                )
+
+    def test_rag_chunks_uses_chapitre_alias(self):
+        for f in self._SQL_FILES:
+            self._check_file_no_chapter_in_sql(f, os.path.basename(f))

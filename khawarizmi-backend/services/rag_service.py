@@ -25,10 +25,10 @@ async def vector_rag_search(
         if chapter:
             result = await db.execute(
                 text("""
-                    SELECT content, source, chapter,
+                    SELECT content, source, chapitre AS chapter,
                            1 - (embedding <=> CAST(:query_emb AS vector)) AS similarity
                     FROM rag_chunks
-                    WHERE LOWER(chapter) LIKE LOWER(:chapter)
+                    WHERE LOWER(chapitre) LIKE LOWER(:chapter)
                     ORDER BY embedding <=> CAST(:query_emb AS vector)
                     LIMIT :lim
                 """),
@@ -37,7 +37,7 @@ async def vector_rag_search(
         else:
             result = await db.execute(
                 text("""
-                    SELECT content, source, chapter,
+                    SELECT content, source, chapitre AS chapter,
                            1 - (embedding <=> CAST(:query_emb AS vector)) AS similarity
                     FROM rag_chunks
                     ORDER BY embedding <=> CAST(:query_emb AS vector)
@@ -74,9 +74,9 @@ async def keyword_rag_search(
         if chapter:
             result = await db.execute(
                 text("""
-                    SELECT content, source, chapter, importance
+                    SELECT content, source, chapitre AS chapter, importance
                     FROM rag_chunks
-                    WHERE LOWER(chapter) LIKE LOWER(:chapter)
+                    WHERE LOWER(chapitre) LIKE LOWER(:chapter)
                       AND LOWER(content) ILIKE ANY(:keywords)
                     ORDER BY chunk_index
                     LIMIT :lim
@@ -86,7 +86,7 @@ async def keyword_rag_search(
         else:
             result = await db.execute(
                 text("""
-                    SELECT content, source, chapter, importance
+                    SELECT content, source, chapitre AS chapter, importance
                     FROM rag_chunks
                     WHERE LOWER(content) ILIKE ANY(:keywords)
                     ORDER BY chunk_index
