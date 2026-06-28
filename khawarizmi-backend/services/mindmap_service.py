@@ -133,11 +133,11 @@ async def run_generation_background(
                 logger.warning(f"MINDMAP_ASYNC | Aucun contexte RAG pour '{chapitre}', génération LLM seule")
                 context_text = f"Chapitre: {chapitre}, Matière: {matiere}, Filière: {filiere}"
                 source_names = "LLM seul (pas de RAG)"
-
-            # Re-ranking : garder les 5 meilleurs chunks
-            chunks = rerank(query_text, raw_chunks, top_k=5)
-            context_text = "\n\n".join([f"Source: {c['source']}\n{c['content']}" for c in chunks])
-            source_names = ", ".join(list({c["source"] for c in chunks}))
+            else:
+                # Re-ranking : garder les 5 meilleurs chunks
+                chunks = rerank(query_text, raw_chunks, top_k=5)
+                context_text = "\n\n".join([f"Source: {c['source']}\n{c['content']}" for c in chunks])
+                source_names = ", ".join(list({c["source"] for c in chunks}))
 
             # 2. Génération LLM (racine + niveau 1 seulement = lazy loading)
             await _update_task(task_id, "running", progress="llm", db=db)
@@ -175,7 +175,7 @@ GÉNÉRATION PROGRESSIVE (LAZY LOADING) :
                 response = await openai_client.chat.completions.create(
                     model=openai_model,
                     temperature=0.2,
-                    max_tokens=1200,
+                    max_tokens=3000,
                     timeout=20.0,
                     messages=[{"role": "system", "content": lazy_prompt}, {"role": "user", "content": user_prompt}],
                 )
