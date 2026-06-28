@@ -86,4 +86,4 @@ class TestJsonFallback:
 
         d1_ids = {d["id"] for d in r1["domains"]}
         d2_ids = {d["id"] for d in r2["domains"]}
-        assert d1_ids != d2_ids, "UUIDs must be unique across calls"
+        assert d1_ids == d2_ids, "UUIDs must be stable (deterministic) across calls — uuid5 same input = same output"

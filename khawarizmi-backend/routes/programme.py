@@ -11,7 +11,7 @@ import json
 import logging
 import unicodedata
 from pathlib import Path
-from uuid import uuid4
+from uuid import NAMESPACE_URL, uuid5
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import text
@@ -40,6 +40,12 @@ def normalize_filiere(filiere: str) -> str:
     """Normalise la filiere pour matcher la DB."""
     f = unicodedata.normalize("NFC", filiere).strip()
     return _FILIERE_ALIASES.get(f.lower(), f)
+
+
+def stable_id(*parts: object) -> str:
+    """UUID v5 stable déterministe — mêmes entrées → même UUID."""
+    raw = ":".join(str(p) for p in parts)
+    return str(uuid5(NAMESPACE_URL, f"khawarizmi-programme:{raw}"))
 
 
 # ════════════════════════════════════════════════════════════════
@@ -75,17 +81,19 @@ def _load_programme_fallback() -> dict:
 
 
 def _restructure_json_to_response(raw: dict) -> dict:
-    """Convertit le format JSON import en format reponse API (avec UUID)."""
+    """Convertit le format JSON import en format reponse API (avec UUID stable)."""
+    matiere = raw.get("matiere", "")
+    filiere = raw.get("filiere", "")
     domains_out = []
     for d in raw.get("domains", []):
-        domain_id = str(uuid4())
+        domain_id = stable_id(matiere, filiere, "domain", d["numero"])
         units_out = []
         for u in d.get("units", []):
-            unit_id = str(uuid4())
+            unit_id = stable_id(matiere, filiere, "unit", d["numero"], u["numero"])
             chapters_out = []
             for ch in u.get("chapters", []):
                 chapters_out.append({
-                    "id": str(uuid4()),
+                    "id": stable_id(matiere, filiere, "chapter", d["numero"], u["numero"], ch["numero"], ch["titre_fr"]),
                     "numero": ch["numero"],
                     "titre_fr": ch["titre_fr"],
                     "titre_ar": ch.get("titre_ar"),
@@ -110,8 +118,8 @@ def _restructure_json_to_response(raw: dict) -> dict:
         })
 
     return {
-        "matiere": raw.get("matiere", ""),
-        "filiere": raw.get("filiere", ""),
+        "matiere": matiere,
+        "filiere": filiere,
         "domains": domains_out,
         "total_chapters": sum(
             len(ch) for d in domains_out for u in d["units"] for ch in [u["chapters"]]
@@ -128,7 +136,7 @@ async def debug_status(
     db: AsyncSession = Depends(get_db),
     current_user: dict = Depends(get_current_user),
 ):
-    """Diagnostic : etat DB + JSON fallback."""
+    """Diagnostic : etat DB + source fallback."""
     try:
         result = await db.execute(text("SELECT COUNT(*) FROM domains"))
         db_count = result.scalar_one()
@@ -136,12 +144,22 @@ async def debug_status(
         db_count = f"ERROR: {exc}"
 
     raw = _load_programme_fallback()
-    json_domain_count = len(raw.get("domains", [])) if raw else 0
+    json_on_disk = _JSON_PATH.exists()
+    domain_count = len(raw.get("domains", [])) if raw else 0
+    if json_on_disk:
+        fallback_source = "json"
+    elif raw:
+        fallback_source = "embedded"
+    else:
+        fallback_source = "none"
 
     return {
         "db_domains_count": db_count,
-        "json_fallback_loaded": bool(raw),
-        "json_domain_count": json_domain_count,
+        "fallback_source": fallback_source,
+        "json_fallback_loaded": json_on_disk,
+        "json_domain_count": domain_count if json_on_disk else 0,
+        "embedded_fallback_loaded": not json_on_disk and bool(raw),
+        "embedded_domain_count": domain_count if not json_on_disk else 0,
         "json_path": str(_JSON_PATH),
         "filiere_aliases": _FILIERE_ALIASES,
     }
