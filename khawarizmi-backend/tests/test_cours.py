@@ -53,12 +53,21 @@ async def test_get_cours_endpoint_accessible(client):
 
 
 @pytest.mark.asyncio
-async def test_get_cours_returns_list(client):
-    """La réponse doit être une liste de chunks."""
+async def test_get_cours_returns_object(client):
+    """La réponse doit être un objet {chapitre, contenu, importance, ...}.
+
+    Contrat réel de GET /api/cours/{title} (DB + fallback fichier) : un dict
+    structuré, pas une liste. L'ancienne assertion isinstance(data, list) était
+    périmée — le contrat a évolué vers un objet riche.
+    """
     resp = await client.get("/api/cours/ADN")
     if resp.status_code == 200:
         data = resp.json()
-        assert isinstance(data, list)
+        assert isinstance(data, dict)
+        assert "chapitre" in data
+        assert "contenu" in data          # contenu du cours (markdown nettoyé)
+        assert len(data["contenu"]) > 100  # section réellement extraite
+        assert data["total_chunks"] >= 1
     # Sinon (503/500), le mock DB a échoué — c'est OK pour ce test
 
 

@@ -18,13 +18,24 @@ questions_db: dict[str, Any] = {}
 try:
     with open(ANNALES_PATH, encoding="utf-8") as f:
         annales = json.load(f)
+        _residuelles = 0
         for sujet in annales:
-            for exercice in sujet.get("exercices", []):
+            # Les question_id bruts (ex. q_0) sont uniques PAR sujet/exercice
+            # mais PAS globalement → 31 questions écrasées silencieusement avant.
+            # On espace la clé : sujet_id:exercice_id:question_id (134 uniques).
+            sujet_id = sujet.get("sujet_id") or sujet.get("id") or "sujet"
+            for _ex_idx, exercice in enumerate(sujet.get("exercices", [])):
+                ex_id = exercice.get("exercice_id") or f"ex{_ex_idx}"
                 for q in exercice.get("questions", []):
-                    qid = q["question_id"]
-                    if qid in questions_db:
-                        logger.warning(f"Collision question_id détectée (annales): {qid}")
-                    questions_db[qid] = q
+                    raw_qid = q["question_id"]
+                    unique_qid = f"{sujet_id}:{ex_id}:{raw_qid}"
+                    q["question_id"] = unique_qid      # propager l'ID globalement unique
+                    q["question_id_orig"] = raw_qid    # tracer l'ID d'origine
+                    if unique_qid in questions_db:
+                        _residuelles += 1
+                    questions_db[unique_qid] = q
+        if _residuelles:
+            logger.warning(f"{_residuelles} collisions résiduelles (clés composées non uniques)")
     logger.info(f"✅ {len(questions_db)} questions chargées depuis {ANNALES_PATH}")
 except Exception as e:
     logger.error(f"❌ Erreur lors du chargement des annales ({ANNALES_PATH}): {e}")

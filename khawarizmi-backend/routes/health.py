@@ -66,7 +66,9 @@ async def health_check():
         "version": cfg.VERSION,
         "database": "connected" if db_ok else "error",
         "redis": "connected" if redis_ok else "error",
-        "ai_model": cfg.AI_MODEL_PRIMARY,
+        # Modèle IA réellement résolu au démarrage (lifespan) — pas le défaut
+        # statique cfg.AI_MODEL_PRIMARY qui peut être périmé/non câblé.
+        "ai_model": getattr(s, "ai_model", None) or "non_configuré",
         "fallback_active": not db_ok or not redis_ok,
         "backup": backup_info,
         "business": business,

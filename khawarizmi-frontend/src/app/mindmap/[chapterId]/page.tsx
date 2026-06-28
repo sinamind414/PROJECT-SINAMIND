@@ -3,7 +3,7 @@
 
 "use client"
 
-import { useEffect, useState, useMemo, useCallback } from "react"
+import { useEffect, useState, useMemo, useCallback, useRef } from "react"
 import { useParams } from "next/navigation"
 import Link from "next/link"
 
@@ -194,6 +194,11 @@ function MindMapContent() {
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([])
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([])
 
+  // Garde-fou anti-cascade : empêche le useEffect de se re-déclencher
+  // quand des mises à jour d'état recréent loadChapterAndMindmap via
+  // la chaîne de dépendances (handleNodeAction → handleUpdateMaitrise).
+  const _fetching = useRef(false)
+
   const pollTask = useCallback(async (taskId: string): Promise<MindMapType> => {
     const maxAttempts = 60
     for (let i = 0; i < maxAttempts; i++) {
@@ -296,6 +301,8 @@ function MindMapContent() {
 
   // Load chapter information and the mindmap
   const loadChapterAndMindmap = useCallback(async () => {
+    if (_fetching.current) return
+    _fetching.current = true
     setLoading(() => true)
     setError(null)
     try {
@@ -402,6 +409,7 @@ function MindMapContent() {
       console.error("Mindmap load failed", err)
       setError(resolveMindmapErrorMessage(err))
     } finally {
+      _fetching.current = false
       setLoading(false)
       setGenerating(false)
     }
@@ -411,7 +419,8 @@ function MindMapContent() {
     if (user && chapterId) {
       void loadChapterAndMindmap()
     }
-  }, [user, chapterId, loadChapterAndMindmap])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, chapterId])
 
   const importanceLabels: Record<string, string> = {
     critique: UI_AR.critique,

@@ -27,6 +27,9 @@ class AppState:
     db_engine: Any | None = None
     db_session: async_sessionmaker[AsyncSession] | None = None
     reconciliation_task: asyncio.Task | None = None
+    # Modèle IA réellement résolu (Groq llama / Gemini / gpt-4o-mini) ou None.
+    # Health le lit au lieu du défaut statique cfg.AI_MODEL_PRIMARY (souvent faux).
+    ai_model: str | None = None
 
 
 state = AppState()
@@ -97,9 +100,15 @@ async def lifespan(app: FastAPI):
 
             state.openai = AsyncOpenAI(api_key=api_key, base_url=base_url)
             state.dual_coding = DualCodingService(state.openai)
+            state.ai_model = model  # modèle réellement résolu — health lira ceci
             logger.info(f"IA initialisée: {base_url} | model={model}")
         except Exception as e:
             logger.error(f"❌ IA init failed: {e} — IA désactivée")
+    else:
+        # Pas de clé IA configurée — on le dit au boot plutôt que d'afficher
+        # le défaut statique "gemini-2.5-flash" qui n'est même pas installé.
+        state.ai_model = None
+        logger.warning("IA désactivée — OPENAI_API_KEY non configuré")
 
     if cfg.DATABASE_URL:
         try:
