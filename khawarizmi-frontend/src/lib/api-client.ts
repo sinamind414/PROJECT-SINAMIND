@@ -48,6 +48,11 @@ let _khawarizmiToken: string | null = null
 
 type ApiRequestOptions = RequestInit & {
   skipAuthRedirect?: boolean
+  /**
+   * Timeout en ms. Par défaut 30s. Sans ça, un appel backend qui ne répond
+   * jamais ( connexion DB/AI bloquée ) fait tourner le spinner à l'infini.
+   */
+  timeoutMs?: number
 }
 
 // ── Classe Client API ──────────────────────────────
@@ -78,7 +83,7 @@ class KhawarizmiApiClient {
     endpoint: string,
     options: ApiRequestOptions = {}
   ): Promise<T> {
-    const { skipAuthRedirect, ...fetchOptions } = options
+    const { skipAuthRedirect, timeoutMs = 30000, ...fetchOptions } = options
 
     const headers: HeadersInit = {
       "Content-Type": "application/json",
@@ -86,13 +91,27 @@ class KhawarizmiApiClient {
     }
 
     if (_khawarizmiToken) {
-      (headers as Record<string, string>)["Authorization"] = `Bearer ${_khawarizmiToken}`
+      (headers as Record<string, string>)[`Authorization`] = `Bearer ${_khawarizmiToken}`
     }
 
-    const response = await fetch(
-      `${API_BASE_URL}${endpoint}`,
-      { ...fetchOptions, headers, credentials: "include" }
-    )
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs)
+
+    let response: Response
+    try {
+      response = await fetch(
+        `${API_BASE_URL}${endpoint}`,
+        { ...fetchOptions, headers, credentials: "include", signal: controller.signal }
+      )
+    } catch (err) {
+      throw new Error(
+        err instanceof DOMException && err.name === "AbortError"
+          ? `${UI_AR.erreur_http_prefix} : مهلة الاتصال ( timeout ) — الخادم لم يستجب.`
+          : `${UI_AR.erreur_http_prefix} : تعذر الاتصال بالخادم.`
+      )
+    } finally {
+      clearTimeout(timeoutId)
+    }
 
     // Token expiré → déconnexion (sauf si skip ou déjà sur auth)
     if (response.status === 401) {
