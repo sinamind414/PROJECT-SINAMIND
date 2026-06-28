@@ -14,8 +14,13 @@ COPY khawarizmi-backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY khawarizmi-backend/ .
-COPY khawarizmi-backend/data/programmes/svt_sciences_experimentales.json ./data/programmes/svt_sciences_experimentales.json
-RUN (ls -la /app/data/ && ls -la /app/data/programmes/ && echo "Data files verified") || echo "data/ not in Docker image, using JSON fallback at runtime"
+
+# Copie explicite du fallback programme vital.
+# Si ce COPY échoue, Railway n'utilise pas le bon contexte ou pas le bon commit.
+COPY khawarizmi-backend/data/programmes/ ./data/programmes/
+
+RUN echo "BUILD_MARKER=programme-json-copy-v2" && \
+    python -c "import json, pathlib; p = pathlib.Path('/app/data/programmes/svt_sciences_experimentales.json'); assert p.exists(), f'MISSING_PROGRAMME_JSON: {p}'; data = json.loads(p.read_text(encoding='utf-8')); assert len(data.get('domains', [])) > 0, 'PROGRAMME_JSON_HAS_NO_DOMAINS'; print('PROGRAMME_JSON_OK', data.get('matiere'), data.get('filiere'), len(data.get('domains', [])))"
 
 EXPOSE 8000
 

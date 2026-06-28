@@ -9,6 +9,11 @@ khawarizmi-backend/data/ocr_test_prod/
 khawarizmi-backend/data/ocr_livre_scolaire/
 khawarizmi-backend/data/ocr_output/
 
+# Fallback programme critique, ne jamais exclure
+!khawarizmi-backend/data/
+!khawarizmi-backend/data/programmes/
+!khawarizmi-backend/data/programmes/**
+
 # Python
 **/__pycache__/
 **/*.pyc
