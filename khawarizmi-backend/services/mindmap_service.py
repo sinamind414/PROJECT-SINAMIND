@@ -188,6 +188,13 @@ GÉNÉRATION PROGRESSIVE (LAZY LOADING) :
             if not generated_data or "racine" not in generated_data:
                 generated_data = {"racine": _build_default_racine(chapitre, matiere), "liens_transversaux": []}
 
+            # Si le LLM n'a généré aucun enfant, en créer par défaut
+            # (llama-3.3-70b-versatile ignore parfois la consigne "enfants != []")
+            racine = generated_data.get("racine", {})
+            if not racine.get("enfants"):
+                logger.warning(f"MINDMAP_ASYNC | LLM a retourné 0 enfants pour '{chapitre}', fallback auto-enfants")
+                racine["enfants"] = _build_default_enfants(chapitre, matiere)
+
             # 3. Formatage + sauvegarde
             await _update_task(task_id, "running", progress="save", db=db)
 
@@ -522,6 +529,12 @@ async def generate_mindmap(
         logger.warning("Structure JSON générée invalide. Utilisation du fallback statique.")
         generated_data = {"racine": _build_default_racine(chapitre, matiere), "liens_transversaux": []}
 
+    # Si le LLM n'a généré aucun enfant, en créer par défaut
+    racine_sync = generated_data.get("racine", {})
+    if not racine_sync.get("enfants"):
+        logger.warning(f"MINDMAP_SYNC | LLM a retourné 0 enfants pour '{chapitre}', fallback auto-enfants")
+        racine_sync["enfants"] = _build_default_enfants(chapitre, matiere)
+
     # 4. Formater récursivement l'arbre généré pour typage et clés uniques
     def format_node_recursive(node: dict, level=0):
         if "id" not in node or not node["id"] or len(node["id"]) < 5:
@@ -591,6 +604,76 @@ def _build_default_racine(chapitre: str, matiere: str) -> dict:
         "enfants": [],
         "liens": [],
     }
+
+
+def _build_default_enfants(chapitre: str, matiere: str) -> list:
+    """Génère 3-5 enfants par défaut quand le LLM n'en produit pas."""
+    # Mapping de concepts SVT par chapitre → enfants par défaut
+    _fallbacks = {
+        "adn": [
+            {"label": "Structure de l'ADN", "type": "concept", "importance": "critique"},
+            {"label": "Réplication de l'ADN", "type": "processus", "importance": "haute"},
+            {"label": "Transcription", "type": "processus", "importance": "haute"},
+            {"label": "Code génétique", "type": "definition", "importance": "critique"},
+            {"label": "Mutations", "type": "concept", "importance": "moyenne"},
+        ],
+        "photosynthese": [
+            {"label": "Phase lumineuse", "type": "processus", "importance": "critique"},
+            {"label": "Phase obscure (Calvin)", "type": "processus", "importance": "critique"},
+            {"label": "Bilan énergétique", "type": "definition", "importance": "haute"},
+            {"label": "Facteurs limitants", "type": "concept", "importance": "moyenne"},
+        ],
+        "genetique": [
+            {"label": "Mendélisme", "type": "concept", "importance": "critique"},
+            {"label": "Ségrégation allélique", "type": "processus", "importance": "haute"},
+            {"label": "Génétique quantitative", "type": "concept", "importance": "haute"},
+            {"label": "Hérédité liée au sexe", "type": "concept", "importance": "moyenne"},
+        ],
+        "immuno": [
+            {"label": "Immunité innée", "type": "concept", "importance": "critique"},
+            {"label": "Immunité adaptative", "type": "concept", "importance": "critique"},
+            {"label": "Vaccination", "type": "processus", "importance": "haute"},
+            {"label": "Déficits immunitaires", "type": "concept", "importance": "moyenne"},
+        ],
+        "evolution": [
+            {"label": "Sélection naturelle", "type": "concept", "importance": "critique"},
+            {"label": "Dérive génétique", "type": "processus", "importance": "haute"},
+            {"label": "Spéciation", "type": "processus", "importance": "haute"},
+            {"label": "Fossiles et preuves", "type": "concept", "importance": "moyenne"},
+        ],
+        "meiose": [
+            {"label": "Division réductionnelle", "type": "processus", "importance": "critique"},
+            {"label": "Division équationnelle", "type": "processus", "importance": "haute"},
+            {"label": "Recombinaison", "type": "processus", "importance": "haute"},
+            {"label": "Gamétogenèse", "type": "processus", "importance": "moyenne"},
+        ],
+    }
+    key = chapitre.lower().strip()
+    concepts = _fallbacks.get(key)
+    if not concepts:
+        # Fallback générique : 4 enfants standard
+        concepts = [
+            {"label": "Définitions", "type": "definition", "importance": "haute"},
+            {"label": "Mécanismes", "type": "processus", "importance": "critique"},
+            {"label": "Applications", "type": "concept", "importance": "haute"},
+            {"label": "Points clés Bac", "type": "concept", "importance": "critique"},
+        ]
+    return [
+        {
+            "id": str(uuid.uuid4()),
+            "label": c["label"],
+            "type": c["type"],
+            "niveau": 1,
+            "importance": c["importance"],
+            "bac_frequent": c["importance"] == "critique",
+            "flashcard_auto": c["importance"] in ("critique", "haute"),
+            "maitrise_eleve": 0,
+            "couleur": {"critique": "#E74C3C", "haute": "#F39C12", "moyenne": "#3498DB"}[c["importance"]],
+            "enfants": [],
+            "liens": [],
+        }
+        for c in concepts
+    ]
 
 
 async def _generate_auto_flashcards(
