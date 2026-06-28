@@ -19,6 +19,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from database import get_db
 from deps import get_current_user
+from fallback_programme_data import FALLBACK_PROGRAMME_DATA
 
 router = APIRouter(prefix="/api/programme", tags=["Programme"])
 logger = logging.getLogger(__name__)
@@ -51,26 +52,26 @@ _programme_cache: dict | None = None
 
 
 def _load_programme_fallback() -> dict:
-    """Charge le programme depuis JSON. Cache en memoire (dict module-level)."""
+    """Charge le programme. Tente JSON d'abord, sinon data/fallback_programme_data.py (embarqué)."""
     global _programme_cache
     if _programme_cache is not None:
         return _programme_cache
 
-    if not _JSON_PATH.exists():
-        logger.error("Programme fallback JSON not found: %s", _JSON_PATH)
-        _programme_cache = {}
-        return _programme_cache
+    # Priorité 1: fichier JSON (si présent dans l'image Docker)
+    if _JSON_PATH.exists():
+        try:
+            with open(_JSON_PATH, encoding="utf-8") as f:
+                raw = json.load(f)
+            logger.info("Programme fallback JSON loaded from %s", _JSON_PATH)
+            _programme_cache = raw
+            return _programme_cache
+        except (json.JSONDecodeError, OSError) as exc:
+            logger.error("Programme fallback JSON error: %s", exc)
 
-    try:
-        with open(_JSON_PATH, encoding="utf-8") as f:
-            raw = json.load(f)
-        logger.info("Programme fallback JSON loaded from %s", _JSON_PATH)
-        _programme_cache = raw
-        return _programme_cache
-    except (json.JSONDecodeError, OSError) as exc:
-        logger.error("Programme fallback JSON error: %s", exc)
-        _programme_cache = {}
-        return _programme_cache
+    # Priorité 2: données embarquées (toujours disponible)
+    logger.info("Using embedded fallback programme data (%d domains)", len(FALLBACK_PROGRAMME_DATA.get("domains", [])))
+    _programme_cache = FALLBACK_PROGRAMME_DATA
+    return _programme_cache
 
 
 def _restructure_json_to_response(raw: dict) -> dict:
