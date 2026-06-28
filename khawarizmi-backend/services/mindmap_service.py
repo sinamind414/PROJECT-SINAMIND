@@ -653,7 +653,7 @@ async def persist_flashcards_to_fsrs(
                 VALUES
                     (:user_id, :mc_id, :concept_id, :chapter,
                      :difficulty, :stability, :state, :due_date,
-                     :next_rev, :interval, :fsrs_state::jsonb, :last_review)
+                     :next_rev, :interval, CAST(:fsrs_state AS jsonb), :last_review)
                 ON CONFLICT (user_id, micro_concept_id)
                 DO UPDATE SET
                     chapter = EXCLUDED.chapter
@@ -875,7 +875,7 @@ async def update_node_maitrise(node_id: str, maitrise: int, user_id: str, db: As
                  prochaine_revision, interval_jours, state, last_review, updated_at)
             VALUES
                 (:user_id, :mc_id, :concept_id, :chapter,
-                 :difficulty, :stability, :fsrs_state::jsonb, :due_date,
+                 :difficulty, :stability, CAST(:fsrs_state AS jsonb), :due_date,
                  :next_rev, :interval, :state, :last_review, :updated_at)
             ON CONFLICT (user_id, micro_concept_id)
             DO UPDATE SET

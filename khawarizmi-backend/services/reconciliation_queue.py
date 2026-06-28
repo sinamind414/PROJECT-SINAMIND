@@ -156,7 +156,7 @@ async def correct_fsrs_scores(student_id: str, question_id: str, corrected_score
                     text("""
                         UPDATE mastery_micro_concepts
                         SET due_date = :due, interval_jours = :interval, difficulty = :difficulty,
-                            stability = :stability, fsrs_state = :fsrs_state::jsonb,
+                            stability = :stability, fsrs_state = CAST(:fsrs_state AS jsonb),
                             pending_real_evaluation = FALSE, updated_at = NOW()
                         WHERE user_id = :uid AND concept_id = :cid
                     """),

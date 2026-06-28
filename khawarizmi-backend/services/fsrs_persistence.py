@@ -102,7 +102,7 @@ async def save_concept_updates(
                      interval_jours, difficulty, stability, fsrs_state, pending_real_evaluation, updated_at)
                 VALUES
                     (:user_id, :c_id, :chapter, :due,
-                     :interval, :difficulty, :stability, :fsrs_state::jsonb, :pending_eval, NOW())
+                     :interval, :difficulty, :stability, CAST(:fsrs_state AS jsonb), :pending_eval, NOW())
                 ON CONFLICT (user_id, concept_id)
                 DO UPDATE SET
                     due_date           = EXCLUDED.due_date,

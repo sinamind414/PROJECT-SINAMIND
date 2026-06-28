@@ -135,7 +135,7 @@ async def soumettre_resultat_drill(
                  total_reviews, avg_score, updated_at)
             VALUES
                 (:user_id, :mc_id, :concept_id, :next_rev,
-                 :interval, :difficulty, :stability, :fsrs_state::jsonb,
+                 :interval, :difficulty, :stability, CAST(:fsrs_state AS jsonb),
                  :due_date, :last_review, :reps, :lapses, :state,
                  1, :avg_score, NOW())
             ON CONFLICT (user_id, micro_concept_id)
@@ -343,7 +343,7 @@ async def review_flashcard(
                  due_date, last_review)
             VALUES
                 (:uid, :mc_id, :next_rev,
-                 :interval, :difficulty, :stability, :fsrs_state::jsonb,
+                 :interval, :difficulty, :stability, CAST(:fsrs_state AS jsonb),
                  :due_date, :last_review)
             ON CONFLICT (user_id, micro_concept_id)
             DO UPDATE SET

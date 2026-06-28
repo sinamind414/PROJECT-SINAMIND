@@ -53,6 +53,31 @@ class TestVectorCastRegression:
         assert ":emb::vector" not in content, "Syntaxe :emb::vector détectée — utiliser CAST(:emb AS vector)"
 
 
+class TestJsonbCastRegression:
+    """Détecte les casts :param::jsonb qui cassent le binding SQLAlchemy/asyncpg."""
+
+    def test_runtime_sql_uses_cast_for_jsonb_params(self):
+        root = os.path.join(os.path.dirname(__file__), "..")
+        checked_files = [
+            "routes/flashcards.py",
+            "routes/payment.py",
+            "services/fsrs_persistence.py",
+            "services/mindmap_service.py",
+            "services/reconciliation_queue.py",
+        ]
+        offenders = []
+        for rel_path in checked_files:
+            path = os.path.join(root, rel_path)
+            with open(path, encoding="utf-8") as f:
+                for line_no, line in enumerate(f, start=1):
+                    if "::jsonb" in line and ":" in line:
+                        offenders.append(f"{rel_path}:{line_no}: {line.strip()}")
+        assert not offenders, (
+            "Cast :param::jsonb détecté — utiliser CAST(:param AS jsonb), "
+            "sinon SQLAlchemy tronque le nom du paramètre.\n" + "\n".join(offenders)
+        )
+
+
 class TestOsGetenvRegression:
     """Détecte les retours de os.getenv au lieu de get_settings()."""
 

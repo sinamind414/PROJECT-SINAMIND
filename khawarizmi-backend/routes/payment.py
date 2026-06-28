@@ -121,7 +121,7 @@ async def chargily_webhook(
             await db.execute(
                 text("""
                     INSERT INTO payments (checkout_id, user_id, amount, status, raw_webhook, paid_at)
-                    VALUES (:cid, :uid, :amount, 'paid', :raw::jsonb, :paid_at)
+                    VALUES (:cid, :uid, :amount, 'paid', CAST(:raw AS jsonb), :paid_at)
                 """),
                 {
                     "cid": checkout_id,
@@ -135,7 +135,7 @@ async def chargily_webhook(
             await db.execute(
                 text("""
                     UPDATE payments
-                    SET status = 'paid', paid_at = :paid_at, raw_webhook = :raw::jsonb, updated_at = NOW()
+                    SET status = 'paid', paid_at = :paid_at, raw_webhook = CAST(:raw AS jsonb), updated_at = NOW()
                     WHERE checkout_id = :cid
                 """),
                 {"cid": checkout_id, "paid_at": datetime.now(UTC), "raw": json.dumps(payload)},
