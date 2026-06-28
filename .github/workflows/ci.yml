@@ -55,3 +55,19 @@ print(f'  ENVIRONMENT: {cfg.ENVIRONMENT}')
           cd khawarizmi-backend
           pip install pytest pytest-asyncio httpx
           pytest tests/test_methodology*.py tests/test_diagnostic.py tests/test_couche3.py tests/test_tutor.py tests/test_bac_blanc_intelligent.py tests/test_mindmap_methodology.py -v --tb=short
+
+  deploy-railway:
+    if: github.ref == 'refs/heads/main'
+    needs: backend-tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Railway CLI
+        run: npm install -g @railway/cli
+
+      - name: Deploy to Railway
+        run: railway up --detach --service PROJECT-SINAMIND --environment production
+        working-directory: khawarizmi-backend
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
