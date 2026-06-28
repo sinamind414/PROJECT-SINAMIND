@@ -374,7 +374,7 @@ RÈGLES OBLIGATOIRES :
 4. flashcard_auto = true si importance = critique ou haute
 5. Couleurs : critique=#E74C3C haute=#F39C12 moyenne=#3498DB
 
-FORMAT JSON OBLIGATOIRE :
+FORMAT JSON OBLIGATOIRE — tu DOIS remplir "enfants" avec 3 à 7 sous-nœuds :
 {
   "racine": {
     "id": "uuid",
@@ -386,12 +386,28 @@ FORMAT JSON OBLIGATOIRE :
     "flashcard_auto": boolean,
     "maitrise_eleve": 0,
     "couleur": "#hex",
-    "enfants": [],
+    "enfants": [
+      {
+        "id": "uuid",
+        "label": "string max 5 mots — EN ARABE",
+        "type": "concept|definition|formule|processus|exception",
+        "niveau": 1,
+        "importance": "critique|haute|moyenne",
+        "bac_frequent": boolean,
+        "flashcard_auto": boolean,
+        "maitrise_eleve": 0,
+        "couleur": "#hex",
+        "enfants": [],
+        "liens": []
+      }
+    ],
     "liens": []
   },
   "liens_transversaux": []
 }
 
+IMPORTANT : "enfants" ne doit JAMAIS être vide. Génère 3 à 7 sous-nœuds
+qui couvrent les concepts essentiels du chapitre.
 Réponds UNIQUEMENT avec le JSON. Aucun texte autour.
 """
 
