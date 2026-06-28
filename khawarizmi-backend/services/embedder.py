@@ -43,9 +43,14 @@ class KhawarizmiEmbedder:
 
         # 1. Charger le tokenizer via Hugging Face Tokenizers (Rust/C++ bindings)
         tokenizer_file = os.path.join(model_path, "tokenizer.json")
-        self.tokenizer = Tokenizer.from_file(tokenizer_file)
-        self.tokenizer.enable_truncation(max_length=128)
-        self.tokenizer.enable_padding(direction="right", pad_id=0, pad_type_id=0, pad_token="[PAD]")
+        try:
+            self.tokenizer = Tokenizer.from_file(tokenizer_file)
+            self.tokenizer.enable_truncation(max_length=128)
+            self.tokenizer.enable_padding(direction="right", pad_id=0, pad_type_id=0, pad_token="[PAD]")
+        except Exception as exc:
+            logger.warning(f"Tokenizer ONNX manquant ou invalide ({tokenizer_file}): {exc}. Activation fallback.")
+            self.tokenizer = None
+            self._fallback_mode = True
 
         # 2. Lancer la session ONNX Runtime de manière résiliente
         self.session = None
