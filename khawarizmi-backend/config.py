@@ -121,6 +121,7 @@ def get_allowed_origins() -> list[str]:
         "http://127.0.0.1:5500",
         "http://127.0.0.1:3000",
         "https://khawarizmi-ia.vercel.app",
+        "https://khawarizmi-ia-two.vercel.app",
         "https://khawarizmi.vercel.app",
         "https://khawarizmi-ia.netlify.app",
         "https://ia-khawarizmi.dz",
