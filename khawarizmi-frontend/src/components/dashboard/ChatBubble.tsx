@@ -186,7 +186,7 @@ export function ChatBubble() {
                 >
                   {msg.content}
                   {msg.fallback && (
-                    <p className="text-amber-400 text-xs mt-1">⚠️ رد احتياطي (الذكاء الاصطناعي غير متاح)</p>
+                    <p className="text-amber-400 text-xs mt-1">⚠️ رد احتياطي</p>
                   )}
                 </div>
 

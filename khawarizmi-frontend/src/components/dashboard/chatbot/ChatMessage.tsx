@@ -65,7 +65,7 @@ export function ChatMessage({ message, isLast, onFeedback, onCardClick }: ChatMe
         )}
         {message.fallback && (
           <p className="text-amber-400 text-xs mt-1">
-            ⚠️ رد احتياطي (الذكاء الاصطناعي غير متاح)
+            ⚠️ رد احتياطي
           </p>
         )}
       </div>
