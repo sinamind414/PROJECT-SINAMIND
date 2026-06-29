@@ -1,336 +1,58 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { AuthGuard } from "@/components/auth/AuthGuard"
 import { apiClient } from "@/lib/api-client"
-import { UI_AR, trAr } from "@/lib/translations"
+import { UI_AR } from "@/lib/translations"
 
-type DrillCard = {
+type DrillUnit = {
   id: string
-  concept_id: string
-  chapter: string
-  texte?: string
-  texte_ar?: string
-  type?: string
-  kind?: "open" | "qcm"
-  options?: string[]
-  explanation?: string
+  unit_ar: string
+  domain_ar: string
+  qcm_count: number
 }
 
-type EvalResult = {
-  score: number
-  statut: string
-  feedback: string
-  manquant: string[]
-  next_review_date: string | null
-  source: string
+const DOMAIN_STYLES: Record<string, { bg: string; border: string; text: string; emoji: string }> = {
+  "التخصص الوظيفي للبروتينات": { bg: "bg-violet-500/10", border: "border-violet-500/30", text: "text-violet-300", emoji: "🧬" },
+  "التحولات الطاقوية": { bg: "bg-amber-500/10", border: "border-amber-500/30", text: "text-amber-300", emoji: "⚡" },
+  "التكتونية العامة": { bg: "bg-emerald-500/10", border: "border-emerald-500/30", text: "text-emerald-300", emoji: "🌍" },
 }
+const DEFAULT_STYLE = { bg: "bg-slate-500/10", border: "border-slate-500/30", text: "text-slate-300", emoji: "📚" }
 
-type QcmResult = {
-  correct: boolean
-  correct_idx: number
-  correct_option: string
-  explanation: string
-  selected_idx: number
-  score: number
-  statut: string
-  next_review_date: string | null
-}
-
-function scoreBucket(score: number): "correct" | "partial" | "again" {
-  if (score >= 7) return "correct"
-  if (score >= 4) return "partial"
-  return "again"
-}
-
-const STATUT_LABELS: Record<string, { ar: string; color: string }> = {
-  CORRECT: { ar: "إجابة صحيحة", color: "text-emerald-400" },
-  PARTIEL: { ar: "إجابة جزئية", color: "text-amber-400" },
-  FAUX: { ar: "إجابة خاطئة", color: "text-red-400" },
-  ERREUR: { ar: "تعذّر التصحيح", color: "text-slate-400" },
-}
-
-function DrillContent() {
-  const [cards, setCards] = useState<DrillCard[]>([])
-  const [currentIdx, setCurrentIdx] = useState(0)
+function DrillIndexContent() {
+  const [units, setUnits] = useState<DrillUnit[]>([])
   const [loading, setLoading] = useState(true)
-  const [evaluating, setEvaluating] = useState(false)
-  const [done, setDone] = useState(false)
-  const [stats, setStats] = useState({ correct: 0, partial: 0, again: 0, total: 0, scoreSum: 0 })
-
-  const [answer, setAnswer] = useState("")
-  const [evalResult, setEvalResult] = useState<EvalResult | null>(null)
-  const [qcmResult, setQcmResult] = useState<QcmResult | null>(null)
   const [error, setError] = useState<string | null>(null)
 
-  function loadSession() {
-    setLoading(true)
-    setAnswer("")
-    setEvalResult(null)
-    setQcmResult(null)
-    setError(null)
-    apiClient.getNextSession(10)
-      .then((res) => {
-        const queue = res.session_queue || []
-        const mapped: DrillCard[] = queue.map((q: Record<string, unknown>, i: number) => ({
-          id: (q.question_id as string) || `q_${i}`,
-          concept_id: (q.concept_cle as string) || (q.concept_id as string) || "",
-          chapter: (q.chapter as string) || "",
-          texte: (q.texte as string) || "",
-          texte_ar: (q.texte_ar as string) || "",
-          type: (q.type as string) || "NEW",
-          kind: (q.kind as "open" | "qcm") || "open",
-          options: (q.options as string[]) || undefined,
-          explanation: (q.explanation as string) || "",
-        }))
-        setCards(mapped)
-      })
-      .catch(() => setCards([]))
+  useEffect(() => {
+    apiClient.getDrillUnits()
+      .then((res) => setUnits(res.units || []))
+      .catch(() => setError("تعذر تحميل الوحدات"))
       .finally(() => setLoading(false))
+  }, [])
+
+  const domains: Record<string, DrillUnit[]> = {}
+  for (const u of units) {
+    const d = u.domain_ar || "أخرى"
+    if (!domains[d]) domains[d] = []
+    domains[d].push(u)
   }
-
-  useEffect(() => { loadSession() }, [])
-
-  const current = cards[currentIdx]
-
-  const handleSubmitAnswer = useCallback(async () => {
-    if (!current || evaluating || !answer.trim()) return
-    setEvaluating(true)
-    setError(null)
-    try {
-      const result = await apiClient.submitDrillAnswer({
-        question_id: current.id,
-        reponse_eleve: answer,
-        lang: "ar",
-      })
-      setEvalResult(result)
-      const bucket = scoreBucket(result.score)
-      setStats((prev) => ({
-        ...prev,
-        correct: prev.correct + (bucket === "correct" ? 1 : 0),
-        partial: prev.partial + (bucket === "partial" ? 1 : 0),
-        again: prev.again + (bucket === "again" ? 1 : 0),
-        total: prev.total + 1,
-        scoreSum: prev.scoreSum + result.score,
-      }))
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "تعذّر التصحيح. حاول مجدداً.")
-    } finally {
-      setEvaluating(false)
-    }
-  }, [current, evaluating, answer])
-
-  const handleSubmitQcm = useCallback(async (selectedIdx: number) => {
-    if (!current || current.kind !== "qcm" || qcmResult || evaluating) return
-    setEvaluating(true)
-    setError(null)
-    try {
-      const result = await apiClient.submitDrillQcm({
-        qcm_id: current.id,
-        selected_idx: selectedIdx,
-      })
-      setQcmResult(result)
-      const bucket = scoreBucket(result.score)
-      setStats((prev) => ({
-        ...prev,
-        correct: prev.correct + (bucket === "correct" ? 1 : 0),
-        partial: prev.partial + (bucket === "partial" ? 1 : 0),
-        again: prev.again + (bucket === "again" ? 1 : 0),
-        total: prev.total + 1,
-        scoreSum: prev.scoreSum + result.score,
-      }))
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "تعذّر التصحيح. حاول مجدداً.")
-    } finally {
-      setEvaluating(false)
-    }
-  }, [current, qcmResult, evaluating])
-
-  const handleNext = useCallback(() => {
-    setAnswer("")
-    setEvalResult(null)
-    setQcmResult(null)
-    setError(null)
-    if (currentIdx + 1 >= cards.length) {
-      setDone(true)
-    } else {
-      setCurrentIdx((i) => i + 1)
-    }
-  }, [currentIdx, cards.length])
 
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-slate-deep">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-10 h-10 border-2 border-mint border-t-transparent rounded-full animate-spin" />
-          <p className="text-slate-400 text-sm">{UI_AR.chargement_programme}</p>
-        </div>
+        <div className="w-10 h-10 border-2 border-mint border-t-transparent rounded-full animate-spin" />
       </div>
     )
   }
 
-  if (done || cards.length === 0) {
-    const avg = stats.total > 0 ? (stats.scoreSum / stats.total).toFixed(1) : "—"
+  if (error) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-slate-deep p-6">
-        <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-8 max-w-md w-full text-center space-y-6">
-          <div className="text-6xl">🎉</div>
-          <h2 className="text-2xl font-bold text-white">
-            {cards.length === 0 ? "لا توجد أسئلة للمراجعة" : "أحسنت — انتهت الجلسة!"}
-          </h2>
-          {stats.total > 0 && (
-            <>
-              <div className="bg-mint/10 border border-mint/20 rounded-xl p-4">
-                <p className="text-3xl font-bold text-mint">{avg}<span className="text-lg text-slate-400">/10</span></p>
-                <p className="text-xs text-slate-400 mt-1">معدل الجلسة</p>
-              </div>
-              <div className="grid grid-cols-3 gap-3">
-                <div className="bg-green-500/10 border border-green-500/20 rounded-xl p-3">
-                  <div className="text-lg font-bold text-green-400">{stats.correct}</div>
-                  <div className="text-xs text-slate-400">صحيح</div>
-                </div>
-                <div className="bg-orange-500/10 border border-orange-500/20 rounded-xl p-3">
-                  <div className="text-lg font-bold text-orange-400">{stats.partial}</div>
-                  <div className="text-xs text-slate-400">جزئي</div>
-                </div>
-                <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-3">
-                  <div className="text-lg font-bold text-red-400">{stats.again}</div>
-                  <div className="text-xs text-slate-400">خاطئ</div>
-                </div>
-              </div>
-            </>
-          )}
-          <div className="flex gap-3 justify-center">
-            <button
-              onClick={() => {
-                setDone(false)
-                setCurrentIdx(0)
-                setStats({ correct: 0, partial: 0, again: 0, total: 0, scoreSum: 0 })
-                loadSession()
-              }}
-              className="px-6 py-3 bg-mint text-slate-deep rounded-xl font-semibold hover:bg-mint-soft transition"
-            >
-              جلسة جديدة
-            </button>
-            <Link href="/dashboard" className="px-6 py-3 bg-slate-800 text-slate-300 border border-slate-700 rounded-xl font-semibold hover:bg-slate-700 transition">
-              {UI_AR.retour_dashboard}
-            </Link>
-          </div>
+        <div className="bg-red-500/10 border border-red-500/30 rounded-2xl p-6 text-center">
+          <p className="text-red-300">{error}</p>
         </div>
-      </div>
-    )
-  }
-
-  const currentStatut = evalResult ? (STATUT_LABELS[evalResult.statut] || STATUT_LABELS.ERREUR) : null
-
-  function renderQcm() {
-    if (!qcmResult) {
-      return (
-        <div className="space-y-3">
-          {current.options?.map((opt, idx) => (
-            <button
-              key={idx}
-              onClick={() => handleSubmitQcm(idx)}
-              disabled={evaluating}
-              className="w-full text-right p-4 rounded-2xl bg-slate-900/70 border border-slate-800 text-white text-sm hover:border-mint/50 hover:bg-slate-900 transition disabled:opacity-50 flex items-center gap-3"
-            >
-              <span className="w-7 h-7 rounded-full bg-slate-800 flex items-center justify-center text-xs font-bold text-mint flex-shrink-0">
-                {["أ", "ب", "ج", "د"][idx]}
-              </span>
-              <span className="flex-1">{opt}</span>
-            </button>
-          ))}
-          {error && (
-            <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-3 text-center">
-              <p className="text-red-300 text-xs">{error}</p>
-            </div>
-          )}
-          {evaluating && (
-            <div className="flex items-center justify-center gap-2 py-2">
-              <span className="w-4 h-4 border-2 border-mint border-t-transparent rounded-full animate-spin" />
-              <span className="text-xs text-slate-400">جاري التصحيح...</span>
-            </div>
-          )}
-        </div>
-      )
-    }
-    return (
-      <div className="space-y-3">
-        <div className={`rounded-2xl p-5 border ${qcmResult.correct ? "bg-emerald-500/10 border-emerald-500/30" : "bg-red-500/10 border-red-500/30"}`}>
-          <div className="flex items-center justify-between mb-3">
-            <span className={`text-2xl font-bold ${qcmResult.correct ? "text-emerald-400" : "text-red-400"}`}>
-              {qcmResult.correct ? "✅ إجابة صحيحة" : "❌ إجابة خاطئة"}
-            </span>
-            <span className={`text-sm font-bold ${qcmResult.correct ? "text-emerald-400" : "text-red-400"}`}>
-              {qcmResult.score}/10
-            </span>
-          </div>
-          {current.options?.map((opt, idx) => {
-            const isCorrect = idx === qcmResult.correct_idx
-            const isSelected = idx === qcmResult.selected_idx
-            return (
-              <div key={idx} className={`flex items-center gap-3 p-2.5 rounded-lg mb-1.5 text-sm ${isCorrect ? "bg-emerald-500/15 text-emerald-200" : isSelected ? "bg-red-500/15 text-red-200" : "text-slate-400"}`}>
-                <span className="w-6 h-6 rounded-full bg-slate-800 flex items-center justify-center text-[10px] font-bold">{["أ", "ب", "ج", "د"][idx]}</span>
-                <span className="flex-1">{opt}</span>
-                {isCorrect && <span>✓</span>}
-                {isSelected && !isCorrect && <span>✗</span>}
-              </div>
-            )
-          })}
-          {qcmResult.explanation && (
-            <p className="text-xs text-slate-400 mt-3 pt-3 border-t border-slate-800/50 leading-relaxed">💡 {qcmResult.explanation}</p>
-          )}
-          {qcmResult.next_review_date && (
-            <p className="text-[11px] text-slate-500 mt-2">📅 المراجعة القادمة: {new Date(qcmResult.next_review_date).toLocaleDateString("ar")}</p>
-          )}
-        </div>
-        <button onClick={handleNext} className="w-full py-3.5 bg-mint text-slate-deep rounded-xl font-bold hover:bg-mint-soft transition">
-          {currentIdx + 1 >= cards.length ? "إنهاء الجلسة" : "السؤال التالي ←"}
-        </button>
-      </div>
-    )
-  }
-
-  function renderOpen() {
-    if (!evalResult) {
-      return (
-        <div className="space-y-3">
-          <textarea value={answer} onChange={(e) => setAnswer(e.target.value)} placeholder="اكتب إجابتك هنا..." disabled={evaluating} rows={5} dir="rtl" className="w-full bg-slate-900/70 border border-slate-800 rounded-2xl p-4 text-white text-sm leading-relaxed resize-none focus:outline-none focus:border-mint/50 transition placeholder:text-slate-600 disabled:opacity-50" />
-          {error && (
-            <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-3 text-center">
-              <p className="text-red-300 text-xs mb-2">{error}</p>
-              <button onClick={() => setError(null)} className="px-4 py-1.5 bg-red-500/20 text-red-200 rounded-lg text-xs font-bold hover:bg-red-500/30 transition">إعادة المحاولة</button>
-            </div>
-          )}
-          <button onClick={handleSubmitAnswer} disabled={evaluating || !answer.trim()} className="w-full py-3.5 bg-gradient-to-r from-mint to-emerald-400 text-slate-deep rounded-xl font-bold hover:opacity-95 transition disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2">
-            {evaluating ? (<><span className="w-4 h-4 border-2 border-slate-deep border-t-transparent rounded-full animate-spin" />جاري التصحيح بالذكاء الاصطناعي...</>) : ("صحّح إجابتي")}
-          </button>
-        </div>
-      )
-    }
-    return (
-      <div className="space-y-4">
-        <div className="bg-slate-900/70 border border-slate-800 rounded-2xl p-5 space-y-3">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-xs text-slate-500 mb-0.5">النتيجة</p>
-              <p className={`text-3xl font-bold ${currentStatut?.color}`}>{evalResult.score}<span className="text-lg text-slate-500">/10</span></p>
-            </div>
-            <span className={`text-sm font-bold ${currentStatut?.color}`}>{currentStatut?.ar}</span>
-          </div>
-          {evalResult.feedback && (<div className="bg-slate-950/50 rounded-xl p-3 border border-slate-800/50"><p className="text-sm text-slate-300 leading-relaxed">{evalResult.feedback}</p></div>)}
-          {evalResult.manquant.length > 0 && (
-            <div className="flex flex-wrap gap-2">
-              <span className="text-xs text-slate-500">ناقص:</span>
-              {evalResult.manquant.map((m, i) => (<span key={i} className="text-[10px] px-2 py-0.5 rounded-full bg-red-500/10 text-red-300 border border-red-500/20">{m}</span>))}
-            </div>
-          )}
-          {evalResult.next_review_date && (<p className="text-[11px] text-slate-500 pt-2 border-t border-slate-800/50">📅 المراجعة القادمة: {new Date(evalResult.next_review_date).toLocaleDateString("ar")}</p>)}
-        </div>
-        <button onClick={handleNext} className="w-full py-3.5 bg-mint text-slate-deep rounded-xl font-bold hover:bg-mint-soft transition">
-          {currentIdx + 1 >= cards.length ? "إنهاء الجلسة" : "السؤال التالي ←"}
-        </button>
       </div>
     )
   }
@@ -338,26 +60,63 @@ function DrillContent() {
   return (
     <div className="min-h-screen bg-slate-deep text-white" dir="rtl">
       <header className="sticky top-0 z-50 bg-slate-950/80 backdrop-blur border-b border-slate-800/50 px-6 py-4 flex items-center justify-between">
-        <Link href="/dashboard" className="text-mint hover:text-mint-soft transition text-sm">{UI_AR.retour_dashboard}</Link>
-        <h1 className="text-lg font-bold bg-gradient-to-r from-mint to-emerald-400 bg-clip-text text-transparent">{UI_AR.session_drill}</h1>
-        <div className="flex items-center gap-2 text-sm text-slate-400"><span>{currentIdx + 1}</span><span>/</span><span>{cards.length}</span></div>
+        <Link href="/dashboard" className="text-mint hover:text-mint-soft transition text-sm">
+          {UI_AR.retour_dashboard}
+        </Link>
+        <h1 className="text-lg font-bold bg-gradient-to-r from-mint to-emerald-400 bg-clip-text text-transparent">
+          مراجعة سريعة
+        </h1>
+        <div className="w-8" />
       </header>
-      <main className="max-w-lg mx-auto px-4 pt-12 pb-8">
-        <div className="w-full h-1.5 bg-slate-800 rounded-full mb-8 overflow-hidden">
-          <div className="h-full bg-gradient-to-r from-mint to-emerald-300 rounded-full transition-all duration-500" style={{ width: `${((currentIdx + 1) / cards.length) * 100}%` }} />
+
+      <main className="max-w-3xl mx-auto px-4 pt-8 pb-12">
+        <div className="text-center mb-10">
+          <div className="text-5xl mb-3">⚡</div>
+          <h2 className="text-2xl font-bold text-white mb-2">اختر وحدة للمراجعة السريعة</h2>
+          <p className="text-slate-400 text-sm">
+            {units.reduce((s, u) => s + u.qcm_count, 0)} سؤال اختيار من متعدد جاهز · 100% مطابق للبرنامج الرسمي
+          </p>
         </div>
-        <div className="relative mb-6">
-          <div className="bg-slate-900/70 border border-slate-800 rounded-2xl p-6 min-h-[140px] flex flex-col justify-center">
-            {current.texte_ar ? (<p className="text-xl font-bold text-white leading-relaxed">{current.texte_ar}</p>) : current.texte ? (<p className="text-lg text-slate-200 leading-relaxed font-medium">{current.texte}</p>) : (<p className="text-lg text-slate-400">{current.concept_id || current.id}</p>)}
-            {current.chapter && (<p className="text-slate-500 text-xs mt-3 pt-3 border-t border-slate-800">الفصل: {trAr(current.chapter)}</p>)}
-          </div>
+
+        <div className="space-y-8">
+          {Object.entries(domains).map(([domain, domUnits]) => {
+            const style = DOMAIN_STYLES[domain] || DEFAULT_STYLE
+            return (
+              <div key={domain}>
+                <h3 className={`text-sm font-bold mb-3 ${style.text}`}>
+                  {style.emoji} {domain}
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {domUnits.map((u) => (
+                    <Link
+                      key={u.id}
+                      href={`/drill/${u.id}`}
+                      className={`block ${style.bg} border ${style.border} rounded-2xl p-4 transition hover:scale-[1.02]`}
+                    >
+                      <div className="flex items-start justify-between mb-2">
+                        <h4 className="text-white font-bold text-sm leading-snug flex-1">{u.unit_ar}</h4>
+                      </div>
+                      <div className="flex items-center gap-2 text-xs">
+                        <span className={`${style.text} font-bold`}>{u.qcm_count} سؤال</span>
+                        <span className="text-slate-500">·</span>
+                        <span className="text-slate-500">QCM</span>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )
+          })}
         </div>
-        {current.kind === "qcm" ? renderQcm() : renderOpen()}
       </main>
     </div>
   )
 }
 
 export default function DrillPage() {
-  return (<AuthGuard><DrillContent /></AuthGuard>)
+  return (
+    <AuthGuard>
+      <DrillIndexContent />
+    </AuthGuard>
+  )
 }

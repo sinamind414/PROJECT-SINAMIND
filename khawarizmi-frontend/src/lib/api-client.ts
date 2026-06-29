@@ -380,11 +380,17 @@ class KhawarizmiApiClient {
 
   // ── Session / Drill ────────────────────────────
 
-  async getNextSession(maxCards = 5): Promise<{ session_queue: Record<string, unknown>[] }> {
+  async getNextSession(maxCards = 5, unitId?: string): Promise<{ session_queue: Record<string, unknown>[] }> {
     return this.request<{ session_queue: Record<string, unknown>[] }>("/api/session/next", {
       method: "POST",
-      body: JSON.stringify({ max_cards: maxCards })
+      body: JSON.stringify({ max_cards: maxCards, ...(unitId ? { unit_id: unitId } : {}) })
     })
+  }
+
+  async getDrillUnits(): Promise<{
+    units: Array<{ id: string; unit_ar: string; domain_ar: string; qcm_count: number }>
+  }> {
+    return this.request("/api/drill/units")
   }
 
   async getNextQuestion(): Promise<Record<string, unknown>> {
