@@ -17,6 +17,7 @@ class SessionNextRequest(BaseModel):
     max_cards: int | None = 5
     lang: str | None = "fr"
     exclude: list[str] | None = []
+    unit_id: str | None = None
 
 
 @router.post("/api/session/next", tags=["Session"])
@@ -30,6 +31,8 @@ async def get_next_session(
     des questions valides ( texte présent ) — exclut les concepts
     méthodologiques sans texte, nœuds mindmap nus, flashcards manuelles.
     Gère le cold start ( nouveaux utilisateurs ) via questions jamais vues.
+
+    Filtrage optionnel par unit_id ( u1..u11 ) : ne sert que les QCM de cette unité.
     """
     from services.drill_queue import build_drill_queue
 
@@ -39,8 +42,34 @@ async def get_next_session(
         max_cards=max_cards,
         db=db,
         exclude=req.exclude,
+        unit_id=req.unit_id,
     )
     return {"session_queue": queue}
+
+
+@router.get("/api/drill/units", tags=["Drill"])
+async def list_drill_units(current_user: dict = Depends(get_current_user)):
+    """Catalogue des 11 unités du programme pour l'index /drill."""
+    from services.units import get_units_catalog
+    from services.qcm_items import qcm_db
+
+    catalog = get_units_catalog()
+    counts: dict[str, int] = {}
+    for q in qcm_db.values():
+        uid = q.get("unit_id", "u_unknown")
+        counts[uid] = counts.get(uid, 0) + 1
+
+    return {
+        "units": [
+            {
+                "id": u["id"],
+                "unit_ar": u["unit_ar"],
+                "domain_ar": u["domain_ar"],
+                "qcm_count": counts.get(u["id"], 0),
+            }
+            for u in catalog
+        ]
+    }
 
 
 class SessionRandomRequest(BaseModel):

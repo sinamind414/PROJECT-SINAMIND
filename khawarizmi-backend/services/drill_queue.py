@@ -63,11 +63,14 @@ async def build_drill_queue(
     max_cards: int,
     db: AsyncSession,
     exclude: list[str] | None = None,
+    unit_id: str | None = None,
 ) -> list[dict]:
     """Construit la queue de drill : DUE ( due ) → NEW ( cold start ).
 
     Ordre : 1. questions FSRS échues déjà vues
-            2. questions jamais vues ( cold start )
+             2. questions jamais vues ( cold start )
+
+    Si unit_id est fourni ( u1..u11 ), ne sert QUE les QCM de cette unité.
 
     Retourne une liste de dicts au contrat attendu par le frontend :
       { question_id, texte, texte_ar, concept_cle, concept_cle_ar, chapter,
@@ -76,6 +79,15 @@ async def build_drill_queue(
     exclude_set = set(exclude or [])
     now = datetime.now(UTC)
     queue: list[dict] = []
+
+    # ── Source QCM : filtrer par unit_id si fourni ──
+    all_qcm = get_all_qcm_ids() if qcm_db else []
+    if unit_id:
+        all_qcm = [qid for qid in all_qcm if qcm_db[qid].get("unit_id") == unit_id]
+        if not all_qcm:
+            logger.warning(f"DRILL_QUEUE | user={user_id} unit={unit_id} AUCUN QCM")
+            return []
+        logger.info(f"DRILL_QUEUE | user={user_id} filtrage unit={unit_id} ({len(all_qcm)} QCM)")
 
     # ── Source de vérité : les questions valides dans questions_db ──
     valid_qids = [
@@ -126,31 +138,36 @@ async def build_drill_queue(
     # ── 2. MIX NEW ( open ) + QCM — citoyens de premier rang ( Phase 3 ) ──
     # Le QCM n'est PAS un bouche-trou : il est la moitié de la session rapide.
     # Les QCM sont auto-corrigés ( zéro IA, instantané ) — idéaux pour densifier.
+    # Si unit_id est fourni, ne servir QUE des QCM de cette unité.
     remaining = max_cards - len(queue)
     if remaining > 0:
-        new_candidates = [qid for qid in valid_qids if qid not in seen_qids]
-        all_qcm = get_all_qcm_ids() if qcm_db else []
         qcm_seen = set(fsrs_state.keys())
         qcm_candidates = [q for q in all_qcm if q not in qcm_seen and q not in exclude_set]
 
-        n_qcm_target = min(remaining // 2, len(qcm_candidates)) if qcm_candidates else 0
-        n_open_target = remaining - n_qcm_target
+        if unit_id:
+            n_qcm_target = min(remaining, len(qcm_candidates))
+            n_open_target = 0
+        else:
+            n_qcm_target = min(remaining // 2, len(qcm_candidates)) if qcm_candidates else 0
+            n_open_target = remaining - n_qcm_target
 
-        open_selected = random.sample(new_candidates, min(n_open_target, len(new_candidates)))
+        if n_open_target > 0:
+            new_candidates = [qid for qid in valid_qids if qid not in seen_qids]
+            open_selected = random.sample(new_candidates, min(n_open_target, len(new_candidates)))
+            for qid in open_selected:
+                q = get_question(qid)
+                if q:
+                    queue.append(_format_drill_item(qid, q, "NEW"))
+
         qcm_selected = random.sample(qcm_candidates, n_qcm_target) if n_qcm_target else []
-
-        for qid in open_selected:
-            q = get_question(qid)
-            if q:
-                queue.append(_format_drill_item(qid, q, "NEW"))
-
         for qid in qcm_selected:
             pub = {k: v for k, v in qcm_db[qid].items() if k != "correct_idx"}
             queue.append({
                 "question_id": qid,
                 "texte_ar": pub.get("question_ar", ""),
                 "concept_cle": pub.get("unit", ""),
-                "chapter": "",
+                "chapter": pub.get("domain_ar", ""),
+                "unit_ar": pub.get("unit_ar", ""),
                 "kind": "qcm",
                 "options": pub.get("options", []),
                 "explanation": pub.get("explanation", ""),

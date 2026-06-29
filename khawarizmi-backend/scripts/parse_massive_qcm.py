@@ -13,8 +13,12 @@ Pour le drill 100% QCM :
 
 import json
 import re
+import sys
 import unicodedata
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from services.units import normalize_unit as _normalize_unit
 
 SOURCE_PATH = Path(__file__).resolve().parent.parent / "data" / "courses" / "drills_svt_arabe_500_QCM_120_definitions_programme_joint.md"
 QCM_OUT = Path(__file__).resolve().parent.parent / "data" / "qcm_items.json"
@@ -247,6 +251,13 @@ def merge_and_save(new_qcm: list, new_defs: list):
             q["id"] = f"qcm_big_{len(merged_qcm) + 1:03d}"
             merged_qcm.append(q)
             added_qcm += 1
+
+    # Normaliser unit_id sur TOUS les QCM (finaux) en une passe
+    for q in merged_qcm:
+        norm_u = _normalize_unit(q.get("unit", ""))
+        q["unit_id"] = norm_u["unit_id"]
+        q["unit_ar"] = norm_u["unit_ar"]
+        q["domain_ar"] = norm_u["domain_ar"]
 
     QCM_OUT.write_text(json.dumps(merged_qcm, ensure_ascii=False, indent=2), encoding="utf-8")
     DEFS_OUT.write_text(json.dumps(merged_defs, ensure_ascii=False, indent=2), encoding="utf-8")
