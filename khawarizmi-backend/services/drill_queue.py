@@ -168,6 +168,7 @@ async def build_drill_queue(
         f"due={len([c for c in queue if c['type'] == 'DUE'])} "
         f"new={len([c for c in queue if c['type'] == 'NEW'])} "
         f"qcm={len([c for c in queue if c.get('kind') == 'qcm'])} "
+        f"definition={len([c for c in queue if c.get('kind') == 'definition'])} "
         f"total={len(queue)}"
     )
     return queue[:max_cards]
@@ -175,6 +176,7 @@ async def build_drill_queue(
 
 def _format_drill_item(qid: str, q: dict, item_type: str) -> dict:
     """Formate une question au contrat attendu par le frontend drill."""
+    kind = q.get("kind", "open")
     return {
         "question_id": qid,
         "texte": q.get("texte", ""),
@@ -185,4 +187,5 @@ def _format_drill_item(qid: str, q: dict, item_type: str) -> dict:
         "micro_concept_id": q.get("micro_concept_id", ""),
         "tentative": 1,
         "type": item_type,
+        "kind": kind,
     }

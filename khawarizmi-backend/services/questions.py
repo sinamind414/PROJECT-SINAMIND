@@ -103,6 +103,10 @@ def _is_question_usable(q: dict[str, Any]) -> bool:
         return False
     if text_value in {"-", "_", "..."}:
         return False
+    # Les cartes définition sont des prompts courts par design ( "عرّف: ..." )
+    # mais ont leur contenu dans reponse_attendue → pas de filtre non_ws.
+    if q.get("kind") == "definition":
+        return True
     # Filtrer les questions junk : contenu réel (non-whitespace) trop court
     # → OCR mal extrait, numéros de page seuls, titres sans contenu
     non_ws = len(text_value.replace("\n", "").replace("\r", "").replace(" ", "").replace("\t", ""))
