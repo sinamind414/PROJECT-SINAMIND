@@ -78,8 +78,10 @@ async def test_session_next_empty_when_no_concepts(client, auth_headers):
     Phase 1 : la logique a migré vers services.drill_queue qui lit
     questions_db. Le scénario 'vide' signifie maintenant 'aucune question
     valide dans questions_db' ( ex. base non ingérée ).
+    Les QCM (qcm_db) sont servis même si questions_db est vide.
     """
-    with patch("services.drill_queue.questions_db", {}):
+    with patch("services.drill_queue.questions_db", {}), \
+         patch("services.drill_queue.qcm_db", {}):
         resp = await client.post(
             "/api/session/next",
             json=_session_request(max_cards=10),

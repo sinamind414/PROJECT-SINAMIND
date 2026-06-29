@@ -89,51 +89,51 @@ async def build_drill_queue(
             return []
         logger.info(f"DRILL_QUEUE | user={user_id} filtrage unit={unit_id} ({len(all_qcm)} QCM)")
 
-    # ── Source de vérité : les questions valides dans questions_db ──
-    valid_qids = [
-        qid for qid, q in questions_db.items()
-        if _is_valid_drill_question(qid, q) and qid not in exclude_set
-    ]
-    if not valid_qids:
-        logger.warning(f"DRILL_QUEUE | user={user_id} AUCUNE question valide dans questions_db")
-        return []
-
-    # ── État FSRS de l'utilisateur, filtré par question_id valide ──
-    res_state = await db.execute(
-        text("""
-            SELECT micro_concept_id, due_date, stability, pending_real_evaluation
-            FROM mastery_micro_concepts
-            WHERE user_id = :uid
-        """),
-        {"uid": user_id},
-    )
+    # ── 1. DUE : questions échues (uniquement si PAS de filtrage unité) ──
+    # Quand unit_id est défini → 100% QCM, zéro question ouverte (textarea).
+    # Les QCM n'ont PAS de FSRS state dans questions_db, donc rien à rappeler.
     fsrs_state: dict[str, dict] = {}
-    for row in res_state.fetchall():
-        mc_id = row[0]
-        if mc_id in valid_qids:  # ne garder que les vraies questions
-            fsrs_state[mc_id] = {
-                "due_date": row[1],
-                "stability": row[2] or 0.0,
-                "pending": bool(row[3]),
-            }
+    seen_qids: set[str] = set()
 
-    seen_qids = set(fsrs_state.keys())
+    if not unit_id:
+        valid_qids = [
+            qid for qid, q in questions_db.items()
+            if _is_valid_drill_question(qid, q) and qid not in exclude_set
+        ]
 
-    # ── 1. DUE : questions échues, triées par stabilité ( + faible d'abord ) ──
-    due_qids = [
-        qid for qid, st in fsrs_state.items()
-        if st["pending"] or (st["due_date"] and st["due_date"] <= now)
-    ]
-    due_qids.sort(key=lambda qid: fsrs_state[qid]["stability"])
+        if valid_qids:
+            res_state = await db.execute(
+                text("""
+                    SELECT micro_concept_id, due_date, stability, pending_real_evaluation
+                    FROM mastery_micro_concepts
+                    WHERE user_id = :uid
+                """),
+                {"uid": user_id},
+            )
+            for row in res_state.fetchall():
+                mc_id = row[0]
+                if mc_id in valid_qids:
+                    fsrs_state[mc_id] = {
+                        "due_date": row[1],
+                        "stability": row[2] or 0.0,
+                        "pending": bool(row[3]),
+                    }
 
-    for qid in due_qids[:max_cards]:
-        q = get_question(qid)
-        if q:
-            queue.append(_format_drill_item(qid, q, "DUE"))
+            seen_qids = set(fsrs_state.keys())
+            due_qids = [
+                qid for qid, st in fsrs_state.items()
+                if st["pending"] or (st["due_date"] and st["due_date"] <= now)
+            ]
+            due_qids.sort(key=lambda qid: fsrs_state[qid]["stability"])
 
-    if len(queue) >= max_cards:
-        logger.info(f"DRILL_QUEUE | user={user_id} due={len(queue)} total={len(queue)}")
-        return queue[:max_cards]
+            for qid in due_qids[:max_cards]:
+                q = get_question(qid)
+                if q:
+                    queue.append(_format_drill_item(qid, q, "DUE"))
+
+            if len(queue) >= max_cards:
+                logger.info(f"DRILL_QUEUE | user={user_id} due={len(queue)} total={len(queue)}")
+                return queue[:max_cards]
 
     # ── 2. MIX NEW ( open ) + QCM — citoyens de premier rang ( Phase 3 ) ──
     # Le QCM n'est PAS un bouche-trou : il est la moitié de la session rapide.
