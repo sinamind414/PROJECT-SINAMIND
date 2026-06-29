@@ -5,13 +5,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from config import get_settings
 from prompts.free_chat_prompt import build_free_prompt, cards_for_mode
-from services.rag_service import rag_search, format_rag_context, source_cards
+from services.rag_service import rag_search, format_rag_context
 from services.llm import _call_with_fallback
 
 logger = logging.getLogger("khawarizmi.free_mode")
 
 
-def _fallback_response(text: str, mode: str, sources: list, source_rag: str | None, fallback: bool = False) -> dict:
+def _fallback_response(text: str, mode: str, fallback: bool = False) -> dict:
     return {
         "content": text,
         "mode": "free",
@@ -20,8 +20,6 @@ def _fallback_response(text: str, mode: str, sources: list, source_rag: str | No
         "from_cache": False,
         "fallback_active": fallback,
         "cards": cards_for_mode(mode),
-        "sources": sources,
-        "source_rag": source_rag,
     }
 
 
@@ -61,19 +59,17 @@ async def handle_free_chat(
 
     rag_chunks = await rag_search(db, message, chapter)
     rag_context = format_rag_context(rag_chunks)
-    sources = source_cards(rag_chunks)
-    source_rag = rag_chunks[0]["source"] if rag_chunks else None
 
     if openai_client is None:
         if rag_chunks:
             excerpt = rag_chunks[0]["content"][:250]
             return _fallback_response(
                 f"أنا في وضع احتياطي، لكن وجدت في القاعدة الرسمية ما يلي:\n\n• {excerpt}\n\nاكتب لي أي جزء لم تفهمه.",
-                mode, sources, source_rag, fallback=True,
+                mode, fallback=True,
             )
         return _fallback_response(
             "أنا متاح في وضع احتياطي. خدمة الذكاء الاصطناعي غير مفعلة.",
-            mode, sources, source_rag, fallback=True,
+            mode, fallback=True,
         )
 
     # P2 — RAG vide → refus ( AGENTS.md §3 : l'IA répond UNIQUEMENT à partir
@@ -85,7 +81,7 @@ async def handle_free_chat(
         return _fallback_response(
             "لم أجد هذه المعلومة في قاعدة الدروس الرسمية. "
             "راجع الكتاب المدرسي، أو أعد صياغة السؤال بشكل أدق. 📖",
-            mode, sources, source_rag, fallback=True,
+            mode, fallback=True,
         )
 
     system_prompt = build_free_prompt(lang, rag_context, user_message=message, tutor=(mode == "tutor"))
@@ -134,8 +130,6 @@ async def handle_free_chat(
             "from_cache": False,
             "fallback_active": False,
             "cards": cards_for_mode(mode),
-            "sources": sources,
-            "source_rag": source_rag,
         }
 
     except Exception as e:
@@ -145,4 +139,4 @@ async def handle_free_chat(
             if rag_chunks
             else "عذراً، أواجه صعوبة. حاول مرة أخرى 🙏"
         )
-        return _fallback_response(fallback_text, mode, sources, source_rag, fallback=True)
+        return _fallback_response(fallback_text, mode, fallback=True)

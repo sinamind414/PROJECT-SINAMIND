@@ -9,7 +9,6 @@ interface ChatMessageProps {
   message: DisplayMessage
   isLast: boolean
   onFeedback: (msgId: number, type: FeedbackType) => void
-  onCardClick: (action: string) => void
 }
 
 const FEEDBACK_LABELS: Record<FeedbackType, string> = {
@@ -20,14 +19,8 @@ const FEEDBACK_LABELS: Record<FeedbackType, string> = {
   quiz: "🧪 اختبرني",
 }
 
-export function ChatMessage({ message, isLast, onFeedback, onCardClick }: ChatMessageProps) {
+export function ChatMessage({ message, isLast, onFeedback }: ChatMessageProps) {
   const isUser = message.role === "user"
-
-  function handleCardAction(action: string) {
-    if (action && action !== "#") {
-      onCardClick(action)
-    }
-  }
 
   return (
     <div className="space-y-2" dir="rtl">
@@ -69,35 +62,6 @@ export function ChatMessage({ message, isLast, onFeedback, onCardClick }: ChatMe
           </p>
         )}
       </div>
-
-      {message.cartes && message.cartes.length > 0 && (
-        <div className="space-y-2 ml-8">
-          {message.cartes.map((card, i) => (
-            <button
-              key={i}
-              onClick={() => handleCardAction(card.action)}
-              className="w-full text-right rounded-xl p-3 transition-all hover:scale-[1.02]"
-              style={{
-                background: "linear-gradient(135deg, rgba(45,212,191,0.12), rgba(251,191,36,0.06))",
-                border: "1px solid rgba(45,212,191,0.2)",
-              }}
-            >
-              <div className="flex items-center justify-between gap-3">
-                <div className="flex-1 min-w-0">
-                  <p className="text-white font-bold text-sm truncate">{card.titre}</p>
-                  <p className="text-gray-400 text-xs truncate">{card.raison}</p>
-                </div>
-                <span
-                  className="px-3 py-1.5 rounded-lg text-xs font-bold flex-shrink-0"
-                  style={{ background: "#2DD4BF", color: "#0C151A" }}
-                >
-                  {card.bouton}
-                </span>
-              </div>
-            </button>
-          ))}
-        </div>
-      )}
 
       {!isUser && isLast && !message.feedbackGiven && (
         <FeedbackButtons

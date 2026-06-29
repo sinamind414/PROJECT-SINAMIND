@@ -12,14 +12,13 @@ const FEEDBACK_OPTIONS: { type: FeedbackType; emoji: string; label: string }[] =
   { type: "partial", emoji: "🤔", label: "نوعاً ما" },
   { type: "confused", emoji: "❌", label: "لم أفهم" },
   { type: "example", emoji: "💡", label: "مثال آخر" },
-  { type: "quiz", emoji: "🧪", label: "اختبرني" },
 ]
 
 export function FeedbackButtons({ onFeedback, disabled }: FeedbackButtonsProps) {
   return (
     <div className="flex flex-col items-center gap-1.5 mt-2" dir="rtl">
       <div className="flex gap-1.5 justify-center">
-        {FEEDBACK_OPTIONS.slice(0, 3).map((opt) => (
+        {FEEDBACK_OPTIONS.slice(0, 2).map((opt) => (
           <button
             key={opt.type}
             onClick={() => onFeedback(opt.type)}
@@ -36,7 +35,7 @@ export function FeedbackButtons({ onFeedback, disabled }: FeedbackButtonsProps) 
         ))}
       </div>
       <div className="flex gap-1.5 justify-center">
-        {FEEDBACK_OPTIONS.slice(3).map((opt) => (
+        {FEEDBACK_OPTIONS.slice(2).map((opt) => (
           <button
             key={opt.type}
             onClick={() => onFeedback(opt.type)}
