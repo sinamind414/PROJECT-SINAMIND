@@ -98,10 +98,10 @@ async def save_concept_updates(
         await db.execute(
             text("""
                 INSERT INTO mastery_micro_concepts
-                    (user_id, concept_id, chapter, due_date,
+                    (user_id, micro_concept_id, concept_id, chapter, due_date,
                      interval_jours, difficulty, stability, fsrs_state, pending_real_evaluation, updated_at)
                 VALUES
-                    (:user_id, :c_id, :chapter, :due,
+                    (:user_id, :c_id, :c_id, :chapter, :due,
                      :interval, :difficulty, :stability, CAST(:fsrs_state AS jsonb), :pending_eval, NOW())
                 ON CONFLICT (user_id, concept_id)
                 DO UPDATE SET

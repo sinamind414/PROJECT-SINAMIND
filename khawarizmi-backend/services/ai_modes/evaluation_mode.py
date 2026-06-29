@@ -92,8 +92,8 @@ async def handle_evaluation(req, user: dict, db: AsyncSession, openai_client):
         await db.execute(
             sa_text("""
                 INSERT INTO mastery_micro_concepts
-                    (user_id, concept_id, chapter, pending_real_evaluation, updated_at)
-                VALUES (:uid, :mc_id, :chapter, TRUE, NOW())
+                    (user_id, micro_concept_id, concept_id, chapter, pending_real_evaluation, updated_at)
+                VALUES (:uid, :mc_id, :mc_id, :chapter, TRUE, NOW())
                 ON CONFLICT (user_id, concept_id)
                 DO UPDATE SET pending_real_evaluation = TRUE, updated_at = NOW()
             """),
