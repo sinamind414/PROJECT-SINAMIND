@@ -107,8 +107,10 @@ async def apply_evaluation_to_fsrs(
     # Fallback L3 ou erreur totale : carte en attente ( Tag )
     await db.execute(
         text("""
-            INSERT INTO mastery_micro_concepts (user_id, concept_id, chapter, pending_real_evaluation, updated_at)
-            VALUES (:user_id, :mc_id, :chapter, TRUE, NOW())
+            INSERT INTO mastery_micro_concepts
+                (user_id, micro_concept_id, concept_id, chapter, pending_real_evaluation, updated_at)
+            VALUES
+                (:user_id, :mc_id, :mc_id, :chapter, TRUE, NOW())
             ON CONFLICT (user_id, concept_id)
             DO UPDATE SET pending_real_evaluation = TRUE, updated_at = NOW()
         """),
