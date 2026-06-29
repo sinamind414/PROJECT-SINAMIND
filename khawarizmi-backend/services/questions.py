@@ -97,11 +97,20 @@ except Exception as e:
 
 logger.info(f"📊 Total questions en mémoire : {len(questions_db)}")
 
+# Caractères OCR suspects : U+063B à U+063F sont des lettres arabes d'extension
+# pour langues minoritaires ( Ouïghour, Kazakh... ) — JAMAIS en arabe SVT
+# standard. Leur présence = corruption OCR garantie ( annales mal numérisées ).
+_OCR_SUSPECT_CHARS = frozenset(chr(c) for c in range(0x063B, 0x0640))
+
+
 def _is_question_usable(q: dict[str, Any]) -> bool:
     text_value = (q.get("texte_ar") or q.get("texte") or "").strip()
     if len(text_value) < 12:
         return False
     if text_value in {"-", "_", "..."}:
+        return False
+    # Rejeter les questions corrompues par OCR ( caractères arabes impossibles ).
+    if _OCR_SUSPECT_CHARS & set(text_value):
         return False
     # Les cartes définition sont des prompts courts par design ( "عرّف: ..." )
     # mais ont leur contenu dans reponse_attendue → pas de filtre non_ws.
