@@ -5,16 +5,10 @@ Dédouillonne les répétitions et génère deux JSON :
   - data/qcm_items.json ( fusionne avec les 50 existants )
   - data/micro_concepts.json ( fusionne avec les 208 existants )
 
-Le fichier source utilise un format riche :
-  QCM : **سN. question** [difficulté] / options أ/ب/ج/د / ✅ الإجابة: X / 💡 explication
-  Définitions type A : **تN. (النوع أ) التعريف:** «...» → ✅ الإجابة: terme
-  Définitions type B : **تN. (النوع ب) ...** → options + ✅ ( format QCM )
-  Définitions type C : **تN. (النوع ج) أكمل:** → ✅ الإجابة: complétion
-
 Pour le drill 100% QCM :
-  - Les QCM سN deviennent des QCM ( kind=qcm )
-  - Les définitions type A et C deviennent des cartes définition ( kind=definition )
-  - Les définitions type B deviennent des QCM ( elles ont déjà des options )
+  - Les QCM سN deviennent des QCM
+  - Les définitions ( تN type A, B, C ) deviennent TOUTES des QCM
+    "trouve le terme" ( génération automatique de distracteurs ).
 """
 
 import json
@@ -31,7 +25,6 @@ MAX_DEF_LEN = 400
 
 
 def norm(t: str) -> str:
-    """Normalise pour la déduplication."""
     nf = unicodedata.normalize("NFKD", t)
     t = "".join(c for c in nf if not unicodedata.combining(c))
     t = re.sub(r'[*#\-><=؟!.،؛:\[\]()"""«»\s]+', "", t)
@@ -125,7 +118,6 @@ def parse_file():
         def_parsed = parse_def_line(line)
         if def_parsed:
             num, question = def_parsed
-
             def_type = "unknown"
             if "النوع أ" in question or "ما المصطلح" in question:
                 def_type = "term"
@@ -135,7 +127,6 @@ def parse_file():
                 def_type = "fill"
 
             correct_idx, explanation = find_answer(lines, i)
-
             sig = norm(question)
             if sig in seen_defs:
                 i += 1
@@ -183,6 +174,46 @@ def parse_file():
     return qcm_items, def_items
 
 
+def generate_qcm_from_defs(def_items: list, existing_labels: list) -> list:
+    """Convertit les définitions en QCM 'trouve le terme'."""
+    import random
+
+    all_terms = []
+    for d in def_items:
+        t = d["label_ar"].strip()
+        if 1 < len(t) <= 40:
+            all_terms.append(t)
+    random.shuffle(all_terms)
+
+    qcm_from_defs = []
+    for d in def_items:
+        correct_term = d["label_ar"]
+        definition = d["definition_ar"]
+
+        definition = re.sub(r"\(النوع [أج]\s*—.*?\)\s*", "", definition).strip()
+        definition = definition.replace("التعريف:", "").replace("التعريف :", "").strip()
+        definition = definition.strip("*").strip("«»").strip()
+
+        distractors = [l for l in all_terms if l != correct_term][:3]
+        if len(distractors) < 3:
+            continue
+
+        options = [correct_term] + distractors
+        random.shuffle(options)
+        correct_idx = options.index(correct_term)
+
+        qcm_from_defs.append({
+            "question_ar": f"ما هو المصطلح العلمي المقابل للتعريف الآتي: «{definition}»؟",
+            "options": options,
+            "correct_idx": correct_idx,
+            "explanation": f"التعريف يطابق مصطلح: {correct_term}.",
+            "unit": d.get("unit", ""),
+            "source": "qcm_genere_from_definition",
+        })
+
+    return qcm_from_defs
+
+
 def merge_and_save(new_qcm: list, new_defs: list):
     existing_qcm = []
     if QCM_OUT.exists():
@@ -191,21 +222,8 @@ def merge_and_save(new_qcm: list, new_defs: list):
     if DEFS_OUT.exists():
         existing_defs = json.loads(DEFS_OUT.read_text(encoding="utf-8"))
 
-    ex_qcm_sigs = set(norm(q["question_ar"]) for q in existing_qcm)
     ex_def_sigs = set(norm(d.get("label_ar", "") + d.get("definition_ar", "")) for d in existing_defs)
-
-    merged_qcm = list(existing_qcm)
-    added_qcm = 0
-    for q in new_qcm:
-        sig = norm(q["question_ar"])
-        if sig not in ex_qcm_sigs:
-            ex_qcm_sigs.add(sig)
-            q["id"] = f"qcm_big_{len(merged_qcm) + 1:03d}"
-            merged_qcm.append(q)
-            added_qcm += 1
-
     merged_defs = list(existing_defs)
-    added_defs = 0
     for d in new_defs:
         sig = norm(d.get("label_ar", "") + d.get("definition_ar", ""))
         if sig not in ex_def_sigs:
@@ -213,29 +231,41 @@ def merge_and_save(new_qcm: list, new_defs: list):
             d["id"] = f"mcd_big_{len(merged_defs) + 1:03d}"
             d["domain"] = ""
             merged_defs.append(d)
-            added_defs += 1
+
+    all_existing_labels = [d.get("label_ar", "") for d in merged_defs if d.get("label_ar")]
+    qcm_from_defs = generate_qcm_from_defs(new_defs, all_existing_labels)
+
+    all_new_qcm = new_qcm + qcm_from_defs
+    ex_qcm_sigs = set(norm(q["question_ar"]) for q in existing_qcm)
+
+    merged_qcm = list(existing_qcm)
+    added_qcm = 0
+    for q in all_new_qcm:
+        sig = norm(q["question_ar"])
+        if sig not in ex_qcm_sigs:
+            ex_qcm_sigs.add(sig)
+            q["id"] = f"qcm_big_{len(merged_qcm) + 1:03d}"
+            merged_qcm.append(q)
+            added_qcm += 1
 
     QCM_OUT.write_text(json.dumps(merged_qcm, ensure_ascii=False, indent=2), encoding="utf-8")
     DEFS_OUT.write_text(json.dumps(merged_defs, ensure_ascii=False, indent=2), encoding="utf-8")
 
-    return len(existing_qcm), added_qcm, len(merged_qcm), len(existing_defs), added_defs, len(merged_defs)
+    return len(existing_qcm), added_qcm, len(merged_qcm), len(existing_defs), len(merged_defs)
 
 
 def main():
     new_qcm, new_defs = parse_file()
-    print(f"Parsé : {len(new_qcm)} QCM uniques, {len(new_defs)} defs uniques")
-
-    ex_q, add_q, tot_q, ex_d, add_d, tot_d = merge_and_save(new_qcm, new_defs)
-
-    print(f"\n=== QCM ===")
+    print(f"Parsé : {len(new_qcm)} QCM originaux, {len(new_defs)} defs à convertir")
+    ex_q, add_q, tot_q, ex_d, tot_d = merge_and_save(new_qcm, new_defs)
+    print(f"\n=== QCM ( 100% clic, zéro écriture ) ===")
     print(f"  Existant : {ex_q}")
     print(f"  Ajouté : {add_q}")
     print(f"  Total : {tot_q}")
-    print(f"\n=== Définitions ===")
+    print(f"\n=== Définitions ( source ) ===")
     print(f"  Existant : {ex_d}")
-    print(f"  Ajouté : {add_d}")
     print(f"  Total : {tot_d}")
-    print(f"\n=== GRAND TOTAL drill : {tot_q + tot_d} items ===")
+    print(f"\n=== GRAND TOTAL drill : {tot_q} QCM ===")
 
 
 if __name__ == "__main__":

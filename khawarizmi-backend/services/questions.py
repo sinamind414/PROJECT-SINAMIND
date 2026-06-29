@@ -151,16 +151,18 @@ logger.info(
     f"(filtrées: {_total_before_filter - _total_after_filter})"
 )
 
-# --- Injection des cartes définition (46 cartes) ---
-from services.definition_cards import load_definition_cards
-_definition_cards = load_definition_cards()
-for card in _definition_cards:
-    qid = card["question_id"]
-    if qid in questions_db:
-        logger.warning(f"Collision question_id détectée (définition): {qid} → écrasé")
-    questions_db[qid] = card
-
-logger.info(f"📚 {len(_definition_cards)} cartes définition injectées dans questions_db")
+# --- Cartes définition -------------------------------------------------
+# Désactivé : les définitions sont maintenant converties en QCM (trouve le terme)
+# par scripts/parse_massive_qcm.py (100% clic, zéro écriture, cf cahier des charges).
+# from services.definition_cards import load_definition_cards
+# _definition_cards = load_definition_cards()
+# for card in _definition_cards:
+#     qid = card["question_id"]
+#     if qid in questions_db:
+#         logger.warning(f"Collision question_id détectée (définition): {qid} → écrasé")
+#     questions_db[qid] = card
+#
+# logger.info(f"📚 {len(_definition_cards)} cartes définition injectées dans questions_db")
 
 
 def get_question(question_id: str) -> dict[str, Any] | None:
