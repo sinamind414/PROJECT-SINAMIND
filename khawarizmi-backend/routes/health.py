@@ -1,12 +1,15 @@
 # routes/health.py
 # Khawarizmi Pro — Endpoint de santé
 
+import logging
 from datetime import UTC, datetime
 
 from fastapi import APIRouter
 from sqlalchemy import text
 
 from config import get_settings
+
+logger = logging.getLogger("khawarizmi.health")
 
 router = APIRouter()
 
@@ -29,15 +32,15 @@ async def health_check():
             async with s.db_session() as db:
                 await db.execute(text("SELECT 1"))
             db_ok = True
-        except Exception:
-            pass
+        except Exception as e:
+            logger.warning(f"Health check DB failed: {e}")
 
     if s.redis:
         try:
             await s.redis.ping()
             redis_ok = True
-        except Exception:
-            pass
+        except Exception as e:
+            logger.warning(f"Health check Redis failed: {e}")
 
     now = datetime.now(UTC)
     backup_info = _check_backup_status()
@@ -106,7 +109,7 @@ def _check_backup_status():
 async def data_foundation_debug():
     """Endpoint de debug pour voir l'état des données canoniques vs legacy."""
     s = _get_state()
-    foundation = {"timestamp": "2026-06-20"}
+    foundation = {"timestamp": datetime.now(UTC).isoformat()}
     try:
         if s.tutor and hasattr(s.tutor, "loader"):
             foundation["data"] = s.tutor.loader.get_data_foundation_report()
