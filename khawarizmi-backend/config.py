@@ -56,6 +56,11 @@ class Settings(BaseSettings):
     zenmux_base_url: str = "https://zenmux.ai/api/v1"
     zenmux_model: str = "z-ai/glm-5.2-free"
 
+    # ── NaraRouter (proxy OpenAI-compatible) ────────────────────
+    NARA_API_KEY: str = ""
+    nara_base_url: str = "https://router.bynara.id/v1"
+    nara_model: str = "deepseek-v4-flash"
+
     SENTRY_DSN: str = ""
 
     ALLOWED_ORIGINS: str = ""

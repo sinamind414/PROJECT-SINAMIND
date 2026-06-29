@@ -7,7 +7,9 @@ CHAÎNE DE FALLBACK (dans l'ordre) :
 2. Gemini 2.5 Flash (GEMINI_API_KEY) — 15 req/min gratuites
 3. Cloudflare GLM-5.2 (CLOUDFLARE_API_TOKEN) — 10K neurons/jour
 4. Z.AI GLM-4.7 (ZAI_API_KEY)
-5. OpenAI gpt-4o-mini (OPENAI_FALLBACK_API_KEY ou REAL_OPENAI_API_KEY)
+5. ZenMux GLM-5.2 (ZENMUX_API_KEY)
+6. NaraRouter (NARA_API_KEY) — proxy OpenAI-compatible, 5M tokens/jour gratuit
+7. OpenAI gpt-4o-mini (OPENAI_FALLBACK_API_KEY ou REAL_OPENAI_API_KEY)
 
 Un fallback ne se déclenche QUE sur rate limit (429/quota).
 Les erreurs réseau/non-429 remontent directement.
@@ -77,6 +79,13 @@ async def _call_with_fallback(
             "ZenMux GLM-5.2",
             AsyncOpenAI(api_key=cfg.ZENMUX_API_KEY, base_url=cfg.zenmux_base_url),
             cfg.zenmux_model,
+        ))
+
+    if cfg.NARA_API_KEY:
+        providers.append((
+            "NaraRouter",
+            AsyncOpenAI(api_key=cfg.NARA_API_KEY, base_url=cfg.nara_base_url),
+            cfg.nara_model,
         ))
 
     fallback_key = cfg.OPENAI_FALLBACK_API_KEY or cfg.REAL_OPENAI_API_KEY
