@@ -8,7 +8,7 @@
   --color-mint-soft: #5EEAD4;
   --color-orange: #F59E0B;
   --color-orange-soft: #FBBF24;
-  --font-arabic: 'Cairo', 'Tajawal', sans-serif;
+  --font-arabic: var(--font-cairo), sans-serif;
 }
 
 :root {
@@ -24,7 +24,7 @@ body {
   margin: 0;
   background-color: #0C151A;
   color: #E6F2EF;
-  font-family: 'Cairo', 'Tajawal', sans-serif;
+  font-family: var(--font-cairo), sans-serif;
   direction: rtl;
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;

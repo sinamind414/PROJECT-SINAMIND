@@ -37,6 +37,10 @@ function DrillContent() {
   const [submitting, setSubmitting] = useState(false)
   const [done, setDone] = useState(false)
   const [stats, setStats] = useState({ correct: 0, hard: 0, again: 0, total: 0 })
+  // Bug "carte figée" : le catch {} vide avalait toute erreur de submitDrillResult
+  // → setRevealed(false)/setCurrentIdx jamais appelés → carte bloquée sans feedback.
+  // Maintenant l'erreur est affichée + bouton réessayer ( ne fige plus ).
+  const [error, setError] = useState<string | null>(null)
 
   function ratingToPercent(rating: Rating): number {
     return { 1: 20, 2: 40, 3: 70, 4: 95 }[rating]
@@ -70,6 +74,7 @@ function DrillContent() {
   const handleRate = useCallback(async (rating: Rating) => {
     if (!current || submitting) return
     setSubmitting(true)
+    setError(null)
     try {
       await apiClient.submitDrillResult(current.id, ratingToPercent(rating))
       setStats((prev) => ({
@@ -85,8 +90,10 @@ function DrillContent() {
       } else {
         setCurrentIdx((i) => i + 1)
       }
-    } catch {
-      //
+    } catch (err) {
+      // AVANT : catch {} vide → la carte restait figée, aucune suite, aucun message.
+      // MAINTENANT : l'erreur est révélée à l'élève + bouton réessayer.
+      setError(err instanceof Error ? err.message : "تعذّر حفظ النتيجة. حاول مجدداً.")
     } finally {
       setSubmitting(false)
     }
@@ -243,27 +250,40 @@ function DrillContent() {
 
         {/* Rating buttons */}
         {revealed && (
-          <div className="grid grid-cols-4 gap-3">
-            {([1, 2, 3, 4] as Rating[]).map((rating) => {
-              const r = RATING_LABELS[rating]
-              const colors: Record<string, string> = {
-                red: "from-red-600 to-red-700 hover:from-red-500",
-                orange: "from-orange-600 to-orange-700 hover:from-orange-500",
-                blue: "from-blue-600 to-blue-700 hover:from-blue-500",
-                green: "from-emerald-600 to-emerald-700 hover:from-emerald-500",
-              }
-              return (
+          <div className="space-y-3">
+            {error && (
+              <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-3 text-center">
+                <p className="text-red-300 text-xs mb-2">{error}</p>
                 <button
-                  key={rating}
-                  onClick={() => handleRate(rating)}
-                  disabled={submitting}
-                  className={`py-3 px-2 rounded-xl bg-gradient-to-b ${colors[r.color]} text-white text-center transition disabled:opacity-50`}
+                  onClick={() => setError(null)}
+                  className="px-4 py-1.5 bg-red-500/20 text-red-200 rounded-lg text-xs font-bold hover:bg-red-500/30 transition"
                 >
-                  <div className="text-xs font-bold">{r.label}</div>
-                  <div className="text-[9px] opacity-70 mt-0.5">{r.desc}</div>
+                  إعادة المحاولة
                 </button>
-              )
-            })}
+              </div>
+            )}
+            <div className="grid grid-cols-4 gap-3">
+              {([1, 2, 3, 4] as Rating[]).map((rating) => {
+                const r = RATING_LABELS[rating]
+                const colors: Record<string, string> = {
+                  red: "from-red-600 to-red-700 hover:from-red-500",
+                  orange: "from-orange-600 to-orange-700 hover:from-orange-500",
+                  blue: "from-blue-600 to-blue-700 hover:from-blue-500",
+                  green: "from-emerald-600 to-emerald-700 hover:from-emerald-500",
+                }
+                return (
+                  <button
+                    key={rating}
+                    onClick={() => handleRate(rating)}
+                    disabled={submitting}
+                    className={`py-3 px-2 rounded-xl bg-gradient-to-b ${colors[r.color]} text-white text-center transition disabled:opacity-50`}
+                  >
+                    <div className="text-xs font-bold">{r.label}</div>
+                    <div className="text-[9px] opacity-70 mt-0.5">{r.desc}</div>
+                  </button>
+                )
+              })}
+            </div>
           </div>
         )}
       </main>

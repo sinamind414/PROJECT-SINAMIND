@@ -118,7 +118,7 @@ async def lifespan(app: FastAPI):
             state.db_engine = create_async_engine(db_url, pool_size=10, max_overflow=20, pool_pre_ping=True)
             state.db_session = async_sessionmaker(state.db_engine, class_=AsyncSession, expire_on_commit=False)
 
-            # Auto-migration : supprimer la FK qui bloque les inserts drill
+            # Auto-migrations : supprimer la FK + normaliser concept_id + élargir micro_concept_id
             async with state.db_engine.begin() as conn:
                 from sqlalchemy import text
                 await conn.execute(text(
@@ -131,7 +131,17 @@ async def lifespan(app: FastAPI):
                     "SET concept_id = micro_concept_id "
                     "WHERE concept_id IS NULL OR concept_id = ''"
                 ))
-            logger.info("Migration 013+014: FK dropped + concept_id normalized")
+                # Élargir micro_concept_id VARCHAR(50) → VARCHAR(200)
+                # Les question_ids composés (sujet:ex:q) atteignent 96 chars → overflow 500
+                await conn.execute(text(
+                    "ALTER TABLE mastery_micro_concepts "
+                    "ALTER COLUMN micro_concept_id TYPE VARCHAR(200)"
+                ))
+                await conn.execute(text(
+                    "ALTER TABLE lexique_termes "
+                    "ALTER COLUMN micro_concept_id TYPE VARCHAR(200)"
+                ))
+            logger.info("Migration 013+014+024: FK dropped + concept_id normalized + micro_concept_id widened to 200")
         except Exception as e:
             logger.error(f"PostgreSQL init error: {e}")
 
