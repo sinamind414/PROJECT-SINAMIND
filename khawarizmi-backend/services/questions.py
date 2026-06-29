@@ -21,6 +21,10 @@ _FIGURE_KEYWORDS = (
     "الوثيقة", "الشكل", "المنحنى", "التمثيل",
 )
 
+# Sources annales dont l'OCR est intégralement corrompu ( 100% garbled ).
+# Au lieu de filtrer question par question, on saute le sujet entier au chargement.
+_CORRUPTED_SOURCES = frozenset({"revision_605_questions"})
+
 
 def _text_references_figure(text: str) -> bool:
     """Détecte si le texte référence une figure/courbe/schéma non disponible."""
@@ -28,18 +32,41 @@ def _text_references_figure(text: str) -> bool:
     return any(kw in lower for kw in _FIGURE_KEYWORDS)
 
 
-# --- [QUARANTAINE] Annales classiques (134 questions) ---
-# Rapport du 29/06/2026 : 77% dégradé (47 RED + 24 YELLOW), 23% propre seulement.
-# La source est majoritairement corrompue — inutilisable pour le drill.
-# Voir analyse dans le channel pour la réhabilitation éventuelle.
-# Désactivé le 29/06/2026 sur décision produit.
-# try:
-#     with open(ANNALES_PATH, encoding="utf-8") as f:
-#         annales = json.load(f)
-#         ... (bloc entier commenté)
-# except Exception as e:
-#     logger.error(f"❌ Erreur lors du chargement des annales ({ANNALES_PATH}): {e}")
-logger.info("⏭️ Annales classiques désactivées (quarantaine)")
+# --- Chargement des annales classiques (134 questions) ---
+try:
+    with open(ANNALES_PATH, encoding="utf-8") as f:
+        annales = json.load(f)
+        _residuelles = 0
+        _filtrees_figure = 0
+        for sujet in annales:
+            # Les question_id bruts (ex. q_0) sont uniques PAR sujet/exercice
+            # mais PAS globalement → 31 questions écrasées silencieusement avant.
+            # On espace la clé : sujet_id:exercice_id:question_id (134 uniques).
+            sujet_id = sujet.get("sujet_id") or sujet.get("id") or "sujet"
+            if sujet_id in _CORRUPTED_SOURCES:
+                logger.info(f"📊 Sujet OCR corrompu ignoré: {sujet_id} ({sum(len(ex.get('questions', [])) for ex in sujet.get('exercices', []))} questions)")
+                continue
+            for _ex_idx, exercice in enumerate(sujet.get("exercices", [])):
+                ex_id = exercice.get("exercice_id") or f"ex{_ex_idx}"
+                for q in exercice.get("questions", []):
+                    raw_qid = q["question_id"]
+                    unique_qid = f"{sujet_id}:{ex_id}:{raw_qid}"
+                    q["question_id"] = unique_qid      # propager l'ID globalement unique
+                    q["question_id_orig"] = raw_qid    # tracer l'ID d'origine
+                    # Filtrer les questions qui référencent une figure absente
+                    if _text_references_figure(q.get("texte", "")):
+                        _filtrees_figure += 1
+                        continue
+                    if unique_qid in questions_db:
+                        _residuelles += 1
+                    questions_db[unique_qid] = q
+        if _residuelles:
+            logger.warning(f"{_residuelles} collisions résiduelles (clés composées non uniques)")
+        if _filtrees_figure:
+            logger.info(f"📊 {_filtrees_figure} questions filtrées (figure/courbe absente)")
+    logger.info(f"✅ {len(questions_db)} questions chargées depuis {ANNALES_PATH}")
+except Exception as e:
+    logger.error(f"❌ Erreur lors du chargement des annales ({ANNALES_PATH}): {e}")
 
 # --- Chargement des questions taggées OCR (234 questions) ---
 _count_before = len(questions_db)
