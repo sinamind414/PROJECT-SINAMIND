@@ -14,11 +14,26 @@ TAGGEES_PATH = os.path.join(_data_dir, "questions_taggees.json")
 
 questions_db: dict[str, Any] = {}
 
+# Mots-clés indiquant qu'une question nécessite une figure/courbe/schéma absent
+_FIGURE_KEYWORDS = (
+    "figure", "courbe", "schéma", "schema", "dessin", "graphique",
+    "document", "tableau", "وثيقة", "شكل", "منحنى", "تمثيل",
+    "الوثيقة", "الشكل", "المنحنى", "التمثيل",
+)
+
+
+def _text_references_figure(text: str) -> bool:
+    """Détecte si le texte référence une figure/courbe/schéma non disponible."""
+    lower = text.lower()
+    return any(kw in lower for kw in _FIGURE_KEYWORDS)
+
+
 # --- Chargement des annales classiques (134 questions) ---
 try:
     with open(ANNALES_PATH, encoding="utf-8") as f:
         annales = json.load(f)
         _residuelles = 0
+        _filtrees_figure = 0
         for sujet in annales:
             # Les question_id bruts (ex. q_0) sont uniques PAR sujet/exercice
             # mais PAS globalement → 31 questions écrasées silencieusement avant.
@@ -31,11 +46,17 @@ try:
                     unique_qid = f"{sujet_id}:{ex_id}:{raw_qid}"
                     q["question_id"] = unique_qid      # propager l'ID globalement unique
                     q["question_id_orig"] = raw_qid    # tracer l'ID d'origine
+                    # Filtrer les questions qui référencent une figure absente
+                    if _text_references_figure(q.get("texte", "")):
+                        _filtrees_figure += 1
+                        continue
                     if unique_qid in questions_db:
                         _residuelles += 1
                     questions_db[unique_qid] = q
         if _residuelles:
             logger.warning(f"{_residuelles} collisions résiduelles (clés composées non uniques)")
+        if _filtrees_figure:
+            logger.info(f"📊 {_filtrees_figure} questions filtrées (figure/courbe absente)")
     logger.info(f"✅ {len(questions_db)} questions chargées depuis {ANNALES_PATH}")
 except Exception as e:
     logger.error(f"❌ Erreur lors du chargement des annales ({ANNALES_PATH}): {e}")
@@ -81,6 +102,18 @@ def _is_question_usable(q: dict[str, Any]) -> bool:
     if len(text_value) < 12:
         return False
     if text_value in {"-", "_", "..."}:
+        return False
+    # Filtrer les questions junk : contenu réel (non-whitespace) trop court
+    # → OCR mal extrait, numéros de page seuls, titres sans contenu
+    non_ws = len(text_value.replace("\n", "").replace("\r", "").replace(" ", "").replace("\t", ""))
+    if non_ws < 30:
+        return False
+    # Filtrer les questions majoritairement vides (lignes vides > 70%)
+    lines = [l.strip() for l in text_value.split("\n") if l.strip()]
+    if not lines:
+        return False
+    non_empty_ratio = len("\n".join(lines)) / len(text_value) if len(text_value) > 0 else 0
+    if non_empty_ratio < 0.3:
         return False
     return True
 
