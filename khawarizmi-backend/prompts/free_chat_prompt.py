@@ -189,17 +189,18 @@ Chaque réponse doit être :
 # ═══════════════════════════════════════════════════════════════
 
 _FEYNMAN_TRIGGERS = [
+    # Requêtes EXPLICITES d'éclaircissement / analogie uniquement.
+    # ( retiré : "صعب", "أعد", "بسط" — substrings trop génériques qui
+    #   déclenchaient le mode analogie sur des plaintes ou des mots courants,
+    #   ex. "صعب عليّ", "أعدت المحاولة", "مبسوط" )
     "لم أفهم",
     "لا أفهم",
     "ما فهمتش",
     "اشرح بطريقة أخرى",
     "اشرح بطريقة مختلفة",
     "بسّط",
-    "بسط",
     "أعد الشرح",
-    "أعد",
     "مثال آخر",
-    "صعب",
     "اشرح بتشبيه",
     "أعطني تشبيه",
     "بطريقة بسيطة",
@@ -267,6 +268,7 @@ def build_free_prompt(
     lang: str,
     rag_context: str,
     user_message: str = "",
+    tutor: bool = False,
 ) -> str:
     """
     Construit le prompt système pour le mode free.
@@ -275,6 +277,7 @@ def build_free_prompt(
         lang: "ar" ou "fr"
         rag_context: contexte du manuel officiel (vide si non trouvé)
         user_message: message de l'élève (utilisé pour détecter le mode analogie)
+        tutor: si True, posture socratique (prof personnel) — guide par questions.
 
     Returns:
         Prompt système complet à envoyer au LLM.
@@ -303,6 +306,23 @@ def build_free_prompt(
             "ثم اربطه بالمصطلح الرسمي للبكالوريا.\n"
             "تجنب الأسلوب الطفولي — أنت تخاطب طالب بكالوريا.\n"
             "أنهِ بسؤال: 'هل وضحت الفكرة الآن؟'"
+        )
+
+    # Mode tutor (prof personnel socratique) : guider par questions, pas donner.
+    if tutor:
+        base += (
+            "\n\n═══════════════════════════════════════════════\n"
+            "🎓 وضع المدرّس الشخصي (سقراطي) مفعّل\n"
+            "═══════════════════════════════════════════════\n"
+            "الطالب فعّل وضع المدرّس الشخصي. علّمه خطوة بخطوة.\n\n"
+            "❌ ممنوع: إعطاء الجواب الكامل مباشرة.\n"
+            "✅ يجب:\n"
+            "• ابدأ بمعلومة صغيرة واحدة فقط (مفهوم واحد)\n"
+            "• ثم اسأل سؤالاً موجّهاً يدفع الطالب للاستنتاج بنفسه\n"
+            "• انتظر إجابته قبل المتابعة\n"
+            "• إذا تعثّر، أعطه تلميحاً (hint) وليس الحل\n"
+            "• تدرّج من البسيط إلى المركّب\n"
+            "• اجعل كل رسالة قصيرة جداً (3-5 أسطر) مرفقة بسؤال واحد فقط"
         )
 
     return base

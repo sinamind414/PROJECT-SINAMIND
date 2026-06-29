@@ -406,6 +406,55 @@ class KhawarizmiApiClient {
     })
   }
 
+  // Phase 2 — drill branché sur l'évaluation réelle ( remplace le self-rating ).
+  // L'élève tape sa réponse → /api/drill/submit → score IA + FSRS mis à jour.
+  async submitDrillAnswer(payload: {
+    question_id: string
+    reponse_eleve: string
+    tentative?: number
+    lang?: string
+  }): Promise<{
+    score: number
+    statut: string
+    feedback: string
+    manquant: string[]
+    next_review_date: string | null
+    source: string
+  }> {
+    return this.request("/api/drill/submit", {
+      method: "POST",
+      body: JSON.stringify({
+        question_id: payload.question_id,
+        reponse_eleve: payload.reponse_eleve,
+        tentative: payload.tentative ?? 1,
+        lang: payload.lang ?? "ar",
+      }),
+    })
+  }
+
+  // Phase 3 — drill QCM : correction locale instantanée ( zéro IA ).
+  async submitDrillQcm(payload: {
+    qcm_id: string
+    selected_idx: number
+  }): Promise<{
+    correct: boolean
+    correct_idx: number
+    correct_option: string
+    explanation: string
+    selected_idx: number
+    score: number
+    statut: string
+    next_review_date: string | null
+  }> {
+    return this.request("/api/drill/qcm/submit", {
+      method: "POST",
+      body: JSON.stringify({
+        qcm_id: payload.qcm_id,
+        selected_idx: payload.selected_idx,
+      }),
+    })
+  }
+
   // ── Annales ────────────────────────────────────
 
   async getAnnales(params?: {
@@ -453,6 +502,7 @@ class KhawarizmiApiClient {
   async sendTuteurMessage(payload: {
     message: string
     context?: { page_source?: string; history?: Array<{ role: string; content: string }> | string[]; chapitre?: string }
+    mode?: "free" | "quick" | "tutor"
   }): Promise<TuteurResponse> {
     if (payload.message === "__init__" || payload.message === "__activate_tutor__") {
       return {
@@ -484,7 +534,7 @@ class KhawarizmiApiClient {
       }>("/api/ai/chat", {
         method: "POST",
         body: JSON.stringify({
-          mode: "free",
+          mode: payload.mode || "free",
           ...chatbotPayload
         }),
       })
@@ -508,7 +558,7 @@ class KhawarizmiApiClient {
     context?: { page_source?: string; history?: Array<{ role: string; content: string }> | string[]; chapitre?: string }
     mode?: "quick" | "tutor"
   }): Promise<TuteurResponse> {
-    return this.sendTuteurMessage({ message: payload.message, context: payload.context })
+    return this.sendTuteurMessage({ message: payload.message, context: payload.context, mode: payload.mode })
   }
 
   async getChatbotState(): Promise<{

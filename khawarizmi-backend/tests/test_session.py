@@ -20,6 +20,32 @@ def _session_request(max_cards=5, lang="fr", exclude=None):
     }
 
 
+@pytest.mark.asyncio
+async def test_session_next_cold_start_serves_valid_questions(client, auth_headers):
+    """Phase 1 — cold start ( nouvel utilisateur, FSRS vide ) doit servir
+    des questions NEW valides, jamais de carte vide ni méthodologique.
+    C'est le fix du bug 'carte Methodologie - منهجية - النص-العلمي'."""
+    resp = await client.post(
+        "/api/session/next",
+        json=_session_request(max_cards=8),
+        headers=auth_headers,
+    )
+    assert resp.status_code == 200
+    data = resp.json()
+    queue = data["session_queue"]
+    assert len(queue) > 0, "cold start doit servir des questions NEW"
+
+    for item in queue:
+        # Aucune carte vide
+        texte = (item.get("texte_ar") or item.get("texte") or "").strip()
+        assert len(texte) >= 12, f"carte sans texte valide: {item.get('question_id')}"
+        # Aucune carte méthodologique ( le bug d'origine )
+        qid = item.get("question_id", "")
+        assert not qid.startswith("minhajiya_"), f"carte méthodologique servie: {qid}"
+        cc = item.get("concept_cle", "") or ""
+        assert "منهجية" not in cc and "Methodologie" not in cc, f"concept méthodologique: {cc}"
+
+
 # ── /api/session/next ───────────────────────────────────────────────
 
 
@@ -47,8 +73,13 @@ async def test_session_next_returns_session_queue_key(client, auth_headers):
 
 @pytest.mark.asyncio
 async def test_session_next_empty_when_no_concepts(client, auth_headers):
-    """Si aucune carte PENDING/DUE/NEW → queue vide (mais réponse OK)."""
-    with patch("routes.session.get_question", return_value=None):
+    """Si aucune question valide disponible → queue vide ( mais réponse OK ).
+
+    Phase 1 : la logique a migré vers services.drill_queue qui lit
+    questions_db. Le scénario 'vide' signifie maintenant 'aucune question
+    valide dans questions_db' ( ex. base non ingérée ).
+    """
+    with patch("services.drill_queue.questions_db", {}):
         resp = await client.post(
             "/api/session/next",
             json=_session_request(max_cards=10),

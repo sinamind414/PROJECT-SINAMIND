@@ -16,6 +16,7 @@ _CHAT_MODES = {
     "methodology": handle_guided_chat,
     "free": handle_free_chat,
     "quick": handle_free_chat,
+    "tutor": handle_free_chat,
 }
 
 

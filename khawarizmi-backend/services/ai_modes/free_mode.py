@@ -25,6 +25,26 @@ def _fallback_response(text: str, mode: str, sources: list, source_rag: str | No
     }
 
 
+def _is_greeting_or_meta(message: str) -> bool:
+    """True si c'est une salutation / remerciement / question d'identité,
+    PAS une demande de contenu SVT.
+
+    Exception AGENTS.md §3 : les messages de navigation/politesse restent
+    autorisés sans RAG ( le LLM sait se présenter / saluer ).
+    Une vraie question SVT sans contexte RAG → refus ( consulte le manuel ).
+    """
+    m = (message or "").lower().strip()
+    if not m:
+        return False
+    meta_triggers = [
+        "مرحبا", "السلام عليكم", "اهلا", "أهلا", "صباح الخير", "مساء الخير",
+        "شكرا", "شكراً", "مشكور", "بارك الله",
+        "من أنت", "من انت", "ما اسمك", "كيف حالك", "عرف بنفسك",
+        "hi", "hello", "bonjour", "salut", "merci", "thanks", "qui es",
+    ]
+    return any(k in m for k in meta_triggers)
+
+
 async def handle_free_chat(
     body,
     user: dict,
@@ -56,7 +76,19 @@ async def handle_free_chat(
             mode, sources, source_rag, fallback=True,
         )
 
-    system_prompt = build_free_prompt(lang, rag_context, user_message=message)
+    # P2 — RAG vide → refus ( AGENTS.md §3 : l'IA répond UNIQUEMENT à partir
+    # du contexte RAG fourni ). Avant : on appelait le LLM sans contexte cours
+    # → l'IA inventait des faits hors manuel ( hallucination ).
+    # Exception : salutations / questions d'identité laissées au LLM.
+    if not rag_chunks and not _is_greeting_or_meta(message):
+        logger.info(f"free | user={user['id']} RAG vide → refus AGENTS.md §3")
+        return _fallback_response(
+            "لم أجد هذه المعلومة في قاعدة الدروس الرسمية. "
+            "راجع الكتاب المدرسي، أو أعد صياغة السؤال بشكل أدق. 📖",
+            mode, sources, source_rag, fallback=True,
+        )
+
+    system_prompt = build_free_prompt(lang, rag_context, user_message=message, tutor=(mode == "tutor"))
     messages = [{"role": "system", "content": system_prompt}]
 
     for h in history[-6:]:
@@ -77,8 +109,14 @@ async def handle_free_chat(
         ai_text = (response.choices[0].message.content or "").strip()
         tokens = response.usage.total_tokens if response.usage else 0
 
-        if lang == "fr" and not any("\u0600" <= c <= "\u06ff" for c in ai_text[:50]):
-            ai_text = "عذراً، أعد صياغة سؤالك بالعربية من فضلك. 🇩🇿"
+        # P1 — Garde-fou langue : le chatbot est arabophone. Si la réponse de
+        # l'IA ne contient quasi aucun caractère arabe, c'est qu'elle a ignoré
+        # la consigne ( Groq/llama répond parfois en français ) → reformulation.
+        # Avant : la condition dépendait de lang=="fr", or le frontend envoie
+        # TOUJOURS lang="ar" → le garde-fou ne se déclenchait jamais.
+        arabic_chars = sum(1 for c in ai_text if "\u0600" <= c <= "\u06ff")
+        if ai_text and arabic_chars / len(ai_text) < 0.15:
+            ai_text = "عذراً، أُجيب دائماً بالعربية. أعد صياغة سؤالك من فضلك. 🇩🇿"
 
         try:
             from services.chatbot_engagement_service import record_chat_interaction

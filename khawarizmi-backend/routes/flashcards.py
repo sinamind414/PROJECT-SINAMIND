@@ -2,15 +2,15 @@ import json
 import logging
 from datetime import UTC, datetime, timedelta
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from fsrs import Card
 from fsrs import Rating as FsrsRating
 from fsrs import Scheduler as CardScheduler
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from deps import get_current_user, get_db, get_scheduler
-from schemas.flashcard import DrillRequest, FlashcardCreateRequest, FlashcardReviewRequest, ScheduleRequest
+from deps import get_current_user, get_db, get_openai, get_scheduler
+from schemas.flashcard import DrillRequest, DrillSubmitRequest, FlashcardCreateRequest, FlashcardReviewRequest, QcmSubmitRequest, ScheduleRequest
 
 logger = logging.getLogger("khawarizmi.api")
 router = APIRouter()
@@ -192,6 +192,147 @@ async def soumettre_resultat_drill(
         "lapses": new_card.lapses,
         "stability": new_card.stability,
         "difficulty": new_card.difficulty,
+    }
+
+
+# ── Phase 2 : drill branché sur l'évaluation réelle ───────────────
+# Remplace le self-rating. L'élève tape sa réponse → évaluation IA
+# ( réutilise evaluate_with_fallback ) → FSRS mis à jour via le MÊME
+# chemin que /api/evaluate ( apply_evaluation_to_fsrs ). Pas de 3e chemin FSRS.
+
+
+@router.post("/api/drill/submit", tags=["Drill"])
+async def soumettre_reponse_drill(
+    body: DrillSubmitRequest,
+    current_user: dict = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+    openai_client=Depends(get_openai),
+):
+    """Évalue la réponse de l'élève au drill et met à jour FSRS.
+
+    Réutilise le moteur d'évaluation complet ( GPT4O → L2 → L3 ) au lieu du
+    self-rating non fiable. FSRS planifie sur le score RÉEL.
+    """
+    from routes.evaluate import EvaluateRequest, evaluate_with_fallback
+    from services.evaluation_fsrs import apply_evaluation_to_fsrs
+    from services.evaluation_utils import normalize_result
+    from services.questions import get_question
+
+    user_id = current_user["id"]
+
+    question = get_question(body.question_id)
+    if not question:
+        raise HTTPException(status_code=404, detail=f"Question {body.question_id} introuvable")
+
+    # Construire une EvaluateRequest pour réutiliser evaluate_with_fallback tel quel
+    eval_req = EvaluateRequest(
+        question_id=body.question_id,
+        reponse_eleve=body.reponse_eleve,
+        tentative=body.tentative,
+        lang=body.lang,
+        include_methodology=False,  # le drill n'a pas besoin de l'éval méthodo lourde
+    )
+
+    eval_result = await evaluate_with_fallback(question, eval_req, openai_client, user_id, db)
+
+    # FSRS mis à jour via le MÊME chemin que /api/evaluate
+    next_review_date = await apply_evaluation_to_fsrs(
+        db=db,
+        user_id=user_id,
+        question_id=body.question_id,
+        reponse_eleve=body.reponse_eleve,
+        question=question,
+        eval_result=eval_result,
+    )
+
+    eval_result = normalize_result(eval_result)
+
+    # Traduire le feedback si arabe
+    if body.lang == "ar":
+        from services.feedback_translator import translate_feedback
+        eval_result["feedback"] = translate_feedback(eval_result.get("feedback", ""))
+
+    logger.info(
+        f"DRILL_SUBMIT | user={user_id} | q={body.question_id} | "
+        f"score={eval_result['score']} | source={eval_result['source']} | "
+        f"next_review={next_review_date}"
+    )
+
+    return {
+        "score": eval_result["score"],
+        "statut": eval_result["statut"],
+        "feedback": eval_result["feedback"],
+        "manquant": eval_result["manquant"],
+        "next_review_date": next_review_date,
+        "source": eval_result["source"],
+    }
+
+
+# ── Phase 3 : drill QCM ( auto-correction locale, zéro IA, instantané ) ──
+
+
+@router.post("/api/drill/qcm/submit", tags=["Drill"])
+async def soumettre_qcm_drill(
+    body: QcmSubmitRequest,
+    current_user: dict = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Corrige une réponse QCM localement et met à jour FSRS.
+
+    Pas d'appel IA : la bonne réponse est connue ( extraite du programme ).
+    Conversion correct/incorrect → score FSRS ( 10 ou 2 ).
+    """
+    from services.evaluation_fsrs import apply_evaluation_to_fsrs
+    from services.qcm_items import get_qcm
+
+    user_id = current_user["id"]
+
+    qcm = get_qcm(body.qcm_id)
+    if not qcm:
+        raise HTTPException(status_code=404, detail=f"QCM {body.qcm_id} introuvable")
+
+    correct_idx = qcm.get("correct_idx", -1)
+    is_correct = body.selected_idx == correct_idx
+
+    score = 10 if is_correct else 2
+    statut = "CORRECT" if is_correct else "FAUX"
+    eval_result = {
+        "score": score,
+        "statut": statut,
+        "source": "QCM_LOCAL",
+        "feedback": qcm.get("explanation", ""),
+        "manquant": [] if is_correct else [
+            qcm["options"][correct_idx] if correct_idx in (0, 1, 2, 3) else "—"
+        ],
+        "needs_l1_review": not is_correct,
+    }
+
+    next_review_date = await apply_evaluation_to_fsrs(
+        db=db,
+        user_id=user_id,
+        question_id=body.qcm_id,
+        reponse_eleve=str(body.selected_idx),
+        question={
+            "concept_cle": qcm.get("unit_slug", "qcm_general"),
+            "chapitre_id": qcm.get("unit_slug", ""),
+        },
+        eval_result=eval_result,
+    )
+
+    logger.info(
+        f"DRILL_QCM | user={user_id} | qcm={body.qcm_id} | "
+        f"correct={is_correct} | next_review={next_review_date}"
+    )
+
+    return {
+        "correct": is_correct,
+        "correct_idx": correct_idx,
+        "correct_option": qcm["options"][correct_idx] if correct_idx in (0, 1, 2, 3) else "",
+        "explanation": qcm.get("explanation", ""),
+        "selected_idx": body.selected_idx,
+        "score": score,
+        "statut": statut,
+        "next_review_date": next_review_date,
     }
 
 

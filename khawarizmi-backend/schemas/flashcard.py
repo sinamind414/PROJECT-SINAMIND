@@ -25,3 +25,17 @@ class FlashcardCreateRequest(BaseModel):
 
 class FlashcardReviewRequest(BaseModel):
     rating: Literal[1, 2, 3, 4]
+
+
+class DrillSubmitRequest(BaseModel):
+    """Phase 2 — drill : l'élève tape sa réponse, le moteur évalue pour de vrai."""
+    question_id: str = Field(..., min_length=2)
+    reponse_eleve: str = Field(..., min_length=1, max_length=10000)
+    tentative: int = 1
+    lang: str = "ar"
+
+
+class QcmSubmitRequest(BaseModel):
+    """Phase 3 — drill QCM : l'élève choisit une option, correction locale."""
+    qcm_id: str = Field(..., min_length=2)
+    selected_idx: int = Field(..., ge=0, le=3)

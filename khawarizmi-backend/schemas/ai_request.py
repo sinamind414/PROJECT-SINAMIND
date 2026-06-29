@@ -3,7 +3,7 @@ from typing import Literal
 
 
 class ChatOrchestratorRequest(BaseModel):
-    mode: Literal["guided", "free", "quick", "methodology"]
+    mode: Literal["guided", "free", "quick", "methodology", "tutor"]
     message: str
     lang: str = "ar"
     history: list[dict] = []
