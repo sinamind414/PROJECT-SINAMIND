@@ -607,56 +607,59 @@ def _build_default_racine(chapitre: str, matiere: str) -> dict:
 
 
 def _build_default_enfants(chapitre: str, matiere: str) -> list:
-    """Génère 3-5 enfants par défaut quand le LLM n'en produit pas."""
-    # Mapping de concepts SVT par chapitre → enfants par défaut
+    """Génère 3-5 enfants par défaut quand le LLM n'en produit pas.
+
+    Tous les labels sont en ARABE ( cahier des charges : interface arabophone ).
+    Alignés sur le programme national algérien SVT 3AS ( Protéines, Énergie,
+    Tectonique ) — pas de concepts hors-programme.
+    """
     _fallbacks = {
         "adn": [
-            {"label": "Structure de l'ADN", "type": "concept", "importance": "critique"},
-            {"label": "Réplication de l'ADN", "type": "processus", "importance": "haute"},
-            {"label": "Transcription", "type": "processus", "importance": "haute"},
-            {"label": "Code génétique", "type": "definition", "importance": "critique"},
-            {"label": "Mutations", "type": "concept", "importance": "moyenne"},
+            {"label": "بنية الـ ADN", "type": "concept", "importance": "critique"},
+            {"label": "تضاعف الـ ADN", "type": "processus", "importance": "haute"},
+            {"label": "الاستنساخ (Transcription)", "type": "processus", "importance": "haute"},
+            {"label": "الشفرة الوراثية", "type": "definition", "importance": "critique"},
+            {"label": "الطفرات", "type": "concept", "importance": "moyenne"},
         ],
         "photosynthese": [
-            {"label": "Phase lumineuse", "type": "processus", "importance": "critique"},
-            {"label": "Phase obscure (Calvin)", "type": "processus", "importance": "critique"},
-            {"label": "Bilan énergétique", "type": "definition", "importance": "haute"},
-            {"label": "Facteurs limitants", "type": "concept", "importance": "moyenne"},
-        ],
-        "genetique": [
-            {"label": "Mendélisme", "type": "concept", "importance": "critique"},
-            {"label": "Ségrégation allélique", "type": "processus", "importance": "haute"},
-            {"label": "Génétique quantitative", "type": "concept", "importance": "haute"},
-            {"label": "Hérédité liée au sexe", "type": "concept", "importance": "moyenne"},
+            {"label": "المرحلة الضوئية", "type": "processus", "importance": "critique"},
+            {"label": "المرحلة المعتمة (كالفن)", "type": "processus", "importance": "critique"},
+            {"label": "الحصيلة الطاقوية", "type": "definition", "importance": "haute"},
+            {"label": "العوامل المحددة", "type": "concept", "importance": "moyenne"},
         ],
         "immuno": [
-            {"label": "Immunité innée", "type": "concept", "importance": "critique"},
-            {"label": "Immunité adaptative", "type": "concept", "importance": "critique"},
-            {"label": "Vaccination", "type": "processus", "importance": "haute"},
-            {"label": "Déficits immunitaires", "type": "concept", "importance": "moyenne"},
+            {"label": "المناعة الطبيعية", "type": "concept", "importance": "critique"},
+            {"label": "المناعة المكتسبة", "type": "concept", "importance": "critique"},
+            {"label": "التعاون الخلوي", "type": "processus", "importance": "haute"},
+            {"label": "نقص المناعة (SIDA)", "type": "concept", "importance": "moyenne"},
         ],
-        "evolution": [
-            {"label": "Sélection naturelle", "type": "concept", "importance": "critique"},
-            {"label": "Dérive génétique", "type": "processus", "importance": "haute"},
-            {"label": "Spéciation", "type": "processus", "importance": "haute"},
-            {"label": "Fossiles et preuves", "type": "concept", "importance": "moyenne"},
+        "enzymes": [
+            {"label": "بنية الإنزيم", "type": "concept", "importance": "critique"},
+            {"label": "الموقع الفعال", "type": "definition", "importance": "critique"},
+            {"label": "تأثير الـ pH", "type": "processus", "importance": "haute"},
+            {"label": "تأثير الحرارة", "type": "processus", "importance": "haute"},
         ],
-        "meiose": [
-            {"label": "Division réductionnelle", "type": "processus", "importance": "critique"},
-            {"label": "Division équationnelle", "type": "processus", "importance": "haute"},
-            {"label": "Recombinaison", "type": "processus", "importance": "haute"},
-            {"label": "Gamétogenèse", "type": "processus", "importance": "moyenne"},
+        "respiration": [
+            {"label": "التحلل السكري", "type": "processus", "importance": "critique"},
+            {"label": "دورة كريبس", "type": "processus", "importance": "haute"},
+            {"label": "الفسفرة التأكسدية", "type": "processus", "importance": "critique"},
+            {"label": "الحصيلة الطاقوية", "type": "definition", "importance": "haute"},
+        ],
+        "tectonique": [
+            {"label": "الصفائح التكتونية", "type": "concept", "importance": "critique"},
+            {"label": "التيارات الحملية", "type": "processus", "importance": "haute"},
+            {"label": "الغوص (Subduction)", "type": "processus", "importance": "critique"},
+            {"label": "التصادم القاري", "type": "processus", "importance": "haute"},
         ],
     }
     key = chapitre.lower().strip()
     concepts = _fallbacks.get(key)
     if not concepts:
-        # Fallback générique : 4 enfants standard
         concepts = [
-            {"label": "Définitions", "type": "definition", "importance": "haute"},
-            {"label": "Mécanismes", "type": "processus", "importance": "critique"},
-            {"label": "Applications", "type": "concept", "importance": "haute"},
-            {"label": "Points clés Bac", "type": "concept", "importance": "critique"},
+            {"label": "المفاهيم الأساسية", "type": "definition", "importance": "haute"},
+            {"label": "الآليات والميكانيزمات", "type": "processus", "importance": "critique"},
+            {"label": "التطبيقات والأمثلة", "type": "concept", "importance": "haute"},
+            {"label": "نقاط البكالوريا المهمة", "type": "concept", "importance": "critique"},
         ]
     return [
         {

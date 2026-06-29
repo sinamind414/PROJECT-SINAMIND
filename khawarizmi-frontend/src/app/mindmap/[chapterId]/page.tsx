@@ -1,9 +1,6 @@
-// src/app/mindmap/[chapterId]/page.tsx
-// Page de consultation interactive du Mind Map (Pilier 4)
-
 "use client"
 
-import { useEffect, useState, useMemo, useCallback, useRef } from "react"
+import { useEffect, useState, useMemo, useCallback } from "react"
 import { useParams } from "next/navigation"
 import Link from "next/link"
 
@@ -23,7 +20,6 @@ import apiClient from "@/lib/api-client"
 import { useAuth } from "@/lib/auth-context"
 import { AuthGuard } from "@/components/auth/AuthGuard"
 import { UI_AR, trAr } from "@/lib/translations"
-import { getActiveLessonByChapterSlug } from "@/lib/active-lessons"
 import {
   MindMap as MindMapType,
   MindMapNode,
@@ -31,7 +27,7 @@ import {
   Programme,
   MAITRISE_COLORS
 } from "@/lib/types"
-import CustomMindMapNode, { type NodeAction } from "@/components/mindmap/CustomMindMapNode"
+import CustomMindMapNode from "@/components/mindmap/CustomMindMapNode"
 
 const PROGRESS_LABELS: Record<string, string> = {
   init: "جاري التهيئة...",
@@ -42,10 +38,7 @@ const PROGRESS_LABELS: Record<string, string> = {
   done: "تم !"
 }
 
-// Define custom node types for React Flow
-const nodeTypes = {
-  mindMapNode: CustomMindMapNode
-}
+const nodeTypes = { mindMapNode: CustomMindMapNode }
 
 function slugifyChapter(value: string): string {
   return value
@@ -56,14 +49,12 @@ function slugifyChapter(value: string): string {
     .replace(/^-+|-+$/g, "")
 }
 
-// Layout helper: Dynamic horizontal tree placement
 function layoutTree(
   node: MindMapNode,
   x = 0,
   yStart = 0,
   spacingX = 320,
-  spacingY = 110,
-  onAction?: (action: NodeAction, node: MindMapNode) => void
+  spacingY = 110
 ): { nodes: Node[]; edges: Edge[]; nextY: number } {
   const nodes: Node[] = []
   const edges: Edge[] = []
@@ -72,13 +63,11 @@ function layoutTree(
   if (children.length > 0) {
     let currentY = yStart
 
-    // Layout all children first
     for (const child of children) {
-      const result = layoutTree(child, x + spacingX, currentY, spacingX, spacingY, onAction)
+      const result = layoutTree(child, x + spacingX, currentY, spacingX, spacingY)
       nodes.push(...result.nodes)
       edges.push(...result.edges)
 
-      // Connect parent to child
       edges.push({
         id: `edge-${node.id}-${child.id}`,
         source: node.id,
@@ -91,7 +80,6 @@ function layoutTree(
       currentY = result.nextY
     }
 
-    // Position parent at the exact vertical midpoint of its children
     const firstChildNode = nodes.find((n) => n.id === children[0].id)
     const lastChildNode = nodes.find((n) => n.id === children[children.length - 1].id)
     const firstChildY = firstChildNode ? (firstChildNode.position as { y: number }).y : yStart
@@ -102,43 +90,21 @@ function layoutTree(
       id: node.id,
       type: "mindMapNode",
       position: { x, y: parentY },
-      data: { node, onAction }
+      data: { node }
     })
 
     return { nodes, edges, nextY: currentY }
   } else {
-    // Leaf node layout
     nodes.push({
       id: node.id,
       type: "mindMapNode",
       position: { x, y: yStart },
-      data: { node, onAction }
+      data: { node }
     })
     return { nodes, edges, nextY: yStart + spacingY }
   }
 }
 
-// Recursive function to update a node's mastery in the nested tree structure
-function updateNodeInTree(
-  root: MindMapNode,
-  id: string,
-  newMaitrise: 0 | 1 | 2
-): boolean {
-  if (root.id === id) {
-    root.maitrise_eleve = newMaitrise
-    return true
-  }
-  if (root.enfants) {
-    for (const child of root.enfants) {
-      if (updateNodeInTree(child, id, newMaitrise)) {
-        return true
-      }
-    }
-  }
-  return false
-}
-
-// Flatten all nodes from tree helper (useful for weak nodes panel)
 function flattenNodes(node: MindMapNode, list: MindMapNode[] = []): MindMapNode[] {
   list.push(node)
   if (node.enfants) {
@@ -179,7 +145,6 @@ function MindMapContent() {
   const { chapterId } = useParams()
   const { user } = useAuth()
 
-  // State management
   const [loading, setLoading] = useState(true)
   const [generating, setGenerating] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -188,16 +153,9 @@ function MindMapContent() {
   const [chapter, setChapter] = useState<Chapter | null>(null)
   const [mindmap, setMindmap] = useState<MindMapType | null>(null)
   const [selectedNode, setSelectedNode] = useState<MindMapNode | null>(null)
-  const [activeAction, setActiveAction] = useState<{ type: NodeAction; result?: string; loading: boolean; feedback?: string } | null>(null)
 
-  // React Flow state
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([])
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([])
-
-  // Garde-fou anti-cascade : empêche le useEffect de se re-déclencher
-  // quand des mises à jour d'état recréent loadChapterAndMindmap via
-  // la chaîne de dépendances (handleNodeAction → handleUpdateMaitrise).
-  const _fetching = useRef(false)
 
   const pollTask = useCallback(async (taskId: string): Promise<MindMapType> => {
     const maxAttempts = 60
@@ -215,7 +173,6 @@ function MindMapContent() {
     throw new Error("timeout_mindmap_generation")
   }, [])
 
-  // Handle node selection click on the canvas
   const handleNodeClick = (_event: React.MouseEvent, node: Node) => {
     const rawNode = node.data?.node as MindMapNode
     if (rawNode) {
@@ -223,90 +180,14 @@ function MindMapContent() {
     }
   }
 
-  // Reset active action when selected node changes
   useEffect(() => {
-    setActiveAction(null)
+    setSelectedNode(null)
   }, [selectedNode?.id])
 
-  // Update mastery level of the selected node (standalone, no callback)
-  const handleUpdateMaitrise = useCallback(async (newMaitrise: 0 | 1 | 2) => {
-    if (!mindmap || !selectedNode) return
-
-    try {
-      await apiClient.updateNodeMaitrise(selectedNode.id, newMaitrise)
-
-      const updatedTree = { ...mindmap.racine }
-      updateNodeInTree(updatedTree, selectedNode.id, newMaitrise)
-
-      setSelectedNode((prev) => prev ? { ...prev, maitrise_eleve: newMaitrise } : null)
-
-      const updatedMindmap = { ...mindmap, racine: updatedTree }
-      setMindmap(updatedMindmap)
-
-      const layout = layoutTree(updatedTree)
-      const transversalEdges: Edge[] = (updatedMindmap.liens_transversaux || []).map((link, idx) => ({
-        id: `transversal-${idx}`,
-        source: link.source,
-        target: link.target,
-        label: link.relation,
-        type: "bezier",
-        animated: true,
-        style: { stroke: "#e2e8f0", strokeWidth: 1.5, strokeDasharray: "4 4" },
-        labelStyle: { fill: "#94a3b8", fontSize: 9, fontWeight: 500 }
-      }))
-      setNodes(layout.nodes)
-      setEdges([...layout.edges, ...transversalEdges])
-
-    } catch {
-      alert(UI_AR.erreur_mise_a_jour_maitrise)
-    }
-  }, [mindmap, selectedNode, setNodes, setEdges])
-
-  // Handle Gen Z actions from node buttons
-  const handleNodeAction = useCallback(async (action: NodeAction, node: MindMapNode) => {
-    if (action === "mastery_up") {
-      await handleUpdateMaitrise(2)
-      setActiveAction({ type: "mastery_up", feedback: "+25 نقطة · تم تثبيت العقدة ✅", loading: false })
-      return
-    }
-    if (action === "mastery_down") {
-      await handleUpdateMaitrise(0)
-      setActiveAction({ type: "mastery_down", feedback: "أُضيف إلى نقاط الضعف ❌", loading: false })
-      return
-    }
-    if (action === "quiz") {
-      setActiveAction({ type: "quiz", loading: false })
-      return
-    }
-    if (action === "flashcard") {
-      setActiveAction({ type: "flashcard", loading: false })
-      return
-    }
-    if (action === "ask") {
-      setActiveAction({ type: "ask", loading: true, result: "" })
-      try {
-        const res = await apiClient.sendTuteurMessage({
-          message: `Explique-moi simplement le concept "${node.label}" dans le contexte SVT. Importance: ${node.importance}.`,
-          context: {
-            page_source: "/mindmap",
-            chapitre: chapter?.titre_fr
-          }
-        })
-        setActiveAction({ type: "ask", loading: false, result: res.reponse })
-      } catch {
-        setActiveAction({ type: "ask", loading: false, result: "تعذر الاتصال بالخوارزمي." })
-      }
-    }
-  }, [chapter, handleUpdateMaitrise])
-
-  // Load chapter information and the mindmap
   const loadChapterAndMindmap = useCallback(async () => {
-    if (_fetching.current) return
-    _fetching.current = true
-    setLoading(() => true)
+    setLoading(true)
     setError(null)
     try {
-      // 1. Resolve chapter name from programme
       const matiere = "SVT"
       const filiere = user?.filiere || "Sciences Experimentales"
       const prog: Programme = await apiClient.getProgramme(matiere, filiere)
@@ -330,26 +211,10 @@ function MindMapContent() {
       }
 
       if (!foundChapter) {
-        // Fallback: try activeLessons by slug
-        const activeLesson = getActiveLessonByChapterSlug(chapterId as string)
-        if (activeLesson) {
-          foundChapter = {
-            id: chapterId as string,
-            titre_fr: activeLesson.chapterFr,
-            titre_ar: activeLesson.chapterAr,
-            numero: activeLesson.chapterNumero,
-            importance: activeLesson.chapterImportance,
-            type: activeLesson.chapterType || "concept",
-          } as Chapter
-        }
-      }
-
-      if (!foundChapter) {
         throw new Error(UI_AR.chapitre_introuvable)
       }
       setChapter(foundChapter)
 
-      // 2. Request/Generate mindmap for this chapter
       setGenerating(true)
       setProgress("init")
       const res = await apiClient.generateMindMap({
@@ -384,10 +249,8 @@ function MindMapContent() {
 
       setMindmap(mindmapData)
 
-      // Compute positions and load React Flow structures
-      const layout = layoutTree(mindmapData.racine, 0, 0, 320, 110, handleNodeAction)
+      const layout = layoutTree(mindmapData.racine)
 
-      // Connect transversal semantic links
       const transversalEdges: Edge[] = (mindmapData.liens_transversaux || []).map((link, idx) => ({
         id: `transversal-${idx}`,
         source: link.source,
@@ -402,25 +265,22 @@ function MindMapContent() {
       setNodes(layout.nodes)
       setEdges([...layout.edges, ...transversalEdges])
 
-      // Auto select root node
       setSelectedNode(mindmapData.racine)
 
     } catch (err) {
       console.error("Mindmap load failed", err)
       setError(resolveMindmapErrorMessage(err))
     } finally {
-      _fetching.current = false
       setLoading(false)
       setGenerating(false)
     }
-  }, [user, chapterId, setEdges, setNodes, pollTask, handleNodeAction])
+  }, [user, chapterId, setEdges, setNodes, pollTask])
 
   useEffect(() => {
     if (user && chapterId) {
       void loadChapterAndMindmap()
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, chapterId])
+  }, [user, chapterId, loadChapterAndMindmap])
 
   const importanceLabels: Record<string, string> = {
     critique: UI_AR.critique,
@@ -436,7 +296,6 @@ function MindMapContent() {
     exception: "استثناء"
   }
 
-  // Compute weak nodes from the current mindmap structure dynamically
   const weakNodes = useMemo(() => {
     if (!mindmap) return []
     const flat = flattenNodes(mindmap.racine)
@@ -495,8 +354,6 @@ function MindMapContent() {
 
   return (
     <main className="flex flex-col h-screen bg-slate-950 overflow-hidden text-slate-100">
-      
-      {/* Top Navigation Header */}
       <header className="border-b border-slate-900 bg-slate-950/80 backdrop-blur px-6 py-4 flex justify-between items-center z-10">
         <div className="flex items-center gap-4">
           <Link href="/dashboard" className="text-slate-400 hover:text-white transition">
@@ -514,10 +371,7 @@ function MindMapContent() {
         </div>
       </header>
 
-      {/* Workspace Area: Canvas + Sidebar */}
       <div className="flex-1 flex overflow-hidden relative">
-        
-        {/* React Flow Mind Map Workspace */}
         <div className="flex-1 h-full relative bg-slate-950">
           <ReactFlow
             nodes={nodes}
@@ -543,15 +397,13 @@ function MindMapContent() {
           </ReactFlow>
         </div>
 
-        {/* Interactive Sidebar Panel */}
         <aside className="w-80 border-l border-slate-900 bg-slate-950/90 backdrop-blur-md p-6 overflow-y-auto space-y-6 flex flex-col justify-between h-full z-10 shadow-2xl">
           <div className="space-y-6">
-            
-            {/* 1. Selected Node Inspector */}
+
             {selectedNode ? (
               <section className="space-y-4">
                 <div className="flex items-start justify-between gap-3">
-                    <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">
+                  <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">
                     {UI_AR.details_noeud}
                   </h3>
                   {selectedNode.bac_frequent && (
@@ -565,7 +417,7 @@ function MindMapContent() {
                   <h4 className="text-base font-bold text-white leading-snug">
                     {trAr(selectedNode.label)}
                   </h4>
-                  
+
                   <div className="grid grid-cols-2 gap-2 text-xs">
                     <div className="bg-slate-900/80 p-2.5 rounded-lg border border-slate-800/40">
                       <span className="text-[10px] text-slate-500 block mb-0.5">{UI_AR.type}</span>
@@ -581,147 +433,27 @@ function MindMapContent() {
                       </span>
                     </div>
                   </div>
-                </div>
 
-                {/* 2. Mastery Controls */}
-                <div className="space-y-2.5">
-                  <label className="text-xs font-semibold text-slate-400 block">
-                    {UI_AR.niveau_maitrise}
-                  </label>
-
-                  <div className="grid grid-cols-3 gap-2">
-                    {([0, 1, 2] as const).map((level) => {
-                      const isActive = selectedNode.maitrise_eleve === level
-                      const activeColor = MAITRISE_COLORS[level]
-                      const labels = [UI_AR.non, UI_AR.en_cours, UI_AR.maitrisee]
-                      const label = labels[level]
-
-                      return (
-                        <button
-                          key={level}
-                          onClick={() => handleUpdateMaitrise(level)}
-                          style={{
-                            borderColor: isActive ? activeColor : "transparent",
-                            backgroundColor: isActive ? `${activeColor}15` : "rgba(30, 41, 59, 0.4)",
-                            color: isActive ? "#ffffff" : "#94a3b8"
-                          }}
-                          className={`py-2 px-1 text-center rounded-lg border text-[11px] font-bold
-                                      hover:bg-slate-800/30 transition-all cursor-pointer`}
-                        >
-                          <span
-                            className="w-1.5 h-1.5 rounded-full inline-block mr-1"
-                            style={{ backgroundColor: activeColor }}
-                          />
-                          {label}
-                        </button>
-                      )
-                    })}
+                  <div className="bg-slate-900/40 border border-slate-800/40 rounded-lg p-2.5">
+                    <span className="text-[10px] text-slate-500 block mb-1">{UI_AR.niveau_maitrise}</span>
+                    <div className="flex items-center gap-2">
+                      <span
+                        className="w-2.5 h-2.5 rounded-full"
+                        style={{ backgroundColor: MAITRISE_COLORS[selectedNode.maitrise_eleve] }}
+                      />
+                      <span className="text-xs font-semibold text-slate-300">
+                        {[UI_AR.non, UI_AR.en_cours, UI_AR.maitrisee][selectedNode.maitrise_eleve]}
+                      </span>
+                    </div>
                   </div>
                 </div>
 
-                {/* 3. Gen Z Action Panel */}
-                {activeAction && (
-                  <section className="space-y-3 pt-2">
-                    {activeAction.feedback && (
-                      <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-3 text-center text-xs text-emerald-400 font-medium">
-                        {activeAction.feedback}
-                      </div>
-                    )}
-
-                    {activeAction.type === "quiz" && (
-                      <div className="bg-slate-900/50 border border-violet-500/20 rounded-xl p-4 space-y-3">
-                        <div className="flex items-center gap-2 text-violet-400">
-                          <span>⚡</span>
-                          <span className="text-xs font-bold uppercase tracking-wider">اختبار سريع</span>
-                        </div>
-                        <p className="text-sm text-slate-300">
-                          اشرح بصوت عاليمفهوم <strong>{trAr(selectedNode.label)}</strong> في 10 ثوانٍ.
-                        </p>
-                        <div className="flex gap-2">
-                          <button
-                            onClick={() => handleUpdateMaitrise(2)}
-                            className="flex-1 py-2 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold hover:bg-emerald-500/20 transition"
-                          >
-                            ✅ أعرف
-                          </button>
-                          <button
-                            onClick={() => handleUpdateMaitrise(0)}
-                            className="flex-1 py-2 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-bold hover:bg-red-500/20 transition"
-                          >
-                            ❌ أتعثر
-                          </button>
-                        </div>
-                      </div>
-                    )}
-
-                    {activeAction.type === "flashcard" && (
-                      <div className="bg-slate-900/50 border border-amber-500/20 rounded-xl p-4 space-y-3">
-                        <div className="flex items-center gap-2 text-amber-400">
-                          <span>🎴</span>
-                          <span className="text-xs font-bold uppercase tracking-wider">Flashcard</span>
-                        </div>
-                        <div className="bg-slate-800/50 rounded-lg p-3 border border-slate-700/50">
-                          <p className="text-sm text-slate-200 font-medium">{trAr(selectedNode.label)}</p>
-                          <p className="text-xs text-slate-500 mt-1">الظهر: {chapter?.titre_fr || "..."}</p>
-                        </div>
-                        <button
-                          onClick={async () => {
-                            try {
-                              await apiClient.createFlashcard({
-                                recto: selectedNode.label,
-                                verso: `الدرس: ${chapter?.titre_fr || "N/A"} — Importance: ${selectedNode.importance}`,
-                                type: selectedNode.type as "definition" | "formule" | "processus" | "exception",
-                                importance: selectedNode.importance
-                              })
-                              setActiveAction({ type: "flashcard", feedback: "+10 نقطة · تم إنشاء البطاقة 🎴", loading: false })
-                            } catch {
-                              setActiveAction({ type: "flashcard", feedback: "تعذر الإنشاء", loading: false })
-                            }
-                          }}
-                          className="w-full py-2 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-bold hover:bg-amber-500/20 transition"
-                        >
-                          🎴 إنشاء البطاقة
-                        </button>
-                      </div>
-                    )}
-
-                    {activeAction.type === "ask" && (
-                      <div className="bg-slate-900/50 border border-blue-500/20 rounded-xl p-4 space-y-3">
-                        <div className="flex items-center gap-2 text-blue-400">
-                          <span>🤖</span>
-                          <span className="text-xs font-bold uppercase tracking-wider">Khawarizmi</span>
-                        </div>
-                        {activeAction.loading ? (
-                          <div className="flex items-center gap-2 py-4 justify-center">
-                            <div className="w-5 h-5 border-2 border-blue-400 border-t-transparent rounded-full animate-spin" />
-                            <span className="text-xs text-slate-400">جاري التفكير...</span>
-                          </div>
-                        ) : (
-                          <p className="text-sm text-slate-300 leading-relaxed">{activeAction.result}</p>
-                        )}
-                      </div>
-                    )}
-
-                    {activeAction.type === "mastery_up" && (
-                      <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-4 text-center">
-                        <p className="text-sm text-emerald-400 font-bold">✅ +25 نقطة · تم تثبيت العقدة</p>
-                      </div>
-                    )}
-
-                    {activeAction.type === "mastery_down" && (
-                      <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 text-center">
-                        <p className="text-sm text-red-400 font-bold">❌ أُضيف إلى نقاط الضعف</p>
-                      </div>
-                    )}
-
-                    <button
-                      onClick={() => setActiveAction(null)}
-                      className="w-full py-1.5 text-[10px] text-slate-500 hover:text-slate-300 transition"
-                    >
-                      إغلاق
-                    </button>
-                  </section>
-                )}
+                <Link
+                  href="/drill"
+                  className="block w-full py-2.5 bg-slate-800/50 border border-slate-700 rounded-xl text-center text-xs font-bold text-mint hover:bg-slate-800 transition"
+                >
+                  🎯 راجع هذا الفصل في المراجعة السريعة ←
+                </Link>
               </section>
             ) : (
               <div className="bg-slate-900/40 border border-slate-800/50 rounded-xl p-4 text-center text-sm text-slate-500">
@@ -729,7 +461,6 @@ function MindMapContent() {
               </div>
             )}
 
-            {/* 3. Weak Nodes Panel */}
             <section className="space-y-3 pt-4 border-t border-slate-900">
               <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center justify-between">
                 <span>{UI_AR.noeuds_faibles}</span>
@@ -743,10 +474,7 @@ function MindMapContent() {
                   {weakNodes.map((n) => (
                     <button
                       key={n.id}
-                      onClick={() => {
-                        setSelectedNode(n)
-                        // Trigger Flow to center node
-                      }}
+                      onClick={() => setSelectedNode(n)}
                       className="w-full text-left p-2.5 rounded-lg bg-slate-900/30 border border-slate-900 hover:border-slate-800 transition flex items-center justify-between gap-2 cursor-pointer group"
                     >
                       <span className="text-slate-300 text-xs font-medium truncate group-hover:text-white transition-colors">
@@ -774,7 +502,6 @@ function MindMapContent() {
 
           </div>
 
-          {/* Revision Call-to-Action */}
           <div className="pt-4 border-t border-slate-900">
             <Link
               href="/drill"
