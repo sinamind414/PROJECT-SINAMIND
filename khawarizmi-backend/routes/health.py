@@ -64,6 +64,12 @@ async def health_check():
         except Exception:
             business["rag_chunks_count"] = -1  # table inexistante
 
+    # Vérification fichier programme (debug temporaire)
+    import os as _os
+    _prog_path = _os.path.join(_os.path.dirname(__file__), "..", "data", "courses", "programme_national_svt_claude_opus.md")
+    business["programme_file_exists"] = _os.path.exists(_prog_path)
+    business["programme_file_size"] = _os.path.getsize(_prog_path) if _os.path.exists(_prog_path) else 0
+
     return {
         "status": "healthy" if (db_ok and redis_ok) else "degraded",
         "version": cfg.VERSION,
@@ -135,3 +141,15 @@ async def get_calibration_stats():
     from services.eval_calibration import get_calibration_stats
 
     return {"timestamp": datetime.now(UTC).isoformat(), "golden_set": get_calibration_stats()}
+
+
+@router.post("/debug/ingest-rag", tags=["Debug"])
+async def trigger_ingestion():
+    """Lance l'ingestion RAG depuis le programme officiel."""
+    from scripts.ingest_claude_opus import ingest as run_ingestion
+    import asyncio
+    try:
+        asyncio.create_task(run_ingestion())
+        return {"status": "started", "message": "Ingestion lancée en arrière-plan, vérifie /health dans ~3 min"}
+    except Exception as e:
+        return {"status": "error", "error": str(e)}
