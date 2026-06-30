@@ -50,16 +50,20 @@ function build(apiProgress?: ProgressResponse | null, dueCards?: number, orienta
     ? orientation.recommendations.map((rec, i) => ({
         id: i + 1,
         title: rec.chapitre_ar || rec.raison,
+        titleAr: rec.chapitre_ar || rec.raison,
         description: rec.raison,
+        descriptionAr: rec.raison,
         xp_reward: Math.max(10, rec.score_priorite * 5),
         icon: rec.type === 'cours' ? 'book' : rec.type === 'action_verb' ? 'zap' : rec.type === 'document_analysis' ? 'file' : 'check',
         status: 'pending' as const,
-        day_label: rec.priorite === 1 ? 'الأولوية الأولى' : rec.priorite === 2 ? 'الأولوية الثانية' : 'الأولوية الثالثة',
+        day_label: rec.priorite === 1 ? 'الأولوية الأولى' : rec.priorite === 2 ? 'الأولوية الثانية' : rec.priorite === 3 ? 'الأولوية الثالثة' : 'الأولوية',
       }))
     : dashboard.todayTasks.map((task, i) => ({
         id: i + 1,
-        title: task.titleAr,
+        title: task.titleAr || '',
+        titleAr: task.titleAr || '',
         description: task.detailAr || task.reasonAr || '',
+        descriptionAr: task.detailAr || task.reasonAr || '',
         xp_reward: task.estimatedMinutes * 5,
         icon: task.type === 'lesson' ? 'book' : task.type === 'drill' ? 'zap' : 'check',
         status: task.status === 'done' ? 'done' : 'pending',
@@ -72,15 +76,21 @@ function build(apiProgress?: ProgressResponse | null, dueCards?: number, orienta
     ? apiProgress.concepts.slice(0, 8).map((c, i) => ({
         id: i + 1,
         title: c.chapitre_id,
+        titleAr: c.chapitre_id,
         progress_percent: Math.round(c.retrievability * 100),
         lessons_count: c.est_due ? 1 : 0,
+        mastery: c.retrievability,
+        href: '/cours',
         color: c.retrievability >= 0.75 ? '#2DD4BF' : c.retrievability >= 0.5 ? '#F59E0B' : '#EF4444',
       }))
     : snapshot.skills.map((skill, i) => ({
         id: i + 1,
         title: skill.labelAr,
+        titleAr: skill.labelAr,
         progress_percent: skill.level,
         lessons_count: skill.attempts,
+        mastery: skill.level / 100,
+        href: '/cours',
         color: skill.level >= 75 ? '#2DD4BF' : skill.level >= 50 ? '#F59E0B' : '#EF4444',
       }));
 

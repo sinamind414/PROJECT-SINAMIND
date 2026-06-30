@@ -18,7 +18,9 @@ export interface Profile {
 export interface Mission {
   id: number;
   title: string;
+  titleAr?: string;
   description: string;
+  descriptionAr?: string;
   xp_reward: number;
   icon: string;
   status: string;
@@ -29,8 +31,11 @@ export interface Mission {
 export interface Topic {
   id: number;
   title: string;
+  titleAr?: string;
   progress_percent: number;
   lessons_count: number;
+  mastery?: number;
+  href?: string;
   color: string;
 }
 
