@@ -5,6 +5,7 @@ import Link from "next/link"
 import { useParams } from "next/navigation"
 import { AuthGuard } from "@/components/auth/AuthGuard"
 import { apiClient } from "@/lib/api-client"
+import { saveMethodologyEvaluation } from "@/lib/progress-store"
 import { UI_AR } from "@/lib/translations"
 
 type DrillCard = {
@@ -83,6 +84,30 @@ function DrillSessionContent() {
         selected_idx: selectedIdx,
       })
       setQcmResult(result)
+
+      // Enregistrer l'erreur dans إصلاح الأخطاء
+      if (!result.correct || result.score < 7) {
+        saveMethodologyEvaluation({
+          source: "exercise",
+          verbSlug: current.concept_id || "qcm_general",
+          answer: current.options?.[selectedIdx] || "",
+          evaluation: {
+            verbSlug: current.concept_id || "qcm_general",
+            score: result.score,
+            scoreMax: 10,
+            percentage: result.score * 10,
+            errors: result.explanation ? [result.explanation] : ["إجابة خاطئة"],
+            success: [],
+            dominantErrorCode: "qcm_wrong",
+            forbiddenMarkersFound: [],
+            missingMarkers: [],
+            criteria: [],
+            advice: result.explanation || "راجع الدرس مجدداً",
+            allowSecondAttempt: true,
+          },
+        })
+      }
+
       const bucket = scoreBucket(result.score)
       setStats((prev) => ({
         ...prev,

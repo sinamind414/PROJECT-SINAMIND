@@ -6,6 +6,7 @@ import { notFound, useParams } from "next/navigation"
 import { AuthGuard } from "@/components/auth/AuthGuard"
 import { AppShell } from "@/components/layout/AppShell"
 import { getActionVerb, getCategoryLabel, getPriorityLabel } from "@/lib/methodology-v1"
+import { saveMethodologyEvaluation } from "@/lib/progress-store"
 import apiClient from "@/lib/api-client"
 import type { VerbEvaluateResponse, ActionVerbExercise } from "@/lib/types"
 
@@ -45,6 +46,29 @@ export default function ActionVerbDetailPage() {
         answer,
       })
       setEvaluation(result)
+
+      // Enregistrer dans إصلاح الأخطاء
+      if (result.percentage < 75) {
+        saveMethodologyEvaluation({
+          source: "exercise",
+          verbSlug: slug,
+          answer,
+          evaluation: {
+            verbSlug: slug,
+            score: result.score,
+            scoreMax: result.score_max,
+            percentage: result.percentage,
+            errors: result.errors,
+            success: result.success,
+            dominantErrorCode: result.dominant_error_code,
+            forbiddenMarkersFound: result.forbidden_found,
+            missingMarkers: result.missing_markers,
+            criteria: [],
+            advice: result.advice,
+            allowSecondAttempt: result.allow_second_attempt,
+          },
+        })
+      }
     } catch (err) {
       setEvaluation({
         verb_slug: slug,
