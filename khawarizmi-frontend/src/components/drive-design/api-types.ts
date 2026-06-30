@@ -26,6 +26,10 @@ export interface Mission {
   status: string;
   day_label: string;
   href?: string;
+  urgenceLabel?: string;
+  besoinLabel?: string;
+  moteurLabel?: string;
+  impactLabel?: string;
 }
 
 export interface Topic {
