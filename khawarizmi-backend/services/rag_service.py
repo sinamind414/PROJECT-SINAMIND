@@ -1,16 +1,38 @@
 import logging
+import re
 
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 logger = logging.getLogger("khawarizmi.rag")
 
+STOP_WORDS_RAG = {
+    "ما", "هو", "هي", "في", "من", "إلى", "على", "عن", "مع", "هذا", "هذه", "التي", "الذي", "كيف", "لماذا", "ماذا",
+    "اشرح", "حدد", "صف", "حلل", "قارن", "استنتج", "اذكر", "عرف",
+    "le", "la", "les", "un", "une", "des", "de", "du", "et", "ou", "dans", "sur", "pour", "par", "avec",
+    "the", "is", "what", "how", "why", "where", "explain", "define",
+}
+
+
+def _extract_keywords(message: str, limit: int = 4) -> list[str]:
+    tokens = re.findall(r"[\u0600-\u06FF\u0750-\u077F\w]+", message.lower())
+    keywords = []
+    seen = set()
+    for token in tokens:
+        if len(token) <= 2 or token in STOP_WORDS_RAG or token in seen:
+            continue
+        seen.add(token)
+        keywords.append(token)
+        if len(keywords) >= limit:
+            break
+    return keywords
+
 
 async def vector_rag_search(
     db: AsyncSession,
     message: str,
     chapter: str | None,
-    limit: int = 20,
+    limit: int = 8,
 ) -> list[dict]:
     try:
         from services.embedder import embedder
@@ -47,7 +69,7 @@ async def vector_rag_search(
             )
         return [
             {
-                "content": r._mapping["content"][:500],
+                "content": r._mapping["content"][:420],
                 "source": r._mapping["source"],
                 "chapter": r._mapping["chapter"],
                 "similarity": float(r._mapping["similarity"]) if r._mapping["similarity"] else 0.0,
@@ -64,10 +86,10 @@ async def keyword_rag_search(
     db: AsyncSession,
     message: str,
     chapter: str | None,
-    limit: int = 20,
+    limit: int = 8,
 ) -> list[dict]:
     try:
-        keywords = [w for w in message.split() if len(w) > 2][:5]
+        keywords = _extract_keywords(message, limit=4)
         if not keywords:
             return []
 
@@ -98,7 +120,7 @@ async def keyword_rag_search(
         importance_scores = {"critique": 0.95, "haute": 0.80, "moyenne": 0.60}
         return [
             {
-                "content": r._mapping["content"][:500],
+                "content": r._mapping["content"][:420],
                 "source": r._mapping["source"],
                 "chapter": r._mapping["chapter"],
                 "similarity": importance_scores.get(r._mapping.get("importance", "moyenne"), 0.60),
@@ -138,8 +160,8 @@ async def rag_search(
     chapter: str | None = None,
     limit: int = 3,
 ) -> list[dict]:
-    vector_chunks = await vector_rag_search(db, message, chapter)
-    keyword_chunks = await keyword_rag_search(db, message, chapter)
+    vector_chunks = await vector_rag_search(db, message, chapter, limit=max(limit * 2, 6))
+    keyword_chunks = await keyword_rag_search(db, message, chapter, limit=max(limit * 2, 6))
     candidates = merge_chunks(vector_chunks, keyword_chunks)
 
     if not candidates:
@@ -163,7 +185,8 @@ def format_rag_context(chunks: list[dict]) -> str:
     for c in chunks:
         src = c.get("source", "manuel")
         chap = c.get("chapter", "")
-        parts.append(f"[{src}/{chap}] {c['content'][:300]}")
+        excerpt = c.get("content", "")[:220].strip()
+        parts.append(f"[{src}/{chap}] {excerpt}")
     return "\n\n".join(parts)
 
 

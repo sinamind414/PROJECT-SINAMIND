@@ -5,12 +5,12 @@ techniques. Le re-ranking applique un second filtre sur les top-K chunks
 récupérés par pgvector pour améliorer la Precision@K.
 
 Pipeline :
-  1. pgvector récupère 20 chunks (bi-encoder, rapide)
-  2. reranker.py re-score ces 20 chunks avec 3 signaux :
+  1. pgvector récupère 8 chunks (bi-encoder, rapide)
+  2. reranker.py re-score ces 8 chunks avec 3 signaux :
      a) Similarité cosinus (déjà calculée par pgvector) — poids 0.4
      b) Score BM25 (fréquence des termes de la question dans le chunk) — poids 0.3
      c) Couverture des mots-clés (mots importants de la question présents) — poids 0.3
-  3. On garde les 5 meilleurs chunks après re-ranking
+  3. On garde les 3 meilleurs chunks après re-ranking
 
 Gain attendu : +30% de précision sur les termes scientifiques techniques
 (ARN polymérase, ATP, etc.) que le bi-encoder manque parfois.
@@ -114,7 +114,6 @@ STOP_WORDS = {
 
 def _tokenize(text: str) -> list[str]:
     """Tokenisation simple : split sur espaces et ponctuation, lowercase."""
-    # Supprimer la ponctuation et splitter
     tokens = re.findall(r"[\u0600-\u06FF\u0750-\u077F\w]+", text.lower())
     return [t for t in tokens if len(t) > 1 and t not in STOP_WORDS]
 
@@ -122,17 +121,12 @@ def _tokenize(text: str) -> list[str]:
 def _bm25_score(
     query_tokens: list[str], chunk_text: str, avg_doc_len: float, doc_freq: dict[str, int], total_docs: int
 ) -> float:
-    """Score BM25 pour un chunk donné.
-
-    BM25 = sum over query terms of:
-        IDF(q) * (f(q,d) * (k1+1)) / (f(q,d) + k1 * (1 - b + b * |d|/avgdl))
-    """
+    """Score BM25 pour un chunk donné."""
     chunk_tokens = _tokenize(chunk_text)
     doc_len = len(chunk_tokens)
     if doc_len == 0:
         return 0.0
 
-    # Fréquence des termes dans le chunk
     term_freq = {}
     for t in chunk_tokens:
         term_freq[t] = term_freq.get(t, 0) + 1
@@ -141,17 +135,12 @@ def _bm25_score(
     for q_term in set(query_tokens):
         if q_term not in term_freq:
             continue
-
-        # IDF (Inverse Document Frequency)
         df = doc_freq.get(q_term, 0)
         if df == 0:
             continue
         idf = math.log((total_docs - df + 0.5) / (df + 0.5) + 1)
-
-        # TF normalisé
         f = term_freq[q_term]
         tf_norm = (f * (BM25_K1 + 1)) / (f + BM25_K1 * (1 - BM25_B + BM25_B * doc_len / max(avg_doc_len, 1)))
-
         score += idf * tf_norm
 
     return score
@@ -169,7 +158,7 @@ def _keyword_coverage_score(query_tokens: list[str], chunk_text: str) -> float:
 def rerank(
     query: str,
     chunks: list[dict],
-    top_k: int = 5,
+    top_k: int = 3,
 ) -> list[dict]:
     """Re-ranke les chunks récupérés par pgvector.
 
@@ -186,7 +175,6 @@ def rerank(
 
     query_tokens = _tokenize(query)
     if not query_tokens:
-        # Fallback : garder l'ordre pgvector
         return chunks[:top_k]
 
     # Calculer les statistiques BM25 sur ce batch de chunks
@@ -206,24 +194,19 @@ def rerank(
     min_cos = min(cosine_scores) if cosine_scores else 0
     cos_range = max(max_cos - min_cos, 1e-9)
 
+    # PRÉ-CALCUL BM25 : une seule fois pour tous les chunks
+    bm25_scores = [
+        _bm25_score(query_tokens, c.get("content", ""), avg_doc_len, doc_freq, total_docs) for c in chunks
+    ]
+    max_bm25 = max(bm25_scores) if bm25_scores else 1.0
+
     # Calculer le score de re-ranking pour chaque chunk
     scored_chunks = []
     for i, chunk in enumerate(chunks):
-        # a) Cosinus normalisé
         cos_norm = (cosine_scores[i] - min_cos) / cos_range
-
-        # b) BM25
-        bm25 = _bm25_score(query_tokens, chunk.get("content", ""), avg_doc_len, doc_freq, total_docs)
-        # Normaliser BM25 sur [0, 1]
-        max_bm25 = max(
-            [_bm25_score(query_tokens, c.get("content", ""), avg_doc_len, doc_freq, total_docs) for c in chunks] or [1]
-        )
-        bm25_norm = bm25 / max(max_bm25, 1e-9)
-
-        # c) Couverture mots-clés
+        bm25_norm = bm25_scores[i] / max(max_bm25, 1e-9)
         kw_cov = _keyword_coverage_score(query_tokens, chunk.get("content", ""))
 
-        # Score combiné
         final_score = W_COSINE * cos_norm + W_BM25 * bm25_norm + W_KEYWORD * kw_cov
 
         chunk_copy = {**chunk}
@@ -233,7 +216,6 @@ def rerank(
         chunk_copy["score_keyword"] = round(kw_cov, 4)
         scored_chunks.append(chunk_copy)
 
-    # Trier par score de re-ranking décroissant
     scored_chunks.sort(key=lambda x: x["score_rerank"], reverse=True)
 
     logger.debug(
