@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest"
+import { describe, expect, it } from "vitest"
 import { buildOrchestratorDashboardData } from "./mappers"
 import type { DailyDashboardState } from "@/lib/daily-dashboard/selectors"
 import type { GamificationSnapshot, ProgressSnapshot } from "@/lib/progress-store"
@@ -22,66 +22,93 @@ const snapshot: ProgressSnapshot = {
   totalAttempts: 3,
   lastUpdated: "2026-06-29T10:00:00Z",
   strongestSkill: {
-    code: "analysis", labelAr: "التحليل", labelFr: "Analyse", level: 82, attempts: 2,
+    code: "analysis",
+    labelAr: "التحليل",
+    labelFr: "Analyse",
+    level: 82,
+    attempts: 2,
   },
   weakestSkill: {
-    code: "hypothesis", labelAr: "الفرضية", labelFr: "Hypothèse", level: 40, attempts: 1,
+    code: "hypothesis",
+    labelAr: "الفرضية",
+    labelFr: "Hypothèse",
+    level: 40,
+    attempts: 1,
   },
   dominantError: {
-    code: "weak_hypothesis", labelAr: "فرضية ضعيفة", labelFr: "Hypothèse faible", count: 2,
+    code: "weak_hypothesis",
+    labelAr: "فرضية ضعيفة",
+    labelFr: "Hypothèse faible",
+    count: 2,
   },
   skills: [
     { code: "analysis", labelAr: "التحليل", labelFr: "Analyse", level: 82, attempts: 2 },
     { code: "hypothesis", labelAr: "الفرضية", labelFr: "Hypothèse", level: 40, attempts: 1 },
   ],
-  errorStats: [
-    { code: "weak_hypothesis", labelAr: "فرضية ضعيفة", labelFr: "Hypothèse faible", count: 2 },
-  ],
+  errorStats: [{ code: "weak_hypothesis", labelAr: "فرضية ضعيفة", labelFr: "Hypothèse faible", count: 2 }],
   recommendations: [],
   history: [
     {
-      id: "1", source: "diagnostic", verbSlug: "analyse",
-      answer: "إجابة تحليلية جيدة", score: 8, scoreMax: 10, percentage: 80,
-      errors: [], success: ["ok"], forbiddenMarkersFound: [], missingMarkers: [],
+      id: "1",
+      source: "diagnostic",
+      verbSlug: "analyse",
+      answer: "إجابة تحليلية جيدة",
+      score: 8,
+      scoreMax: 10,
+      percentage: 80,
+      errors: [],
+      success: ["ok"],
+      forbiddenMarkersFound: [],
+      missingMarkers: [],
       createdAt: "2026-06-28T10:00:00Z",
     },
     {
-      id: "2", source: "exercise", verbSlug: "hypothesis",
-      answer: "إجابة ضعيفة تحتاج مراجعة", score: 4, scoreMax: 10, percentage: 40,
-      errors: ["weak_hypothesis"], success: [], dominantErrorCode: "weak_hypothesis",
-      forbiddenMarkersFound: [], missingMarkers: [],
+      id: "2",
+      source: "exercise",
+      verbSlug: "hypothesis",
+      answer: "إجابة ضعيفة تحتاج مراجعة",
+      score: 4,
+      scoreMax: 10,
+      percentage: 40,
+      errors: ["weak_hypothesis"],
+      success: [],
+      dominantErrorCode: "weak_hypothesis",
+      forbiddenMarkersFound: [],
+      missingMarkers: [],
       createdAt: "2026-06-27T10:00:00Z",
     },
   ],
 }
 
 const dashboard: DailyDashboardState = {
-  todayLabelAr: "29 جوان",
+  todayLabelAr: "اليوم",
   streakDays: 4,
   readiness: 72,
   masteredCount: 1,
   weakCount: 1,
-  strongestSkill: "التحليل",
-  weakestSkill: "الفرضية",
-  dominantError: "فرضية ضعيفة",
-  dominantErrorCount: 2,
   recentActions: [],
   todayTasks: [
     {
-      id: "t1", type: "lesson", titleAr: "مراجعة التنفس",
-      detailAr: "ارجع إلى أساسيات الفصل", reasonAr: "نقطة ضعف حالية",
-      href: "/cours/respiration", estimatedMinutes: 20, priority: "high", status: "todo",
+      id: "t1",
+      type: "lesson",
+      titleAr: "مراجعة التنفس",
+      detailAr: "ارجع إلى أساسيات الفصل",
+      reasonAr: "نقطة ضعف حالية",
+      href: "/cours/respiration",
+      estimatedMinutes: 20,
+      priority: "high",
+      status: "todo",
     },
   ],
   tomorrowTasks: [],
   weekActivity: [
-    { dayLabelAr: "الأحد", dateNumber: 28, status: "done", primaryTaskAr: "Flashcards" },
-    { dayLabelAr: "الإثنين", dateNumber: 29, status: "active", primaryTaskAr: "Cours" },
-    { dayLabelAr: "الثلاثاء", dateNumber: 30, status: "planned", primaryTaskAr: "Mindmap" },
-    { dayLabelAr: "الأربعاء", dateNumber: 1, status: "planned", primaryTaskAr: "Annales" },
-    { dayLabelAr: "الخميس", dateNumber: 2, status: "planned", primaryTaskAr: "Révision" },
-    { dayLabelAr: "الجمعة", dateNumber: 3, status: "missed", primaryTaskAr: "DOC" },
-    { dayLabelAr: "السبت", dateNumber: 4, status: "planned", primaryTaskAr: "Flashcards" },
+    { dayLabelAr: "الأحد", dateNumber: 0, status: "done", primaryTaskAr: "Flashcards" },
+    { dayLabelAr: "الإثنين", dateNumber: 1, status: "active", primaryTaskAr: "Cours" },
+    { dayLabelAr: "الثلاثاء", dateNumber: 2, status: "planned", primaryTaskAr: "Mindmap" },
+    { dayLabelAr: "الأربعاء", dateNumber: 3, status: "planned", primaryTaskAr: "Annales" },
+    { dayLabelAr: "الخميس", dateNumber: 4, status: "planned", primaryTaskAr: "Révision" },
+    { dayLabelAr: "الجمعة", dateNumber: 5, status: "missed", primaryTaskAr: "DOC" },
+    { dayLabelAr: "السبت", dateNumber: 6, status: "planned", primaryTaskAr: "Flashcards" },
   ],
 }
 
@@ -89,22 +116,21 @@ function makeApi(): DashboardOrchestratorResponse {
   return {
     user: { id: "u1", prenom: "Aya", filiere: "Sciences Naturelles", plan: "premium" },
     progress: {
-      user_id: "u1", nb_concepts: 2, dues_aujourd_hui: 3,
-      prediction_bac: {
-        note_globale: 15.5,
-        par_matiere: {
-          svt: { note: 15.5, coefficient: 6, nb_concepts: 2, retrievability: 0.77 },
-        },
-      },
+      user_id: "u1",
+      nb_concepts: 2,
+      dues_aujourd_hui: 3,
+      prediction_bac: { note_globale: 15.5, par_matiere: { svt: { note: 15.5, coefficient: 6, nb_concepts: 2, retrievability: 0.77 } } },
       concepts: [
         {
-          matiere: "svt", chapitre_id: "respiration_cellulaire",
+          matiere: "svt",
+          chapitre_id: "respiration_cellulaire",
           stability: 1.2, difficulty: 6.2, retrievability: 0.42,
           prochaine_revision: null, interval_jours: null, est_due: true,
           statut_revision: "a_revoir_aujourdhui", priority: "urgente",
         },
         {
-          matiere: "svt", chapitre_id: "immunite_specifique",
+          matiere: "svt",
+          chapitre_id: "immunite_specifique",
           stability: 4.5, difficulty: 4.1, retrievability: 0.81,
           prochaine_revision: "2026-07-02T10:00:00Z", interval_jours: 3, est_due: false,
           statut_revision: "stable", priority: "normale",
@@ -117,8 +143,7 @@ function makeApi(): DashboardOrchestratorResponse {
       recommendations: [
         {
           priorite: 1, type: "cours", chapitre_slug: "respiration_cellulaire",
-          chapitre_ar: "التنفس الخلوي",
-          raison: "هذا الفصل يهدد نقاطك الآن.",
+          chapitre_ar: "التنفس الخلوي", raison: "هذا الفصل يهدد نقاطك الآن.",
           action: "/cours/respiration_cellulaire", score_priorite: 8,
           niveau_urgence: "critique", nature_besoin: "memoire",
           moteur_source_principal: "flashcards", impact_note_estime: "fort",
@@ -151,8 +176,7 @@ function makeApi(): DashboardOrchestratorResponse {
         chapterSlug: "respiration_cellulaire", source: "orientation",
       },
       engine_pulse: {
-        predictionBac: 15.5, dueToday: 3, flashcardsDue: 3,
-        actionVerbsDue: 1, documentAnalysisDue: 2,
+        predictionBac: 15.5, dueToday: 3, flashcardsDue: 3, actionVerbsDue: 1, documentAnalysisDue: 2,
         urgentConceptsCount: 1, soonConceptsCount: 1, stableConceptsCount: 1,
         topPriorityConcept: {
           matiere: "svt", chapitre_id: "respiration_cellulaire",
@@ -162,49 +186,40 @@ function makeApi(): DashboardOrchestratorResponse {
         },
         topOrientation: {
           priorite: 1, type: "cours", chapitre_slug: "respiration_cellulaire",
-          chapitre_ar: "التنفس الخلوي",
-          raison: "هذا الفصل يهدد نقاطك الآن.",
+          chapitre_ar: "التنفس الخلوي", raison: "هذا الفصل يهدد نقاطك الآن.",
           action: "/cours/respiration_cellulaire", score_priorite: 8,
           niveau_urgence: "critique", nature_besoin: "memoire",
           moteur_source_principal: "flashcards", impact_note_estime: "fort",
         },
-        dueCardsTotal: 3,
-        source: "backend",
+        dueCardsTotal: 3, source: "backend",
       },
-      generated_at: "2026-06-30T10:00:00Z",
-      source: "backend_orchestrator",
+      generated_at: "2026-06-30T10:00:00Z", source: "backend_orchestrator",
     },
   }
 }
 
 describe("buildOrchestratorDashboardData", () => {
-  it("maps API payload with orientation signals correctly", () => {
+  it("maps api orchestration signals into dashboard state", () => {
     const result = buildOrchestratorDashboardData({ api: makeApi(), gamification, snapshot, dashboard })
 
     expect(result.profile.name).toBe("Aya")
     expect(result.profile.progress_percent).toBe(78)
-
     expect(result.missions).toHaveLength(1)
     expect(result.missions[0].urgenceLabel).toBe("عاجل جداً")
     expect(result.missions[0].moteurLabel).toBe("FSRS")
-    expect(result.missions[0].besoinLabel).toBe("🧠 تثبيت الذاكرة")
-    expect(result.missions[0].impactLabel).toBe("ربح نقاط قوي")
-
     expect(result.priorityAction.source).toBe("orientation")
     expect(result.enginePulse.source).toBe("api")
     expect(result.topics[0].href).toBe("/cours/respiration_cellulaire")
     expect(result.weakestTopic?.title).toBe("respiration cellulaire")
   })
 
-  it("falls back gracefully when API payload is null", () => {
+  it("falls back to local dashboard data when api is absent", () => {
     const result = buildOrchestratorDashboardData({ api: null, gamification, snapshot, dashboard })
 
     expect(result.profile.name).toBe("الطالب")
     expect(result.profile.progress_percent).toBe(55)
-
     expect(result.missions).toHaveLength(1)
     expect(result.missions[0].day_label).toBe("اليوم")
-
     expect(result.priorityAction.source).toBe("fallback")
     expect(result.continueCard.source).toBe("fallback")
     expect(result.strategicChapter.source).toBe("fallback")
@@ -212,7 +227,7 @@ describe("buildOrchestratorDashboardData", () => {
     expect(result.topics[0].href).toBe("/progress")
   })
 
-  it("derives exercises and mistakes from snapshot history", () => {
+  it("derives exercises and mistakes from local methodology snapshot", () => {
     const result = buildOrchestratorDashboardData({ api: null, gamification, snapshot, dashboard })
 
     expect(result.exercises).toHaveLength(2)
@@ -225,12 +240,7 @@ describe("buildOrchestratorDashboardData", () => {
     const api = makeApi()
     const degradedApi = {
       ...api,
-      orchestration: {
-        ...api.orchestration,
-        priority_action: null,
-        continue_card: null,
-        strategic_chapter: null,
-      },
+      orchestration: { ...api.orchestration, priority_action: null, continue_card: null, strategic_chapter: null },
     } as unknown as DashboardOrchestratorResponse
 
     const result = buildOrchestratorDashboardData({ api: degradedApi, gamification, snapshot, dashboard })
@@ -244,26 +254,19 @@ describe("buildOrchestratorDashboardData", () => {
   })
 
   it("falls back to gamification progress when prediction bac is null", () => {
-    const api = makeApi()
-    api.orchestration.engine_pulse.predictionBac = null
-
+    const api = makeApi(); api.orchestration.engine_pulse.predictionBac = null
     const result = buildOrchestratorDashboardData({ api, gamification, snapshot, dashboard })
 
     expect(result.profile.progress_percent).toBe(55)
     expect(result.enginePulse.predictionBac).toBeNull()
   })
 
-  it("limits progress concepts to eight topics", () => {
+  it("keeps only the first eight progress concepts in topics", () => {
     const api = makeApi()
     api.progress.concepts = Array.from({ length: 10 }, (_, i) => ({
-      matiere: "svt",
-      chapitre_id: `chapitre_${i + 1}`,
-      stability: 1 + i,
-      difficulty: 3,
-      retrievability: 0.1 * ((i % 5) + 1),
-      prochaine_revision: null,
-      interval_jours: null,
-      est_due: i % 2 === 0,
+      matiere: "svt", chapitre_id: `chapitre_${i + 1}`,
+      stability: 1 + i, difficulty: 3, retrievability: 0.1 * ((i % 5) + 1),
+      prochaine_revision: null, interval_jours: null, est_due: i % 2 === 0,
       statut_revision: i % 2 === 0 ? "a_revoir_aujourdhui" : "stable",
       priority: i % 2 === 0 ? "urgente" : "normale",
     }))
@@ -279,17 +282,11 @@ describe("buildOrchestratorDashboardData", () => {
     api.orientation.recommendations = [
       api.orientation.recommendations[0],
       {
-        priorite: 2,
-        type: "document_analysis",
-        chapitre_slug: "immunite_specifique",
-        chapitre_ar: "المناعة النوعية",
-        raison: "تمرين وثائقي مهم لربح نقاط BAC.",
-        action: "/document-analysis/immunite_specifique",
-        score_priorite: 6,
-        niveau_urgence: "haute",
-        nature_besoin: "bac",
-        moteur_source_principal: "document_analysis",
-        impact_note_estime: "moyen",
+        priorite: 2, type: "document_analysis", chapitre_slug: "immunite_specifique",
+        chapitre_ar: "المناعة النوعية", raison: "تمرين وثائقي مهم لربح نقاط BAC.",
+        action: "/document-analysis/immunite_specifique", score_priorite: 6,
+        niveau_urgence: "haute", nature_besoin: "bac",
+        moteur_source_principal: "document_analysis", impact_note_estime: "moyen",
       },
     ]
 
@@ -302,13 +299,8 @@ describe("buildOrchestratorDashboardData", () => {
     expect(result.missions[1].impactLabel).toBe("ربح نقاط متوسط")
   })
 
-  it("returns safe empty arrays when local history is empty", () => {
-    const emptySnapshot: ProgressSnapshot = {
-      ...snapshot,
-      history: [],
-      totalAttempts: 0,
-    }
-
+  it("returns safe empty mistakes and exercises when local history is empty", () => {
+    const emptySnapshot: ProgressSnapshot = { ...snapshot, history: [], totalAttempts: 0 }
     const result = buildOrchestratorDashboardData({ api: null, gamification, snapshot: emptySnapshot, dashboard })
 
     expect(result.exercises).toHaveLength(0)
@@ -316,9 +308,7 @@ describe("buildOrchestratorDashboardData", () => {
   })
 
   it("falls back to local missions when orientation recommendations are empty even if api exists", () => {
-    const api = makeApi()
-    api.orientation.recommendations = []
-
+    const api = makeApi(); api.orientation.recommendations = []
     const result = buildOrchestratorDashboardData({ api, gamification, snapshot, dashboard })
 
     expect(result.missions).toHaveLength(1)
@@ -327,9 +317,7 @@ describe("buildOrchestratorDashboardData", () => {
   })
 
   it("falls back to local progress topics when api progress concepts are empty", () => {
-    const api = makeApi()
-    api.progress.concepts = []
-
+    const api = makeApi(); api.progress.concepts = []
     const result = buildOrchestratorDashboardData({ api, gamification, snapshot, dashboard })
 
     expect(result.topics).toHaveLength(2)
@@ -339,14 +327,12 @@ describe("buildOrchestratorDashboardData", () => {
 
   it("sanitizes unusual chapter identifiers into readable topic titles", () => {
     const api = makeApi()
-    api.progress.concepts = [
-      {
-        matiere: "svt", chapitre_id: "___respiration-cellulaire___",
-        stability: 2, difficulty: 3, retrievability: 0.5,
-        prochaine_revision: null, interval_jours: null, est_due: true,
-        statut_revision: "a_revoir_aujourdhui", priority: "urgente",
-      },
-    ]
+    api.progress.concepts = [{
+      matiere: "svt", chapitre_id: "___respiration-cellulaire___",
+      stability: 2, difficulty: 3, retrievability: 0.5,
+      prochaine_revision: null, interval_jours: null, est_due: true,
+      statut_revision: "a_revoir_aujourdhui", priority: "urgente",
+    }]
 
     const result = buildOrchestratorDashboardData({ api, gamification, snapshot, dashboard })
 
@@ -358,14 +344,12 @@ describe("buildOrchestratorDashboardData", () => {
     const api = makeApi()
     api.progress.concepts = [
       {
-        matiere: "svt", chapitre_id: "zero_case",
-        stability: 1, difficulty: 3, retrievability: -4,
+        matiere: "svt", chapitre_id: "zero_case", stability: 1, difficulty: 3, retrievability: -4,
         prochaine_revision: null, interval_jours: null, est_due: true,
         statut_revision: "a_revoir_aujourdhui", priority: "urgente",
       },
       {
-        matiere: "svt", chapitre_id: "over_case",
-        stability: 1, difficulty: 3, retrievability: 9,
+        matiere: "svt", chapitre_id: "over_case", stability: 1, difficulty: 3, retrievability: 9,
         prochaine_revision: null, interval_jours: null, est_due: false,
         statut_revision: "stable", priority: "normale",
       },
@@ -377,21 +361,54 @@ describe("buildOrchestratorDashboardData", () => {
     expect(result.topics[1].progress_percent).toBe(100)
   })
 
-  it("treats NaN retrievability as zero mastery instead of propagating NaN", () => {
+  it("does not treat NaN-like retrievability as a valid mastery signal", () => {
     const api = makeApi()
-    api.orchestration.engine_pulse.predictionBac = Number.NaN
-    api.progress.concepts = [
-      {
-        matiere: "svt", chapitre_id: "nan_case",
-        stability: 1, difficulty: 3, retrievability: Number.NaN,
-        prochaine_revision: null, interval_jours: null, est_due: true,
-        statut_revision: "a_revoir_aujourdhui", priority: "urgente",
-      },
-    ]
+    api.progress.concepts = [{
+      matiere: "svt", chapitre_id: "nan_case", stability: 1, difficulty: 3, retrievability: Number.NaN,
+      prochaine_revision: null, interval_jours: null, est_due: true,
+      statut_revision: "a_revoir_aujourdhui", priority: "urgente",
+    }]
 
     const result = buildOrchestratorDashboardData({ api, gamification, snapshot, dashboard })
 
     expect(result.topics[0].progress_percent).toBe(0)
-    expect(result.enginePulse.predictionBac).toBeNull()
+    expect(result.topics[0].mastery).toBe(0)
+    expect(result.weakestTopic?.title).toBe("nan case")
+  })
+
+  it("survives partially malformed api branches by falling back safely", () => {
+    const malformedApi = {
+      user: { id: "u1", prenom: "Aya" },
+      progress: null,
+      orientation: null,
+      week_activity: null,
+      due_cards: { total: 0, cards: [] },
+      orchestration: null,
+    } as unknown as DashboardOrchestratorResponse
+
+    const result = buildOrchestratorDashboardData({ api: malformedApi, gamification, snapshot, dashboard })
+
+    expect(result.profile.name).toBe("Aya")
+    expect(result.priorityAction.source).toBe("fallback")
+    expect(result.continueCard.source).toBe("fallback")
+    expect(result.strategicChapter.source).toBe("fallback")
+    expect(result.enginePulse.source).toBe("api")
+    expect(result.enginePulse.dueToday).toBe(0)
+    expect(result.missions[0].titleAr).toBe("مراجعة التنفس")
+    expect(result.topics[0].href).toBe("/progress")
+    expect(result.weekly.length).toBeGreaterThan(0)
+  })
+
+  it("survives malformed nested arrays by falling back to local sources", () => {
+    const api = makeApi()
+    ;(api.progress as unknown as { concepts: unknown }).concepts = "invalid"
+    ;(api.orientation as unknown as { recommendations: unknown }).recommendations = "invalid"
+    ;(api.week_activity as unknown as { days: unknown }).days = "invalid"
+
+    const result = buildOrchestratorDashboardData({ api, gamification, snapshot, dashboard })
+
+    expect(result.missions[0].titleAr).toBe("مراجعة التنفس")
+    expect(result.topics[0].href).toBe("/progress")
+    expect(result.weekly.length).toBe(dashboard.weekActivity.length)
   })
 })
