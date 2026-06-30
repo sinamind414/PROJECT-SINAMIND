@@ -1,5 +1,5 @@
 import type { OrientationRecommendation } from "@/lib/types"
-import { getImpactBadge, getNeedBadge, getSourceBadge, getUrgencyBadge } from "./mission-signals"
+import { getImpactBadge, getNeedBadge, getSourceBadge, getUrgencyBadge } from "@/features/dashboard/orchestrator"
 
 type DecisionSignalsPanelProps = {
   recommendation: OrientationRecommendation

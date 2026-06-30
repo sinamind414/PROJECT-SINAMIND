@@ -1,7 +1,7 @@
 import Link from "next/link"
 import type { OrientationRecommendation } from "@/lib/types"
 import type { OrchestratorPriorityAction } from "@/features/dashboard/orchestrator"
-import { getImpactBadge, getNeedBadge, getSourceBadge, getUrgencyBadge } from "./mission-signals"
+import { getImpactBadge, getNeedBadge, getSourceBadge, getUrgencyBadge } from "@/features/dashboard/orchestrator"
 
 type PriorityActionCardProps = {
   action: OrchestratorPriorityAction
