@@ -48,7 +48,7 @@ export function ChatbotWidget() {
       {/* Panel */}
       {isOpen && (
         <div
-          className="fixed bottom-24 lg:bottom-24 left-4 lg:left-6 w-[calc(100vw-2rem)] lg:w-96 max-w-[calc(100vw-2rem)] lg:max-w-[calc(100vw-3rem)] z-50 rounded-2xl shadow-2xl overflow-hidden flex flex-col"
+          className="fixed bottom-[calc(env(safe-area-inset-bottom)+6rem)] lg:bottom-24 left-4 lg:left-6 w-[calc(100vw-2rem)] lg:w-96 max-w-[calc(100vw-2rem)] lg:max-w-[calc(100vw-3rem)] z-[90] rounded-2xl shadow-2xl overflow-hidden flex flex-col"
           style={{
             background: "#182730",
             border: "1px solid rgba(255,255,255,0.08)",
@@ -74,7 +74,9 @@ export function ChatbotWidget() {
             <div className="flex items-center gap-2">
               <TutorToggle isTutorMode={isTutorMode} onToggle={toggleTutorMode} />
               <button
+                type="button"
                 onClick={closeChat}
+                aria-label="إغلاق المساعد خوارزمي"
                 className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors"
               >
                 ✕
@@ -293,14 +295,22 @@ export function ChatbotWidget() {
 
       {/* FAB */}
       <button
+        type="button"
         onClick={() => (isOpen ? closeChat() : openChat())}
-        className="fixed bottom-24 lg:bottom-6 left-4 lg:left-6 w-14 h-14 rounded-full shadow-2xl flex items-center justify-center z-50 transition-all hover:scale-110"
+        aria-label={isOpen ? "إغلاق المساعد خوارزمي" : "سأل الأستاذ خوارزمي"}
+        title="سأل الأستاذ خوارزمي"
+        className="chatbot-trigger fixed bottom-[calc(env(safe-area-inset-bottom)+5.5rem)] lg:bottom-6 left-4 lg:left-6 w-14 h-14 rounded-full shadow-2xl flex items-center justify-center z-[90] transition-all hover:scale-110"
         style={{
           background: "linear-gradient(135deg, #2DD4BF, #14B8A6, #F59E0B)",
           boxShadow: "0 8px 24px rgba(45,212,191,0.4)",
         }}
       >
-        <span className="text-2xl">{isOpen ? "✕" : "🧠"}</span>
+        <span className="text-2xl" aria-hidden="true">{isOpen ? "✕" : "🧠"}</span>
+        {!isOpen && badge === 0 && (
+          <span className="absolute left-16 top-1/2 hidden -translate-y-1/2 whitespace-nowrap rounded-full bg-slate-900/95 border border-mint/30 px-3 py-1.5 text-xs font-bold text-mint shadow-xl sm:block">
+            سأل خوارزمي
+          </span>
+        )}
 
         {!isOpen && badge > 0 && (
           <div className="absolute -top-1 -right-1 min-w-[20px] h-5 rounded-full bg-red-500 border-2 border-[#0C151A] flex items-center justify-center px-1">
