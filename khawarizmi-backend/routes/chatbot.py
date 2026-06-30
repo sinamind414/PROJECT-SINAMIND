@@ -13,6 +13,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request
 from openai import AsyncOpenAI
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from cache import get_cache, make_cache_key, set_cache
 from config import get_settings
 from database import get_db
 from deps import get_current_user, get_openai_optional
@@ -55,15 +56,27 @@ def _response(
 def _cards_for_mode(mode: str) -> list[dict]:
     cards = {
         "quick": [
-            {"titre": "شرح مفهوم", "raison": "فهم أفضل للدرس", "action": "اطلب شرح أي مفهوم في SVT", "bouton": "📖 شرح"},
-            {"titre": "حل تمرين", "raison": "تطبيق مباشر", "action": "حل تمارين البكالوريا", "bouton": "✍️ تمرين"},
+            {"titre": "اشرح لي بسرعة", "raison": "فهم مباشر دون إطالة", "action": "اشرح الفكرة الأساسية فقط", "bouton": "⚡ سريع"},
+            {"titre": "أعطني الأهم للبكالوريا", "raison": "تركيز على النقاط التي تربحك العلامة", "action": "ما المهم في البكالوريا هنا؟", "bouton": "🎯 BAC"},
         ],
         "tutor": [
-            {"titre": "شرح خطوة بخطوة", "raison": "تعليم تدريجي", "action": "اطلب شرح المفهوم بالتفصيل", "bouton": "📚 شرح"},
-            {"titre": "سؤال تفاعلي", "raison": "تقييم الفهم", "action": "اسألني سؤالاً", "bouton": "❓ سؤال"},
+            {"titre": "شرح خطوة بخطوة", "raison": "تعليم تدريجي حتى الفهم", "action": "اشرح لي خطوة بخطوة", "bouton": "📚 شرح"},
+            {"titre": "ساعدني بدون الجواب", "raison": "توجيه سقراطي ذكي", "action": "ساعدني بدون أن تعطيني الجواب", "bouton": "🧠 فكر"},
+        ],
+        "bac": [
+            {"titre": "ماذا ينتظر المصحح؟", "raison": "فهم المطلوب في صيغة البكالوريا", "action": "ماذا ينتظر المصحح في هذا السؤال؟", "bouton": "📝 مصحح"},
+            {"titre": "أين أخطئ عادة؟", "raison": "تجنب الأخطاء الشائعة", "action": "ما هي الأخطاء الشائعة هنا؟", "bouton": "⚠️ أخطاء"},
         ],
     }
     return cards.get(mode, cards["quick"])
+
+
+def _mode_instruction(mode: str) -> str:
+    if mode == "tutor":
+        return "أجب كمدرس شخصي: قصير، تدريجي، وادفع التلميذ إلى الفهم خطوة بخطوة."
+    if mode == "bac":
+        return "أجب بصيغة موجهة للبكالوريا: ركز على المطلوب، المنهجية، والنقطة التي تربح العلامة."
+    return "أجب بسرعة ووضوح: الفكرة الأساسية أولاً ثم أهم نقطة تطبيقية."
 
 
 # ── Endpoint ─────────────────────────────────────
@@ -104,6 +117,18 @@ async def ask_chatbot(
 
     cfg = get_settings()
     system_prompt = SYSTEM_PROMPT_AR if lang == "ar" else SYSTEM_PROMPT_FR
+    system_prompt = f"{system_prompt}\n\nتوجيه إضافي حسب النمط:\n{_mode_instruction(mode)}"
+
+    cache_key = make_cache_key("chatbot", lang, mode, chapter or "-", message.strip().lower())
+    cached = await get_cache(cache_key)
+    if cached:
+        import json
+        try:
+            payload = json.loads(cached)
+            payload["from_cache"] = True
+            return payload
+        except json.JSONDecodeError:
+            pass
 
     rag_chunks = await rag_search(db, message, chapter)
     rag_context = format_rag_context(rag_chunks)
@@ -141,7 +166,7 @@ async def ask_chatbot(
     # Limiter l'historique aux 6 derniers échanges (économie de tokens)
     for h in history[-6:]:
         if isinstance(h, dict) and h.get("role") in ("user", "assistant") and h.get("content"):
-            messages.append({"role": h["role"], "content": h["content"][:500]})
+            messages.append({"role": h["role"], "content": h["content"][:300]})
     messages.append({"role": "user", "content": message[:1000]})
 
     try:
@@ -169,7 +194,7 @@ async def ask_chatbot(
         except Exception:
             logger.warning("Échec record_chat_interaction (non bloquant)")
 
-        return {
+        result = {
             "response": ai_text,
             "lang": "ar",
             "tokens_utilises": tokens_used,
@@ -179,6 +204,14 @@ async def ask_chatbot(
             "sources": sources,
             "source_rag": source_rag,
         }
+
+        try:
+            import json
+            await set_cache(cache_key, json.dumps(result, ensure_ascii=False), ttl=900)
+        except Exception:
+            logger.warning("Échec cache chatbot (non bloquant)")
+
+        return result
 
     except Exception as e:
         logger.error(f"Erreur chatbot : {e}")
