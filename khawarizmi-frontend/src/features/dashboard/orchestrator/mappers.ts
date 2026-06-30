@@ -88,8 +88,8 @@ function buildProfile(
   dashboard: DailyDashboardState,
 ): Profile {
   const countdown = getCountdown()
-  const predictionValue = api?.orchestration.engine_pulse.predictionBac ?? null
-  const apiReady = predictionValue != null
+  const predictionValue = api?.orchestration.engine_pulse.predictionBac
+  const apiReady = (predictionValue != null && Number.isFinite(predictionValue))
     ? Math.max(0, Math.min(100, Math.round((predictionValue / 20) * 100)))
     : gamification.xpProgress
 
@@ -207,7 +207,7 @@ function buildMistakes(snapshot: ProgressSnapshot): Mistake[] {
 
 function buildEnginePulse(api: DashboardOrchestratorResponse | null): EnginePulse {
   return {
-    predictionBac: api?.orchestration.engine_pulse.predictionBac ?? null,
+    predictionBac: Number.isFinite(api?.orchestration.engine_pulse.predictionBac ?? undefined) ? api!.orchestration.engine_pulse.predictionBac : null,
     dueToday: api?.orchestration.engine_pulse.dueToday ?? 0,
     flashcardsDue: api?.orchestration.engine_pulse.flashcardsDue ?? 0,
     actionVerbsDue: api?.orchestration.engine_pulse.actionVerbsDue ?? 0,

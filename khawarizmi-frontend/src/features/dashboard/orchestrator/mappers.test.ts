@@ -314,4 +314,84 @@ describe("buildOrchestratorDashboardData", () => {
     expect(result.exercises).toHaveLength(0)
     expect(result.mistakes).toHaveLength(0)
   })
+
+  it("falls back to local missions when orientation recommendations are empty even if api exists", () => {
+    const api = makeApi()
+    api.orientation.recommendations = []
+
+    const result = buildOrchestratorDashboardData({ api, gamification, snapshot, dashboard })
+
+    expect(result.missions).toHaveLength(1)
+    expect(result.missions[0].titleAr).toBe("مراجعة التنفس")
+    expect(result.missions[0].urgenceLabel).toBeUndefined()
+  })
+
+  it("falls back to local progress topics when api progress concepts are empty", () => {
+    const api = makeApi()
+    api.progress.concepts = []
+
+    const result = buildOrchestratorDashboardData({ api, gamification, snapshot, dashboard })
+
+    expect(result.topics).toHaveLength(2)
+    expect(result.topics[0].titleAr).toBe("التحليل")
+    expect(result.topics[0].href).toBe("/progress")
+  })
+
+  it("sanitizes unusual chapter identifiers into readable topic titles", () => {
+    const api = makeApi()
+    api.progress.concepts = [
+      {
+        matiere: "svt", chapitre_id: "___respiration-cellulaire___",
+        stability: 2, difficulty: 3, retrievability: 0.5,
+        prochaine_revision: null, interval_jours: null, est_due: true,
+        statut_revision: "a_revoir_aujourdhui", priority: "urgente",
+      },
+    ]
+
+    const result = buildOrchestratorDashboardData({ api, gamification, snapshot, dashboard })
+
+    expect(result.topics[0].title).toBe("respiration cellulaire")
+    expect(result.topics[0].href).toBe("/cours/___respiration-cellulaire___")
+  })
+
+  it("keeps topic progress bounded between 0 and 100 for extreme retrievability values", () => {
+    const api = makeApi()
+    api.progress.concepts = [
+      {
+        matiere: "svt", chapitre_id: "zero_case",
+        stability: 1, difficulty: 3, retrievability: -4,
+        prochaine_revision: null, interval_jours: null, est_due: true,
+        statut_revision: "a_revoir_aujourdhui", priority: "urgente",
+      },
+      {
+        matiere: "svt", chapitre_id: "over_case",
+        stability: 1, difficulty: 3, retrievability: 9,
+        prochaine_revision: null, interval_jours: null, est_due: false,
+        statut_revision: "stable", priority: "normale",
+      },
+    ]
+
+    const result = buildOrchestratorDashboardData({ api, gamification, snapshot, dashboard })
+
+    expect(result.topics[0].progress_percent).toBe(0)
+    expect(result.topics[1].progress_percent).toBe(100)
+  })
+
+  it("treats NaN retrievability as zero mastery instead of propagating NaN", () => {
+    const api = makeApi()
+    api.orchestration.engine_pulse.predictionBac = Number.NaN
+    api.progress.concepts = [
+      {
+        matiere: "svt", chapitre_id: "nan_case",
+        stability: 1, difficulty: 3, retrievability: Number.NaN,
+        prochaine_revision: null, interval_jours: null, est_due: true,
+        statut_revision: "a_revoir_aujourdhui", priority: "urgente",
+      },
+    ]
+
+    const result = buildOrchestratorDashboardData({ api, gamification, snapshot, dashboard })
+
+    expect(result.topics[0].progress_percent).toBe(0)
+    expect(result.enginePulse.predictionBac).toBeNull()
+  })
 })
