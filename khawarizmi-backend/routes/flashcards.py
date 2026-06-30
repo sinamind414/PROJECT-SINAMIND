@@ -344,41 +344,9 @@ async def get_due_cards(
     current_user: dict = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    now = datetime.now(UTC)
-    result = await db.execute(
-        text("""
-            SELECT id, micro_concept_id, concept_id, chapter,
-                   difficulty, stability, state, due_date,
-                   prochaine_revision, interval_jours
-            FROM mastery_micro_concepts
-            WHERE user_id = :uid
-              AND due_date <= :now
-              AND (state IS NULL OR state IN (0, 1))
-            ORDER BY due_date ASC, stability ASC
-            LIMIT 20
-        """),
-        {"uid": current_user["id"], "now": now},
-    )
-    rows = result.fetchall()
+    from services.progress_snapshots import get_due_cards_snapshot
 
-    cards = []
-    for r in rows:
-        cards.append(
-            {
-                "id": str(r[0]),
-                "micro_concept_id": r[1],
-                "concept_id": r[2],
-                "chapter": r[3],
-                "difficulty": r[4],
-                "stability": r[5],
-                "state": r[6],
-                "due_date": r[7].isoformat() if r[7] else None,
-                "next_review": r[8].isoformat() if r[8] else None,
-                "interval_jours": r[9],
-            }
-        )
-
-    return {"cards": cards, "total": len(cards)}
+    return await get_due_cards_snapshot(db, current_user["id"])
 
 
 @router.post("/api/flashcards", tags=["Flashcards"])
