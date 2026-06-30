@@ -2,6 +2,12 @@
 
 0ms. 0 DA. 0 appel API.
 Normalise l'arabe, détecte les patterns, retourne l'intention.
+
+Nouveaux types ajoutés :
+  - procrastination : l'élève remet à plus tard
+  - daily_plan     : demande programme du jour
+  - smart_goal     : demande objectif de révision
+  - illusion       : croit comprendre mais ne comprend pas
 """
 
 import re
@@ -41,8 +47,63 @@ INTENT_RULES = [
             "وش راك",
             "برنامج اليوم",
             "خطة اليوم",
+            "وين نبدأ",
+            "كيف نرتب",
+            "وش الاولوية",
         ],
         "type": "orientation",
+    },
+    {
+        "intent": "procrastination",
+        "patterns": [
+            "غدا",
+            "بكره",
+            "بكرة",
+            "لاحقا",
+            "بعد",
+            "مش هنهار",
+            "ما نرويش",
+            "راني مشغول",
+            "ما عنديش وقت",
+            "خلاص بقا",
+            "بعدين",
+            "يلا نشوفو",
+            "راهي طويلة",
+            "ما نقدرش نبدأ",
+            "نشوفو غدا",
+            "نكملو بعد",
+        ],
+        "type": "procrastination",
+    },
+    {
+        "intent": "daily_plan",
+        "patterns": [
+            "برنامج اليوم",
+            "وش نراجع اليوم",
+            "خطة اليوم",
+            "اليوم ندير",
+            "وش لازم ندير اليوم",
+            "مهمة اليوم",
+            "كم بطاقة اليوم",
+            "وش مستحق اليوم",
+        ],
+        "type": "daily_plan",
+    },
+    {
+        "intent": "smart_goal",
+        "patterns": [
+            "هدف",
+            "هدفي",
+            "نحتاج هدف",
+            "خطة مراجعة",
+            "برنامج مراجعة",
+            "وش نحقق",
+            "هدف الاسبوع",
+            "هدف الشهر",
+            "نحتاج خطة",
+            "كيف ننظم",
+        ],
+        "type": "smart_goal",
     },
     {
         "intent": "motivation",
@@ -62,8 +123,29 @@ INTENT_RULES = [
             "صعبة",
             "معقد",
             "محبط",
+            "نحس بضغط",
+            "خايف من البكالوريا",
+            "ما راني مستعد",
+            "راني خايف",
         ],
         "type": "motivation",
+    },
+    {
+        "intent": "illusion",
+        "patterns": [
+            "فاهم",
+            "فهمت كلش",
+            "راني فاهم",
+            "مافيهاش",
+            "سهلة",
+            "راني نعرف",
+            "نعرف ذاك",
+            "مش لازم نراجع",
+            "راني ختمت",
+            "خلصت",
+            "مافيها والو",
+        ],
+        "type": "illusion",
     },
     {
         "intent": "triche",
@@ -97,7 +179,16 @@ INTENT_RULES = [
     },
     {
         "intent": "navigation",
-        "patterns": ["اين درس", "وين الفصل", "اريد رابط", "كيف نروح ل", "عرضني", "اين اجد", "وين الدرس", "اين الموضوع"],
+        "patterns": [
+            "اين درس",
+            "وين الفصل",
+            "اريد رابط",
+            "كيف نروح ل",
+            "عرضني",
+            "اين اجد",
+            "وين الدرس",
+            "اين الموضوع",
+        ],
         "type": "navigation",
     },
     {
@@ -118,6 +209,10 @@ INTENT_RULES = [
             "عرّف",
             "وضّح",
             "لماذا",
+            "لم أفهم",
+            "ما فهمتش",
+            "بسّط",
+            "اشرح لي",
         ],
         "type": "socratique",
     },
@@ -125,6 +220,22 @@ INTENT_RULES = [
 
 # Message spécial d'initialisation
 INIT_MESSAGE = "__init__"
+
+# Priorité des intents (du plus spécifique au plus général)
+_INTENT_PRIORITY = [
+    "procrastination",
+    "triche",
+    "daily_plan",
+    "smart_goal",
+    "motivation",
+    "illusion",
+    "feedback",
+    "navigation",
+    "orientation",
+    "sos_concept",
+]
+
+_RULE_BY_INTENT = {rule["intent"]: rule for rule in INTENT_RULES}
 
 
 def classify(message: str) -> dict:
@@ -138,7 +249,10 @@ def classify(message: str) -> dict:
 
     norm = normalize_arabic(message)
 
-    for rule in INTENT_RULES:
+    for intent_name in _INTENT_PRIORITY:
+        rule = _RULE_BY_INTENT.get(intent_name)
+        if not rule:
+            continue
         for pattern in rule["patterns"]:
             if normalize_arabic(pattern) in norm:
                 return {

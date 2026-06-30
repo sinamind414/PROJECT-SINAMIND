@@ -508,56 +508,44 @@ class KhawarizmiApiClient {
 
   // ── Tuteur IA (chatbot) ──────────────────────
 
-  // ── Tuteur IA (chatbot) ──────────────────────
+  // ── Chatbot / Tuteur IA (orchestrateur unifié) ──
 
   async sendTuteurMessage(payload: {
     message: string
     context?: { page_source?: string; history?: Array<{ role: string; content: string }> | string[]; chapitre?: string }
     mode?: "free" | "quick" | "tutor"
   }): Promise<TuteurResponse> {
-    if (payload.message === "__init__" || payload.message === "__activate_tutor__") {
-      return {
-        reponse: "مرحبا بك يا طالب البكالوريا! كيف يمكنني مساعدتك اليوم في مادة SVT؟ 😊",
-        type: "orientation",
-        cartes: [
-          { titre: "شرح مفهوم", raison: "فهم أفضل للدرس", action: "اطلب شرح أي مفهوم في SVT", bouton: "📖 شرح" },
-          { titre: "حل تمرين", raison: "تطبيق مباشر", action: "حل تمارين البكالوريا", bouton: "✍️ تمرين" },
-        ],
-        flashcards_suggerees: [],
-        fallback_active: false,
-      }
-    }
-
+    const chapitre = payload.context?.chapitre
     const history = (payload.context?.history as Array<{ role: string; content: string }> | undefined) || []
-    const chatbotPayload: Record<string, unknown> = { message: payload.message, lang: "ar" }
-    if (history.length > 0) {
-      chatbotPayload.history = history.slice(-6)
+    const tuteurBody: Record<string, unknown> = {
+      message: payload.message,
+      lang: "ar",
+      mode: payload.mode || "quick",
+    }
+    if (chapitre) {
+      tuteurBody.context = { chapitre, history: history.slice(-6) }
+    } else if (history.length > 0) {
+      tuteurBody.context = { history: history.slice(-6) }
     }
 
     try {
-      const data = await this.request<{
-        content: string; lang: string; tokens_used?: number; from_cache?: boolean
-        fallback_active?: boolean
-        cards?: Array<{ titre: string; raison: string; action: string; bouton: string }>
-        sources?: Array<{ source: string; chapter?: string; excerpt: string }>
-        source_rag?: string
-        type?: string
-      }>("/api/ai/chat", {
+      const d = await this.request<Record<string, unknown>>("/api/tuteur", {
         method: "POST",
-        body: JSON.stringify({
-          mode: payload.mode || "free",
-          ...chatbotPayload
-        }),
+        body: JSON.stringify(tuteurBody),
       })
-      const d = data as Record<string, unknown>
       return {
-        reponse: (d.content as string) || (d.response as string) || (d.reponse as string) || "لم تصلني إجابة واضحة. أعد المحاولة من فضلك.",
+        reponse: (d.reponse as string) || (d.response as string) || (d.content as string) || "لم تصلني إجابة واضحة. أعد المحاولة من فضلك.",
         type: ((d.type as TuteurResponse["type"]) || "socratique") as TuteurResponse["type"],
-        cartes: ((d.cards as TuteurResponse["cartes"]) || (d.cartes as TuteurResponse["cartes"]) || []),
+        cartes: (d.cartes as TuteurResponse["cartes"]) || [],
         flashcards_suggerees: (d.flashcards_suggerees as string[]) || [],
         sources: (d.sources as TuteurResponse["sources"]) || [],
         source_rag: d.source_rag as string | undefined,
         fallback_active: Boolean(d.fallback_active),
+        question_suivante: d.question_suivante as string | undefined,
+        redirect: d.redirect as string | undefined,
+        lang: "ar",
+        tokens_used: d.tokens_used as number | undefined || d.tokens_utilises as number | undefined,
+        from_cache: Boolean(d.from_cache),
       }
     } catch {
       throw new Error("Chatbot indisponible")

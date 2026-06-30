@@ -898,5 +898,7 @@ export interface TuteurResponse {
   lang?: string
   tokens_used?: number
   from_cache?: boolean
+  due_concept?: string
+  due_chapter?: string
 }
 

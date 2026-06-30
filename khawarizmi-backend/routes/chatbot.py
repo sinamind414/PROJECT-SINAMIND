@@ -1,12 +1,15 @@
 """
-routes/chatbot.py - Endpoint dédié pour le chatbot v2 (Q&A libre).
+routes/chatbot.py — Endpoint dédié pour le chatbot v2 (Q&A libre).
 
 POST /api/chatbot/ask
-Body : { message: str, history?: [{role, content}], lang?: "fr"|"ar", chapitre?: str }
+Body : { message, history?, lang?, chapitre?, mode? }
 Auth : JWT Bearer requis
-Réponse : { response: str, sources?: [], source_rag?: str, from_cache: false }
+
+Délègue au chatbot_orchestrator unifié.
+Maintient les endpoints legacy (state, feedback, daily-mission, etc.)
 """
 
+import json
 import logging
 
 from fastapi import APIRouter, Depends, HTTPException, Request
@@ -14,23 +17,13 @@ from openai import AsyncOpenAI
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from cache import get_cache, make_cache_key, set_cache
-from config import get_settings
-from database import get_db
 from deps import get_current_user, get_openai_optional
+from database import get_db
 from rate_limit import chat_limit, limiter
-from services.llm import _call_with_fallback
+from services.chatbot_orchestrator import handle_chatbot_message
 
 logger = logging.getLogger("khawarizmi.chatbot")
 router = APIRouter(prefix="/api/chatbot", tags=["Chatbot"])
-
-
-from prompts.free_chat_prompt import SYSTEM_PROMPT_AR, SYSTEM_PROMPT_FR
-
-
-from services.rag_service import format_rag_context, rag_search, source_cards
-
-
-# ── Helpers ─────────────────────────────────────
 
 
 def _response(
@@ -79,7 +72,7 @@ def _mode_instruction(mode: str) -> str:
     return "أجب بسرعة ووضوح: الفكرة الأساسية أولاً ثم أهم نقطة تطبيقية."
 
 
-# ── Endpoint ─────────────────────────────────────
+# ── Endpoint principal ────────────────────────────
 
 
 @router.post("/ask")
@@ -91,15 +84,6 @@ async def ask_chatbot(
     db: AsyncSession = Depends(get_db),
     openai_client: AsyncOpenAI | None = Depends(get_openai_optional),
 ):
-    """
-    Réponse libre à une question SVT en arabe.
-    Body :
-      - message: str (question de l'utilisateur)
-      - history?: list[{role, content}] (historique de conversation)
-      - lang?: "fr" | "ar" (défaut: "ar")
-      - chapitre?: str (chapitre optionnel pour filtrer le RAG)
-      - mode?: "quick" | "tutor" (défaut: "quick")
-    """
     message = body.get("message", "").strip()
     if not message:
         raise HTTPException(status_code=400, detail="Le champ 'message' est requis")
@@ -115,14 +99,10 @@ async def ask_chatbot(
     chapter = body.get("chapitre") or None
     mode = body.get("mode", "quick")
 
-    cfg = get_settings()
-    system_prompt = SYSTEM_PROMPT_AR if lang == "ar" else SYSTEM_PROMPT_FR
-    system_prompt = f"{system_prompt}\n\nتوجيه إضافي حسب النمط:\n{_mode_instruction(mode)}"
-
+    # Cache lookup (simple, pas sémantique)
     cache_key = make_cache_key("chatbot", lang, mode, chapter or "-", message.strip().lower())
     cached = await get_cache(cache_key)
     if cached:
-        import json
         try:
             payload = json.loads(cached)
             payload["from_cache"] = True
@@ -130,109 +110,44 @@ async def ask_chatbot(
         except json.JSONDecodeError:
             pass
 
-    rag_chunks = await rag_search(db, message, chapter)
-    rag_context = format_rag_context(rag_chunks)
-    sources = source_cards(rag_chunks)
-    source_rag = rag_chunks[0]["source"] if rag_chunks else None
+    # Déléguer au chatbot orchestrator unifié
+    context = {
+        "chapitre": chapter,
+        "history": history,
+        "mode": mode,
+    }
 
-    if openai_client is None:
-        if rag_chunks:
-            excerpt = rag_chunks[0]["content"][:250]
-            return _response(
-                f"أنا في وضع احتياطي، لكن وجدت في القاعدة الرسمية ما يلي:\n\n• {excerpt}\n\nاكتب لي أي جزء لم تفهمه وسأبسطه خطوة بخطوة.",
-                type_="orientation",
-                fallback=True,
-                cartes=_cards_for_mode(mode),
-                sources=sources,
-                source_rag=source_rag,
-            )
-        return _response(
-            "أنا متاح الآن في وضع احتياطي. اكتب المفهوم الذي تريد فهمه وسأرشدك بخطوات قصيرة، لكن خدمة الذكاء الاصطناعي غير مفعلة حالياً.",
-            type_="orientation",
-            fallback=True,
-            cartes=_cards_for_mode(mode),
-            sources=sources,
-            source_rag=source_rag,
-        )
+    result = await handle_chatbot_message(
+        message=message,
+        context=context,
+        user_id=str(current_user["id"]),
+        db=db,
+        openai_client=openai_client,
+        mode=mode,
+    )
 
-    # Injecter le contexte RAG dans le prompt système
-    messages = [{"role": "system", "content": system_prompt}]
-    if rag_context:
-        messages.append({
-            "role": "system",
-            "content": f"Contexte du manuel officiel :\n{rag_context}",
-        })
+    # Mapper le format orchestrator → format legacy route
+    response_data = {
+        "response": result.get("reponse", ""),
+        "lang": "ar",
+        "tokens_utilises": result.get("tokens_used", 0),
+        "from_cache": result.get("from_cache", False),
+        "fallback_active": result.get("fallback_active", False),
+        "cartes": result.get("cartes", []),
+        "sources": result.get("sources", []),
+        "source_rag": result.get("source_rag"),
+        "type": result.get("type", "socratique"),
+        "question_suivante": result.get("question_suivante"),
+        "flashcards_suggerees": result.get("flashcards_suggerees", []),
+    }
 
-    # Limiter l'historique aux 6 derniers échanges (économie de tokens)
-    for h in history[-6:]:
-        if isinstance(h, dict) and h.get("role") in ("user", "assistant") and h.get("content"):
-            messages.append({"role": h["role"], "content": h["content"][:300]})
-    messages.append({"role": "user", "content": message[:1000]})
-
+    # Cache store (non bloquant)
     try:
-        response = await _call_with_fallback(
-            messages=messages,
-            primary_client=openai_client,
-            primary_model=cfg.openai_model,
-            temperature=0.7,
-            max_tokens=800,
-            timeout=30.0,
-        )
-        ai_text = (response.choices[0].message.content or "").strip()
-        tokens_used = response.usage.total_tokens if response.usage else 0
+        await set_cache(cache_key, json.dumps(response_data, ensure_ascii=False), ttl=900)
+    except Exception:
+        pass
 
-        if lang == "fr" and not any("\u0600" <= c <= "\u06ff" for c in ai_text[:50]):
-            ai_text = "عذراً، أعد صياغة سؤالك بالعربية من فضلك. 🇩🇿"
-
-        # Enregistrer l'interaction (non bloquant)
-        try:
-            from services.chatbot_engagement_service import record_chat_interaction
-            await record_chat_interaction(
-                db, current_user["id"], message,
-                chapter=chapter, mode=mode,
-            )
-        except Exception:
-            logger.warning("Échec record_chat_interaction (non bloquant)")
-
-        result = {
-            "response": ai_text,
-            "lang": "ar",
-            "tokens_utilises": tokens_used,
-            "from_cache": False,
-            "fallback_active": False,
-            "cartes": _cards_for_mode(mode),
-            "sources": sources,
-            "source_rag": source_rag,
-        }
-
-        try:
-            import json
-            await set_cache(cache_key, json.dumps(result, ensure_ascii=False), ttl=900)
-        except Exception:
-            logger.warning("Échec cache chatbot (non bloquant)")
-
-        return result
-
-    except Exception as e:
-        logger.error(f"Erreur chatbot : {e}")
-        if rag_chunks:
-            fallback_text = (
-                f"حسب الدرس: {rag_chunks[0]['content'][:200]}...\n"
-                "ماذا تستنتج من هذا؟ 💡"
-            )
-        else:
-            fallback_text = "عذراً، أواجه صعوبة في الاتصال حالياً. حاول مرة أخرى بعد قليل 🙏"
-
-        return {
-            "response": fallback_text,
-            "lang": "ar",
-            "tokens_utilises": 0,
-            "from_cache": False,
-            "fallback_active": True,
-            "cartes": _cards_for_mode(mode),
-            "sources": sources,
-            "source_rag": source_rag,
-        }
+    return response_data
 
 
 @router.get("/health")

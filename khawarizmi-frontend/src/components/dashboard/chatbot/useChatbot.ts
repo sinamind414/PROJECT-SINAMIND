@@ -353,72 +353,18 @@ export function useChatbot(): UseChatbotReturn {
     }
   }, [addAssistantMessage])
 
-  const toggleTutorMode = useCallback(async () => {
-    if (!isTutorMode) {
-      setLoading(true)
-      try {
-        await apiClient.sendChatbotMessage({
-          message: "__activate_tutor__",
-          context: {
-            page_source: typeof window !== "undefined" ? window.location.pathname : undefined,
-          },
-          mode: "tutor",
-        })
-        setIsTutorMode(true)
-        addAssistantMessage({
-          reponse: "تم تفعيل وضع المدرس الشخصي 🎓. سأساعدك بطريقة تعليمية مخصصة.",
-          type: "orientation",
-          cartes: [],
-          flashcards_suggerees: [],
-          fallback_active: false,
-        })
-      } catch {
-        addAssistantMessage({
-          reponse: "تعذر تفعيل وضع المدرس. حاول مرة أخرى.",
-          type: "refus",
-          cartes: [],
-          flashcards_suggerees: [],
-          fallback_active: true,
-        })
-      } finally {
-        setLoading(false)
-      }
-    } else {
-      setIsTutorMode(false)
-      const exitMsg = "خرجت من وضع المدرس الشخصي"
-      const userDisplay: DisplayMessage = {
-        id: nextMessageId(),
-        role: "user",
-        content: exitMsg,
-      }
-      setMessages((prev) => [...prev, userDisplay])
-      historyRef.current = [
-        ...historyRef.current,
-        { role: "user", content: exitMsg },
-      ]
-      setLoading(true)
-      try {
-        const resp = await apiClient.sendChatbotMessage({
-          message: exitMsg,
-          context: {
-            page_source: typeof window !== "undefined" ? window.location.pathname : undefined,
-            history: historyRef.current.slice(-6),
-          },
-          mode: "quick",
-        })
-        addAssistantMessage(resp)
-      } catch {
-        addAssistantMessage({
-          reponse: "تم إيقاف وضع المدرس.",
-          type: "orientation",
-          cartes: [],
-          flashcards_suggerees: [],
-          fallback_active: false,
-        })
-      } finally {
-        setLoading(false)
-      }
-    }
+  const toggleTutorMode = useCallback(() => {
+    const newMode = !isTutorMode
+    setIsTutorMode(newMode)
+    addAssistantMessage({
+      reponse: newMode
+        ? "تم تفعيل وضع المدرس الشخصي 🎓. سأساعدك بطريقة تعليمية مخصصة."
+        : "خرجت من وضع المدرس الشخصي.",
+      type: "orientation",
+      cartes: [],
+      flashcards_suggerees: [],
+      fallback_active: false,
+    })
   }, [isTutorMode, addAssistantMessage])
 
   const handleSuggestion = useCallback((text: string) => {

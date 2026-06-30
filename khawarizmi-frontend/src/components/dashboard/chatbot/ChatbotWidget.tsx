@@ -68,7 +68,7 @@ export function ChatbotWidget() {
               <span className="text-2xl">🧠</span>
               <div>
                 <h3 className="text-white font-bold text-sm">خوارزمي</h3>
-                <p className="text-white/70 text-xs">مدرّمك الذكي</p>
+                <p className="text-white/70 text-xs">أستاذك في SVT</p>
               </div>
             </div>
             <div className="flex items-center gap-2">
