@@ -342,13 +342,30 @@ export interface ProgressConcept {
   prochaine_revision: string | null
   interval_jours: number | null
   est_due: boolean
+  statut_revision?: "a_revoir_aujourdhui" | "bientot" | "stable"
+  priority?: "urgente" | "haute" | "normale"
+}
+
+export interface BacPredictionDetail {
+  note: number
+  coefficient: number
+  nb_concepts: number
+  retrievability: number
+}
+
+export interface BacPrediction {
+  note_globale: number
+  par_matiere: Record<string, BacPredictionDetail>
+  points_forts?: string[]
+  points_faibles?: string[]
+  mention?: string
 }
 
 export interface ProgressResponse {
   user_id?: string
   nb_concepts: number
   dues_aujourd_hui: number
-  prediction_bac: number | null
+  prediction_bac: BacPrediction | null
   concepts: ProgressConcept[]
   message?: string
 }
@@ -749,6 +766,64 @@ export interface OrientationResponse {
   }
   recommendations: OrientationRecommendation[]
   message: string
+}
+
+export interface DashboardOrchestratorResponse {
+  user: {
+    id: string | number
+    prenom?: string | null
+    filiere?: string | null
+    plan?: string | null
+  }
+  progress: ProgressResponse
+  orientation: OrientationResponse
+  week_activity: WeekActivityResponse
+  due_cards: {
+    cards: Array<Record<string, unknown>>
+    total: number
+  }
+  orchestration: {
+    priority_action: {
+      title: string
+      reason: string
+      href: string
+      cta: string
+      badge: string
+      tone: "danger" | "mint" | "amber"
+      source: string
+    }
+    continue_card: {
+      title: string
+      subtitle: string
+      href: string
+      cta: string
+      source: string
+    }
+    strategic_chapter: {
+      title: string
+      subtitle: string
+      lessonHref: string
+      mindmapHref: string
+      chapterSlug?: string | null
+      source: string
+    }
+    engine_pulse: {
+      predictionBac: number | null
+      dueToday: number
+      flashcardsDue: number
+      actionVerbsDue: number
+      documentAnalysisDue: number
+      urgentConceptsCount: number
+      soonConceptsCount: number
+      stableConceptsCount: number
+      topPriorityConcept?: ProgressConcept | null
+      topOrientation?: OrientationRecommendation | null
+      dueCardsTotal: number
+      source: string
+    }
+    generated_at: string
+    source: string
+  }
 }
 
 // ═══════════════════════════════════════════════

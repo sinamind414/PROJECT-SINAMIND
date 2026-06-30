@@ -34,6 +34,7 @@ import {
   VerbProgressResponse,
   DaProgressResponse,
   DaWeakSpotsResponse,
+  DashboardOrchestratorResponse,
   TuteurResponse,
   LessonResponse,
   CheckAnswerResponse,
@@ -499,6 +500,10 @@ class KhawarizmiApiClient {
 
   async getWeekActivity(): Promise<WeekActivityResponse> {
     return this.request<WeekActivityResponse>("/api/week-activity")
+  }
+
+  async getDashboardOrchestrator(): Promise<DashboardOrchestratorResponse> {
+    return this.request<DashboardOrchestratorResponse>("/api/dashboard/orchestrator")
   }
 
   // ── Tuteur IA (chatbot) ──────────────────────

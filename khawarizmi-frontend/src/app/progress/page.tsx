@@ -55,7 +55,7 @@ export default function ProgressPage() {
   }, [])
 
   const data = snapshot || getProgressSnapshot()
-  const apiReady = apiProgress?.prediction_bac ?? null
+  const apiReady = apiProgress?.prediction_bac?.note_globale ?? null
   const apiDues = apiProgress?.dues_aujourd_hui ?? null
   const apiConcepts = apiProgress?.concepts ?? []
 

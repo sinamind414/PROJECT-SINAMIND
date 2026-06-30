@@ -5,7 +5,7 @@ import type { DashboardData, Profile, Mission, Topic, WeekDay, Exercise, Mistake
 import { getGamificationSnapshot, getProgressSnapshot } from '@/lib/progress-store';
 import { buildDashboardState } from '@/lib/daily-dashboard/selectors';
 import apiClient from '@/lib/api-client';
-import type { ProgressResponse, OrientationResponse, WeekActivityResponse } from '@/lib/types';
+import type { ProgressResponse, OrientationResponse, WeekActivityResponse, DashboardOrchestratorResponse } from '@/lib/types';
 
 function getCountdown(): { days: number; label: string } {
   const bacDate = new Date('2026-06-10T00:00:00+01:00');
@@ -23,8 +23,8 @@ function build(apiProgress?: ProgressResponse | null, dueCards?: number, orienta
   const dashboard = buildDashboardState(weekActivity);
   const countdown = getCountdown();
 
-  const apiReady = apiProgress?.prediction_bac != null
-    ? Math.round((apiProgress.prediction_bac / 20) * 100)
+  const apiReady = apiProgress?.prediction_bac?.note_globale != null
+    ? Math.round((apiProgress.prediction_bac.note_globale / 20) * 100)
     : gamification.xpProgress;
 
   const apiDues = apiProgress?.dues_aujourd_hui ?? dueCards ?? 0;
@@ -142,6 +142,20 @@ export function useDriveDashboard(): DashboardData {
 
     const refreshLocal = () => setData(build(null));
     const refreshApi = async () => {
+      try {
+        // Primary: single orchestrator endpoint
+        const orchestrator = await apiClient.getDashboardOrchestrator();
+        if (cancelled) return;
+        const apiProgress = orchestrator.progress as unknown as ProgressResponse;
+        const orientation = orchestrator.orientation as unknown as OrientationResponse;
+        const weekAct = orchestrator.week_activity as unknown as WeekActivityResponse;
+        const dueTotal = orchestrator.due_cards.total;
+        setData(build(apiProgress, dueTotal, orientation, weekAct));
+        return;
+      } catch {
+        // Fallback: individual endpoints
+      }
+
       try {
         const [prog, due, orient, week] = await Promise.allSettled([
           apiClient.getProgress(),
