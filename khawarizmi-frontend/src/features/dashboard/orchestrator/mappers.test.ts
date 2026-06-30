@@ -220,4 +220,98 @@ describe("buildOrchestratorDashboardData", () => {
     expect(result.mistakes).toHaveLength(1)
     expect(result.mistakes[0].topic).toBe("weak_hypothesis")
   })
+
+  it("keeps local fallback cards when api exists but orchestrator cards are missing", () => {
+    const api = makeApi()
+    const degradedApi = {
+      ...api,
+      orchestration: {
+        ...api.orchestration,
+        priority_action: null,
+        continue_card: null,
+        strategic_chapter: null,
+      },
+    } as unknown as DashboardOrchestratorResponse
+
+    const result = buildOrchestratorDashboardData({ api: degradedApi, gamification, snapshot, dashboard })
+
+    expect(result.priorityAction.source).toBe("fallback")
+    expect(result.priorityAction.href).toBe("/drill")
+    expect(result.continueCard.source).toBe("fallback")
+    expect(result.continueCard.href).toBe("/cours")
+    expect(result.strategicChapter.source).toBe("fallback")
+    expect(result.strategicChapter.lessonHref).toBe("/cours")
+  })
+
+  it("falls back to gamification progress when prediction bac is null", () => {
+    const api = makeApi()
+    api.orchestration.engine_pulse.predictionBac = null
+
+    const result = buildOrchestratorDashboardData({ api, gamification, snapshot, dashboard })
+
+    expect(result.profile.progress_percent).toBe(55)
+    expect(result.enginePulse.predictionBac).toBeNull()
+  })
+
+  it("limits progress concepts to eight topics", () => {
+    const api = makeApi()
+    api.progress.concepts = Array.from({ length: 10 }, (_, i) => ({
+      matiere: "svt",
+      chapitre_id: `chapitre_${i + 1}`,
+      stability: 1 + i,
+      difficulty: 3,
+      retrievability: 0.1 * ((i % 5) + 1),
+      prochaine_revision: null,
+      interval_jours: null,
+      est_due: i % 2 === 0,
+      statut_revision: i % 2 === 0 ? "a_revoir_aujourdhui" : "stable",
+      priority: i % 2 === 0 ? "urgente" : "normale",
+    }))
+
+    const result = buildOrchestratorDashboardData({ api, gamification, snapshot, dashboard })
+
+    expect(result.topics).toHaveLength(8)
+    expect(result.topics[7].title).toBe("chapitre 8")
+  })
+
+  it("preserves multiple orientation recommendations and their ordering", () => {
+    const api = makeApi()
+    api.orientation.recommendations = [
+      api.orientation.recommendations[0],
+      {
+        priorite: 2,
+        type: "document_analysis",
+        chapitre_slug: "immunite_specifique",
+        chapitre_ar: "المناعة النوعية",
+        raison: "تمرين وثائقي مهم لربح نقاط BAC.",
+        action: "/document-analysis/immunite_specifique",
+        score_priorite: 6,
+        niveau_urgence: "haute",
+        nature_besoin: "bac",
+        moteur_source_principal: "document_analysis",
+        impact_note_estime: "moyen",
+      },
+    ]
+
+    const result = buildOrchestratorDashboardData({ api, gamification, snapshot, dashboard })
+
+    expect(result.missions).toHaveLength(2)
+    expect(result.missions[0].day_label).toBe("الأولوية الأولى")
+    expect(result.missions[1].day_label).toBe("الأولوية الثانية")
+    expect(result.missions[1].moteurLabel).toBe("DOC")
+    expect(result.missions[1].impactLabel).toBe("ربح نقاط متوسط")
+  })
+
+  it("returns safe empty arrays when local history is empty", () => {
+    const emptySnapshot: ProgressSnapshot = {
+      ...snapshot,
+      history: [],
+      totalAttempts: 0,
+    }
+
+    const result = buildOrchestratorDashboardData({ api: null, gamification, snapshot: emptySnapshot, dashboard })
+
+    expect(result.exercises).toHaveLength(0)
+    expect(result.mistakes).toHaveLength(0)
+  })
 })
