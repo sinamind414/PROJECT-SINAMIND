@@ -183,23 +183,34 @@ class KhawarizmiScheduler:
 
     # ═══ PRÉDICTION BAC ══════════════════════════════════════
 
-    def predire_score_bac(self, cards_par_matiere: dict[str, list[Card]]) -> dict[str, Any]:
+    async def predire_score_bac(self, cards_par_matiere: dict[str, list[Card]]) -> dict[str, Any]:
         """
         Prédit le score BAC pondéré par les coefficients officiels.
-
-        Args:
-            cards_par_matiere : {'mathematiques': [Card, ...], ...}
-
-        Returns:
-            {
-                'note_globale':     14.5,   # /20
-                'par_matiere':      {...},  # détail par matière
-                'points_forts':     [...],  # matières > 14/20
-                'points_faibles':   [...],  # matières < 10/20
-            }
+        Version avec cache léger pour éviter les recalculs inutiles.
         """
         if not cards_par_matiere:
             return {"note_globale": 0.0, "par_matiere": {}}
+
+        from cache import get_cache, make_cache_key, set_cache
+
+        cache_payload = {
+            matiere: [
+                {
+                    "stability": round(getattr(card, "stability", 0.0) or 0.0, 3),
+                    "difficulty": round(getattr(card, "difficulty", 0.0) or 0.0, 3),
+                    "last_review": str(getattr(card, "last_review", None)),
+                }
+                for card in cards
+            ]
+            for matiere, cards in cards_par_matiere.items()
+        }
+        cache_key = make_cache_key("fsrs", "bac_prediction", json.dumps(cache_payload, sort_keys=True, ensure_ascii=False))
+        cached = await get_cache(cache_key)
+        if cached:
+            try:
+                return json.loads(cached)
+            except json.JSONDecodeError:
+                pass
 
         scores_ponderes = []
         coeffs_total = 0
@@ -210,10 +221,7 @@ class KhawarizmiScheduler:
                 continue
 
             coeff = COEFFICIENTS_BAC.get(matiere, 1)
-
-            # Récupérabilité moyenne de la matière
             avg_ret = sum(self._get_retrievability(c) for c in cards) / len(cards)
-
             note_matiere = round(avg_ret * 20, 1)
 
             detail[matiere] = {
@@ -227,11 +235,11 @@ class KhawarizmiScheduler:
             coeffs_total += coeff
 
         if coeffs_total == 0:
-            return {"note_globale": 0.0, "par_matiere": detail}
+            result = {"note_globale": 0.0, "par_matiere": detail}
+            await set_cache(cache_key, json.dumps(result, ensure_ascii=False), ttl=3600)
+            return result
 
         note_globale = round(sum(scores_ponderes) / coeffs_total, 1)
-
-        # Points forts / faibles
         points_forts = [m for m, d in detail.items() if d["note"] >= 14]
         points_faibles = [m for m, d in detail.items() if d["note"] < 10]
 
@@ -239,13 +247,15 @@ class KhawarizmiScheduler:
             f"Prédiction BAC : {note_globale}/20 ({len(points_forts)} forces, {len(points_faibles)} faiblesses)"
         )
 
-        return {
+        result = {
             "note_globale": note_globale,
             "par_matiere": detail,
             "points_forts": points_forts,
             "points_faibles": points_faibles,
             "mention": self._get_mention(note_globale),
         }
+        await set_cache(cache_key, json.dumps(result, ensure_ascii=False), ttl=3600)
+        return result
 
     def _get_mention(self, note: float) -> str:
         """Mention BAC algérienne officielle."""
@@ -260,6 +270,25 @@ class KhawarizmiScheduler:
         if note >= 10:
             return "Passable"
         return "Insuffisant"
+
+    def _priority_label(self, stability: float) -> str:
+        if stability <= 1:
+            return "urgente"
+        if stability <= 3:
+            return "haute"
+        return "normale"
+
+    def _review_status_label(self, next_rev: datetime | None) -> str:
+        now = datetime.now(UTC)
+        if not next_rev:
+            return "a_revoir_aujourdhui"
+        if next_rev.tzinfo is None:
+            next_rev = next_rev.replace(tzinfo=UTC)
+        if next_rev <= now:
+            return "a_revoir_aujourdhui"
+        if (next_rev - now).total_seconds() <= 86400:
+            return "bientot"
+        return "stable"
 
     # ═══ UTILITAIRES ════════════════════════════════════════
 
@@ -309,12 +338,14 @@ class KhawarizmiScheduler:
         rows = result.fetchall()
         due_concepts = []
         for row in rows:
+            stability = row[1] if row[1] is not None else 0.0
             due_concepts.append(
                 {
                     "concept_id": row[0],
-                    "stability": row[1] if row[1] is not None else 0.0,
+                    "stability": stability,
                     "due_date": row[2],
                     "state": row[3],
+                    "priority": self._priority_label(stability),
                 }
             )
         return due_concepts

@@ -57,6 +57,7 @@ async def get_progression(
         cards_par_matiere.setdefault(matiere, []).append(card)
         retrievability = scheduler._get_retrievability(card)
 
+        est_due = next_rev <= datetime.now(UTC) if next_rev else True
         concepts.append(
             {
                 "matiere": matiere,
@@ -66,11 +67,12 @@ async def get_progression(
                 "retrievability": retrievability,
                 "prochaine_revision": next_rev.isoformat() if next_rev else None,
                 "interval_jours": interval,
-                "est_due": next_rev <= datetime.now(UTC) if next_rev else True,
+                "est_due": est_due,
+                "statut_revision": scheduler._review_status_label(next_rev),
             }
         )
 
-    prediction = scheduler.predire_score_bac(cards_par_matiere)
+    prediction = await scheduler.predire_score_bac(cards_par_matiere)
     dues_auj = sum(1 for c in concepts if c["est_due"])
 
     return {
