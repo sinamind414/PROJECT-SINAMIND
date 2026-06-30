@@ -33,6 +33,14 @@ async def get_progress_snapshot(
     )
     rows = result.fetchall()
 
+    if not rows:
+        return {
+            "nb_concepts": 0,
+            "dues_aujourd_hui": 0,
+            "prediction_bac": None,
+            "concepts": [],
+        }
+
     concepts: list[dict[str, Any]] = []
     cards_par_matiere: dict[str, list] = {}
 
