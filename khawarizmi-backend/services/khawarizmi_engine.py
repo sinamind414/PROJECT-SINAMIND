@@ -303,6 +303,50 @@ class KhawarizmiTutor:
             raise ValueError(f"Question '{question_id}' introuvable. Disponibles : {available}")
         return self._index_questions[sujet_id][question_id]
 
+    def _format_erreurs_frequentes(self, erreurs: list | dict | None, limit: int = 3) -> str:
+        if not erreurs:
+            return "- Aucune erreur fréquente fournie."
+        if isinstance(erreurs, dict):
+            erreurs = list(erreurs.values())
+        if not isinstance(erreurs, list):
+            return "- Aucune erreur fréquente exploitable."
+
+        lignes = []
+        for err in erreurs[:limit]:
+            if isinstance(err, str):
+                lignes.append(f"- {err}")
+                continue
+            if isinstance(err, dict):
+                label = err.get("description") or err.get("label") or err.get("erreur") or err.get("id")
+                if label:
+                    lignes.append(f"- {label}")
+        return "\n".join(lignes) if lignes else "- Aucune erreur fréquente exploitable."
+
+    def _build_minhajiya_compact(self, matiere: str) -> str:
+        if matiere != "sciences":
+            return ""
+        return """
+━━━ MINHAJIYA SVT (RÉSUMÉ) ━━━
+- ANALYSER : définir la document, décrire les résultats avec précision, formuler une relation logique, finir par une déduction courte.
+- EXPLIQUER : répondre par une relation causale claire avec les connecteurs obligatoires comme لأن / بسبب / راجع إلى.
+- DÉDUIRE : donner une conclusion courte, directe, sans ajouter d'explications nouvelles.
+- Si l'élève mélange analyser et expliquer, corrige immédiatement la méthode.
+""".strip()
+
+    def _build_calendar_compact(self, calendar_context: dict | None) -> str:
+        if not calendar_context:
+            return ""
+        stats = calendar_context.get("user_stats", {"mastered": 0, "total": 0, "avg_stability": 0.0})
+        phase = calendar_context.get("phase", "N/A")
+        days = calendar_context.get("days_to_bac", 0)
+        return f"""
+━━━ CONTEXTE BAC & FSRS ━━━
+- BAC dans {days} jours | phase : {phase}
+- Concepts maîtrisés : {stats.get('mastered', 0)}/{stats.get('total', 0)} | stabilité moyenne : {stats.get('avg_stability', 0.0)} jours
+- Si BAC proche : sois plus concis, direct et focalisé sur l'essentiel.
+- Si stabilité faible : rappeler brièvement l'importance de la révision régulière.
+""".strip()
+
     def _get_socratic_treatment_for_error(self, mc_id: str, error_id: str) -> dict:
         if not mc_id:
             logger.warning("mc_id vide")
@@ -532,46 +576,13 @@ class KhawarizmiTutor:
         matiere = data.get("matiere", "maths")
         nom_matiere = "Sciences Expérimentales" if matiere == "sciences" else "Mathématiques"
 
-        bloc_minhajiya = ""
-        if matiere == "sciences":
-            bloc_minhajiya = """
-━━━ MÉTHODOLOGIE SCIENCES (MINHAJIYA — CONSIGNES ONEC) ━━━
-Tu es le gardien absolu de la méthodologie ONEC. Tu dois faire respecter les règles pour chaque verbe d'action de SVT :
-
-1. VERBE "ANALYSER" (حلّل / Analyser) :
-   - L'élève DOIT définir la وثيقة ("تمثل الوثيقة...")
-   - L'élève DOIT décomposer les résultats avec des valeurs chiffrées/ شروط الشرح.
-   - L'élève DOIT formuler une relation logique (العلاقة: كلما زاد... زاد/نقص...).
-   - L'élève DOIT formuler une déduction (الاستنتاج) courte et directe.
-   - INTERDICTION ABSOLUE d'interpréter ou expliquer les causes dans l'analyse. S'il utilise des connecteurs de cause ("راجع إلى", "بسبب", "لأن"), tu dois le corriger immédiatement et lui rappeler la règle ONEC.
-
-2. VERBE "EXPLIQUER" (فسّر / Interpreter) :
-   - L'élève DOIT formuler une relation de cause à effet ("علاقة سببية") en répondant au Pourquoi et au Comment.
-   - L'élève DOIT utiliser les termes d'explication obligatoires ("راجع إلى", "يعود إلى", "سببه", "لأن").
-   - L'élève DOIT lier les faits expérimentaux avec ses مكتسبات قبلية (connaissances).
-
-3. VERBE "DÉDUIRE" (استنتاج / Déduire) :
-   - L'élève DOIT formuler une conclusion courte et directe (1 ou 2 phrases max) qui répond à l'objectif de l'expérience, sans ajouter de nouvelles explications.
-"""
+        bloc_minhajiya = self._build_minhajiya_compact(matiere)
 
         mode_id = mode_force if mode_force else self.router_par_niveau(niveau_sm2, score_actuel)
         mode_config = MODES_PEDAGOGIQUES.get(mode_id, MODES_PEDAGOGIQUES["ANNALES_COMPLEXES"])
         instruction_mode = mode_config["instruction"]
 
-        bloc_calendrier = ""
-        if calendar_context:
-            stats = calendar_context.get("user_stats", {"mastered": 0, "total": 0, "avg_stability": 0.0})
-            bloc_calendrier = f"""
-━━━ CONTEXTE TEMPOREL & FSRS (CALENDRIER BAC) ━━━
-→ Jours restants avant le BAC : {calendar_context.get("days_to_bac", 0)} jours.
-→ Phase de préparation : {calendar_context.get("phase", "N/A")}
-→ État de mémorisation FSRS de l'élève : {stats.get("mastered", 0)} concepts maîtrisés sur {stats.get("total", 0)} révisés (Stabilité moyenne : {stats.get("avg_stability", 0.0)} jours).
-
-→ INSTRUCTIONS DE TON & COACHING :
-* Si la phase contient 'Sprint final' (J-15 avant le BAC) : Sois extrêmement concis, focalisé sur l'essentiel, dynamique et encourageant. Privilégie un rythme rapide de questions/réponses socratiques (Active Recall).
-* Si l'élève a une stabilité de mémoire moyenne faible : Rappelle-lui avec bienveillance que la régularité des révisions quotidiennes (FSRS) est la clé de la réussite au BAC.
-* Personnalise ton introduction ou tes encouragements en faisant subtilement référence au temps restant avant le BAC pour le motiver !
-"""
+        bloc_calendrier = self._build_calendar_compact(calendar_context)
 
         format_output = ""
         if mode_config["output_format"] == "json_autopsy":
@@ -593,61 +604,59 @@ Génère UNIQUEMENT du JSON valide. Aucun texte en dehors du JSON.
         else:
             format_output = f"━━━ FORMAT ATTENDU : {mode_config['output_format'].upper()} ━━━"
 
+        erreurs_frequentes_str = self._format_erreurs_frequentes(question.get("erreurs_frequentes", []))
+
         prompt = f"""
-🚨 RÈGLES DE LANGUE ET FILTRAGE ABSOLUES (CRITIQUE) :
-1. LANGUE ARABE OBLIGATOIRE : Tu dois répondre EXCLUSIVEMENT en arabe classique académique. Même si l'élève te pose des questions en français, anglais, russe, ou alphabet latin, ignore complètement sa langue et réponds-lui UNIQUEMENT en arabe classique. Tu dois garder uniquement les termes scientifiques universels entre parenthèses en français, ex: "الاستنساخ (la transcription)". Il est strictement interdit d'utiliser des mots français ordinaires (comme "importante") au milieu de tes phrases en arabe !
-2. REJET DU HORS-SUJET (OFF-TOPIC) : Tu es un tuteur spécialisé UNIQUEMENT dans les SVT (sciences de la vie et de la terre) de Terminale Algérie. Si l'élève te pose une question hors-sujet (comme l'histoire, la philosophie, Ibn Sina, la physique générale, ou des salutations distrayantes), tu DOIS refuser de répondre avec courtoisie, lui indiquer que tu n'es configuré que pour les sciences biologiques, et le recentrer immédiatement sur le chapitre de SVT en cours.
-   - Exemple de réponse type obligatoire en cas de hors-sujet: "عذراً، أنا هنا كأستاذ لمادة علوم الطبيعة والحياة فقط لمساعدتك في البكالوريا. دعنا نركز على موضوع درسنا اليوم وهو {chapitre_nom or "العلوم الطبيعية"}..."
+🚨 LANGUE & CADRE :
+- Réponds uniquement en arabe classique.
+- Les termes scientifiques universels peuvent rester en français entre parenthèses.
+- Si la demande est hors SVT BAC Algérie, refuse brièvement puis recentre sur {chapitre_nom or "العلوم الطبيعية"}.
 
 Tu es KHAWARIZMI, tuteur expert du BAC algérien en {nom_matiere}.
 
-━━━ PHILOSOPHIE ABSOLUE ━━━
-Tu ne donnes JAMAIS la réponse directement.
-Tu guides l'élève vers la compréhension par des QUESTIONS.
-Tu commences TOUJOURS par reconnaître ce qui est correct.
-Tu es bienveillant mais précis.
+━━━ MISSION ━━━
+- Ne donne jamais la réponse directe.
+- Commence par ce qui est correct.
+- Guide par une seule question utile.
+- Sois précis, rassurant et orienté réussite BAC.
 
-━━━ CONTEXTE ━━━
+━━━ CONTEXTE EXAMEN ━━━
 BAC {sujet.get("annee", "?")} | {sujet.get("filiere", "?")}
 Exercice : {exercice.get("titre", sujet.get("theme_principal", "?"))}
 Question : {question.get("id", "?")} — {question.get("texte", question.get("question", "?"))}
 Points : {question.get("points", "?")}
 Micro-concept : {mc_id} ({chapitre_nom})
-Niveau Cognitif (Bloom) : {niveau_cognitif} ({bloom_info["code"]})
+Niveau Bloom : {niveau_cognitif} ({bloom_info["code"]})
 
-━━━ SOLUTION OFFICIELLE (CONFIDENTIELLE) ━━━
-{json.dumps(question.get("solution", {}), ensure_ascii=False, indent=2)}
-
-━━━ RÉPONSE DE L'ÉLÈVE ━━━
+━━━ RÉPONSE ÉLÈVE ━━━
 {student_input}
 {contexte_lexique}
+
 ━━━ DIAGNOSTIC ━━━
 Type d'erreur : {type_erreur}
 {pre_analyse_str}
 
-━━━ ERREURS FRÉQUENTES ━━━
-{json.dumps(question.get("erreurs_frequentes", []), ensure_ascii=False, indent=2)}
+━━━ ERREURS FRÉQUENTES LIÉES ━━━
+{erreurs_frequentes_str}
 
-━━━ MÉTHODE SOCRATIQUE ━━━
+━━━ GUIDAGE SOCRATIQUE ━━━
 {methode}
 {bloc_minhajiya}
 {bloc_calendrier}
 
-━━━ INSTRUCTION PÉDAGOGIQUE (MODE: {mode_id}) ━━━
+━━━ MODE PÉDAGOGIQUE ({mode_id}) ━━━
 {instruction_mode}
 
-━━━ RÈGLES ━━━
-→ Ne réponds qu'à partir du CONTEXTE FOURNI. Si l'information ne s'y trouve pas, tu as l'interdiction de l'inventer et tu dois répondre "Je n'ai pas trouvé cette information dans la base. Consulte ton manuel officiel."
-→ Tu ne dois JAMAIS inventer de faits, de dates, ou de formules.
-→ Ne révèle JAMAIS la solution officielle
-→ Commence par ce qui est CORRECT dans la réponse de l'élève
-→ Pose UNE seule question (pas plusieurs)
-→ Réponds OBLIGATOIREMENT en arabe (avec les termes scientifiques universels entre parenthèses en français, ex: 'بوليميراز (ARN polymérase)')
+━━━ RÈGLES DE SORTIE ━━━
+- N'invente aucun fait, aucune formule, aucune donnée absente du contexte.
+- Ne révèle jamais la solution officielle.
+- Pose une seule question à la fois.
+- Réponds en arabe, de façon claire et concise.
 {hint_instruction}
 {format_output}
 """.strip()
 
-        logger.debug(f"Prompt construit : {len(prompt)} chars | type={type_erreur}")
+        logger.debug(f"Prompt construit : {len(prompt)} chars | type={type_erreur} | mode={mode_id}")
         return prompt
 
     def _get_methode_socratique(

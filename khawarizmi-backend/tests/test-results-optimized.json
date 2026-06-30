@@ -1,0 +1,92 @@
+{
+  "timestamp": "2026-06-30 11:21:08",
+  "engine_version": "2.0-optimized",
+  "cases": [
+    {
+      "name": "Cas 1 — Erreur de concept (protéines)",
+      "prompt_chars": 3592,
+      "prompt_tokens": 898,
+      "quality_checks": {
+        "langue_arabe": true,
+        "socratique": true,
+        "minhajiya": true,
+        "mode_pedagogique": true,
+        "contexte_bac": true,
+        "micro_concept": true,
+        "type_erreur": true,
+        "erreurs_frequentes": true,
+        "pas_solution_directe": true
+      }
+    },
+    {
+      "name": "Cas 2 — Erreur de méthode (kowached)",
+      "prompt_chars": 3809,
+      "prompt_tokens": 952,
+      "quality_checks": {
+        "langue_arabe": true,
+        "socratique": true,
+        "minhajiya": true,
+        "mode_pedagogique": true,
+        "contexte_bac": true,
+        "micro_concept": true,
+        "type_erreur": true,
+        "erreurs_frequentes": true,
+        "pas_solution_directe": true
+      }
+    },
+    {
+      "name": "Cas 3 — Erreur d'exécution (cellule)",
+      "prompt_chars": 4079,
+      "prompt_tokens": 1019,
+      "quality_checks": {
+        "langue_arabe": true,
+        "socratique": true,
+        "minhajiya": true,
+        "mode_pedagogique": true,
+        "contexte_bac": true,
+        "micro_concept": true,
+        "type_erreur": true,
+        "erreurs_frequentes": true,
+        "pas_solution_directe": true
+      }
+    },
+    {
+      "name": "Cas 4 — Bon élève (ADN)",
+      "prompt_chars": 4576,
+      "prompt_tokens": 1144,
+      "quality_checks": {
+        "langue_arabe": true,
+        "socratique": true,
+        "minhajiya": true,
+        "mode_pedagogique": true,
+        "contexte_bac": true,
+        "micro_concept": true,
+        "type_erreur": true,
+        "erreurs_frequentes": true,
+        "pas_solution_directe": true
+      }
+    },
+    {
+      "name": "Cas 5 — Élève fragile (révision)",
+      "prompt_chars": 2859,
+      "prompt_tokens": 714,
+      "quality_checks": {
+        "langue_arabe": true,
+        "socratique": true,
+        "minhajiya": true,
+        "mode_pedagogique": true,
+        "contexte_bac": true,
+        "micro_concept": true,
+        "type_erreur": true,
+        "erreurs_frequentes": true,
+        "pas_solution_directe": true
+      }
+    }
+  ],
+  "summary": {
+    "avg_prompt_chars": 3783,
+    "avg_prompt_tokens": 945,
+    "total_cases": 5,
+    "global_quality_score": 10.0
+  }
+}
