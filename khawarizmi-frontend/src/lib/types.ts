@@ -747,6 +747,11 @@ export interface CorrectionResponse {
 // Orientation (SAD)
 // ═══════════════════════════════════════════════
 
+export type OrientationUrgency = "critique" | "haute" | "normale"
+export type OrientationNeedNature = "memoire" | "bac" | "methodologie" | "structure"
+export type OrientationEngineSource = "flashcards" | "document_analysis" | "mindmap" | "action_verbs"
+export type OrientationImpactEstimate = "fort" | "moyen" | "limite"
+
 export interface OrientationRecommendation {
   priorite: number
   type: "cours" | "action_verb" | "document_analysis" | "flashcards" | "mindmap" | "annales"
@@ -755,6 +760,10 @@ export interface OrientationRecommendation {
   raison: string
   action: string
   score_priorite: number
+  niveau_urgence?: OrientationUrgency
+  nature_besoin?: OrientationNeedNature
+  moteur_source_principal?: OrientationEngineSource
+  impact_note_estime?: OrientationImpactEstimate
 }
 
 export interface OrientationResponse {

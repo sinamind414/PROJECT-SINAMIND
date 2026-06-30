@@ -106,14 +106,27 @@ class TestCalculerOrientation:
             "action_verbs": 1,
             "document_analysis": 2,
         }
-        assert len(result["recommendations"]) == 2
+        assert len(result["recommendations"]) == 3
         top = result["recommendations"][0]
         assert top["type"] == "cours"
         assert top["chapitre_slug"] == "genetique_humaine"
         assert top["chapitre_ar"] == "الوراثة البشرية"
         assert top["action"] == "/cours/genetique_humaine"
         assert "chapitre critique" in top["raison"]
-        assert "analyse de document" in top["raison"]
+        assert "analyse" in top["raison"]
+        assert top["niveau_urgence"] == "critique"
+        assert top["nature_besoin"] == "memoire"
+        assert top["moteur_source_principal"] == "flashcards"
+        assert top["impact_note_estime"] == "fort"
+        # 3ème reco : DA pour genetique_humaine (permissive already check)
+        da_reco = result["recommendations"][2]
+        assert da_reco["type"] == "document_analysis"
+        assert da_reco["chapitre_slug"] == "genetique_humaine"
+        assert "analyse" in da_reco["raison"]
+        assert da_reco["niveau_urgence"] == "normale"
+        assert da_reco["nature_besoin"] == "bac"
+        assert da_reco["moteur_source_principal"] == "document_analysis"
+        assert da_reco["impact_note_estime"] == "limite"
         assert "Commence par" in result["message"]
 
     async def test_adds_action_verb_recommendation_when_room_left(self):
@@ -133,13 +146,18 @@ class TestCalculerOrientation:
         result = await calculer_orientation(db, "1")
 
         assert len(result["recommendations"]) == 2
-        assert result["recommendations"][0]["type"] == "action_verb"
-        assert result["recommendations"][0]["action"] == "/action-verbs/analyser"
-        assert "score moyen 20%" in result["recommendations"][0]["raison"]
+        av0 = result["recommendations"][0]
+        assert av0["type"] == "action_verb"
+        assert av0["action"] == "/action-verbs/analyser"
+        assert "score moyen 20%" in av0["raison"]
+        assert av0["niveau_urgence"] == "critique"
+        assert av0["nature_besoin"] == "methodologie"
+        assert av0["moteur_source_principal"] == "action_verbs"
+        assert av0["impact_note_estime"] == "fort"
         assert result["recommendations"][1]["type"] == "action_verb"
         assert result["dues_aujourd_hui"]["action_verbs"] == 2
 
-    async def test_document_analysis_signals_appear_in_course_raison(self):
+    async def test_adds_document_analysis_recommendation_if_only_da_signal(self):
         now = datetime.now(UTC)
         db = SequencedDb([
             [],
@@ -158,6 +176,153 @@ class TestCalculerOrientation:
 
         assert len(result["recommendations"]) == 1
         rec = result["recommendations"][0]
-        assert rec["type"] == "cours"
+        assert rec["type"] == "document_analysis"
         assert rec["chapitre_slug"] == "immunologie"
-        assert "analyse de document" in rec["raison"]
+        assert "analyse" in rec["raison"]
+        assert rec["action"] == "/document-analysis/chapters/immunologie"
+        assert rec["niveau_urgence"] == "normale"
+        assert rec["nature_besoin"] == "bac"
+        assert rec["moteur_source_principal"] == "document_analysis"
+        assert rec["impact_note_estime"] == "limite"
+
+    async def test_bac_frequent_breaks_tie_in_chapter_ranking(self):
+        now = datetime.now(UTC)
+        db = SequencedDb([
+            [
+                {"chapter": "chap_a", "nb_dues": 1},
+                {"chapter": "chap_b", "nb_dues": 1},
+            ],
+            [],
+            [],
+            [],
+            [
+                {"chapter_id": "chap_a", "titre_fr": "Chap A", "titre_ar": "أ", "importance": "haute", "bac_frequent": True},
+                {"chapter_id": "chap_b", "titre_fr": "Chap B", "titre_ar": "ب", "importance": "haute", "bac_frequent": False},
+            ],
+            [
+                {"chapter": "chap_a", "avg_stability": 5.0, "nb_concepts": 2},
+                {"chapter": "chap_b", "avg_stability": 5.0, "nb_concepts": 2},
+            ],
+        ])
+
+        result = await calculer_orientation(db, "1")
+
+        slugs = [r["chapitre_slug"] for r in result["recommendations"]]
+        assert slugs == ["chap_a", "chap_b"]
+        a = result["recommendations"][0]
+        assert a["niveau_urgence"] == "normale"
+        assert a["nature_besoin"] == "memoire"
+        assert a["moteur_source_principal"] == "flashcards"
+        assert a["impact_note_estime"] == "limite"
+
+    async def test_critical_domination_over_moyenne_with_fc_dues(self):
+        now = datetime.now(UTC)
+        db = SequencedDb([
+            [
+                {"chapter": "chap_crit", "nb_dues": 1},
+                {"chapter": "chap_moy", "nb_dues": 1},
+            ],
+            [],
+            [],
+            [],
+            [
+                {"chapter_id": "chap_crit", "titre_fr": "Critique", "titre_ar": "ج", "importance": "critique", "bac_frequent": False},
+                {"chapter_id": "chap_moy", "titre_fr": "Moyen", "titre_ar": "م", "importance": "moyenne", "bac_frequent": False},
+            ],
+            [
+                {"chapter": "chap_crit", "avg_stability": 5.0, "nb_concepts": 1},
+                {"chapter": "chap_moy", "avg_stability": 5.0, "nb_concepts": 1},
+            ],
+        ])
+
+        result = await calculer_orientation(db, "1")
+
+        slugs = [r["chapitre_slug"] for r in result["recommendations"]]
+        assert slugs[0] == "chap_crit"
+
+    async def test_av_gate_skips_moderate_verb_when_courses_strong(self):
+        now = datetime.now(UTC)
+        db = SequencedDb([
+            [
+                {"chapter": "critique_chap", "nb_dues": 3},
+            ],
+            [
+                {"verb_slug": "analyser", "last_score": 45, "attempts": 3, "prochaine_revision": now - timedelta(hours=2)},
+            ],
+            [],
+            [],
+            [
+                {"chapter_id": "critique_chap", "titre_fr": "Critique", "titre_ar": "ج", "importance": "critique", "bac_frequent": True},
+            ],
+            [
+                {"chapter": "critique_chap", "avg_stability": 5.0, "nb_concepts": 2},
+            ],
+        ])
+
+        result = await calculer_orientation(db, "1")
+
+        types = [r["type"] for r in result["recommendations"]]
+        assert "action_verb" not in types
+        cours = result["recommendations"][0]
+        assert cours["type"] == "cours"
+        assert cours["niveau_urgence"] is not None
+        assert cours["nature_besoin"] is not None
+        assert cours["moteur_source_principal"] is not None
+        assert cours["impact_note_estime"] is not None
+
+    async def test_av_included_when_severe_score_below_threshold(self):
+        now = datetime.now(UTC)
+        db = SequencedDb([
+            [
+                {"chapter": "critique_chap", "nb_dues": 3},
+            ],
+            [
+                {"verb_slug": "analyser", "last_score": 30, "attempts": 3, "prochaine_revision": now - timedelta(hours=2)},
+            ],
+            [],
+            [],
+            [
+                {"chapter_id": "critique_chap", "titre_fr": "Critique", "titre_ar": "ج", "importance": "critique", "bac_frequent": True},
+            ],
+            [
+                {"chapter": "critique_chap", "avg_stability": 5.0, "nb_concepts": 2},
+            ],
+        ])
+
+        result = await calculer_orientation(db, "1")
+
+        types = [r["type"] for r in result["recommendations"]]
+        assert "action_verb" in types
+        av_reco = [r for r in result["recommendations"] if r["type"] == "action_verb"][0]
+        assert av_reco["niveau_urgence"] is not None
+        assert av_reco["nature_besoin"] == "methodologie"
+        assert av_reco["moteur_source_principal"] == "action_verbs"
+        assert av_reco["impact_note_estime"] is not None
+
+    async def test_dangerous_cumul_bonus_ranks_chapter_higher(self):
+        now = datetime.now(UTC)
+        db = SequencedDb([
+            [
+                {"chapter": "chap_a", "nb_dues": 1},
+                {"chapter": "chap_b", "nb_dues": 1},
+            ],
+            [],
+            [
+                {"verb_slug": "interpreter", "chapter_slug": "chap_a", "last_score": 50, "attempts": 2, "prochaine_revision": None},
+                {"verb_slug": "interpreter", "chapter_slug": "chap_b", "last_score": 50, "attempts": 2, "prochaine_revision": None},
+            ],
+            [],
+            [
+                {"chapter_id": "chap_a", "titre_fr": "Chap A", "titre_ar": "أ", "importance": "critique", "bac_frequent": False},
+                {"chapter_id": "chap_b", "titre_fr": "Chap B", "titre_ar": "ب", "importance": "critique", "bac_frequent": False},
+            ],
+            [
+                {"chapter": "chap_a", "avg_stability": 2.5, "nb_concepts": 2},
+                {"chapter": "chap_b", "avg_stability": 5.0, "nb_concepts": 2},
+            ],
+        ])
+
+        result = await calculer_orientation(db, "1")
+
+        slugs = [r["chapitre_slug"] for r in result["recommendations"] if r["type"] == "cours"]
+        assert slugs[0] == "chap_a"

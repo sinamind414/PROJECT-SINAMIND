@@ -75,6 +75,48 @@ def _verb_priority_score(*, last_score: int, attempts: int, is_due: bool) -> int
     return score
 
 
+def _niveau_urgence_from_score(score: int) -> str:
+    if score >= 30:
+        return "critique"
+    if score >= 16:
+        return "haute"
+    return "normale"
+
+
+def _impact_note_estime(score: int) -> str:
+    if score >= 30:
+        return "fort"
+    if score >= 16:
+        return "moyen"
+    return "limite"
+
+
+def _chapter_nature_besoin(fc_dues: int, da_dues: int, weak_nodes: int, stability: float) -> str:
+    if da_dues >= max(fc_dues, 1) and da_dues >= weak_nodes:
+        return "bac"
+    if weak_nodes >= 3:
+        return "structure"
+    if stability < LOW_STABILITY_THRESHOLD or fc_dues > 0:
+        return "memoire"
+    return "bac"
+
+
+def _chapter_source_principal(fc_dues: int, da_dues: int, weak_nodes: int) -> str:
+    if da_dues >= max(fc_dues, weak_nodes, 1):
+        return "document_analysis"
+    if weak_nodes >= max(fc_dues, da_dues, 1):
+        return "mindmap"
+    return "flashcards"
+
+
+def _verb_nature_besoin() -> str:
+    return "methodologie"
+
+
+def _verb_source_principal() -> str:
+    return "action_verbs"
+
+
 async def calculer_orientation(
     db: AsyncSession,
     user_id: str,
@@ -138,6 +180,22 @@ async def calculer_orientation(
                         last_score=last_score,
                         attempts=attempts,
                         is_due=is_due,
+                    ),
+                    "niveau_urgence": _niveau_urgence_from_score(
+                        _verb_priority_score(
+                            last_score=last_score,
+                            attempts=attempts,
+                            is_due=is_due,
+                        )
+                    ),
+                    "nature_besoin": _verb_nature_besoin(),
+                    "moteur_source_principal": _verb_source_principal(),
+                    "impact_note_estime": _impact_note_estime(
+                        _verb_priority_score(
+                            last_score=last_score,
+                            attempts=attempts,
+                            is_due=is_due,
+                        )
                     ),
                 }
             )
@@ -238,6 +296,10 @@ async def calculer_orientation(
         weak_nodes = weak_nodes_by_chapter.get(ch, 0)
         stability = chapter_stability.get(ch, 0.0)
 
+        # only_da_signal: pas de flashcards ni mindmap dues → la section DA gère
+        if fc_dues == 0 and weak_nodes == 0 and da_dues > 0:
+            continue
+
         meta = _find_chapter_meta(ch, chapter_meta)
         importance = meta.get("importance", "moyenne")
         bac_frequent = bool(meta.get("bac_frequent", False))
@@ -263,6 +325,10 @@ async def calculer_orientation(
                     "bac_frequent": bac_frequent,
                     "titre_ar": meta.get("titre_ar", ch),
                     "titre_fr": meta.get("titre_fr", ch),
+                    "niveau_urgence": _niveau_urgence_from_score(score),
+                    "nature_besoin": _chapter_nature_besoin(fc_dues, da_dues, weak_nodes, stability),
+                    "moteur_source_principal": _chapter_source_principal(fc_dues, da_dues, weak_nodes),
+                    "impact_note_estime": _impact_note_estime(score),
                 }
             )
 
@@ -300,6 +366,10 @@ async def calculer_orientation(
                 "raison": " · ".join(raisons),
                 "action": f"/cours/{cs['chapter']}",
                 "score_priorite": cs["score"],
+                "niveau_urgence": cs["niveau_urgence"],
+                "nature_besoin": cs["nature_besoin"],
+                "moteur_source_principal": cs["moteur_source_principal"],
+                "impact_note_estime": cs["impact_note_estime"],
             }
         )
 
@@ -323,6 +393,10 @@ async def calculer_orientation(
                     "raison": f"Verbe '{v['verb_slug']}' : score moyen {v['last_score']}%",
                     "action": f"/action-verbs/{v['verb_slug']}",
                     "score_priorite": v["score_priorite"],
+                    "niveau_urgence": v["niveau_urgence"],
+                    "nature_besoin": v["nature_besoin"],
+                    "moteur_source_principal": v["moteur_source_principal"],
+                    "impact_note_estime": v["impact_note_estime"],
                 }
             )
 
@@ -336,12 +410,18 @@ async def calculer_orientation(
                 da_score += BAC_FREQUENT_BONUS
             if meta.get("importance") == "critique":
                 da_score += 5
-            ranked_da.append((ch, nb, da_score, meta))
+            ranked_da.append((
+                ch, nb, da_score, meta,
+                _niveau_urgence_from_score(da_score),
+                "bac",
+                "document_analysis",
+                _impact_note_estime(da_score),
+            ))
 
-        for ch, nb, da_score, meta in sorted(ranked_da, key=lambda x: -x[2]):
+        for ch, nb, da_score, meta, niveau_urgence, nature_besoin, moteur_source_principal, impact_note_estime in sorted(ranked_da, key=lambda x: -x[2]):
             if len(recommendations) >= MAX_RECOMMENDATIONS:
                 break
-            already = any(r.get("chapitre_slug") == ch for r in recommendations)
+            already = any(r.get("type") == "document_analysis" and r.get("chapitre_slug") == ch for r in recommendations)
             if already:
                 continue
             recommendations.append(
@@ -353,6 +433,10 @@ async def calculer_orientation(
                     "raison": f"{nb} analyse(s) de document en retard (FSRS)",
                     "action": f"/document-analysis/chapters/{ch}",
                     "score_priorite": da_score,
+                    "niveau_urgence": niveau_urgence,
+                    "nature_besoin": nature_besoin,
+                    "moteur_source_principal": moteur_source_principal,
+                    "impact_note_estime": impact_note_estime,
                 }
             )
 

@@ -50,6 +50,10 @@ class OrientationRecommendationPayload(BaseModel):
     raison: str
     action: str
     score_priorite: int
+    niveau_urgence: Literal["critique", "haute", "normale"] | None = None
+    nature_besoin: Literal["memoire", "bac", "methodologie", "structure"] | None = None
+    moteur_source_principal: Literal["flashcards", "document_analysis", "mindmap", "action_verbs"] | None = None
+    impact_note_estime: Literal["fort", "moyen", "limite"] | None = None
 
 
 class OrientationDuesPayload(BaseModel):
