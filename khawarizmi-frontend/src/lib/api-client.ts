@@ -520,7 +520,7 @@ class KhawarizmiApiClient {
   async sendTuteurMessage(payload: {
     message: string
     context?: { page_source?: string; history?: Array<{ role: string; content: string }> | string[]; chapitre?: string }
-    mode?: "free" | "quick" | "tutor"
+    mode?: "free" | "quick" | "tutor" | "bac"
   }): Promise<TuteurResponse> {
     const chapitre = payload.context?.chapitre
     const history = (payload.context?.history as Array<{ role: string; content: string }> | undefined) || []
@@ -562,7 +562,7 @@ class KhawarizmiApiClient {
   async sendChatbotMessage(payload: {
     message: string
     context?: { page_source?: string; history?: Array<{ role: string; content: string }> | string[]; chapitre?: string }
-    mode?: "quick" | "tutor"
+    mode?: "quick" | "tutor" | "bac"
   }): Promise<TuteurResponse> {
     return this.sendTuteurMessage({ message: payload.message, context: payload.context, mode: payload.mode })
   }
