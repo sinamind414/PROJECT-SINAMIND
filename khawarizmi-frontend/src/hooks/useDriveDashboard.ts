@@ -5,7 +5,62 @@ import type { DashboardData, Profile, Mission, Topic, WeekDay, Exercise, Mistake
 import { getGamificationSnapshot, getProgressSnapshot } from '@/lib/progress-store';
 import { buildDashboardState } from '@/lib/daily-dashboard/selectors';
 import apiClient from '@/lib/api-client';
-import type { ProgressResponse, OrientationResponse, WeekActivityResponse, DashboardOrchestratorResponse } from '@/lib/types';
+import type {
+  DashboardOrchestratorResponse,
+  DashboardPrioritySource,
+  OrientationRecommendation,
+  ProgressConcept,
+} from '@/lib/types';
+
+export interface OrchestratorPriorityAction {
+  title: string;
+  reason: string;
+  href: string;
+  cta: string;
+  badge: string;
+  tone: 'danger' | 'mint' | 'amber';
+  source: 'orientation' | 'fsrs' | 'local' | 'fallback';
+}
+
+export interface OrchestratorContinueCard {
+  title: string;
+  subtitle: string;
+  href: string;
+  cta: string;
+  source: 'orientation' | 'fsrs' | 'local' | 'fallback';
+}
+
+export interface OrchestratorStrategicChapter {
+  title: string;
+  subtitle: string;
+  lessonHref: string;
+  mindmapHref: string;
+  chapterSlug?: string | null;
+  source: 'orientation' | 'fsrs' | 'local' | 'fallback';
+}
+
+export interface EnginePulse {
+  predictionBac: number | null;
+  dueToday: number;
+  flashcardsDue: number;
+  actionVerbsDue: number;
+  documentAnalysisDue: number;
+  urgentConceptsCount: number;
+  soonConceptsCount: number;
+  stableConceptsCount: number;
+  topPriorityConcept?: ProgressConcept | null;
+  topOrientation?: OrientationRecommendation | null;
+  source: 'api' | 'local';
+}
+
+export interface OrchestratorDashboardData extends DashboardData {
+  enginePulse: EnginePulse;
+  priorityAction: OrchestratorPriorityAction;
+  continueCard: OrchestratorContinueCard;
+  strategicChapter: OrchestratorStrategicChapter;
+  weakestTopic?: Topic | null;
+  strongestTopic?: Topic | null;
+}
 
 function getCountdown(): { days: number; label: string } {
   const bacDate = new Date('2026-06-10T00:00:00+01:00');
@@ -17,20 +72,37 @@ function getCountdown(): { days: number; label: string } {
 const DAYS_SHORT = ['ح', 'ن', 'ث', 'ر', 'خ', 'ج', 'س'];
 const DAYS_FULL = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
 
-function build(apiProgress?: ProgressResponse | null, dueCards?: number, orientation?: OrientationResponse | null, weekActivity?: WeekActivityResponse | null): DashboardData {
+function chapterTitleFromConcept(chapterId: string): string {
+  return chapterId.replace(/[_-]+/g, ' ').trim() || chapterId;
+}
+
+function conceptToTopic(concept: ProgressConcept, index: number): Topic {
+  const progress = Math.max(0, Math.min(100, Math.round((concept.retrievability || 0) * 100)));
+  return {
+    id: index + 1,
+    title: chapterTitleFromConcept(concept.chapitre_id),
+    titleAr: chapterTitleFromConcept(concept.chapitre_id),
+    progress_percent: progress,
+    lessons_count: concept.est_due ? 1 : 0,
+    mastery: progress,
+    href: `/cours/${encodeURIComponent(concept.chapitre_id)}`,
+    color: progress >= 75 ? '#2DD4BF' : progress >= 50 ? '#F59E0B' : '#EF4444',
+  };
+}
+
+function buildFromOrchestrator(api: DashboardOrchestratorResponse | null): OrchestratorDashboardData {
   const gamification = getGamificationSnapshot();
   const snapshot = getProgressSnapshot();
-  const dashboard = buildDashboardState(weekActivity);
+  const dashboard = buildDashboardState(api?.week_activity ?? null);
   const countdown = getCountdown();
 
-  const apiReady = apiProgress?.prediction_bac?.note_globale != null
-    ? Math.round((apiProgress.prediction_bac.note_globale / 20) * 100)
+  const predictionValue = api?.orchestration.engine_pulse.predictionBac ?? null;
+  const apiReady = predictionValue != null
+    ? Math.max(0, Math.min(100, Math.round((predictionValue / 20) * 100)))
     : gamification.xpProgress;
 
-  const apiDues = apiProgress?.dues_aujourd_hui ?? dueCards ?? 0;
-
   const profile: Profile = {
-    name: 'الطالب',
+    name: api?.user?.prenom || 'الطالب',
     exam_track: 'علوم الطبيعة والحياة',
     exam_year: '2026',
     level: gamification.level,
@@ -46,8 +118,8 @@ function build(apiProgress?: ProgressResponse | null, dueCards?: number, orienta
     missions_done: dashboard.todayTasks.filter(t => t.status === 'done').length,
   };
 
-  const missions: Mission[] = orientation?.recommendations?.length
-    ? orientation.recommendations.map((rec, i) => ({
+  const missions: Mission[] = api?.orientation?.recommendations?.length
+    ? api.orientation.recommendations.map((rec, i) => ({
         id: i + 1,
         title: rec.chapitre_ar || rec.raison,
         titleAr: rec.chapitre_ar || rec.raison,
@@ -55,13 +127,14 @@ function build(apiProgress?: ProgressResponse | null, dueCards?: number, orienta
         descriptionAr: rec.raison,
         xp_reward: Math.max(10, rec.score_priorite * 5),
         icon: rec.type === 'cours' ? 'book' : rec.type === 'action_verb' ? 'zap' : rec.type === 'document_analysis' ? 'file' : 'check',
-        status: 'pending' as const,
-        day_label: rec.priorite === 1 ? 'الأولوية الأولى' : rec.priorite === 2 ? 'الأولوية الثانية' : rec.priorite === 3 ? 'الأولوية الثالثة' : 'الأولوية',
+        status: 'pending',
+        day_label: rec.priorite === 1 ? 'الأولوية الأولى' : rec.priorite === 2 ? 'الأولوية الثانية' : 'الأولوية الثالثة',
+        href: rec.action,
       }))
     : dashboard.todayTasks.map((task, i) => ({
         id: i + 1,
-        title: task.titleAr || '',
-        titleAr: task.titleAr || '',
+        title: task.titleAr,
+        titleAr: task.titleAr,
         description: task.detailAr || task.reasonAr || '',
         descriptionAr: task.detailAr || task.reasonAr || '',
         xp_reward: task.estimatedMinutes * 5,
@@ -71,33 +144,31 @@ function build(apiProgress?: ProgressResponse | null, dueCards?: number, orienta
         href: task.href,
       }));
 
-  // Si l'API renvoie des concepts FSRS, on les utilise comme topics
-  const topics: Topic[] = apiProgress?.concepts?.length
-    ? apiProgress.concepts.slice(0, 8).map((c, i) => ({
-        id: i + 1,
-        title: c.chapitre_id,
-        titleAr: c.chapitre_id,
-        progress_percent: Math.round(c.retrievability * 100),
-        lessons_count: c.est_due ? 1 : 0,
-        mastery: c.retrievability,
-        href: '/cours',
-        color: c.retrievability >= 0.75 ? '#2DD4BF' : c.retrievability >= 0.5 ? '#F59E0B' : '#EF4444',
-      }))
+  const topics: Topic[] = api?.progress?.concepts?.length
+    ? api.progress.concepts.slice(0, 8).map(conceptToTopic)
     : snapshot.skills.map((skill, i) => ({
         id: i + 1,
         title: skill.labelAr,
         titleAr: skill.labelAr,
         progress_percent: skill.level,
         lessons_count: skill.attempts,
-        mastery: skill.level / 100,
-        href: '/cours',
+        mastery: skill.level,
+        href: '/progress',
         color: skill.level >= 75 ? '#2DD4BF' : skill.level >= 50 ? '#F59E0B' : '#EF4444',
       }));
 
+  const weakestTopic = topics.length
+    ? [...topics].sort((a, b) => (a.mastery ?? a.progress_percent) - (b.mastery ?? b.progress_percent))[0]
+    : null;
+
+  const strongestTopic = topics.length
+    ? [...topics].sort((a, b) => (b.mastery ?? b.progress_percent) - (a.mastery ?? a.progress_percent))[0]
+    : null;
+
   const now = new Date();
   const dayOfWeek = now.getDay();
-
-  const weekly: WeekDay[] = dashboard.weekActivity.map((day, i) => {
+  const apiDays = api?.week_activity?.days;
+  const weekly: WeekDay[] = (apiDays || dashboard.weekActivity).map((day: any, i: number) => {
     const d = new Date(now);
     d.setDate(now.getDate() - dayOfWeek + i);
     return {
@@ -105,7 +176,7 @@ function build(apiProgress?: ProgressResponse | null, dueCards?: number, orienta
       day_name: DAYS_FULL[d.getDay()],
       day_short: DAYS_SHORT[d.getDay()],
       date_label: `${d.getDate()}/${d.getMonth() + 1}`,
-      task_title: day.primaryTaskAr || 'مراجعة',
+      task_title: day.primary_task || day.task_title || 'مراجعة',
       completed: day.status === 'done',
     };
   });
@@ -131,44 +202,81 @@ function build(apiProgress?: ProgressResponse | null, dueCards?: number, orienta
       reviewed: false,
     }));
 
-  return { profile, missions, topics, weekly, exercises, mistakes };
+  return {
+    profile,
+    missions,
+    topics,
+    weekly,
+    exercises,
+    mistakes,
+    enginePulse: {
+      predictionBac: api?.orchestration.engine_pulse.predictionBac ?? null,
+      dueToday: api?.orchestration.engine_pulse.dueToday ?? 0,
+      flashcardsDue: api?.orchestration.engine_pulse.flashcardsDue ?? 0,
+      actionVerbsDue: api?.orchestration.engine_pulse.actionVerbsDue ?? 0,
+      documentAnalysisDue: api?.orchestration.engine_pulse.documentAnalysisDue ?? 0,
+      urgentConceptsCount: api?.orchestration.engine_pulse.urgentConceptsCount ?? 0,
+      soonConceptsCount: api?.orchestration.engine_pulse.soonConceptsCount ?? 0,
+      stableConceptsCount: api?.orchestration.engine_pulse.stableConceptsCount ?? 0,
+      topPriorityConcept: api?.orchestration.engine_pulse.topPriorityConcept ?? null,
+      topOrientation: api?.orchestration.engine_pulse.topOrientation ?? null,
+      source: api?.orchestration?.engine_pulse?.source === 'backend' ? 'api' : 'local',
+    },
+    priorityAction: api?.orchestration.priority_action
+      ? {
+          ...api.orchestration.priority_action,
+          source: api.orchestration.priority_action.source as OrchestratorPriorityAction['source'],
+        }
+      : {
+          title: 'ارجع إلى المراجعة السريعة',
+          reason: 'لا توجد أولوية حادة الآن.',
+          href: '/drill',
+          cta: 'راجع الآن',
+          badge: '🔄 تثبيت المكتسبات',
+          tone: 'amber',
+          source: 'fallback',
+        },
+    continueCard: api?.orchestration.continue_card
+      ? {
+          ...api.orchestration.continue_card,
+          source: api.orchestration.continue_card.source as OrchestratorContinueCard['source'],
+        }
+      : {
+          title: 'آخر درس درسته',
+          subtitle: 'استأنف من حيث توقفت',
+          href: '/cours',
+          cta: 'تابع الآن',
+          source: 'fallback',
+        },
+    strategicChapter: api?.orchestration.strategic_chapter
+      ? {
+          ...api.orchestration.strategic_chapter,
+          source: api.orchestration.strategic_chapter.source as OrchestratorStrategicChapter['source'],
+        }
+      : {
+          title: 'لا توجد نقطة ضعف واضحة حالياً',
+          subtitle: 'استمر في المراجعة السريعة أو انتقل إلى تمارين BAC',
+          lessonHref: '/cours',
+          mindmapHref: '/mindmap',
+          source: 'fallback',
+        },
+    weakestTopic,
+    strongestTopic,
+  };
 }
 
-export function useDriveDashboard(): DashboardData {
-  const [data, setData] = useState<DashboardData>(() => build(null));
+export function useDriveDashboard(): OrchestratorDashboardData {
+  const [data, setData] = useState<OrchestratorDashboardData>(() => buildFromOrchestrator(null));
 
   useEffect(() => {
     let cancelled = false;
 
-    const refreshLocal = () => setData(build(null));
+    const refreshLocal = () => setData(buildFromOrchestrator(null));
     const refreshApi = async () => {
       try {
-        // Primary: single orchestrator endpoint
-        const orchestrator = await apiClient.getDashboardOrchestrator();
+        const payload = await apiClient.getDashboardOrchestrator();
         if (cancelled) return;
-        const apiProgress = orchestrator.progress as unknown as ProgressResponse;
-        const orientation = orchestrator.orientation as unknown as OrientationResponse;
-        const weekAct = orchestrator.week_activity as unknown as WeekActivityResponse;
-        const dueTotal = orchestrator.due_cards.total;
-        setData(build(apiProgress, dueTotal, orientation, weekAct));
-        return;
-      } catch {
-        // Fallback: individual endpoints
-      }
-
-      try {
-        const [prog, due, orient, week] = await Promise.allSettled([
-          apiClient.getProgress(),
-          apiClient.getDueCards(),
-          apiClient.getOrientation(),
-          apiClient.getWeekActivity(),
-        ]);
-        if (cancelled) return;
-        const apiProgress = prog.status === 'fulfilled' ? prog.value : null;
-        const dueCards = due.status === 'fulfilled' ? due.value.total : undefined;
-        const orientation = orient.status === 'fulfilled' ? orient.value : null;
-        const weekAct = week.status === 'fulfilled' ? week.value : null;
-        setData(build(apiProgress, dueCards, orientation, weekAct));
+        setData(buildFromOrchestrator(payload));
       } catch {
         // fallback local déjà chargé
       }

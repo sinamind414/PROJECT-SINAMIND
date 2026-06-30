@@ -10,6 +10,14 @@ from services.progress_snapshots import get_due_cards_snapshot, get_progress_sna
 from services.scheduler import KhawarizmiScheduler
 
 
+def _safe_str(value: Any, default: str = "") -> str:
+    if value is None:
+        return default
+    if not isinstance(value, str):
+        return str(value)
+    return value.strip() or default
+
+
 def _safe_chapter_title(chapter_slug: str | None) -> str:
     if not chapter_slug:
         return ""
@@ -36,11 +44,11 @@ def _build_priority_action(orientation: dict[str, Any], progress: dict[str, Any]
         if rec_type == "document_analysis":
             cta = "ابدأ تحليل الوثائق"
         return {
-            "title": top_orientation.get("chapitre_ar") or top_orientation.get("raison"),
-            "reason": top_orientation.get("raison"),
-            "href": top_orientation.get("action") or _slug_to_lesson_href(top_orientation.get("chapitre_slug")),
+            "title": _safe_str(top_orientation.get("chapitre_ar") or top_orientation.get("raison")),
+            "reason": _safe_str(top_orientation.get("raison")),
+            "href": _safe_str(top_orientation.get("action") or _slug_to_lesson_href(top_orientation.get("chapitre_slug")), "/cours"),
             "cta": cta,
-            "badge": "أولوية المحركات" if top_orientation.get("priorite") == 1 else "توصية ذكية",
+            "badge": "🔥 أولوية المحركات" if top_orientation.get("priorite") == 1 else "🎯 توصية ذكية",
             "tone": "danger" if top_orientation.get("priorite") == 1 else "mint",
             "source": "orientation",
         }
@@ -52,7 +60,7 @@ def _build_priority_action(orientation: dict[str, Any], progress: dict[str, Any]
             "reason": "هذا المفهوم مستحق اليوم، وتأجيله يضعف التثبيت ويرفع احتمال النسيان.",
             "href": _slug_to_lesson_href(top_due.get("chapitre_id")),
             "cta": "ابدأ المراجعة الآن",
-            "badge": "مراجعة مستحقة",
+            "badge": "⚠️ مراجعة مستحقة",
             "tone": "danger",
             "source": "fsrs",
         }
@@ -62,7 +70,7 @@ def _build_priority_action(orientation: dict[str, Any], progress: dict[str, Any]
         "reason": "لا توجد أولوية حادة الآن، فثبّت المكتسبات قبل الانتقال.",
         "href": "/drill",
         "cta": "راجع الآن",
-        "badge": "تثبيت المكتسبات",
+        "badge": "🔄 تثبيت المكتسبات",
         "tone": "amber",
         "source": "fallback",
     }
@@ -72,9 +80,9 @@ def _build_continue_card(orientation: dict[str, Any], progress: dict[str, Any]) 
     top_orientation = (orientation.get("recommendations") or [None])[0]
     if top_orientation:
         return {
-            "title": top_orientation.get("chapitre_ar") or top_orientation.get("raison"),
+            "title": _safe_str(top_orientation.get("chapitre_ar") or top_orientation.get("raison")),
             "subtitle": "هذا هو الفصل الذي أعطته المحركات أولوية فعلية الآن",
-            "href": top_orientation.get("action") or _slug_to_lesson_href(top_orientation.get("chapitre_slug")),
+            "href": _safe_str(top_orientation.get("action") or _slug_to_lesson_href(top_orientation.get("chapitre_slug")), "/cours"),
             "cta": "تابع من هنا",
             "source": "orientation",
         }
@@ -104,8 +112,8 @@ def _build_strategic_chapter(orientation: dict[str, Any], progress: dict[str, An
     if top_orientation and top_orientation.get("chapitre_slug"):
         chapter_slug = top_orientation.get("chapitre_slug")
         return {
-            "title": top_orientation.get("chapitre_ar") or chapter_slug,
-            "subtitle": top_orientation.get("raison"),
+            "title": _safe_str(top_orientation.get("chapitre_ar") or chapter_slug, chapter_slug),
+            "subtitle": _safe_str(top_orientation.get("raison"), ""),
             "lessonHref": _slug_to_lesson_href(chapter_slug),
             "mindmapHref": _slug_to_mindmap_href(chapter_slug),
             "chapterSlug": chapter_slug,

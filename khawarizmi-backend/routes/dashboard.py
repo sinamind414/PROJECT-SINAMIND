@@ -4,13 +4,14 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from deps import get_current_user, get_db, get_scheduler
+from schemas.dashboard import DashboardOrchestratorPayload
 from services.dashboard_orchestrator import build_dashboard_orchestrator
 
 logger = logging.getLogger("khawarizmi.api")
 router = APIRouter(prefix="/api/dashboard", tags=["Dashboard"])
 
 
-@router.get("/orchestrator")
+@router.get("/orchestrator", response_model=DashboardOrchestratorPayload)
 async def get_dashboard_orchestrator(
     current_user: dict = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),

@@ -768,6 +768,8 @@ export interface OrientationResponse {
   message: string
 }
 
+export type DashboardPrioritySource = "orientation" | "fsrs" | "fallback"
+
 export interface DashboardOrchestratorResponse {
   user: {
     id: string | number
@@ -779,7 +781,18 @@ export interface DashboardOrchestratorResponse {
   orientation: OrientationResponse
   week_activity: WeekActivityResponse
   due_cards: {
-    cards: Array<Record<string, unknown>>
+    cards: Array<{
+      id: string
+      micro_concept_id?: string | null
+      concept_id?: string | null
+      chapter?: string | null
+      difficulty?: number | null
+      stability?: number | null
+      state?: number | string | null
+      due_date?: string | null
+      next_review?: string | null
+      interval_jours?: number | null
+    }>
     total: number
   }
   orchestration: {
@@ -790,14 +803,14 @@ export interface DashboardOrchestratorResponse {
       cta: string
       badge: string
       tone: "danger" | "mint" | "amber"
-      source: string
+      source: DashboardPrioritySource
     }
     continue_card: {
       title: string
       subtitle: string
       href: string
       cta: string
-      source: string
+      source: DashboardPrioritySource
     }
     strategic_chapter: {
       title: string
@@ -805,7 +818,7 @@ export interface DashboardOrchestratorResponse {
       lessonHref: string
       mindmapHref: string
       chapterSlug?: string | null
-      source: string
+      source: DashboardPrioritySource
     }
     engine_pulse: {
       predictionBac: number | null
@@ -819,10 +832,10 @@ export interface DashboardOrchestratorResponse {
       topPriorityConcept?: ProgressConcept | null
       topOrientation?: OrientationRecommendation | null
       dueCardsTotal: number
-      source: string
+      source: "backend"
     }
     generated_at: string
-    source: string
+    source: "backend_orchestrator"
   }
 }
 
