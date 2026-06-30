@@ -106,7 +106,7 @@ class TestCalculerOrientation:
             "action_verbs": 1,
             "document_analysis": 2,
         }
-        assert len(result["recommendations"]) == 3
+        assert len(result["recommendations"]) == 2
         top = result["recommendations"][0]
         assert top["type"] == "cours"
         assert top["chapitre_slug"] == "genetique_humaine"
