@@ -849,6 +849,86 @@ export interface DashboardOrchestratorResponse {
 }
 
 // ═══════════════════════════════════════════════
+// Lexique
+// ═══════════════════════════════════════════════
+
+export interface LexiqueTerme {
+  id: string
+  terme_fr: string
+  terme_ar: string
+  definition_fr: string
+  definition_ar: string
+  importance: string
+  bac_frequent: boolean
+  chapitre_principal: string
+  categorie_fr?: string | null
+  categorie_ar?: string | null
+}
+
+export interface LexiqueSearchResponse {
+  results: LexiqueTerme[]
+  total: number
+  query: string
+}
+
+// ═══════════════════════════════════════════════
+// Diagnostic
+// ═══════════════════════════════════════════════
+
+export interface DiagnosticProfile {
+  id: string
+  name: string
+  description: string
+  severity: string
+  recommendation: string
+}
+
+export interface DiagnosticResponse {
+  level: string
+  level_label: string
+  score_moyen: number
+  error_profiles: DiagnosticProfile[]
+  recommendations: string[]
+}
+
+// ═══════════════════════════════════════════════
+// Dual Coding
+// ═══════════════════════════════════════════════
+
+export interface DualCodingSchemaSummary {
+  id: string
+  nom: string
+}
+
+export interface EvaluateSchemaResponse {
+  score: number
+  fleches_correctes: boolean | null
+  vocabulaire_exact: boolean | null
+  ordre_correct: boolean | null
+  elements_manquants: string[]
+  feedback: string
+  question_socratique: string
+  erreur: string | null
+}
+
+// ═══════════════════════════════════════════════
+// Document Analysis (scénarios)
+// ═══════════════════════════════════════════════
+
+export interface DocumentAnalysisScenarioSummary {
+  id: string
+  slug: string
+  chapter_slug: string | null
+  unit_key: string
+  title_ar: string
+  subtitle_ar: string
+  context_ar: string
+  nb_documents: number
+  nb_questions: number
+  dominant_skills: string[]
+}
+
+// ═══════════════════════════════════════════════
 // Tuteur Contextuel (Chat)
 // ═══════════════════════════════════════════════
 

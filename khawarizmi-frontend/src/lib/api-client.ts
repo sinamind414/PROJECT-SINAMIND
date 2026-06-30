@@ -38,6 +38,13 @@ import {
   TuteurResponse,
   LessonResponse,
   CheckAnswerResponse,
+  LexiqueSearchResponse,
+  LexiqueTerme,
+  DiagnosticResponse,
+  DiagnosticProfile,
+  DualCodingSchemaSummary,
+  EvaluateSchemaResponse,
+  DocumentAnalysisScenarioSummary,
 } from "./types"
 
 // En dev: paths relatifs (proxy Next.js). En prod: Railway direct (CORS).
@@ -955,6 +962,125 @@ class KhawarizmiApiClient {
     return this.request<{ name: string; points: number; level: number }[]>(
       "/api/phase6/top-performers"
     )
+  }
+
+  // ── Lexique ────────────────────────────────────
+
+  async searchLexique(
+    q: string,
+    params?: { chapitre?: string; domaine?: string; importance?: "critique" | "haute" | "moyenne"; limit?: number; offset?: number }
+  ): Promise<LexiqueSearchResponse> {
+    const searchParams = new URLSearchParams()
+    searchParams.set("q", q)
+    if (params?.chapitre) searchParams.set("chapitre", params.chapitre)
+    if (params?.domaine) searchParams.set("domaine", params.domaine)
+    if (params?.importance) searchParams.set("importance", params.importance)
+    if (params?.limit !== undefined) searchParams.set("limit", String(params.limit))
+    if (params?.offset !== undefined) searchParams.set("offset", String(params.offset))
+    return this.request<LexiqueSearchResponse>(`/api/lexique/search?${searchParams.toString()}`)
+  }
+
+  async getLexiqueTerm(termeId: string): Promise<LexiqueTerme> {
+    return this.request<LexiqueTerme>(`/api/lexique/${encodeURIComponent(termeId)}`)
+  }
+
+  async getLexiqueByChapter(chapitre: string, importance?: "critique" | "haute" | "moyenne"): Promise<LexiqueSearchResponse> {
+    const qs = new URLSearchParams()
+    if (importance) qs.set("importance", importance)
+    return this.request<LexiqueSearchResponse>(`/api/lexique/by-chapter/${encodeURIComponent(chapitre)}?${qs.toString()}`)
+  }
+
+  async getLexiqueByDomaine(domaineId: string): Promise<LexiqueSearchResponse> {
+    return this.request<LexiqueSearchResponse>(`/api/lexique/by-domaine/${encodeURIComponent(domaineId)}`)
+  }
+
+  // ── Diagnostic ───────────────────────────────────
+
+  async getDiagnosticProfiles(): Promise<{ profiles: DiagnosticProfile[] }> {
+    return this.request<{ profiles: DiagnosticProfile[] }>("/api/diagnostic/profiles")
+  }
+
+  async submitDiagnosticMethodology(scores: Array<Record<string, unknown>>): Promise<DiagnosticResponse> {
+    return this.request<DiagnosticResponse>("/api/diagnostic/methodology", {
+      method: "POST",
+      body: JSON.stringify({ scores }),
+    })
+  }
+
+  async submitDiagnosticReport(payload: {
+    verb: string
+    task_type: string
+    structure: Record<string, unknown>
+    doc_usage: Record<string, unknown>
+    student_answer: string
+    previous_answers?: Array<Record<string, unknown>>
+  }): Promise<Record<string, unknown>> {
+    return this.request<Record<string, unknown>>("/api/diagnostic/report", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    })
+  }
+
+  // ── Dual Coding ──────────────────────────────────
+
+  async getDualCodingSchemas(): Promise<DualCodingSchemaSummary[]> {
+    return this.request<DualCodingSchemaSummary[]>("/api/dual-coding/schemas")
+  }
+
+  async getDualCodingSchemasByChapter(chapitre: string): Promise<DualCodingSchemaSummary[]> {
+    return this.request<DualCodingSchemaSummary[]>(`/api/dual-coding/schemas/${encodeURIComponent(chapitre)}`)
+  }
+
+  async evaluateDualCoding(imageBase64: string, schemaId: string): Promise<EvaluateSchemaResponse> {
+    return this.request<EvaluateSchemaResponse>("/api/dual-coding/evaluate", {
+      method: "POST",
+      body: JSON.stringify({ image_base64: imageBase64, schema_id: schemaId }),
+    })
+  }
+
+  // ── Cours ────────────────────────────────────────
+
+  async listCours(): Promise<string[]> {
+    return this.request<string[]>("/api/cours/list")
+  }
+
+  // ── Exercices ────────────────────────────────────
+
+  async correctExercise(exerciseId: number, answer: string, language: string = "ar"): Promise<Record<string, unknown>> {
+    return this.request<Record<string, unknown>>(`/api/exercices/${exerciseId}/correct`, {
+      method: "POST",
+      body: JSON.stringify({ answer, language }),
+    })
+  }
+
+  async ensureExerciseArabic(exerciseId: number): Promise<{ generated_arabic: boolean }> {
+    return this.request<{ generated_arabic: boolean }>(`/api/exercices/${exerciseId}/ensure-arabic`, {
+      method: "POST",
+    })
+  }
+
+  // ── Flashcards méthodologiques ───────────────────
+
+  async getMethodologyFlashcards(): Promise<Record<string, unknown>[]> {
+    return this.request<Record<string, unknown>[]>("/api/flashcards/methodology")
+  }
+
+  async getMethodologyFlashcardsByCategory(category: string): Promise<Record<string, unknown>[]> {
+    return this.request<Record<string, unknown>[]>(`/api/flashcards/methodology/category/${encodeURIComponent(category)}`)
+  }
+
+  // ── Document Analysis — Scénarios ───────────────
+
+  async getDocumentAnalysisScenarios(): Promise<DocumentAnalysisScenarioSummary[]> {
+    return this.request<DocumentAnalysisScenarioSummary[]>("/api/document-analysis/scenarios")
+  }
+
+  async getDocumentAnalysisScenario(slug: string): Promise<Record<string, unknown>> {
+    return this.request<Record<string, unknown>>(`/api/document-analysis/scenarios/${encodeURIComponent(slug)}`)
+  }
+
+  async getDocumentAnalysisScenarioCorrection(slug: string): Promise<Record<string, unknown>> {
+    return this.request<Record<string, unknown>>(`/api/document-analysis/scenarios/${encodeURIComponent(slug)}/correction`)
   }
 
   // ── Health Check ───────────────────────────────
