@@ -17,13 +17,17 @@ import MistakesPanel from "@/components/drive-design/MistakesPanel"
 import GamificationPanel from "@/components/gamification/GamificationPanel"
 import SocialLivePanel from "@/components/gamification/SocialLivePanel"
 import AnalyticsPanel from "@/components/gamification/AnalyticsPanel"
+import { ContinueCard } from "@/components/ui/ContinueCard"
+import { RevealSection } from "@/components/ui/RevealSection"
+import { ChoiceCardGrid } from "@/components/ui/ChoiceCardGrid"
 import { useDriveDashboard } from "@/hooks/useDriveDashboard"
 import type { DashboardData } from "@/components/drive-design/api-types"
 
 export default function DashboardPage() {
   const data = useDriveDashboard()
   const [localState, setLocalState] = useState<DashboardData | null>(null)
-  const [showAllMobile, setShowAllMobile] = useState(false)
+  const [showDetails, setShowDetails] = useState(false)
+  const [showAdvanced, setShowAdvanced] = useState(false)
   const state = localState ?? data
 
   const dailyMission = state.missions.find(m => m.status === 'pending') || state.missions[0]
@@ -68,104 +72,185 @@ export default function DashboardPage() {
   const totalMistakes = state.mistakes.length
   const reviewedMistakes = state.mistakes.filter(m => m.reviewed).length
 
+  const lastActivity = state.weekly.find(w => !w.completed) || state.weekly[0]
+
+  const quickStartCards = [
+    {
+      emoji: "📖",
+      title: "درس سريع",
+      subtitle: "اقرأ شرح المفاهيم",
+      href: "/cours",
+      accent: "#10b981",
+    },
+    {
+      emoji: "🧠",
+      title: "خريطة ذهنية",
+      subtitle: "رتّب المعلومة في بالك",
+      href: "/mindmap",
+      accent: "#8b5cf6",
+    },
+    {
+      emoji: "🔄",
+      title: "مراجعة سريعة",
+      subtitle: "Flashcards مراجعة نشطة",
+      href: "/drill",
+      accent: "#f59e0b",
+    },
+    {
+      emoji: "✍️",
+      title: "تمارين",
+      subtitle: "طبّق اللي تعلمته",
+      href: "/exercises",
+      accent: "#3b82f6",
+    },
+  ]
+
   return (
     <AuthGuard>
       <AppShell>
-          <div className="max-w-7xl mx-auto space-y-4">
-            <div className="hidden sm:block">
-              <Header profile={state.profile} onContinueAction={() => {}} />
-            </div>
+        <div className="max-w-7xl mx-auto space-y-4">
 
-            {/* XP + Mission du jour — en haut, visible immédiatement */}
-            <div className="grid md:grid-cols-2 gap-4">
-              <DailyMission mission={dailyMission} onDoneAction={updateMission} />
-              <LevelXp profile={state.profile} />
-            </div>
-
-            {/* Sprint 15 min */}
-            <div className={`${showAllMobile ? "block" : "hidden"} sm:block`}>
-              <SprintTimer />
-            </div>
-
-            {/* ابدأ من هنا — raccourcis */}
-            <div className="bg-slate-900/50 border border-slate-800/50 rounded-2xl p-4" aria-labelledby="quick-start-title">
-              <h3 id="quick-start-title" className="text-sm font-bold text-white mb-3">ابدأ من هنا</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-2">
-                <Link href="/cours" className="flex items-center justify-center sm:justify-start gap-2 px-3 py-2.5 rounded-xl bg-mint/10 border border-mint/30 text-mint text-xs font-bold hover:bg-mint/20 transition text-center sm:text-right">
-                  <span>📖</span> درس سريع
-                </Link>
-                <Link href="/mindmap" className="flex items-center justify-center sm:justify-start gap-2 px-3 py-2.5 rounded-xl bg-violet-500/10 border border-violet-500/30 text-violet-400 text-xs font-bold hover:bg-violet-500/20 transition text-center sm:text-right">
-                  <span>🧠</span> خريطة ذهنية
-                </Link>
-                <Link href="/drill" className="flex items-center justify-center sm:justify-start gap-2 px-3 py-2.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-bold hover:bg-amber-500/20 transition text-center sm:text-right">
-                  <span>🔄</span> مراجعة سريعة
-                </Link>
-                <Link href="/exercises" className="flex items-center justify-center sm:justify-start gap-2 px-3 py-2.5 rounded-xl bg-blue-500/10 border border-blue-500/30 text-blue-400 text-xs font-bold hover:bg-blue-500/20 transition text-center sm:text-right">
-                  <span>✍️</span> تمارين
-                </Link>
-              </div>
-            </div>
-
-            <ProgressCluster profile={state.profile} />
-
-            {!showAllMobile && (
-              <button
-                type="button"
-                onClick={() => setShowAllMobile(true)}
-                className="md:hidden w-full rounded-2xl border border-mint/30 bg-mint/10 px-4 py-3 text-sm font-black text-mint hover:bg-mint/15 transition"
-              >
-                عرض كل التفاصيل ↓
-              </button>
-            )}
-
-            {/* ملخص اليوم */}
-            <div className={`${showAllMobile ? "block" : "hidden"} md:block bg-slate-900/50 border border-slate-800/50 rounded-2xl p-4`}>
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="text-sm font-bold text-white">ملخص اليوم</h3>
-                <span className="text-[10px] text-mint font-bold cursor-pointer hover:underline">🏆 شوف الترتيب</span>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div className="bg-slate-800/50 rounded-xl p-3 text-center">
-                  <p className="text-lg font-black text-mint">{state.missions.length}</p>
-                  <p className="text-[10px] text-slate-400 font-semibold">مهام اليوم</p>
-                </div>
-                <div className="bg-slate-800/50 rounded-xl p-3 text-center">
-                  <p className="text-lg font-black text-amber-400">{doneExercises}/{totalExercises}</p>
-                  <p className="text-[10px] text-slate-400 font-semibold">التمارين</p>
-                </div>
-                <div className="bg-slate-800/50 rounded-xl p-3 text-center">
-                  <p className="text-lg font-black text-red-400">{totalMistakes - reviewedMistakes}</p>
-                  <p className="text-[10px] text-slate-400 font-semibold">نقاط تحتاج مراجعة</p>
-                </div>
-              </div>
-            </div>
-
-            <div className={`${showAllMobile ? "grid" : "hidden"} md:grid lg:grid-cols-3 gap-4`}>
-              <div className="lg:col-span-2 space-y-4">
-                <WeeklyPlan days={state.weekly} onToggleAction={updateWeek} />
-              </div>
-              <div className="space-y-4">
-                <TopicsPanel topics={state.topics} />
-              </div>
-            </div>
-
-            <div className={`${showAllMobile ? "grid" : "hidden"} md:grid md:grid-cols-2 gap-4`}>
-              <ExercisesPanel exercises={state.exercises} onToggleAction={updateExercise} />
-              <MistakesPanel mistakes={state.mistakes} onToggleAction={updateMistake} />
-            </div>
-
-            {/* Section bonus */}
-            <div className="hidden lg:grid lg:grid-cols-3 gap-4 pt-4 border-t border-slate-800/50">
-              <GamificationPanel profile={state.profile} />
-              <SocialLivePanel chapter="proteines" />
-              <AnalyticsPanel />
-            </div>
-
+          {/* Desktop header */}
+          <div className="hidden sm:block">
+            <Header profile={state.profile} onContinueAction={() => {}} />
           </div>
 
-          <footer className="mt-6 text-center text-xs text-slate-500 font-semibold py-4 font-arabic">
-            منصة مراجعة البكالوريا — علوم الطبيعة والحياة · 2026 · صُممت بكل عناية
-          </footer>
+          {/* ═══════════════════════════════════════════
+              LEVEL 1 — Premier écran, toujours visible
+              ═══════════════════════════════════════════ */}
+
+          {/* Mission du jour — l'action principale */}
+          <DailyMission mission={dailyMission} onDoneAction={updateMission} />
+
+          {/* Reprendre où j'étais — lien direct */}
+          {lastActivity && (
+            <ContinueCard
+              title={lastActivity.task_title}
+              subtitle={`${lastActivity.day_name} · ${lastActivity.completed ? "مكتمل ✅" : "في الانتظار"}`}
+              href="/drill"
+              progress={lastActivity.completed ? 100 : 0}
+              emoji="📍"
+            />
+          )}
+
+          {/* ابدأ من هنا — 4 raccourcis rapides */}
+          <ChoiceCardGrid cards={quickStartCards} columns={2} />
+
+          {/* Bouton « détails » — secondary level */}
+          {!showDetails && (
+            <button
+              type="button"
+              onClick={() => setShowDetails(true)}
+              className="w-full rounded-2xl border border-mint/30 bg-mint/10 px-4 py-3 text-sm font-black text-mint hover:bg-mint/15 transition"
+            >
+              عرض كل التفاصيل ↓
+            </button>
+          )}
+
+          {/* ═══════════════════════════════════════════
+              LEVEL 2 — Secondaire, après clic
+              ═══════════════════════════════════════════ */}
+          {showDetails && (
+            <>
+              {/* XP + Sprint */}
+              <div className="grid md:grid-cols-2 gap-4">
+                <LevelXp profile={state.profile} />
+                <SprintTimer />
+              </div>
+
+              {/* Progression */}
+              <ProgressCluster profile={state.profile} />
+
+              {/* ملخص اليوم */}
+              <div className="bg-slate-900/50 border border-slate-800/50 rounded-2xl p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-sm font-bold text-white">ملخص اليوم</h3>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div className="bg-slate-800/50 rounded-xl p-3 text-center">
+                    <p className="text-lg font-black text-mint">{state.missions.length}</p>
+                    <p className="text-[10px] text-slate-400 font-semibold">مهام اليوم</p>
+                  </div>
+                  <div className="bg-slate-800/50 rounded-xl p-3 text-center">
+                    <p className="text-lg font-black text-amber-400">{doneExercises}/{totalExercises}</p>
+                    <p className="text-[10px] text-slate-400 font-semibold">التمارين</p>
+                  </div>
+                  <div className="bg-slate-800/50 rounded-xl p-3 text-center">
+                    <p className="text-lg font-black text-red-400">{totalMistakes - reviewedMistakes}</p>
+                    <p className="text-[10px] text-slate-400 font-semibold">نقاط تحتاج مراجعة</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Plan de la semaine + Sujets */}
+              <div className="grid lg:grid-cols-3 gap-4">
+                <div className="lg:col-span-2">
+                  <WeeklyPlan days={state.weekly} onToggleAction={updateWeek} />
+                </div>
+                <div>
+                  <TopicsPanel topics={state.topics} />
+                </div>
+              </div>
+
+              {/* Bouton « avancé » — advanced level */}
+              {!showAdvanced && (
+                <button
+                  type="button"
+                  onClick={() => setShowAdvanced(true)}
+                  className="w-full rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm font-bold text-white/60 hover:text-white/80 hover:bg-white/[0.06] transition"
+                >
+                  إعدادات المتقدمة ▼
+                </button>
+              )}
+            </>
+          )}
+
+          {/* ═══════════════════════════════════════════
+              LEVEL 3 — Avancé, caché par défaut
+              ═══════════════════════════════════════════ */}
+          {showDetails && showAdvanced && (
+            <>
+              {/* Exercices + Erreurs — mobile/desktop */}
+              <RevealSection title="التمارين والنقاط الضعيفة">
+                <div className="grid md:grid-cols-2 gap-4 pt-4">
+                  <ExercisesPanel exercises={state.exercises} onToggleAction={updateExercise} />
+                  <MistakesPanel mistakes={state.mistakes} onToggleAction={updateMistake} />
+                </div>
+              </RevealSection>
+
+              {/* Gamification — visible desktop, collapsible mobile */}
+              <div className="hidden lg:block">
+                <div className="grid grid-cols-3 gap-4 pt-4 border-t border-slate-800/50">
+                  <GamificationPanel profile={state.profile} />
+                  <SocialLivePanel chapter="proteines" />
+                  <AnalyticsPanel />
+                </div>
+              </div>
+
+              <div className="lg:hidden space-y-4">
+                <RevealSection title="التحديات والترتيب">
+                  <div className="pt-4">
+                    <GamificationPanel profile={state.profile} />
+                  </div>
+                </RevealSection>
+                <RevealSection title="المجتمع الحي">
+                  <div className="pt-4">
+                    <SocialLivePanel chapter="proteines" />
+                  </div>
+                </RevealSection>
+                <RevealSection title="الإحصائيات">
+                  <div className="pt-4">
+                    <AnalyticsPanel />
+                  </div>
+                </RevealSection>
+              </div>
+            </>
+          )}
+        </div>
+
+        <footer className="mt-6 text-center text-xs text-slate-500 font-semibold py-4 font-arabic">
+          منصة مراجعة البكالوريا — علوم الطبيعة والحياة · 2026 · صُممت بكل عناية
+        </footer>
       </AppShell>
     </AuthGuard>
   )

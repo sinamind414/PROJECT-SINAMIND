@@ -199,7 +199,7 @@ export function WeekSchedule() {
                       {course.action !== "exam" && (
                         <div className="grid grid-cols-3 gap-2 mt-3">
                           <Link
-                            href={`/cours/${encodeURIComponent(course.subject)}`}
+                            href="/cours"
                             className="px-2 py-1.5 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 border border-blue-500/30 rounded-lg text-xs font-medium text-center transition-all"
                           >
                             📖 الدرس

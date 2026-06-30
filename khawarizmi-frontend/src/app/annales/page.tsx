@@ -4,6 +4,8 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import { AuthGuard } from "@/components/auth/AuthGuard"
 import { AppShell } from "@/components/layout/AppShell"
+import { ProgressivePageHeader } from "@/components/ui/ProgressivePageHeader"
+import { RevealSection } from "@/components/ui/RevealSection"
 import { getAllSujets } from "@/lib/annales-bac"
 import type { SujetBac } from "@/lib/annales-bac"
 import apiClient from "@/lib/api-client"
@@ -20,6 +22,8 @@ const DIFFICULTE_AR: Record<string, string> = {
   moyen: "متوسط",
   difficile: "صعب",
 }
+
+type EntryType = "year" | "filiere" | "search" | null
 
 function annaleToSujet(a: Annale): SujetBac {
   const diff = a.difficulte <= 2 ? "facile" : a.difficulte <= 4 ? "moyen" : "difficile"
@@ -43,11 +47,13 @@ function annaleToSujet(a: Annale): SujetBac {
 }
 
 function AnnalesContent() {
+  const [entryType, setEntryType] = useState<EntryType>(null)
   const [search, setSearch] = useState("")
   const [sujets, setSujets] = useState<SujetBac[]>([])
   const [loading, setLoading] = useState(true)
   const [source, setSource] = useState<"api" | "local">("local")
   const [filiere, setFiliere] = useState<"all" | "SE" | "Math">("all")
+  const [selectedYear, setSelectedYear] = useState<number | null>(null)
 
   useEffect(() => {
     let cancelled = false
@@ -74,88 +80,187 @@ function AnnalesContent() {
     return () => { cancelled = true }
   }, [])
 
-  const visible = !search.trim()
-    ? sujets.filter((s) => {
-        if (filiere === "SE") return s.filiere === "Sciences Expérimentales"
-        if (filiere === "Math") return s.filiere === "Mathématiques"
-        return true
-      })
-    : sujets.filter(
-        (s) =>
-          (filiere === "all" || (filiere === "SE" && s.filiere === "Sciences Expérimentales") || (filiere === "Math" && s.filiere === "Mathématiques")) &&
-          (s.titre.toLowerCase().includes(search.toLowerCase()) ||
-          s.titreAr.includes(search) ||
-          s.chapitres.some((c) => c.toLowerCase().includes(search.toLowerCase())) ||
-          String(s.annee).includes(search))
+  const years = Array.from(new Set(sujets.map((s) => s.annee))).sort((a, b) => b - a)
+
+  const visible = sujets.filter((s) => {
+    if (filiere === "SE" && s.filiere !== "Sciences Expérimentales") return false
+    if (filiere === "Math" && s.filiere !== "Mathématiques") return false
+    if (selectedYear && s.annee !== selectedYear) return false
+    if (search.trim()) {
+      const q = search.toLowerCase()
+      return (
+        s.titre.toLowerCase().includes(q) ||
+        s.titreAr.includes(search) ||
+        s.chapitres.some((c) => c.toLowerCase().includes(q)) ||
+        String(s.annee).includes(search)
       )
+    }
+    return true
+  })
+
+  const filiereLabel =
+    filiere === "SE" ? "شعبة علوم تجريبية" : filiere === "Math" ? "شعبة رياضيات" : "جميع الشعب"
 
   return (
     <AppShell>
       <main className="flex-1 p-6 overflow-auto">
         <div className="max-w-5xl mx-auto space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div>
-              <h1 className="text-2xl font-bold text-white">مواضيع البكالوريا</h1>
-              <p className="text-sm text-slate-400 mt-1">
-                {loading ? "جاري التحميل..." : `${visible.length} موضوع — ${filiere === "SE" ? "شعبة علوم تجريبية" : filiere === "Math" ? "شعبة رياضيات" : "جميع الشعب"}`}
-                {source === "local" && !loading && (
-                  <span className="text-amber-500/70 text-[10px] mr-2">(بيانات محلية)</span>
-                )}
-              </p>
+          <ProgressivePageHeader
+            breadcrumb={[{ label: "مواضيع البكالوريا" }]}
+            title="مواضيع البكالوريا"
+            subtitle={
+              loading
+                ? "جاري التحميل..."
+                : `${visible.length} موضوع — ${filiereLabel}` +
+                  (source === "local" ? " (بيانات محلية)" : "")
+            }
+          />
+
+          {/* Level 1 — Entry Type */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {([
+              { type: "year" as EntryType, emoji: "📅", title: "حسب السنة", subtitle: "اختر سنة الامتحان" },
+              { type: "filiere" as EntryType, emoji: "🎓", title: "حسب الشعبة", subtitle: "علوم تجريبية أو رياضيات" },
+              { type: "search" as EntryType, emoji: "🔍", title: "بحث", subtitle: "ابحث بالعنوان أو الفصل" },
+            ]).map((card) => (
+              <button
+                key={card.type}
+                type="button"
+                onClick={() => {
+                  setEntryType(entryType === card.type ? null : card.type)
+                  if (card.type === "year") setSelectedYear(null)
+                  if (card.type === "filiere") setFiliere("all")
+                  if (card.type === "search") setSearch("")
+                }}
+                className={`group rounded-2xl p-5 glass border hover:scale-[1.02] transition-all duration-200 text-left ${
+                  entryType === card.type
+                    ? "border-mint/40 bg-mint/[0.06]"
+                    : "border-mint/10 hover:border-mint/30"
+                }`}
+              >
+                <div className="flex items-start justify-between mb-3">
+                  <span className="text-3xl">{card.emoji}</span>
+                  {entryType === card.type && (
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold border bg-mint/15 border-mint/30 text-mint-soft">
+                      مفعّل
+                    </span>
+                  )}
+                </div>
+                <h3 className="text-white font-bold text-lg mb-1">{card.title}</h3>
+                <p className="text-gray-400 text-sm leading-relaxed">{card.subtitle}</p>
+                <p className="text-mint text-sm font-bold mt-3 opacity-0 group-hover:opacity-100 transition">
+                  {entryType === card.type ? "إخفاء ←" : "اختر ←"}
+                </p>
+              </button>
+            ))}
+          </div>
+
+          {/* Level 2 — Year Cards */}
+          {entryType === "year" && (
+            <div className="space-y-3">
+              <h3 className="text-white font-bold text-sm">اختر السنة</h3>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => setSelectedYear(null)}
+                  className={`px-4 py-2 rounded-xl border text-sm font-bold transition-all ${
+                    selectedYear === null
+                      ? "bg-mint/15 border-mint/30 text-mint-soft"
+                      : "bg-slate-900/30 border-slate-700/50 text-slate-400 hover:border-slate-600"
+                  }`}
+                >
+                  الكل
+                </button>
+                {years.map((y) => (
+                  <button
+                    key={y}
+                    type="button"
+                    onClick={() => setSelectedYear(y)}
+                    className={`px-4 py-2 rounded-xl border text-sm font-bold transition-all ${
+                      selectedYear === y
+                        ? "bg-mint/15 border-mint/30 text-mint-soft"
+                        : "bg-slate-900/30 border-slate-700/50 text-slate-400 hover:border-slate-600"
+                    }`}
+                  >
+                    {y}
+                    <span className="text-[10px] mr-1.5 opacity-60">
+                      {sujets.filter((s) => s.annee === y).length}
+                    </span>
+                  </button>
+                ))}
+              </div>
             </div>
-            <input
-              type="text"
-              placeholder="بحث..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="bg-slate-900/50 border border-mint/15 rounded-xl px-4 py-2.5 text-sm text-white placeholder:text-slate-500 w-full sm:w-56 focus:border-mint/40 focus:outline-none"
-            />
-          </div>
+          )}
 
-          {/* Filière Tabs */}
-          <div className="flex gap-3">
-            <button
-              onClick={() => setFiliere("all")}
-              className={`flex items-center gap-2 px-5 py-3 rounded-xl border text-sm font-bold transition-all ${
-                filiere === "all"
-                  ? "bg-mint/15 border-mint/30 text-mint-soft"
-                  : "bg-slate-900/30 border-slate-700/50 text-slate-400 hover:border-slate-600"
-              }`}
-            >
-              <span className="text-lg">📚</span>
-              <span>جميع الشعب</span>
-              <span className="text-[10px] bg-slate-800/80 px-1.5 py-0.5 rounded-full">{sujets.length}</span>
-            </button>
-            <button
-              onClick={() => setFiliere("SE")}
-              className={`flex items-center gap-2 px-5 py-3 rounded-xl border text-sm font-bold transition-all ${
-                filiere === "SE"
-                  ? "bg-emerald-500/15 border-emerald-500/30 text-emerald-400"
-                  : "bg-slate-900/30 border-slate-700/50 text-slate-400 hover:border-slate-600"
-              }`}
-            >
-              <span className="text-lg">🔬</span>
-              <span>🔬 شعبة علوم تجريبية</span>
-              <span className="text-[10px] bg-slate-800/80 px-1.5 py-0.5 rounded-full">
-                {sujets.filter((s) => s.filiere === "Sciences Expérimentales").length}
-              </span>
-            </button>
-            <button
-              onClick={() => setFiliere("Math")}
-              className={`flex items-center gap-2 px-5 py-3 rounded-xl border text-sm font-bold transition-all ${
-                filiere === "Math"
-                  ? "bg-amber-500/15 border-amber-500/30 text-amber-400"
-                  : "bg-slate-900/30 border-slate-700/50 text-slate-400 hover:border-slate-600"
-              }`}
-            >
-              <span className="text-lg">📐</span>
-              <span>📐 شعبة رياضيات</span>
-              <span className="text-[10px] bg-slate-800/80 px-1.5 py-0.5 rounded-full">
-                {sujets.filter((s) => s.filiere === "Mathématiques").length}
-              </span>
-            </button>
-          </div>
+          {/* Level 2 — Filière Tabs */}
+          {entryType === "filiere" && (
+            <div className="space-y-3">
+              <h3 className="text-white font-bold text-sm">اختر الشعبة</h3>
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => setFiliere("all")}
+                  className={`flex items-center gap-2 px-5 py-3 rounded-xl border text-sm font-bold transition-all ${
+                    filiere === "all"
+                      ? "bg-mint/15 border-mint/30 text-mint-soft"
+                      : "bg-slate-900/30 border-slate-700/50 text-slate-400 hover:border-slate-600"
+                  }`}
+                >
+                  <span className="text-lg">📚</span>
+                  <span>جميع الشعب</span>
+                  <span className="text-[10px] bg-slate-800/80 px-1.5 py-0.5 rounded-full">{sujets.length}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setFiliere("SE")}
+                  className={`flex items-center gap-2 px-5 py-3 rounded-xl border text-sm font-bold transition-all ${
+                    filiere === "SE"
+                      ? "bg-emerald-500/15 border-emerald-500/30 text-emerald-400"
+                      : "bg-slate-900/30 border-slate-700/50 text-slate-400 hover:border-slate-600"
+                  }`}
+                >
+                  <span className="text-lg">🔬</span>
+                  <span>شعبة علوم تجريبية</span>
+                  <span className="text-[10px] bg-slate-800/80 px-1.5 py-0.5 rounded-full">
+                    {sujets.filter((s) => s.filiere === "Sciences Expérimentales").length}
+                  </span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setFiliere("Math")}
+                  className={`flex items-center gap-2 px-5 py-3 rounded-xl border text-sm font-bold transition-all ${
+                    filiere === "Math"
+                      ? "bg-amber-500/15 border-amber-500/30 text-amber-400"
+                      : "bg-slate-900/30 border-slate-700/50 text-slate-400 hover:border-slate-600"
+                  }`}
+                >
+                  <span className="text-lg">📐</span>
+                  <span>شعبة رياضيات</span>
+                  <span className="text-[10px] bg-slate-800/80 px-1.5 py-0.5 rounded-full">
+                    {sujets.filter((s) => s.filiere === "Mathématiques").length}
+                  </span>
+                </button>
+              </div>
+            </div>
+          )}
 
+          {/* Level 2 — Search */}
+          {entryType === "search" && (
+            <RevealSection title="🔍 بحث في المواضيع" defaultOpen={true}>
+              <div className="py-3">
+                <input
+                  type="text"
+                  placeholder="ابحث بالعنوان، الفصل، أو السنة..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="w-full bg-slate-900/50 border border-mint/15 rounded-xl px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-mint/40 focus:outline-none"
+                  autoFocus
+                />
+              </div>
+            </RevealSection>
+          )}
+
+          {/* Level 3 — Sujets */}
           <div className="grid gap-4 sm:grid-cols-2">
             {visible.map((sujet) => (
               <SujetCard key={sujet.slug} sujet={sujet} />

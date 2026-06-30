@@ -91,7 +91,7 @@ export function TodoWidget() {
               {!todo.done && (
                 <div className="flex gap-2 mr-8">
                   <Link
-                    href={`/cours/${encodeURIComponent(todo.title)}`}
+                    href="/cours"
                     className="flex-1 py-1.5 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 rounded-lg text-[10px] text-center transition-all"
                   >
                     📖 الدرس

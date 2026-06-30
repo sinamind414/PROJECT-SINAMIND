@@ -84,7 +84,7 @@ export function ChapterItem({ chapter, onClick }: ChapterItemProps) {
 
       <div className="grid grid-cols-3 gap-2 mt-3" dir="rtl">
         <Link
-          href={`/cours/${encodedTitle}`}
+          href="/cours"
           className="px-3 py-2 bg-blue-500/10 hover:bg-blue-500/20 
                      text-blue-400 border border-blue-500/30 
                      rounded-lg text-xs font-medium text-center 
