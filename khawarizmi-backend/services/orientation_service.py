@@ -11,9 +11,23 @@ from datetime import UTC, datetime
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
-# ── Poids par importance ───────────────────────────
+# ── Poids stratégique BAC SVT ──────────────────────
 
-IMPORTANCE_WEIGHT = {"critique": 3, "haute": 2, "moyenne": 1}
+IMPORTANCE_POINTS = {"critique": 12, "haute": 7, "moyenne": 3}
+BAC_FREQUENT_BONUS = 4
+FC_DUES_MULTIPLIER = 2.5
+STABILITY_LOW = 2.0
+STABILITY_MED = 4.0
+STABILITY_LOW_BONUS = 6
+STABILITY_MED_BONUS = 3
+DA_DUES_MULTIPLIER = 4
+WEAK_NODES_MULTIPLIER = 2.5
+DISORGANIZATION_THRESHOLD = 3
+DISORGANIZATION_BONUS = 3
+CUMUL_BONUS = 4
+DANGER_BAC_BONUS = 5
+AV_DUE_BONUS = 8
+AV_PERSISTENT_WEAK_BONUS = 5
 
 # ── Seuils ─────────────────────────────────────────
 
@@ -77,6 +91,7 @@ async def calculer_orientation(
                     "verb_slug": m["verb_slug"],
                     "last_score": m["last_score"] or 0,
                     "attempts": m["attempts"] or 0,
+                    "is_due": is_due,
                 }
             )
 
@@ -179,15 +194,31 @@ async def calculer_orientation(
 
         meta = _find_chapter_meta(ch, chapter_meta)
         importance = meta.get("importance", "moyenne")
-        weight = IMPORTANCE_WEIGHT.get(importance, 1)
 
-        score = 0
-        score += fc_dues * weight
-        score += da_dues * 2 * weight
-        score += weak_nodes * 2
+        impact_bac = IMPORTANCE_POINTS.get(importance, 3)
+        if meta.get("bac_frequent"):
+            impact_bac += BAC_FREQUENT_BONUS
 
-        if stability < 5.0 and total_concepts > 0:
-            score += int((5.0 - stability) * weight)
+        urgence_memoire = fc_dues * FC_DUES_MULTIPLIER
+        if total_concepts > 0:
+            if stability < STABILITY_LOW:
+                urgence_memoire += STABILITY_LOW_BONUS
+            elif stability < STABILITY_MED:
+                urgence_memoire += STABILITY_MED_BONUS
+
+        dette_documents = da_dues * DA_DUES_MULTIPLIER
+
+        dette_mindmap = weak_nodes * WEAK_NODES_MULTIPLIER
+        if weak_nodes >= DISORGANIZATION_THRESHOLD:
+            dette_mindmap += DISORGANIZATION_BONUS
+
+        fragilite = 0
+        if fc_dues > 0 and da_dues > 0:
+            fragilite += CUMUL_BONUS
+        if importance == "critique" and total_concepts > 0 and stability < 3.0:
+            fragilite += DANGER_BAC_BONUS
+
+        score = impact_bac + urgence_memoire + dette_documents + dette_mindmap + fragilite
 
         if score > 0:
             chapter_scores.append(
@@ -237,12 +268,18 @@ async def calculer_orientation(
             }
         )
 
-    # (b) Verbes méthodologiques faibles
+    # (b) Verbes méthodologiques faibles (score multi-critères)
     if weak_verbs and len(recommendations) < MAX_RECOMMENDATIONS:
-        weakest = sorted(weak_verbs, key=lambda v: v["last_score"])[:2]
-        for v in weakest:
-            if len(recommendations) >= MAX_RECOMMENDATIONS:
-                break
+        av_scores = []
+        for v in weak_verbs:
+            av_base = (WEAK_SCORE_THRESHOLD - v["last_score"]) // 5
+            if v.get("is_due"):
+                av_base += AV_DUE_BONUS
+            if v["attempts"] >= 3 and v["last_score"] < WEAK_SCORE_THRESHOLD:
+                av_base += AV_PERSISTENT_WEAK_BONUS
+            av_scores.append((v, av_base))
+        av_scores.sort(key=lambda x: -x[1])
+        for v, sc in av_scores[:min(2, MAX_RECOMMENDATIONS - len(recommendations))]:
             recommendations.append(
                 {
                     "priorite": len(recommendations) + 1,
@@ -251,26 +288,32 @@ async def calculer_orientation(
                     "chapitre_ar": None,
                     "raison": f"Verbe '{v['verb_slug']}' : score moyen {v['last_score']}%",
                     "action": f"/action-verbs/{v['verb_slug']}",
-                    "score_priorite": (WEAK_SCORE_THRESHOLD - v["last_score"]) // 5,
+                    "score_priorite": sc,
                 }
             )
 
-    # (c) Document analysis dues (si pas déjà couvert)
+    # (c) Document analysis dues (agressif en SVT — prioritaire si nb ≥ 2)
     if len(recommendations) < MAX_RECOMMENDATIONS:
         for ch, nb in sorted(da_by_chapter.items(), key=lambda x: -x[1]):
             if len(recommendations) >= MAX_RECOMMENDATIONS:
                 break
-            already = any(r.get("chapitre_slug") == ch for r in recommendations)
-            if already:
+            first_cours = next((r for r in recommendations if r["type"] == "cours"), None)
+            if first_cours and first_cours["chapitre_slug"] == ch and nb < 2:
+                continue
+            already_da = any(r.get("chapitre_slug") == ch and r["type"] == "document_analysis" for r in recommendations)
+            if already_da:
                 continue
             meta = _find_chapter_meta(ch, chapter_meta)
+            reason = f"{nb} analyse(s) de document en retard"
+            if meta.get("bac_frequent"):
+                reason += " — chapitre BAC fréquent"
             recommendations.append(
                 {
                     "priorite": len(recommendations) + 1,
                     "type": "document_analysis",
                     "chapitre_slug": ch,
                     "chapitre_ar": meta.get("titre_ar", ch),
-                    "raison": f"{nb} analyse(s) de document en retard (FSRS)",
+                    "raison": reason,
                     "action": f"/document-analysis/chapters/{ch}",
                     "score_priorite": nb * 2,
                 }
