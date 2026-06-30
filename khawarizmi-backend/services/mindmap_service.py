@@ -8,6 +8,31 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 
 logger = logging.getLogger("khawarizmi.mindmap_service")
 
+# ── Limite de tokens pour les prompts contextuels MindMap ──────────────────────
+# Réduit le volume de texte envoyé au LLM pour accélérer la génération
+# et limiter les coûts. Les chunks RAG sont tronqués avant injection.
+
+
+def _compact_mindmap_context(chunks: list[dict], excerpt_len: int = 220) -> str:
+    """
+    Formate les chunks RAG pour le prompt MindMap en limitant la taille de chaque extrait.
+
+    Args:
+        chunks: Liste de dicts avec clés 'source' et 'content'
+        excerpt_len: Nombre max de caractères par extrait (défaut: 220)
+
+    Returns:
+        Texte formaté pour injection dans le prompt LLM
+    """
+    if not chunks:
+        return ""
+    lines = []
+    for c in chunks:
+        src = c.get("source", "?")
+        txt = (c.get("content") or "")[:excerpt_len]
+        lines.append(f"Source: {src}\n{txt}")
+    return "\n\n".join(lines)
+
 
 # ── Génération asynchrone (BackgroundTasks) ──────────────────────────────────
 # Le flux asynchrone évite les timeouts HTTP sur la génération MindMap :
@@ -115,7 +140,7 @@ async def run_generation_background(
                     AND (LOWER(chapitre) = LOWER(:chapitre)
                          OR LOWER(REPLACE(chapitre, 'é', 'e')) = LOWER(REPLACE(:chapitre, 'é', 'e')))
                     ORDER BY embedding <=> CAST(:emb AS vector)
-                    LIMIT 20
+                    LIMIT 8
                 """),
                 {"matiere": matiere, "chapitre": chapitre, "emb": str(query_vector.tolist())},
             )
@@ -134,9 +159,9 @@ async def run_generation_background(
                 context_text = f"Chapitre: {chapitre}, Matière: {matiere}, Filière: {filiere}"
                 source_names = "LLM seul (pas de RAG)"
             else:
-                # Re-ranking : garder les 5 meilleurs chunks
-                chunks = rerank(query_text, raw_chunks, top_k=5)
-                context_text = "\n\n".join([f"Source: {c['source']}\n{c['content']}" for c in chunks])
+                # Re-ranking : garder les 3 meilleurs chunks (compact format)
+                chunks = rerank(query_text, raw_chunks, top_k=3)
+                context_text = _compact_mindmap_context(chunks)
                 source_names = ", ".join(list({c["source"] for c in chunks}))
 
             # 2. Génération LLM (racine + niveau 1 seulement = lazy loading)
@@ -175,7 +200,7 @@ GÉNÉRATION PROGRESSIVE (LAZY LOADING) :
                 response = await openai_client.chat.completions.create(
                     model=openai_model,
                     temperature=0.2,
-                    max_tokens=3000,
+                    max_tokens=1800,
                     timeout=20.0,
                     messages=[{"role": "system", "content": lazy_prompt}, {"role": "user", "content": user_prompt}],
                 )
@@ -281,7 +306,7 @@ async def expand_node(
                      OR LOWER(REPLACE(chapitre, 'é', 'e')) = LOWER(REPLACE(:chapitre, 'é', 'e')))
                 AND content ILIKE :keyword
                 ORDER BY embedding <=> CAST(:emb AS vector)
-                LIMIT 10
+                LIMIT 6
             """),
             {
                 "matiere": matiere,
@@ -298,12 +323,12 @@ async def expand_node(
             }
             for r in res_chunks.fetchall()
         ]
-        chunks = rerank(query_text, raw_chunks, top_k=3) if raw_chunks else []
+        chunks = rerank(query_text, raw_chunks, top_k=2) if raw_chunks else []
     except Exception as e:
         logger.error(f"MINDMAP_EXPAND | Erreur RAG: {e}")
         chunks = []
 
-    context_text = "\n\n".join([f"Source: {c['source']}\n{c['content']}" for c in chunks]) if chunks else ""
+    context_text = _compact_mindmap_context(chunks, excerpt_len=180) if chunks else ""
 
     expand_prompt = f"""
     Tu es un expert pédagogique. Génère les sous-nœuds (niveau enfant) du nœud suivant.
@@ -462,7 +487,7 @@ async def generate_mindmap(
                 AND (LOWER(chapitre) = LOWER(:chapitre)
                      OR LOWER(REPLACE(chapitre, 'é', 'e')) = LOWER(REPLACE(:chapitre, 'é', 'e')))
                 ORDER BY embedding <=> CAST(:emb AS vector)
-                LIMIT 20
+                LIMIT 8
             """),
             {"matiere": matiere, "chapitre": chapitre, "emb": str(query_vector.tolist())},
         )
@@ -474,7 +499,7 @@ async def generate_mindmap(
             }
             for r in res_chunks.fetchall()
         ]
-        chunks = rerank(query_text, raw_chunks, top_k=5) if raw_chunks else []
+        chunks = rerank(query_text, raw_chunks, top_k=3) if raw_chunks else []
         logger.info(f"Chunks RAG trouvés: {len(raw_chunks)} → re-rankés: {len(chunks)}")
     except Exception as e:
         logger.error(f"Erreur recherche RAG: {type(e).__name__}: {e}")
@@ -490,7 +515,7 @@ async def generate_mindmap(
         source_names = "LLM seul (pas de RAG)"
 
     if chunks:
-        context_text = "\n\n".join([f"Source: {c['source']}\n{c['content']}" for c in chunks])
+        context_text = _compact_mindmap_context(chunks)
         source_names = ", ".join(list({c["source"] for c in chunks}))
     # else: context_text and source_names already set by fallback above
 
@@ -514,7 +539,7 @@ async def generate_mindmap(
         response = await openai_client.chat.completions.create(
             model=_model,
             temperature=0.2,
-            max_tokens=2000,
+            max_tokens=1400,
             timeout=25.0,
             messages=[{"role": "system", "content": MINDMAP_SYSTEM_PROMPT}, {"role": "user", "content": user_prompt}],
         )
