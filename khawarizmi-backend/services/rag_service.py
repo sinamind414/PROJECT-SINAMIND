@@ -12,6 +12,24 @@ RAG_CACHE_TTL_SECONDS = 300
 RAG_CACHE_MAX_ITEMS = 256
 _rag_cache: OrderedDict[tuple[str, str | None, int], tuple[float, list[dict]]] = OrderedDict()
 
+# Cache metrics
+_rag_cache_hits = 0
+_rag_cache_misses = 0
+
+
+def rag_cache_stats() -> dict:
+    """Retourne les métriques du cache RAG."""
+    total = _rag_cache_hits + _rag_cache_misses
+    return {
+        "hits": _rag_cache_hits,
+        "misses": _rag_cache_misses,
+        "total": total,
+        "hit_rate": round(_rag_cache_hits / total * 100, 1) if total > 0 else 0.0,
+        "size": len(_rag_cache),
+        "max_size": RAG_CACHE_MAX_ITEMS,
+        "ttl_seconds": RAG_CACHE_TTL_SECONDS,
+    }
+
 STOP_WORDS_RAG = {
     "ما", "هو", "هي", "في", "من", "إلى", "على", "عن", "مع", "هذا", "هذه", "التي", "الذي", "كيف", "لماذا", "ماذا",
     "اشرح", "حدد", "صف", "حلل", "قارن", "استنتج", "اذكر", "عرف",
@@ -171,7 +189,12 @@ async def rag_search(
     cached = _rag_cache.get(cache_key)
     if cached and now - cached[0] < RAG_CACHE_TTL_SECONDS:
         _rag_cache.move_to_end(cache_key)
+        global _rag_cache_hits
+        _rag_cache_hits += 1
         return [dict(item) for item in cached[1]]
+
+    global _rag_cache_misses
+    _rag_cache_misses += 1
 
     vector_chunks = await vector_rag_search(db, message, chapter, limit=max(limit * 2, 6))
     keyword_chunks = await keyword_rag_search(db, message, chapter, limit=max(limit * 2, 6))

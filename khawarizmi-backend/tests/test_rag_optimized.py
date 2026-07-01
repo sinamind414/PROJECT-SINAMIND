@@ -10,7 +10,7 @@ import time
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from services.rag_service import _extract_keywords, merge_chunks, format_rag_context, source_cards
+from services.rag_service import _extract_keywords, merge_chunks, format_rag_context, source_cards, rag_cache_stats
 from services.reranker import rerank, _tokenize, _keyword_coverage_score
 
 # ── Mock chunks (simulent des résultats DB) ────────────────
@@ -250,3 +250,55 @@ if __name__ == "__main__":
     success = run_all_tests()
     print(f"\n{'SUCCES' if success else 'ECHEC'} — Tests RAG termines.")
     sys.exit(0 if success else 1)
+
+
+def test_rag_cache_stats():
+    stats = rag_cache_stats()
+    assert "hits" in stats
+    assert "misses" in stats
+    assert "hit_rate" in stats
+    assert "size" in stats
+    assert "max_size" in stats
+    assert "ttl_seconds" in stats
+    assert stats["max_size"] == 256
+    assert stats["ttl_seconds"] == 300
+    assert isinstance(stats["hit_rate"], float)
+
+
+def test_chatbot_fallbacks():
+    from services.chatbot_fallbacks import (
+        fallback_motivation,
+        fallback_procrastination,
+        fallback_socratique,
+        fallback_smart_goal,
+    )
+    assert isinstance(fallback_motivation({}), str)
+    assert isinstance(fallback_procrastination(None), str)
+    assert isinstance(fallback_socratique("test", []), str)
+    assert isinstance(fallback_smart_goal(None), str)
+    assert len(fallback_motivation({})) > 20
+    assert len(fallback_procrastination(None)) > 20
+
+
+def test_chatbot_response():
+    from services.chatbot_response import make_response, normalize_response, normalize_cached
+    r = make_response("test", type_="socratique")
+    assert r["reponse"] == "test"
+    assert r["type"] == "socratique"
+    assert r["lang"] == "ar"
+    assert r["from_cache"] is False
+
+    n = normalize_response({"reponse": "x", "type": "motivation"})
+    assert n["type"] == "motivation"
+    assert n["from_cache"] is False
+
+    c = normalize_cached({"reponse": "y", "type": "feedback"})
+    assert c["from_cache"] is True
+
+
+def test_llm_helpers():
+    from services.llm_helpers import sanitize_response
+    assert sanitize_response("") == ""
+    assert sanitize_response("hello") == "hello"
+    assert "Claude" not in (sanitize_response("I am Claude and I help.") or "clean")
+    assert "حسب الكتاب" not in (sanitize_response("حسب الكتاب هذا درس.") or "clean")
