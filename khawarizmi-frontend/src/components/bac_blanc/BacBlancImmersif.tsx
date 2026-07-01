@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react"
 import { apiClient } from "@/lib/api-client"
+import { saveBacBlancErrors } from "@/lib/progress-store"
 import type {
   StartBacResponse,
   ChooseSubjectResponse,
@@ -116,6 +117,10 @@ export function BacBlancImmersif({ annaleSlug }: { annaleSlug: string }) {
     setPhase("soumission")
     try {
       const result = await apiClient.submitBac(sessionId)
+      saveBacBlancErrors({
+        sessionId,
+        scoresByVerb: result.scores_by_verb,
+      })
       setSubmitResult(result)
       setPhase("debrief")
     } catch (e) {

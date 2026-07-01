@@ -34,6 +34,28 @@ def normalize_arabic(text: str) -> str:
 
 INTENT_RULES = [
     {
+        "intent": "explication",
+        "patterns": [
+            "اشرح لي",
+            "اشرح",
+            "وضح لي",
+            "فسر لي",
+            "فهمني",
+        ],
+        "type": "explication",
+    },
+    {
+        "intent": "socratique",
+        "patterns": [
+            "لماذا",
+            "علاش",
+            "ليش",
+            "كيف نستنتج",
+            "كيف نفكر",
+        ],
+        "type": "socratique",
+    },
+    {
         "intent": "orientation",
         "patterns": [
             "وش ندير",
@@ -57,6 +79,7 @@ INTENT_RULES = [
         "intent": "procrastination",
         "patterns": [
             "غدا",
+            "بكرا",
             "بكره",
             "بكرة",
             "لاحقا",
@@ -79,6 +102,7 @@ INTENT_RULES = [
         "intent": "daily_plan",
         "patterns": [
             "برنامج اليوم",
+            "شنو نقرا اليوم",
             "وش نراجع اليوم",
             "خطة اليوم",
             "اليوم ندير",
@@ -113,10 +137,13 @@ INTENT_RULES = [
             "ما راني فاهم",
             "صعيب",
             "ماقدرتش",
+            "ما قدرت",
             "راني ضايع",
             "بزاف",
             "مرهق",
             "متعب",
+            "تعبت",
+            "طاقه",
             "يأس",
             "حابس",
             "ما نقدرش",
@@ -181,6 +208,7 @@ INTENT_RULES = [
         "intent": "navigation",
         "patterns": [
             "اين درس",
+            "وين نلقى",
             "وين الفصل",
             "اريد رابط",
             "كيف نروح ل",
@@ -195,12 +223,9 @@ INTENT_RULES = [
         "intent": "sos_concept",
         "patterns": [
             "ما هو",
-            "اشرح",
             "فهمت",
             "ما الفرق",
             "كيفاه يحدث",
-            "علاش",
-            "ليش",
             "وش معناها",
             "ماذا يقصد",
             "متى يحدث",
@@ -208,13 +233,11 @@ INTENT_RULES = [
             "ماهو",
             "عرّف",
             "وضّح",
-            "لماذا",
             "لم أفهم",
             "ما فهمتش",
             "بسّط",
-            "اشرح لي",
         ],
-        "type": "socratique",
+        "type": "explication",
     },
 ]
 
@@ -232,6 +255,8 @@ _INTENT_PRIORITY = [
     "feedback",
     "navigation",
     "orientation",
+    "explication",
+    "socratique",
     "sos_concept",
 ]
 
@@ -244,7 +269,10 @@ def classify(message: str) -> dict:
     Returns:
         dict avec intent, type, et is_init.
     """
-    if message.strip() == INIT_MESSAGE:
+    if not message.strip():
+        return {"intent": "socratique", "type": "explication", "is_init": False}
+
+    if message.strip() in (INIT_MESSAGE, "__activate_tutor__"):
         return {"intent": "init", "type": "orientation", "is_init": True}
 
     norm = normalize_arabic(message)
@@ -262,11 +290,16 @@ def classify(message: str) -> dict:
                 }
 
     # Default : question de concept
-    return {"intent": "sos_concept", "type": "socratique", "is_init": False}
+    return {"intent": "sos_concept", "type": "explication", "is_init": False}
 
 
 def detect_language(text: str) -> str:
     """Détecte si le message est en arabe, français ou mixte."""
+    arabizi_markers = ("kayfa", "halak", "salam", "wach", "chno", "kifach")
+    lower = text.lower()
+    if any(marker in lower for marker in arabizi_markers):
+        return "ar"
+
     arabic_chars = sum(1 for c in text if "\u0600" <= c <= "\u06ff")
     french_chars = sum(1 for c in text if c.isalpha() and c.isascii())
     if arabic_chars > french_chars:

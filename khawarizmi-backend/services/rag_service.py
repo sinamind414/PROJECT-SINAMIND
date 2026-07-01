@@ -1,10 +1,16 @@
 import logging
 import re
+import time
+from collections import OrderedDict
 
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 logger = logging.getLogger("khawarizmi.rag")
+
+RAG_CACHE_TTL_SECONDS = 300
+RAG_CACHE_MAX_ITEMS = 256
+_rag_cache: OrderedDict[tuple[str, str | None, int], tuple[float, list[dict]]] = OrderedDict()
 
 STOP_WORDS_RAG = {
     "ما", "هو", "هي", "في", "من", "إلى", "على", "عن", "مع", "هذا", "هذه", "التي", "الذي", "كيف", "لماذا", "ماذا",
@@ -160,11 +166,19 @@ async def rag_search(
     chapter: str | None = None,
     limit: int = 3,
 ) -> list[dict]:
+    cache_key = (message.strip().lower(), chapter.strip().lower() if chapter else None, limit)
+    now = time.monotonic()
+    cached = _rag_cache.get(cache_key)
+    if cached and now - cached[0] < RAG_CACHE_TTL_SECONDS:
+        _rag_cache.move_to_end(cache_key)
+        return [dict(item) for item in cached[1]]
+
     vector_chunks = await vector_rag_search(db, message, chapter, limit=max(limit * 2, 6))
     keyword_chunks = await keyword_rag_search(db, message, chapter, limit=max(limit * 2, 6))
     candidates = merge_chunks(vector_chunks, keyword_chunks)
 
     if not candidates:
+        _rag_cache[cache_key] = (now, [])
         return []
 
     try:
@@ -175,6 +189,11 @@ async def rag_search(
         logger.warning(f"Reranker indisponible, fallback tri par similarité : {e}")
         reranked = sorted(candidates, key=lambda c: c.get("similarity", 0), reverse=True)[:limit]
 
+    _rag_cache[cache_key] = (now, [dict(item) for item in reranked])
+    _rag_cache.move_to_end(cache_key)
+    while len(_rag_cache) > RAG_CACHE_MAX_ITEMS:
+        _rag_cache.popitem(last=False)
+
     return reranked
 
 
@@ -183,10 +202,8 @@ def format_rag_context(chunks: list[dict]) -> str:
         return ""
     parts = []
     for c in chunks:
-        src = c.get("source", "manuel")
-        chap = c.get("chapter", "")
-        excerpt = c.get("content", "")[:220].strip()
-        parts.append(f"[{src}/{chap}] {excerpt}")
+        excerpt = c.get("content", "")[:180].strip()
+        parts.append(f"• {excerpt}")
     return "\n\n".join(parts)
 
 

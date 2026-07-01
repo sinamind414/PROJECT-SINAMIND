@@ -177,14 +177,14 @@ def test_format_rag_context():
     print(f"  Chunks formatés : {len(merged)}")
     print(f"  Taille contexte : {len(context)} chars")
 
-    # Vérifier format [source/chapitre] excerpt
-    assert "[" in context and "]" in context, "Format [source/chapitre] manquant"
-    # Vérifier taille réduite (220 chars max par chunk)
+    # Vérifier format • excerpt (sans tags [source])
+    assert "•" in context, "Format • excerpt manquant"
+    assert "[" not in context, "Les tags [source] ne doivent plus apparaître dans le contexte"
     for line in context.split("\n\n"):
-        if line.startswith("["):
-            excerpt_part = line.split("] ", 1)[1] if "] " in line else ""
-            assert len(excerpt_part) <= 220, f"Excerpt trop long : {len(excerpt_part)} chars"
-    print(f"  OK — format compact (220 chars max par excerpt)")
+        if line.startswith("•"):
+            excerpt_part = line[2:].strip()
+            assert len(excerpt_part) <= 180, f"Excerpt trop long : {len(excerpt_part)} chars"
+    print(f"  OK — format compact (180 chars max par excerpt, sans tags source)")
 
     # Afficher un extrait
     lines = context.split("\n\n")

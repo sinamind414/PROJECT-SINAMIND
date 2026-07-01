@@ -160,6 +160,18 @@ const FALLBACK_ERROR_BY_VERB: Record<string, string> = {
   "scientific-text": "missing_problematic",
 }
 
+const BAC_ERROR_BY_VERB: Record<string, string> = {
+  analyse: "vague_observation",
+  analyze: "vague_observation",
+  interpret: "wrong_scientific_causality",
+  interpretation: "wrong_scientific_causality",
+  deduce: "deduction_too_long",
+  deduction: "deduction_too_long",
+  hypothesis: "weak_hypothesis",
+  "scientific-text": "missing_problematic",
+  scientific_text: "missing_problematic",
+}
+
 function isBrowser() {
   return typeof window !== "undefined" && typeof window.localStorage !== "undefined"
 }
@@ -367,6 +379,81 @@ export function saveMethodologyEvaluations(records: Array<{
 
   window.localStorage.setItem(STORAGE_KEY, JSON.stringify([...nextRecords, ...current].slice(0, 200)))
   window.dispatchEvent(new Event("sinamind-progress-updated"))
+}
+
+export function saveBacBlancErrors(input: {
+  sessionId: string
+  scoresByVerb: Array<{
+    verb_slug: string
+    score: number
+    score_max: number
+    percentage: number
+  }>
+}) {
+  if (!isBrowser()) return
+
+  const current = getStoredAnswers()
+  const existing = new Set(current.map((item) => item.answer))
+  const records = input.scoresByVerb
+    .filter((score) => score.percentage < 75)
+    .map((score) => {
+      const verbSlug = score.verb_slug || "bac_blanc"
+      const marker = `bac_blanc:${input.sessionId}:${verbSlug}`
+      return {
+        marker,
+        source: "exercise" as const,
+        verbSlug,
+        answer: marker,
+        evaluation: {
+          verbSlug,
+          score: score.score,
+          scoreMax: score.score_max,
+          percentage: score.percentage,
+          success: [],
+          errors: [`Bac Blanc: score faible en ${verbSlug} (${score.percentage}%).`],
+          missingMarkers: [],
+          forbiddenMarkersFound: [],
+          criteria: [],
+          advice: "راجع هذا النوع من المهارات قبل إعادة المحاولة.",
+          allowSecondAttempt: true,
+          dominantErrorCode: BAC_ERROR_BY_VERB[verbSlug] || FALLBACK_ERROR_BY_VERB[verbSlug] || "wrong_action_verb",
+        },
+      }
+    })
+    .filter((record) => !existing.has(record.marker))
+
+  if (!records.length) return
+  saveMethodologyEvaluations(records.map(({ marker: _marker, ...record }) => record))
+}
+
+export function saveBacBlancCorrectionErrors(input: {
+  sessionId: string
+  corrections: Array<{
+    verb_slug: string
+    score: number
+    score_max: number
+    percentage: number
+  }>
+}) {
+  const grouped = new Map<string, { score: number; score_max: number }>()
+  for (const item of input.corrections) {
+    const verbSlug = item.verb_slug || "bac_blanc"
+    const current = grouped.get(verbSlug) || { score: 0, score_max: 0 }
+    grouped.set(verbSlug, {
+      score: current.score + Number(item.score || 0),
+      score_max: current.score_max + Number(item.score_max || 0),
+    })
+  }
+
+  saveBacBlancErrors({
+    sessionId: input.sessionId,
+    scoresByVerb: Array.from(grouped.entries()).map(([verb_slug, score]) => ({
+      verb_slug,
+      score: score.score,
+      score_max: score.score_max,
+      percentage: Math.round((score.score / Math.max(score.score_max, 1)) * 100),
+    })),
+  })
 }
 
 function average(values: number[]) {

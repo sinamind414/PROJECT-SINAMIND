@@ -670,8 +670,8 @@ class KhawarizmiApiClient {
     )
   }
 
-  async getBacCorrection(sessionId: string): Promise<SubmitBacResponse> {
-    return this.request<SubmitBacResponse>(
+  async getBacCorrection(sessionId: string): Promise<CorrectionResponse> {
+    return this.request<CorrectionResponse>(
       `/api/bac-blanc/${sessionId}/correction`
     )
   }

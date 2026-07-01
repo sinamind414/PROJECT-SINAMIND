@@ -7,6 +7,7 @@ from . import (
     annales,
     auth,
     avatar,
+    bac_blanc_intelligent,
     chapitres,
     chatbot,
     chatbot_engagement,
@@ -33,6 +34,7 @@ from . import (
     programme,
     progress,
     session,
+    tutor,
     videos,
 )
 
@@ -76,4 +78,7 @@ ALL_ROUTERS = [
     methodology.router,
     methodology_flashcards.router,
     mindmap_methodology.router,
+    # ── Tutor & Bac Blanc ──
+    tutor.router,
+    bac_blanc_intelligent.router,
 ]

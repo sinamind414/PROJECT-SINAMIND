@@ -164,8 +164,8 @@ def _format_rag_context(rag_chunks: list[dict]) -> str:
     if not rag_chunks:
         return ""
     lines = ["📖 المحتوى من الكتاب المدرسي الرسمي:"]
-    for c in rag_chunks[:3]:
-        content = c.get("content", "")[:300]
+    for c in rag_chunks[:2]:
+        content = c.get("content", "")[:220]
         lines.append(f"• {content}")
     return "\n".join(lines)
 

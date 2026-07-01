@@ -5,7 +5,8 @@ import { useEffect, useState } from "react"
 import { AuthGuard } from "@/components/auth/AuthGuard"
 import { AppShell } from "@/components/layout/AppShell"
 import { apiClient } from "@/lib/api-client"
-import type { SubmitBacResponse } from "@/lib/types"
+import { saveBacBlancCorrectionErrors } from "@/lib/progress-store"
+import type { CorrectionResponse } from "@/lib/types"
 
 /* ------------------------------------------------------------------ */
 /*  Page "Correction" — Accessible UNIQUEMENT après l'examen        */
@@ -17,7 +18,7 @@ export default function CorrectionPage() {
   const searchParams = useSearchParams()
   const rawSessionId = searchParams.get("session")
 
-  const [result, setResult] = useState<SubmitBacResponse | null>(null)
+  const [result, setResult] = useState<CorrectionResponse | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
 
@@ -48,6 +49,10 @@ export default function CorrectionPage() {
     async function fetchResult() {
       try {
         const resp = await apiClient.getBacCorrection(sessionId)
+        saveBacBlancCorrectionErrors({
+          sessionId,
+          corrections: resp.corrections,
+        })
         setResult(resp)
       } catch (err: any) {
         setError(err.message || "Erreur lors de la récupération des résultats.")
@@ -102,9 +107,11 @@ export default function CorrectionPage() {
   }
 
   /* ---- Afficher la correction ---- */
-  const scoreColor =
-    result.score_global >= 75 ? "#2DD4BF" :
-    result.score_global >= 50 ? "#F59E0B" : "#EF4444"
+  const totalScore = result.corrections.reduce((sum, item) => sum + Number(item.score || 0), 0)
+  const totalMax = result.corrections.reduce((sum, item) => sum + Number(item.score_max || 0), 0)
+  const scoreGlobal = Math.round((totalScore / Math.max(totalMax, 1)) * 100)
+  const skippedCount = result.corrections.filter((item) => item.skipped).length
+  const scoreColor = scoreGlobal >= 75 ? "#2DD4BF" : scoreGlobal >= 50 ? "#F59E0B" : "#EF4444"
 
   return (
     <AuthGuard>
@@ -121,22 +128,23 @@ export default function CorrectionPage() {
               <p className="text-4xl">🎉</p>
               <h1 className="text-2xl font-bold text-white">نتائج الامتحان</h1>
               <p className="text-6xl font-bold" style={{ color: scoreColor }}>
-                {result.score_global}%
+                {scoreGlobal}%
               </p>
-              <p className="text-gray-400 text-sm">
-                الوقت المستخدم: {Math.floor(result.time_used_sec / 60)} دقيقة
-              </p>
+              <p className="text-gray-400 text-sm">تمارين متخطاة: {skippedCount}</p>
             </div>
 
             {/* Détail par exercice */}
             <div className="rounded-2xl p-5 bg-[#182730] border border-white/[0.06] space-y-3">
               <h2 className="text-white font-bold">النتائج حسب التمرين</h2>
-              {result.scores_by_exercise.map((ex) => (
-                <div key={ex.exercise_id} className="flex items-center justify-between">
-                  <span className={`text-sm ${ex.skipped ? "text-amber-400" : "text-gray-300"}`}>
-                    {ex.title_ar} {ex.skipped && "(متخطى)"}
-                  </span>
-                  <span className="text-white font-bold text-sm">{ex.percentage}%</span>
+              {result.corrections.map((ex) => (
+                <div key={ex.exercise_id} className="rounded-xl p-3 bg-white/[0.03] border border-white/[0.06] space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className={`text-sm ${ex.skipped ? "text-amber-400" : "text-gray-300"}`}>
+                      {ex.title_ar} {ex.skipped && "(متخطى)"}
+                    </span>
+                    <span className="text-white font-bold text-sm">{ex.percentage}%</span>
+                  </div>
+                  {ex.feedback && <p className="text-gray-500 text-xs leading-relaxed">{ex.feedback}</p>}
                 </div>
               ))}
             </div>
@@ -144,10 +152,18 @@ export default function CorrectionPage() {
             {/* Détail par verbe méthodologique */}
             <div className="rounded-2xl p-5 bg-[#182730] border border-white/[0.06] space-y-3">
               <h2 className="text-white font-bold">النتائج حسب المهارة</h2>
-              {result.scores_by_verb.map((v) => (
-                <div key={v.verb_slug} className="flex items-center justify-between">
-                  <span className="text-gray-300 text-sm">{v.verb_slug}</span>
-                  <span className="text-white font-bold text-sm">{v.percentage}%</span>
+              {Object.entries(
+                result.corrections.reduce<Record<string, { score: number; scoreMax: number }>>((acc, item) => {
+                  const key = item.verb_slug || "bac_blanc"
+                  acc[key] = acc[key] || { score: 0, scoreMax: 0 }
+                  acc[key].score += Number(item.score || 0)
+                  acc[key].scoreMax += Number(item.score_max || 0)
+                  return acc
+                }, {})
+              ).map(([verbSlug, score]) => (
+                <div key={verbSlug} className="flex items-center justify-between">
+                  <span className="text-gray-300 text-sm">{verbSlug}</span>
+                  <span className="text-white font-bold text-sm">{Math.round((score.score / Math.max(score.scoreMax, 1)) * 100)}%</span>
                 </div>
               ))}
             </div>
