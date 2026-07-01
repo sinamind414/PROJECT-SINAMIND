@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منصة المتفوق 3AS | المرحلة 9 : الدرس 17 والدرس 18</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #f8fafc;
+            --surface: #ffffff;
+            --primary: #0f172a;
+            --accent: #2563eb;
+            --accent-light: #eff6ff;
+            --success: #16a34a;
+            --success-light: #f0fdf4;
+            --warning: #d97706;
+            --warning-light: #fffbeb;
+            --danger: #dc2626;
+            --danger-light: #fef2f2;
+            --emerald-dark: #065f46;
+            --emerald-light: #ecfdf5;
+            --fuchsia-dark: #701a75;
+            --fuchsia-light: #fdf4ff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --radius: 16px;
+            --shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Cairo', 'Tajawal', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            line-height: 1.8;
+            padding-bottom: 60px;
+        }
+
+        .ltr-seq {
+            direction: ltr;
+            unicode-bidi: embed;
+            display: inline-block;
+            font-family: monospace;
+            font-weight: bold;
+            color: var(--accent);
+            background: #f1f5f9;
+            padding: 2px 8px;
+            border-radius: 6px;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 900;
+            font-size: 1.25rem;
+            color: var(--primary);
+        }
+
+        .brand-badge {
+            background: var(--emerald-dark);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            white-space: nowrap;
+        }
+
+        .chapter-switcher {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .ch-btn {
+            background: var(--bg-main);
+            border: 2px solid var(--border);
+            padding: 8px 18px;
+            border-radius: 12px;
+            font-family: inherit;
+            font-weight: 800;
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .ch-btn:hover {
+            border-color: var(--emerald-dark);
+            color: var(--emerald-dark);
+        }
+
+        .ch-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                padding: 1rem;
+                text-align: center;
+            }
+            .chapter-switcher {
+                justify-content: center;
+                width: 100%;
+            }
+            .ch-btn {
+                flex: 1;
+                font-size: 0.85rem;
+                padding: 8px 10px;
+            }
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 2rem auto;
+            padding: 0 1.2rem;
+        }
+
+        .chapter-view {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .chapter-view.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Hero Header */
+        .lesson-header {
+            border-radius: var(--radius);
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+            color: white;
+        }
+
+        .header-ch17 {
+            background: linear-gradient(135deg, #047857 0%, #10b981 100%);
+        }
+
+        .header-ch18 {
+            background: linear-gradient(135deg, #701a75 0%, #c026d3 100%);
+        }
+
+        .lesson-breadcrumb {
+            font-size: 0.85rem;
+            opacity: 0.9;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .lesson-header h1 {
+            font-size: 2.1rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+            line-height: 1.3;
+        }
+
+        .lesson-objectives {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--surface);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+        }
+
+        @media (max-width: 600px) {
+            .lesson-header { padding: 1.5rem; }
+            .lesson-header h1 { font-size: 1.5rem; }
+            .card { padding: 1.2rem; }
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid var(--bg-main);
+            padding-bottom: 0.8rem;
+        }
+
+        .step-num {
+            background: #d1fae5;
+            color: #047857;
+            width: 38px;
+            height: 38px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            font-weight: 900;
+            font-size: 1.1rem;
+        }
+
+        .step-num-fuchsia {
+            background: #fae8ff;
+            color: #c026d3;
+        }
+
+        .problem-box {
+            background: var(--warning-light);
+            border-right: 5px solid var(--warning);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+        }
+
+        .problem-title {
+            font-weight: 800;
+            color: #92400e;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Document Analysis */
+        .doc-viewer {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        @media (max-width: 850px) {
+            .doc-viewer { grid-template-columns: 1fr; }
+        }
+
+        .doc-visual {
+            background: #0f172a;
+            border-radius: 12px;
+            padding: 1.5rem;
+            color: white;
+        }
+
+        .svg-container {
+            width: 100%;
+            height: auto;
+            max-height: 260px;
+        }
+
+        .doc-analysis {
+            background: var(--bg-main);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+        }
+
+        .method-tag {
+            display: inline-block;
+            background: #e0f2fe;
+            color: #0369a1;
+            font-size: 0.75rem;
+            font-weight: 800;
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+        }
+
+        /* Interactive simulators */
+        .interactive-box {
+            background: #1e293b;
+            border-radius: 12px;
+            padding: 1.5rem;
+            color: white;
+            margin: 1.5rem 0;
+        }
+
+        .btn-action {
+            background: #059669;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-family: inherit;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin: 5px;
+        }
+
+        .btn-action:hover { background: #047857; }
+        .btn-fuchsia { background: #c026d3; }
+        .btn-fuchsia:hover { background: #a21caf; }
+
+        /* Scientific text */
+        .scientific-text {
+            background: var(--surface);
+            border: 2px solid #cbd5e1;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .text-part {
+            margin-bottom: 1.2rem;
+            padding-right: 1rem;
+            border-right: 4px solid #059669;
+        }
+
+        .text-part.ch18-border { border-right-color: #c026d3; }
+
+        .text-part h4 {
+            font-size: 0.95rem;
+            color: #059669;
+            margin-bottom: 0.3rem;
+            font-weight: 800;
+        }
+
+        .text-part.ch18-border h4 { color: #c026d3; }
+
+        /* Quiz */
+        .question-item {
+            background: var(--bg-main);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin-top: 1rem;
+        }
+
+        .option-btn {
+            background: white;
+            border: 1.5px solid var(--border);
+            padding: 12px 16px;
+            border-radius: 10px;
+            text-align: right;
+            font-family: inherit;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text-main);
+        }
+
+        .option-btn:hover {
+            border-color: #059669;
+            background: #ecfdf5;
+        }
+
+        .option-btn.correct {
+            background: var(--success-light);
+            border-color: var(--success);
+            color: var(--success);
+            font-weight: 700;
+        }
+
+        .option-btn.wrong {
+            background: var(--danger-light);
+            border-color: var(--danger);
+            color: var(--danger);
+        }
+
+        .feedback-box {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            display: none;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar with Phase Switcher -->
+    <nav class="navbar">
+        <div class="brand">
+            <span>منصة المتفوق 3AS</span>
+            <span class="brand-badge">المرحلة 9 (الدرس 17 و 18)</span>
+        </div>
+        <div class="chapter-switcher">
+            <button class="ch-btn active" onclick="showChapter('ch17', event)">🔬 الدرس 17 : النقل المشبكي الكيميائي وآلية عمل ACh</button>
+            <button class="ch-btn" onclick="showChapter('ch18', event)">🧠 الدرس 18 : الإدماج العصبي (PPSE مقابل PPSI والتجميع)</button>
+        </div>
+    </nav>
+
+    <div class="container">
+
+        <!-- ================================================================= -->
+        <!-- CHAPTER 17 : LA TRANSMISSION SYNAPTIQUE CHIMIQUE (الدرس 17) -->
+        <!-- ================================================================= -->
+        <div id="ch17" class="chapter-view active">
+            
+            <header class="lesson-header header-ch17">
+                <div class="lesson-breadcrumb">المجال الأول : التخصص الوظيفي للبروتينات • الوحدة 5 : دور البروتينات في الاتصال العصبي</div>
+                <h1>الدرس 17 : النقل المشبكي الكيميائي وآلية عمل المبلغ العصبي الأستيل كولين (ACh)</h1>
+                <div class="lesson-objectives">
+                    <div>🎯 <strong>الهدف العلمي :</strong> تفسير النقل أحادي الاتجاه للرسالة العصبية على مستوى المشبك الكيميائي، ودور قنوات Ca²⁺ الفولطية والقنوات المبوبة كيميائياً وإنزيم AChE.</div>
+                    <div>⏱️ <strong>المدة التقديرية للتعلم الذاتي :</strong> 25 دقيقة</div>
+                </div>
+            </header>
+
+            <!-- Step 1: Problématique -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num">1</span>
+                    <span>وضعية الانطلاق وبناء الإشكالية العلميـة</span>
+                </div>
+                <div class="problem-box">
+                    <div class="problem-title">⚠️ كيف تعبر السيالة العصبية الفراغ الفاصل بين خليتين عصبيتين؟</div>
+                    <p>لا تتصل الخلايا العصبية فيما بينها اتصالاً فيزيائياً مباشراً، بل يفصل بينها فراغ دقيق يسمى <strong>الشق المشبكي (<span class="ltr-seq">Fente synaptique</span> ≈ 20 nm)</strong>. ولا تستطيع السيالة الكهربائية (كمون العمل) القفز عبر هذا الشق! <strong>كيف تتحول الرسالة الكهربائية إلى رسالة كيميائية في المشبك ثم تعود لرسالة كهربائية في الخلية الموالية؟</strong></p>
+                </div>
+            </section>
+
+            <!-- Step 2: Document Analyse -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num">2</span>
+                    <span>التحليل المنهجي لخطوات النقل المشبكي الكيميائي (مشبك تنبيهي أستيل كولين)</span>
+                </div>
+                <div class="doc-viewer">
+                    <div class="doc-visual" style="background: #064e3b;">
+                        <h4 style="color: #6ee7b7; margin-bottom: 1rem; font-size: 0.95rem;">البنية التشريحية والجزيئية للمشبك الكيميائي التنبيهي</h4>
+                        <!-- SVG Synapse -->
+                        <svg class="svg-container" viewBox="0 0 400 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Bouton présynaptique -->
+                            <path d="M80 20 V 80 Q 80 130 140 130 H 260 Q 320 130 320 80 V 20" fill="#047857" stroke="#34d399" stroke-width="2"/>
+                            <text x="200" y="45" fill="#a7f3d0" font-size="11" text-anchor="middle" font-weight="bold">الزر قبل المشبكي (Presynaptique)</text>
+
+                            <!-- Ca2+ channels -->
+                            <path d="M100 110 V 130" stroke="#fbbf24" stroke-width="6"/>
+                            <text x="75" y="125" fill="#fbbf24" font-size="8">قنوات Ca²⁺</text>
+
+                            <!-- Vesicles -->
+                            <circle cx="170" cy="85" r="14" fill="#10b981" stroke="#6ee7b7"/>
+                            <circle cx="230" cy="85" r="14" fill="#10b981" stroke="#6ee7b7"/>
+                            <circle cx="200" cy="115" r="14" fill="#10b981" stroke="#6ee7b7"/>
+                            <!-- ACh dots inside vesicle -->
+                            <circle cx="196" cy="113" r="2.5" fill="#fef08a"/>
+                            <circle cx="204" cy="117" r="2.5" fill="#fef08a"/>
+
+                            <!-- Fente synaptique -->
+                            <text x="200" y="153" fill="#fde68a" font-size="10" text-anchor="middle">الشق المشبكي (تحرير الأستيل كولين ACh)</text>
+                            <circle cx="180" cy="148" r="3" fill="#fbbf24"/>
+                            <circle cx="220" cy="145" r="3" fill="#fbbf24"/>
+
+                            <!-- Membrane postsynaptique -->
+                            <path d="M40 170 H 360" stroke="#34d399" stroke-width="8"/>
+                            <text x="200" y="200" fill="#6ee7b7" font-size="11" text-anchor="middle" font-weight="bold">الغشاء بعد المشبكي (Postsynaptique)</text>
+
+                            <!-- Receptor channels -->
+                            <path d="M175 166 V 174" stroke="#38bdf8" stroke-width="10"/>
+                            <path d="M225 166 V 174" stroke="#38bdf8" stroke-width="10"/>
+                            <text x="200" y="180" fill="#38bdf8" font-size="8" text-anchor="middle">مستقبلات-قنوات كيميائية</text>
+                        </svg>
+                        <p style="font-size: 0.85rem; color: #cbd5e1; margin-top: 10px;">💡 يفتح دخول Ca²⁺ الحويصلات، ويرتبط ACh بالمستقبلات فيدخل Na⁺ ليولد PPSE.</p>
+                    </div>
+
+                    <div class="doc-analysis">
+                        <span class="method-tag">منهجية البكالوريا : الخطوات الزمنية الستة</span>
+                        <h4 style="margin: 8px 0; color: var(--primary);">كيف تنتقل السيالة عبر المشبك؟</h4>
+                        <ol style="padding-right: 1.2rem; line-height: 1.8;">
+                            <li>وصول موجة كمون العمل (<span class="ltr-seq">PA</span>) إلى الغشاء قبل المشبكي.</li>
+                            <li>انفتح <strong>قنوات الكالسيوم الفولطية (<span class="ltr-seq">Ca²⁺ voltage-dépendants</span>)</strong> ودخول شوارد <span class="ltr-seq">Ca²⁺</span> نحو الهيولى.</li>
+                            <li>يحفز الكالسيوم هجرة والتحام الحويصلات المشبكية مع الغشاء وإطراح <strong>الأستيل كولين (<span class="ltr-seq">ACh</span>)</strong> في الشق المشبكي.</li>
+                            <li>تثبت جزيئتا <span class="ltr-seq">ACh</span> على الموقعين النوعيين <strong>للمستقبل القنوي (<span class="ltr-seq">Récepteur-canal مبوب كيميائياً</span>)</strong> على الغشاء بعد المشبكي.</li>
+                            <li>تنفتح القناة الكيميائية ويدخل تيار جارف من شوارد الصوديوم (<span class="ltr-seq">Na⁺</span>) مولداً <strong>كموناً بعد مشبكي تنبيهي (<span class="ltr-seq">PPSE</span>)</strong> زوال استقطاب.</li>
+                            <li>يتدخل إنزيم <strong>الأستيل كولين إستراز (<span class="ltr-seq">AChE</span>)</strong> ليفكك <span class="ltr-seq">ACh</span> إلى كولين وحمض أستيك وتغلق القناة فوراً (تجنب التنبيه المستمر).</li>
+                        </ol>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 3: Interactive Synapse Simulator -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num">3</span>
+                    <span>محاكي المشبك الكيميائي وإنزيم الإستراز التفاعلي</span>
+                </div>
+                <p>اختر مرحلة أو تأثير دواء مشبكي لملاحظة استجابة المستقبل القنوي :</p>
+                
+                <div class="interactive-box" style="background: #064e3b;">
+                    <div style="margin-bottom: 15px;">
+                        <button class="btn-action" onclick="simSyn(1)">🟢 نقل طبيعي ناجح (إفراز وتفكيك ACh)</button>
+                        <button class="btn-action" style="background:#dc2626;" onclick="simSyn(2)">🔴 تأثير سم الكرار (Curare - شلل عضلات)</button>
+                        <button class="btn-action" style="background:#d97706;" onclick="simSyn(3)">⚠️ غاز السارين أو المبيدات الحشرية (تثبيط AChE)</button>
+                    </div>
+                    <div id="synDisplayBox" style="background: #047857; border: 2px solid #34d399; border-radius: 12px; padding: 1.5rem; text-align: center;">
+                        <h3 style="color: #6ee7b7; margin-bottom: 10px;">🟢 النقل المشبكي الطبيعي</h3>
+                        <p style="color: #cbd5e1; line-height: 1.8;">يرتبط الأستيل كولين مؤقتاً، يفتح المستقبل القنوي، يدخل الصوديوم ويسجل راسم الاهتزاز موجة تنبيهية (<span class="ltr-seq">PPSE</span>). ثم يتدخل إنزيم <span class="ltr-seq">AChE</span> ليفككه في أجزاء من الملي ثانية وتعود العضلة للراحة.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 4: Quiz Ch17 -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num">4</span>
+                    <span>تقويم الدرس 17 : أسئلة البكالوريا المتكررة</span>
+                </div>
+
+                <div class="question-item" id="c17q1-container">
+                    <h4 style="margin-bottom: 12px;">1. ما هو الفرق البنيوي والوظيفي بين القنوات المبوبة كهربائياً والقنوات المبوبة كيميائياً؟</h4>
+                    <div class="options-grid">
+                        <button class="option-btn" onclick="checkCh17Answer(0, true)">أ) المبوبة كهربائياً تفتح بتغير فرق الجهد (على طول الليف العصبي)، أما المبوبة كيميائياً فتفتح عند تثبيت مبلغ كيميائي مثل ACh (على الغشاء بعد المشبكي).</button>
+                        <button class="option-btn" onclick="checkCh17Answer(1, false)">ب) لا يوجد أي فرق بينهما.</button>
+                        <button class="option-btn" onclick="checkCh17Answer(2, false)">ج) القنوات الكيميائية تستهلك طاقة ATP الفورية.</button>
+                    </div>
+                    <div class="feedback-box" id="c17q1-feedback"></div>
+                </div>
+            </section>
+        </div>
+
+        <!-- ================================================================= -->
+        <!-- CHAPTER 18 : INTÉGRATION NEURO-SYNAPTIQUE PPSE/PPSI (الدرس 18) -->
+        <!-- ================================================================= -->
+        <div id="ch18" class="chapter-view">
+            
+            <header class="lesson-header header-ch18">
+                <div class="lesson-breadcrumb">المجال الأول : التخصص الوظيفي للبروتينات • الوحدة 5 : دور البروتينات في الاتصال العصبي</div>
+                <h1>الدرس 18 : الإدماج العصبي وأنواع المشابك (التنبيهي PPSE مقابل التثبيطي PPSI)</h1>
+                <div class="lesson-objectives">
+                    <div>🎯 <strong>الهدف العلمي :</strong> التمييز بين المشبك التنبيهي والتثبيطي (GABA وتدفق Cl⁻)، وحساب الحصيلة الجبرية للتجميع الفضائي والزمني في القطعة الابتدائية SI.</div>
+                    <div>⏱️ <strong>المدة التقديرية للتعلم الذاتي :</strong> 25 دقيقة</div>
+                </div>
+            </header>
+
+            <!-- Step 1: Problématique -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num step-num-fuchsia">1</span>
+                    <span>الإشكالية الحسابية للخلية العصبية المحركة</span>
+                </div>
+                <div class="problem-box" style="border-right-color: #c026d3; background: #fae8ff;">
+                    <div class="problem-title" style="color: #701a75;">⚠️ كيف تتخذ الخلية العصبية الحركية قرار الانقباض أو الاسترخاء عندما تتلقى آلاف السيالات المتضادة؟</div>
+                    <p>تتصل الخلية العصبية المحركة في النخاع الشوكي بآلاف النهايات العصبية. بعضها يرسل أوامر تنبيهية (انقباض) وبعضها يرسل أوامر تثبيطية (استرخاء كبح). <strong>كيف تقوم هذه الخلية بدمج وحساب كل هذه الرسائل الكيميائية المتضادة في القطعة الابتدائية (<span class="ltr-seq">Segment Initial SI</span>) لتقرر توليد كمون عمل واحد أو الصمت؟</strong></p>
+                </div>
+            </section>
+
+            <!-- Step 2: Document Analyse -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num step-num-fuchsia">2</span>
+                    <span>التحليل المنهجي للمشبك التثبيطي (GABA) وظاهرة الإدماج العصبي</span>
+                </div>
+                <div class="doc-viewer">
+                    <div class="doc-visual" style="background: #4a044e;">
+                        <h4 style="color: #f0abfc; margin-bottom: 1rem; font-size: 0.95rem;">مقارنة بين الكمون التنبيهي (PPSE) والكمون التثبيطي (PPSI)</h4>
+                        <!-- SVG PPSE vs PPSI -->
+                        <svg class="svg-container" viewBox="0 0 400 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Axes Left PPSE -->
+                            <path d="M30 140 H 180" stroke="#a21caf" stroke-width="1.5" stroke-dasharray="4"/>
+                            <text x="25" y="143" fill="#cbd5e1" font-size="9">-70</text>
+                            <path d="M30 90 H 180" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="4"/>
+                            <text x="25" y="93" fill="#ef4444" font-size="9">-50 عتبة</text>
+                            <path d="M50 140 Q 90 85 130 140" stroke="#38bdf8" stroke-width="3" fill="none"/>
+                            <text x="100" y="75" fill="#38bdf8" font-size="11" font-weight="bold">PPSE (زوال استقطاب)</text>
+                            <text x="100" y="165" fill="#e879f9" font-size="9" text-anchor="middle">دخول شوارد Na⁺</text>
+
+                            <!-- Axes Right PPSI -->
+                            <path d="M220 140 H 370" stroke="#a21caf" stroke-width="1.5" stroke-dasharray="4"/>
+                            <text x="215" y="143" fill="#cbd5e1" font-size="9">-70</text>
+                            <path d="M240 140 Q 280 185 320 140" stroke="#f43f5e" stroke-width="3" fill="none"/>
+                            <text x="290" y="195" fill="#f43f5e" font-size="11" font-weight="bold">PPSI (فرط استقطاب)</text>
+                            <text x="290" y="125" fill="#f0abfc" font-size="9" text-anchor="middle">دخول شوارد Cl⁻ (أو خروج K⁺)</text>
+                        </svg>
+                        <p style="font-size: 0.85rem; color: #cbd5e1; margin-top: 10px;">💡 يقرب PPSE المنحنى من العتبة (-50 mV)، بينما يبعد PPSI المنحنى عن العتبة (-80 mV).</p>
+                    </div>
+
+                    <div class="doc-analysis">
+                        <span class="method-tag" style="background: #fae8ff; color: #a21caf;">مبدأ الإدماج في البكالوريا</span>
+                        <h4 style="margin: 8px 0; color: var(--primary);">كيف يحسب القطعة الابتدائية (<span class="ltr-seq">SI</span>) الحصيلة؟</h4>
+                        <p>تقوم الخلية العصبية بعد المشبكية بدمج الكمونات القادمة وفق آليتين :</p>
+                        <ul style="list-style-type: none; line-height: 1.8;">
+                            <li>• <strong>التجميع الفضائي (<span class="ltr-seq">Sommation spatiale</span>) :</strong> جمع سيالات تصل في نفس الوقت من نهايات عصبية مختلفة ومتعددة.</li>
+                            <li>• <strong>التجميع الزمني (<span class="ltr-seq">Sommation temporelle</span>) :</strong> جمع سيالات متقاربة جداً في الزمن قادمة من نفس النهاية العصبية قبل المشبكية.</li>
+                        </ul>
+                        <hr style="margin: 12px 0; border: none; border-top: 1px solid var(--border);">
+                        <p><strong>قاعدة اتخاذ القرار :</strong> إذا كانت الحصيلة الجبرية في القطعة الابتدائية <span class="ltr-seq">SI</span> تفوق أو تساوي عتبة التنبيه (<span class="ltr-seq">≥ -50 mV</span>)، تنفتح قنوات <span class="ltr-seq">Na⁺</span> الفولطية وينطلق كمون عمل. وإذا كانت الحصيلة دون العتبة يبقى الليف في حالة راحة.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 3: Interactive Integration Calculator -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num step-num-fuchsia">3</span>
+                    <span>آلة حساب الإدماج العصبي التفاعلية</span>
+                </div>
+                <p>اختر مزيج التنبيهات القادمة للخلية الحركية لمعرفة هل يتولد كمون عمل في القطعة الابتدائية :</p>
+                
+                <div class="interactive-box" style="background: #4a044e;">
+                    <div style="margin-bottom: 15px;">
+                        <button class="btn-action btn-fuchsia" onclick="simInteg(1)">🟢 2 تنبيه تنبيهي (+15 mV لكل مشبك PPSE)</button>
+                        <button class="btn-action btn-fuchsia" onclick="simInteg(2)">🔴 تنبيه تنبيهي واحد + تنبيه تثبيطي واحد (PPSE + PPSI)</button>
+                    </div>
+                    <div id="integDisplayBox" style="background: #701a75; border: 2px solid #e879f9; border-radius: 12px; padding: 1.5rem; text-align: center;">
+                        <h3 style="color: #4ade80; margin-bottom: 10px;">🟢 تجميع فضائي يفوق العتبة (-40 mV)</h3>
+                        <p style="color: #cbd5e1; line-height: 1.8;">كمون الراحة (-70 mV) + 30 mV تنبيه = <strong>-40 mV</strong>. بما أن الحصيلة تفوق عتبة التوليد (-50 mV)، يولد القطعة الابتدائية <span class="ltr-seq">SI</span> كمون عمل كامل (+30 mV) ينتقل نحو العضلة.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 4: Quiz Ch18 -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num step-num-fuchsia">4</span>
+                    <span>تقويم الدرس 18 : أسئلة البكالوريا المتكررة</span>
+                </div>
+
+                <div class="question-item" id="c18q1-container">
+                    <h4 style="margin-bottom: 12px;">1. ما هو المبلغ العصبي الرئيسي والمستقبل الأيوني المسؤول عن نشأة الكمون التثبيطي (<span class="ltr-seq">PPSI</span>)؟</h4>
+                    <div class="options-grid">
+                        <button class="option-btn" onclick="checkCh18Answer(0, true)">أ) حمض الغابا (<span class="ltr-seq">GABA</span>) الذي يفتح القنوات المبوبة كيميائياً للكلور (<span class="ltr-seq">Cl⁻</span>) فيدخل الكلور السالب محدثاً فرط استقطاب.</button>
+                        <button class="option-btn" onclick="checkCh18Answer(1, false)">ب) الأستيل كولين الذي يدخل شوارد الكالسيوم.</button>
+                        <button class="option-btn" onclick="checkCh18Answer(2, false)">ج) أنزيم الأستيل كولين إستراز.</button>
+                    </div>
+                    <div class="feedback-box" id="c18q1-feedback"></div>
+                </div>
+            </section>
+        </div>
+
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        function showChapter(chId, evt) {
+            document.querySelectorAll('.chapter-view').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.ch-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(chId).classList.add('active');
+            if (evt) evt.target.classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function simSyn(num) {
+            let box = document.getElementById('synDisplayBox');
+            if (num === 1) {
+                box.innerHTML = `
+                    <h3 style="color: #6ee7b7; margin-bottom: 10px;">🟢 النقل المشبكي الطبيعي</h3>
+                    <p style="color: #cbd5e1; line-height: 1.8;">يرتبط الأستيل كولين مؤقتاً، يفتح المستقبل القنوي، يدخل الصوديوم ويسجل راسم الاهتزاز موجة تنبيهية (<span class="ltr-seq">PPSE</span>). ثم يتدخل إنزيم <span class="ltr-seq">AChE</span> ليفككه في أجزاء من الملي ثانية وتعود العضلة للراحة.</p>
+                `;
+            } else if (num === 2) {
+                box.innerHTML = `
+                    <h3 style="color: #ef4444; margin-bottom: 10px;">🔴 سم الكرار (Curare) - منافس وبديل صامت</h3>
+                    <p style="color: #cbd5e1; line-height: 1.8;">يتشابه جزيء الكرار في بنيته الفراغية مع الأستيل كولين فينافسه ويرتبط بمستقبلات ACh على الغشاء بعد المشبكي. لكنه <strong>لا يفتح القناة الكيميائية ولا يولد PPSE</strong>، كما أن إنزيم AChE لا يفككه! يسد المستقبلات وتصاب العضلات الحركية والتنفسية بالشلل الرخو المميت.</p>
+                `;
+            } else {
+                box.innerHTML = `
+                    <h3 style="color: #fbbf24; margin-bottom: 10px;">⚠️ غاز السارين والمبيدات الحشرية - شلل تشنجي مميت</h3>
+                    <p style="color: #cbd5e1; line-height: 1.8;">ترتبط هذه السموم بإنزيم <strong>الأستيل كولين إستراز (<span class="ltr-seq">AChE</span>) وتثبّطه نهائياً</strong>. يبقى الأستيل كولين المفرز متراكماً ومرتبطاً بالمستقبلات القنوية في الشق المشبكي، فتظل القنوات مفتوحة ويستمر دخول Na⁺ مولداً تنبيهات متواصلة وتشنجاً عضلياً قاتلاً (تيتانوس).</p>
+                `;
+            }
+        }
+
+        function simInteg(num) {
+            let box = document.getElementById('integDisplayBox');
+            if (num === 1) {
+                box.innerHTML = `
+                    <h3 style="color: #4ade80; margin-bottom: 10px;">🟢 تجميع فضائي يفوق العتبة (-40 mV)</h3>
+                    <p style="color: #cbd5e1; line-height: 1.8;">كمون الراحة (-70 mV) + 30 mV تنبيه = <strong>-40 mV</strong>. بما أن الحصيلة تفوق عتبة التوليد (-50 mV)، يولد القطعة الابتدائية <span class="ltr-seq">SI</span> كمون عمل كامل (+30 mV) ينتقل نحو العضلة.</p>
+                `;
+            } else {
+                box.innerHTML = `
+                    <h3 style="color: #f43f5e; margin-bottom: 10px;">🔴 تجميع دون العتبة (-65 mV) - إلغاء التنبيه</h3>
+                    <p style="color: #cbd5e1; line-height: 1.8;">كمون الراحة (-70 mV) + تنبيه (+15 mV) + تثبيط (-10 mV) = <strong>-65 mV</strong>. الحصيلة الجبرية لا تصل إلى العتبة (-50 mV)، فلا تنفتح القنوات الفولطية ولا يتولد كمون عمل. يصمت الليف المحرك وتسترخي العضلة.</p>
+                `;
+            }
+        }
+
+        function checkCh17Answer(optIdx, isCorrect) {
+            let container = document.getElementById('c17q1-container');
+            let btns = container.querySelectorAll('.option-btn');
+            let fb = document.getElementById('c17q1-feedback');
+
+            btns.forEach((b, idx) => {
+                b.disabled = true;
+                if (idx === optIdx) b.classList.add(isCorrect ? 'correct' : 'wrong');
+            });
+
+            fb.style.display = 'block';
+            if (isCorrect) {
+                fb.style.background = '#f0fdf4'; fb.style.color = '#166534'; fb.style.border = '1px solid #bbf7d0';
+                fb.innerHTML = '<strong>✅ إجابة صحيحة ممتاز!</strong> القنوات الكهربائية حساسة لفرق الجهد، والقنوات الكيميائية حساسة للمبلغ الكيميائي.';
+            } else {
+                fb.style.background = '#fef2f2'; fb.style.color = '#991b1b'; fb.style.border = '1px solid #fecaca';
+                fb.innerHTML = '<strong>❌ إجابة خاطئة.</strong> التمييز بين القنوات المبوبة كهربائياً وكيميائياً هو أساس فهم الاتصال العصبي في البكالوريا.';
+            }
+        }
+
+        function checkCh18Answer(optIdx, isCorrect) {
+            let container = document.getElementById('c18q1-container');
+            let btns = container.querySelectorAll('.option-btn');
+            let fb = document.getElementById('c18q1-feedback');
+
+            btns.forEach((b, idx) => {
+                b.disabled = true;
+                if (idx === optIdx) b.classList.add(isCorrect ? 'correct' : 'wrong');
+            });
+
+            fb.style.display = 'block';
+            if (isCorrect) {
+                fb.style.background = '#f0fdf4'; fb.style.color = '#166534'; fb.style.border = '1px solid #bbf7d0';
+                fb.innerHTML = '<strong>✅ إجابة صحيحة ممتاز!</strong> حمض الغابا (GABA) هو المبلغ التثبيطي الرئيسي في النخاع الشوكي والدماغ.';
+            } else {
+                fb.style.background = '#fef2f2'; fb.style.color = '#991b1b'; fb.style.border = '1px solid #fecaca';
+                fb.innerHTML = '<strong>❌ إجابة خاطئة.</strong> الأستيل كولين مبلغ تنبيهي في الغالب، أما الغابا فهو المبلغ التثبيطي.';
+            }
+        }
+    </script>
+</body>
+</html>

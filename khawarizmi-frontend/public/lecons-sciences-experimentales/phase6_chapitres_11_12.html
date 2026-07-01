@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منصة المتفوق 3AS | المرحلة 6 : الدرس 11 والدرس 12</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #f8fafc;
+            --surface: #ffffff;
+            --primary: #0f172a;
+            --accent: #2563eb;
+            --accent-light: #eff6ff;
+            --success: #16a34a;
+            --success-light: #f0fdf4;
+            --warning: #d97706;
+            --warning-light: #fffbeb;
+            --danger: #dc2626;
+            --danger-light: #fef2f2;
+            --blue-dark: #1e3a8a;
+            --blue-light: #eff6ff;
+            --violet: #6d28d9;
+            --violet-light: #f5f3ff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --radius: 16px;
+            --shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Cairo', 'Tajawal', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            line-height: 1.8;
+            padding-bottom: 60px;
+        }
+
+        .ltr-seq {
+            direction: ltr;
+            unicode-bidi: embed;
+            display: inline-block;
+            font-family: monospace;
+            font-weight: bold;
+            color: var(--accent);
+            background: #f1f5f9;
+            padding: 2px 8px;
+            border-radius: 6px;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 900;
+            font-size: 1.25rem;
+            color: var(--primary);
+        }
+
+        .brand-badge {
+            background: var(--blue-dark);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            white-space: nowrap;
+        }
+
+        .chapter-switcher {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .ch-btn {
+            background: var(--bg-main);
+            border: 2px solid var(--border);
+            padding: 8px 18px;
+            border-radius: 12px;
+            font-family: inherit;
+            font-weight: 800;
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .ch-btn:hover {
+            border-color: var(--blue-dark);
+            color: var(--blue-dark);
+        }
+
+        .ch-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                padding: 1rem;
+                text-align: center;
+            }
+            .chapter-switcher {
+                justify-content: center;
+                width: 100%;
+            }
+            .ch-btn {
+                flex: 1;
+                font-size: 0.85rem;
+                padding: 8px 10px;
+            }
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 2rem auto;
+            padding: 0 1.2rem;
+        }
+
+        .chapter-view {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .chapter-view.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Hero Header */
+        .lesson-header {
+            border-radius: var(--radius);
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+            color: white;
+        }
+
+        .header-ch11 {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+        }
+
+        .header-ch12 {
+            background: linear-gradient(135deg, #4c1d95 0%, #8b5cf6 100%);
+        }
+
+        .lesson-breadcrumb {
+            font-size: 0.85rem;
+            opacity: 0.9;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .lesson-header h1 {
+            font-size: 2.1rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+            line-height: 1.3;
+        }
+
+        .lesson-objectives {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--surface);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+        }
+
+        @media (max-width: 600px) {
+            .lesson-header { padding: 1.5rem; }
+            .lesson-header h1 { font-size: 1.5rem; }
+            .card { padding: 1.2rem; }
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid var(--bg-main);
+            padding-bottom: 0.8rem;
+        }
+
+        .step-num {
+            background: var(--blue-light);
+            color: var(--blue-dark);
+            width: 38px;
+            height: 38px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            font-weight: 900;
+            font-size: 1.1rem;
+        }
+
+        .step-num-violet {
+            background: var(--violet-light);
+            color: var(--violet);
+        }
+
+        .problem-box {
+            background: var(--warning-light);
+            border-right: 5px solid var(--warning);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+        }
+
+        .problem-title {
+            font-weight: 800;
+            color: #92400e;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Document Analysis */
+        .doc-viewer {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        @media (max-width: 850px) {
+            .doc-viewer { grid-template-columns: 1fr; }
+        }
+
+        .doc-visual {
+            background: #0f172a;
+            border-radius: 12px;
+            padding: 1.5rem;
+            color: white;
+        }
+
+        .svg-container {
+            width: 100%;
+            height: auto;
+            max-height: 260px;
+        }
+
+        .doc-analysis {
+            background: var(--bg-main);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+        }
+
+        .method-tag {
+            display: inline-block;
+            background: #e0f2fe;
+            color: #0369a1;
+            font-size: 0.75rem;
+            font-weight: 800;
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+        }
+
+        /* Interactive simulators */
+        .interactive-box {
+            background: #1e293b;
+            border-radius: 12px;
+            padding: 1.5rem;
+            color: white;
+            margin: 1.5rem 0;
+        }
+
+        .btn-action {
+            background: var(--blue-dark);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-family: inherit;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin: 5px;
+        }
+
+        .btn-action:hover { background: #1d4ed8; }
+        .btn-violet { background: var(--violet); }
+        .btn-violet:hover { background: #5b21b6; }
+
+        /* Scientific text */
+        .scientific-text {
+            background: var(--surface);
+            border: 2px solid #cbd5e1;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .text-part {
+            margin-bottom: 1.2rem;
+            padding-right: 1rem;
+            border-right: 4px solid var(--blue-dark);
+        }
+
+        .text-part.ch12-border { border-right-color: var(--violet); }
+
+        .text-part h4 {
+            font-size: 0.95rem;
+            color: var(--blue-dark);
+            margin-bottom: 0.3rem;
+            font-weight: 800;
+        }
+
+        .text-part.ch12-border h4 { color: var(--violet); }
+
+        /* Quiz */
+        .question-item {
+            background: var(--bg-main);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin-top: 1rem;
+        }
+
+        .option-btn {
+            background: white;
+            border: 1.5px solid var(--border);
+            padding: 12px 16px;
+            border-radius: 10px;
+            text-align: right;
+            font-family: inherit;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text-main);
+        }
+
+        .option-btn:hover {
+            border-color: var(--blue-dark);
+            background: #eff6ff;
+        }
+
+        .option-btn.correct {
+            background: var(--success-light);
+            border-color: var(--success);
+            color: var(--success);
+            font-weight: 700;
+        }
+
+        .option-btn.wrong {
+            background: var(--danger-light);
+            border-color: var(--danger);
+            color: var(--danger);
+        }
+
+        .feedback-box {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            display: none;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar with Phase Switcher -->
+    <nav class="navbar">
+        <div class="brand">
+            <span>منصة المتفوق 3AS</span>
+            <span class="brand-badge">المرحلة 6 (الدرس 11 و 12)</span>
+        </div>
+        <div class="chapter-switcher">
+            <button class="ch-btn active" onclick="showChapter('ch11', event)">🦠 الدرس 11 : الاستجابة الخلطية وبنية الأجسام المضادة</button>
+            <button class="ch-btn" onclick="showChapter('ch12', event)">🔬 الدرس 12 : المعقد المناعي وآلية بلعمة التخلص منه</button>
+        </div>
+    </nav>
+
+    <div class="container">
+
+        <!-- ================================================================= -->
+        <!-- CHAPTER 11 : IMMUNITÉ HUMORALE & ANTICORPS (الدرس 11) -->
+        <!-- ================================================================= -->
+        <div id="ch11" class="chapter-view active">
+            
+            <header class="lesson-header header-ch11">
+                <div class="lesson-breadcrumb">المجال الأول : التخصص الوظيفي للبروتينات • الوحدة 4 : دور البروتينات في الدفاع عن الذات</div>
+                <h1>الدرس 11 : الاستجابة المناعية الخلطية وبنية الجسم المضاد (Anticorps / γ-globuline)</h1>
+                <div class="lesson-objectives">
+                    <div>🎯 <strong>الهدف العلمي :</strong> إثبات الطبيعة البروتينية للأجسام المضادة (غلوبيلينات غاما)، وتحديد بنيتها الجزيئية في شكل حرف Y ومواقع التخصص.</div>
+                    <div>⏱️ <strong>المدة التقديرية للتعلم الذاتي :</strong> 25 دقيقة</div>
+                </div>
+            </header>
+
+            <!-- Step 1: Problématique -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num">1</span>
+                    <span>وضعية الانطلاق وبناء الإشكالية العلميـة</span>
+                </div>
+                <div class="problem-box">
+                    <div class="problem-title">⚠️ كيف يحمي المصل المناعي حيواناً من سم الكزاز القاتل؟</div>
+                    <p>إذا حقنا حيواناً بسم الكزاز الفعّال يموت فوراً. ولكن إذا حقناه بـ <strong>مصل (سيروم مأخوذ من دم حيوان محصن ضد الكزاز)</strong> ثم حقناه بالسم القاتل، فإنه يعيش ولا تظهر عليه أي أعراض! وهذا يعني أن المصل يحتوي على جزيئات دفاعية نوعية تتدخل في السوائل (الأخلاط : الدم واللمف). <strong>ما هي الطبيعة الكيميائية لهذه الجزيئات (الأجسام المضادة)؟ وكيف تتوافق بنيتها الجزيئية في شكل حرف Y مع أداء وظيفتها بدقة؟</strong></p>
+                </div>
+            </section>
+
+            <!-- Step 2: Document Analyse -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num">2</span>
+                    <span>التحليل المنهجي للرحلان الكهربائي لمصل الدم وبنية الجسم المضاد في شكل حرف Y</span>
+                </div>
+                <div class="doc-viewer">
+                    <div class="doc-visual" style="background: #172554;">
+                        <h4 style="color: #93c5fd; margin-bottom: 1rem; font-size: 0.95rem;">البنية الجزيئية المفصلة للجسم المضاد (4 سلاسل بيبتيدية : 2 ثقيلة H + 2 خفيفة L)</h4>
+                        <!-- SVG Antibody -->
+                        <svg class="svg-container" viewBox="0 0 400 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Heavy chains H (dark blue) -->
+                            <path d="M140 50 L 180 120 V 200" stroke="#3b82f6" stroke-width="10" stroke-linecap="round"/>
+                            <path d="M260 50 L 220 120 V 200" stroke="#3b82f6" stroke-width="10" stroke-linecap="round"/>
+                            <text x="200" y="165" fill="#bfdbfe" font-size="11" text-anchor="middle">سلسلتان ثقيلتان (H)</text>
+
+                            <!-- Light chains L (light cyan) -->
+                            <path d="M115 65 L 145 115" stroke="#38bdf8" stroke-width="8" stroke-linecap="round"/>
+                            <path d="M285 65 L 255 115" stroke="#38bdf8" stroke-width="8" stroke-linecap="round"/>
+                            <text x="85" y="90" fill="#38bdf8" font-size="10">سلسلة خفيفة (L)</text>
+
+                            <!-- Disulfide bonds (red lines) -->
+                            <path d="M185 140 H 215" stroke="#ef4444" stroke-width="3"/>
+                            <path d="M185 155 H 215" stroke="#ef4444" stroke-width="3"/>
+                            <path d="M152 90 L 135 80" stroke="#ef4444" stroke-width="2"/>
+                            <path d="M248 90 L 265 80" stroke="#ef4444" stroke-width="2"/>
+                            <text x="200" y="185" fill="#fca5a5" font-size="9" text-anchor="middle">جسور ثنائية الكبريت S-S</text>
+
+                            <!-- Antigen Binding Sites (top tips) -->
+                            <ellipse cx="127" cy="53" rx="18" ry="8" fill="#fbbf24" stroke="#f59e0b"/>
+                            <ellipse cx="273" cy="53" rx="18" ry="8" fill="#fbbf24" stroke="#f59e0b"/>
+                            <text x="200" y="25" fill="#fbbf24" font-size="11" text-anchor="middle" font-weight="bold">موقع تثبيت محدد المستضد (المنطقة المتغيرة)</text>
+                        </svg>
+                        <p style="font-size: 0.85rem; color: #cbd5e1; margin-top: 10px;">💡 المنطقة الثابتة (الأسفل) متماثلة عند جميع الأجسام المضادة، والمنطقة المتغيرة (الأعلى) تتغير حسب المستضد.</p>
+                    </div>
+
+                    <div class="doc-analysis">
+                        <span class="method-tag">منهجية البكالوريا : استخراج المعلومات الجزيئية</span>
+                        <h4 style="margin: 8px 0; color: var(--primary);">ما هو مميزات البنية الفراغية للجسم المضاد؟</h4>
+                        <p>الجسم المضاد بروتين ينتمي لمجموعة <strong>غلوبيلينات غاما (<span class="ltr-seq">γ-globulines</span>)</strong>، يتكون من 4 سلاسل بيبتيدية :</p>
+                        <ul style="list-style-type: none; line-height: 1.8;">
+                            <li>• <strong>سلسلتان ثقيلتان (<span class="ltr-seq">Chaînes Lourdes - H</span>)</strong> متماثلتان داخل الجزيء.</li>
+                            <li>• <strong>سلسلتان خفيفتان (<span class="ltr-seq">Chaînes Légères - L</span>)</strong> متماثلتان.</li>
+                            <li>• ترتبط السلاسل فيما بينها بواسطة <strong>جسور ثنائية الكبريت (<span class="ltr-seq">Ponts disulfures S-S</span>)</strong>.</li>
+                            <li>• <strong>التخصص الفائق :</strong> يمتلك الجسم المضاد موقعين متماثلين لتثبيت محدد المستضد في قمة المنطقة المتغيرة، يتكاملان بنيوياً معه بدقة.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 3: Interactive Antibody Explorer -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num">3</span>
+                    <span>مختبر تشريح الجسم المضاد التفاعلي</span>
+                </div>
+                <p>اضغط على منطقة من الجسم المضاد لمعاينة تخصصها الوظيفي :</p>
+                
+                <div class="interactive-box" style="background: #1e3a8a;">
+                    <div style="margin-bottom: 15px;">
+                        <button class="btn-action" onclick="simAb('var')">⭐ المنطقة المتغيرة (موقع التثبيت)</button>
+                        <button class="btn-action" style="background:#0284c7;" onclick="simAb('const')">⚓ المنطقة الثابتة (موقع تثبيت البلعمية)</button>
+                        <button class="btn-action" style="background:#dc2626;" onclick="simAb('ss')">🔒 الجسور ثنائية الكبريت (S-S)</button>
+                    </div>
+                    <div id="abDisplayBox" style="background: #172554; border: 2px solid #3b82f6; border-radius: 12px; padding: 1.5rem; text-align: center;">
+                        <h3 style="color: #fbbf24; margin-bottom: 10px;">⭐ المنطقة المتغيرة (المتخصصة في المستضد)</h3>
+                        <p style="color: #cbd5e1; line-height: 1.8;">توجد في نهايات السلاسل الثقيلة والخفيفة (الجزء العلوي لحرف Y). تختلف متتالية الأحماض الأمينية في هذه المنطقة باختلاف المستضد، مما يمنح الجسم المضاد <strong>خصوصية فائقة</strong> تشبه المفتاح والقفل مع محدد المستضد (<span class="ltr-seq">Épitope</span>).</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 4: Quiz Ch11 -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num">4</span>
+                    <span>تقويم الدرس 11 : أسئلة البكالوريا المتكررة</span>
+                </div>
+
+                <div class="question-item" id="c11q1-container">
+                    <h4 style="margin-bottom: 12px;">1. أين تقع المنطقة المتغيرة التي تشكل موقع تثبيت محدد المستضد في جزيء الجسم المضاد؟</h4>
+                    <div class="options-grid">
+                        <button class="option-btn" onclick="checkCh11Answer(0, true)">أ) في النهايات الأمينية (الجزء العلوي) للسلاسل الثقيلة والخفيفة معاً.</button>
+                        <button class="option-btn" onclick="checkCh11Answer(1, false)">ب) في الجزء السفلي للسلاسل الثقيلة فقط.</button>
+                        <button class="option-btn" onclick="checkCh11Answer(2, false)">ج) في الجسور ثنائية الكبريت.</button>
+                    </div>
+                    <div class="feedback-box" id="c11q1-feedback"></div>
+                </div>
+            </section>
+        </div>
+
+        <!-- ================================================================= -->
+        <!-- CHAPTER 12 : LE COMPLEXE IMMUN & PHAGOCYTOSE (الدرس 12) -->
+        <!-- ================================================================= -->
+        <div id="ch12" class="chapter-view">
+            
+            <header class="lesson-header header-ch12">
+                <div class="lesson-breadcrumb">المجال الأول : التخصص الوظيفي للبروتينات • الوحدة 4 : دور البروتينات في الدفاع عن الذات</div>
+                <h1>الدرس 12 : تشكل المعقد المناعي وآلية التخلص منه بواسطة البلعميات الكبيرة (Phagocytose)</h1>
+                <div class="lesson-objectives">
+                    <div>🎯 <strong>الهدف العلمي :</strong> توضيح دور المعقد المناعي في إبطال مفعول المستضد، وتفصيل المراحل الأربعة لعملية بلعمة المعقد المناعي بواسطة الماكروفاج.</div>
+                    <div>⏱️ <strong>المدة التقديرية للتعلم الذاتي :</strong> 25 دقيقة</div>
+                </div>
+            </header>
+
+            <!-- Step 1: Problématique -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num step-num-violet">1</span>
+                    <span>الإشكالية الأساسية لختام الاستجابة الخلطية</span>
+                </div>
+                <div class="problem-box" style="border-right-color: var(--violet); background: var(--violet-light);">
+                    <div class="problem-title" style="color: #5b21b6;">⚠️ هل يقوم الجسم المضاد بقتل المستضد بنفسه؟</div>
+                    <p>يعتقد الكثيرون أن الجسم المضاد يقتل أو يدمر البكتيريا أو السم فور ارتباطه به، <strong>وهذا خطأ علمي فادح في البكالوريا!</strong> الجسم المضاد يرتبط بالمستضد مشكلاً <strong>المعقد المناعي (<span class="ltr-seq">Complexe Immun</span>)</strong> الذي يبطل مفعوله ويمنع انتشاره فقط. <strong>كيف يتم إذن التخلص النهائي من هذا المعقد المناعي وتدميره داخل الجسم؟</strong></p>
+                </div>
+            </section>
+
+            <!-- Step 2: Document Analyse -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num step-num-violet">2</span>
+                    <span>التحليل المنهجي لخطوات البلعمة (Phagocytose) بتدخل البلعمية الكبيرة (Macrophage)</span>
+                </div>
+                <div class="doc-viewer">
+                    <div class="doc-visual" style="background: #312e81;">
+                        <h4 style="color: #c4b5fd; margin-bottom: 1rem; font-size: 0.95rem;">مراحل بلعمة المعقد المناعي (التثبيت ← الابتلاع ← الهضم ← الإطراح)</h4>
+                        <!-- SVG Phagocytosis -->
+                        <svg class="svg-container" viewBox="0 0 400 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Macrophage surface -->
+                            <path d="M40 180 C 30 100, 100 50, 180 50 C 260 50, 350 100, 360 180 Z" fill="#4338ca" stroke="#818cf8" stroke-width="2"/>
+                            
+                            <!-- Fc Receptor -->
+                            <path d="M170 50 V 30 C 170 25, 190 25, 190 30 V 50" fill="#a7f3d0" stroke="#10b981" stroke-width="2"/>
+                            <text x="215" y="38" fill="#a7f3d0" font-size="10">مستقبل غشائي للموقع Fc</text>
+
+                            <!-- Antibody Y binding to receptor -->
+                            <path d="M180 30 L 165 10 M 180 30 L 195 10" stroke="#fbbf24" stroke-width="4"/>
+                            <circle cx="180" cy="5" r="8" fill="#ef4444"/>
+                            <text x="180" y="-3" fill="white" font-size="8" text-anchor="middle">Ag</text>
+
+                            <!-- Pseudopods engulfing -->
+                            <path d="M110 55 Q 110 10, 150 15" stroke="#818cf8" stroke-width="3" fill="none"/>
+                            <path d="M250 55 Q 250 10, 210 15" stroke="#818cf8" stroke-width="3" fill="none"/>
+                            <text x="180" y="110" fill="#e0e7ff" font-size="12" text-anchor="middle" font-weight="bold">البلعمية الكبيرة (Macrophage)</text>
+
+                            <!-- Lysosomes inside -->
+                            <circle cx="130" cy="130" r="10" fill="#f43f5e"/>
+                            <circle cx="230" cy="135" r="12" fill="#f43f5e"/>
+                            <text x="180" y="145" fill="#fca5a5" font-size="10" text-anchor="middle">ليزوزومات تفرز إنزيمات هاضمة</text>
+                        </svg>
+                        <p style="font-size: 0.85rem; color: #cbd5e1; margin-top: 10px;">💡 يثبت الماكروفاج المعقد المناعي عن طريق تكامل مستقبله الغشائي مع الجزء الثابت Fc للجسم المضاد.</p>
+                    </div>
+
+                    <div class="doc-analysis">
+                        <span class="method-tag" style="background: #f3e8ff; color: #6d28d9;">الخطوات الأربعة المعتمدة في البكالوريا</span>
+                        <h4 style="margin: 8px 0; color: var(--primary);">كيف يتم هضم المعقد المناعي؟</h4>
+                        <ol style="padding-right: 1.2rem; line-height: 1.8;">
+                            <li><strong>مرحلة التثبيت :</strong> يرتبط الجزء الثابت (<span class="ltr-seq">Fc</span>) للجسم المضاد في المعقد المناعي بمستقبلات غشائية نوعية على سطح البلعمية الكبيرة.</li>
+                            <li><strong>مرحلة الابتلاع :</strong> ترسل البلعمية أرجلاً كاذبة (<span class="ltr-seq">Pseudopodes</span>) تحيط بالمعقد المناعي وتشكل فجوة بلعمية (<span class="ltr-seq">Phagosome</span>).</li>
+                            <li><strong>مرحلة الهضم :</strong> تلتحم الليزوزومات (<span class="ltr-seq">Lysosomes</span>) مع الفجوة وتفرز إنزيمات التحلل المائي لتفكيك المستضد والجسم المضاد.</li>
+                            <li><strong>مرحلة الإطراح :</strong> تطرح فضلات الهضم خارج الخلية.</li>
+                        </ol>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 3: Interactive Phagocytosis Simulator -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num step-num-violet">3</span>
+                    <span>محاكي البلعمة التفاعلي خطوة بخطوة</span>
+                </div>
+                <p>اضغط لتنفيذ مراحل القضاء النهائي على المعقد المناعي :</p>
+                
+                <div class="interactive-box" style="background: #312e81;">
+                    <div style="margin-bottom: 15px;">
+                        <button class="btn-action btn-violet" onclick="simPhago(1)">1️⃣ التثبيت على المستقبل Fc</button>
+                        <button class="btn-action btn-violet" onclick="simPhago(2)">2️⃣ الإحاطة والابتلاع</button>
+                        <button class="btn-action btn-violet" onclick="simPhago(3)">3️⃣ الهضم الليزوزومي</button>
+                    </div>
+                    <div id="phagoDisplayBox" style="background: #1e1b4b; border: 2px solid #8b5cf6; border-radius: 12px; padding: 1.5rem; text-align: center;">
+                        <h3 style="color: #a7f3d0; margin-bottom: 10px;">1️⃣ التثبيت النوعي على مستقبلات البلعمية</h3>
+                        <p style="color: #cbd5e1; line-height: 1.8;">تتميز البلعميات الكبيرة بامتلاك مستقبلات غشائية تتكامل بنيوياً مع <strong>المنطقة الثابتة (<span class="ltr-seq">Fragment Fc</span>)</strong> للأجسام المضادة. هذا التثبيت يسرع ويسهل عملية البلعمة مقارنة بابتلاع المستضد لوحده.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 4: Quiz Ch12 -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num step-num-violet">4</span>
+                    <span>تقويم الدرس 12 : أسئلة البكالوريا المتكررة</span>
+                </div>
+
+                <div class="question-item" id="c12q1-container">
+                    <h4 style="margin-bottom: 12px;">1. ما هو الدور المباشر الذي يلعبه تشكل "المعقد المناعي" (ارتباط الجسم المضاد بالمستضد)؟</h4>
+                    <div class="options-grid">
+                        <button class="option-btn" onclick="checkCh12Answer(0, true)">أ) إبطال مفعول المستضد (منع تكاثره وانتشاره وتأثيره السام) وتسهيل بلعمته من طرف الماكروفاج.</button>
+                        <button class="option-btn" onclick="checkCh12Answer(1, false)">ب) التحلل الذاتي والفوري للبكتيريا دون الحاجة لبلعميات.</button>
+                        <button class="option-btn" onclick="checkCh12Answer(2, false)">ج) تحويل المستضد إلى كريات دم حمراء.</button>
+                    </div>
+                    <div class="feedback-box" id="c12q1-feedback"></div>
+                </div>
+            </section>
+        </div>
+
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        function showChapter(chId, evt) {
+            document.querySelectorAll('.chapter-view').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.ch-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(chId).classList.add('active');
+            if (evt) evt.target.classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function simAb(part) {
+            let box = document.getElementById('abDisplayBox');
+            if (part === 'var') {
+                box.innerHTML = `
+                    <h3 style="color: #fbbf24; margin-bottom: 10px;">⭐ المنطقة المتغيرة (المتخصصة في المستضد)</h3>
+                    <p style="color: #cbd5e1; line-height: 1.8;">توجد في نهايات السلاسل الثقيلة والخفيفة (الجزء العلوي لحرف Y). تختلف متتالية الأحماض الأمينية في هذه المنطقة باختلاف المستضد، مما يمنح الجسم المضاد <strong>خصوصية فائقة</strong> تشبه المفتاح والقفل مع محدد المستضد (<span class="ltr-seq">Épitope</span>).</p>
+                `;
+            } else if (part === 'const') {
+                box.innerHTML = `
+                    <h3 style="color: #38bdf8; margin-bottom: 10px;">⚓ المنطقة الثابتة (التثبيت على البلعمية)</h3>
+                    <p style="color: #cbd5e1; line-height: 1.8;">تتمثل في الساق السفلي لحرف Y (المنطقة Fc للسلاسل الثقيلة). تكون متماثلة عند جميع الأجسام المضادة من نفس الصنف، ودورها الأساسي هو <strong>الارتباط بالمستقبلات الغشائية للبلعميات الكبيرة</strong> لتسهيل بلعمة المعقد المناعي.</p>
+                `;
+            } else {
+                box.innerHTML = `
+                    <h3 style="color: #ef4444; margin-bottom: 10px;">🔒 الجسور ثنائية الكبريت (S-S)</h3>
+                    <p style="color: #cbd5e1; line-height: 1.8;">روابط تكافؤية قوية تربط السلسلتين الثقيلتين ببعضهما البعض، وتربط كل سلسلة ثقيلة بسلسلة خفيفة، مما يحافظ على استقرار وتماسك البنية الفراغية الثلاثية للجسم المضاد في شكل حرف Y.</p>
+                `;
+            }
+        }
+
+        function simPhago(step) {
+            let box = document.getElementById('phagoDisplayBox');
+            if (step === 1) {
+                box.innerHTML = `
+                    <h3 style="color: #a7f3d0; margin-bottom: 10px;">1️⃣ التثبيت النوعي على مستقبلات البلعمية</h3>
+                    <p style="color: #cbd5e1; line-height: 1.8;">تتميز البلعميات الكبيرة بامتلاك مستقبلات غشائية تتكامل بنيوياً مع <strong>المنطقة الثابتة (<span class="ltr-seq">Fragment Fc</span>)</strong> للأجسام المضادة. هذا التثبيت يسرع ويسهل عملية البلعمة.</p>
+                `;
+            } else if (step === 2) {
+                box.innerHTML = `
+                    <h3 style="color: #fbbf24; margin-bottom: 10px;">2️⃣ الإحاطة بالأرجل الكاذبة والابتلاع</h3>
+                    <p style="color: #cbd5e1; line-height: 1.8;">يستطيل الغشاء الهيولي للبلعمية مشكلاً أرجلاً كاذبة (<span class="ltr-seq">Pseudopodes</span>) تحيط بالمعقد المناعي بالكامل حتى تغلق عليه داخل فجوة بلعمية مغلقة في الهيولى تسمى (<span class="ltr-seq">Phagosome</span>).</p>
+                `;
+            } else {
+                box.innerHTML = `
+                    <h3 style="color: #f43f5e; margin-bottom: 10px;">3️⃣ الهضم الليزوزومي الفعّال والإطراح</h3>
+                    <p style="color: #cbd5e1; line-height: 1.8;">تتجه الليزوزومات نحو الفجوة البلعمية وتفرز محتواها من إنزيمات التحلل المائي القوية، فيتم تفكيك وهضم المستضد والجسم المضاد معاً، ثم تطرح البقايا المحللة خارج الخلية.</p>
+                `;
+            }
+        }
+
+        function checkCh11Answer(optIdx, isCorrect) {
+            let container = document.getElementById('c11q1-container');
+            let btns = container.querySelectorAll('.option-btn');
+            let fb = document.getElementById('c11q1-feedback');
+
+            btns.forEach((b, idx) => {
+                b.disabled = true;
+                if (idx === optIdx) b.classList.add(isCorrect ? 'correct' : 'wrong');
+            });
+
+            fb.style.display = 'block';
+            if (isCorrect) {
+                fb.style.background = '#f0fdf4'; fb.style.color = '#166534'; fb.style.border = '1px solid #bbf7d0';
+                fb.innerHTML = '<strong>✅ إجابة صحيحة ممتاز!</strong> يشترك الجزء العلوي للسلسلتين الثقيلة والخفيفة معاً في تشكيل موقع تثبيت المستضد.';
+            } else {
+                fb.style.background = '#fef2f2'; fb.style.color = '#991b1b'; fb.style.border = '1px solid #fecaca';
+                fb.innerHTML = '<strong>❌ إجابة خاطئة.</strong> الجزء السفلي يمثل المنطقة الثابتة المخصصة للتثبيت على الماكروفاج.';
+            }
+        }
+
+        function checkCh12Answer(optIdx, isCorrect) {
+            let container = document.getElementById('c12q1-container');
+            let btns = container.querySelectorAll('.option-btn');
+            let fb = document.getElementById('c12q1-feedback');
+
+            btns.forEach((b, idx) => {
+                b.disabled = true;
+                if (idx === optIdx) b.classList.add(isCorrect ? 'correct' : 'wrong');
+            });
+
+            fb.style.display = 'block';
+            if (isCorrect) {
+                fb.style.background = '#f0fdf4'; fb.style.color = '#166534'; fb.style.border = '1px solid #bbf7d0';
+                fb.innerHTML = '<strong>✅ إجابة صحيحة ممتاز!</strong> المعقد المناعي يبطل المفعول (Neutralisation) ولا يدمر المستضد مباشرة بل يسهل بلعمته.';
+            } else {
+                fb.style.background = '#fef2f2'; fb.style.color = '#991b1b'; fb.style.border = '1px solid #fecaca';
+                fb.innerHTML = '<strong>❌ إجابة خاطئة.</strong> التدمير والهضم الفعلي للمستضد يتم لاحقاً داخل البلعميات الكبيرة بواسطة الليزوزومات.';
+            }
+        }
+    </script>
+</body>
+</html>

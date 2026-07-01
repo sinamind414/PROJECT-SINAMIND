@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منصة المتفوق 3AS | المرحلة 2 : الدرس 3 والدرس 4</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #f8fafc;
+            --surface: #ffffff;
+            --primary: #0f172a;
+            --accent: #2563eb;
+            --accent-light: #eff6ff;
+            --success: #16a34a;
+            --success-light: #f0fdf4;
+            --warning: #d97706;
+            --warning-light: #fffbeb;
+            --danger: #dc2626;
+            --danger-light: #fef2f2;
+            --teal: #0d9488;
+            --teal-light: #f0fdf4;
+            --rose: #e11d48;
+            --rose-light: #fff1f2;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --radius: 16px;
+            --shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Cairo', 'Tajawal', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            line-height: 1.8;
+            padding-bottom: 60px;
+        }
+
+        .ltr-seq {
+            direction: ltr;
+            unicode-bidi: embed;
+            display: inline-block;
+            font-family: monospace;
+            font-weight: bold;
+            color: var(--accent);
+            background: #f1f5f9;
+            padding: 2px 8px;
+            border-radius: 6px;
+        }
+
+        /* Navbar & Phase switcher */
+        .navbar {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 900;
+            font-size: 1.25rem;
+            color: var(--primary);
+        }
+
+        .brand-badge {
+            background: var(--teal);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            white-space: nowrap;
+        }
+
+        .chapter-switcher {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .ch-btn {
+            background: var(--bg-main);
+            border: 2px solid var(--border);
+            padding: 8px 18px;
+            border-radius: 12px;
+            font-family: inherit;
+            font-weight: 800;
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .ch-btn:hover {
+            border-color: var(--teal);
+            color: var(--teal);
+        }
+
+        .ch-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                padding: 1rem;
+                text-align: center;
+            }
+            .chapter-switcher {
+                justify-content: center;
+                width: 100%;
+            }
+            .ch-btn {
+                flex: 1;
+                font-size: 0.85rem;
+                padding: 8px 10px;
+            }
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 2rem auto;
+            padding: 0 1.2rem;
+        }
+
+        .chapter-view {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .chapter-view.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Hero Header */
+        .lesson-header {
+            border-radius: var(--radius);
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+            color: white;
+        }
+
+        .header-ch3 {
+            background: linear-gradient(135deg, #0f172a 0%, #0d9488 100%);
+        }
+
+        .header-ch4 {
+            background: linear-gradient(135deg, #4c0519 0%, #e11d48 100%);
+        }
+
+        .lesson-breadcrumb {
+            font-size: 0.85rem;
+            opacity: 0.9;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .lesson-header h1 {
+            font-size: 2.1rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+            line-height: 1.3;
+        }
+
+        .lesson-objectives {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--surface);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+        }
+
+        @media (max-width: 600px) {
+            .lesson-header { padding: 1.5rem; }
+            .lesson-header h1 { font-size: 1.5rem; }
+            .card { padding: 1.2rem; }
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid var(--bg-main);
+            padding-bottom: 0.8rem;
+        }
+
+        .step-num {
+            background: var(--accent-light);
+            color: var(--accent);
+            width: 38px;
+            height: 38px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            font-weight: 900;
+            font-size: 1.1rem;
+        }
+
+        .step-num-rose {
+            background: var(--rose-light);
+            color: var(--rose);
+        }
+
+        .problem-box {
+            background: var(--warning-light);
+            border-right: 5px solid var(--warning);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+        }
+
+        .problem-title {
+            font-weight: 800;
+            color: #92400e;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Document Analysis */
+        .doc-viewer {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        @media (max-width: 850px) {
+            .doc-viewer { grid-template-columns: 1fr; }
+        }
+
+        .doc-visual {
+            background: #0f172a;
+            border-radius: 12px;
+            padding: 1.5rem;
+            color: white;
+        }
+
+        .svg-container {
+            width: 100%;
+            height: auto;
+            max-height: 260px;
+        }
+
+        .doc-analysis {
+            background: var(--bg-main);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+        }
+
+        .method-tag {
+            display: inline-block;
+            background: #e0f2fe;
+            color: #0369a1;
+            font-size: 0.75rem;
+            font-weight: 800;
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+        }
+
+        /* Interactive simulators */
+        .interactive-box {
+            background: #1e293b;
+            border-radius: 12px;
+            padding: 1.5rem;
+            color: white;
+            margin: 1.5rem 0;
+        }
+
+        .sim-ribosome-display {
+            background: #0f172a;
+            border: 2px solid #334155;
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            min-height: 180px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .btn-action {
+            background: var(--teal);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-family: inherit;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin: 5px;
+        }
+
+        .btn-action:hover { background: #0f766e; }
+        .btn-reset { background: #475569; }
+
+        /* Structure Selector */
+        .struct-tabs {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        @media (max-width: 600px) {
+            .struct-tabs { grid-template-columns: 1fr 1fr; }
+        }
+
+        .btn-struct {
+            background: #334155;
+            color: white;
+            border: 1px solid #475569;
+            padding: 10px;
+            border-radius: 8px;
+            font-family: inherit;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .btn-struct.active {
+            background: var(--rose);
+            border-color: #fda4af;
+        }
+
+        /* Scientific text */
+        .scientific-text {
+            background: var(--surface);
+            border: 2px solid #cbd5e1;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .text-part {
+            margin-bottom: 1.2rem;
+            padding-right: 1rem;
+            border-right: 4px solid var(--teal);
+        }
+
+        .text-part.ch4-border { border-right-color: var(--rose); }
+
+        .text-part h4 {
+            font-size: 0.95rem;
+            color: var(--teal);
+            margin-bottom: 0.3rem;
+            font-weight: 800;
+        }
+
+        .text-part.ch4-border h4 { color: var(--rose); }
+
+        /* Quiz */
+        .question-item {
+            background: var(--bg-main);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin-top: 1rem;
+        }
+
+        .option-btn {
+            background: white;
+            border: 1.5px solid var(--border);
+            padding: 12px 16px;
+            border-radius: 10px;
+            text-align: right;
+            font-family: inherit;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text-main);
+        }
+
+        .option-btn:hover {
+            border-color: var(--teal);
+            background: #f0fdf4;
+        }
+
+        .option-btn.correct {
+            background: var(--success-light);
+            border-color: var(--success);
+            color: var(--success);
+            font-weight: 700;
+        }
+
+        .option-btn.wrong {
+            background: var(--danger-light);
+            border-color: var(--danger);
+            color: var(--danger);
+        }
+
+        .feedback-box {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            display: none;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar with Phase Switcher -->
+    <nav class="navbar">
+        <div class="brand">
+            <span>منصة المتفوق 3AS</span>
+            <span class="brand-badge">المرحلة 2 (الدرس 3 و 4)</span>
+        </div>
+        <div class="chapter-switcher">
+            <button class="ch-btn active" onclick="showChapter('ch3', event)">⚙️ الدرس 3 : مراحل الترجمة ومتعدد الريبوزوم</button>
+            <button class="ch-btn" onclick="showChapter('ch4', event)">🔬 الدرس 4 : مستويات البنية الفراغية للبروتين</button>
+        </div>
+    </nav>
+
+    <div class="container">
+
+        <!-- ================================================================= -->
+        <!-- CHAPTER 3 : LES ÉTAPES DE LA TRADUCTION (مراحل الترجمة) -->
+        <!-- ================================================================= -->
+        <div id="ch3" class="chapter-view active">
+            
+            <header class="lesson-header header-ch3">
+                <div class="lesson-breadcrumb">المجال الأول : التخصص الوظيفي للبروتينات • الوحدة 1 : تركيب البروتين</div>
+                <h1>الدرس 3 : مراحل الترجمة في الريبوزوم وظاهرة متعدد الريبوزوم (Polysome)</h1>
+                <div class="lesson-objectives">
+                    <div>🎯 <strong>الهدف العلمي :</strong> تحديد المراحل الثلاث للترجمة (البداية، الاستطالة، النهاية) ودور متعدد الريبوزوم في تضخيم التصنيع.</div>
+                    <div>⏱️ <strong>المدة التقديرية للتعلم الذاتي :</strong> 25 دقيقة</div>
+                </div>
+            </header>
+
+            <!-- Step 1: Problématique -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num">1</span>
+                    <span>وضعية الانطلاق وبناء الإشكالية العلميـة</span>
+                </div>
+                <div class="problem-box">
+                    <div class="problem-title">⚠️ كيف يتحول الـ ARNm إلى سلسلة بيبتيدية في أجزاء من الثانية؟</div>
+                    <p>بعد وصول الـ <span class="ltr-seq">ARNm</span> إلى الهيولى، وتنشيط الأحماض الأمينية بارتباطها مع جزيئات الـ <span class="ltr-seq">ARNt</span>، تتدخل عضيات دقيقة تسمى <strong>الريبوزومات (<span class="ltr-seq">Ribosomes</span>)</strong> لقراءة شفرة الـ <span class="ltr-seq">ARNm</span> وربط الأحماض الأمينية بروابط بيبتيدية. <strong>كيف تتم هذه العملية زمنياً ومكانياً داخل الريبوزوم؟ وكيف تضمن الخلية سرعة الإنتاج؟</strong></p>
+                </div>
+            </section>
+
+            <!-- Step 2: Document Analyse -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num">2</span>
+                    <span>التحليل المنهجي لظاهرة متعدد الريبوزوم (البوليزوم - Polysome)</span>
+                </div>
+                <div class="doc-viewer">
+                    <div class="doc-visual">
+                        <h4 style="margin-bottom: 1rem; color: #5eead4; font-size: 0.95rem;">صورة بالمجهر الإلكتروني ورسم تفسيري لمتعدد الريبوزوم أثناء الترجمة</h4>
+                        <!-- SVG Polysome -->
+                        <svg class="svg-container" viewBox="0 0 400 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <!-- ARNm line -->
+                            <path d="M30 100 H 370" stroke="#f43f5e" stroke-width="3" stroke-dasharray="6 2"/>
+                            <text x="340" y="85" fill="#fda4af" font-size="12" font-weight="bold">خيط الـ ARNm (5' → 3')</text>
+                            
+                            <!-- Ribosomes moving left to right -->
+                            <!-- Ribosome 1 (start) -->
+                            <ellipse cx="80" cy="100" rx="14" ry="18" fill="#0f766e" stroke="#5eead4" stroke-width="2"/>
+                            <path d="M80 82 Q 75 60 75 50" stroke="#fbbf24" stroke-width="3"/>
+                            <circle cx="75" cy="48" r="4" fill="#fbbf24"/>
+
+                            <!-- Ribosome 2 -->
+                            <ellipse cx="160" cy="100" rx="14" ry="18" fill="#0f766e" stroke="#5eead4" stroke-width="2"/>
+                            <path d="M160 82 Q 155 50 145 35" stroke="#fbbf24" stroke-width="3"/>
+                            <circle cx="145" cy="33" r="4" fill="#fbbf24"/>
+
+                            <!-- Ribosome 3 -->
+                            <ellipse cx="240" cy="100" rx="14" ry="18" fill="#0f766e" stroke="#5eead4" stroke-width="2"/>
+                            <path d="M240 82 Q 230 40 215 20" stroke="#fbbf24" stroke-width="3"/>
+                            <circle cx="215" cy="18" r="4" fill="#fbbf24"/>
+
+                            <!-- Ribosome 4 (long polypeptide) -->
+                            <ellipse cx="320" cy="100" rx="14" ry="18" fill="#0f766e" stroke="#5eead4" stroke-width="2"/>
+                            <path d="M320 82 Q 305 30 285 10" stroke="#fbbf24" stroke-width="3"/>
+                            <circle cx="285" cy="8" r="4" fill="#fbbf24"/>
+
+                            <!-- Direction arrow -->
+                            <path d="M80 150 H 310" stroke="#2dd4bf" stroke-width="2"/>
+                            <polygon points="315,150 305,145 305,155" fill="#2dd4bf"/>
+                            <text x="195" y="170" fill="#2dd4bf" font-size="12" text-anchor="middle" font-weight="bold">اتجاه حركة الريبوزومات على الـ ARNm ➡️</text>
+                        </svg>
+                        <p style="font-size: 0.85rem; color: #cbd5e1; margin-top: 10px;">🟡 الخيوط الصفراء المتدرجة في الطول تمثل السلاسل البيبتيدية قيد التشكل.</p>
+                    </div>
+
+                    <div class="doc-analysis">
+                        <span class="method-tag">منهجية البكالوريا : التفسير والأهمية البيولوجية</span>
+                        <h4 style="margin: 8px 0; color: var(--primary);">ما هو متعدد الريبوزوم؟ وما فائدته للخلية؟</h4>
+                        <p><strong>التعريف :</strong> متعدد الريبوزوم (<span class="ltr-seq">Polysome</span>) هو خيط واحد من الـ <span class="ltr-seq">ARNm</span> ترتبط به عدة ريبوزومات في نفس الوقت، حيث يقوم كل ريبوزوم بترجمة نفس الرسالة الوراثية.</p>
+                        <hr style="margin: 12px 0; border: none; border-top: 1px solid var(--border);">
+                        <p><strong>الأهمية البيولوجية (سؤال كلاسيكي في البكالوريا) :</strong></p>
+                        <p>يسمح متعدد الريبوزوم بتركيب <strong>كميات كبيرة جدا من نفس الروتين في مدة زمنية قصيرة جداً</strong>، استجابة لحاجة الخلية والعضوية الفورية.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 3: Interactive Translation Simulator -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num">3</span>
+                    <span>المحاكي التفاعلي لخطوات الترجمة داخل الريبوزوم</span>
+                </div>
+                <p>يتكون الريبوزوم من تحت وحدتين (صغرى وكبرى)، ويحتوي على موقعين تحفيزيين : الموقع الببتيدي (<span class="ltr-seq">Site P</span>) والموقع الأميني (<span class="ltr-seq">Site A</span>). اضغط لتنفيذ مراحل الترجمة :</p>
+                
+                <div class="interactive-box">
+                    <div style="margin-bottom: 15px;">
+                        <button class="btn-action" onclick="simTrans(1)">1️⃣ مرحلة البداية (Initiation)</button>
+                        <button class="btn-action" onclick="simTrans(2)">2️⃣ مرحلة الاستطالة (Élongation)</button>
+                        <button class="btn-action" onclick="simTrans(3)">3️⃣ مرحلة النهاية (Terminaison)</button>
+                    </div>
+                    <div class="sim-ribosome-display" id="simTransBox">
+                        <h3 style="color: #2dd4bf; margin-bottom: 10px;">🔬 اختر مرحلة من المراحل أعلاه لمعاينة تفاصيلها الجزيئية</h3>
+                        <p style="color: #cbd5e1;">ستشاهد كيف يتحرك الريبوزوم خطوة بخطوة (بمقدار رامزة واحدة) وكيف تتشكل الرابطة البيبتيدية.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 4: Bilan & Quiz Ch3 -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num">4</span>
+                    <span>الخلاصة والتقويم الذاتي (الدرس 3)</span>
+                </div>
+                <div class="scientific-text">
+                    <div class="text-part">
+                        <h4>ملخص المراحل الثلاث للترجمة</h4>
+                        <p>• <strong>البداية :</strong> توضع تحت الوحدة الصغرى على رامزة البداية <span class="ltr-seq">AUG</span>، ثم ارتباط المعقد (<span class="ltr-seq">ARNt - Méthionine</span>) في الموقع <span class="ltr-seq">P</span>، تليها التحاق تحت الوحدة الكبرى.</p>
+                        <p>• <strong>الاستطالة :</strong> دخول المعقد الثاني إلى الموقع <span class="ltr-seq">A</span>، تشكل رابطة ببتيدية بين الميثيونين والحمض الثاني، ثم حركة الريبوزوم برامزة واحدة (انتقال الموقع <span class="ltr-seq">A</span> إلى <span class="ltr-seq">P</span>).</p>
+                        <p>• <strong>النهاية :</strong> وصول الريبوزوم إلى إحدى رامزات التوقف (<span class="ltr-seq">UAA, UAG, UGA</span>)، انفصال تحت وحدتي الريبوزوم، وتحرر السلسلة البيبتيدية وانفصال الميثيونين الأول.</p>
+                    </div>
+                </div>
+
+                <!-- Quiz Ch3 -->
+                <div class="question-item" id="c3q1-container" style="margin-top: 1.5rem;">
+                    <h4 style="margin-bottom: 12px;">اختبر فهمك : أين تتشكل الرابطة البيبتيدية أثناء مرحلة الاستطالة في الريبوزوم؟</h4>
+                    <div class="options-grid">
+                        <button class="option-btn" onclick="checkCh3Answer(0, true)">أ) بين الحمض الأميني المحمول على الـ <span class="ltr-seq">ARNt</span> في الموقع <span class="ltr-seq">P</span> والحمض الأميني الجديد في الموقع <span class="ltr-seq">A</span>.</button>
+                        <button class="option-btn" onclick="checkCh3Answer(1, false)">ب) بين تحت الوحدة الصغرى وتحت الوحدة الكبرى للريبوزوم.</button>
+                        <button class="option-btn" onclick="checkCh3Answer(2, false)">ج) بين رامزة الـ <span class="ltr-seq">ARNm</span> والرامزة المضادة للـ <span class="ltr-seq">ARNt</span>.</button>
+                    </div>
+                    <div class="feedback-box" id="c3q1-feedback"></div>
+                </div>
+            </section>
+        </div>
+
+        <!-- ================================================================= -->
+        <!-- CHAPTER 4 : STRUCTURE SPATIALE DES PROTÉINES (البنية الفراغية) -->
+        <!-- ================================================================= -->
+        <div id="ch4" class="chapter-view">
+            
+            <header class="lesson-header header-ch4">
+                <div class="lesson-breadcrumb">المجال الأول : التخصص الوظيفي للبروتينات • الوحدة 2 : العلاقة بين بنية ووظيفة البروتين</div>
+                <h1>الدرس 4 : مستويات البنية الفراغية للبروتين وأنواع الروابط الكيميائية</h1>
+                <div class="lesson-objectives">
+                    <div>🎯 <strong>الهدف العلمي :</strong> التمييز الدقيق بين المستويات الأربعة (أولية، ثانوية، ثالثية، رابعية) وتحديد الروابط الأربعة المسؤولة عن استقرار البنية الثلاثية.</div>
+                    <div>⏱️ <strong>المدة التقديرية للتعلم الذاتي :</strong> 25 دقيقة</div>
+                </div>
+            </header>
+
+            <!-- Step 1: Problématique -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num step-num-rose">1</span>
+                    <span>الإشكالية الأساسية للوحدة الثانية</span>
+                </div>
+                <div class="problem-box" style="border-right-color: var(--rose); background: var(--rose-light);">
+                    <div class="problem-title" style="color: #881337;">⚠️ لماذا يفقد البروتين وظيفته إذا تغيرت شكله؟</div>
+                    <p>بعد انتهاء الترجمة، لا تبقى السلسلة البيبتيدية كخيط مستقيم طويل، بل تلتف وتنطوي بشكل ثلاثي الأبعاد دقيق ومحدد وراثيا يسمى <strong>البنية الفراغية (<span class="ltr-seq">Structure spatiale</span>)</strong>. <strong>ما هي المستويات المتدرجة لهذه البنية؟ وما هي الروابط الكيميائية التي تحافظ على استقرارها وتمنحها التخصص الوظيفي؟</strong></p>
+                </div>
+            </section>
+
+            <!-- Step 2: Interactive Structure Explorer -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num step-num-rose">2</span>
+                    <span>المختبر الافتراضي لمستويات البنية الفراغية الأربعة</span>
+                </div>
+                <p>اضغط على المستوى الفراغي لمعاينة خصائصه الهندسية والروابط المساهمة فيه :</p>
+                
+                <div class="interactive-box" style="background: #18181b;">
+                    <div class="struct-tabs">
+                        <button class="btn-struct active" onclick="showStruct(1, event)">1️⃣ البنية الأولية (Primaire)</button>
+                        <button class="btn-struct" onclick="showStruct(2, event)">2️⃣ البنية الثانوية (Secondaire)</button>
+                        <button class="btn-struct" onclick="showStruct(3, event)">3️⃣ البنية الثالثية (Tertiaire)</button>
+                        <button class="btn-struct" onclick="showStruct(4, event)">4️⃣ البنية الرابعية (Quaternaire)</button>
+                    </div>
+                    <div id="structBox" style="background: #27272a; border-radius: 10px; padding: 1.5rem; border: 1px solid #3f3f46;">
+                        <h3 style="color: #fda4af; margin-bottom: 10px;">1️⃣ البنية الأولية (<span class="ltr-seq">Structure Primaire</span>)</h3>
+                        <p style="line-height: 1.8;">هي تسلسل خطي بسيط للأحماض الأمينية المرتبطة ببعضها البعض بواسطة <strong>روابط ببتيدية (<span class="ltr-seq">Liaisons peptidiques التكافؤية قوية</span>)</strong> فقط. لا تمتلك البنية الأولية أي التفاف أو وظيفة بيولوجية فعالة.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 3: Les 4 Liaisons Chimiques -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num step-num-rose">3</span>
+                    <span>الروابط الكيميائية الأربعة المسؤولة عن استقرار البنية الثالثية</span>
+                </div>
+                <p>تستقر البنية الثالثية بفضل نشأة روابط كيميائية بين الجذور الحرة (<span class="ltr-seq">Radicaux R</span>) للأحماض الأمينية المحددة وراثياً :</p>
+                
+                <div class="doc-viewer" style="margin-top: 1rem;">
+                    <div class="doc-visual" style="background: #3f1d38;">
+                        <h4 style="color: #fda4af; margin-bottom: 12px;">تصنيف الروابط حسب القوة والنوعية</h4>
+                        <ul style="list-style-type: none; line-height: 2.2; font-size: 0.95rem;">
+                            <li>🔒 <strong>جسور ثنائية الكبريت (<span class="ltr-seq">Ponts disulfures</span>) :</strong> رابطة تكافؤية قوية جداً تنشأ بين جذري حمضين من السيستيين (<span class="ltr-seq">Cys - Cys</span>).</li>
+                            <li>⚡ <strong>روابط شاردية الأيونية (<span class="ltr-seq">Liaisons ioniques</span>) :</strong> تجاذب كهربائي بين جذر موجب (حامضي) وجذر سالب (قاعدي).</li>
+                            <li>💧 <strong>تجاذب الجذور الكارهة للماء (<span class="ltr-seq">Interactions hydrophobes</span>) :</strong> تجمع الجذور غير القطبية نحو الداخل بعيداً عن الماء.</li>
+                            <li>🧲 <strong>روابط هيدروجينية (<span class="ltr-seq">Liaisons hydrogènes</span>) :</strong> روابط ضعيفة بين ذرات ذات كهروسلبية مختلفة (<span class="ltr-seq">H ... O</span>).</li>
+                        </ul>
+                    </div>
+
+                    <div class="doc-analysis">
+                        <span class="method-tag" style="background: #ffe4e6; color: #9f1239;">قاعدة ذهبية في أسئلة البكالوريا</span>
+                        <p style="margin-top: 8px;">تتوقف وظيفة البروتين على <strong>بنيته الفراغية الثلاثية أو الرابعية</strong>، وهذه الأخيرة تتوقف على <strong>عدد ونوع وترتيب الأحماض الأمينية</strong> (البنية الأولية) التي تحدد مواضع الروابط الكيميائية بدقة.</p>
+                        <p style="margin-top: 8px; font-weight: bold; color: var(--rose);">أي تغير في تسلسل الأحماض الأمينية (طفرة) يؤدي إلى تغير أماكن الروابط، وبالتالي تخريب البنية الفراغية وفقدان الوظيفة.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 4: Quiz Ch4 -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num step-num-rose">4</span>
+                    <span>تقويم الدرس 4 : أسئلة البكالوريا المتكررة</span>
+                </div>
+
+                <div class="question-item" id="c4q1-container">
+                    <h4 style="margin-bottom: 12px;">1. ما هو الفرق الأساسي الذي يميز البنية الرابعية عن البنية الثالثية؟</h4>
+                    <div class="options-grid">
+                        <button class="option-btn" onclick="checkCh4Answer(1, 0, true)">أ) البنية الرابعية تتكون من تجمع تحت وحدتين أو أكثر (سلسلتين بيبتيديتين أو أكثر ذوات بنية ثالثية).</button>
+                        <button class="option-btn" onclick="checkCh4Answer(1, 1, false)">ب) البنية الرابعية لا تحتوي على أي روابط بيبتيدية.</button>
+                        <button class="option-btn" onclick="checkCh4Answer(1, 2, false)">ج) البنية الرابعية تتواجد داخل النواة فقط.</button>
+                    </div>
+                    <div class="feedback-box" id="c4q1-feedback"></div>
+                </div>
+
+                <div class="question-item" id="c4q2-container">
+                    <h4 style="margin-bottom: 12px;">2. ما هي الرابطة التكافؤية (القوية جداً) الوحيدة التي تساهم في استقرار البنية الثالثية؟</h4>
+                    <div class="options-grid">
+                        <button class="option-btn" onclick="checkCh4Answer(2, 0, false)">أ) الرابطة الهيدروجينية.</button>
+                        <button class="option-btn" onclick="checkCh4Answer(2, 1, false)">ب) الرابطة الشاردية الأيونية.</button>
+                        <button class="option-btn" onclick="checkCh4Answer(2, 2, true)">ج) الجسر ثنائي الكبريت (<span class="ltr-seq">Pont disulfure</span>).</button>
+                    </div>
+                    <div class="feedback-box" id="c4q2-feedback"></div>
+                </div>
+            </section>
+        </div>
+
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        function showChapter(chId, evt) {
+            document.querySelectorAll('.chapter-view').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.ch-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(chId).classList.add('active');
+            if (evt) evt.target.classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Translation Simulator
+        function simTrans(step) {
+            let box = document.getElementById('simTransBox');
+            if (step === 1) {
+                box.innerHTML = `
+                    <h3 style="color: #38bdf8; margin-bottom: 10px;">1️⃣ مرحلة البداية (Initiation)</h3>
+                    <p style="line-height: 1.8;">• تتوضع تحت الوحدة الصغرى للريبوزوم على رامزة البداية <span class="ltr-seq">5'- AUG -3'</span> للـ <span class="ltr-seq">ARNm</span>.<br>
+                    • يلتحق الـ <span class="ltr-seq">ARNt</span> الحامل للميثيونين (<span class="ltr-seq">Met</span>) ذو الرامزة المضادة <span class="ltr-seq">UAC</span> بالموقع الببتيدي (<span class="ltr-seq">Site P</span>).<br>
+                    • تلتحق تحت الوحدة الكبرى بالصغرى ليتشكل <strong>معقد الانطلاق الفعال</strong>، ويبقى الموقع الأميني (<span class="ltr-seq">Site A</span>) شاغراً لاستقبال الحمض الموالي.</p>
+                `;
+            } else if (step === 2) {
+                box.innerHTML = `
+                    <h3 style="color: #fbbf24; margin-bottom: 10px;">2️⃣ مرحلة الاستطالة (Élongation)</h3>
+                    <p style="line-height: 1.8;">• يدخل الـ <span class="ltr-seq">ARNt</span> الثاني الحامل للحمض الأميني رقم 2 إلى الموقع <span class="ltr-seq">Site A</span>.<br>
+                    • تنشأ <strong>رابطة ببتيدية</strong> بين الميثيونين والحمض الأميني الثاني بتدخل إنزيمات وريبو-إنزيمات في الريبوزوم.<br>
+                    • ينفصل الـ <span class="ltr-seq">ARNt</span> الأول ويغادر الريبوزوم، ثم يتحرك الريبوزوم خطوة واحدة (رامزة واحدة) على خيط الـ <span class="ltr-seq">ARNm</span>، فيصبح الموقع <span class="ltr-seq">Site A</span> شاغراً من جديد.</p>
+                `;
+            } else if (step === 3) {
+                box.innerHTML = `
+                    <h3 style="color: #f43f5e; margin-bottom: 10px;">3️⃣ مرحلة النهاية (Terminaison)</h3>
+                    <p style="line-height: 1.8;">• يصل الموقع <span class="ltr-seq">Site A</span> للريبوزوم إلى إحدى رامزات التوقف (<span class="ltr-seq">UAA, UAG, UGA</span>).<br>
+                    • لا يوجد أي <span class="ltr-seq">ARNt</span> يحمل رامزة مضادة لرامزات التوقف، فيتدخل عامل التحرير.<br>
+                    • تنفصل السلسلة البيبتيدية المتشكلة، وينفصل الحمض الأميني الأول (الميثيونين <span class="ltr-seq">Met</span>)، وتتفكك تحت وحدتي الريبوزوم عن خيط الـ <span class="ltr-seq">ARNm</span>.</p>
+                `;
+            }
+        }
+
+        // Structure Virtual Lab
+        function showStruct(num, evt) {
+            document.querySelectorAll('.btn-struct').forEach(el => el.classList.remove('active'));
+            if (evt) evt.target.classList.add('active');
+
+            let box = document.getElementById('structBox');
+            if (num === 1) {
+                box.innerHTML = `
+                    <h3 style="color: #fda4af; margin-bottom: 10px;">1️⃣ البنية الأولية (<span class="ltr-seq">Structure Primaire</span>)</h3>
+                    <p style="line-height: 1.8;">هي تسلسل خطي بسيط للأحماض الأمينية المرتبطة ببعضها البعض بواسطة <strong>روابط ببتيدية (<span class="ltr-seq">Liaisons peptidiques التكافؤية القوية</span>)</strong> فقط. لا تمتلك البنية الأولية أي التفاف أو وظيفة بيولوجية فعالة.</p>
+                `;
+            } else if (num === 2) {
+                box.innerHTML = `
+                    <h3 style="color: #fb7185; margin-bottom: 10px;">2️⃣ البنية الثانوية (<span class="ltr-seq">Structure Secondaire</span>)</h3>
+                    <p style="line-height: 1.8;">تنتج عن التفاف واطواء السلسلة البيبتيدية (البنية الأولية) في مناطق محددة بفضل نشأة <strong>روابط هيدروجينية</strong> بين مجموعات (<span class="ltr-seq">C=O</span>) ومجموعات (<span class="ltr-seq">N-H</span>) للروابط البيبتيدية. وتأخذ نمطين أساسيين : الحلزون ألفا (<span class="ltr-seq">α</span>) والوريقة المطوية بيتا (<span class="ltr-seq">β</span>).</p>
+                `;
+            } else if (num === 3) {
+                box.innerHTML = `
+                    <h3 style="color: #f43f5e; margin-bottom: 10px;">3️⃣ البنية الثالثية (<span class="ltr-seq">Structure Tertiaire</span>)</h3>
+                    <p style="line-height: 1.8;">تنتج عن انطواء البنية الثانوية في الفراغ بفضل مناطق البينية (المنعطفات)، وتتميز بوجود 4 أنواع من الروابط بين الجذور الحرة (<span class="ltr-seq">Radicaux R</span>) : جسور ثنائية الكبريت، روابط شاردية، هيدروجينية، وتجاذب الجذور الكارهة للماء. وهي بنية وظيفية فعالة.</p>
+                `;
+            } else if (num === 4) {
+                box.innerHTML = `
+                    <h3 style="color: #e11d48; margin-bottom: 10px;">4️⃣ البنية الرابعية (<span class="ltr-seq">Structure Quaternaire</span>)</h3>
+                    <p style="line-height: 1.8;">هي أعلى مستوى تنظيم فراغي، تنتج عن تجمع وترافق <strong>سلسلتين بيبتيديتين أو أكثر</strong> (تسمى كل سلسلة تحت وحدة - <span class="ltr-seq">Sous-unité</span> ذوات بنية ثالثية منفصلة). ترتبط تحت الوحدات فيما بينها بروابط ضعيفة (هيدروجينية، شاردية، كارهة للماء) مثل جزيئة الهيموغلوبين (<span class="ltr-seq">Hémoglobine</span>).</p>
+                `;
+            }
+        }
+
+        function checkCh3Answer(optIdx, isCorrect) {
+            let container = document.getElementById('c3q1-container');
+            let btns = container.querySelectorAll('.option-btn');
+            let fb = document.getElementById('c3q1-feedback');
+
+            btns.forEach((b, idx) => {
+                b.disabled = true;
+                if (idx === optIdx) b.classList.add(isCorrect ? 'correct' : 'wrong');
+            });
+
+            fb.style.display = 'block';
+            if (isCorrect) {
+                fb.style.background = '#f0fdf4'; fb.style.color = '#166534'; fb.style.border = '1px solid #bbf7d0';
+                fb.innerHTML = '<strong>✅ إجابة صحيحة ممتاز!</strong> تتشكل الرابطة البيبتيدية داخل الموقع التحفيزي للريبوزوم بين الحمض الموجود في الموقع P والحمض الملتحق بالموقع A.';
+            } else {
+                fb.style.background = '#fef2f2'; fb.style.color = '#991b1b'; fb.style.border = '1px solid #fecaca';
+                fb.innerHTML = '<strong>❌ إجابة خاطئة.</strong> الرابطة البيبتيدية تتشكل بين الأحماض الأمينية المتجاورة في الموقعين P و A للريبوزوم.';
+            }
+        }
+
+        function checkCh4Answer(qIdx, optIdx, isCorrect) {
+            let container = document.getElementById(`c4q${qIdx}-container`);
+            let btns = container.querySelectorAll('.option-btn');
+            let fb = document.getElementById(`c4q${qIdx}-feedback`);
+
+            btns.forEach((b, idx) => {
+                b.disabled = true;
+                if (idx === optIdx) b.classList.add(isCorrect ? 'correct' : 'wrong');
+            });
+
+            fb.style.display = 'block';
+            if (isCorrect) {
+                fb.style.background = '#f0fdf4'; fb.style.color = '#166534'; fb.style.border = '1px solid #bbf7d0';
+                fb.innerHTML = '<strong>✅ إجابة صحيحة ممتاز!</strong> تعليل علمي دقيق ومتوافق مع المنهج الرسمي לבكالوريا الجزائر.';
+            } else {
+                fb.style.background = '#fef2f2'; fb.style.color = '#991b1b'; fb.style.border = '1px solid #fecaca';
+                if (qIdx === 1) {
+                    fb.innerHTML = '<strong>❌ إجابة خاطئة.</strong> البنية الرابعية تتكون بالضرورة من سلسلتين بيبتيديتين على الأقل (تحت وحدتين).';
+                } else {
+                    fb.innerHTML = '<strong>❌ إجابة خاطئة.</strong> الرابطة التكافؤية القوية الوحيدة بين الجذور R هي الجسر ثنائي الكبريت (Pont disulfure) بين أحماض السيستيين Cys.';
+                }
+            }
+        }
+    </script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"1954b47c125f43f8b4338b3c4f804e4f","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+</body>
+</html>

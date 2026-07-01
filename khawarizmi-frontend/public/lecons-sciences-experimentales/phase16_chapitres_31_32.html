@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منصة المتفوق 3AS | المرحلة 16 : الدرس 31 والدرس 32</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #f8fafc;
+            --surface: #ffffff;
+            --primary: #0f172a;
+            --accent: #2563eb;
+            --accent-light: #eff6ff;
+            --success: #16a34a;
+            --success-light: #f0fdf4;
+            --warning: #d97706;
+            --warning-light: #fffbeb;
+            --danger: #dc2626;
+            --danger-light: #fef2f2;
+            --stone-dark: #334155;
+            --stone-light: #f1f5f9;
+            --cyan-dark: #0e7490;
+            --cyan-light: #ecfeff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --radius: 16px;
+            --shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Cairo', 'Tajawal', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            line-height: 1.8;
+            padding-bottom: 60px;
+        }
+
+        .ltr-seq {
+            direction: ltr;
+            unicode-bidi: embed;
+            display: inline-block;
+            font-family: monospace;
+            font-weight: bold;
+            color: var(--accent);
+            background: #f1f5f9;
+            padding: 2px 8px;
+            border-radius: 6px;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 900;
+            font-size: 1.25rem;
+            color: var(--primary);
+        }
+
+        .brand-badge {
+            background: var(--stone-dark);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            white-space: nowrap;
+        }
+
+        .chapter-switcher {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .ch-btn {
+            background: var(--bg-main);
+            border: 2px solid var(--border);
+            padding: 8px 18px;
+            border-radius: 12px;
+            font-family: inherit;
+            font-weight: 800;
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .ch-btn:hover {
+            border-color: var(--stone-dark);
+            color: var(--stone-dark);
+        }
+
+        .ch-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                padding: 1rem;
+                text-align: center;
+            }
+            .chapter-switcher {
+                justify-content: center;
+                width: 100%;
+            }
+            .ch-btn {
+                flex: 1;
+                font-size: 0.85rem;
+                padding: 8px 10px;
+            }
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 2rem auto;
+            padding: 0 1.2rem;
+        }
+
+        .chapter-view {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .chapter-view.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Hero Header */
+        .lesson-header {
+            border-radius: var(--radius);
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+            color: white;
+        }
+
+        .header-ch31 {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+        }
+
+        .header-ch32 {
+            background: linear-gradient(135deg, #164e63 0%, #0e7490 100%);
+        }
+
+        .lesson-breadcrumb {
+            font-size: 0.85rem;
+            opacity: 0.9;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .lesson-header h1 {
+            font-size: 2.1rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+            line-height: 1.3;
+        }
+
+        .lesson-objectives {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--surface);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+        }
+
+        @media (max-width: 600px) {
+            .lesson-header { padding: 1.5rem; }
+            .lesson-header h1 { font-size: 1.5rem; }
+            .card { padding: 1.2rem; }
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid var(--bg-main);
+            padding-bottom: 0.8rem;
+        }
+
+        .step-num {
+            background: #e2e8f0;
+            color: #334155;
+            width: 38px;
+            height: 38px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            font-weight: 900;
+            font-size: 1.1rem;
+        }
+
+        .step-num-cyan {
+            background: #cffafe;
+            color: #0e7490;
+        }
+
+        .problem-box {
+            background: var(--warning-light);
+            border-right: 5px solid var(--warning);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+        }
+
+        .problem-title {
+            font-weight: 800;
+            color: #92400e;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Document Analysis */
+        .doc-viewer {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        @media (max-width: 850px) {
+            .doc-viewer { grid-template-columns: 1fr; }
+        }
+
+        .doc-visual {
+            background: #0f172a;
+            border-radius: 12px;
+            padding: 1.5rem;
+            color: white;
+        }
+
+        .svg-container {
+            width: 100%;
+            height: auto;
+            max-height: 260px;
+        }
+
+        .doc-analysis {
+            background: var(--bg-main);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+        }
+
+        .method-tag {
+            display: inline-block;
+            background: #e0f2fe;
+            color: #0369a1;
+            font-size: 0.75rem;
+            font-weight: 800;
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+        }
+
+        /* Interactive simulators */
+        .interactive-box {
+            background: #1e293b;
+            border-radius: 12px;
+            padding: 1.5rem;
+            color: white;
+            margin: 1.5rem 0;
+        }
+
+        .btn-action {
+            background: #334155;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-family: inherit;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin: 5px;
+        }
+
+        .btn-action:hover { background: #475569; }
+        .btn-cyan { background: #0e7490; }
+        .btn-cyan:hover { background: #155e75; }
+
+        /* Scientific text */
+        .scientific-text {
+            background: var(--surface);
+            border: 2px solid #cbd5e1;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .text-part {
+            margin-bottom: 1.2rem;
+            padding-right: 1rem;
+            border-right: 4px solid #334155;
+        }
+
+        .text-part.ch32-border { border-right-color: #0e7490; }
+
+        .text-part h4 {
+            font-size: 0.95rem;
+            color: #334155;
+            margin-bottom: 0.3rem;
+            font-weight: 800;
+        }
+
+        .text-part.ch32-border h4 { color: #0e7490; }
+
+        /* Quiz */
+        .question-item {
+            background: var(--bg-main);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin-top: 1rem;
+        }
+
+        .option-btn {
+            background: white;
+            border: 1.5px solid var(--border);
+            padding: 12px 16px;
+            border-radius: 10px;
+            text-align: right;
+            font-family: inherit;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text-main);
+        }
+
+        .option-btn:hover {
+            border-color: #334155;
+            background: #f1f5f9;
+        }
+
+        .option-btn.correct {
+            background: var(--success-light);
+            border-color: var(--success);
+            color: var(--success);
+            font-weight: 700;
+        }
+
+        .option-btn.wrong {
+            background: var(--danger-light);
+            border-color: var(--danger);
+            color: var(--danger);
+        }
+
+        .feedback-box {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            display: none;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar with Phase Switcher -->
+    <nav class="navbar">
+        <div class="brand">
+            <span>منصة المتفوق 3AS</span>
+            <span class="brand-badge">المرحلة 16 (الدرس 31 و 32)</span>
+        </div>
+        <div class="chapter-switcher">
+            <button class="ch-btn active" onclick="showChapter('ch31', event)">🗺️ الدرس 31 : تحديد الصفائح التكتونية وحدودها النشطة</button>
+            <button class="ch-btn" onclick="showChapter('ch32', event)">🌊 الدرس 32 : شواهد اتساع قاع المحيط والمغناطيسية القديمة</button>
+        </div>
+    </nav>
+
+    <div class="container">
+
+        <!-- ================================================================= -->
+        <!-- CHAPTER 31 : DÉLIMITATION DES PLAQUES TECTONIQUES (الدرس 31) -->
+        <!-- ================================================================= -->
+        <div id="ch31" class="chapter-view active">
+            
+            <header class="lesson-header header-ch31">
+                <div class="lesson-breadcrumb">المجال الثالث : التكتونية العامة • الوحدة 1 : النشاط التكتوني للصفائح</div>
+                <h1>الدرس 31 : مفهوم الصفيحة التكتونية وتحديد حدودها بالنشاط الزلزالي والبركاني</h1>
+                <div class="lesson-objectives">
+                    <div>🎯 <strong>الهدف العلمي :</strong> تعريف الغلاف الصخري والاستينوسفير، وإثبات أن سطح الأرض مقسم إلى صفائح صلبة تتحدد بأحزمة ضيقة وشديدة النشاط الزلزالي والبركاني.</div>
+                    <div>⏱️ <strong>المدة التقديرية للتعلم الذاتي :</strong> 25 دقيقة</div>
+                </div>
+            </header>
+
+            <!-- Step 1: Problématique -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num">1</span>
+                    <span>وضعية الانطلاق وبناء الإشكالية العلميـة</span>
+                </div>
+                <div class="problem-box">
+                    <div class="problem-title">⚠️ لماذا تتمركز 90% من زلازل وبراكين العالم في أحزمة جغرافية ضيقة جداً؟</div>
+                    <p>عند رسم خريطة زلازل وبراكين الأرض، نلاحظ أنها لا تتوزع عشوائياً، بل تشكل أحزمة وخطوطاً ضيقة جداً تحيط بمساحات شاسعة وهادئة تكتونياً. <strong>ما الذي تمثله هذه المساحات الهادئة (الصفائح التكتونية)؟ وماذا يبرر هذا النشاط العنيف عند حدودها المشتركة؟</strong></p>
+                </div>
+            </section>
+
+            <!-- Step 2: Document Analyse -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num">2</span>
+                    <span>التحليل المنهجي لمقطع في الغلاف الصخري (الصلب) العائم فوق الاستينوسفير (المطاطي)</span>
+                </div>
+                <div class="doc-viewer">
+                    <div class="doc-visual" style="background: #1e293b;">
+                        <h4 style="color: #cbd5e1; margin-bottom: 1rem; font-size: 0.95rem;">مقطع رأسي يبين الغلاف الصخري (Lithosphère) وأنواع الحدود التكتونية الثلاثة</h4>
+                        <!-- SVG Plates -->
+                        <svg class="svg-container" viewBox="0 0 400 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Asthenosphere bottom -->
+                            <rect x="20" y="120" width="360" height="80" fill="#7f1d1d"/>
+                            <text x="200" y="165" fill="#fca5a5" font-size="11" text-anchor="middle">الاستينوسفير (Asthénosphere مطاطي لدن ساخن)</text>
+
+                            <!-- Left plate oceanic divergent -->
+                            <path d="M20 70 H 145 V 120 H 20 Z" fill="#334155" stroke="#94a3b8" stroke-width="2"/>
+                            <text x="80" y="95" fill="#f8fafc" font-size="9" text-anchor="middle">صفيحة محيطية 1</text>
+
+                            <!-- Middle plate oceanic divergent / subduction -->
+                            <path d="M155 70 H 270 L 310 150 H 250 L 220 120 H 155 Z" fill="#475569" stroke="#94a3b8" stroke-width="2"/>
+                            <text x="200" y="95" fill="#f8fafc" font-size="9" text-anchor="middle">صفيحة محيطية 2</text>
+
+                            <!-- Right continental plate -->
+                            <path d="M275 60 H 380 V 120 H 275 Z" fill="#64748b" stroke="#94a3b8" stroke-width="2"/>
+                            <text x="330" y="85" fill="#f8fafc" font-size="9" text-anchor="middle">صفيحة قارية 3</text>
+
+                            <!-- Dorsale divergence -->
+                            <path d="M140 60 L 150 45 L 160 60" fill="#ea580c"/>
+                            <text x="150" y="38" fill="#fdba74" font-size="8" text-anchor="middle" font-weight="bold">ظهيرة (تباعد)</text>
+                            <path d="M130 65 H 110 M 170 65 H 190" stroke="#fdba74" stroke-width="2" marker-end="url(#arrow)"/>
+
+                            <!-- Subduction convergence -->
+                            <text x="295" y="135" fill="#f87171" font-size="8" font-weight="bold">غوص (تقارب)</text>
+                            <path d="M305 65 L 285 65" stroke="#f87171" stroke-width="2"/>
+                        </svg>
+                        <p style="font-size: 0.85rem; color: #cbd5e1; margin-top: 10px;">💡 الغلاف الصخري صلب وسميك (100 كم) يطفو فوق الاستينوسفير اللدن.</p>
+                    </div>
+
+                    <div class="doc-analysis">
+                        <span class="method-tag">منهجية البكالوريا : المفاهيم التكتونية الأساسية</span>
+                        <h4 style="margin: 8px 0; color: var(--primary);">ما هي الصفيحة التكتونية؟ وما أنواع حدودها؟</h4>
+                        <p><strong>الصفيحة التكتونية (<span class="ltr-seq">Plaque tectonique</span>) :</strong> هي مساحة شاسعة وصلبة وهادئة تكتونياً من الغلاف الصخري (<span class="ltr-seq">Lithosphère</span>)، تحدها أحزمة ضيقة نشطة بالزلازل والبراكين، وتصنف حدودها إلى 3 أنواع :</p>
+                        <ul style="list-style-type: none; line-height: 1.8;">
+                            <li>• <strong>حدود البناء والتباعد (<span class="ltr-seq">Limites divergentes الظهرات المحيطية</span>) :</strong> تتسع عندها المحيطات وتتولد قشرة محيطية جديدة (براكين طفحية وزلازل سطحية).</li>
+                            <li>• <strong>حدود الهدم والتقارب (<span class="ltr-seq">Limites convergentes مناطق الغوص</span>) :</strong> تغوص صفيحة محيطية كثيفة تحت صفيحة قارية (زلازل عميقة وبراكين انفجارية).</li>
+                            <li>• <strong>حدود محافظة (<span class="ltr-seq">Limites conservatives الفوالق التحويلية</span>) :</strong> انزلاق أفقي للصفائح دون بناء أو هدم.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 3: Interactive Tectonic Globe Simulator -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num">3</span>
+                    <span>محاكي حدود الصفائح التكتونية التفاعلي</span>
+                </div>
+                <p>اضغط على نوع الحد التكتوني لمعاينة مميزاته الجيولوجية والزلزالية :</p>
+                
+                <div class="interactive-box" style="background: #1e293b;">
+                    <div style="margin-bottom: 15px;">
+                        <button class="btn-action" onclick="simPlates('dorsale')">🌋 محور الظهيرة المحيطية (حدود تباعد)</button>
+                        <button class="btn-action" style="background:#dc2626;" onclick="simPlates('subd')">💥 منطقة الغوص (حدود تقارب وهدم)</button>
+                        <button class="btn-action" style="background:#475569;" onclick="simPlates('faille')">↔️ فالق تحويلي (حدود محافظة)</button>
+                    </div>
+                    <div id="platesDisplayBox" style="background: #0f172a; border: 2px solid #64748b; border-radius: 12px; padding: 1.5rem; text-align: center;">
+                        <h3 style="color: #4ade80; margin-bottom: 10px;">🌋 محور الظهيرة المحيطية (Dorsale)</h3>
+                        <p style="color: #cbd5e1; line-height: 1.8;">تتميز بقوى شد وتباعد تؤدي إلى صعود الماغما البازلتية الساخنة من الاستينوسفير. تشهد <strong>براكين بازلتية طفحية هادئة</strong> و<strong>زلازل سطحية قليلة العمق (< 30 كم)</strong> تتبع خسف الظهيرة (<span class="ltr-seq">Rift</span>).</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 4: Quiz Ch31 -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num">4</span>
+                    <span>تقويم الدرس 31 : أسئلة البكالوريا المتكررة</span>
+                </div>
+
+                <div class="question-item" id="c31q1-container">
+                    <h4 style="margin-bottom: 12px;">1. ما هو الفرق الفيزيائي الذي يسمح للغلاف الصخري (<span class="ltr-seq">Lithosphère</span>) بالطفو والحركة فوق الاستينوسفير (<span class="ltr-seq">Asthénosphère</span>)؟</h4>
+                    <div class="options-grid">
+                        <button class="option-btn" onclick="checkCh31Answer(0, true)">أ) الغلاف الصخري صلب وبارد، بينما الاستينوسفير لدن ومطاطي (<span class="ltr-seq">Ductile</span>) وأعلى حرارة بسبب سرعة الموجات الزلزالية المنخفضة (منطقة <span class="ltr-seq">LVZ</span>).</button>
+                        <button class="option-btn" onclick="checkCh31Answer(1, false)">ب) الغلاف الصخري سائل والاستينوسفير صلب.</button>
+                        <button class="option-btn" onclick="checkCh31Answer(2, false)">ج) كلاهما صلب ومحكم الارتباط.</button>
+                    </div>
+                    <div class="feedback-box" id="c31q1-feedback"></div>
+                </div>
+            </section>
+        </div>
+
+        <!-- ================================================================= -->
+        <!-- CHAPTER 32 : EXPANSION OCÉANIQUE & PALÉOMAGNÉTISME (الدرس 32) -->
+        <!-- ================================================================= -->
+        <div id="ch32" class="chapter-view">
+            
+            <header class="lesson-header header-ch32">
+                <div class="lesson-breadcrumb">المجال الثالث : التكتونية العامة • الوحدة 1 : النشاط التكتوني للصفائح</div>
+                <h1>الدرس 32 : شواهد اتساع قاع المحيط والمغناطيسية القديمة (Paléomagnétisme)</h1>
+                <div class="lesson-objectives">
+                    <div>🎯 <strong>الهدف العلمي :</strong> إثبات اتساع قاع المحيط بالأدلة الرسوبية (عمر وسُمك الرسوبيات) والأدلة المغناطيسية (تناوب الأشرطة المغناطيسية المتناظرة بالنسبة للظهيرة).</div>
+                    <div>⏱️ <strong>المدة التقديرية للتعلم الذاتي :</strong> 25 دقيقة</div>
+                </div>
+            </header>
+
+            <!-- Step 1: Problématique -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num step-num-cyan">1</span>
+                    <span>الإشكالية الجيولوجية لاتساع المحيطات</span>
+                </div>
+                <div class="problem-box" style="border-right-color: var(--cyan-dark); background: var(--cyan-light);">
+                    <div class="problem-title" style="color: #0e7490;">⚠️ كيف نثبت أن قاع المحيط الأطلسي يتسع وأن قارة إفريقيا تبتعد عن أمريكا؟</div>
+                    <p>في عام 1912، طرح ألفريد فيغنر نظرية زحزحة القارات مستنداً لتطابق السواحل والمستحاثات، لكنه عجز عن تفسير المحرك! وفي ستينيات القرن الماضي، قدمت سفن الحفر البحري والمسح المغناطيسي البرهان القاطع على <strong>اتساع قاع المحيط (<span class="ltr-seq">Expansion océanique</span>)</strong> انطلاقاً من الظهرات. <strong>كيف تثبت دراسة صخور البازلت والرسوبيات البحرية هذا الاتساع المستمر؟</strong></p>
+                </div>
+            </section>
+
+            <!-- Step 2: Document Analyse -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num step-num-cyan">2</span>
+                    <span>التحليل المنهجي للأشرطة المغناطيسية المتناظرة وعمر الرسوبيات</span>
+                </div>
+                <div class="doc-viewer">
+                    <div class="doc-visual" style="background: #083344;">
+                        <h4 style="color: #67e8f9; margin-bottom: 1rem; font-size: 0.95rem;">تناوب أشرطة المغناطيسية العادية والمقلوبة وسُمك الرسوبيات على جانبي الظهيرة</h4>
+                        <!-- SVG Expansion -->
+                        <svg class="svg-container" viewBox="0 0 400 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Rift center -->
+                            <rect x="190" y="40" width="20" height="120" fill="#ea580c"/>
+                            <text x="200" y="32" fill="#fdba74" font-size="9" text-anchor="middle" font-weight="bold">محور الظهيرة (Rift - حديث جداً 0 سنة)</text>
+
+                            <!-- Normal magnetic bands (dark cyan) -->
+                            <rect x="160" y="40" width="30" height="120" fill="#0e7490"/>
+                            <rect x="210" y="40" width="30" height="120" fill="#0e7490"/>
+
+                            <!-- Reversed magnetic bands (white/light) -->
+                            <rect x="120" y="40" width="40" height="120" fill="#cbd5e1"/>
+                            <rect x="240" y="40" width="40" height="120" fill="#cbd5e1"/>
+
+                            <!-- Older Normal bands -->
+                            <rect x="70" y="40" width="50" height="120" fill="#0e7490"/>
+                            <rect x="280" y="40" width="50" height="120" fill="#0e7490"/>
+
+                            <!-- Sediments thickness layer (yellowish top) -->
+                            <path d="M20 40 L 190 40 V 42 L 20 55 Z" fill="#fbbf24" opacity="0.8"/>
+                            <path d="M380 40 L 210 40 V 42 L 380 55 Z" fill="#fbbf24" opacity="0.8"/>
+                            <text x="70" y="30" fill="#fde68a" font-size="8">رسوبيات قديمة وسميكة</text>
+                            <text x="330" y="30" fill="#fde68a" font-size="8">رسوبيات قديمة وسميكة</text>
+
+                            <!-- Arrows spreading -->
+                            <path d="M150 175 H 60 M 250 175 H 340" stroke="#38bdf8" stroke-width="3" marker-end="url(#arrow)"/>
+                            <text x="200" y="192" fill="#67e8f9" font-size="10" text-anchor="middle" font-weight="bold">← اتساع وحركة تباعد القاع نحو القارات →</text>
+                        </svg>
+                        <p style="font-size: 0.85rem; color: #cbd5e1; margin-top: 10px;">💡 التناظر التام للأشرطة بالنسبة لمحور الظهيرة يثبت عمل الظهيرة كمصنع مستمر لقاع المحيط.</p>
+                    </div>
+
+                    <div class="doc-analysis">
+                        <span class="method-tag" style="background: #ecfeff; color: #0e7490;">الأدلة القاطعة في البكالوريا</span>
+                        <h4 style="margin: 8px 0; color: var(--primary);">ما هي شواهد اتساع قاع المحيط؟</h4>
+                        <ol style="padding-right: 1.2rem; line-height: 1.8;">
+                            <li><strong>الشاهد الرسوبي (الحفر البحري) :</strong> كلما ابتعدنا عن محور الظهيرة واقتربنا من القارات، <strong>يزداد عمر الرسوبيات ويزداد سُمكها</strong>. وهذا يثبت أن القاع القريب من الظهيرة حديث التكوين، والقاع البعيد قديم.</li>
+                            <li><strong>الشاهد المغناطيسي (<span class="ltr-seq">Paléomagnétisme</span>) :</strong> تحتوي صخور البازلت على معادن مغناطيسية (المغنيتيت) تسجل اتجاه الحقل المغناطيسي للأرض وقت تصلبها. نلاحظ وجود <strong>أشرطة مغناطيسية عادية ومقلوبة متناظرة تماماً</strong> بالنسبة لمحور الظهيرة، مما يثبت أن القاع يتشكل باستمرار ويندفع بالتساوي نحو الجانبين.</li>
+                        </ol>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 3: Interactive Ocean Spreading Simulator -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num step-num-cyan">3</span>
+                    <span>محاكي اتساع قاع المحيط والمغناطيسية القديمة</span>
+                </div>
+                <p>اضغط لاختبار عمر وسُمك الرسوبيات حسب المسافة من محور الظهيرة :</p>
+                
+                <div class="interactive-box" style="background: #083344;">
+                    <div style="margin-bottom: 15px;">
+                        <button class="btn-action btn-cyan" onclick="simOcean('rift')">🌋 عند محور الظهيرة مباشرة (المسافة = 0 كم)</button>
+                        <button class="btn-action btn-cyan" onclick="simOcean('mid')">🌊 على مسافة متوسطة (500 كم من الظهيرة)</button>
+                        <button class="btn-action btn-cyan" style="background:#0284c7;" onclick="simOcean('cont')">🏖️ بالقرب من الساحل القاري (1500 كم من الظهيرة)</button>
+                    </div>
+                    <div id="oceanDisplayBox" style="background: #164e63; border: 2px solid #22d3ee; border-radius: 12px; padding: 1.5rem; text-align: center;">
+                        <h3 style="color: #67e8f9; margin-bottom: 10px;">🌋 عند محور الظهيرة مباشرة</h3>
+                        <p style="color: #cbd5e1; line-height: 1.8;">صخور بازلتية حديثة التكوين جداً (عمرها يقارب 0 سنة). <strong>سُمك الرسوبيات معدوم تماماً (0 متر)</strong> لعدم مرور وقت يسمح بترسب المستحاثات.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 4: Quiz Ch32 -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num step-num-cyan">4</span>
+                    <span>تقويم الدرس 32 : أسئلة البكالوريا المتكررة</span>
+                </div>
+
+                <div class="question-item" id="c32q1-container">
+                    <h4 style="margin-bottom: 12px;">1. ماذا يدل التناظر الهندسي التام لأشرطة المغناطيسية القديمة (العادية والمقلوبة) على جانبي محور الظهيرة المحيطية؟</h4>
+                    <div class="options-grid">
+                        <button class="option-btn" onclick="checkCh32Answer(0, true)">أ) يدل على أن صخور قاع المحيط تتشكل بشكل مستمر وبسرعة متساوية من صعود الماغما في محور الظهيرة، وتندفع نحو الجانبين بشكل متناظر مع مرور الزمن.</button>
+                        <button class="option-btn" onclick="checkCh32Answer(1, false)">ب) يدل على أن الأرض تتوقف عن الدوران.</button>
+                        <button class="option-btn" onclick="checkCh32Answer(2, false)">ج) يدل على أن المحيط يتقلص وينكمش في محور الظهيرة.</button>
+                    </div>
+                    <div class="feedback-box" id="c32q1-feedback"></div>
+                </div>
+            </section>
+        </div>
+
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        function showChapter(chId, evt) {
+            document.querySelectorAll('.chapter-view').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.ch-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(chId).classList.add('active');
+            if (evt) evt.target.classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function simPlates(type) {
+            let box = document.getElementById('platesDisplayBox');
+            if (type === 'dorsale') {
+                box.innerHTML = `
+                    <h3 style="color: #4ade80; margin-bottom: 10px;">🌋 محور الظهيرة المحيطية (Dorsale - تباعد وبناء)</h3>
+                    <p style="color: #cbd5e1; line-height: 1.8;">تتميز بقوى شد وتباعد تؤدي إلى صعود الماغما البازلتية الساخنة من الاستينوسفير. تشهد <strong>براكين بازلتية طفحية هادئة</strong> و<strong>زلازل سطحية قليلة العمق (< 30 كم)</strong> تتبع خسف الظهيرة (<span class="ltr-seq">Rift</span>).</p>
+                `;
+            } else if (type === 'subd') {
+                box.innerHTML = `
+                    <h3 style="color: #f43f5e; margin-bottom: 10px;">💥 منطقة الغوص (Subduction - تقارب وهدم)</h3>
+                    <p style="color: #cbd5e1; line-height: 1.8;">تتميز بقوى انضغاط وتقارب، حيث تغوص الصفيحة المحيطية الباردة والكثيفة تحت الصفيحة القارية. تشهد <strong>زلازل عنيفة تتدرج في العمق (بؤر بينيوف حتى 700 كم)</strong> و<strong>براكين انفجارية خطيرة</strong> وسلاسل جبلية.</p>
+                `;
+            } else {
+                box.innerHTML = `
+                    <h3 style="color: #94a3b8; margin-bottom: 10px;">↔️ الفالق التحويلي (Faille transformante - حدود محافظة)</h3>
+                    <p style="color: #cbd5e1; line-height: 1.8;">تنزلق الصفائح بمحاذاة بعضها البعض أفقياً دون بناء قشرة جديدة ودون هدم. تشهد نشاطاً زلزالياً سطحياً متكرراً (مثل فالق سان أندرياس) دون نشاط بركاني.</p>
+                `;
+            }
+        }
+
+        function simOcean(pos) {
+            let box = document.getElementById('oceanDisplayBox');
+            if (pos === 'rift') {
+                box.innerHTML = `
+                    <h3 style="color: #67e8f9; margin-bottom: 10px;">🌋 عند محور الظهيرة مباشرة</h3>
+                    <p style="color: #cbd5e1; line-height: 1.8;">صخور بازلتية حديثة التكوين جداً (عمرها يقارب 0 سنة). <strong>سُمك الرسوبيات معدوم تماماً (0 متر)</strong> لعدم مرور وقت يسمح بترسب المستحاثات.</p>
+                `;
+            } else if (pos === 'mid') {
+                box.innerHTML = `
+                    <h3 style="color: #38bdf8; margin-bottom: 10px;">🌊 على مسافة متوسطة (500 كم من الظهيرة)</h3>
+                    <p style="color: #cbd5e1; line-height: 1.8;">عمر البازلت يقارب 25 مليون سنة. <strong>سُمك الرسوبيات متوسط (حوالي 200 متر)</strong>، وتحتوي على مستحاثات بحرية متوسطة القدم.</p>
+                `;
+            } else {
+                box.innerHTML = `
+                    <h3 style="color: #fef08a; margin-bottom: 10px;">🏖️ بالقرب من الساحل القاري (1500 كم من الظهيرة)</h3>
+                    <p style="color: #cbd5e1; line-height: 1.8;">صخور بازلتية قديمة جداً (عمرها يفوق 100 مليون سنة). <strong>سُمك الرسوبيات ضخم جداً (يفوق 1000 متر)</strong> وتتراكم فيها طبقات رسوبية قديمة من العصر الجوراسي.</p>
+                `;
+            }
+        }
+
+        function checkCh31Answer(optIdx, isCorrect) {
+            let container = document.getElementById('c31q1-container');
+            let btns = container.querySelectorAll('.option-btn');
+            let fb = document.getElementById('c31q1-feedback');
+
+            btns.forEach((b, idx) => {
+                b.disabled = true;
+                if (idx === optIdx) b.classList.add(isCorrect ? 'correct' : 'wrong');
+            });
+
+            fb.style.display = 'block';
+            if (isCorrect) {
+                fb.style.background = '#f0fdf4'; fb.style.color = '#166534'; fb.style.border = '1px solid #bbf7d0';
+                fb.innerHTML = '<strong>✅ إجابة صحيحة ممتاز!</strong> التباين الريولوجي (الصلابة مقابل اللدونة) هو سر حركة الصفائح.';
+            } else {
+                fb.style.background = '#fef2f2'; fb.style.color = '#991b1b'; fb.style.border = '1px solid #fecaca';
+                fb.innerHTML = '<strong>❌ إجابة خاطئة.</strong> الاستينوسفير ليس سائلاً بل صلب لدن مطاطي يسمح بانزلاق الغلاف الصخري البارد.';
+            }
+        }
+
+        function checkCh32Answer(optIdx, isCorrect) {
+            let container = document.getElementById('c32q1-container');
+            let btns = container.querySelectorAll('.option-btn');
+            let fb = document.getElementById('c32q1-feedback');
+
+            btns.forEach((b, idx) => {
+                b.disabled = true;
+                if (idx === optIdx) b.classList.add(isCorrect ? 'correct' : 'wrong');
+            });
+
+            fb.style.display = 'block';
+            if (isCorrect) {
+                fb.style.background = '#f0fdf4'; fb.style.color = '#166534'; fb.style.border = '1px solid #bbf7d0';
+                fb.innerHTML = '<strong>✅ إجابة صحيحة ممتاز!</strong> التناظر المغناطيسي هو الدليل القاطع على عمل الظهيرة كمصنع متسع لقاع المحيط.';
+            } else {
+                fb.style.background = '#fef2f2'; fb.style.color = '#991b1b'; fb.style.border = '1px solid #fecaca';
+                fb.innerHTML = '<strong>❌ إجابة خاطئة.</strong> التناظر المغناطيسي يثبت التوسع وحركة التباعد المنتظمة من محور الظهيرة.';
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منصة المتفوق 3AS | المرحلة 10 : الدرس 19 والدرس 20</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #f8fafc;
+            --surface: #ffffff;
+            --primary: #0f172a;
+            --accent: #2563eb;
+            --accent-light: #eff6ff;
+            --success: #16a34a;
+            --success-light: #f0fdf4;
+            --warning: #d97706;
+            --warning-light: #fffbeb;
+            --danger: #dc2626;
+            --danger-light: #fef2f2;
+            --slate-dark: #334155;
+            --slate-light: #f1f5f9;
+            --lime-dark: #15803d;
+            --lime-light: #f0fdf4;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --radius: 16px;
+            --shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Cairo', 'Tajawal', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            line-height: 1.8;
+            padding-bottom: 60px;
+        }
+
+        .ltr-seq {
+            direction: ltr;
+            unicode-bidi: embed;
+            display: inline-block;
+            font-family: monospace;
+            font-weight: bold;
+            color: var(--accent);
+            background: #f1f5f9;
+            padding: 2px 8px;
+            border-radius: 6px;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 900;
+            font-size: 1.25rem;
+            color: var(--primary);
+        }
+
+        .brand-badge {
+            background: var(--slate-dark);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            white-space: nowrap;
+        }
+
+        .chapter-switcher {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .ch-btn {
+            background: var(--bg-main);
+            border: 2px solid var(--border);
+            padding: 8px 18px;
+            border-radius: 12px;
+            font-family: inherit;
+            font-weight: 800;
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .ch-btn:hover {
+            border-color: var(--slate-dark);
+            color: var(--slate-dark);
+        }
+
+        .ch-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                padding: 1rem;
+                text-align: center;
+            }
+            .chapter-switcher {
+                justify-content: center;
+                width: 100%;
+            }
+            .ch-btn {
+                flex: 1;
+                font-size: 0.85rem;
+                padding: 8px 10px;
+            }
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 2rem auto;
+            padding: 0 1.2rem;
+        }
+
+        .chapter-view {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .chapter-view.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Hero Header */
+        .lesson-header {
+            border-radius: var(--radius);
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+            color: white;
+        }
+
+        .header-ch19 {
+            background: linear-gradient(135deg, #1e293b 0%, #475569 100%);
+        }
+
+        .header-ch20 {
+            background: linear-gradient(135deg, #14532d 0%, #16a34a 100%);
+        }
+
+        .lesson-breadcrumb {
+            font-size: 0.85rem;
+            opacity: 0.9;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .lesson-header h1 {
+            font-size: 2.1rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+            line-height: 1.3;
+        }
+
+        .lesson-objectives {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--surface);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+        }
+
+        @media (max-width: 600px) {
+            .lesson-header { padding: 1.5rem; }
+            .lesson-header h1 { font-size: 1.5rem; }
+            .card { padding: 1.2rem; }
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid var(--bg-main);
+            padding-bottom: 0.8rem;
+        }
+
+        .step-num {
+            background: #e2e8f0;
+            color: #334155;
+            width: 38px;
+            height: 38px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            font-weight: 900;
+            font-size: 1.1rem;
+        }
+
+        .step-num-lime {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .problem-box {
+            background: var(--warning-light);
+            border-right: 5px solid var(--warning);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+        }
+
+        .problem-title {
+            font-weight: 800;
+            color: #92400e;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Document Analysis */
+        .doc-viewer {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        @media (max-width: 850px) {
+            .doc-viewer { grid-template-columns: 1fr; }
+        }
+
+        .doc-visual {
+            background: #0f172a;
+            border-radius: 12px;
+            padding: 1.5rem;
+            color: white;
+        }
+
+        .svg-container {
+            width: 100%;
+            height: auto;
+            max-height: 260px;
+        }
+
+        .doc-analysis {
+            background: var(--bg-main);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+        }
+
+        .method-tag {
+            display: inline-block;
+            background: #e0f2fe;
+            color: #0369a1;
+            font-size: 0.75rem;
+            font-weight: 800;
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+        }
+
+        /* Interactive simulators */
+        .interactive-box {
+            background: #1e293b;
+            border-radius: 12px;
+            padding: 1.5rem;
+            color: white;
+            margin: 1.5rem 0;
+        }
+
+        .btn-action {
+            background: #334155;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-family: inherit;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin: 5px;
+        }
+
+        .btn-action:hover { background: #475569; }
+        .btn-lime { background: #16a34a; }
+        .btn-lime:hover { background: #15803d; }
+
+        /* Scientific text */
+        .scientific-text {
+            background: var(--surface);
+            border: 2px solid #cbd5e1;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .text-part {
+            margin-bottom: 1.2rem;
+            padding-right: 1rem;
+            border-right: 4px solid #334155;
+        }
+
+        .text-part.ch20-border { border-right-color: #16a34a; }
+
+        .text-part h4 {
+            font-size: 0.95rem;
+            color: #334155;
+            margin-bottom: 0.3rem;
+            font-weight: 800;
+        }
+
+        .text-part.ch20-border h4 { color: #16a34a; }
+
+        /* Quiz */
+        .question-item {
+            background: var(--bg-main);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin-top: 1rem;
+        }
+
+        .option-btn {
+            background: white;
+            border: 1.5px solid var(--border);
+            padding: 12px 16px;
+            border-radius: 10px;
+            text-align: right;
+            font-family: inherit;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text-main);
+        }
+
+        .option-btn:hover {
+            border-color: #334155;
+            background: #f1f5f9;
+        }
+
+        .option-btn.correct {
+            background: var(--success-light);
+            border-color: var(--success);
+            color: var(--success);
+            font-weight: 700;
+        }
+
+        .option-btn.wrong {
+            background: var(--danger-light);
+            border-color: var(--danger);
+            color: var(--danger);
+        }
+
+        .feedback-box {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            display: none;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar with Phase Switcher -->
+    <nav class="navbar">
+        <div class="brand">
+            <span>منصة المتفوق 3AS</span>
+            <span class="brand-badge">المرحلة 10 (الدرس 19 و 20)</span>
+        </div>
+        <div class="chapter-switcher">
+            <button class="ch-btn active" onclick="showChapter('ch19', event)">💊 الدرس 19 : تأثير المخدرات (المورفين والأنكيفالين)</button>
+            <button class="ch-btn" onclick="showChapter('ch20', event)">🌿 الدرس 20 : البنية الفوقية للصانعة الخضراء (التركيب الضوئي)</button>
+        </div>
+    </nav>
+
+    <div class="container">
+
+        <!-- ================================================================= -->
+        <!-- CHAPTER 19 : IMPACT DES DROGUES MORPHINE & ENKÉPHALINE (الدرس 19) -->
+        <!-- ================================================================= -->
+        <div id="ch19" class="chapter-view active">
+            
+            <header class="lesson-header header-ch19">
+                <div class="lesson-breadcrumb">المجال الأول : التخصص الوظيفي للبروتينات • الوحدة 5 : دور البروتينات في الاتصال العصبي</div>
+                <h1>الدرس 19 : تأثير المخدرات على النقل المشبكي (آلية تسكين الألم بالمورفين والأنكيفالين)</h1>
+                <div class="lesson-objectives">
+                    <div>🎯 <strong>الهدف العلمي :</strong> تفسير نقل رسالة الألم بواسطة المادة P، وآلية الكبح الطبيعي بالأنكيفالين مقابل التسكين القوي للمورفين (التماثل البنيوي مع المستقبلات الأفيونية).</div>
+                    <div>⏱️ <strong>المدة التقديرية للتعلم الذاتي :</strong> 25 دقيقة</div>
+                </div>
+            </header>
+
+            <!-- Step 1: Problématique -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num">1</span>
+                    <span>وضعية الانطلاق وبناء الإشكالية العلميـة</span>
+                </div>
+                <div class="problem-box">
+                    <div class="problem-title">⚠️ كيف يوقف المورفين آلام الحروق والعمليات الجراحية الشديدة؟</div>
+                    <p>عند التعرض لإصابة أو حرق، ترسل العصبونات الحسية سيالات الألم نحو الدماغ عن طريق إفراز مبلغ كيميائي منبه يسمى <strong>المادة P (<span class="ltr-seq">Substance P</span>)</strong> في النخاع الشوكي. يمتلك الجسم نظام كبح طبيعي يفرز مادة <strong>الأنكيفالين (<span class="ltr-seq">Enképhaline</span>)</strong> لتخفيف الألم مؤقتاً. ويعتبر <strong>المورفين (<span class="ltr-seq">Morphine</span>)</strong> أقوى مسكن طبي عرفه الإنسان. <strong>كيف يقلد المورفين عمل الأنكيفالين الطبيعي ليمنع انتقال رسالة الألم في المشبك؟</strong></p>
+                </div>
+            </section>
+
+            <!-- Step 2: Document Analyse -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num">2</span>
+                    <span>التحليل المنهجي لمشبك الألم والمستقبلات الأفيونية قبل المشبكية</span>
+                </div>
+                <div class="doc-viewer">
+                    <div class="doc-visual" style="background: #1e293b;">
+                        <h4 style="color: #cbd5e1; margin-bottom: 1rem; font-size: 0.95rem;">آلية التثبيط قبل المشبكي لرسالة الألم (المادة P مقابل الأنكيفالين/المورفين)</h4>
+                        <!-- SVG Pain Synapse -->
+                        <svg class="svg-container" viewBox="0 0 400 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Pain Sensory Neuron (Top Right) -->
+                            <path d="M150 20 V 100 H 280 V 20" fill="#475569" stroke="#94a3b8" stroke-width="2"/>
+                            <text x="215" y="45" fill="#f8fafc" font-size="10" text-anchor="middle" font-weight="bold">نهاية العصبون الحسي للألم</text>
+
+                            <!-- Substance P vesicles -->
+                            <circle cx="215" cy="75" r="10" fill="#ef4444"/>
+                            <text x="215" y="78" fill="white" font-size="7" text-anchor="middle">مادة P</text>
+
+                            <!-- Inhibitory Interneuron Enkephaline (Top Left) -->
+                            <path d="M40 50 H 135 C 145 50, 150 60, 150 70 V 90 H 40 Z" fill="#7c3aed" stroke="#c084fc" stroke-width="2"/>
+                            <text x="90" y="72" fill="#f3e8ff" font-size="9" text-anchor="middle" font-weight="bold">عصبون جامع (أنكيفالين)</text>
+
+                            <!-- Opioid Receptors on presynaptic sensory neuron -->
+                            <path d="M148 75 V 85" stroke="#fbbf24" stroke-width="6"/>
+                            <text x="120" y="105" fill="#fbbf24" font-size="8">مستقبل أفيوني</text>
+
+                            <!-- Ca2+ channel -->
+                            <path d="M250 100 V 115" stroke="#38bdf8" stroke-width="6"/>
+                            <text x="270" y="112" fill="#38bdf8" font-size="8">قناة Ca²⁺</text>
+
+                            <!-- Postsynaptic motor/brain neuron -->
+                            <path d="M120 150 H 310 V 200 H 120 Z" fill="#1e293b" stroke="#64748b" stroke-width="2"/>
+                            <text x="215" y="180" fill="#cbd5e1" font-size="11" text-anchor="middle" font-weight="bold">العصبون الوارد نحو الدماغ (الشعور بالألم)</text>
+                        </svg>
+                        <p style="font-size: 0.85rem; color: #cbd5e1; margin-top: 10px;">💡 ارتباط المورفين بالمستقبل الأفيوني يغلق قنوات Ca²⁺ فيمنع إطراح المادة P.</p>
+                    </div>
+
+                    <div class="doc-analysis">
+                        <span class="method-tag">منهجية البكالوريا : التماثل البنيوي والتثبيط</span>
+                        <h4 style="margin: 8px 0; color: var(--primary);">كيف يكبح المورفين الألم؟</h4>
+                        <ol style="padding-right: 1.2rem; line-height: 1.8;">
+                            <li><strong>في الحالة العادية (إحساس بالألم) :</strong> تدخل شوارد <span class="ltr-seq">Ca²⁺</span> للزر الحسي، تطرح المادة <span class="ltr-seq">P</span>، ترتبط بمستقبلاتها في العصبون الوارد للدماغ فيشعر الإنسان بالألم.</li>
+                            <li><strong>التماثل البنيوي (<span class="ltr-seq">Mimétisme structural</span>) :</strong> يمتلك المورفين والأنكيفالين نفس البنية الفراغية في جزء الجزيء المخصص للارتباط بالمستقبلات الأفيونية قبل المشبكية.</li>
+                            <li><strong>التثبيط قبل المشبكي :</strong> ارتبط المورفين يمنع انفتح قنوات <span class="ltr-seq">Ca²⁺</span> الفولطية للزر الحسي، فلا يدخل الكالسيوم ولا تفرز المادة <span class="ltr-seq">P</span> نهائياً، فينقطع وصول سيالة الألم للدماغ.</li>
+                        </ol>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 3: Interactive Pain Simulator -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num">3</span>
+                    <span>محاكي مشبك الألم وتأثير المورفين التفاعلي</span>
+                </div>
+                <p>اختر الحالة المشبكية لملاحظة إفراز المادة P وانتقال رسالة الألم :</p>
+                
+                <div class="interactive-box" style="background: #1e293b;">
+                    <div style="margin-bottom: 15px;">
+                        <button class="btn-action" style="background:#dc2626;" onclick="simPain('normal')">🔴 إصابة مؤلمة (إفراز كثيف للمادة P)</button>
+                        <button class="btn-action" style="background:#7c3aed;" onclick="simPain('enk')">🟣 تدخل الأنكيفالين الطبيعي (كبح مؤقت)</button>
+                        <button class="btn-action" style="background:#16a34a;" onclick="simPain('morph')">🟢 حقن المورفين الطبي (تسكين عميق ودائم)</button>
+                    </div>
+                    <div id="painDisplayBox" style="background: #0f172a; border: 2px solid #64748b; border-radius: 12px; padding: 1.5rem; text-align: center;">
+                        <h3 style="color: #fca5a5; margin-bottom: 10px;">🔴 الشعور بألم حاد ومستمر</h3>
+                        <p style="color: #cbd5e1; line-height: 1.8;">قنوات الكالسيوم مفتوحة، تفرز المادة P بكثافة في الشق المشبكي وتولد تواتراً عالياً من كمونات العمل نحو الدماغ.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 4: Quiz Ch19 -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num">4</span>
+                    <span>تقويم الدرس 19 : أسئلة البكالوريا المتكررة</span>
+                </div>
+
+                <div class="question-item" id="c19q1-container">
+                    <h4 style="margin-bottom: 12px;">1. أين تتواجد المستقبلات الأفيونية الخاصة بالأنكيفالين والمورفين؟ وما هو تأثير ارتباط المورفين بها؟</h4>
+                    <div class="options-grid">
+                        <button class="option-btn" onclick="checkCh19Answer(0, true)">أ) تتواجد على الغشاء قبل المشبكي للعصبون الحسي للألم، وارتباط المورفين بها يغلق قنوات Ca²⁺ ويمنع إطراح المادة P.</button>
+                        <button class="option-btn" onclick="checkCh19Answer(1, false)">ب) تتواجد في النواة وتخرب الـ ADN.</button>
+                        <button class="option-btn" onclick="checkCh19Answer(2, false)">ج) تتواجد في العضلات وتسبب انقباضها.</button>
+                    </div>
+                    <div class="feedback-box" id="c19q1-feedback"></div>
+                </div>
+            </section>
+        </div>
+
+        <!-- ================================================================= -->
+        <!-- CHAPTER 20 : PHOTOSYNTHÈSE & CHLOROPLASTE (الدرس 20 - بداية المجال 2) -->
+        <!-- ================================================================= -->
+        <div id="ch20" class="chapter-view">
+            
+            <header class="lesson-header header-ch20">
+                <div class="lesson-breadcrumb">المجال الثاني : التحولات الطاقوية • الوحدة 1 : آليات تحويل الطاقة الضوئية إلى طاقة كيميائية كامنة</div>
+                <h1>الدرس 20 : مقر التركيب الضوئي والبنية الفوقية للصانعة الخضراء (Chloroplaste)</h1>
+                <div class="lesson-objectives">
+                    <div>🎯 <strong>الهدف العلمي :</strong> تحديد الصانعة الخضراء كمقر للتركيب الضوئي، والتمييز البنيوي بين التيلاكويد (مقر الكيميوضوئية) والحشوة (مقر الكيميوحيوية).</div>
+                    <div>⏱️ <strong>المدة التقديرية للتعلم الذاتي :</strong> 25 دقيقة</div>
+                </div>
+            </header>
+
+            <!-- Step 1: Problématique -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num step-num-lime">1</span>
+                    <span>الإشكالية الطاقوية الكبرى للمجال الثاني</span>
+                </div>
+                <div class="problem-box" style="border-right-color: #16a34a; background: #f0fdf4;">
+                    <div class="problem-title" style="color: #15803d;">⚠️ كيف تحول النباتات الخضراء أشعة الشمس إلى سكر النشا؟</div>
+                    <p>تعتبر النباتات اليخضورات المنتجات الأولية للطاقة في المحيط الحيوي، حيث تقوم بظاهرة <strong>التركيب الضوئي (<span class="ltr-seq">Photosynthèse</span>)</strong> التي تحول الطاقة الضوئية الفزيائية إلى طاقة كيميائية كامنة مخزنة في الروابط الكربونية للجزيئات العضوية (النشا والغلوكوز). <strong>أين تتم هذه الظاهرة بالتحديد داخل الخلية النباتية؟ وكيف تتلاءم البنية المجهرية الفوقية لعضية "الصانعة الخضراء" مع أداء هذه التفاعلات المعقدة؟</strong></p>
+                </div>
+            </section>
+
+            <!-- Step 2: Document Analyse -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num step-num-lime">2</span>
+                    <span>التحليل المنهجي للبنية الفوقية للصانعة الخضراء بالمجهر الإلكتروني</span>
+                </div>
+                <div class="doc-viewer">
+                    <div class="doc-visual" style="background: #064e3b;">
+                        <h4 style="color: #86efac; margin-bottom: 1rem; font-size: 0.95rem;">رسم تخطيطي ثلاثي الأبعاد لـ الصانعة الخضراء (Chloroplaste) ومقصوراتها</h4>
+                        <!-- SVG Chloroplast -->
+                        <svg class="svg-container" viewBox="0 0 400 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Outer/Inner membrane -->
+                            <ellipse cx="200" cy="100" rx="180" ry="85" fill="#047857" stroke="#34d399" stroke-width="4"/>
+                            <ellipse cx="200" cy="100" rx="170" ry="76" fill="#065f46" stroke="#6ee7b7" stroke-width="2" stroke-dasharray="6 3"/>
+                            <text x="200" y="35" fill="#d1fae5" font-size="11" text-anchor="middle" font-weight="bold">غشاء خارجي وغشاء داخلي يفصل بينهما فراغ بين غشائي</text>
+
+                            <!-- Stroma -->
+                            <text x="310" y="140" fill="#a7f3d0" font-size="12" font-weight="bold">الحشوة (Stroma)</text>
+
+                            <!-- Thylakoids / Grana -->
+                            <!-- Granum 1 -->
+                            <rect x="80" y="80" width="40" height="10" rx="4" fill="#10b981" stroke="#6ee7b7"/>
+                            <rect x="80" y="93" width="40" height="10" rx="4" fill="#10b981" stroke="#6ee7b7"/>
+                            <rect x="80" y="106" width="40" height="10" rx="4" fill="#10b981" stroke="#6ee7b7"/>
+                            <text x="100" y="133" fill="#86efac" font-size="10" text-anchor="middle">بذرة (Granum)</text>
+
+                            <!-- Granum 2 -->
+                            <rect x="180" y="70" width="40" height="10" rx="4" fill="#10b981" stroke="#6ee7b7"/>
+                            <rect x="180" y="83" width="40" height="10" rx="4" fill="#10b981" stroke="#6ee7b7"/>
+                            <rect x="180" y="96" width="40" height="10" rx="4" fill="#10b981" stroke="#6ee7b7"/>
+
+                            <!-- Intergranal lamella -->
+                            <path d="M120 85 H 180 M 120 98 H 180" stroke="#34d399" stroke-width="4"/>
+                            <text x="150" y="75" fill="#d1fae5" font-size="9" text-anchor="middle">تيلاكويد حشوي</text>
+
+                            <!-- Starch / ADN -->
+                            <circle cx="270" cy="85" r="14" fill="#fef08a" stroke="#fbbf24"/>
+                            <text x="270" y="88" fill="#854d0e" font-size="7" text-anchor="middle">حبيبة نشا</text>
+                        </svg>
+                        <p style="font-size: 0.85rem; color: #cbd5e1; margin-top: 10px;">🟢 التيلاكويد يحمل أصبغة اليخضور، والحشوة تحتوي على إنزيم الروبيسكو (Rubisco).</p>
+                    </div>
+
+                    <div class="doc-analysis">
+                        <span class="method-tag" style="background: #ecfdf5; color: #15803d;">أساسيات المجال الثاني في البكالوريا</span>
+                        <h4 style="margin: 8px 0; color: var(--primary);">مقارنة المقصورتين الفعالتين في الصانعة</h4>
+                        <ul style="list-style-type: none; line-height: 1.8;">
+                            <li>• <strong>التيلاكويد (<span class="ltr-seq">Thylakoïde أو الكيسات</span>) :</strong> أكياس غشائية مسطحة تتوضع أحياناً فوق بعضها مشكلة البذرة (<span class="ltr-seq">Granum</span>). يحتوي غشاؤها على <strong>أصبغة اليخضور (<span class="ltr-seq">Chlorophylle</span>) والأنظمة الضوئية (<span class="ltr-seq">PS I و PS II</span>) وإنزيم الـ <span class="ltr-seq">ATP synthase</span></strong> $\leftarrow$ مقر المرحلة الكيميوضوئية.</li>
+                            <li>• <strong>الحشوة (<span class="ltr-seq">Stroma أو ستروما</span>) :</strong> سائل أساسي غني بالإنزيمات (خاصة إنزيم <span class="ltr-seq">Rubisco</span> المثبت للـ <span class="ltr-seq">CO₂</span>) ومرافقات الإنزيمات وحبيبات النشا والـ <span class="ltr-seq">ADN</span> $\leftarrow$ مقر المرحلة الكيميوحيوية (حلقة كالفن).</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 3: Interactive Chloroplast Microscope -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num step-num-lime">3</span>
+                    <span>المجهر الإلكتروني الافتراضي لمقصورات الصانعة الخضراء</span>
+                </div>
+                <p>اضغط على المقنصورة لاكتشاف شروط وتفاعلات المرحلة التابعة لها :</p>
+                
+                <div class="interactive-box" style="background: #14532d;">
+                    <div style="margin-bottom: 15px;">
+                        <button class="btn-action btn-lime" onclick="simChloro('thyl')">🌿 غشاء التيلاكويد (المرحلة الكيميوضوئية)</button>
+                        <button class="btn-action btn-lime" onclick="simChloro('stroma')">🧪 الحشوة / الستروما (المرحلة الكيميوحيوية)</button>
+                    </div>
+                    <div id="chloroDisplayBox" style="background: #166534; border: 2px solid #4ade80; border-radius: 12px; padding: 1.5rem; text-align: center;">
+                        <h3 style="color: #86efac; margin-bottom: 10px;">🌿 غشاء التيلاكويد (مقر المرحلة الكيميوضوئية)</h3>
+                        <p style="color: #cbd5e1; line-height: 1.8;">يتطلب ضوءاً مباشراً. تقوم الأنظمة الضوئية بامتصاص الفوتونات وأكسدة الماء (<span class="ltr-seq">H₂O</span>) لانطلاق غاز الأكسجين (<span class="ltr-seq">O₂</span>)، وتركيب طاقة <span class="ltr-seq">ATP</span> وإرجاع النواقل (<span class="ltr-seq">NADPH, H⁺</span>).</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 4: Quiz Ch20 -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num step-num-lime">4</span>
+                    <span>تقويم الدرس 20 : أسئلة البكالوريا المتكررة</span>
+                </div>
+
+                <div class="question-item" id="c20q1-container">
+                    <h4 style="margin-bottom: 12px;">1. لماذا تعتبر الصانعة الخضراء عضية مقسمة إلى مقصورات (<span class="ltr-seq">Compartimentée</span>)؟</h4>
+                    <div class="options-grid">
+                        <button class="option-btn" onclick="checkCh20Answer(0, true)">أ) لأنها تحتوي على فراغات وأغشية منفصلة (التيلاكويد والحشوة) تمنح شروطاً كيميائية وإنزيمية مختلفة ومستقلة تسمح بحدوث مرحلتي التركيب الضوئي بانتظام.</button>
+                        <button class="option-btn" onclick="checkCh20Answer(1, false)">ب) لأنها تحتوي على نواة مستقلة.</button>
+                        <button class="option-btn" onclick="checkCh20Answer(2, false)">ج) لأنها تتواجد في خلايا الإنسان.</button>
+                    </div>
+                    <div class="feedback-box" id="c20q1-feedback"></div>
+                </div>
+            </section>
+        </div>
+
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        function showChapter(chId, evt) {
+            document.querySelectorAll('.chapter-view').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.ch-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(chId).classList.add('active');
+            if (evt) evt.target.classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function simPain(state) {
+            let box = document.getElementById('painDisplayBox');
+            if (state === 'normal') {
+                box.innerHTML = `
+                    <h3 style="color: #fca5a5; margin-bottom: 10px;">🔴 الشعور بألم حاد ومستمر</h3>
+                    <p style="color: #cbd5e1; line-height: 1.8;">قنوات الكالسيوم مفتوحة، تفرز المادة P بكثافة في الشق المشبكي وتولد تواتراً عالياً من كمونات العمل نحو الدماغ.</p>
+                `;
+            } else if (state === 'enk') {
+                box.innerHTML = `
+                    <h3 style="color: #d8b4fe; margin-bottom: 10px;">🟣 كبح طبيعي قصير المدى (الأنكيفالين)</h3>
+                    <p style="color: #cbd5e1; line-height: 1.8;">يفرز العصبون الجامع الأنكيفالين الذي يرتبط بالمستقبلات الأفيونية. يقل دخول Ca²⁺ ويقل إفراز المادة P فيخف الشعور بالألم سرعان ما يتحلل الأنكيفالين.</p>
+                `;
+            } else {
+                box.innerHTML = `
+                    <h3 style="color: #86efac; margin-bottom: 10px;">🟢 تسكين عميق وممتد (المورفين الطبي)</h3>
+                    <p style="color: #cbd5e1; line-height: 1.8;">يرتبط المورفين بقوة وبثبات طويل بالمستقبلات الأفيونية قبل المشبكية. تغلق قنوات Ca²⁺ تماماً وينعدم إطراح المادة P، فيختفي الشعور بالألم كلياً أثناء الجراحة.</p>
+                `;
+            }
+        }
+
+        function simChloro(part) {
+            let box = document.getElementById('chloroDisplayBox');
+            if (part === 'thyl') {
+                box.innerHTML = `
+                    <h3 style="color: #86efac; margin-bottom: 10px;">🌿 غشاء التيلاكويد (مقر المرحلة الكيميوضوئية)</h3>
+                    <p style="color: #cbd5e1; line-height: 1.8;">يتطلب ضوءاً مباشراً. تقوم الأنظمة الضوئية بامتصاص الفوتونات وأكسدة الماء (<span class="ltr-seq">H₂O</span>) لانطلاق غاز الأكسجين (<span class="ltr-seq">O₂</span>)، وتركيب طاقة <span class="ltr-seq">ATP</span> وإرجاع النواقل (<span class="ltr-seq">NADPH, H⁺</span>).</p>
+                `;
+            } else {
+                box.innerHTML = `
+                    <h3 style="color: #fde68a; margin-bottom: 10px;">🧪 الحشوة / الستروما (مقر المرحلة الكيميوحيوية)</h3>
+                    <p style="color: #cbd5e1; line-height: 1.8;">لا تتطلب ضوءاً مباشراً ولكنها تستهلك نواتج المرحلة السابقة (<span class="ltr-seq">ATP و NADPH, H⁺</span>). يتدخل إنزيم الروبيسكو لتثبيت غاز <span class="ltr-seq">CO₂</span> وبناء السكريات (حلقة كالفن).</p>
+                `;
+            }
+        }
+
+        function checkCh19Answer(optIdx, isCorrect) {
+            let container = document.getElementById('c19q1-container');
+            let btns = container.querySelectorAll('.option-btn');
+            let fb = document.getElementById('c19q1-feedback');
+
+            btns.forEach((b, idx) => {
+                b.disabled = true;
+                if (idx === optIdx) b.classList.add(isCorrect ? 'correct' : 'wrong');
+            });
+
+            fb.style.display = 'block';
+            if (isCorrect) {
+                fb.style.background = '#f0fdf4'; fb.style.color = '#166534'; fb.style.border = '1px solid #bbf7d0';
+                fb.innerHTML = '<strong>✅ إجابة صحيحة ممتاز!</strong> التثبيط قبل المشبكي هو سر آلية تسكين المورفين.';
+            } else {
+                fb.style.background = '#fef2f2'; fb.style.color = '#991b1b'; fb.style.border = '1px solid #fecaca';
+                fb.innerHTML = '<strong>❌ إجابة خاطئة.</strong> المستقبلات الأفيونية توجد على غشاء نهاية العصبون الحسي للألم.';
+            }
+        }
+
+        function checkCh20Answer(optIdx, isCorrect) {
+            let container = document.getElementById('c20q1-container');
+            let btns = container.querySelectorAll('.option-btn');
+            let fb = document.getElementById('c20q1-feedback');
+
+            btns.forEach((b, idx) => {
+                b.disabled = true;
+                if (idx === optIdx) b.classList.add(isCorrect ? 'correct' : 'wrong');
+            });
+
+            fb.style.display = 'block';
+            if (isCorrect) {
+                fb.style.background = '#f0fdf4'; fb.style.color = '#166534'; fb.style.border = '1px solid #bbf7d0';
+                fb.innerHTML = '<strong>✅ إجابة صحيحة ممتاز!</strong> التقسيم إلى مقصورات يسمح بعزل التفاعلات وتوفير التراكيز المثالية لكل مرحلة.';
+            } else {
+                fb.style.background = '#fef2f2'; fb.style.color = '#991b1b'; fb.style.border = '1px solid #fecaca';
+                fb.innerHTML = '<strong>❌ إجابة خاطئة.</strong> التقسيم لمقصورات هو خاصية بنيوية ووظيفية أساسية في الصانعة الخضراء.';
+            }
+        }
+    </script>
+</body>
+</html>

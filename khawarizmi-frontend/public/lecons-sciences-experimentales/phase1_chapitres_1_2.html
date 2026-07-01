@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منصة المتفوق 3AS | المرحلة 1 : الدرس 1 والدرس 2</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #f8fafc;
+            --surface: #ffffff;
+            --primary: #0f172a;
+            --accent: #2563eb;
+            --accent-light: #eff6ff;
+            --success: #16a34a;
+            --success-light: #f0fdf4;
+            --warning: #d97706;
+            --warning-light: #fffbeb;
+            --danger: #dc2626;
+            --danger-light: #fef2f2;
+            --purple: #7c3aed;
+            --purple-light: #f5f3ff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --radius: 16px;
+            --shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Cairo', 'Tajawal', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            line-height: 1.8;
+            padding-bottom: 60px;
+        }
+
+        .ltr-seq {
+            direction: ltr;
+            unicode-bidi: embed;
+            display: inline-block;
+            font-family: monospace;
+            font-weight: bold;
+            color: var(--accent);
+            background: #f1f5f9;
+            padding: 2px 8px;
+            border-radius: 6px;
+        }
+
+        /* Navbar & Phase selector */
+        .navbar {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 900;
+            font-size: 1.25rem;
+            color: var(--primary);
+        }
+
+        .brand-badge {
+            background: var(--accent);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            white-space: nowrap;
+        }
+
+        .chapter-switcher {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .ch-btn {
+            background: var(--bg-main);
+            border: 2px solid var(--border);
+            padding: 8px 18px;
+            border-radius: 12px;
+            font-family: inherit;
+            font-weight: 800;
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .ch-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .ch-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                padding: 1rem;
+                text-align: center;
+            }
+            .chapter-switcher {
+                justify-content: center;
+                width: 100%;
+            }
+            .ch-btn {
+                flex: 1;
+                font-size: 0.85rem;
+                padding: 8px 10px;
+            }
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 2rem auto;
+            padding: 0 1.2rem;
+        }
+
+        /* Chapter Views */
+        .chapter-view {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .chapter-view.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Hero Header */
+        .lesson-header {
+            border-radius: var(--radius);
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+            color: white;
+        }
+
+        .header-ch1 {
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+        }
+
+        .header-ch2 {
+            background: linear-gradient(135deg, #312e81 0%, #6d28d9 100%);
+        }
+
+        .lesson-breadcrumb {
+            font-size: 0.85rem;
+            opacity: 0.9;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .lesson-header h1 {
+            font-size: 2.1rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+            line-height: 1.3;
+        }
+
+        .lesson-objectives {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--surface);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+        }
+
+        @media (max-width: 600px) {
+            .lesson-header { padding: 1.5rem; }
+            .lesson-header h1 { font-size: 1.5rem; }
+            .card { padding: 1.2rem; }
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid var(--bg-main);
+            padding-bottom: 0.8rem;
+        }
+
+        .step-num {
+            background: var(--accent-light);
+            color: var(--accent);
+            width: 38px;
+            height: 38px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            font-weight: 900;
+            font-size: 1.1rem;
+        }
+
+        .step-num-purple {
+            background: var(--purple-light);
+            color: var(--purple);
+        }
+
+        .problem-box {
+            background: var(--warning-light);
+            border-right: 5px solid var(--warning);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+        }
+
+        .problem-title {
+            font-weight: 800;
+            color: #92400e;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Document Analysis */
+        .doc-viewer {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        @media (max-width: 850px) {
+            .doc-viewer { grid-template-columns: 1fr; }
+        }
+
+        .doc-visual {
+            background: #0f172a;
+            border-radius: 12px;
+            padding: 1.5rem;
+            color: white;
+        }
+
+        .svg-container {
+            width: 100%;
+            height: auto;
+            max-height: 260px;
+        }
+
+        .doc-analysis {
+            background: var(--bg-main);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+        }
+
+        .method-tag {
+            display: inline-block;
+            background: #e0f2fe;
+            color: #0369a1;
+            font-size: 0.75rem;
+            font-weight: 800;
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+        }
+
+        /* Interactive Organelle Explorer / Code Genetic Decoder */
+        .interactive-box {
+            background: #1e293b;
+            border-radius: 12px;
+            padding: 1.5rem;
+            color: white;
+            margin: 1.5rem 0;
+        }
+
+        .cell-explorer-btns {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+
+        .btn-exp {
+            background: #334155;
+            color: white;
+            border: 1px solid #475569;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-family: inherit;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-exp.active {
+            background: var(--accent);
+            border-color: #60a5fa;
+        }
+
+        .exp-detail-card {
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 10px;
+            padding: 1.2rem;
+            line-height: 1.7;
+        }
+
+        /* Genetic Code Decoder Grid */
+        .decoder-controls {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 1rem;
+        }
+
+        @media (max-width: 500px) {
+            .decoder-controls { grid-template-columns: 1fr; }
+        }
+
+        .nuc-select {
+            background: #334155;
+            color: white;
+            border: 2px solid #64748b;
+            padding: 10px;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .decoder-result {
+            background: #0f172a;
+            border: 2px solid var(--purple);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        /* Scientific text */
+        .scientific-text {
+            background: var(--surface);
+            border: 2px solid #cbd5e1;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .text-part {
+            margin-bottom: 1.2rem;
+            padding-right: 1rem;
+            border-right: 4px solid var(--accent);
+        }
+
+        .text-part.ch2-border { border-right-color: var(--purple); }
+
+        .text-part h4 {
+            font-size: 0.95rem;
+            color: var(--accent);
+            margin-bottom: 0.3rem;
+            font-weight: 800;
+        }
+
+        .text-part.ch2-border h4 { color: var(--purple); }
+
+        /* Quiz */
+        .question-item {
+            background: var(--bg-main);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin-top: 1rem;
+        }
+
+        .option-btn {
+            background: white;
+            border: 1.5px solid var(--border);
+            padding: 12px 16px;
+            border-radius: 10px;
+            text-align: right;
+            font-family: inherit;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text-main);
+        }
+
+        .option-btn:hover {
+            border-color: var(--accent);
+            background: var(--accent-light);
+        }
+
+        .option-btn.correct {
+            background: var(--success-light);
+            border-color: var(--success);
+            color: var(--success);
+            font-weight: 700;
+        }
+
+        .option-btn.wrong {
+            background: var(--danger-light);
+            border-color: var(--danger);
+            color: var(--danger);
+        }
+
+        .feedback-box {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar with Phase Switcher -->
+    <nav class="navbar">
+        <div class="brand">
+            <span>منصة المتفوق 3AS</span>
+            <span class="brand-badge">المرحلة 1 (الدرس 1 و 2)</span>
+        </div>
+        <div class="chapter-switcher">
+            <button class="ch-btn active" onclick="showChapter('ch1', event)">📖 الدرس 1 : مقر تركيب البروتين</button>
+            <button class="ch-btn" onclick="showChapter('ch2', event)">🧬 الدرس 2 : الشفرة الوراثية وتنشيط الأحماض الأمينية</button>
+        </div>
+    </nav>
+
+    <div class="container">
+
+        <!-- ================================================================= -->
+        <!-- CHAPTER 1 : SIÈGE DE LA SYNTHÈSE DES PROTÉINES (مقر تركيب البروتين) -->
+        <!-- ================================================================= -->
+        <div id="ch1" class="chapter-view active">
+            
+            <header class="lesson-header header-ch1">
+                <div class="lesson-breadcrumb">المجال الأول : التخصص الوظيفي للبروتينات • الوحدة 1 : تركيب البروتين</div>
+                <h1>الدرس 1 : تذكير بالمكتسبات ومقر تركيب البروتين في الخلية</h1>
+                <div class="lesson-objectives">
+                    <div>🎯 <strong>الهدف العلمي :</strong> إثبات أن تركيب البروتين يتم في الهيولى بالضبط على مستوى الشبكة الهيولية الداخلية المحببة (REG).</div>
+                    <div>⏱️ <strong>المدة التقديرية للتعلم الذاتي :</strong> 20 دقيقة</div>
+                </div>
+            </header>
+
+            <!-- Step 1: Problématique -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num">1</span>
+                    <span>وضعية الانطلاق وبناء الإشكالية العلميـة</span>
+                </div>
+                <div class="problem-box">
+                    <div class="problem-title">⚠️ التساؤل الجوهري لبداية الوحدة</div>
+                    <p>تتميز الخلايا الحية بقدرتها الفائقة على اصطناع بروتينات متنوعة (إنزيمات، هرمونات، أجسام مضادة) تضمن تخصصها الوظيفي. انطلاقا من مكتسباتك حول البنية الدقيقة للخلية، <strong>أين يتم بالضبط تجميع الأحماض الأمينية لتركيب هذه البروتينات داخل الخلية؟</strong></p>
+                </div>
+                <p>للتأكد من المقر الدقيق لتركيب البروتين، قام العلماء بإجراء تجارب تتتبع مسار الأحماض الأمينية المشعة داخل الخلايا الإفرازية (مثل خلايا البنكرياس).</p>
+            </section>
+
+            <!-- Step 2: Document Analyse -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num">2</span>
+                    <span>التحليل المنهجي لتجربة التصوير الإشعاعي الذاتي (الأحماض الأمينية المشعة)</span>
+                </div>
+                <div class="doc-viewer">
+                    <div class="doc-visual">
+                        <h4 style="margin-bottom: 1rem; color: #93c5fd; font-size: 0.95rem;">خلية عنقودية للبنكرياس بعد 3 دقائق من الحضن في وسط به لوسين مشع ³H-Leucine</h4>
+                        <!-- SVG Cell Diagram -->
+                        <svg class="svg-container" viewBox="0 0 400 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Cell outer membrane -->
+                            <rect x="20" y="20" width="360" height="200" rx="40" fill="#1e293b" stroke="#3b82f6" stroke-width="2"/>
+                            <!-- Nucleus -->
+                            <circle cx="90" cy="120" r="45" fill="#334155" stroke="#60a5fa" stroke-width="2"/>
+                            <text x="90" y="124" fill="#cbd5e1" font-size="12" text-anchor="middle">النواة</text>
+                            <!-- REG (Rough Endoplasmic Reticulum) around nucleus -->
+                            <path d="M145 75 Q 180 90 145 120 Q 180 150 145 165" stroke="#38bdf8" stroke-width="6" fill="none"/>
+                            <path d="M165 70 Q 200 90 165 120 Q 200 150 165 170" stroke="#38bdf8" stroke-width="6" fill="none"/>
+                            <text x="185" y="60" fill="#38bdf8" font-size="11">الشبكة الهيولية المحببة (REG)</text>
+                            <!-- Red dots representing amino acids on REG -->
+                            <circle cx="155" cy="85" r="4.5" fill="#ef4444"/>
+                            <circle cx="165" cy="100" r="4.5" fill="#ef4444"/>
+                            <circle cx="170" cy="120" r="4.5" fill="#ef4444"/>
+                            <circle cx="160" cy="135" r="4.5" fill="#ef4444"/>
+                            <circle cx="150" cy="155" r="4.5" fill="#ef4444"/>
+                            <!-- Golgi -->
+                            <path d="M250 80 Q 270 120 250 160" stroke="#a855f7" stroke-width="5" fill="none"/>
+                            <path d="M265 85 Q 285 120 265 155" stroke="#a855f7" stroke-width="5" fill="none"/>
+                            <text x="270" y="70" fill="#a855f7" font-size="11">جهاز غولجي</text>
+                            <!-- Secretory vesicles -->
+                            <circle cx="330" cy="100" r="12" fill="#475569" stroke="#94a3b8"/>
+                            <circle cx="340" cy="140" r="14" fill="#475569" stroke="#94a3b8"/>
+                            <text x="335" y="180" fill="#94a3b8" font-size="10" text-anchor="middle">حويصلات إفرازية</text>
+                        </svg>
+                        <p style="font-size: 0.85rem; color: #cbd5e1; margin-top: 10px;">🔴 النقاط الحمراء تشير إلى الإشعاع المتركز في الشبكة الهيولية الداخلية المحببة بعد 3 دقائق فقط.</p>
+                    </div>
+
+                    <div class="doc-analysis">
+                        <span class="method-tag">منهجية البكالوريا : الاستدلال العلمي</span>
+                        <h4 style="margin: 8px 0; color: var(--primary);">لماذا استعمل العلماء الأحماض الأمينية المشعة تحديدًا؟</h4>
+                        <ul style="list-style-type: none; padding-right: 0;">
+                            <li style="margin-bottom: 10px;">• <strong>الأحماض الأمينية</strong> هي الوحدات البنائية الأساسية لتركيب البروتينات.</li>
+                            <li style="margin-bottom: 10px;">• <strong>العنصر المشع (التريتيوم ³H)</strong> يسمح بتحديد المقر الدقيق ومتابعة الحركية الزمنية داخل العضيات الخلوية.</li>
+                            <li style="background: #eff6ff; padding: 12px; border-radius: 8px; border-right: 3px solid var(--accent);">
+                                <strong>النتيجة الحاسمة :</strong> بعد مدة قصيرة (3 دقائق)، يظهر الإشعاع حصريا على مستوى <strong>الشبكة الهيولية الداخلية المحببة <span class="ltr-seq">REG</span></strong>، مما يثبت أنها المقر الحقيقي لتركيب البروتين في الخلية.
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 3: Interactive Cell Explorer -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num">3</span>
+                    <span>المستكشف التفاعلي لحركية البروتين داخل الخلية الإفرازية</span>
+                </div>
+                <p>اضغط على الزمن التجريبي لمتابعة مسار البروتين المصنوع حديثا :</p>
+                
+                <div class="interactive-box">
+                    <div class="cell-explorer-btns">
+                        <button class="btn-exp active" onclick="exploreTime(3, event)">⏱️ بعد 3 دقائق (البداية)</button>
+                        <button class="btn-exp" onclick="exploreTime(20, event)">⏱️ بعد 20 دقيقة (النضج)</button>
+                        <button class="btn-exp" onclick="exploreTime(120, event)">⏱️ بعد 120 دقيقة (الإفراز)</button>
+                    </div>
+                    <div class="exp-detail-card" id="expDetailText">
+                        <strong style="color: #60a5fa; font-size: 1.1rem;">⏱️ الحالة عند الزمن 3 دقائق :</strong>
+                        <p style="margin-top: 8px;">يتمركز الإشعاع كليا على مستوى <strong>الشبكة الهيولية الداخلية المحببة (<span class="ltr-seq">REG</span>)</strong> المتواجدة في الهيولى. وهذا يدل على أن عملية دمج الأحماض الأمينية وتركيب السلسلة البيبتيدية تبدأ هنا بفضل الريبوزومات المتصلة بأغشية الشبكة.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 4: Bilan & Quiz Ch1 -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num">4</span>
+                    <span>الخلاصة والتقويم الذاتي (الدرس 1)</span>
+                </div>
+                <div class="scientific-text">
+                    <div class="text-part" style="border-right-color: var(--success); margin-bottom: 0;">
+                        <h4 style="color: var(--success);">الحقيقة العلمية المعتمدة في البكالوريا</h4>
+                        <p>يتم تركيب البروتين عند حقيقيات النوى في <strong>الهيولى</strong> (الستوبلازم)، وبالتحديد على مستوى <strong>الشبكة الهيولية الداخلية المحببة (<span class="ltr-seq">Réticulum Endoplasmique Granuleux</span>)</strong> انطلاقا من الأحماض الأمينية الناتجة عن الهضم.</p>
+                    </div>
+                </div>
+
+                <!-- Quiz Ch1 -->
+                <div class="question-item" id="c1q1-container" style="margin-top: 1.5rem;">
+                    <h4 style="margin-bottom: 12px;">اختبر فهمك : لماذا تسمى الشبكة الهيولية بـ "المحببة" أو "الفعالة"؟</h4>
+                    <div class="options-grid">
+                        <button class="option-btn" onclick="checkCh1Answer(0, false)">أ) لاحتوائها على حبيبات الجليكوجين المخزنة للطاقة.</button>
+                        <button class="option-btn" onclick="checkCh1Answer(1, true)">ب) لوجود جسيمات دقيقة متصلة بغشائها الخارجي تسمى الريبوزومات (<span class="ltr-seq">Ribosomes</span>).</button>
+                        <button class="option-btn" onclick="checkCh1Answer(2, false)">ج) لأنها تحتوي على ثقوب نووية تسمح بخروج الـ <span class="ltr-seq">ADN</span>.</button>
+                    </div>
+                    <div class="feedback-box" id="c1q1-feedback"></div>
+                </div>
+            </section>
+        </div>
+
+        <!-- ================================================================= -->
+        <!-- CHAPTER 2 : CODE GÉNÉTIQUE ET ACTIVATION (الشفرة الوراثية والتنشيط) -->
+        <!-- ================================================================= -->
+        <div id="ch2" class="chapter-view">
+            
+            <header class="lesson-header header-ch2">
+                <div class="lesson-breadcrumb">المجال الأول : التخصص الوظيفي للبروتينات • الوحدة 1 : تركيب البروتين</div>
+                <h1>الدرس 2 : الشفرة الوراثية وتنشيط الأحماض الأمينية</h1>
+                <div class="lesson-objectives">
+                    <div>🎯 <strong>الهدف العلمي :</strong> فهم كيفية ترجمة اللغة النووية (4 أحرف) إلى لغة بروتينية (20 حمض أميني) وآلية ربط الحمض الأميني بالـ <span class="ltr-seq">ARNt</span>.</div>
+                    <div>⏱️ <strong>المدة التقديرية للتعلم الذاتي :</strong> 25 دقيقة</div>
+                </div>
+            </header>
+
+            <!-- Step 1: Problématique -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num step-num-purple">1</span>
+                    <span>الإشكالية الرياضية والبيولوجية للشفرة الوراثية</span>
+                </div>
+                <div class="problem-box" style="border-right-color: var(--purple); background: var(--purple-light);">
+                    <div class="problem-title" style="color: #5b21b6;">⚠️ كيف نترجم 4 أحرف إلى 20 كلمة؟</div>
+                    <p>تتكون اللغة النووية للـ <span class="ltr-seq">ARNm</span> من <strong>4 قواعد آزوتية فقط (<span class="ltr-seq">A, U, C, G</span>)</strong>، بينما تتكون اللغة البروتينية من <strong>20 حمضاً أمينياً مختلفاً</strong> في بالطبيعة. كيف يمكن لأربع قواعد فقط أن تشفر وتنظم ترتيب 20 حمضاً أمينياً دون أي نقص أو تداخل؟</p>
+                </div>
+                <p>بالبرهان الرياضي المنطقي :</p>
+                <ul style="margin-right: 1.5rem; line-height: 2;">
+                    <li>• إذا كانت كل قاعدة تشفر لحمض أميني واحد ($4^1 = 4$) : هذا غير كافٍ لتغطية 20 حمضاً.</li>
+                    <li>• إذا كانت كل قاعدتين تشفران لحمض أميني ($4^2 = 16$) : يبقى العدد غير كافٍ.</li>
+                    <li>• <strong>الاستنتاج الحتمي ($4^3 = 64$) :</strong> كل <strong>3 قواعد آزوتية متتالية (رامزة أو Triplet)</strong> تشفر لحمض أميني واحد. وبما أن 64 > 20، فهذا يفسر تشفير عدة رامزات لحمض أميني واحد (الترادف).</li>
+                </ul>
+            </section>
+
+            <!-- Step 2: Interactive Decoder -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num step-num-purple">2</span>
+                    <span>فك شفرة البكالوريا التفاعلي (جدول الشفرة الوراثية)</span>
+                </div>
+                <p>اختر القواعد الآزوتية الثلاث (الرامزة على الـ <span class="ltr-seq">ARNm</span>) لاكتشاف الحمض الأميني الموافق ومعنى الرامزات الخاصة :</p>
+                
+                <div class="interactive-box" style="background: #0f172a;">
+                    <div class="decoder-controls">
+                        <div>
+                            <label style="font-size:0.85rem; color:#94a3b8;">الحرف الأول (5') :</label>
+                            <select id="nuc1" class="nuc-select" style="width:100%;" onchange="decodeCodon()">
+                                <option value="A">A (أدينين)</option>
+                                <option value="U">U (يوراسيل)</option>
+                                <option value="C">C (سيتوزين)</option>
+                                <option value="G">G (غوانين)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label style="font-size:0.85rem; color:#94a3b8;">الحرف الثاني :</label>
+                            <select id="nuc2" class="nuc-select" style="width:100%;" onchange="decodeCodon()">
+                                <option value="U">U (يوراسيل)</option>
+                                <option value="A">A (أدينين)</option>
+                                <option value="C">C (سيتوزين)</option>
+                                <option value="G">G (غوانين)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label style="font-size:0.85rem; color:#94a3b8;">الحرف الثالث (3') :</label>
+                            <select id="nuc3" class="nuc-select" style="width:100%;" onchange="decodeCodon()">
+                                <option value="G">G (غوانين)</option>
+                                <option value="A">A (أدينين)</option>
+                                <option value="U">U (يوراسيل)</option>
+                                <option value="C">C (سيتوزين)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="decoder-result" id="decoderBox">
+                        <div style="font-size: 1.5rem; font-family: monospace; color: #c084fc; font-weight: bold; direction: ltr;">5'- AUG -3'</div>
+                        <h3 style="margin: 10px 0; color: #4ade80;">الحمض الأميني : الميثيونين (Méthionine - Met)</h3>
+                        <p style="font-size: 0.9rem; color: #cbd5e1;">🟢 هذه هي <strong>رامزة البداية (Codon d'initiation)</strong> التي تنطلق منها دائما عملية الترجمة في الخلية.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 3: Activation des Acides Aminés -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num step-num-purple">3</span>
+                    <span>آلية تنشيط الأحماض الأمينية (المرحلة التحضيرية للترجمة)</span>
+                </div>
+                <p>لكي يشارك الحمض الأميني في تركيب البروتين، يجب أن يُربط أولاً بالناقل الخاص به وهو الـ <strong><span class="ltr-seq">ARNt</span> (ARN de transfert)</strong>. تتم هذه العملية بتدخل ثلاثة عناصر جوهرية :</p>
+                
+                <div class="doc-viewer" style="margin-top: 1rem;">
+                    <div class="doc-visual" style="background: #1e1b4b;">
+                        <h4 style="color: #c084fc; margin-bottom: 10px; font-size: 0.95rem;">شروط ومتطلبات عملية التنشيط</h4>
+                        <ul style="list-style-type: none; line-height: 2; font-size: 0.95rem;">
+                            <li>🧪 <strong>حمض أميني حر (<span class="ltr-seq">AA</span>)</strong> في الهيولى.</li>
+                            <li>🧬 <strong>ناقل نوعي (<span class="ltr-seq">ARNt</span>)</strong> يمتلك موقعين : موقع تثبيت الحمض الأميني، وموقع الرامزة المضادة (<span class="ltr-seq">Anticodon</span>).</li>
+                            <li>⚡ <strong>طاقة جزيئية (<span class="ltr-seq">ATP</span>)</strong> لإنشاء الرابطة الغنية بالطاقة.</li>
+                            <li>⚙️ <strong>إنزيم التنشيط النوعي (<span class="ltr-seq">Aminoacyl-ARNt synthétase</span>)</strong>.</li>
+                        </ul>
+                    </div>
+
+                    <div class="doc-analysis">
+                        <span class="method-tag" style="background: #f3e8ff; color: #6b21a8;">خطوات التنشيط في البكالوريا</span>
+                        <p style="margin-top: 5px;">1. يتوضع كل من الحمض الأميني والـ <span class="ltr-seq">ARNt</span> في المواقع الفعالة النوعية لإنزيم التنشيط.</p>
+                        <p>2. يتم إماتة جزيئة الـ <span class="ltr-seq">ATP</span> لربط الحمض الأميني بالـ <span class="ltr-seq">ARNt</span> برابطة إسترية غنية بالطاقة.</p>
+                        <p>3. يتحرر المعقد <strong>(حمض أميني - <span class="ltr-seq">ARNt</span> منشط)</strong> وينفصل عن الإنزيم ليتجه نحو الريبوزوم.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 4: Quiz Ch2 -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num step-num-purple">4</span>
+                    <span>تقويم الدرس 2 : أسئلة البكالوريا المتكررة</span>
+                </div>
+
+                <div class="question-item" id="c2q1-container">
+                    <h4 style="margin-bottom: 12px;">1. كم عدد الرامزات التي لا تشفر لأي حمض أميني وتسمى "رامزات التوقف" (<span class="ltr-seq">Codons STOP</span>)؟</h4>
+                    <div class="options-grid">
+                        <button class="option-btn" onclick="checkCh2Answer(1, 0, false)">أ) رامزة واحدة فقط وهي <span class="ltr-seq">AUG</span>.</button>
+                        <button class="option-btn" onclick="checkCh2Answer(1, 1, true)">ب) 3 رامزات وهي : <span class="ltr-seq">UAA, UAG, UGA</span>.</button>
+                        <button class="option-btn" onclick="checkCh2Answer(1, 2, false)">ج) 64 رامزة بالكامل.</button>
+                    </div>
+                    <div class="feedback-box" id="c2q1-feedback"></div>
+                </div>
+
+                <div class="question-item" id="c2q2-container">
+                    <h4 style="margin-bottom: 12px;">2. إذا حدث طفرة أدت إلى تخريب موقع الرامزة المضادة (<span class="ltr-seq">Anticodon</span>) في جزيئة الـ <span class="ltr-seq">ARNt</span>، ماذا يحدث؟</h4>
+                    <div class="options-grid">
+                        <button class="option-btn" onclick="checkCh2Answer(2, 0, false)">أ) يتوقف استنساخ الـ <span class="ltr-seq">ADN</span> داخل النواة.</button>
+                        <button class="option-btn" onclick="checkCh2Answer(2, 1, true)">ب) يفشل الـ <span class="ltr-seq">ARNt</span> في التعرف على رامزة الـ <span class="ltr-seq">ARNm</span> الموافقة أثناء الترجمة في الريبوزوم.</button>
+                        <button class="option-btn" onclick="checkCh2Answer(2, 2, false)">ج) لا يتحلل جزيء الـ <span class="ltr-seq">ATP</span> أبداً.</button>
+                    </div>
+                    <div class="feedback-box" id="c2q2-feedback"></div>
+                </div>
+            </section>
+        </div>
+
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        // Switch chapters
+        function showChapter(chId, evt) {
+            document.querySelectorAll('.chapter-view').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.ch-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(chId).classList.add('active');
+            if (evt) evt.target.classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Cell Explorer Time Switcher
+        function exploreTime(minutes, evt) {
+            document.querySelectorAll('.btn-exp').forEach(el => el.classList.remove('active'));
+            if (evt) evt.target.classList.add('active');
+
+            let box = document.getElementById('expDetailText');
+            if (minutes === 3) {
+                box.innerHTML = `<strong style="color: #60a5fa; font-size: 1.1rem;">⏱️ الحالة عند الزمن 3 دقائق :</strong>
+                <p style="margin-top: 8px;">يتمركز الإشعاع كليا على مستوى <strong>الشبكة الهيولية الداخلية المحببة (<span class="ltr-seq">REG</span>)</strong> المتواجدة في الهيولى. وهذا يدل على أن عملية دمج الأحماض الأمينية وتركيب السلسلة البيبتيدية تبدأ هنا بفضل الريبوزومات.</p>`;
+            } else if (minutes === 20) {
+                box.innerHTML = `<strong style="color: #a855f7; font-size: 1.1rem;">⏱️ الحالة عند الزمن 20 دقيقة :</strong>
+                <p style="margin-top: 8px;">ينتقل الإشعاع من الشبكة الهيولية المحببة ليستقر داخل <strong>جهاز غولجي (<span class="ltr-seq">Appareil de Golgi</span>)</strong> عبر حويصلات انتقالية، حيث يكتسب البروتين بنيته الفراغية النهائية ونضجه الوظيفي.</p>`;
+            } else if (minutes === 120) {
+                box.innerHTML = `<strong style="color: #4ade80; font-size: 1.1rem;">⏱️ الحالة عند الزمن 120 دقيقة (ساعتان) :</strong>
+                <p style="margin-top: 8px;">يتجمع الإشعاع داخل <strong>الحويصلات الإفرازية (<span class="ltr-seq">Vésicules de sécrétion</span>)</strong> التي تهاجر نحو الغشاء الهيولي لتطرح محتواها البروتيني خارج الخلية عن طريق ظاهرة الإطراح الخلوي (<span class="ltr-seq">Exocytose</span>).</p>`;
+            }
+        }
+
+        // Genetic Code Decoder
+        function decodeCodon() {
+            let n1 = document.getElementById('nuc1').value;
+            let n2 = document.getElementById('nuc2').value;
+            let n3 = document.getElementById('nuc3').value;
+            let codon = n1 + n2 + n3;
+
+            let box = document.getElementById('decoderBox');
+            let aa = "";
+            let desc = "";
+            let color = "#4ade80";
+
+            if (codon === "AUG") {
+                aa = "الميثيونين (Méthionine - Met)";
+                desc = "🟢 هذه هي <strong>رامزة البداية (Codon d'initiation)</strong> التي تنطلق منها دائما عملية الترجمة في الخلية.";
+            } else if (codon === "UAA" || codon === "UAG" || codon === "UGA") {
+                aa = "توقف الترجمة (Codon STOP)";
+                desc = "🛑 هذه <strong>رامزة توقف بدون حمض أميني</strong>، تؤدي إلى انفصال الريبوزوم وتحرير السلسلة البيبتيدية.";
+                color = "#ef4444";
+            } else if (n1 === "U" && n2 === "U" && (n3 === "U" || n3 === "C")) {
+                aa = "الفينيل ألانين (Phénylalanine - Phe)";
+                desc = "🔬 أول حمض أميني تم اكتشاف شفرته تاريخياً من طرف العالم نيرنبرغ باستعمال متعدد اليوراسيل (Poly-U).";
+            } else if (n1 === "C" && n2 === "C") {
+                aa = "البرولين (Proline - Pro)";
+                desc = "💡 نلاحظ أن الأحرف الأولى CC كافية لتحديد البرولين مهما كان الحرف الثالث (خاصية الترادف في الشفرة).";
+            } else if (n1 === "G" && n2 === "G") {
+                aa = "الغليسين (Glycine - Gly)";
+                desc = "🧪 أصغر حمض أميني في الطبيعة، تشفر له جميع الرامزات التي تبدأ بـ GG.";
+            } else {
+                aa = "حمض أميني محدد ضمن الشفرة الوراثية";
+                desc = "📖 كل رامزة ثلاثية على الـ <span class=\"ltr-seq\">ARNm</span> تقابلها رامزة مضادة على الـ <span class=\"ltr-seq\">ARNt</span> تحمل هذا الحمض الأميني بدقة.";
+            }
+
+            box.innerHTML = `
+                <div style="font-size: 1.5rem; font-family: monospace; color: #c084fc; font-weight: bold; direction: ltr;">5'- ${codon} -3'</div>
+                <h3 style="margin: 10px 0; color: ${color};">الحمض الأميني : ${aa}</h3>
+                <p style="font-size: 0.9rem; color: #cbd5e1;">${desc}</p>
+            `;
+        }
+
+        // Quiz Checkers
+        function checkCh1Answer(optIdx, isCorrect) {
+            let container = document.getElementById('c1q1-container');
+            let btns = container.querySelectorAll('.option-btn');
+            let fb = document.getElementById('c1q1-feedback');
+
+            btns.forEach((b, idx) => {
+                b.disabled = true;
+                if (idx === optIdx) b.classList.add(isCorrect ? 'correct' : 'wrong');
+            });
+
+            fb.style.display = 'block';
+            if (isCorrect) {
+                fb.style.background = '#f0fdf4'; fb.style.color = '#166534'; fb.style.border = '1px solid #bbf7d0';
+                fb.innerHTML = '<strong>✅ إجابة صحيحة ممتاز!</strong> الريبوزومات هي العضيات المسؤولة عن تجميع الأحماض الأمينية وتمنح الشبكة مظهرها المحبب.';
+            } else {
+                fb.style.background = '#fef2f2'; fb.style.color = '#991b1b'; fb.style.border = '1px solid #fecaca';
+                fb.innerHTML = '<strong>❌ إجابة خاطئة.</strong> الشبكة الهيولية تسمى محببة لأن غشاءها الخارجي مرصع بالريبوزومات التي تظهر كحبيبات دقيقة تحت المجهر الإلكتروني.';
+            }
+        }
+
+        function checkCh2Answer(qIdx, optIdx, isCorrect) {
+            let container = document.getElementById(`c2q${qIdx}-container`);
+            let btns = container.querySelectorAll('.option-btn');
+            let fb = document.getElementById(`c2q${qIdx}-feedback`);
+
+            btns.forEach((b, idx) => {
+                b.disabled = true;
+                if (idx === optIdx) b.classList.add(isCorrect ? 'correct' : 'wrong');
+            });
+
+            fb.style.display = 'block';
+            if (isCorrect) {
+                fb.style.background = '#f0fdf4'; fb.style.color = '#166534'; fb.style.border = '1px solid #bbf7d0';
+                fb.innerHTML = '<strong>✅ إجابة صحيحة ممتاز!</strong> تعليل علمي دقيق ومتوافق مع المنهج الرسمي.';
+            } else {
+                fb.style.background = '#fef2f2'; fb.style.color = '#991b1b'; fb.style.border = '1px solid #fecaca';
+                if (qIdx === 1) {
+                    fb.innerHTML = '<strong>❌ إجابة خاطئة.</strong> توجد 3 رامزات توقف في جدول الشفرة الوراثية (UAA, UAG, UGA) ولا تقابلها أي جزيئة ARNt.';
+                } else {
+                    fb.innerHTML = '<strong>❌ إجابة خاطئة.</strong> الرامزة المضادة على الـ ARNt تتكامل مع رامزة الـ ARNm في الريبوزوم، وتخريبها يمنع التعرف السليم على الرسالة الوراثية.';
+                }
+            }
+        }
+    </script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"1954b47c125f43f8b4338b3c4f804e4f","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+</body>
+</html>

@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منصة المتفوق 3AS | المرحلة 18 : الدرس 35 والدرس 36</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #f8fafc;
+            --surface: #ffffff;
+            --primary: #0f172a;
+            --accent: #2563eb;
+            --accent-light: #eff6ff;
+            --success: #16a34a;
+            --success-light: #f0fdf4;
+            --warning: #d97706;
+            --warning-light: #fffbeb;
+            --danger: #dc2626;
+            --danger-light: #fef2f2;
+            --orange-dark: #9a3412;
+            --orange-light: #fff7ed;
+            --amber-dark: #b45309;
+            --amber-light: #fffbeb;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --radius: 16px;
+            --shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Cairo', 'Tajawal', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            line-height: 1.8;
+            padding-bottom: 60px;
+        }
+
+        .ltr-seq {
+            direction: ltr;
+            unicode-bidi: embed;
+            display: inline-block;
+            font-family: monospace;
+            font-weight: bold;
+            color: var(--accent);
+            background: #f1f5f9;
+            padding: 2px 8px;
+            border-radius: 6px;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 900;
+            font-size: 1.25rem;
+            color: var(--primary);
+        }
+
+        .brand-badge {
+            background: var(--orange-dark);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            white-space: nowrap;
+        }
+
+        .chapter-switcher {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .ch-btn {
+            background: var(--bg-main);
+            border: 2px solid var(--border);
+            padding: 8px 18px;
+            border-radius: 12px;
+            font-family: inherit;
+            font-weight: 800;
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .ch-btn:hover {
+            border-color: var(--orange-dark);
+            color: var(--orange-dark);
+        }
+
+        .ch-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                padding: 1rem;
+                text-align: center;
+            }
+            .chapter-switcher {
+                justify-content: center;
+                width: 100%;
+            }
+            .ch-btn {
+                flex: 1;
+                font-size: 0.85rem;
+                padding: 8px 10px;
+            }
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 2rem auto;
+            padding: 0 1.2rem;
+        }
+
+        .chapter-view {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .chapter-view.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Hero Header */
+        .lesson-header {
+            border-radius: var(--radius);
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+            color: white;
+        }
+
+        .header-ch35 {
+            background: linear-gradient(135deg, #7c2d12 0%, #ea580c 100%);
+        }
+
+        .header-ch36 {
+            background: linear-gradient(135deg, #78350f 0%, #b45309 100%);
+        }
+
+        .lesson-breadcrumb {
+            font-size: 0.85rem;
+            opacity: 0.9;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .lesson-header h1 {
+            font-size: 2.1rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+            line-height: 1.3;
+        }
+
+        .lesson-objectives {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--surface);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+        }
+
+        @media (max-width: 600px) {
+            .lesson-header { padding: 1.5rem; }
+            .lesson-header h1 { font-size: 1.5rem; }
+            .card { padding: 1.2rem; }
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid var(--bg-main);
+            padding-bottom: 0.8rem;
+        }
+
+        .step-num {
+            background: #ffedd5;
+            color: #9a3412;
+            width: 38px;
+            height: 38px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            font-weight: 900;
+            font-size: 1.1rem;
+        }
+
+        .step-num-amber {
+            background: #fef3c7;
+            color: #b45309;
+        }
+
+        .problem-box {
+            background: var(--warning-light);
+            border-right: 5px solid var(--warning);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+        }
+
+        .problem-title {
+            font-weight: 800;
+            color: #92400e;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Document Analysis */
+        .doc-viewer {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        @media (max-width: 850px) {
+            .doc-viewer { grid-template-columns: 1fr; }
+        }
+
+        .doc-visual {
+            background: #0f172a;
+            border-radius: 12px;
+            padding: 1.5rem;
+            color: white;
+        }
+
+        .svg-container {
+            width: 100%;
+            height: auto;
+            max-height: 260px;
+        }
+
+        .doc-analysis {
+            background: var(--bg-main);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+        }
+
+        .method-tag {
+            display: inline-block;
+            background: #e0f2fe;
+            color: #0369a1;
+            font-size: 0.75rem;
+            font-weight: 800;
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+        }
+
+        /* Interactive simulators */
+        .interactive-box {
+            background: #1e293b;
+            border-radius: 12px;
+            padding: 1.5rem;
+            color: white;
+            margin: 1.5rem 0;
+        }
+
+        .btn-action {
+            background: #ea580c;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-family: inherit;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin: 5px;
+        }
+
+        .btn-action:hover { background: #c2410c; }
+        .btn-amber { background: #d97706; }
+        .btn-amber:hover { background: #b45309; }
+
+        /* Scientific text */
+        .scientific-text {
+            background: var(--surface);
+            border: 2px solid #cbd5e1;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .text-part {
+            margin-bottom: 1.2rem;
+            padding-right: 1rem;
+            border-right: 4px solid #ea580c;
+        }
+
+        .text-part.ch36-border { border-right-color: #d97706; }
+
+        .text-part h4 {
+            font-size: 0.95rem;
+            color: #ea580c;
+            margin-bottom: 0.3rem;
+            font-weight: 800;
+        }
+
+        .text-part.ch36-border h4 { color: #d97706; }
+
+        /* Quiz */
+        .question-item {
+            background: var(--bg-main);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin-top: 1rem;
+        }
+
+        .option-btn {
+            background: white;
+            border: 1.5px solid var(--border);
+            padding: 12px 16px;
+            border-radius: 10px;
+            text-align: right;
+            font-family: inherit;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text-main);
+        }
+
+        .option-btn:hover {
+            border-color: #ea580c;
+            background: #fff7ed;
+        }
+
+        .option-btn.correct {
+            background: var(--success-light);
+            border-color: var(--success);
+            color: var(--success);
+            font-weight: 700;
+        }
+
+        .option-btn.wrong {
+            background: var(--danger-light);
+            border-color: var(--danger);
+            color: var(--danger);
+        }
+
+        .feedback-box {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            display: none;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar with Phase Switcher -->
+    <nav class="navbar">
+        <div class="brand">
+            <span>منصة المتفوق 3AS</span>
+            <span class="brand-badge">المرحلة 18 (الدرس 35 و 36)</span>
+        </div>
+        <div class="chapter-switcher">
+            <button class="ch-btn active" onclick="showChapter('ch35', event)">🔥 الدرس 35 : الطاقة الداخلية للكرة الأرضية ومصدرها</button>
+            <button class="ch-btn" onclick="showChapter('ch36', event)">⚙️ الدرس 36 : تيارات الحمل الحراري المحرك الأساسي للصفائح</button>
+        </div>
+    </nav>
+
+    <div class="container">
+
+        <!-- ================================================================= -->
+        <!-- CHAPTER 35 : L'ÉNERGIE INTERNE DE LA TERRE (الدرس 35) -->
+        <!-- ================================================================= -->
+        <div id="ch35" class="chapter-view active">
+            
+            <header class="lesson-header header-ch35">
+                <div class="lesson-breadcrumb">المجال الثالث : التكتونية العامة • الوحدة 1 : النشاط التكتوني للصفائح</div>
+                <h1>الدرس 35 : الطاقة الداخلية للكرة الأرضية (التدرج الجيوتحراري وطرق انتقال الحرارة)</h1>
+                <div class="lesson-objectives">
+                    <div>🎯 <strong>الهدف العلمي :</strong> تحديد مصدر الحرارة الداخلية للأرض (التفكك الإشعاعي)، والتمييز بين التوصيل البطيء في الغلاف الصخري والحمل الحراري السريع في البرنس.</div>
+                    <div>⏱️ <strong>المدة التقديرية للتعلم الذاتي :</strong> 25 دقيقة</div>
+                </div>
+            </header>
+
+            <!-- Step 1: Problématique -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num">1</span>
+                    <span>وضعية الانطلاق وبناء الإشكالية العلميـة</span>
+                </div>
+                <div class="problem-box">
+                    <div class="problem-title">⚠️ من أين تأتي الحرارة الهائلة التي تذيب الصخور وتدفع البراكين؟</div>
+                    <p>عند النزول في المناجم العميقة، يلاحظ العمال ارتفاعاً مطرداً في درجة الحرارة (حوالي 30°C لكل كيلومتر في القشرة الأرضية) يسمى <strong>التدرج الجيوتحراري (<span class="ltr-seq">Gradient géothermique</span>)</strong>. وتصل حرارة نواة الأرض إلى 5000°C! <strong>ما هو المصدر الحقيقي لهذه الطاقة الداخلية الهائلة؟ وكيف تنتقل من أعماق الأرض نحو السطح؟</strong></p>
+                </div>
+            </section>
+
+            <!-- Step 2: Document Analyse -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num">2</span>
+                    <span>التحليل المنهجي لمصدر الحرارة وأنماط انتقالها (التوصيل مقابل الحمل الحراري)</span>
+                </div>
+                <div class="doc-viewer">
+                    <div class="doc-visual" style="background: #431407;">
+                        <h4 style="color: #fdba74; margin-bottom: 1rem; font-size: 0.95rem;">مخطط طرق انتقال الحرارة في أغلفة الأرض</h4>
+                        <!-- SVG Heat Transfer -->
+                        <svg class="svg-container" viewBox="0 0 400 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Lithosphere Top -->
+                            <rect x="30" y="20" width="340" height="45" fill="#334155" stroke="#94a3b8"/>
+                            <text x="200" y="40" fill="#f8fafc" font-size="11" text-anchor="middle" font-weight="bold">الغلاف الصخري الصلب (Lithosphère)</text>
+                            <text x="200" y="55" fill="#fca5a5" font-size="9" text-anchor="middle">انتقال بطيء جداً عن طريق التوصيل (Conduction دون حركة مادة)</text>
+
+                            <!-- Mantle Bottom -->
+                            <rect x="30" y="65" width="340" height="120" fill="#7f1d1d" stroke="#f87171"/>
+                            <text x="200" y="90" fill="#fef08a" font-size="11" text-anchor="middle" font-weight="bold">الستار / البرنس اللدن (Manteau - Asthénosphère)</text>
+
+                            <!-- Convection cells -->
+                            <ellipse cx="120" cy="135" rx="50" ry="30" stroke="#fb923c" stroke-width="3" stroke-dasharray="6 3"/>
+                            <path d="M70 135 L 70 120 M 170 135 L 170 150" stroke="#fb923c" stroke-width="3" marker-end="url(#arrow)"/>
+
+                            <ellipse cx="280" cy="135" rx="50" ry="30" stroke="#4ade80" stroke-width="3" stroke-dasharray="6 3"/>
+                            <path d="M230 135 L 230 150 M 330 135 L 330 120" stroke="#4ade80" stroke-width="3"/>
+
+                            <text x="200" y="140" fill="white" font-size="10" text-anchor="middle" font-weight="bold">تيارات الحمل الحراري (Convection مع حركة مادة)</text>
+                            <text x="200" y="170" fill="#fdba74" font-size="8" text-anchor="middle">صعود المادة الساخنة وهبوط المادة الباردة</text>
+                        </svg>
+                        <p style="font-size: 0.85rem; color: #cbd5e1; margin-top: 10px;">💡 الحمل الحراري هو أسرع وأكفأ وسيلة لنقل الحرارة في الأغلفة اللدنة.</p>
+                    </div>
+
+                    <div class="doc-analysis">
+                        <span class="method-tag">منهجية البكالوريا : المفاهيم الحرارية</span>
+                        <h4 style="margin: 8px 0; color: var(--primary);">ما هو مصدر الحرارة وكيف تنتقل؟</h4>
+                        <p>1. <strong>مصدر الطاقة الداخلية :</strong> تنتج أساساً (حوالي 90%) عن <strong>التفكك الإشعاعي (<span class="ltr-seq">Désintégration radioactive</span>)</strong> للنظائر غير المستقرة الموجودة في صخور القشرة والبرنس (خاصة اليورانيوم <span class="ltr-seq">²³⁸U</span>، الثوريوم <span class="ltr-seq">²³²Th</span>، والبوتاسيوم <span class="ltr-seq">⁴⁰K</span>)، بالإضافة للحرارة المتبقية من نشأة الأرض.</p>
+                        <hr style="margin: 12px 0; border: none; border-top: 1px solid var(--border);">
+                        <p>2. <strong>أنماط انتقال الحرارة :</strong></p>
+                        <ul style="list-style-type: none; line-height: 1.8;">
+                            <li>• <strong>التوصيل (<span class="ltr-seq">Conduction</span>) :</strong> انتقال الحرارة من جزيء لآخر <em>دون حركة المادة</em>. يتم في <strong>الغلاف الصخري الصلب</strong>، وهو نقل بطيء جداً.</li>
+                            <li>• <strong>الحمل الحراري (<span class="ltr-seq">Convection</span>) :</strong> انتقال الحرارة <em>عن طريق حركة وانتقال المادة نفسها</em> (تصعد المادة الساخنة الخفيفة وتهبط الباردة الكثيفة). يتم في <strong>البرنس اللدن</strong> وهو نقل سريع وفعال.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 3: Interactive Geothermal Simulator -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num">3</span>
+                    <span>محاكي طرق انتقال الحرارة التفاعلي</span>
+                </div>
+                <p>قارن كفاءة التوصيل الحراري بالحمل الحراري في الصخور :</p>
+                
+                <div class="interactive-box" style="background: #431407;">
+                    <div style="margin-bottom: 15px;">
+                        <button class="btn-action" onclick="simHeat('cond')">🪨 النقل بالتوصيل في الغلاف الصخري (Conduction)</button>
+                        <button class="btn-action" style="background:#16a34a;" onclick="simHeat('conv')">🌋 النقل بالحمل الحراري في البرنس (Convection)</button>
+                    </div>
+                    <div id="heatDisplayBox" style="background: #7c2d12; border: 2px solid #fb923c; border-radius: 12px; padding: 1.5rem; text-align: center;">
+                        <h3 style="color: #fdba74; margin-bottom: 10px;">🪨 النقل بالتوصيل (Conduction)</h3>
+                        <p style="color: #cbd5e1; line-height: 1.8;">يحدث في الصخور الصلبة. تهتز الذرات الساخنة وتنقل الحرارة للذرات المجاورة دون أن تغادر مكانها. يعتبر الغلاف الصخري عازلاً حرارياً جيداً، مما يجعل تسرب الحرارة بالتوصيل بطيئاً جداً فيحافظ على سخونة باطن الأرض.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 4: Quiz Ch35 -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num">4</span>
+                    <span>تقويم الدرس 35 : أسئلة البكالوريا المتكررة</span>
+                </div>
+
+                <div class="question-item" id="c35q1-container">
+                    <h4 style="margin-bottom: 12px;">1. ما هو المصدر الأول والأساسي للطاقة الحرارية الداخلية للكرة الأرضية؟</h4>
+                    <div class="options-grid">
+                        <button class="option-btn" onclick="checkCh35Answer(0, true)">أ) التفكك الإشعاعي التلقائي والمستمر للنظائر المشعة (اليورانيوم، الثوريوم، البوتاسيوم) الموجودة في صخور الأرض.</button>
+                        <button class="option-btn" onclick="checkCh35Answer(1, false)">ب) أشعة الشمس التي تخترق القشرة الأرضية.</button>
+                        <button class="option-btn" onclick="checkCh35Answer(2, false)">ج) احتراق النفط والفحم في باطن الأرض.</button>
+                    </div>
+                    <div class="feedback-box" id="c35q1-feedback"></div>
+                </div>
+            </section>
+        </div>
+
+        <!-- ================================================================= -->
+        <!-- CHAPTER 36 : LES COURANTS DE CONVECTION (الدرس 36) -->
+        <!-- ================================================================= -->
+        <div id="ch36" class="chapter-view">
+            
+            <header class="lesson-header header-ch36">
+                <div class="lesson-breadcrumb">المجال الثالث : التكتونية العامة • الوحدة 1 : النشاط التكتوني للصفائح</div>
+                <h1>الدرس 36 : تيارات الحمل الحراري المحرك الأساسي لحركات الصفائح التكتونية</h1>
+                <div class="lesson-objectives">
+                    <div>🎯 <strong>الهدف العلمي :</strong> إثبات أن الأرض تعمل كآلة حرارية تحول الطاقة الحرارية الداخلية إلى طاقة حركية ميكانيكية (تيارات الحمل الحراري) تدفع الظهرات وتسحب مناطق الغوص.</div>
+                    <div>⏱️ <strong>المدة التقديرية للتعلم الذاتي :</strong> 25 دقيقة</div>
+                </div>
+            </header>
+
+            <!-- Step 1: Problématique -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num step-num-amber">1</span>
+                    <span>الإشكالية الميكانيكية لحركة الصفائح</span>
+                </div>
+                <div class="problem-box" style="border-right-color: var(--amber-dark); background: var(--amber-light);">
+                    <div class="problem-title" style="color: #92400e;">⚠️ كيف تتحول الحرارة الصامتة في باطن الأرض إلى محرك جبار يحرك القارات؟</div>
+                    <p>تزن القارات والمحيطات ملايين المليارات من الأطنان. <strong>ما هي القوة الميكانيكية الخارقة القادرة على شق الظهرات المحيطية ودفع القارات وحني الغلاف الصخري في مناطق الغوص؟ وكيف تعمل الكرة الأرضية كـ "آلة حرارية" (<span class="ltr-seq">Machine thermique</span>) دقيقة؟</strong></p>
+                </div>
+            </section>
+
+            <!-- Step 2: Document Analyse -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num step-num-amber">2</span>
+                    <span>التحليل المنهجي لخلية الحمل الحراري (صعود الأعمدة الساخنة وهبوط الألواح الباردة)</span>
+                </div>
+                <div class="doc-viewer">
+                    <div class="doc-visual" style="background: #451a03;">
+                        <h4 style="color: #fde047; margin-bottom: 1rem; font-size: 0.95rem;">خلية الحمل الحراري في البرنس المحركة للصفائح</h4>
+                        <!-- SVG Convection Motor -->
+                        <svg class="svg-container" viewBox="0 0 400 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Core Hot bottom -->
+                            <rect x="20" y="160" width="360" height="30" fill="#dc2626"/>
+                            <text x="200" y="180" fill="white" font-size="11" text-anchor="middle" font-weight="bold">حدود البرنس مع النواة (منطقة ساخنة جداً)</text>
+
+                            <!-- Mantle Convection -->
+                            <path d="M200 160 V 60" stroke="#fbbf24" stroke-width="8" marker-end="url(#arrow)"/>
+                            <text x="200" y="110" fill="#fef08a" font-size="9" text-anchor="middle">عمود ساخن خفيف صاعد (Panache)</text>
+
+                            <!-- Divergence at top -->
+                            <path d="M190 60 H 100 M 210 60 H 300" stroke="#f59e0b" stroke-width="4" marker-end="url(#arrow)"/>
+                            <polygon points="190,50 200,35 210,50" fill="#ea580c"/>
+                            <text x="200" y="28" fill="#fdba74" font-size="9" text-anchor="middle" font-weight="bold">ظهيرة محيطية (تباعد)</text>
+
+                            <!-- Sinking cold slab -->
+                            <path d="M80 60 L 120 150" stroke="#38bdf8" stroke-width="8"/>
+                            <path d="M320 60 L 280 150" stroke="#38bdf8" stroke-width="8"/>
+                            <text x="70" y="110" fill="#93c5fd" font-size="8">صفيحة باردة غائصة</text>
+                            <text x="330" y="110" fill="#93c5fd" font-size="8">صفيحة باردة غائصة</text>
+                        </svg>
+                        <p style="font-size: 0.85rem; color: #cbd5e1; margin-top: 10px;">💡 صعود المادة يسحب الظهيرة، وهبوط اللوح البارد يسحب منطقة الغوص.</p>
+                    </div>
+
+                    <div class="doc-analysis">
+                        <span class="method-tag" style="background: #fef3c7; color: #b45309;">محرك الأرض في البكالوريا</span>
+                        <h4 style="margin: 8px 0; color: var(--primary);">كيف تعمل الآلة الحرارية للأرض؟</h4>
+                        <ol style="padding-right: 1.2rem; line-height: 1.8;">
+                            <li><strong>تسخين وتمدد المادة في العمق :</strong> تسخن مادة البرنس العميقة بفعل الحرارة الإشعاعية، فتتمدد وتقل كثافتها وتصعد نحو الأعلى مشكلة <strong>أعمده ساخنة صاعدة (<span class="ltr-seq">Panaches chauds</span>)</strong> أسفل الظهرات المحيطية، مما يدفع الصفائح للتباعد.</li>
+                            <li><strong>تبريد وغوص المادة عند السطح :</strong> عند السطح، يفقد الغلاف الصخري المحيطي حرارته فيبرد ويزداد سمكه وكثافته، فيغوص بفعل ثقله في مناطق الغوص مشكلاً <strong>ألواحاً باردة هابطة (<span class="ltr-seq">Plaques plongeantes</span>)</strong> تسحب معها بقية الصفيحة.</li>
+                        </ol>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 3: Interactive Thermal Motor Simulator -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num step-num-amber">3</span>
+                    <span>محاكي الآلة الحرارية لحركة القارات</span>
+                </div>
+                <p>اضغط لتشغيل محرك الحمل الحراري ومعاينة تحول الطاقة الحرارية لميكانيكية :</p>
+                
+                <div class="interactive-box" style="background: #451a03;">
+                    <div style="margin-bottom: 15px;">
+                        <button class="btn-action btn-amber" onclick="simMotor('run')">⚙️ تشغيل تيارات الحمل الحراري (نشاط تكتوني مستمر)</button>
+                        <button class="btn-action" style="background:#dc2626;" onclick="simMotor('stop')">❄️ تبريد باطن الأرض (توقف المحرك وموت الكوكب تكتونياً)</button>
+                    </div>
+                    <div id="motorDisplayBox" style="background: #78350f; border: 2px solid #fbbf24; border-radius: 12px; padding: 1.5rem; text-align: center;">
+                        <h3 style="color: #4ade80; margin-bottom: 10px;">⚙️ الأرض آلة حرارية حية ونشطة</h3>
+                        <p style="color: #cbd5e1; line-height: 1.8;">تتحول الطاقة الحرارية الناتجة عن التفكك الإشعاعي إلى طاقة حركية (تيارات الحمل الحراري). صعود الماغما يدفع الظهرات، وغوص الألواح الباردة يسحب الخنادق، فتستمر زحزحة القارات وتجدد قشرة الأرض.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 4: Quiz Ch36 -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num step-num-amber">4</span>
+                    <span>تقويم الدرس 36 : أسئلة البكالوريا المتكررة</span>
+                </div>
+
+                <div class="question-item" id="c36q1-container">
+                    <h4 style="margin-bottom: 12px;">1. لماذا نقول إن الكرة الأرضية تعمل كـ "آلة حرارية" (<span class="ltr-seq">Machine thermique</span>)؟</h4>
+                    <div class="options-grid">
+                        <button class="option-btn" onclick="checkCh36Answer(0, true)">أ) لأنها تقوم بتحويل الطاقة الحرارية الداخلية (المكتسبة من التفكك الإشعاعي) إلى طاقة ميكانيكية حركية تتجلى في تيارات الحمل الحراري وحركة الصفائح التكتونية.</button>
+                        <button class="option-btn" onclick="checkCh36Answer(1, false)">ب) لأن حرارتها تشبه حرارة محرك السيارة.</button>
+                        <button class="option-btn" onclick="checkCh36Answer(2, false)">ج) لأنها تدور في الفضاء بسرعة ثابتة.</button>
+                    </div>
+                    <div class="feedback-box" id="c36q1-feedback"></div>
+                </div>
+            </section>
+        </div>
+
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        function showChapter(chId, evt) {
+            document.querySelectorAll('.chapter-view').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.ch-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(chId).classList.add('active');
+            if (evt) evt.target.classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function simHeat(type) {
+            let box = document.getElementById('heatDisplayBox');
+            if (type === 'cond') {
+                box.innerHTML = `
+                    <h3 style="color: #fdba74; margin-bottom: 10px;">🪨 النقل بالتوصيل (Conduction)</h3>
+                    <p style="color: #cbd5e1; line-height: 1.8;">يحدث في الصخور الصلبة. تهتز الذرات الساخنة وتنقل الحرارة للذرات المجاورة دون أن تغادر مكانها. يعتبر الغلاف الصخري عازلاً حرارياً جيداً، مما يجعل تسرب الحرارة بالتوصيل بطيئاً جداً فيحافظ على سخونة باطن الأرض.</p>
+                `;
+            } else {
+                box.innerHTML = `
+                    <h3 style="color: #4ade80; margin-bottom: 10px;">🌋 النقل بالحمل الحراري (Convection)</h3>
+                    <p style="color: #cbd5e1; line-height: 1.8;">يحدث في البرنس اللدن (<span class="ltr-seq">Asthénosphère</span>). تنقل الحرارة بحركة وانتقال المادة نفسها! تصعد الصخور اللدنة الساخنة والخفيفة نحو الأعلى، وتهبط الصخور الباردة والكثيفة نحو الأسفل. وهو نقل سريع وفعال جداً.</p>
+                `;
+            }
+        }
+
+        function simMotor(state) {
+            let box = document.getElementById('motorDisplayBox');
+            if (state === 'run') {
+                box.innerHTML = `
+                    <h3 style="color: #4ade80; margin-bottom: 10px;">⚙️ الأرض آلة حرارية حية ونشطة</h3>
+                    <p style="color: #cbd5e1; line-height: 1.8;">تتحول الطاقة الحرارية الناتجة عن التفكك الإشعاعي إلى طاقة حركية (تيارات الحمل الحراري). صعود الماغما يدفع الظهرات، وغوص الألواح الباردة يسحب الخنادق، فتستمر زحزحة القارات وتجدد قشرة الأرض.</p>
+                `;
+            } else {
+                box.innerHTML = `
+                    <h3 style="color: #ef4444; margin-bottom: 10px;">❄️ توقف المحرك التكتوني (سيناريو الموت الحراري)</h3>
+                    <p style="color: #cbd5e1; line-height: 1.8;">لو نفدت النظائر المشعة وبرد باطن الأرض، ستتوقف تيارات الحمل الحراري نهائياً. ستتوقف الظهرات ومناطق الغوص، وتتوقف الزلازل والبراكين، وتتجمد الأرض ككوكب ميت جيولوجياً مثل القمر أو المريخ.</p>
+                `;
+            }
+        }
+
+        function checkCh35Answer(optIdx, isCorrect) {
+            let container = document.getElementById('c35q1-container');
+            let btns = container.querySelectorAll('.option-btn');
+            let fb = document.getElementById('c35q1-feedback');
+
+            btns.forEach((b, idx) => {
+                b.disabled = true;
+                if (idx === optIdx) b.classList.add(isCorrect ? 'correct' : 'wrong');
+            });
+
+            fb.style.display = 'block';
+            if (isCorrect) {
+                fb.style.background = '#f0fdf4'; fb.style.color = '#166534'; fb.style.border = '1px solid #bbf7d0';
+                fb.innerHTML = '<strong>✅ إجابة صحيحة ممتاز!</strong> التفكك الإشعاعي للنظائر هو المصدر المستدام والداخلي للحرارة.';
+            } else {
+                fb.style.background = '#fef2f2'; fb.style.color = '#991b1b'; fb.style.border = '1px solid #fecaca';
+                fb.innerHTML = '<strong>❌ إجابة خاطئة.</strong> الشمس تؤثر على سطح الأرض فقط ولا علاقة لها بحرارة النواة والبرنس.';
+            }
+        }
+
+        function checkCh36Answer(optIdx, isCorrect) {
+            let container = document.getElementById('c36q1-container');
+            let btns = container.querySelectorAll('.option-btn');
+            let fb = document.getElementById('c36q1-feedback');
+
+            btns.forEach((b, idx) => {
+                b.disabled = true;
+                if (idx === optIdx) b.classList.add(isCorrect ? 'correct' : 'wrong');
+            });
+
+            fb.style.display = 'block';
+            if (isCorrect) {
+                fb.style.background = '#f0fdf4'; fb.style.color = '#166534'; fb.style.border = '1px solid #bbf7d0';
+                fb.innerHTML = '<strong>✅ إجابة صحيحة ممتاز!</strong> تحويل الحرارة إلى طاقة ميكانيكية حركية هو التعريف الدقيق للآلة الحرارية في البكالوريا.';
+            } else {
+                fb.style.background = '#fef2f2'; fb.style.color = '#991b1b'; fb.style.border = '1px solid #fecaca';
+                fb.innerHTML = '<strong>❌ إجابة خاطئة.</strong> الآلة الحرارية تعني التحويل الفعلي للطاقة الحرارية إلى شغل ميكانيكي (حركة الصفائح).';
+            }
+        }
+    </script>
+</body>
+</html>

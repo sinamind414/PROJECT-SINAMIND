@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منصة المتفوق 3AS | المرحلة 7 : الدرس 13 والدرس 14</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #f8fafc;
+            --surface: #ffffff;
+            --primary: #0f172a;
+            --accent: #2563eb;
+            --accent-light: #eff6ff;
+            --success: #16a34a;
+            --success-light: #f0fdf4;
+            --warning: #d97706;
+            --warning-light: #fffbeb;
+            --danger: #dc2626;
+            --danger-light: #fef2f2;
+            --purple-dark: #3b0764;
+            --purple-light: #faf5ff;
+            --gold: #b45309;
+            --gold-light: #fffbeb;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --radius: 16px;
+            --shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Cairo', 'Tajawal', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            line-height: 1.8;
+            padding-bottom: 60px;
+        }
+
+        .ltr-seq {
+            direction: ltr;
+            unicode-bidi: embed;
+            display: inline-block;
+            font-family: monospace;
+            font-weight: bold;
+            color: var(--accent);
+            background: #f1f5f9;
+            padding: 2px 8px;
+            border-radius: 6px;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 900;
+            font-size: 1.25rem;
+            color: var(--primary);
+        }
+
+        .brand-badge {
+            background: var(--purple-dark);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            white-space: nowrap;
+        }
+
+        .chapter-switcher {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .ch-btn {
+            background: var(--bg-main);
+            border: 2px solid var(--border);
+            padding: 8px 18px;
+            border-radius: 12px;
+            font-family: inherit;
+            font-weight: 800;
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .ch-btn:hover {
+            border-color: var(--purple-dark);
+            color: var(--purple-dark);
+        }
+
+        .ch-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                padding: 1rem;
+                text-align: center;
+            }
+            .chapter-switcher {
+                justify-content: center;
+                width: 100%;
+            }
+            .ch-btn {
+                flex: 1;
+                font-size: 0.85rem;
+                padding: 8px 10px;
+            }
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 2rem auto;
+            padding: 0 1.2rem;
+        }
+
+        .chapter-view {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .chapter-view.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Hero Header */
+        .lesson-header {
+            border-radius: var(--radius);
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+            color: white;
+        }
+
+        .header-ch13 {
+            background: linear-gradient(135deg, #4c1d95 0%, #6d28d9 100%);
+        }
+
+        .header-ch14 {
+            background: linear-gradient(135deg, #78350f 0%, #b45309 100%);
+        }
+
+        .lesson-breadcrumb {
+            font-size: 0.85rem;
+            opacity: 0.9;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .lesson-header h1 {
+            font-size: 2.1rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+            line-height: 1.3;
+        }
+
+        .lesson-objectives {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--surface);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+        }
+
+        @media (max-width: 600px) {
+            .lesson-header { padding: 1.5rem; }
+            .lesson-header h1 { font-size: 1.5rem; }
+            .card { padding: 1.2rem; }
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid var(--bg-main);
+            padding-bottom: 0.8rem;
+        }
+
+        .step-num {
+            background: var(--purple-light);
+            color: #6d28d9;
+            width: 38px;
+            height: 38px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            font-weight: 900;
+            font-size: 1.1rem;
+        }
+
+        .step-num-gold {
+            background: var(--gold-light);
+            color: var(--gold);
+        }
+
+        .problem-box {
+            background: var(--warning-light);
+            border-right: 5px solid var(--warning);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+        }
+
+        .problem-title {
+            font-weight: 800;
+            color: #92400e;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Document Analysis */
+        .doc-viewer {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        @media (max-width: 850px) {
+            .doc-viewer { grid-template-columns: 1fr; }
+        }
+
+        .doc-visual {
+            background: #0f172a;
+            border-radius: 12px;
+            padding: 1.5rem;
+            color: white;
+        }
+
+        .svg-container {
+            width: 100%;
+            height: auto;
+            max-height: 260px;
+        }
+
+        .doc-analysis {
+            background: var(--bg-main);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+        }
+
+        .method-tag {
+            display: inline-block;
+            background: #e0f2fe;
+            color: #0369a1;
+            font-size: 0.75rem;
+            font-weight: 800;
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+        }
+
+        /* Interactive simulators */
+        .interactive-box {
+            background: #1e293b;
+            border-radius: 12px;
+            padding: 1.5rem;
+            color: white;
+            margin: 1.5rem 0;
+        }
+
+        .btn-action {
+            background: #6d28d9;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-family: inherit;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin: 5px;
+        }
+
+        .btn-action:hover { background: #5b21b6; }
+        .btn-gold { background: var(--gold); }
+        .btn-gold:hover { background: #92400e; }
+
+        /* Scientific text */
+        .scientific-text {
+            background: var(--surface);
+            border: 2px solid #cbd5e1;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .text-part {
+            margin-bottom: 1.2rem;
+            padding-right: 1rem;
+            border-right: 4px solid #6d28d9;
+        }
+
+        .text-part.ch14-border { border-right-color: var(--gold); }
+
+        .text-part h4 {
+            font-size: 0.95rem;
+            color: #6d28d9;
+            margin-bottom: 0.3rem;
+            font-weight: 800;
+        }
+
+        .text-part.ch14-border h4 { color: var(--gold); }
+
+        /* Quiz */
+        .question-item {
+            background: var(--bg-main);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin-top: 1rem;
+        }
+
+        .option-btn {
+            background: white;
+            border: 1.5px solid var(--border);
+            padding: 12px 16px;
+            border-radius: 10px;
+            text-align: right;
+            font-family: inherit;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text-main);
+        }
+
+        .option-btn:hover {
+            border-color: #6d28d9;
+            background: #faf5ff;
+        }
+
+        .option-btn.correct {
+            background: var(--success-light);
+            border-color: var(--success);
+            color: var(--success);
+            font-weight: 700;
+        }
+
+        .option-btn.wrong {
+            background: var(--danger-light);
+            border-color: var(--danger);
+            color: var(--danger);
+        }
+
+        .feedback-box {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            display: none;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar with Phase Switcher -->
+    <nav class="navbar">
+        <div class="brand">
+            <span>منصة المتفوق 3AS</span>
+            <span class="brand-badge">المرحلة 7 (الدرس 13 و 14)</span>
+        </div>
+        <div class="chapter-switcher">
+            <button class="ch-btn active" onclick="showChapter('ch13', event)">⚔️ الدرس 13 : المناعة الخلوية (LTc والبرفورين)</button>
+            <button class="ch-btn" onclick="showChapter('ch14', event)">🎼 الدرس 14 : التعاون الخلوي ودور LT4 المساعد (IL-2)</button>
+        </div>
+    </nav>
+
+    <div class="container">
+
+        <!-- ================================================================= -->
+        <!-- CHAPTER 13 : IMMUNITÉ CELLULAIRE RIMC & LTc (الدرس 13) -->
+        <!-- ================================================================= -->
+        <div id="ch13" class="chapter-view active">
+            
+            <header class="lesson-header header-ch13">
+                <div class="lesson-breadcrumb">المجال الأول : التخصص الوظيفي للبروتينات • الوحدة 4 : دور البروتينات في الدفاع عن الذات</div>
+                <h1>الدرس 13 : الاستجابة المناعية ذات الوساطة الخلوية (RIMC) وآلية القضاء على الخلية المصابة</h1>
+                <div class="lesson-objectives">
+                    <div>🎯 <strong>الهدف العلمي :</strong> تحديد آلية التعرف المزدوج للخلايا اللمفاوية السامة (LTc) على الخلية المصابة، وتفسير الصدمة الحلولية بواسطة البرفورين والغرانزيم.</div>
+                    <div>⏱️ <strong>المدة التقديرية للتعلم الذاتي :</strong> 25 دقيقة</div>
+                </div>
+            </header>
+
+            <!-- Step 1: Problématique -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num">1</span>
+                    <span>وضعية الانطلاق وبناء الإشكالية العلميـة</span>
+                </div>
+                <div class="problem-box">
+                    <div class="problem-title">⚠️ كيف يقضي الجسم على الفيروسات المختبئة داخل الخلايا المصابة؟</div>
+                    <p>الأجسام المضادة في الدم واللمف لا تستطيع الدخول إلى داخل الخلايا المصابة بالفيروسات ولا تستطيع الوصول إلى الخلايا السرطانية. لذلك يتدخل نمط آخر من المناعة يعتمد على خلايا قاتلة متخصصة تسمى <strong>الخلايا اللمفاوية التائية السامة (<span class="ltr-seq">LTc - T cytotoxiques</span>)</strong> الناتجة عن تمايز اللمفاويات <span class="ltr-seq">LT8</span>. <strong>كيف تتعرف الخلية التائية القاتلة على الخلية المصابة بدقة؟ وكيف تقوم بتفجيرها وإعدامها؟</strong></p>
+                </div>
+            </section>
+
+            <!-- Step 2: Document Analyse -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num">2</span>
+                    <span>التحليل المنهجي للتعرف المزدوج والصدمة الحلولية (البرفورين Perforine)</span>
+                </div>
+                <div class="doc-viewer">
+                    <div class="doc-visual" style="background: #2e1065;">
+                        <h4 style="color: #d8b4fe; margin-bottom: 1rem; font-size: 0.95rem;">آلية التعرف المزدوج وإفراز البرفورين لإحداث الصدمة الحلولية</h4>
+                        <!-- SVG Cytotoxic Lyse -->
+                        <svg class="svg-container" viewBox="0 0 400 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <!-- LTc Cell (top) -->
+                            <path d="M100 20 H 300 C 330 20, 350 40, 350 70 C 350 100, 330 110, 300 110 H 100 C 70 110, 50 100, 50 70 C 50 40, 70 20, 100 20 Z" fill="#6d28d9" stroke="#a78bfa" stroke-width="2"/>
+                            <text x="200" y="50" fill="#f3e8ff" font-size="12" text-anchor="middle" font-weight="bold">الخلية اللمفاوية القاتلة (LTc)</text>
+
+                            <!-- TCR and CD8 -->
+                            <path d="M185 110 V 135" stroke="#fbbf24" stroke-width="4"/>
+                            <text x="170" y="125" fill="#fbbf24" font-size="9">TCR</text>
+                            <path d="M215 110 V 135" stroke="#38bdf8" stroke-width="4"/>
+                            <text x="230" y="125" fill="#38bdf8" font-size="9">CD8</text>
+
+                            <!-- Infected Cell (bottom) -->
+                            <path d="M80 150 H 320 C 350 150, 360 170, 360 200 H 40 C 40 170, 50 150, 80 150 Z" fill="#4c1d95" stroke="#f43f5e" stroke-width="2"/>
+                            <text x="200" y="190" fill="#fca5a5" font-size="12" text-anchor="middle" font-weight="bold">الخلية المصابة بالفيروس</text>
+
+                            <!-- CMH I + Peptide -->
+                            <path d="M200 150 V 135" stroke="#4ade80" stroke-width="4"/>
+                            <circle cx="200" cy="135" r="4" fill="#ef4444"/>
+                            <text x="200" y="132" fill="white" font-size="7" text-anchor="middle">Ag</text>
+
+                            <!-- Perforine pores (red dots releasing) -->
+                            <circle cx="130" cy="125" r="5" fill="#ef4444"/>
+                            <circle cx="145" cy="135" r="5" fill="#ef4444"/>
+                            <circle cx="260" cy="130" r="5" fill="#ef4444"/>
+                            <text x="120" y="145" fill="#fca5a5" font-size="9">جزيئات البرفورين</text>
+                        </svg>
+                        <p style="font-size: 0.85rem; color: #cbd5e1; margin-top: 10px;">💡 يتكامل مستقبل TCR مع المستضد، ومؤشر CD8 مع جزيئة CMH-I (تعرف مزدوج).</p>
+                    </div>
+
+                    <div class="doc-analysis">
+                        <span class="method-tag">منهجية البكالوريا : تفاصيل الصدمة الحلولية</span>
+                        <h4 style="margin: 8px 0; color: var(--primary);">كيف تعدم الخلية <span class="ltr-seq">LTc</span> الخلية المصابة؟</h4>
+                        <ol style="padding-right: 1.2rem; line-height: 1.8;">
+                            <li><strong>التعرف المزدوج (<span class="ltr-seq">Double reconnaissance</span>) :</strong> يرتبط مستقبل <span class="ltr-seq">TCR</span> للخلية <span class="ltr-seq">LTc</span> بالبيبتيد المستضدي، ويرتبط مؤشر <span class="ltr-seq">CD8</span> بجزيئة <span class="ltr-seq">CMH-I</span> للخلية المصابة.</li>
+                            <li><strong>إفراز البرفورين والغرانزيم :</strong> يثير التعرف المزدوج إفراز حويصلات تحتوي على بروتينات <strong>البرفورين (<span class="ltr-seq">Perforine</span>)</strong> وإنزيمات <strong>الغرانزيم (<span class="ltr-seq">Granzyme</span>)</strong>.</li>
+                            <li><strong>تشكل الثقوب الغشائية :</strong> تتبلمر جزيئات البرفورين بوجود شوارد الكالسيوم مشكلة ثقوباً وأنابيب مفتوحة في غشاء الخلية المصابة.</li>
+                            <li><strong>الصدمة الحلولية (<span class="ltr-seq">Choc osmotique</span>) :</strong> يدخل الماء والشوارد بكثافة عبر الثقوب فتنفجر الخلية المصابة، ويدخل الغرانزيم ليهدم الـ <span class="ltr-seq">ADN</span> ويحفز الانتحار الخلوي.</li>
+                        </ol>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 3: Interactive Cytotoxic Simulator -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num">3</span>
+                    <span>محاكي "قبلة الموت" الخلوية التفاعلي</span>
+                </div>
+                <p>اضغط لمتابعة المراحل المتسلسلة لعملية القضاء الخلوي :</p>
+                
+                <div class="interactive-box" style="background: #2e1065;">
+                    <div style="margin-bottom: 15px;">
+                        <button class="btn-action" onclick="simLtc(1)">1️⃣ التعرف المزدوج والالتصاق</button>
+                        <button class="btn-action" onclick="simLtc(2)">2️⃣ إفراز وبلمرة البرفورين</button>
+                        <button class="btn-action" style="background:#e11d48;" onclick="simLtc(3)">3️⃣ انفجار الخلية المصابة</button>
+                    </div>
+                    <div id="ltcDisplayBox" style="background: #3b0764; border: 2px solid #a78bfa; border-radius: 12px; padding: 1.5rem; text-align: center;">
+                        <h3 style="color: #a7f3d0; margin-bottom: 10px;">1️⃣ التعرف المزدوج الدقيق</h3>
+                        <p style="color: #cbd5e1; line-height: 1.8;">تضمن الخلية القاتلة <span class="ltr-seq">LTc</span> أنها لا تهاجم إلا الخلية التابعة للذات المصابة بالمستضد المحدد، وذلك باشتراط تطابق الـ <span class="ltr-seq">CD8</span> مع <span class="ltr-seq">CMH-I</span> وتطابق الـ <span class="ltr-seq">TCR</span> مع المستضد معاً.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 4: Quiz Ch13 -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num">4</span>
+                    <span>تقويم الدرس 13 : أسئلة البكالوريا المتكررة</span>
+                </div>
+
+                <div class="question-item" id="c13q1-container">
+                    <h4 style="margin-bottom: 12px;">1. ما هو الدور الدقيق الذي يلعبه بروتين "البرفورين" (<span class="ltr-seq">Perforine</span>) في القضاء على الخلية المصابة؟</h4>
+                    <div class="options-grid">
+                        <button class="option-btn" onclick="checkCh13Answer(0, true)">أ) يتبلمر في غشاء الخلية المصابة مشكلاً ثقوباً تسمح بدخول الماء والشوارد والغرانزيم لإحداث صدمة حلولية مميتة.</button>
+                        <button class="option-btn" onclick="checkCh13Answer(1, false)">ب) يتحول إلى جسم مضاد يرتبط بالفيروس في الدم.</button>
+                        <button class="option-btn" onclick="checkCh13Answer(2, false)">ج) يقوم ببلعمة الخلية السرطانية مباشرة.</button>
+                    </div>
+                    <div class="feedback-box" id="c13q1-feedback"></div>
+                </div>
+            </section>
+        </div>
+
+        <!-- ================================================================= -->
+        <!-- CHAPTER 14 : COOPÉRATION CELLULAIRE & LT4 / IL-2 (الدرس 14) -->
+        <!-- ================================================================= -->
+        <div id="ch14" class="chapter-view">
+            
+            <header class="lesson-header header-ch14">
+                <div class="lesson-breadcrumb">المجال الأول : التخصص الوظيفي للبروتينات • الوحدة 4 : دور البروتينات في الدفاع عن الذات</div>
+                <h1>الدرس 14 : التعاون الخلوي ودور اللمفاويات التائية المساعدة (LT4) والأنترلوكين-2 (IL-2)</h1>
+                <div class="lesson-objectives">
+                    <div>🎯 <strong>الهدف العلمي :</strong> إثبات أن الخلايا LT4 هي المايسترو المحور المركزي للاستجابة المناعية (الخلطية والخلوية معاً) عن طريق إفراز هرمون الأنترلوكين-2.</div>
+                    <div>⏱️ <strong>المدة التقديرية للتعلم الذاتي :</strong> 25 دقيقة</div>
+                </div>
+            </header>
+
+            <!-- Step 1: Problématique -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num step-num-gold">1</span>
+                    <span>الإشكالية الكبرى لختام وحدة المناعة</span>
+                </div>
+                <div class="problem-box" style="border-right-color: var(--gold); background: var(--gold-light);">
+                    <div class="problem-title" style="color: #92400e;">⚠️ لماذا يدمر فيروس الإيدز (VIH) المناعة بالكامل رغم أنه يهاجم خلايا LT4 فقط؟</div>
+                    <p>يهاجم فيروس السيدا (<span class="ltr-seq">VIH</span>) حصرياً الخلايا اللمفاوية التائية المساعدة <strong><span class="ltr-seq">LT4</span> (التي تحمل مؤشر <span class="ltr-seq">CD4</span>)</strong>. وعندما يتناقص عدد خلايا <span class="ltr-seq">LT4</span>، تنهار المناعة الخلطية (إنتاج الأجسام المضادة من طرف <span class="ltr-seq">LB</span>) وتنهار المناعة الخلوية (<span class="ltr-seq">LTc</span>) معاً، فيموت المريض بأبسط الأمراض الانتهازية! <strong>كيف تفسر هذا الدور المحوري والخارق لخلايا <span class="ltr-seq">LT4</span> في التنسيق بين جميع الخلايا المناعية؟</strong></p>
+                </div>
+            </section>
+
+            <!-- Step 2: Document Analyse -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num step-num-gold">2</span>
+                    <span>التحليل المنهجي للتعاون الخلوي وإفراز مبلغ الأنترلوكين-2 (IL-2)</span>
+                </div>
+                <div class="doc-viewer">
+                    <div class="doc-visual" style="background: #451a03;">
+                        <h4 style="color: #fdba74; margin-bottom: 1rem; font-size: 0.95rem;">مخطط التنسيق والتحفيز بواسطة الأنترلوكين-2 المفرز من خلايا LTh المساعدة</h4>
+                        <!-- SVG IL-2 -->
+                        <svg class="svg-container" viewBox="0 0 400 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <!-- LT4 / LTh in center -->
+                            <circle cx="200" cy="70" r="35" fill="#b45309" stroke="#fbbf24" stroke-width="3"/>
+                            <text x="200" y="74" fill="#fffbeb" font-size="12" text-anchor="middle" font-weight="bold">LT4 المساعدة</text>
+
+                            <!-- Arrows sending IL-2 -->
+                            <path d="M170 90 L 100 140" stroke="#f59e0b" stroke-width="3" marker-end="url(#arrow)"/>
+                            <text x="120" y="110" fill="#fde68a" font-size="10">IL-2</text>
+                            <path d="M230 90 L 300 140" stroke="#f59e0b" stroke-width="3"/>
+                            <text x="280" y="110" fill="#fde68a" font-size="10">IL-2</text>
+
+                            <!-- LB left -->
+                            <circle cx="80" cy="165" r="30" fill="#1e3a8a" stroke="#60a5fa" stroke-width="2"/>
+                            <text x="80" y="169" fill="white" font-size="11" text-anchor="middle" font-weight="bold">الخلية LB</text>
+
+                            <!-- LT8 right -->
+                            <circle cx="320" cy="165" r="30" fill="#581c87" stroke="#c084fc" stroke-width="2"/>
+                            <text x="320" y="169" fill="white" font-size="11" text-anchor="middle" font-weight="bold">الخلية LT8</text>
+                        </svg>
+                        <p style="font-size: 0.85rem; color: #cbd5e1; margin-top: 10px;">💡 بدون هرمون IL-2 لا تتكاثر ولا تتمايز الخلايا LB ولا LT8.</p>
+                    </div>
+
+                    <div class="doc-analysis">
+                        <span class="method-tag" style="background: #fffbeb; color: #b45309;">سر البكالوريا في المناعة</span>
+                        <h4 style="margin: 8px 0; color: var(--primary);">لماذا تعتبر <span class="ltr-seq">LT4</span> محور المناعة النوعية؟</h4>
+                        <p>تتعرف خلايا <span class="ltr-seq">LT4</span> بواسطة مؤشر <span class="ltr-seq">CD4</span> على البيبتيد المستضدي المعروض على جزيئة <strong><span class="ltr-seq">CMH-II</span></strong> للبلعميات الكبيرة (<span class="ltr-seq">CPA</span>).</p>
+                        <hr style="margin: 12px 0; border: none; border-top: 1px solid var(--border);">
+                        <p>بعد التعرف، تتكاثر وتتمايز إلى خلايا مساعدة (<span class="ltr-seq">LTh - T helper</span>) تفرز مبلغاً كيميائياً أساسياً هو <strong>الأنترلوكين-2 (<span class="ltr-seq">Interleukine-2 IL-2</span>)</strong> الذي يعمل على :</p>
+                        <ul style="list-style-type: none; line-height: 1.8;">
+                            <li>• تحفيز تكاثر وتمايز <span class="ltr-seq">LB</span> المحسسة إلى خلايا بلازمية منتجة للأجسام المضادة.</li>
+                            <li>• تحفيز تكاثر وتمايز <span class="ltr-seq">LT8</span> المحسسة إلى خلايا قاتلة <span class="ltr-seq">LTc</span>.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 3: Interactive Orchestra Simulator -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num step-num-gold">3</span>
+                    <span>مختبر أوركسترا المناعة التفاعلي</span>
+                </div>
+                <p>اختبر حدوث الاستجابة المناعية في وجود وفي غياب خلايا المايسترو <span class="ltr-seq">LT4</span> :</p>
+                
+                <div class="interactive-box" style="background: #451a03;">
+                    <div style="margin-bottom: 15px;">
+                        <button class="btn-action btn-gold" onclick="simCoop('normal')">🟢 مناعة طبيعية بوجود خلايا LT4</button>
+                        <button class="btn-action" style="background:#dc2626;" onclick="simCoop('sida')">🔴 غياب خلايا LT4 (مرض السيدا VIH)</button>
+                    </div>
+                    <div id="coopDisplayBox" style="background: #78350f; border: 2px solid #fbbf24; border-radius: 12px; padding: 1.5rem; text-align: center;">
+                        <h3 style="color: #4ade80; margin-bottom: 10px;">🟢 استجابة مناعية قوية ومتكاملة</h3>
+                        <p style="color: #cbd5e1; line-height: 1.8;">تفرز خلايا <span class="ltr-seq">LTh</span> كميات وفيرة من مبلغ <span class="ltr-seq">IL-2</span>. تستجيب اللمفاويات <span class="ltr-seq">LB</span> وتنتج ملايين الأجسام المضادة، وتستجيب اللمفاويات <span class="ltr-seq">LT8</span> وتتحول لجحافل قاتلة <span class="ltr-seq">LTc</span>، فيتم تطهير العضوية بنجاح من المستضد.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 4: Quiz Ch14 -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num step-num-gold">4</span>
+                    <span>تقويم الدرس 14 : أسئلة البكالوريا المتكررة</span>
+                </div>
+
+                <div class="question-item" id="c14q1-container">
+                    <h4 style="margin-bottom: 12px;">1. لماذا لا تستجيب الخلايا اللمفاوية غير المحسسة (التي لم تتعرف بعد على المستضد) لهرمون الأنترلوكين-2 (<span class="ltr-seq">IL-2</span>)؟</h4>
+                    <div class="options-grid">
+                        <button class="option-btn" onclick="checkCh14Answer(0, true)">أ) لأن الخلية اللمفاوية لا تقوم بتركيب وعرض المستقبلات الغشائية الخاصة بالـ <span class="ltr-seq">IL-2</span> إلا بعد تعرفها وتنشيطها بالمستضد.</button>
+                        <button class="option-btn" onclick="checkCh14Answer(1, false)">ب) لأن هرمون IL-2 يدمر الخلايا غير المحسسة.</button>
+                        <button class="option-btn" onclick="checkCh14Answer(2, false)">ج) لأن الخلايا غير المحسسة لا تمتلك غشاء هيولياً.</button>
+                    </div>
+                    <div class="feedback-box" id="c14q1-feedback"></div>
+                </div>
+            </section>
+        </div>
+
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        function showChapter(chId, evt) {
+            document.querySelectorAll('.chapter-view').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.ch-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(chId).classList.add('active');
+            if (evt) evt.target.classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function simLtc(step) {
+            let box = document.getElementById('ltcDisplayBox');
+            if (step === 1) {
+                box.innerHTML = `
+                    <h3 style="color: #a7f3d0; margin-bottom: 10px;">1️⃣ التعرف المزدوج الدقيق</h3>
+                    <p style="color: #cbd5e1; line-height: 1.8;">تضمن الخلية القاتلة <span class="ltr-seq">LTc</span> أنها لا تهاجم إلا الخلية التابعة للذات المصابة بالمستضد المحدد، وذلك باشتراط تطابق الـ <span class="ltr-seq">CD8</span> مع <span class="ltr-seq">CMH-I</span> وتطابق الـ <span class="ltr-seq">TCR</span> مع المستضد معاً.</p>
+                `;
+            } else if (step === 2) {
+                box.innerHTML = `
+                    <h3 style="color: #fbbf24; margin-bottom: 10px;">2️⃣ إفراز وبلمرة البرفورين في الغشاء</h3>
+                    <p style="color: #cbd5e1; line-height: 1.8;">تطرح الخلية القاتلة جزيئات البرفورين التي تنتظم وتتبلمر دائرياً في غشاء الخلية المصابة مشكلة قنوات مفتوحة (ثقوب غشائية بقطر 10 إلى 20 نانومتر).</p>
+                `;
+            } else {
+                box.innerHTML = `
+                    <h3 style="color: #f43f5e; margin-bottom: 10px;">3️⃣ الصدمة الحلولية والانفجار الخلوي</h3>
+                    <p style="color: #cbd5e1; line-height: 1.8;">يدخل الماء والشوارد بكثافة عبر الثقوب فتنفجر الخلية المصابة، ويدخل إنزيم الغرانزيم ليقطع الـ <span class="ltr-seq">ADN</span> ويحفز ظاهرة الموت الخلوي المبرمج (<span class="ltr-seq">Apoptose</span>)، ثم تأتي البلعميات لتنظيف البقايا.</p>
+                `;
+            }
+        }
+
+        function simCoop(type) {
+            let box = document.getElementById('coopDisplayBox');
+            if (type === 'normal') {
+                box.innerHTML = `
+                    <h3 style="color: #4ade80; margin-bottom: 10px;">🟢 استجابة مناعية قوية ومتكاملة</h3>
+                    <p style="color: #cbd5e1; line-height: 1.8;">تفرز خلايا <span class="ltr-seq">LTh</span> كميات وفيرة من مبلغ <span class="ltr-seq">IL-2</span>. تستجيب اللمفاويات <span class="ltr-seq">LB</span> وتنتج ملايين الأجسام المضادة، وتستجيب اللمفاويات <span class="ltr-seq">LT8</span> وتتحول لجحافل قاتلة <span class="ltr-seq">LTc</span>، فيتم تطهير العضوية بنجاح.</p>
+                `;
+            } else {
+                box.innerHTML = `
+                    <h3 style="color: #ef4444; margin-bottom: 10px;">🔴 انهيار مناعي تام (عجز مناعي مكتسب)</h3>
+                    <p style="color: #cbd5e1; line-height: 1.8;">بغيب خلايا <span class="ltr-seq">LT4</span> ينعدم إفراز مبلغ الأنترلوكين-2 (<span class="ltr-seq">IL-2 = 0</span>). رغم وجود خلايا <span class="ltr-seq">LB</span> وخلايا <span class="ltr-seq">LT8</span> سليمة وتعرفها على المستضد، إلا أنها لا تجد التحفيز الهرموني الكافي للتكاثر والتمايز، فتصاب العضوية بالشلل المناعي.</p>
+                `;
+            }
+        }
+
+        function checkCh13Answer(optIdx, isCorrect) {
+            let container = document.getElementById('c13q1-container');
+            let btns = container.querySelectorAll('.option-btn');
+            let fb = document.getElementById('c13q1-feedback');
+
+            btns.forEach((b, idx) => {
+                b.disabled = true;
+                if (idx === optIdx) b.classList.add(isCorrect ? 'correct' : 'wrong');
+            });
+
+            fb.style.display = 'block';
+            if (isCorrect) {
+                fb.style.background = '#f0fdf4'; fb.style.color = '#166534'; fb.style.border = '1px solid #bbf7d0';
+                fb.innerHTML = '<strong>✅ إجابة صحيحة ممتاز!</strong> البرفورين يشكل قنوات غشائية تسبب دخول الماء وانفجار الخلية (الصدمة الحلولية).';
+            } else {
+                fb.style.background = '#fef2f2'; fb.style.color = '#991b1b'; fb.style.border = '1px solid #fecaca';
+                fb.innerHTML = '<strong>❌ إجابة خاطئة.</strong> البرفورين بروتين ثاقب للغشاء يفرز من طرف خلايا LTc لإحداث صدمة حلولية.';
+            }
+        }
+
+        function checkCh14Answer(optIdx, isCorrect) {
+            let container = document.getElementById('c14q1-container');
+            let btns = container.querySelectorAll('.option-btn');
+            let fb = document.getElementById('c14q1-feedback');
+
+            btns.forEach((b, idx) => {
+                b.disabled = true;
+                if (idx === optIdx) b.classList.add(isCorrect ? 'correct' : 'wrong');
+            });
+
+            fb.style.display = 'block';
+            if (isCorrect) {
+                fb.style.background = '#f0fdf4'; fb.style.color = '#166534'; fb.style.border = '1px solid #bbf7d0';
+                fb.innerHTML = '<strong>✅ إجابة صحيحة ممتاز!</strong> تحسس الخلية اللمفاوية بالمستضد يحفزها على إظهار مستقبلات IL-2 الغشائية.';
+            } else {
+                fb.style.background = '#fef2f2'; fb.style.color = '#991b1b'; fb.style.border = '1px solid #fecaca';
+                fb.innerHTML = '<strong>❌ إجابة خاطئة.</strong> السبب هو أن مستقبلات IL-2 لا يتم التعبير عنها على غشاء اللمفاويات إلا بعد التعرف المسبق على المستضد.';
+            }
+        }
+    </script>
+</body>
+</html>

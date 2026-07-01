@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منصة المتفوق 3AS | الفهرس الوطني الشامل (55 درساً رسمياً)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #f8fafc;
+            --surface: #ffffff;
+            --primary: #0f172a;
+            --accent: #2563eb;
+            --accent-light: #eff6ff;
+            --success: #16a34a;
+            --emerald: #059669;
+            --amber: #d97706;
+            --danger: #dc2626;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --radius: 16px;
+            --shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Cairo', 'Tajawal', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            line-height: 1.7;
+            padding-bottom: 60px;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            padding: 1.2rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 900;
+            font-size: 1.4rem;
+            color: var(--primary);
+        }
+
+        .brand-badge {
+            background: var(--success);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            white-space: nowrap;
+        }
+
+        .container {
+            max-width: 1150px;
+            margin: 2rem auto;
+            padding: 0 1.2rem;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+            color: white;
+            border-radius: var(--radius);
+            padding: 3rem 2rem;
+            margin-bottom: 2.5rem;
+            text-align: center;
+            box-shadow: var(--shadow);
+        }
+
+        .hero h1 {
+            font-size: 2.4rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+        }
+
+        .hero p {
+            font-size: 1.1rem;
+            color: #93c5fd;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid { grid-template-columns: 1fr; }
+            .hero h1 { font-size: 1.8rem; }
+        }
+
+        .stat-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: var(--shadow);
+        }
+
+        .stat-num {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: var(--accent);
+        }
+
+        .stat-label {
+            font-weight: 700;
+            color: var(--text-muted);
+        }
+
+        /* Domain Section */
+        .domain-box {
+            background: var(--surface);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            margin-bottom: 2.5rem;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .domain-header {
+            padding: 1.5rem 2rem;
+            color: white;
+            font-size: 1.4rem;
+            font-weight: 900;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .dom-1 { background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%); }
+        .dom-2 { background: linear-gradient(135deg, #14532d 0%, #16a34a 100%); }
+        .dom-3 { background: linear-gradient(135deg, #78350f 0%, #d97706 100%); }
+
+        .unit-section {
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .unit-section:last-child { border-bottom: none; }
+
+        .unit-title {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .chapter-list {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        @media (max-width: 850px) {
+            .chapter-list { grid-template-columns: 1fr; }
+        }
+
+        .ch-item {
+            background: var(--bg-main);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s;
+            text-decoration: none;
+            color: var(--text-main);
+        }
+
+        .ch-item:hover {
+            border-color: var(--accent);
+            background: var(--accent-light);
+            transform: translateX(-3px);
+        }
+
+        .ch-num {
+            background: white;
+            color: var(--accent);
+            border: 1px solid var(--border);
+            width: 32px;
+            height: 32px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            font-weight: 900;
+            font-size: 0.9rem;
+            margin-left: 10px;
+            flex-shrink: 0;
+        }
+
+        .ch-info {
+            display: flex;
+            align-items: center;
+            flex: 1;
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
+
+        .phase-tag {
+            background: #e2e8f0;
+            color: #475569;
+            font-size: 0.75rem;
+            font-weight: 800;
+            padding: 4px 8px;
+            border-radius: 6px;
+            white-space: nowrap;
+        }
+
+        .ch-item:hover .phase-tag {
+            background: var(--accent);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="brand">
+            <span>منصة المتفوق 3AS</span>
+            <span class="brand-badge">مطابق 100% للكتاب المدرسي الرسمي</span>
+        </div>
+        <div style="font-weight: 700; color: var(--text-muted);">
+            شعبة العلوم التجريبية • وزارة التربية الوطنية
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="hero">
+            <h1>الفهرس الوطني الشامل لبرنامج علوم الطبيعة والحياة (55 درساً)</h1>
+            <p>تم تدقيق وتطابق جميع العناوين الرسمية الواردة في فهرس الكتاب المدرسي (الصفحات 5، 6، 7) وربطها بالوحدات التفاعلية المنجزة وفق منهجية التعلم الذاتي في 22 مرحلة تطبيقية.</p>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-num">55</div>
+                <div class="stat-label">درساً وعنواناً فرعياً رسمياً في الكتاب</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-num" style="color: var(--emerald);">22</div>
+                <div class="stat-label">مرحلة تفاعلية وتطبيقية جاهزة للاستخدام</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-num" style="color: var(--amber);">11</div>
+                <div class="stat-label">وحدة تعليمية كاملة عبر 3 مجالات كبرى</div>
+            </div>
+        </div>
+
+        <!-- ================================================================= -->
+        <!-- DOMAINE 1 : التخصص الوظيفي للبروتينات (30 درس) -->
+        <!-- ================================================================= -->
+        <div class="domain-box">
+            <div class="domain-header dom-1">
+                <span>المجال الأول : التخصص الوظيفي للبروتينات</span>
+                <span style="font-size: 1rem; opacity: 0.9;">30 درساً رسمياً (5 وحدات)</span>
+            </div>
+
+            <!-- U1 -->
+            <div class="unit-section">
+                <div class="unit-title">📘 الوحدة 1 : تركيب البروتين (5 دروس)</div>
+                <div class="chapter-list">
+                    <a href="phase1_chapitres_1_2.html" class="ch-item">
+                        <div class="ch-info"><span class="ch-num">1</span> 1. تذكير بالمكتسبات (شروط تركيب البروتين)</div>
+                        <span class="phase-tag">المرحلة 1</span>
+                    </a>
+                    <a href="phase1_chapitres_1_2.html" class="ch-item">
+                        <div class="ch-info"><span class="ch-num">2</span> 2. مقر تركيب البروتين في الخلية (REG)</div>
+                        <span class="phase-tag">المرحلة 1</span>
+                    </a>
+                    <a href="lecon_transcription.html" class="ch-item">
+                        <div class="ch-info"><span class="ch-num">3</span> 3. استنساخ المعلومات الوراثية على مستوى ADN</div>
+                        <span class="phase-tag">الدرس التفاعلي</span>
+                    </a>
+                    <a href="phase1_chapitres_1_2.html" class="ch-item">
+                        <div class="ch-info"><span class="ch-num">4</span> 4. الترجمة والشفرة الوراثية وتنشيط الأحماض</div>
+                        <span class="phase-tag">المرحلة 1</span>
+                    </a>
+                    <a href="phase2_chapitres_3_4.html" class="ch-item">
+                        <div class="ch-info"><span class="ch-num">5</span> 5. مراحل الترجمة في الريبوزوم ومتعدد الريبوزوم</div>
+                        <span class="phase-tag">المرحلة 2</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- U2 -->
+            <div class="unit-section">
+                <div class="unit-title">📗 الوحدة 2 : العلاقة بين بنية ووظيفة البروتين (3 دروس)</div>
+                <div class="chapter-list">
+                    <a href="phase2_chapitres_3_4.html" class="ch-item">
+                        <div class="ch-info"><span class="ch-num">6</span> 1. تمثيل البنية الفراغية للبروتين</div>
+                        <span class="phase-tag">المرحلة 2</span>
+                    </a>
+                    <a href="phase2_chapitres_3_4.html" class="ch-item">
+                        <div class="ch-info"><span class="ch-num">7</span> 2. مستويات البنية الفراغية للبروتينات والروابط</div>
+                        <span class="phase-tag">المرحلة 2</span>
+                    </a>
+                    <a href="phase3_chapitres_5_6.html" class="ch-item">
+                        <div class="ch-info"><span class="ch-num">8</span> 3. العلاقة بين بنية ووظيفة البروتين وتأثير الطفرات</div>
+                        <span class="phase-tag">المرحلة 3</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- U3 -->
+            <div class="unit-section">
+                <div class="unit-title">📙 الوحدة 3 : النشاط الإنزيمي للبروتينات (4 دروس)</div>
+                <div class="chapter-list">
+                    <a href="phase3_chapitres_5_6.html" class="ch-item">
+                        <div class="ch-info"><span class="ch-num">9</span> 1. مفهوم الإنزيم وأهميته البيولوجية</div>
+                        <span class="phase-tag">المرحلة 3</span>
+                    </a>
+                    <a href="phase3_chapitres_5_6.html" class="ch-item">
+                        <div class="ch-info"><span class="ch-num">10</span> 2. النشاط الإنزيمي وعلاقته ببنية الموقع الفعال</div>
+                        <span class="phase-tag">المرحلة 3</span>
+                    </a>
+                    <a href="phase4_chapitres_7_8.html" class="ch-item">
+                        <div class="ch-info"><span class="ch-num">11</span> 3. دراسة تأثير تغير درجة pH الوسط على نشاط الإنزيم</div>
+                        <span class="phase-tag">المرحلة 4</span>
+                    </a>
+                    <a href="phase4_chapitres_7_8.html" class="ch-item">
+                        <div class="ch-info"><span class="ch-num">12</span> 4. دراسة تأثير تغيرات درجة الحرارة على نشاط الإنزيم</div>
+                        <span class="phase-tag">المرحلة 4</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- U4 -->
+            <div class="unit-section">
+                <div class="unit-title">📕 الوحدة 4 : دور البروتينات في الدفاع عن الذات (11 درساً)</div>
+                <div class="chapter-list">
+                    <a href="phase5_chapitres_9_10.html" class="ch-item">
+                        <div class="ch-info"><span class="ch-num">13</span> 1. تذكير بالمكتسبات (المناعة)</div>
+                        <span class="phase-tag">المرحلة 5</span>
+                    </a>
+                    <a href="phase5_chapitres_9_10.html" class="ch-item">
+                        <div class="ch-info"><span class="ch-num">14</span> 2. الذات واللاذات ومؤشرات الـ CMH / HLA</div>
+                        <span class="phase-tag">المرحلة 5</span>
+                    </a>
+                    <a href="phase5_chapitres_9_10.html" class="ch-item">
+                        <div class="ch-info"><span class="ch-num">15</span> 3. الجزيئات الدفاعية في الحالة الأولى (الزمر ABO و Rh)</div>
+                        <span class="phase-tag">المرحلة 5</span>
+                    </a>
+                    <a href="phase6_chapitres_11_12.html" class="ch-item">
+                        <div class="ch-info"><span class="ch-num">16</span> 4. المعقد المناعي وإبطال مفعول المستضد</div>
+                        <span class="phase-tag">المرحلة 6</span>
+                    </a>
+                    <a href="phase6_chapitres_11_12.html" class="ch-item">
+                        <div class="ch-info"><span class="ch-num">17</span> 5. مصدر الأجسام المضادة وبنيتها في شكل حرف Y</div>
+                        <span class="phase-tag">المرحلة 6</span>
+                    </a>
+                    <a href="phase6_chapitres_11_12.html" class="ch-item">
+                        <div class="ch-info"><span class="ch-num">18</span> 6. العناصر الدفاعية في الحالة الثانية (البلعمة)</div>
+                        <span class="phase-tag">المرحلة 6</span>
+                    </a>
+                    <a href="phase7_chapitres_13_14.html" class="ch-item">
+                        <div class="ch-info"><span class="ch-num">19</span> 7. طرق تأثير اللمفاويات LTc (البرفورين والغرانزيم)</div>
+                        <span class="phase-tag">المرحلة 7</span>
+                    </a>
+                    <a href="phase7_chapitres_13_14.html" class="ch-item">
+                        <div class="ch-info"><span class="ch-num">20</span> 8. مصدر اللمفاويات LTc والتعرف المزدوج</div>
+                        <span class="phase-tag">المرحلة 7</span>
+                    </a>
+                    <a href="phase7_chapitres_13_14.html" class="ch-item">
+                        <div class="ch-info"><span class="ch-num">21</span> 9. تحفيز الخلايا LB و LT8 (دور LT4 المساعدة)</div>
+                        <span class="phase-tag">المرحلة 7</span>
+                    </a>
+                    <a href="phase7_chapitres_13_14.html" class="ch-item">
+                        <div class="ch-info"><span class="ch-num">22</span> 10. اختيار نمط الاستجابة المناعية وتأثير IL-2</div>
+                        <span class="phase-tag">المرحلة 7</span>
+                    </a>
+                    <a href="phase7_chapitres_13_14.html" class="ch-item">
+                        <div class="ch-info"><span class="ch-num">23</span> 11. سبب فقدان المناعة المكتسبة (فيروس الإيدز VIH)</div>
+                        <span class="phase-tag">المرحلة 7</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- U5 -->
+            <div class="unit-section">
+                <div class="unit-title">📓 الوحدة 5 : دور البروتينات في الاتصال العصبي (7 دروس)</div>
+                <div class="chapter-list">
+                    <a href="phase8_chapitres_15_16.html" class="ch-item">
+                        <div class="ch-info"><span class="ch-num">24</span> 1. تذكير بالمكتسبات (السيالة العصبية)</div>
+                        <span class="phase-tag">المرحلة 8</span>
+                    </a>
+                    <a href="phase8_chapitres_15_16.html" class="ch-item">
+                        <div class="ch-info"><span class="ch-num">25</span> 2. النقل المشبكي (الكمون الغشائي)</div>
+                        <span class="phase-tag">المرحلة 8</span>
+                    </a>
+                    <a href="phase9_chapitres_17_18.html" class="ch-item">
+                        <div class="ch-info"><span class="ch-num">26</span> 3. آلية النقل المشبكي الكيميائي (الأستيل كولين ACh)</div>
+                        <span class="phase-tag">المرحلة 9</span>
+                    </a>
+                    <a href="phase8_chapitres_15_16.html" class="ch-item">
+                        <div class="ch-info"><span class="ch-num">27</span> 4. كمون الراحة ومضخة Na⁺/K⁺-ATPase</div>
+                        <span class="phase-tag">المرحلة 8</span>
+                    </a>
+                    <a href="phase8_chapitres_15_16.html" class="ch-item">
+                        <div class="ch-info"><span class="ch-num">28</span> 5. كمون العمل والقنوات الفولطية</div>
+                        <span class="phase-tag">المرحلة 8</span>
+                    </a>
+                    <a href="phase9_chapitres_17_18.html" class="ch-item">
+                        <div class="ch-info"><span class="ch-num">29</span> 6. آلية الإدماج العصبي (PPSE مقابل PPSI)</div>
+                        <span class="phase-tag">المرحلة 9</span>
+                    </a>
+                    <a href="phase10_chapitres_19_20.html" class="ch-item">
+                        <div class="ch-info"><span class="ch-num">30</span> 7. تأثير المخدرات على مستوى المشبك (المورفين)</div>
+                        <span class="phase-tag">المرحلة 10</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================================================================= -->
+        <!-- DOMAINE 2 : التحولات الطاقوية (11 درس) -->
+        <!-- ================================================================= -->
+        <div class="domain-box">
+            <div class="domain-header dom-2">
+                <span>المجال الثاني : التحولات الطاقوية</span>
+                <span style="font-size: 1rem; opacity: 0.9;">11 درساً رسمياً (3 وحدات)</span>
+            </div>
+
+            <!-- U1 -->
+            <div class="unit-section">
+                <div class="unit-title">🌿 الوحدة 1 : آليات تحويل الطاقة الضوئية إلى طاقة كيميائية كامنة (4 دروس)</div>
+                <div class="chapter-list">
+                    <a href="phase10_chapitres_19_20.html" class="ch-item">
+                        <div class="ch-info"><span class="ch-num">31</span> 1. تذكير بالمكتسبات (شروط التركيب الضوئي)</div>
+                        <span class="phase-tag">المرحلة 10</span>
+                    </a>
+                    <a href="phase10_chapitres_19_20.html" class="ch-item">
+                        <div class="ch-info"><span class="ch-num">32</span> 2. مقر عملية التركيب الضوئي (البنية الفوقية للصانعة)</div>
+                        <span class="phase-tag">المرحلة 10</span>
+                    </a>
+                    <a href="phase11_chapitres_21_22.html" class="ch-item">
+                        <div class="ch-info"><span class="ch-num">33</span> 3. تفاعلات المرحلة الكيميوضوئية (التحلل الضوئي والفسفرة)</div>
+                        <span class="phase-tag">المرحلة 11</span>
+                    </a>
+                    <a href="phase12_chapitres_23_24.html" class="ch-item">
+                        <div class="ch-info"><span class="ch-num">34</span> 4. تفاعلات المرحلة الكيميوحيوية (حلقة كالفن والتكامل)</div>
+                        <span class="phase-tag">المرحلة 12</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- U2 -->
+            <div class="unit-section">
+                <div class="unit-title">⚡ الوحدة 2 : آليات تحويل الطاقة الكيميائية الكامنة إلى ATP (6 دروس)</div>
+                <div class="chapter-list">
+                    <a href="phase13_chapitres_25_26.html" class="ch-item">
+                        <div class="ch-info"><span class="ch-num">35</span> 1. تذكير بالمكتسبات (التنفس والتخمر)</div>
+                        <span class="phase-tag">المرحلة 13</span>
+                    </a>
+                    <a href="phase13_chapitres_25_26.html" class="ch-item">
+                        <div class="ch-info"><span class="ch-num">36</span> 2. مقر الأكسدة التنفسية (بنية الميتوكندرون)</div>
+                        <span class="phase-tag">المرحلة 13</span>
+                    </a>
+                    <a href="phase13_chapitres_25_26.html" class="ch-item">
+                        <div class="ch-info"><span class="ch-num">37</span> 3. التحلل السكري في الهيولى (Glycolyse)</div>
+                        <span class="phase-tag">المرحلة 13</span>
+                    </a>
+                    <a href="phase13_chapitres_25_26.html" class="ch-item">
+                        <div class="ch-info"><span class="ch-num">38</span> 4. مراحل تفكك حمض البيروفيك (تفاعلات حلقة كريبس)</div>
+                        <span class="phase-tag">المرحلة 13</span>
+                    </a>
+                    <a href="phase14_chapitres_27_28.html" class="ch-item">
+                        <div class="ch-info"><span class="ch-num">39</span> 5. الفسفرة التأكسدية والسلسلة التنفسية (38 ATP)</div>
+                        <span class="phase-tag">المرحلة 14</span>
+                    </a>
+                    <a href="phase14_chapitres_27_28.html" class="ch-item">
+                        <div class="ch-info"><span class="ch-num">40</span> 6. آليات تحويل الطاقة في وسط لا هوائي (التخمر 2 ATP)</div>
+                        <span class="phase-tag">المرحلة 14</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- U3 -->
+            <div class="unit-section">
+                <div class="unit-title">🔄 الوحدة 3 : تحويل الطاقة على المستوى ما فوق البنية الخلوية (1 درس)</div>
+                <div class="chapter-list">
+                    <a href="phase15_chapitres_29_30.html" class="ch-item" style="grid-column: span 2;">
+                        <div class="ch-info"><span class="ch-num">41</span> 1. المقارنة الشاملة بين الصانعة والميتوكندرون ودورة الطاقة والمادة في المحيط الحيوي</div>
+                        <span class="phase-tag">المرحلة 15</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================================================================= -->
+        <!-- DOMAINE 3 : التكتونية العامة (14 درس) -->
+        <!-- ================================================================= -->
+        <div class="domain-box">
+            <div class="domain-header dom-3">
+                <span>المجال الثالث : التكتونية العامة (الجيولوجيا)</span>
+                <span style="font-size: 1rem; opacity: 0.9;">14 درساً رسمياً (3 وحدات)</span>
+            </div>
+
+            <!-- U1 -->
+            <div class="unit-section">
+                <div class="unit-title">🌋 الوحدة 1 : النشاط التكتوني للصفائح (3 دروس)</div>
+                <div class="chapter-list">
+                    <a href="phase16_chapitres_31_32.html" class="ch-item">
+                        <div class="ch-info"><span class="ch-num">42</span> 1. تحديد الصفائح التكتونية بالنشاط الزلزالي والبركاني</div>
+                        <span class="phase-tag">المرحلة 16</span>
+                    </a>
+                    <a href="phase16_chapitres_31_32.html" class="ch-item">
+                        <div class="ch-info"><span class="ch-num">43</span> 2. حركات الصفائح التكتونية (التباعد والغوص)</div>
+                        <span class="phase-tag">المرحلة 16</span>
+                    </a>
+                    <a href="phase18_chapitres_35_36.html" class="ch-item">
+                        <div class="ch-info"><span class="ch-num">44</span> 3. الطاقة الداخلية للكرة الأرضية وتيارات الحمل الحراري</div>
+                        <span class="phase-tag">المرحلة 18</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- U2 -->
+            <div class="unit-section">
+                <div class="unit-title">🌍 الوحدة 2 : بنية الكرة الأرضية (3 دروس)</div>
+                <div class="chapter-list">
+                    <a href="phase19_chapitres_37_38.html" class="ch-item">
+                        <div class="ch-info"><span class="ch-num">45</span> 1. الموجات الزلزالية (P و S) وتحديد الانقطاعات الرئيسية</div>
+                        <span class="phase-tag">المرحلة 19</span>
+                    </a>
+                    <a href="phase19_chapitres_37_38.html" class="ch-item">
+                        <div class="ch-info"><span class="ch-num">46</span> 2. التركيب الكيميائي والمعدني لصخور القشرة والبرنس</div>
+                        <span class="phase-tag">المرحلة 19</span>
+                    </a>
+                    <a href="phase20_chapitres_39_40.html" class="ch-item">
+                        <div class="ch-info"><span class="ch-num">47</span> 3. نمذجة البنية الداخلية للكرة الأرضية (الأغلفة الخمسة)</div>
+                        <span class="phase-tag">المرحلة 20</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- U3 -->
+            <div class="unit-section">
+                <div class="unit-title">🏔️ الوحدة 3 : النشاط التكتوني والبنيات الجيولوجية المرتبطة به (8 دروس)</div>
+                <div class="chapter-list">
+                    <a href="phase21_chapitres_41_42.html" class="ch-item">
+                        <div class="ch-info"><span class="ch-num">48</span> 1. الظواهر المرتبطة بالبناء (خصائص الظهرات محيطية)</div>
+                        <span class="phase-tag">المرحلة 21</span>
+                    </a>
+                    <a href="phase21_chapitres_41_42.html" class="ch-item">
+                        <div class="ch-info"><span class="ch-num">49</span> 2. المغمايتية الثولييتية وتشكل اللوح المحيطي</div>
+                        <span class="phase-tag">المرحلة 21</span>
+                    </a>
+                    <a href="phase21_chapitres_41_42.html" class="ch-item">
+                        <div class="ch-info"><span class="ch-num">50</span> 3. تشكل الصخور المميزة للظهيرة (بازلت الوسائد والغابرو)</div>
+                        <span class="phase-tag">المرحلة 21</span>
+                    </a>
+                    <a href="phase17_chapitres_33_34.html" class="ch-item">
+                        <div class="ch-info"><span class="ch-num">51</span> 4. الظواهر المرتبطة بالغوص (مستوى بنيوف والخندق)</div>
+                        <span class="phase-tag">المرحلة 17</span>
+                    </a>
+                    <a href="phase17_chapitres_33_34.html" class="ch-item">
+                        <div class="ch-info"><span class="ch-num">52</span> 5. اختفاء اللوح المحيطي والمغمايتية الأنديزيتية للغوص</div>
+                        <span class="phase-tag">المرحلة 17</span>
+                    </a>
+                    <a href="phase21_chapitres_41_42.html" class="ch-item">
+                        <div class="ch-info"><span class="ch-num">53</span> 6. التضاريس الناجمة عن التصادم (سلاسل الجبال كالهيمالايا)</div>
+                        <span class="phase-tag">المرحلة 21</span>
+                    </a>
+                    <a href="phase20_chapitres_39_40.html" class="ch-item">
+                        <div class="ch-info"><span class="ch-num">54</span> 7. شواهد التقلص التكتوني (الطيات والفوالق الانكسارية)</div>
+                        <span class="phase-tag">المرحلة 20</span>
+                    </a>
+                    <a href="phase22_chapitres_43_44.html" class="ch-item">
+                        <div class="ch-info"><span class="ch-num">55</span> 8. شواهد محيط قديم (الأفيوليت ودورة الصخور والموارد بالجزائر)</div>
+                        <span class="phase-tag">المرحلة 22</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>
