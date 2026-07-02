@@ -240,6 +240,12 @@ async def evaluer_reponses_v2(
             "feedback_ar": result["feedback_ar"],
             "advice_ar": result["advice_ar"],
             "source": result["source"],
+            # Spec §3.1 — feedback enrichi
+            "missing": result.get("missing", []),
+            "dominant_error_code": result.get("dominant_error_code", "unknown"),
+            "success": result.get("success", []),
+            "errors": result.get("errors", []),
+            "remediation": result.get("remediation"),
             # Ne PAS exposer llm_raw au frontend en prod
         })
 

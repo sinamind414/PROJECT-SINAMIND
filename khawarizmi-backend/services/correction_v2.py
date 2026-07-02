@@ -20,6 +20,7 @@ import hashlib
 from typing import Any, Protocol, runtime_checkable
 
 from services.answer_sanity import check_answer_sanity
+from services.remediation_service import get_remediation, get_generic_remediation
 from prompts.correction_prompt import (
     SYSTEM_PROMPT_AR,
     build_correction_prompt,
@@ -223,6 +224,13 @@ def _build_sanity_result(
         "student_answer_hash": _sha256_text(student_answer),
         "llm_raw_hash": None,
         "parse_status": "not_called",
+        # Spec §3.1 — champs additionnels
+        "missing": [],
+        "dominant_error_code": sanity_code,
+        "success": [],
+        "errors": [],
+        # Guide p.2 — remédiation automatique
+        "remediation": None,
     }
 
 
@@ -262,11 +270,50 @@ def _build_error_result(
         "student_answer_hash": _sha256_text(student_answer),
         "llm_raw_hash": _sha256_text(llm_raw) if llm_raw is not None else None,
         "parse_status": "failed",
+        # Spec §3.1 — champs additionnels
+        "missing": [],
+        "dominant_error_code": "server_error",
+        "success": [],
+        "errors": [],
+        "remediation": None,
     }
 
 
 def _sha256_text(value: str) -> str:
     return hashlib.sha256(value.encode("utf-8")).hexdigest()
+
+
+# ── dominant_error_code — Spec §3.1 ──────────────
+
+
+def _compute_dominant_error_code(
+    highlights: list[dict],
+    unmatched: list[dict],
+    sanity_code: str,
+    score: int,
+    score_max: int,
+) -> str:
+    """Détermine le code d'erreur dominant pour le retour API (Spec §3.1)."""
+    if sanity_code != "ok":
+        return sanity_code  # gibberish, too_short, empty, etc.
+
+    if score == score_max:
+        return "all_correct"
+
+    highlight_types = {h.get("type") for h in highlights if isinstance(h, dict)}
+
+    if "scientific_error" in highlight_types:
+        return "scientific_error"
+    if "off_topic" in highlight_types:
+        return "off_topic"
+    if "missing_link" in highlight_types:
+        return "methodology_error"
+    if unmatched:
+        return "methodology_error"
+    if score < score_max:
+        return "partial_correct"
+
+    return "unknown"
 
 
 # ── Fonction principale ──────────────────────────
@@ -486,13 +533,37 @@ async def evaluate_answer_v2(
         f"score={score}/{score_max} ({percentage}%) highlights={len(highlights)}"
     )
 
+    # Spec §3.1 — mapping des champs
+    success = [str(m) for m in matched]
+    missing = [
+        {
+            "expected": u["criterion"],
+            "why_ar": u.get("why_ar", ""),
+            "from_model_answer": u.get("from_model_answer", ""),
+        }
+        for u in unmatched if isinstance(u, dict)
+    ]
+    errors = list(unmatched)  # alias spec-compatible
+    dominant_error_code = _compute_dominant_error_code(
+        highlights=highlights,
+        unmatched=unmatched,
+        sanity_code="ok",
+        score=score,
+        score_max=score_max,
+    )
+
+    # Guide p.2 — remédiation automatique
+    remediation = get_remediation(verb_slug, dominant_error_code)
+    if remediation is None:
+        remediation = get_generic_remediation(dominant_error_code)
+
     return {
         "source": source,
         "score": score,
         "score_max": score_max,
         "percentage": percentage,
         "highlights": highlights,
-        "matched_criteria": [str(m) for m in matched],
+        "matched_criteria": success,
         "unmatched_criteria": unmatched,
         "feedback_ar": feedback_ar,
         "advice_ar": advice_ar,
@@ -506,4 +577,10 @@ async def evaluate_answer_v2(
         "student_answer_hash": _sha256_text(student_answer),
         "llm_raw_hash": _sha256_text(llm_raw) if llm_raw is not None else None,
         "parse_status": "ok" if source == "llm" else "recovered",
+        # Spec §3.1 — champs additionnels
+        "missing": missing,
+        "dominant_error_code": dominant_error_code,
+        "success": success,
+        "errors": errors,
+        "remediation": remediation,
     }
