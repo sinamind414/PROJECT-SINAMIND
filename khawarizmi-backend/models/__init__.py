@@ -7,11 +7,14 @@ from models.payment import Payment
 from models.phase1 import ComboState
 from models.reference import CommonMistake, ReferenceEmbedding
 from models.session import MasteryMicroConcept
+from models.social import CommunityPost, Conversation, Message, Comment
 from models.user import User, Waitlist
 
 __all__ = [
     "Base",
     "User", "Waitlist",
+    "Conversation", "Message",
+    "CommunityPost", "Comment",
     "MicroConcept", "ConceptPrerequisite", "QuestionConceptMapping", "QuestionConceptMap",
     "MasteryMicroConcept",
     "Payment",

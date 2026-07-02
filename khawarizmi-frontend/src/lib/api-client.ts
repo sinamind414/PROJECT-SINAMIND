@@ -48,6 +48,16 @@ import {
   AdminGlobalResponse,
   AdminMethodologyGapsResponse,
   AdminStudentsAtRiskResponse,
+  SocialConversationsResponse,
+  SocialMessagesResponse,
+  SocialPostsResponse,
+  SocialConversation,
+  SocialMessage,
+  SocialPost,
+  VoteResponse,
+  SendMessageRequest,
+  CreatePostRequest,
+  CreateConversationRequest,
 } from "./types"
 
 // En dev: paths relatifs (proxy Next.js). En prod: Railway direct (CORS).
@@ -1150,6 +1160,52 @@ class KhawarizmiApiClient {
 
   async getAdminAnalyticsStudentsAtRisk(): Promise<AdminStudentsAtRiskResponse> {
     return this.request<AdminStudentsAtRiskResponse>("/api/admin/analytics/students-at-risk")
+  }
+
+  // ── Social Hub (Messenger + Blog) ──────────────
+
+  async getSocialConversations(): Promise<SocialConversationsResponse> {
+    return this.request<SocialConversationsResponse>("/api/social/messenger/conversations")
+  }
+
+  async createSocialConversation(data: CreateConversationRequest): Promise<SocialConversation> {
+    return this.request<SocialConversation>("/api/social/messenger/conversations", {
+      method: "POST",
+      body: JSON.stringify(data),
+    })
+  }
+
+  async getSocialMessages(conversationId: number): Promise<SocialMessagesResponse> {
+    return this.request<SocialMessagesResponse>(
+      `/api/social/messenger/conversations/${conversationId}/messages`
+    )
+  }
+
+  async sendSocialMessage(conversationId: number, data: SendMessageRequest): Promise<SocialMessage> {
+    return this.request<SocialMessage>(
+      `/api/social/messenger/conversations/${conversationId}/messages`,
+      { method: "POST", body: JSON.stringify(data) }
+    )
+  }
+
+  async getSocialPosts(page = 1, tag?: string): Promise<SocialPostsResponse> {
+    let path = `/api/social/blog/posts?page=${page}`
+    if (tag) path += `&tag=${encodeURIComponent(tag)}`
+    return this.request<SocialPostsResponse>(path)
+  }
+
+  async createSocialPost(data: CreatePostRequest): Promise<SocialPost> {
+    return this.request<SocialPost>("/api/social/blog/posts", {
+      method: "POST",
+      body: JSON.stringify(data),
+    })
+  }
+
+  async voteSocialPost(postId: number, vote: -1 | 0 | 1): Promise<VoteResponse> {
+    return this.request<VoteResponse>(`/api/social/blog/posts/${postId}/vote`, {
+      method: "POST",
+      body: JSON.stringify({ vote }),
+    })
   }
 }
 

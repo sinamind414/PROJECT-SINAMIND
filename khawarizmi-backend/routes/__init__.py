@@ -37,6 +37,7 @@ from . import (
     programme,
     progress,
     session,
+    social,
     tutor,
     videos,
 )
@@ -84,6 +85,8 @@ ALL_ROUTERS = [
     # ── Tutor & Bac Blanc ──
     tutor.router,
     bac_blanc_intelligent.router,
+    # ── Social Hub (Messenger + Blog + Fichiers) ──
+    social.router,
     # ── Admin Analytics (Dashboard Professeur) ──
     admin_analytics.router,
     # ── Document Analysis (v2 uniquement — v1 désactivée) ──

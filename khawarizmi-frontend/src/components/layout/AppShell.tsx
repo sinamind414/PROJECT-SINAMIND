@@ -7,7 +7,7 @@ import {
   MobileDrawer,
   MobileTopBar,
 } from "@/components/layout/Sidebar"
-import { ChatbotWidget } from "@/components/dashboard/chatbot/ChatbotWidget"
+import { SocialHubWidget } from "@/components/dashboard/social/SocialHubWidget"
 
 type AppShellProps = {
   children: ReactNode
@@ -53,9 +53,7 @@ export function AppShell({ children, hideMobileNav = false }: AppShellProps) {
 
       {!hideMobileNav && <MobileBottomNav onOpenMenu={() => setMobileMenuOpen(true)} />}
 
-      <div>
-        <ChatbotWidget />
-      </div>
+      <SocialHubWidget />
     </div>
   )
 }

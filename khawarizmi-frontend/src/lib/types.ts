@@ -1022,3 +1022,77 @@ export interface AdminStudentsAtRiskResponse {
   students: AdminStudentAtRisk[]
 }
 
+// ── Social Hub ─────────────────────────────────
+
+export interface SocialConversation {
+  id: number
+  title: string | null
+  is_group: boolean
+  last_message: string | null
+  last_message_at: string | null
+  unread_count: number
+  participant_ids: number[]
+}
+
+export interface SocialMessage {
+  id: number
+  conversation_id: number
+  sender_id: number
+  sender_name: string
+  content: string | null
+  file_url: string | null
+  file_type: string | null
+  created_at: string
+}
+
+export interface SocialPost {
+  id: number
+  author_id: number
+  author_name: string
+  title: string
+  content: string
+  tags: string[]
+  upvotes: number
+  downvotes: number
+  created_at: string
+  updated_at: string
+  user_vote: number | null
+}
+
+export interface SocialConversationsResponse {
+  conversations: SocialConversation[]
+}
+
+export interface SocialMessagesResponse {
+  messages: SocialMessage[]
+}
+
+export interface SocialPostsResponse {
+  posts: SocialPost[]
+  total: number
+  page: number
+  per_page: number
+}
+
+export interface CreateConversationRequest {
+  participant_id: number
+  title?: string
+}
+
+export interface SendMessageRequest {
+  content?: string
+  file_url?: string
+  file_type?: string
+}
+
+export interface CreatePostRequest {
+  title: string
+  content: string
+  tags?: string[]
+}
+
+export interface VoteResponse {
+  upvotes: number
+  downvotes: number
+}
+
