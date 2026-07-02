@@ -14,25 +14,28 @@ from typing import Any
 from openai import AsyncOpenAI
 
 from config import get_settings
+from prompts.correction_prompt import MANHADJIYA_RUBRICS
 from services.llm import _call_with_fallback
 
 logger = logging.getLogger("khawarizmi.socratic_tutor")
 
 SYSTEM_PROMPT_SOCRATIC = (
-    "أنت مرشد تربوي خبير في العلوم الطبيعية (الجزائر). "
+    "أنت مرشد تربوي خبير في العلوم الطبيعية (الجزائر) وفق منهجية المنهجية (Manhadjiya). "
     "مهمتك تقديم تلميحات وإرشادات بدون إعطاء الإجابة مباشرة.\n\n"
     "## القواعد الصارمة:\n"
     "1. لا تعطِ الإجابة النهائية أو النتيجة.\n"
-    "2. وجه التلميذ نحو الخطوة التالية في المنهجية.\n"
-    "3. استخدم أسئلة توجيهية مثل: 'ماذا تلاحظ في الوثيقة؟' 'ما العلاقة بين...؟'\n"
-    "4. أشر إلى الخطوة المنهجية المطلوبة دون شرحها كاملاً.\n"
-    "5. أجب بصيغة JSON فقط:\n"
+    "2. لا تعطِ الدرجة أو التصحيح.\n"
+    "3. وجه التلميذ نحو الخطوة التالية في المنهجية المطلوبة.\n"
+    "4. استخدم أسئلة توجيهية مثل: 'ماذا تلاحظ في الوثيقة؟' 'ما العلاقة بين...؟'\n"
+    "5. ركز على الخطوة التي فاته التلميذ: تعريف الوثيقة؟ استخراج المعطيات؟ الربط السببي؟\n"
+    "6. أشر إلى الخطوة المنهجية المطلوبة دون شرحها كاملاً.\n"
+    "7. أجب بصيغة JSON فقط:\n"
     "```json\n"
-    '{"hint_ar": "<تلميح قصير 1-2 جمل>", '
+    '{"hint_ar": "<تلميح قصير 1-2 جمل بالعربية فقط>", '
     '"focus_area": "<Document|Methodology|Conclusion>", '
-    '"methodology_step": "<اسم الخطوة>"}\n'
+    '"methodology_step": "<اسم الخطوة من المنهجية المقدمة>"}\n'
     "```\n"
-    "6. التلميح بالعربية فقط."
+    "8. التلميح بالعربية فقط."
 )
 
 DEFAULT_HINT = {
@@ -67,12 +70,17 @@ async def get_socratic_hint(
             caption = doc.get("caption", "")
             doc_block += f"\n--- وثيقة {i+1}: {title}\n{caption}\n"
 
+    methodology = MANHADJIYA_RUBRICS.get(verb_slug) or MANHADJIYA_RUBRICS["analyse"]
     user_prompt = (
         f"السياق: {scenario_context}\n"
         f"{doc_block}"
         f"السؤال: {question_prompt}\n"
         f"المهارة: {question_skill}\n"
         f"الفعل: {verb_slug}\n"
+        f"المنهجية:\n"
+        f"  - الخطوات: {' ← '.join(methodology['steps'])}\n"
+        f"  - الأخطاء الشائعة: {methodology['common_errors']}\n"
+        f"  - الكلمات المفتاحية: {'، '.join(methodology['keywords'])}\n"
         f"إجابة التلميذ: {student_answer}\n"
         f"الإجابة النموذجية: {model_answer}\n"
     )

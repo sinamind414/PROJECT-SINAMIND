@@ -9,10 +9,13 @@ Fonctions exportées :
 - build_correction_prompt(...)  → construit le prompt user complet
 - SYSTEM_PROMPT_AR              → prompt système (instructions au LLM)
 - VERB_METHODOLOGY_AR           → méthodologie par verbe (extraits du livre)
+- MANHADJIYA_RUBRICS            → rubriques structurées (steps, common_errors, keywords)
+- normalize_arabic(text)        → normalisation de texte arabe
 """
 
 from __future__ import annotations
 
+import re
 from typing import Any
 
 # ── Prompt système (instructions au LLM) ──────────
@@ -163,6 +166,54 @@ VERB_METHODOLOGY_AR: dict[str, str] = {
 - **الكلمات المفتاحية**: كلما... كلما، العلاقة طردية/عكسية
 - **البنية**: متغير1 ← تأثير → متغير2 + نوع العلاقة""",
 }
+
+
+# ── Rubriques structurées Manhadjiya (Blueprint § Fichier B) ──────
+
+MANHADJIYA_RUBRICS: dict[str, dict[str, Any]] = {
+    "analyse": {
+        "steps": ["Définition doc", "Décomposition", "Relation", "Conclusion"],
+        "common_errors": "Confondre analyse et interprétation",
+        "keywords": ["تمثل الوثيقة", "نلاحظ", "كلما"],
+    },
+    "interpret": {
+        "steps": ["Rappel fait", "Justification", "Causalité", "Conclusion"],
+        "common_errors": "Sauter la justification",
+        "keywords": ["بسبب", "راجع إلى"],
+    },
+    "deduce": {
+        "steps": ["Synthèse", "Logique", "Réponse concise"],
+        "common_errors": "Trop long",
+        "keywords": ["نستنتج", "ومنه"],
+    },
+    "hypothesis": {
+        "steps": ["Formulation hypothétique", "Lien problème", "Mécanisme"],
+        "common_errors": "Présentée comme certitude",
+        "keywords": ["نفترض أن", "ربما"],
+    },
+    "scientific-text": {
+        "steps": ["Intro", "Développement structuré", "Conclusion"],
+        "common_errors": "Oubli intro/conclusion",
+        "keywords": ["مقدمة", "عرض", "خاتمة"],
+    },
+}
+
+
+# ── Normalisation de texte arabe ──────────────────
+
+_ARABIC_DIACRITICS = re.compile(r"[\u064B-\u0652\u0670\u0640]")
+_ALEF_VARIANTS = {"أ": "ا", "إ": "ا", "آ": "ا", "ٱ": "ا"}
+_TA_MARBUTA = re.compile(r"ة")
+
+
+def normalize_arabic(text: str) -> str:
+    if not text:
+        return ""
+    t = _ARABIC_DIACRITICS.sub("", text)
+    for variant, canonical in _ALEF_VARIANTS.items():
+        t = t.replace(variant, canonical)
+    t = _TA_MARBUTA.sub("ه", t)
+    return t.lower().strip()
 
 
 # ── Construction du prompt utilisateur ────────────
