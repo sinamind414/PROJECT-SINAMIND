@@ -14,6 +14,7 @@ from . import (
     cours,
     dashboard,
     diagnostic,
+    document_analysis_v2,
     dual_coding,
     exercices,
     flashcards,
@@ -81,4 +82,6 @@ ALL_ROUTERS = [
     # ── Tutor & Bac Blanc ──
     tutor.router,
     bac_blanc_intelligent.router,
+    # ── Document Analysis V2 (correcteur hybride LLM + sanity) ──
+    document_analysis_v2.router,
 ]
