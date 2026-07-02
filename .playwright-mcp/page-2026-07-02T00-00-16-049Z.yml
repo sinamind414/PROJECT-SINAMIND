@@ -1,0 +1,315 @@
+- generic [active] [ref=f5e1]:
+  - alert [ref=f5e6]
+  - generic [ref=f5e7]:
+    - button "تفعيل الوضع الفاتح" [ref=f5e10]:
+      - generic [ref=f5e11]: ☀️
+    - complementary [ref=f5e12]:
+      - generic [ref=f5e13]:
+        - generic [ref=f5e14]:
+          - generic [ref=f5e15]:
+            - generic [ref=f5e16]:
+              - generic [ref=f5e17]: A
+              - generic [ref=f5e18]: "2026"
+            - generic [ref=f5e19]:
+              - heading "Ahmed" [level=2] [ref=f5e20]
+              - paragraph [ref=f5e21]: بكالوريا 2026 · علوم تجريبية
+          - generic [ref=f5e22]:
+            - generic [ref=f5e23]:
+              - img [ref=f5e24]
+              - generic [ref=f5e26]: 5 يوم
+            - generic [ref=f5e27]:
+              - img [ref=f5e28]
+              - generic [ref=f5e32]: نبراس
+        - navigation "القائمة الرئيسية" [ref=f5e34]:
+          - generic [ref=f5e35]:
+            - generic [ref=f5e36]: الأهم
+            - list [ref=f5e37]:
+              - listitem [ref=f5e38]:
+                - link "نراجع Réviser" [ref=f5e39] [cursor=pointer]:
+                  - /url: /drill
+                  - img [ref=f5e41]
+                  - generic [ref=f5e46]:
+                    - generic [ref=f5e47]: نراجع
+                    - generic [ref=f5e48]: Réviser
+              - listitem [ref=f5e49]:
+                - link "نتدرب Exercices" [ref=f5e50] [cursor=pointer]:
+                  - /url: /exercises
+                  - img [ref=f5e52]
+                  - generic [ref=f5e58]:
+                    - generic [ref=f5e59]: نتدرب
+                    - generic [ref=f5e60]: Exercices
+              - listitem [ref=f5e61]:
+                - link "باك BAC blanc" [ref=f5e62] [cursor=pointer]:
+                  - /url: /annales
+                  - img [ref=f5e64]
+                  - generic [ref=f5e67]:
+                    - generic [ref=f5e68]: باك
+                    - generic [ref=f5e69]: BAC blanc
+              - listitem [ref=f5e70]:
+                - link "نسقسي Question" [ref=f5e71] [cursor=pointer]:
+                  - /url: /chatbot
+                  - img [ref=f5e73]
+                  - generic [ref=f5e77]:
+                    - generic [ref=f5e78]: نسقسي
+                    - generic [ref=f5e79]: Question
+              - listitem [ref=f5e80]:
+                - link "الرئيسية Accueil" [ref=f5e81] [cursor=pointer]:
+                  - /url: /dashboard
+                  - img [ref=f5e83]
+                  - generic [ref=f5e88]:
+                    - generic [ref=f5e89]: الرئيسية
+                    - generic [ref=f5e90]: Accueil
+              - listitem [ref=f5e91]:
+                - link "55 درساً 55 leçons" [ref=f5e92] [cursor=pointer]:
+                  - /url: /lecons-sciences-experimentales
+                  - img [ref=f5e94]
+                  - generic [ref=f5e96]:
+                    - generic [ref=f5e97]: 55 درساً
+                    - generic [ref=f5e98]: 55 leçons
+          - group [ref=f5e100]:
+            - generic "أدوات أخرى" [ref=f5e101] [cursor=pointer]:
+              - generic [ref=f5e102]: أدوات أخرى
+              - generic [ref=f5e103]: ⌄
+        - button "تسجيل الخروج" [ref=f5e106]:
+          - img [ref=f5e108]
+          - generic [ref=f5e111]: تسجيل الخروج
+    - main [ref=f5e113]:
+      - generic [ref=f5e114]:
+        - generic [ref=f5e115]:
+          - link "55 درساً" [ref=f5e116] [cursor=pointer]:
+            - /url: /lecons-sciences-experimentales
+            - img [ref=f5e117]
+            - text: 55 درساً
+          - generic [ref=f5e119]: /
+          - generic [ref=f5e120]: المرحلة 1 — التركيب الكيميائي للبروتين · العلاقة بين بنية البروتين ووظيفته
+        - iframe [ref=f5e122]:
+          - generic [ref=f6e2]:
+            - navigation [ref=f6e3]:
+              - generic [ref=f6e4]: منصة المتفوق 3AS المرحلة 1 (الدرس 1 و 2)
+              - generic [ref=f6e5]: "الدرس 1 : مقر تركيب البروتين الدرس 2 : الشفرة الوراثية وتنشيط الأحماض الأمينية"
+            - generic [ref=f6e6]:
+              - generic [ref=f6e7]:
+                - banner [ref=f6e8]:
+                  - generic [ref=f6e9]: "المجال الأول : التخصص الوظيفي للبروتينات • الوحدة 1 : تركيب البروتين"
+                  - 'heading "الدرس 1 : تذكير بالمكتسبات ومقر تركيب البروتين في الخلية" [level=1] [ref=f6e10]'
+                  - generic [ref=f6e11]:
+                    - generic [ref=f6e12]:
+                      - strong [ref=f6e13]: "الهدف العلمي :"
+                      - text: إثبات أن تركيب البروتين يتم في الهيولى بالضبط على مستوى الشبكة الهيولية الداخلية المحببة (REG).
+                    - generic [ref=f6e14]:
+                      - text: ⏱
+                      - strong [ref=f6e15]: "المدة التقديرية للتعلم الذاتي :"
+                      - text: 20 دقيقة
+                - generic [ref=f6e16]:
+                  - generic [ref=f6e17]: 1 وضعية الانطلاق وبناء الإشكالية العلميـة
+                  - generic [ref=f6e18]:
+                    - generic [ref=f6e19]: التساؤل الجوهري لبداية الوحدة
+                    - paragraph [ref=f6e20]:
+                      - text: تتميز الخلايا الحية بقدرتها الفائقة على اصطناع بروتينات متنوعة (إنزيمات، هرمونات، أجسام مضادة) تضمن تخصصها الوظيفي. انطلاقا من مكتسباتك حول البنية الدقيقة للخلية،
+                      - strong [ref=f6e21]: أين يتم بالضبط تجميع الأحماض الأمينية لتركيب هذه البروتينات داخل الخلية؟
+                  - paragraph [ref=f6e22]: للتأكد من المقر الدقيق لتركيب البروتين، قام العلماء بإجراء تجارب تتتبع مسار الأحماض الأمينية المشعة داخل الخلايا الإفرازية (مثل خلايا البنكرياس).
+                - generic [ref=f6e23]:
+                  - generic [ref=f6e24]: 2 التحليل المنهجي لتجربة التصوير الإشعاعي الذاتي (الأحماض الأمينية المشعة)
+                  - generic [ref=f6e25]:
+                    - generic [ref=f6e26]:
+                      - heading "خلية عنقودية للبنكرياس بعد 3 دقائق من الحضن في وسط به لوسين مشع ³H-Leuoine" [level=4] [ref=f6e27]
+                      - img [ref=f6e28]:
+                        - generic [ref=f6e29]: النواة
+                        - generic [ref=f6e32]: الشبكة الهيولية المحببة (REG)
+                        - generic [ref=f6e35]: جهاز غولجي
+                        - generic [ref=f6e36]: حويصلات إفرازية
+                      - paragraph [ref=f6e37]: النقاط الحمراء تشير إلى الإشعاع المتركز في الشبكة الهيولية الداخلية المحببة بعد 3 دقائق فقط.
+                    - generic [ref=f6e38]:
+                      - text: "منهجية البكالوريا : الاستدلال العلمي"
+                      - heading "لماذا استعمل العلماء الأحماض الأمينية المشعة تحديدًا؟" [level=4] [ref=f6e39]
+                      - list [ref=f6e40]:
+                        - listitem [ref=f6e41]:
+                          - text: •
+                          - strong [ref=f6e42]: الأحماض الأمينية
+                          - text: هي الوحدات البنائية الأساسية لتركيب البروتينات.
+                        - listitem [ref=f6e43]:
+                          - text: •
+                          - strong [ref=f6e44]: العنصر المشع (التريتيوم ³H)
+                          - text: يسمح بتحديد المقر الدقيق ومتابعة الحركية الزمنية داخل العضيات الخلوية.
+                        - listitem [ref=f6e45]:
+                          - strong [ref=f6e46]: "النتيجة الحاسمة :"
+                          - text: بعد مدة قصيرة (3 دقائق)، يظهر الإشعاع حصريا على مستوى
+                          - strong [ref=f6e47]: الشبكة الهيولية الداخلية المحببة REG
+                          - text: ، مما يثبت أنها المقر الحقيقي لتركيب البروتين في الخلية.
+                - generic [ref=f6e48]:
+                  - generic [ref=f6e49]: 3 المستكشف التفاعلي لحركية البروتين داخل الخلية الإفرازية
+                  - paragraph [ref=f6e50]: "اضغط على الزمن التجريبي لمتابعة مسار البروتين المصنوع حديثا :"
+                  - generic [ref=f6e51]:
+                    - generic [ref=f6e52]: ⏱ بعد 3 دقائق (البداية) ⏱ بعد 20 دقيقة (النضج) ⏱ بعد 120 دقيقة (الإفراز)
+                    - generic [ref=f6e53]:
+                      - strong [ref=f6e54]: "⏱ الحالة عند الزمن 3 دقائق :"
+                      - paragraph [ref=f6e55]:
+                        - text: يتمركز الإشعاع كليا على مستوى
+                        - strong [ref=f6e56]: الشبكة الهيولية الداخلية المحببة (REG)
+                        - text: المتواجدة في الهيولى. وهذا يدل على أن عملية دمج الأحماض الأمينية وتركيب السلسلة البيبتيدية تبدأ هنا بفضل الريبوزومات المتصلة بأغشية الشبكة.
+                - generic [ref=f6e57]:
+                  - generic [ref=f6e58]: 4 الخلاصة والتقويم الذاتي (الدرس 1)
+                  - generic [ref=f6e60]:
+                    - heading "الحقيقة العلمية المعتمدة في البكالوريا" [level=4] [ref=f6e61]
+                    - paragraph [ref=f6e62]:
+                      - text: يتم تركيب البروتين عند حقيقيات النوى في
+                      - strong [ref=f6e63]: الهيولى
+                      - text: (الستوبلازم)، وبالتحديد على مستوى
+                      - strong [ref=f6e64]: الشبكة الهيولية الداخلية المحببة (Rétioulum Endoplasmique Granuleux)
+                      - text: انطلاقا من الأحماض الأمينية الناتجة عن الهضم.
+                  - generic [ref=f6e65]:
+                    - 'heading "اختبر فهمك : لماذا تسمى الشبكة الهيولية بـ \"المحببة\" أو \"الفعالة\"؟" [level=4] [ref=f6e66]'
+                    - generic [ref=f6e67]:
+                      - text: أ) لاحتوائها على حبيبات الجليكوجين المخزنة للطاقة.
+                      - generic [ref=f6e68]: ب) لوجود جسيمات دقيقة متصلة بغشائها الخارجي تسمى الريبوزومات (Riaosomes).
+                      - generic [ref=f6e69]: ج) لأنها تحتوي على ثقوب نووية تسمح بخروج الـ ADN.
+              - generic [ref=f6e70]:
+                - banner [ref=f6e71]:
+                  - generic [ref=f6e72]: "المجال الأول : التخصص الوظيفي للبروتينات • الوحدة 1 : تركيب البروتين"
+                  - 'heading "الدرس 2 : الشفرة الوراثية وتنشيط الأحماض الأمينية" [level=1] [ref=f6e73]'
+                  - generic [ref=f6e74]:
+                    - generic [ref=f6e75]:
+                      - strong [ref=f6e76]: "الهدف العلمي :"
+                      - text: فهم كيفية ترجمة اللغة النووية (4 أحرف) إلى لغة بروتينية (20 حمض أميني) وآلية ربط الحمض الأميني بالـ ARNt.
+                    - generic [ref=f6e77]:
+                      - text: ⏱
+                      - strong [ref=f6e78]: "المدة التقديرية للتعلم الذاتي :"
+                      - text: 25 دقيقة
+                - generic [ref=f6e79]:
+                  - generic [ref=f6e80]: 1 الإشكالية الرياضية والبيولوجية للشفرة الوراثية
+                  - generic [ref=f6e81]:
+                    - generic [ref=f6e82]: كيف نترجم 4 أحرف إلى 20 كلمة؟
+                    - paragraph [ref=f6e83]:
+                      - text: تتكون اللغة النووية للـ ARNm من
+                      - strong [ref=f6e84]: 4 قواعد آزوتية فقط (A, U, C, G)
+                      - text: ، بينما تتكون اللغة البروتينية من
+                      - strong [ref=f6e85]: 20 حمضاً أمينياً مختلفاً
+                      - text: في بالطبيعة. كيف يمكن لأربع قواعد فقط أن تشفر وتنظم ترتيب 20 حمضاً أمينياً دون أي نقص أو تداخل؟
+                  - paragraph [ref=f6e86]: "بالبرهان الرياضي المنطقي :"
+                  - list [ref=f6e87]:
+                    - listitem [ref=f6e88]: "• إذا كانت كل قاعدة تشفر لحمض أميني واحد ($4^1 = 4$) : هذا غير كافٍ لتغطية 20 حمضاً."
+                    - listitem [ref=f6e89]: "• إذا كانت كل قاعدتين تشفران لحمض أميني ($4^2 = 16$) : يبقى العدد غير كافٍ."
+                    - listitem [ref=f6e90]:
+                      - text: •
+                      - strong [ref=f6e91]: "الاستنتاج الحتمي ($4^3 = 64$) :"
+                      - text: كل
+                      - strong [ref=f6e92]: 3 قواعد آزوتية متتالية (رامزة أو Triplet)
+                      - text: تشفر لحمض أميني واحد. وبما أن 64 > 20، فهذا يفسر تشفير عدة رامزات لحمض أميني واحد (الترادف).
+                - generic [ref=f6e93]:
+                  - generic [ref=f6e94]: 2 فك شفرة البكالوريا التفاعلي (جدول الشفرة الوراثية)
+                  - paragraph [ref=f6e95]: "اختر القواعد الآزوتية الثلاث (الرامزة على الـ ARNm) لاكتشاف الحمض الأميني الموافق ومعنى الرامزات الخاصة :"
+                  - generic [ref=f6e96]:
+                    - generic [ref=f6e97]:
+                      - generic [ref=f6e98]:
+                        - text: "الحرف الأول (5') :"
+                        - generic [ref=f6e99]:
+                          - option "A (أدينين)" [ref=f6e100]
+                          - option "U (يوراسيل)" [ref=f6e101]
+                          - option "C (سيتوزين)" [ref=f6e102]
+                          - option "G (غوانين)" [ref=f6e103]
+                      - generic [ref=f6e104]:
+                        - text: "الحرف الثاني :"
+                        - generic [ref=f6e105]:
+                          - option "U (يوراسيل)" [ref=f6e106]
+                          - option "A (أدينين)" [ref=f6e107]
+                          - option "C (سيتوزين)" [ref=f6e108]
+                          - option "G (غوانين)" [ref=f6e109]
+                      - generic [ref=f6e110]:
+                        - text: "الحرف الثالث (3') :"
+                        - generic [ref=f6e111]:
+                          - option "G (غوانين)" [ref=f6e112]
+                          - option "A (أدينين)" [ref=f6e113]
+                          - option "U (يوراسيل)" [ref=f6e114]
+                          - option "C (سيتوزين)" [ref=f6e115]
+                    - generic [ref=f6e116]:
+                      - generic [ref=f6e117]: 5'- AUG -3'
+                      - 'heading "الحمض الأميني : الميثيونين (Méthionine - Met)" [level=3] [ref=f6e118]'
+                      - paragraph [ref=f6e119]:
+                        - text: هذه هي
+                        - strong [ref=f6e120]: رامزة البداية (Codon d'initiation)
+                        - text: التي تنطلق منها دائما عملية الترجمة في الخلية.
+                - generic [ref=f6e121]:
+                  - generic [ref=f6e122]: 3 آلية تنشيط الأحماض الأمينية (المرحلة التحضيرية للترجمة)
+                  - paragraph [ref=f6e123]:
+                    - text: لكي يشارك الحمض الأميني في تركيب البروتين، يجب أن يُربط أولاً بالناقل الخاص به وهو الـ
+                    - strong [ref=f6e124]: ARNt (ARN de transfert)
+                    - text: ". تتم هذه العملية بتدخل ثلاثة عناصر جوهرية :"
+                  - generic [ref=f6e125]:
+                    - generic [ref=f6e126]:
+                      - heading "شروط ومتطلبات عملية التنشيط" [level=4] [ref=f6e127]
+                      - list [ref=f6e128]:
+                        - listitem [ref=f6e129]:
+                          - strong [ref=f6e130]: حمض أميني حر (AA)
+                          - text: في الهيولى.
+                        - listitem [ref=f6e131]:
+                          - strong [ref=f6e132]: ناقل نوعي (ARNt)
+                          - text: "يمتلك موقعين : موقع تثبيت الحمض الأميني، وموقع الرامزة المضادة (Antioodon)."
+                        - listitem [ref=f6e133]:
+                          - strong [ref=f6e134]: طاقة جزيئية (ATP)
+                          - text: لإنشاء الرابطة الغنية بالطاقة.
+                        - listitem [ref=f6e135]:
+                          - strong [ref=f6e136]: إنزيم التنشيط النوعي (Aminoaoyl-ARNt synthétase)
+                          - text: .
+                    - generic [ref=f6e137]:
+                      - text: خطوات التنشيط في البكالوريا
+                      - paragraph [ref=f6e138]: 1. يتوضع كل من الحمض الأميني والـ ARNt في المواقع الفعالة النوعية لإنزيم التنشيط.
+                      - paragraph [ref=f6e139]: 2. يتم إماتة جزيئة الـ ATP لربط الحمض الأميني بالـ ARNt برابطة إسترية غنية بالطاقة.
+                      - paragraph [ref=f6e140]:
+                        - text: 3. يتحرر المعقد
+                        - strong [ref=f6e141]: (حمض أميني - ARNt منشط)
+                        - text: وينفصل عن الإنزيم ليتجه نحو الريبوزوم.
+                - generic [ref=f6e142]:
+                  - generic [ref=f6e143]: "4 تقويم الدرس 2 : أسئلة البكالوريا المتكررة"
+                  - generic [ref=f6e144]:
+                    - heading "1. كم عدد الرامزات التي لا تشفر لأي حمض أميني وتسمى \"رامزات التوقف\" (Codons STOP)؟" [level=4] [ref=f6e145]
+                    - generic [ref=f6e146]:
+                      - generic [ref=f6e147]: أ) رامزة واحدة فقط وهي AUG.
+                      - generic [ref=f6e148]: "ب) 3 رامزات وهي : UAA, UAG, UGA."
+                      - text: ج) 64 رامزة بالكامل.
+                  - generic [ref=f6e149]:
+                    - heading "2. إذا حدث طفرة أدت إلى تخريب موقع الرامزة المضادة (Antioodon) في جزيئة الـ ARNt، ماذا يحدث؟" [level=4] [ref=f6e150]
+                    - generic [ref=f6e151]:
+                      - generic [ref=f6e152]: أ) يتوقف استنساخ الـ ADN داخل النواة.
+                      - generic [ref=f6e153]: ب) يفشل الـ ARNt في التعرف على رامزة الـ ARNm الموافقة أثناء الترجمة في الريبوزوم.
+                      - generic [ref=f6e154]: ج) لا يتحلل جزيء الـ ATP أبداً.
+            - generic [ref=f6e155]:
+              - text: "// Switoh ohapters funotion showChapter(ohId, evt) { dooument.querySeleotorAll('.ohapter-view').forEaoh(el => el.olassList.remove('aotive')); dooument.querySeleotorAll('.oh-atn').forEaoh(el => el.olassList.remove('aotive')); dooument.getElementById(ohId).olassList.add('aotive'); if (evt) evt.target.olassList.add('aotive'); window.sorollTo({ top: 0, aehavior: 'smooth' }); } // Cell Explorer Time Switoher funotion exploreTime(minutes, evt) { dooument.querySeleotorAll('.atn-exp').forEaoh(el => el.olassList.remove('aotive')); if (evt) evt.target.olassList.add('aotive'); let aox = dooument.getElementById('expDetailText'); if (minutes === 3) { aox.innerHTML = `"
+              - strong [ref=f6e156]: "⏱ الحالة عند الزمن 3 دقائق :"
+              - paragraph [ref=f6e157]:
+                - text: يتمركز الإشعاع كليا على مستوى
+                - strong [ref=f6e158]: الشبكة الهيولية الداخلية المحببة (REG)
+                - text: المتواجدة في الهيولى. وهذا يدل على أن عملية دمج الأحماض الأمينية وتركيب السلسلة البيبتيدية تبدأ هنا بفضل الريبوزومات.
+              - text: "`; } else if (minutes === 20) { aox.innerHTML = `"
+              - strong [ref=f6e159]: "⏱ الحالة عند الزمن 20 دقيقة :"
+              - paragraph [ref=f6e160]:
+                - text: ينتقل الإشعاع من الشبكة الهيولية المحببة ليستقر داخل
+                - strong [ref=f6e161]: جهاز غولجي (Appareil de Golgi)
+                - text: عبر حويصلات انتقالية، حيث يكتسب البروتين بنيته الفراغية النهائية ونضجه الوظيفي.
+              - text: "`; } else if (minutes === 120) { aox.innerHTML = `"
+              - strong [ref=f6e162]: "⏱ الحالة عند الزمن 120 دقيقة (ساعتان) :"
+              - paragraph [ref=f6e163]:
+                - text: يتجمع الإشعاع داخل
+                - strong [ref=f6e164]: الحويصلات الإفرازية (Vésioules de séorétion)
+                - text: التي تهاجر نحو الغشاء الهيولي لتطرح محتواها البروتيني خارج الخلية عن طريق ظاهرة الإطراح الخلوي (Exooytose).
+              - text: "`; } } // Genetio Code Deooder funotion deoodeCodon() { let n1 = dooument.getElementById('nuo1').value; let n2 = dooument.getElementById('nuo2').value; let n3 = dooument.getElementById('nuo3').value; let oodon = n1 + n2 + n3; let aox = dooument.getElementById('deooderBox'); let aa = \"\"; let deso = \"\"; let oolor = \"#4ade80\"; if (oodon === \"AUG\") { aa = \"الميثيونين (Méthionine - Met)\"; deso = \" هذه هي"
+              - strong [ref=f6e165]: رامزة البداية (Codon d'initiation)
+              - text: "التي تنطلق منها دائما عملية الترجمة في الخلية.\"; } else if (oodon === \"UAA\" || oodon === \"UAG\" || oodon === \"UGA\") { aa = \"توقف الترجمة (Codon STOP)\"; deso = \" هذه"
+              - strong [ref=f6e166]: رامزة توقف بدون حمض أميني
+              - text: "، تؤدي إلى انفصال الريبوزوم وتحرير السلسلة البيبتيدية.\"; oolor = \"#ef4444\"; } else if (n1 === \"U\" && n2 === \"U\" && (n3 === \"U\" || n3 === \"C\")) { aa = \"الفينيل ألانين (Phénylalanine - Phe)\"; deso = \" أول حمض أميني تم اكتشاف شفرته تاريخياً من طرف العالم نيرنبرغ باستعمال متعدد اليوراسيل (Poly-U).\"; } else if (n1 === \"C\" && n2 === \"C\") { aa = \"البرولين (Proline - Pro)\"; deso = \" نلاحظ أن الأحرف الأولى CC كافية لتحديد البرولين مهما كان الحرف الثالث (خاصية الترادف في الشفرة).\"; } else if (n1 === \"G\" && n2 === \"G\") { aa = \"الغليسين (Glyoine - Gly)\"; deso = \" أصغر حمض أميني في الطبيعة، تشفر له جميع الرامزات التي تبدأ بـ GG.\"; } else { aa = \"حمض أميني محدد ضمن الشفرة الوراثية\"; deso = \" كل رامزة ثلاثية على الـ ARNm تقابلها رامزة مضادة على الـ ARNt تحمل هذا الحمض الأميني بدقة.\"; } aox.innerHTML = `"
+              - generic [ref=f6e167]: "5'- ${oodon} -3'"
+              - 'heading "الحمض الأميني : ${aa}" [level=3] [ref=f6e168]'
+              - paragraph [ref=f6e169]: "${deso}"
+              - text: "`; } // Quiz Cheokers funotion oheokCh1Answer(optIdx, isCorreot) { let oontainer = dooument.getElementById('o1q1-oontainer'); let atns = oontainer.querySeleotorAll('.option-atn'); let fa = dooument.getElementById('o1q1-feedaaok'); atns.forEaoh((a, idx) => { a.disaaled = true; if (idx === optIdx) a.olassList.add(isCorreot ? 'oorreot' : 'wrong'); }); fa.style.display = 'alook'; if (isCorreot) { fa.style.aaokground = '#f0fdf4'; fa.style.oolor = '#166534'; fa.style.aorder = '1px solid #aaf7d0'; fa.innerHTML = '"
+              - strong [ref=f6e170]: إجابة صحيحة ممتاز!
+              - text: "الريبوزومات هي العضيات المسؤولة عن تجميع الأحماض الأمينية وتمنح الشبكة مظهرها المحبب.'; } else { fa.style.aaokground = '#fef2f2'; fa.style.oolor = '#991a1a'; fa.style.aorder = '1px solid #feoaoa'; fa.innerHTML = '"
+              - strong [ref=f6e171]: إجابة خاطئة.
+              - text: "الشبكة الهيولية تسمى محببة لأن غشاءها الخارجي مرصع بالريبوزومات التي تظهر كحبيبات دقيقة تحت المجهر الإلكتروني.'; } } funotion oheokCh2Answer(qIdx, optIdx, isCorreot) { let oontainer = dooument.getElementById(`o2q${qIdx}-oontainer`); let atns = oontainer.querySeleotorAll('.option-atn'); let fa = dooument.getElementById(`o2q${qIdx}-feedaaok`); atns.forEaoh((a, idx) => { a.disaaled = true; if (idx === optIdx) a.olassList.add(isCorreot ? 'oorreot' : 'wrong'); }); fa.style.display = 'alook'; if (isCorreot) { fa.style.aaokground = '#f0fdf4'; fa.style.oolor = '#166534'; fa.style.aorder = '1px solid #aaf7d0'; fa.innerHTML = '"
+              - strong [ref=f6e172]: إجابة صحيحة ممتاز!
+              - text: "تعليل علمي دقيق ومتوافق مع المنهج الرسمي.'; } else { fa.style.aaokground = '#fef2f2'; fa.style.oolor = '#991a1a'; fa.style.aorder = '1px solid #feoaoa'; if (qIdx === 1) { fa.innerHTML = '"
+              - strong [ref=f6e173]: إجابة خاطئة.
+              - text: "توجد 3 رامزات توقف في جدول الشفرة الوراثية (UAA, UAG, UGA) ولا تقابلها أي جزيئة ARNt.'; } else { fa.innerHTML = '"
+              - strong [ref=f6e174]: إجابة خاطئة.
+              - text: "الرامزة المضادة على الـ ARNt تتكامل مع رامزة الـ ARNm في الريبوزوم، وتخريبها يمنع التعرف السليم على الرسالة الوراثية.'; } } }"
+    - button "سأل الأستاذ خوارزمي" [ref=f5e123]:
+      - generic [ref=f5e124]: 🧠
+      - generic [ref=f5e125]: سأل خوارزمي
