@@ -129,6 +129,34 @@ function CorrectionCard({
         <p className="text-gray-200 text-sm leading-relaxed">{item.question.learningFocus}</p>
         <p className="text-gray-400 text-xs leading-relaxed mt-2">نصيحة المحرك: {item.evaluation.advice}</p>
       </div>
+
+      {item.evaluation.remediation?.hint && (
+        <div className="rounded-2xl p-4 bg-amber-500/10 border border-amber-500/30 space-y-2">
+          <div className="flex items-center gap-2 text-amber-200 font-bold text-sm">
+            <span>تلميح سُقراطي</span>
+          </div>
+          <p className="text-gray-200 text-xs">{item.evaluation.remediation.hint.hint_ar}</p>
+          <p className="text-amber-300 text-[10px]">
+            التركيز: {item.evaluation.remediation.hint.focus_area} · الخطوة: {item.evaluation.remediation.hint.methodology_step}
+          </p>
+        </div>
+      )}
+
+      {item.evaluation.remediation?.lesson_title && !item.evaluation.remediation?.hint && (
+        <div className="rounded-2xl p-4 bg-mint/10 border border-mint/30 space-y-3">
+          <div className="flex items-center gap-2 text-mint-soft font-bold text-sm">
+            <span>📚</span> {item.evaluation.remediation.lesson_title}
+          </div>
+          <p className="text-gray-300 text-xs">{item.evaluation.remediation.advice_ar}</p>
+          <a
+            href={`/docs/manhadjiya.pdf#page=${item.evaluation.remediation.page}`}
+            target="_blank"
+            className="inline-block px-3 py-1.5 rounded-lg bg-mint text-white text-[10px] font-bold"
+          >
+            Ouvrir le livre à la page {item.evaluation.remediation.page} ➜
+          </a>
+        </div>
+      )}
     </div>
   )
 }
@@ -146,6 +174,12 @@ export function ScenarioRunner({
   const [award, setAward] = useState<GamificationAward | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const [apiSource, setApiSource] = useState(false)
+  const [requestingHint, setRequestingHint] = useState(false)
+  const [hints, setHints] = useState<Record<string, {
+    hint_ar: string
+    focus_area: string
+    methodology_step: string
+  }>>({})
 
   const questions = getActiveQuestions(scenario, chapterLink)
 
@@ -191,6 +225,8 @@ export function ScenarioRunner({
               allowSecondAttempt: evalData.percentage < 85,
               highlights: evalData.highlights,
               source: evalData.source,
+              dominantErrorCode: evalData.dominant_error_code,
+              remediation: evalData.remediation,
             }
           : evaluateMethodologyAnswer({ verbSlug: question.verbSlug, answer: answers[question.id] || "" })
 
@@ -241,12 +277,34 @@ export function ScenarioRunner({
     }
   }
 
+  async function requestHint(question: MethodologyQuestion) {
+    setRequestingHint(true)
+    try {
+      const payload = {
+        scenario_id: scenario.id,
+        chapter_slug: chapterLink?.slug ?? null,
+        answers: [{ verb_slug: question.verbSlug, answer: answers[question.id] || "" }],
+        request_hint: true,
+      }
+      const resp = await apiClient.evaluateDaAnswersV2(payload)
+      const evalData = resp.evaluations[0]
+      if (evalData?.remediation?.hint) {
+        setHints((prev) => ({ ...prev, [question.id]: evalData.remediation!.hint! }))
+      }
+    } catch {
+      // fallback local silencieux
+    } finally {
+      setRequestingHint(false)
+    }
+  }
+
   function reset() {
     setAnswers({})
     setResult(null)
     setSaved(false)
     setAward(null)
     setApiSource(false)
+    setHints({})
   }
 
   return (
@@ -317,6 +375,20 @@ export function ScenarioRunner({
                   className="w-full rounded-xl bg-[#0C151A] border border-white/[0.08] text-white p-4 outline-none focus:border-mint"
                   placeholder={q.placeholder}
                 />
+                <div className="flex flex-wrap items-center gap-2 mt-2">
+                  <button
+                    onClick={() => requestHint(q)}
+                    disabled={requestingHint}
+                    className="px-3 py-1.5 rounded-lg bg-amber-500/20 text-amber-200 border border-amber-500/30 text-xs font-bold hover:bg-amber-500/30 transition disabled:opacity-50"
+                  >
+                    {requestingHint ? "..." : "طلب تلميح سُقراطي"}
+                  </button>
+                  {hints[q.id] && (
+                    <span className="text-amber-300 text-[10px]">
+                      {hints[q.id].hint_ar}
+                    </span>
+                  )}
+                </div>
               </div>
             ))}
           </div>

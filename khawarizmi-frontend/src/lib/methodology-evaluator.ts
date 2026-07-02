@@ -25,7 +25,14 @@ export type MethodologyEvaluation = {
   dominantErrorCode?: string
 
   highlights?: Highlight[]
-  source?: "sanity" | "llm" | "llm_recovered" | "llm_error"
+  source?: "sanity" | "llm" | "llm_recovered" | "llm_error" | "socratic"
+
+  remediation?: {
+    page?: number
+    lesson_title?: string
+    advice_ar?: string
+    hint?: { hint_ar: string; focus_area: string; methodology_step: string }
+  } | null
 }
 
 export type EvaluateMethodologyInput = {

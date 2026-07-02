@@ -707,6 +707,7 @@ class KhawarizmiApiClient {
     scenario_id: string
     chapter_slug: string | null
     answers: Array<{ verb_slug: string; answer: string; question_id?: string }>
+    request_hint?: boolean
   }) {
     return this.request<{
       session_id: string
@@ -730,7 +731,17 @@ class KhawarizmiApiClient {
         unmatched_criteria: Array<{ criterion: string; why_ar: string; from_model_answer: string }>
         feedback_ar: string
         advice_ar: string
-        source: "sanity" | "llm" | "llm_recovered" | "llm_error"
+        source: "sanity" | "llm" | "llm_recovered" | "llm_error" | "socratic"
+        dominant_error_code?: string
+        missing?: Array<{ expected: string; why_ar: string; from_model_answer: string }>
+        success?: string[]
+        errors?: string[]
+        remediation?: {
+          page?: number
+          lesson_title?: string
+          advice_ar?: string
+          hint?: { hint_ar: string; focus_area: string; methodology_step: string }
+        } | null
       }>
     }>("/api/document-analysis/evaluate-v2", {
       method: "POST",
