@@ -24,6 +24,7 @@ import {
   X,
   Menu,
   Layers3,
+  FlaskConical,
 } from "lucide-react"
 
 type MenuItem = { href: string; icon: LucideIcon; labelAr: string; labelFr: string }
@@ -35,7 +36,7 @@ const MAIN_NAV: MenuItem[] = [
   { href: "/annales", icon: BookMarked, labelAr: "باك", labelFr: "BAC blanc" },
   { href: "/chatbot", icon: Microscope, labelAr: "نسقسي", labelFr: "Question" },
   { href: "/dashboard", icon: LayoutDashboard, labelAr: "الرئيسية", labelFr: "Accueil" },
-  { href: "/lecons-sciences-experimentales", icon: BookOpen, labelAr: "55 درساً", labelFr: "55 leçons" },
+  { href: "/lecons-sciences-experimentales", icon: FlaskConical, labelAr: "التجارب المقررة", labelFr: "Expériences" },
 ]
 
 export const MENU_PHASES: Phase[] = [

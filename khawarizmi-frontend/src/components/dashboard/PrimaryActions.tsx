@@ -7,7 +7,7 @@ const ACTIONS = [
     href: "/cours",
     icon: "📚",
     title: "الدروس النشطة",
-    desc: "55 درساً تفاعلياً",
+    desc: "55 فصلاً بمنهجية الباك",
     accent: "#2DD4BF",
   },
   {

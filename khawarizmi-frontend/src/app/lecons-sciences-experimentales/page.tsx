@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { AppShell } from "@/components/layout/AppShell"
-import { BookOpen, Layers3, GraduationCap, Microscope, ChevronLeft } from "lucide-react"
+import { BookOpen, Layers3, GraduationCap, Microscope, ChevronLeft, FlaskConical } from "lucide-react"
 
 type PhaseMeta = {
   slug: string
@@ -43,7 +43,7 @@ const DOMAINES = [
 ]
 
 const STATS = [
-  { value: "55", label: "درس رسمي" },
+  { value: "44", label: "تجربة مقررة" },
   { value: "22", label: "مرحلة تفاعلية" },
   { value: "3", label: "مجالات علمية" },
 ]
@@ -71,11 +71,11 @@ export default function LeconsPage() {
             الفهرس الوطني 3AS · علوم تجريبية
           </div>
           <h1 className="text-3xl lg:text-4xl font-black mb-4">
-            <span className="text-transparent bg-clip-text bg-gradient-to-l from-mint to-orange">55 درساً</span> تفاعلياً للبكالوريا
+            <span className="text-transparent bg-clip-text bg-gradient-to-l from-mint to-orange">التجارب المقررة</span> للبكالوريا
           </h1>
           <p className="text-slate-300 text-base max-w-2xl mx-auto leading-relaxed">
-            الدروس الرسمية للسنوات الثلاث الأخير (3AS) وفق البرنامج الوطني الجزائري.
-            كل درس في صفحة تفاعلية مع تمارين ومحاكاة وأنشطة تقييم ذاتي.
+            الأنشطة والتجارب المخبرية الرسمية (3AS) وفق المنهاج الوطني الجزائري.
+            كل تجربة في صفحة تفاعلية مع وضعيات الانطلاق والتحليل المنهجي للوثائق.
           </p>
         </div>
 
@@ -116,12 +116,12 @@ export default function LeconsPage() {
                         المرحلة {phase.phase}
                       </span>
                     </div>
-                    <BookOpen className="w-3.5 h-3.5 text-slate-500 group-hover:text-mint transition" aria-hidden="true" />
+                    <FlaskConical className="w-3.5 h-3.5 text-slate-500 group-hover:text-mint transition" aria-hidden="true" />
                   </div>
                   <p className="text-sm font-bold leading-relaxed text-slate-200 group-hover:text-white transition mb-1 line-clamp-2">
                     {phase.label}
                   </p>
-                  <p className="text-xs text-slate-500">الدروس {phase.chapters}</p>
+                  <p className="text-xs text-slate-500">التجارب {phase.chapters}</p>
                 </Link>
               ))}
             </div>

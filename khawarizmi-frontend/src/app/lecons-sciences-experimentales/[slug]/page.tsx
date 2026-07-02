@@ -57,7 +57,7 @@ export default function PhasePage() {
         <div className="flex items-center gap-2 mb-4 text-sm">
           <Link href="/lecons-sciences-experimentales" className="text-mint hover:text-mint-soft transition font-bold">
             <ChevronRight className="w-4 h-4 inline" aria-hidden="true" />
-            55 درساً
+            التجارب المقررة
           </Link>
           <span className="text-slate-500">/</span>
           <span className="text-slate-300 font-semibold truncate">{phaseLabel}</span>
