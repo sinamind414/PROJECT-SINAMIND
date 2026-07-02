@@ -982,3 +982,43 @@ export interface TuteurResponse {
   due_chapter?: string
 }
 
+// ═══════════════════════════════════════════════
+// Admin Analytics (Dashboard Professeur)
+// ═══════════════════════════════════════════════
+
+export interface AdminVerbStat {
+  verb_slug: string
+  avg_score: number
+  total_attempts: number
+}
+
+export interface AdminGlobalResponse {
+  verbs: AdminVerbStat[]
+  global_avg: number
+  total_evaluations: number
+  total_students: number
+  most_critical_verb: AdminVerbStat | null
+}
+
+export interface AdminGapItem {
+  error_type: string
+  occurrences: number
+}
+
+export interface AdminMethodologyGapsResponse {
+  gaps: AdminGapItem[]
+  total: number
+  insight_ar: string
+}
+
+export interface AdminStudentAtRisk {
+  user_id: number
+  prenom: string
+  avg_score: number
+  attempts: number
+}
+
+export interface AdminStudentsAtRiskResponse {
+  students: AdminStudentAtRisk[]
+}
+

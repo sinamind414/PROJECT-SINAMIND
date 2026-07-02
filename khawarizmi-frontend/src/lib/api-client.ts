@@ -45,6 +45,9 @@ import {
   DualCodingSchemaSummary,
   EvaluateSchemaResponse,
   DocumentAnalysisScenarioSummary,
+  AdminGlobalResponse,
+  AdminMethodologyGapsResponse,
+  AdminStudentsAtRiskResponse,
 } from "./types"
 
 // En dev: paths relatifs (proxy Next.js). En prod: Railway direct (CORS).
@@ -1133,6 +1136,20 @@ class KhawarizmiApiClient {
 
   async healthCheck(): Promise<HealthCheck> {
     return this.request<HealthCheck>("/health")
+  }
+
+  // ── Admin Analytics (Dashboard Professeur) ────
+
+  async getAdminAnalyticsGlobal(): Promise<AdminGlobalResponse> {
+    return this.request<AdminGlobalResponse>("/api/admin/analytics/global")
+  }
+
+  async getAdminAnalyticsMethodologyGaps(): Promise<AdminMethodologyGapsResponse> {
+    return this.request<AdminMethodologyGapsResponse>("/api/admin/analytics/methodology-gaps")
+  }
+
+  async getAdminAnalyticsStudentsAtRisk(): Promise<AdminStudentsAtRiskResponse> {
+    return this.request<AdminStudentsAtRiskResponse>("/api/admin/analytics/students-at-risk")
   }
 }
 

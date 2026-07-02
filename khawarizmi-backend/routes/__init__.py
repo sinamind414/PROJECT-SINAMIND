@@ -2,6 +2,7 @@
 # Registry centralisé de tous les routers API
 
 from . import (
+    admin_analytics,
     ai_chat,
     ai_evaluate,
     annales,
@@ -83,6 +84,8 @@ ALL_ROUTERS = [
     # ── Tutor & Bac Blanc ──
     tutor.router,
     bac_blanc_intelligent.router,
+    # ── Admin Analytics (Dashboard Professeur) ──
+    admin_analytics.router,
     # ── Document Analysis (v2 uniquement — v1 désactivée) ──
     # document_analysis.router,  # DÉSACTIVÉ : v1 utilisait evaluate_answer (regex) qui notait 75% le charabia
     document_analysis_v2.router,
