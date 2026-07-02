@@ -123,7 +123,7 @@ async def evaluer_reponses_v2(
                 text("""
                     SELECT id, verb_slug, prompt_ar, skill_ar,
                            model_answer_ar, learning_focus_ar
-                    FROM da_questions WHERE id = :qid
+                    FROM da_questions WHERE verb_slug = :qid
                 """),
                 {"qid": ans.question_id},
             )
