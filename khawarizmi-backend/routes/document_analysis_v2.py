@@ -22,6 +22,7 @@ from config import get_settings
 from deps import get_current_user, get_db, get_openai
 from rate_limit import evaluate_limit, limiter
 from schemas.document_analysis import EvaluateRequest
+from services.correction_audit import log_correction_audit
 from services.correction_v2_retry import evaluate_answer_v2_with_retry
 from services.llm import _call_with_fallback
 from services.rag_service import rag_search, format_rag_context
@@ -241,6 +242,15 @@ async def evaluer_reponses_v2(
             "source": result["source"],
             # Ne PAS exposer llm_raw au frontend en prod
         })
+
+        # 8b. Audit logging asynchrone (hashes uniquement)
+        await log_correction_audit(
+            db=db,
+            result=result,
+            verb_slug=q["verb_slug"],
+            user_id=current_user["id"],
+            session_id=str(session_id),
+        )
 
     # 9. Update session
     global_pct = round((total_score / total_max) * 100) if total_max else 0

@@ -11,13 +11,14 @@ CHAÎNE DE FALLBACK (dans l'ordre) :
 6. NaraRouter (NARA_API_KEY) — proxy OpenAI-compatible, 5M tokens/jour gratuit
 7. OpenAI gpt-4o-mini (OPENAI_FALLBACK_API_KEY ou REAL_OPENAI_API_KEY)
 
-Un fallback ne se déclenche QUE sur rate limit (429/quota).
-Les erreurs réseau/non-429 remontent directement.
+Fallback sur rate limit (429/quota) et, si un validateur est fourni,
+sur réponse HTTP 200 inexploitable (ex. JSON invalide).
 """
 
 import json
 import logging
 import re
+from collections.abc import Callable
 
 from openai import AsyncOpenAI
 from tenacity import retry, stop_after_attempt, wait_exponential
@@ -27,6 +28,16 @@ from services.llm_parser import parse_llm_json
 from prompts.evaluation_prompt import EVALUATION_SYSTEM_PROMPT, build_evaluation_prompt
 
 logger = logging.getLogger("khawarizmi.llm")
+
+
+def _tag_response_provider(response: object, provider: str, model: str) -> object:
+    """Ajoute des métadonnées non bloquantes pour l'audit."""
+    try:
+        setattr(response, "_khawarizmi_provider", provider)
+        setattr(response, "_khawarizmi_model", model)
+    except Exception:
+        pass
+    return response
 
 
 def _get_glm47_client():
@@ -46,6 +57,7 @@ async def _call_with_fallback(
     temperature: float = 0,
     max_tokens: int = 400,
     timeout: float = 8.0,
+    response_validator: Callable[[str], bool] | None = None,
 ) -> object:
     cfg = get_settings()
     providers = []
@@ -97,16 +109,36 @@ async def _call_with_fallback(
         ))
 
     try:
-        return await primary_client.chat.completions.create(
+        primary_response = await primary_client.chat.completions.create(
             model=primary_model,
             temperature=temperature,
             max_tokens=max_tokens,
             timeout=timeout,
             messages=messages,
         )
+        # Si un validateur est fourni et que le contenu du provider primaire
+        # est invalide, on bascule vers les fallbacks au lieu de rendre
+        # l'erreur silencieusement.
+        if response_validator is not None:
+            try:
+                content = primary_response.choices[0].message.content or ""
+                if not response_validator(content):
+                    logger.warning(
+                        "⚠️ Contenu primaire invalide (validateur) — "
+                        "tentative fallback..."
+                    )
+                    raise ValueError("response_validator: contenu invalide")
+            except (IndexError, AttributeError) as ve:
+                logger.warning(
+                    f"⚠️ Impossible d'extraire le contenu primaire pour "
+                    f"validation — fallback. Erreur: {ve}"
+                )
+                raise ValueError(f"extract_failed: {ve}")
+        return _tag_response_provider(primary_response, "primary", primary_model)
     except Exception as e:
-        is_rate_limit = "429" in str(e) or "quota" in str(e).lower()
-        if not is_rate_limit:
+        is_rate_limit = "429" in str(e) or "quota" in str(e).lower() or "quota" in str(e)
+        is_validator_reject = "response_validator" in str(e) or "extract_failed" in str(e)
+        if not is_rate_limit and not is_validator_reject:
             raise
 
     for name, client, model in providers:
@@ -119,12 +151,21 @@ async def _call_with_fallback(
                 timeout=timeout,
                 messages=messages,
             )
+            if response_validator is not None:
+                try:
+                    content = resp.choices[0].message.content or ""
+                    if not response_validator(content):
+                        logger.warning(f"⚠️ Réponse fallback {name} invalide — provider suivant...")
+                        continue
+                except (IndexError, AttributeError) as ve:
+                    logger.warning(f"⚠️ Extraction réponse fallback {name} impossible — provider suivant. Erreur: {ve}")
+                    continue
             logger.info(f"✅ Fallback {name} réussi.")
-            return resp
+            return _tag_response_provider(resp, name, model)
         except Exception as fallback_err:
             logger.error(f"❌ Échec {name} : {fallback_err}")
 
-    raise RuntimeError("Tous les providers IA ont échoué (rate limit). Réessaie plus tard.")
+    raise RuntimeError("Tous les providers IA ont échoué ou retourné une réponse invalide. Réessaie plus tard.")
 
 
 @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=1, max=4))

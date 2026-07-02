@@ -22,7 +22,7 @@ SYSTEM_PROMPT_AR = """أنت مصحح امتحان البكالوريا في م�
 
 ## القواعد الصارمة:
 
-1. **التصحيح بالمقارنة مع الإجابة النموذجية فقط** — لا تخترع معايير جديدة.
+1. **التصحيح بالمقارنة مع الإجابة النموذجية والمنهجية المطلوبة فقط** — لا تخترع معايير جديدة.
 2. **النقطة تُعطى فقط إذا ذُكر المفهوم الصحيح** — لا تعطِ نقاطاً على كلام عام.
 3. **الكلام غير المفهوم = صفر** — لا تحاول إيجاد معنى في نص غير مفهوم.
 4. **التغذية الراجعة باللغة العربية فقط**.
@@ -248,24 +248,89 @@ def build_correction_prompt(
 
 def _summarize_data(data: dict) -> str:
     """Résumé compact d'un objet data de document pour le prompt LLM."""
+    doc_type = data.get("type")
+    unit = data.get("unit")
+
+    # ── Graphiques à points (méthodology-documents.ts) ──
+    if "points" in data:
+        points = data["points"]
+        if isinstance(points, list) and points:
+            labels_values = []
+            numeric_values = []
+            for p in points[:8]:
+                if not isinstance(p, dict):
+                    continue
+                label = p.get("label") or p.get("x") or "?"
+                value = p.get("value") or p.get("y")
+                labels_values.append(f"{label}={value}{unit or ''}")
+                if isinstance(value, (int, float)):
+                    numeric_values.append(value)
+            trend = ""
+            if len(numeric_values) >= 2:
+                if numeric_values[-1] > numeric_values[0]:
+                    trend = " | اتجاه: ارتفاع"
+                elif numeric_values[-1] < numeric_values[0]:
+                    trend = " | اتجاه: انخفاض"
+                else:
+                    trend = " | اتجاه: ثبات"
+            axes = []
+            if data.get("xLabel"):
+                axes.append(f"س={data['xLabel']}")
+            if data.get("yLabel"):
+                axes.append(f"ع={data['yLabel']}")
+            prefix = doc_type or "رسم بياني"
+            base = f"{prefix}: {'؛ '.join(axes)}" if axes else prefix
+            return f"{base} | القيم: {', '.join(labels_values)}{trend}"
+
+    # ── Graphiques à labels+values (format DB brut) ──
     if "labels" in data and "values" in data:
-        # Graphique : labels + premières valeurs
         labels = data["labels"]
         values = data["values"]
         if isinstance(values, list) and values:
             if isinstance(values[0], dict):
-                # Multi-series
                 series_names = [v.get("label", "?") for v in values[:3]]
                 return f"رسم بياني: {', '.join(map(str, labels[:5]))}... | سلاسل: {', '.join(series_names)}"
             return f"رسم بياني: {', '.join(map(str, labels[:5]))}... → {', '.join(map(str, values[:5]))}..."
+
+    # ── Tableaux ──
     if "rows" in data:
-        # Tableau
-        n = len(data["rows"])
+        rows = data["rows"]
+        n = len(rows)
+        if n > 0 and isinstance(rows[0], dict):
+            columns = data.get("columns") or []
+            # Format méthodology-documents.ts : {columns: [...], rows: [{cells: [...], tone: ...}]}
+            if columns and isinstance(rows[0].get("cells"), list):
+                lines = []
+                for r in rows[:5]:
+                    cells = r.get("cells", [])
+                    pairs = [f"{columns[i]}={cells[i]}" for i in range(min(len(columns), len(cells)))]
+                    lines.append(" | ".join(pairs))
+                return f"جدول ({n} صفوف):\n" + "\n".join(lines)
+            # Format dict plat : clés = colonnes
+            skip_keys = {"tone", "style", "className"}
+            cols = [c for c in rows[0].keys() if c not in skip_keys]
+            if cols:
+                lines = []
+                for r in rows[:5]:
+                    vals = [str(r.get(c, "")) for c in cols]
+                    lines.append(" | ".join(vals))
+                return f"جدول ({n} صفوف):\n" + "\n".join(lines)
         return f"جدول بـ {n} صفوف"
+
+    # ── Schémas / flux (steps + arrows) ──
     if "steps" in data:
-        # Flux
-        n = len(data["steps"])
+        steps = data["steps"]
+        arrows = data.get("arrows") or []
+        n = len(steps)
+        if isinstance(steps, list) and steps:
+            parts = []
+            for i, step in enumerate(steps[:8]):
+                parts.append(str(step))
+                if i < len(arrows):
+                    parts.append(f"←{arrows[i]}→")
+            return f"مخطط تدفق ({n} خطوات): " + " ".join(parts)
         return f"مخطط تدفق بـ {n} خطوات"
+
     # Fallback
     import json
     return json.dumps(data, ensure_ascii=False)[:200]

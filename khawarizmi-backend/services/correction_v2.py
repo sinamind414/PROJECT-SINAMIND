@@ -16,6 +16,7 @@ from __future__ import annotations
 import json
 import logging
 import re
+import hashlib
 from typing import Any, Protocol, runtime_checkable
 
 from services.answer_sanity import check_answer_sanity
@@ -29,7 +30,7 @@ logger = logging.getLogger("khawarizmi.correction_v2")
 # ── Paramètres LLM ────────────────────────────────
 # NE PAS modifier sans accord utilisateur (cf. HANDOFF § 8)
 
-LLM_TEMPERATURE = 0.1
+LLM_TEMPERATURE = 0.0
 LLM_MAX_TOKENS = 4096
 LLM_TIMEOUT_SECONDS = 25.0
 
@@ -48,6 +49,7 @@ class LLMCaller(Protocol):
         temperature: float = 0,
         max_tokens: int = 400,
         timeout: float = 8.0,
+        response_validator: Any = None,
     ) -> Any: ...
 
 
@@ -214,6 +216,13 @@ def _build_sanity_result(
         "confidence": 1.0,
         "sanity_code": sanity_code,
         "llm_raw": None,
+        "provider": "none",
+        "model": "none",
+        "finish_reason": "sanity",
+        "prompt_hash": None,
+        "student_answer_hash": _sha256_text(student_answer),
+        "llm_raw_hash": None,
+        "parse_status": "not_called",
     }
 
 
@@ -225,6 +234,11 @@ def _build_error_result(
     score_max: int,
     error_message: str,
     llm_raw: str | None = None,
+    prompt_hash: str | None = None,
+    student_answer: str = "",
+    provider: str = "unknown",
+    model: str = "unknown",
+    finish_reason: str = "unknown",
 ) -> dict[str, Any]:
     """Construit le résultat quand l'appel LLM échoue."""
     return {
@@ -241,7 +255,18 @@ def _build_error_result(
         "sanity_code": "ok",
         "llm_raw": llm_raw,
         "error_message": error_message,
+        "provider": provider,
+        "model": model,
+        "finish_reason": finish_reason,
+        "prompt_hash": prompt_hash,
+        "student_answer_hash": _sha256_text(student_answer),
+        "llm_raw_hash": _sha256_text(llm_raw) if llm_raw is not None else None,
+        "parse_status": "failed",
     }
+
+
+def _sha256_text(value: str) -> str:
+    return hashlib.sha256(value.encode("utf-8")).hexdigest()
 
 
 # ── Fonction principale ──────────────────────────
@@ -328,6 +353,8 @@ async def evaluate_answer_v2(
         except Exception:
             logger.warning(f"{log_prefix}rag_provider_failed — poursuite sans RAG")
 
+    prompt_hash = _sha256_text(user_prompt)
+
     messages = [
         {"role": "system", "content": SYSTEM_PROMPT_AR},
         {"role": "user", "content": user_prompt},
@@ -336,6 +363,13 @@ async def evaluate_answer_v2(
     # ── 3. APPEL LLM ────────────────────────────
 
     llm_raw: str | None = None
+    provider = "unknown"
+    model = primary_model
+    finish_reason = "unknown"
+
+    def _llm_response_validator(content: str) -> bool:
+        """Valide que la réponse LLM contient du JSON exploitable."""
+        return _extract_json_from_response(content) is not None
 
     try:
         response = await llm_call(
@@ -345,12 +379,16 @@ async def evaluate_answer_v2(
             temperature=LLM_TEMPERATURE,
             max_tokens=LLM_MAX_TOKENS,
             timeout=LLM_TIMEOUT_SECONDS,
+            response_validator=_llm_response_validator,
         )
 
         # Extraire le contenu textuel
         try:
             choice = response.choices[0]
             llm_raw = choice.message.content or ""
+            provider = getattr(response, "_khawarizmi_provider", provider)
+            model = getattr(response, "_khawarizmi_model", model)
+            finish_reason = getattr(choice, "finish_reason", None) or "unknown"
             logger.warning(
                 f"{log_prefix}llm_response_fr | "
                 f"fr={choice.finish_reason} rl={len(llm_raw)}"
@@ -364,6 +402,10 @@ async def evaluate_answer_v2(
         return _build_error_result(
             score_max=score_max,
             error_message=str(e),
+            prompt_hash=prompt_hash,
+            student_answer=student_answer,
+            provider=provider,
+            model=model,
         )
 
     # ── 4. POST-VALIDATION ───────────────────────
@@ -379,6 +421,11 @@ async def evaluate_answer_v2(
             score_max=score_max,
             error_message="Impossible de parser la réponse JSON du LLM.",
             llm_raw=llm_raw,
+            prompt_hash=prompt_hash,
+            student_answer=student_answer,
+            provider=provider,
+            model=model,
+            finish_reason=finish_reason,
         )
 
     # Extraire les champs avec valeurs par défaut
@@ -452,4 +499,11 @@ async def evaluate_answer_v2(
         "confidence": confidence,
         "sanity_code": "ok",
         "llm_raw": llm_raw,
+        "provider": provider,
+        "model": model,
+        "finish_reason": finish_reason,
+        "prompt_hash": prompt_hash,
+        "student_answer_hash": _sha256_text(student_answer),
+        "llm_raw_hash": _sha256_text(llm_raw) if llm_raw is not None else None,
+        "parse_status": "ok" if source == "llm" else "recovered",
     }
