@@ -24,6 +24,7 @@ from rate_limit import evaluate_limit, limiter
 from schemas.document_analysis import EvaluateRequest
 from services.correction_audit import log_correction_audit
 from services.correction_v2_retry import evaluate_answer_v2_with_retry
+from services.socratic_tutor import get_socratic_hint
 from services.llm import _call_with_fallback
 from services.rag_service import rag_search, format_rag_context
 
@@ -148,7 +149,40 @@ async def evaluer_reponses_v2(
         # 5. Score_max : reprendre les totaux de VERB_RULES existants
         score_max = _compute_score_max_for_verb(q["verb_slug"])
 
-        # 6. Appel du correcteur v2 avec retry sur erreurs transitoires
+        # 6. SWITCH : Mode Socratique (indice) vs Mode Évaluation (note)
+        if body.request_hint:
+            hint = await get_socratic_hint(
+                scenario_context=scenario_context,
+                documents=documents,
+                question_prompt=q["prompt_ar"],
+                question_skill=q["skill_ar"],
+                verb_slug=q["verb_slug"],
+                model_answer=q["model_answer_ar"],
+                learning_focus=q["learning_focus_ar"],
+                student_answer=ans.answer,
+            )
+            # Pas de note, pas de persistance, pas de FSRS
+            evaluations.append({
+                "question_id": str(q["id"]),
+                "verb_slug": q["verb_slug"],
+                "score": 0,
+                "score_max": score_max,
+                "percentage": 0,
+                "highlights": [],
+                "matched_criteria": [],
+                "unmatched_criteria": [],
+                "feedback_ar": hint["hint_ar"],
+                "advice_ar": hint["hint_ar"],
+                "source": "socratic",
+                "missing": [],
+                "dominant_error_code": "socratic_hint",
+                "success": [],
+                "errors": [],
+                "remediation": {"hint": hint},
+            })
+            continue
+
+        # 6b. Mode Évaluation : appel du correcteur v2 avec retry
         result = await evaluate_answer_v2_with_retry(
             scenario_context=scenario_context,
             documents=documents,

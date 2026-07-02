@@ -83,7 +83,7 @@ ALL_ROUTERS = [
     # ── Tutor & Bac Blanc ──
     tutor.router,
     bac_blanc_intelligent.router,
-    # ── Document Analysis (v1 legacy + v2 hybride) ──
-    document_analysis.router,
+    # ── Document Analysis (v2 uniquement — v1 désactivée) ──
+    # document_analysis.router,  # DÉSACTIVÉ : v1 utilisait evaluate_answer (regex) qui notait 75% le charabia
     document_analysis_v2.router,
 ]

@@ -76,6 +76,7 @@ class EvaluateRequest(BaseModel):
     scenario_id: str
     chapter_slug: str | None = None
     answers: list[EvaluateAnswerInput] = Field(..., min_length=1)
+    request_hint: bool = False
 
 
 class AnswerEvaluation(BaseModel):
