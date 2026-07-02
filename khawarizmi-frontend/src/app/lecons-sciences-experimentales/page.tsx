@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { AppShell } from "@/components/layout/AppShell"
-import { BookOpen, Layers3, GraduationCap, Microscope, ChevronLeft, FlaskConical } from "lucide-react"
+import { BookOpen, Layers3, GraduationCap, Microscope, FlaskConical, ChevronLeft } from "lucide-react"
 
 type PhaseMeta = {
   slug: string
@@ -36,10 +36,108 @@ const PHASES: PhaseMeta[] = [
   { slug: "phase22_chapitres_43_44", phase: 22, label: "العلاقة بين التكتونية والرسوبيات · التطبيقات الجيولوجية", chapters: "43 – 44" },
 ]
 
-const DOMAINES = [
-  { label: "المواد العضوية والبروتينات", color: "blue", domain: 1, phases: PHASES.slice(0, 10) },
-  { label: "تحويل الطاقة", color: "emerald", domain: 2, phases: PHASES.slice(10, 14) },
-  { label: "الظواهر التكتونية", color: "amber", domain: 3, phases: PHASES.slice(14, 22) },
+type UnitGroup = {
+  numero: number
+  labelAr: string
+  labelFr: string
+  phases: PhaseMeta[]
+}
+
+type DomainGroup = {
+  domain: number
+  label: string
+  color: string
+  units: UnitGroup[]
+}
+
+const DOMAINES: DomainGroup[] = [
+  {
+    domain: 1,
+    label: "المواد العضوية والبروتينات",
+    color: "blue",
+    units: [
+      {
+        numero: 1,
+        labelAr: "تركيب البروتين",
+        labelFr: "Synthèse des protéines",
+        phases: PHASES.slice(0, 2),
+      },
+      {
+        numero: 2,
+        labelAr: "العلاقة بين بنية البروتين ووظيفته",
+        labelFr: "Relation structure et fonction",
+        phases: PHASES.slice(2, 4),
+      },
+      {
+        numero: 3,
+        labelAr: "النشاط الإنزيمي للبروتينات",
+        labelFr: "Activité enzymatique",
+        phases: PHASES.slice(4, 6),
+      },
+      {
+        numero: 4,
+        labelAr: "دور البروتينات في الدفاع عن الذات",
+        labelFr: "Immunité et défense de soi",
+        phases: PHASES.slice(6, 8),
+      },
+      {
+        numero: 5,
+        labelAr: "دور البروتينات في الاتصال العصبي",
+        labelFr: "Communication nerveuse",
+        phases: PHASES.slice(8, 10),
+      },
+    ],
+  },
+  {
+    domain: 2,
+    label: "تحويل الطاقة",
+    color: "emerald",
+    units: [
+      {
+        numero: 1,
+        labelAr: "آليات تحويل الطاقة الضوئية إلى طاقة كيميائية كامنة",
+        labelFr: "Photosynthèse",
+        phases: PHASES.slice(10, 11),
+      },
+      {
+        numero: 2,
+        labelAr: "آليات تحويل الطاقة الكيميائية الكامنة إلى ATP",
+        labelFr: "Respiration et fermentation",
+        phases: PHASES.slice(11, 13),
+      },
+      {
+        numero: 3,
+        labelAr: "تحويل الطاقة على المستوى ما فوق البنيوي الخلوي",
+        labelFr: "Ultrastructure cellulaire",
+        phases: PHASES.slice(13, 14),
+      },
+    ],
+  },
+  {
+    domain: 3,
+    label: "الظواهر التكتونية",
+    color: "amber",
+    units: [
+      {
+        numero: 1,
+        labelAr: "النشاط التكتوني للصفائح",
+        labelFr: "Tectonique des plaques",
+        phases: PHASES.slice(14, 17),
+      },
+      {
+        numero: 2,
+        labelAr: "بنية الكرة الأرضية",
+        labelFr: "Structure du globe terrestre",
+        phases: PHASES.slice(17, 19),
+      },
+      {
+        numero: 3,
+        labelAr: "النشاط التكتوني والبنيات الجيولوجية المرتبطة به",
+        labelFr: "Géologie et formation des chaînes",
+        phases: PHASES.slice(19, 22),
+      },
+    ],
+  },
 ]
 
 const STATS = [
@@ -89,47 +187,73 @@ export default function LeconsPage() {
           ))}
         </div>
 
-        {/* Domaines */}
+        {/* Domaines -> Unités -> Chapitres/Expériences */}
         {DOMAINES.map((domaine) => (
-          <section key={domaine.domain} className="mb-8">
-            <div className="flex items-center gap-3 mb-5">
-              <div className={`w-9 h-9 rounded-xl bg-gradient-to-br ${DOMAIN_GRADIENTS[domaine.color]} flex items-center justify-center shadow-lg`}>
-                <Microscope className="w-4.5 h-4.5 text-white" aria-hidden="true" />
+          <section key={domaine.domain} className="mb-12">
+            <div className="flex items-center gap-3 mb-6">
+              <div className={`w-10 h-10 rounded-2xl bg-gradient-to-br ${DOMAIN_GRADIENTS[domaine.color]} flex items-center justify-center shadow-lg`}>
+                <Microscope className="w-5 h-5 text-white" aria-hidden="true" />
               </div>
               <div>
-                <h2 className="text-lg font-black">المجال {domaine.domain}</h2>
-                <p className="text-xs text-slate-400">{domaine.label}</p>
+                <h2 className="text-xl font-black text-white">المجال {domaine.domain} : {domaine.label}</h2>
+                <p className="text-xs text-slate-400 font-medium mt-0.5">{domaine.units.length} وحدات · {domaine.units.reduce((acc, u) => acc + u.phases.length, 0)} مراحل تفاعلية</p>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-              {domaine.phases.map((phase) => (
-                <Link
-                  key={phase.slug}
-                  href={`/lecons-sciences-experimentales/${phase.slug}`}
-                  className="group rounded-2xl bg-white/[0.04] border border-white/[0.08] p-4 hover:bg-mint/5 hover:border-mint/30 transition-all hover:shadow-lg hover:shadow-mint/5"
-                >
-                  <div className="flex items-start justify-between mb-2">
-                    <div className="flex items-center gap-2">
-                      <Layers3 className="w-3.5 h-3.5 text-mint" aria-hidden="true" />
-                      <span className="text-[10px] font-bold text-mint bg-mint/10 px-2 py-0.5 rounded-md">
-                        المرحلة {phase.phase}
+            <div className="space-y-6">
+              {domaine.units.map((unit) => (
+                <div key={unit.numero} className="rounded-3xl bg-white/[0.02] border border-white/[0.08] p-5 lg:p-6 shadow-xl shadow-black/20">
+                  <div className="flex items-center justify-between mb-4 border-b border-white/[0.06] pb-3">
+                    <div className="flex items-center gap-3">
+                      <span className="w-8 h-8 rounded-xl bg-mint/15 text-mint font-bold flex items-center justify-center text-sm shrink-0">
+                        {unit.numero}
                       </span>
+                      <div>
+                        <h3 className="text-base lg:text-lg font-bold text-white">{unit.labelAr}</h3>
+                        <p className="text-xs text-gray-500">{unit.labelFr}</p>
+                      </div>
                     </div>
-                    <FlaskConical className="w-3.5 h-3.5 text-slate-500 group-hover:text-mint transition" aria-hidden="true" />
+                    <span className="text-xs font-semibold text-slate-400 bg-white/[0.04] px-3 py-1 rounded-full border border-white/[0.06] shrink-0">
+                      {unit.phases.length} مراحل
+                    </span>
                   </div>
-                  <p className="text-sm font-bold leading-relaxed text-slate-200 group-hover:text-white transition mb-1 line-clamp-2">
-                    {phase.label}
-                  </p>
-                  <p className="text-xs text-slate-500">التجارب {phase.chapters}</p>
-                </Link>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {unit.phases.map((phase) => (
+                      <Link
+                        key={phase.slug}
+                        href={`/lecons-sciences-experimentales/${phase.slug}`}
+                        className="group rounded-2xl bg-white/[0.03] border border-white/[0.08] p-4 hover:bg-mint/5 hover:border-mint/30 transition-all hover:shadow-lg hover:shadow-mint/5 flex flex-col justify-between"
+                      >
+                        <div>
+                          <div className="flex items-start justify-between mb-2">
+                            <div className="flex items-center gap-2">
+                              <Layers3 className="w-3.5 h-3.5 text-mint" aria-hidden="true" />
+                              <span className="text-[10px] font-bold text-mint bg-mint/10 px-2 py-0.5 rounded-md">
+                                المرحلة {phase.phase}
+                              </span>
+                            </div>
+                            <FlaskConical className="w-3.5 h-3.5 text-slate-500 group-hover:text-mint transition" aria-hidden="true" />
+                          </div>
+                          <p className="text-sm font-bold leading-relaxed text-slate-200 group-hover:text-white transition mb-2 line-clamp-2">
+                            {phase.label}
+                          </p>
+                        </div>
+                        <div className="pt-2 border-t border-white/[0.04] flex items-center justify-between text-xs text-slate-500 group-hover:text-slate-400 transition">
+                          <span>التجارب {phase.chapters}</span>
+                          <span className="text-mint font-bold opacity-0 group-hover:opacity-100 transition">افتح ←</span>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
               ))}
             </div>
           </section>
         ))}
 
         {/* Leçon transcription link */}
-        <div className="text-center pb-6">
+        <div className="text-center pb-6 mt-8">
           <Link
             href="/lecons-sciences-experimentales/lecon_transcription"
             className="inline-flex items-center gap-2 rounded-xl border border-orange/30 bg-orange/10 px-5 py-2.5 text-orange font-bold hover:bg-orange/20 transition text-sm"
