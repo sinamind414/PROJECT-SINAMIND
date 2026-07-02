@@ -9,26 +9,26 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-main: #f8fafc;
-            --surface: #ffffff;
-            --primary: #0f172a;
+            --bg-main: #0c151a;
+            --surface: #131e24;
+            --primary: #5eead4;
             --accent: #2563eb;
-            --accent-light: #eff6ff;
+            --accent-light: rgba(255, 255, 255, 0.05);
             --success: #16a34a;
-            --success-light: #f0fdf4;
+            --success-light: rgba(255, 255, 255, 0.05);
             --warning: #d97706;
-            --warning-light: #fffbeb;
+            --warning-light: rgba(255, 255, 255, 0.05);
             --danger: #dc2626;
-            --danger-light: #fef2f2;
+            --danger-light: rgba(255, 255, 255, 0.05);
             --slate-dark: #334155;
-            --slate-light: #f1f5f9;
+            --slate-light: rgba(255, 255, 255, 0.05);
             --red-dark: #991b1b;
-            --red-light: #fef2f2;
-            --text-main: #1e293b;
-            --text-muted: #64748b;
-            --border: #e2e8f0;
+            --red-light: rgba(255, 255, 255, 0.05);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: rgba(255, 255, 255, 0.08);
             --radius: 16px;
-            --shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+            --shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
         }
 
         * {
@@ -52,7 +52,7 @@
             font-family: monospace;
             font-weight: bold;
             color: var(--accent);
-            background: #f1f5f9;
+            background: rgba(255, 255, 255, 0.06);
             padding: 2px 8px;
             border-radius: 6px;
         }
@@ -246,7 +246,7 @@
 
         .step-num-red {
             background: #fee2e2;
-            color: #991b1b;
+            color: #f87171;
         }
 
         .problem-box {
@@ -259,7 +259,7 @@
 
         .problem-title {
             font-weight: 800;
-            color: #92400e;
+            color: #f59e0b;
             margin-bottom: 0.5rem;
             display: flex;
             align-items: center;
@@ -300,8 +300,8 @@
 
         .method-tag {
             display: inline-block;
-            background: #e0f2fe;
-            color: #0369a1;
+            background: rgba(56, 189, 248, 0.15);
+            color: #38bdf8;
             font-size: 0.75rem;
             font-weight: 800;
             padding: 2px 8px;
@@ -350,7 +350,7 @@
             border-right: 4px solid #334155;
         }
 
-        .text-part.ch40-border { border-right-color: #991b1b; }
+        .text-part.ch40-border { border-right-color: #f87171; }
 
         .text-part h4 {
             font-size: 0.95rem;
@@ -359,7 +359,7 @@
             font-weight: 800;
         }
 
-        .text-part.ch40-border h4 { color: #991b1b; }
+        .text-part.ch40-border h4 { color: #f87171; }
 
         /* Quiz */
         .question-item {
@@ -393,7 +393,7 @@
 
         .option-btn:hover {
             border-color: #334155;
-            background: #f1f5f9;
+            background: rgba(255, 255, 255, 0.06);
         }
 
         .option-btn.correct {
@@ -570,7 +570,7 @@
                     <span>الإشكالية الميكانيكية للتشوهات الصخرية</span>
                 </div>
                 <div class="problem-box" style="border-right-color: var(--red-dark); background: var(--red-light);">
-                    <div class="problem-title" style="color: #991b1b;">⚠️ لماذا تنثني بعض الصخور كالمطاط بينما تنكسر صخور أخرى كالزجاج؟</div>
+                    <div class="problem-title" style="color: #f87171;">⚠️ لماذا تنثني بعض الصخور كالمطاط بينما تنكسر صخور أخرى كالزجاج؟</div>
                     <p>تتعرض الطبقات الصخرية للقشرة الأرضية لقوى تكتونية هائلة ومهولة ناتجة عن حركة الصفائح. في بعض المناطق نجد الطبقات ملتوية ومنحنية في شكل موجات جبلية رائعة تسمى <strong>الطيات (<span class="ltr-seq">Plis</span>)</strong>. وفي مناطق أخرى نجد الطبقات مكسورة وممزقة ومزاحة عن بعضها البعض تسمى <strong>الفوالق (<span class="ltr-seq">Failles</span>)</strong>. <strong>ما هي العوامل الفيزيائية (الحرارة، الضغط، طبيعة الصخر) والقوى التكتونية التي تتحكم في نوع التشوه الصخري؟</strong></p>
                 </div>
             </section>
@@ -610,7 +610,7 @@
                     </div>
 
                     <div class="doc-analysis">
-                        <span class="method-tag" style="background: #fef2f2; color: #991b1b;">التصنيف الميكانيكي في البكالوريا</span>
+                        <span class="method-tag" style="background: #fef2f2; color: #f87171;">التصنيف الميكانيكي في البكالوريا</span>
                         <h4 style="margin: 8px 0; color: var(--primary);">متى تتشكل الطية ومتى يتشكل الفالق؟</h4>
                         <ol style="padding-right: 1.2rem; line-height: 1.8;">
                             <li><strong>التشوهات اللدنة (الطيات <span class="ltr-seq">Plis</span>) :</strong> تحدث عندما تكون الصخور في أعماق القشرة تحت حرارة وضغط عاليين (تتصرف كأنها لدنة <span class="ltr-seq">Ductile</span>)، أو عندما تكون القوى التكتونية بطيئة. تؤدي قوى الانضغاط إلى انثنائها دون انكسار (طية محدبة أو مقعرة).</li>

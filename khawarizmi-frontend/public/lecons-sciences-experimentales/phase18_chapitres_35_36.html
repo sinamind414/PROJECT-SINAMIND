@@ -9,26 +9,26 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-main: #f8fafc;
-            --surface: #ffffff;
-            --primary: #0f172a;
+            --bg-main: #0c151a;
+            --surface: #131e24;
+            --primary: #5eead4;
             --accent: #2563eb;
-            --accent-light: #eff6ff;
+            --accent-light: rgba(255, 255, 255, 0.05);
             --success: #16a34a;
-            --success-light: #f0fdf4;
+            --success-light: rgba(255, 255, 255, 0.05);
             --warning: #d97706;
-            --warning-light: #fffbeb;
+            --warning-light: rgba(255, 255, 255, 0.05);
             --danger: #dc2626;
-            --danger-light: #fef2f2;
+            --danger-light: rgba(255, 255, 255, 0.05);
             --orange-dark: #9a3412;
-            --orange-light: #fff7ed;
+            --orange-light: rgba(255, 255, 255, 0.05);
             --amber-dark: #b45309;
-            --amber-light: #fffbeb;
-            --text-main: #1e293b;
-            --text-muted: #64748b;
-            --border: #e2e8f0;
+            --amber-light: rgba(255, 255, 255, 0.05);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: rgba(255, 255, 255, 0.08);
             --radius: 16px;
-            --shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+            --shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
         }
 
         * {
@@ -52,7 +52,7 @@
             font-family: monospace;
             font-weight: bold;
             color: var(--accent);
-            background: #f1f5f9;
+            background: rgba(255, 255, 255, 0.06);
             padding: 2px 8px;
             border-radius: 6px;
         }
@@ -232,7 +232,7 @@
 
         .step-num {
             background: #ffedd5;
-            color: #9a3412;
+            color: #fb923c;
             width: 38px;
             height: 38px;
             flex-shrink: 0;
@@ -246,7 +246,7 @@
 
         .step-num-amber {
             background: #fef3c7;
-            color: #b45309;
+            color: #fbbf24;
         }
 
         .problem-box {
@@ -259,7 +259,7 @@
 
         .problem-title {
             font-weight: 800;
-            color: #92400e;
+            color: #f59e0b;
             margin-bottom: 0.5rem;
             display: flex;
             align-items: center;
@@ -300,8 +300,8 @@
 
         .method-tag {
             display: inline-block;
-            background: #e0f2fe;
-            color: #0369a1;
+            background: rgba(56, 189, 248, 0.15);
+            color: #38bdf8;
             font-size: 0.75rem;
             font-weight: 800;
             padding: 2px 8px;
@@ -568,7 +568,7 @@
                     <span>الإشكالية الميكانيكية لحركة الصفائح</span>
                 </div>
                 <div class="problem-box" style="border-right-color: var(--amber-dark); background: var(--amber-light);">
-                    <div class="problem-title" style="color: #92400e;">⚠️ كيف تتحول الحرارة الصامتة في باطن الأرض إلى محرك جبار يحرك القارات؟</div>
+                    <div class="problem-title" style="color: #f59e0b;">⚠️ كيف تتحول الحرارة الصامتة في باطن الأرض إلى محرك جبار يحرك القارات؟</div>
                     <p>تزن القارات والمحيطات ملايين المليارات من الأطنان. <strong>ما هي القوة الميكانيكية الخارقة القادرة على شق الظهرات المحيطية ودفع القارات وحني الغلاف الصخري في مناطق الغوص؟ وكيف تعمل الكرة الأرضية كـ "آلة حرارية" (<span class="ltr-seq">Machine thermique</span>) دقيقة؟</strong></p>
                 </div>
             </section>
@@ -607,7 +607,7 @@
                     </div>
 
                     <div class="doc-analysis">
-                        <span class="method-tag" style="background: #fef3c7; color: #b45309;">محرك الأرض في البكالوريا</span>
+                        <span class="method-tag" style="background: #fef3c7; color: #fbbf24;">محرك الأرض في البكالوريا</span>
                         <h4 style="margin: 8px 0; color: var(--primary);">كيف تعمل الآلة الحرارية للأرض؟</h4>
                         <ol style="padding-right: 1.2rem; line-height: 1.8;">
                             <li><strong>تسخين وتمدد المادة في العمق :</strong> تسخن مادة البرنس العميقة بفعل الحرارة الإشعاعية، فتتمدد وتقل كثافتها وتصعد نحو الأعلى مشكلة <strong>أعمده ساخنة صاعدة (<span class="ltr-seq">Panaches chauds</span>)</strong> أسفل الظهرات المحيطية، مما يدفع الصفائح للتباعد.</li>
