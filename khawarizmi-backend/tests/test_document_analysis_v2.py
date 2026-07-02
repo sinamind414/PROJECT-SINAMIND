@@ -101,7 +101,7 @@ async def test_evaluate_v2_success(client, auth_headers):
     with (
         patch("tests.conftest.MockAsyncSession.execute", new=mock_execute),
         patch(
-            "routes.document_analysis_v2.evaluate_answer_v2",
+            "routes.document_analysis_v2.evaluate_answer_v2_with_retry",
             return_value=mock_eval_res,
         ) as mock_eval,
     ):

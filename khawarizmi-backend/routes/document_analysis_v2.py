@@ -22,7 +22,7 @@ from config import get_settings
 from deps import get_current_user, get_db, get_openai
 from rate_limit import evaluate_limit, limiter
 from schemas.document_analysis import EvaluateRequest
-from services.correction_v2 import evaluate_answer_v2
+from services.correction_v2_retry import evaluate_answer_v2_with_retry
 from services.llm import _call_with_fallback
 from services.rag_service import rag_search, format_rag_context
 
@@ -147,8 +147,8 @@ async def evaluer_reponses_v2(
         # 5. Score_max : reprendre les totaux de VERB_RULES existants
         score_max = _compute_score_max_for_verb(q["verb_slug"])
 
-        # 6. Appel du correcteur v2
-        result = await evaluate_answer_v2(
+        # 6. Appel du correcteur v2 avec retry sur erreurs transitoires
+        result = await evaluate_answer_v2_with_retry(
             scenario_context=scenario_context,
             documents=documents,
             question_prompt=q["prompt_ar"],
@@ -168,36 +168,46 @@ async def evaluer_reponses_v2(
         # 7. Persistance MINIMALE dans da_answers (décision validée).
         #    matched_criteria → success, [u["criterion"] for u in unmatched] → errors
         #    highlights → NON persisté (renvoyé dans la réponse API uniquement)
-        await db.execute(
-            text("""
-                INSERT INTO da_answers
-                    (session_id, question_id, verb_slug, chapter_slug,
-                     answer_text, score, score_max, percentage, feedback_ar,
-                     success, errors, missing_markers, forbidden_found)
-                VALUES
-                    (:session_id, :question_id, :verb_slug, :chapter_slug,
-                     :answer_text, :score, :score_max, :percentage, :feedback_ar,
-                     :success, :errors, :missing_markers, :forbidden_found)
-            """),
-            {
-                "session_id": session_id,
-                "question_id": str(q["id"]),
-                "verb_slug": q["verb_slug"],
-                "chapter_slug": body.chapter_slug or "",
-                "answer_text": ans.answer,
-                "score": result["score"],
-                "score_max": result["score_max"],
-                "percentage": result["percentage"],
-                "feedback_ar": result["feedback_ar"],
-                "success": json.dumps(result["matched_criteria"], ensure_ascii=False),
-                "errors": json.dumps(
-                    [u["criterion"] for u in result["unmatched_criteria"]],
-                    ensure_ascii=False,
-                ),
-                "missing_markers": json.dumps([], ensure_ascii=False),
-                "forbidden_found": json.dumps([], ensure_ascii=False),
-            },
-        )
+        #    Si source=llm_error (panne serveur), NE PAS insérer pour ne pas
+        #    polluer l'historique pédagogique de l'élève.
+        if result["source"] != "llm_error":
+            await db.execute(
+                text("""
+                    INSERT INTO da_answers
+                        (session_id, question_id, verb_slug, chapter_slug,
+                         answer_text, score, score_max, percentage, feedback_ar,
+                         success, errors, missing_markers, forbidden_found)
+                    VALUES
+                        (:session_id, :question_id, :verb_slug, :chapter_slug,
+                         :answer_text, :score, :score_max, :percentage, :feedback_ar,
+                         :success, :errors, :missing_markers, :forbidden_found)
+                """),
+                {
+                    "session_id": session_id,
+                    "question_id": str(q["id"]),
+                    "verb_slug": q["verb_slug"],
+                    "chapter_slug": body.chapter_slug or "",
+                    "answer_text": ans.answer,
+                    "score": result["score"],
+                    "score_max": result["score_max"],
+                    "percentage": result["percentage"],
+                    "feedback_ar": result["feedback_ar"],
+                    "success": json.dumps(result["matched_criteria"], ensure_ascii=False),
+                    "errors": json.dumps(
+                        [u["criterion"] for u in result["unmatched_criteria"]],
+                        ensure_ascii=False,
+                    ),
+                    "missing_markers": json.dumps([], ensure_ascii=False),
+                    "forbidden_found": json.dumps([], ensure_ascii=False),
+                },
+            )
+        else:
+            logger.warning(
+                f"eval_v2 | source=llm_error pour question_id={q['id']} "
+                f"user={current_user['id']} — insertion da_answers SKIP "
+                f"pour ne pas polluer l'historique élève. "
+                f"error_message={result.get('error_message', '?')[:200]}"
+            )
 
         # Ne PAS mettre à jour FSRS si source == "llm_error" (échec technique)
         if result["source"] != "llm_error":
@@ -209,8 +219,12 @@ async def evaluer_reponses_v2(
                 percentage=result["percentage"],
             )
 
-        total_score += result["score"]
-        total_max += result["score_max"]
+        # Compter uniquement les évaluations pédagogiques réussies dans le
+        # score de session. Sinon une panne LLM sur une question ferait
+        # chuter le score global de l'élève injustement.
+        if result["source"] != "llm_error":
+            total_score += result["score"]
+            total_max += result["score_max"]
 
         # 8. Format de réponse enrichi avec highlights
         evaluations.append({
@@ -241,12 +255,15 @@ async def evaluer_reponses_v2(
         f"score={total_score}/{total_max} ({global_pct}%)"
     )
 
+    n_errors = sum(1 for e in evaluations if e["source"] == "llm_error")
+
     return {
         "session_id": str(session_id),
         "score_global": total_score,
         "score_max": total_max,
         "percentage": global_pct,
         "evaluations": evaluations,
+        "technical_errors": n_errors,
     }
 
 
