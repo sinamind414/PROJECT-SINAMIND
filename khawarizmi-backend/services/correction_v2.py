@@ -264,6 +264,8 @@ async def evaluate_answer_v2(
     llm_call: LLMCaller,
     primary_client: Any,
     primary_model: str,
+    # RAG context provider (optionnel — dégradation silencieuse si absent)
+    rag_context_provider: Any = None,
     request_id: str | None = None,
 ) -> dict[str, Any]:
     """Évalue une réponse d'élève avec le pipeline hybride sanity + LLM.
@@ -308,6 +310,23 @@ async def evaluate_answer_v2(
         score_max=score_max,
         student_answer=student_answer,
     )
+
+    # RAG enrichment : injecter les extraits du LIVRE MANHADJIYA si disponible
+    if rag_context_provider is not None:
+        try:
+            rag_context = await rag_context_provider(
+                verb_slug=verb_slug,
+                question_prompt=question_prompt,
+                student_answer=student_answer,
+            )
+            if rag_context:
+                user_prompt = (
+                    f"{user_prompt}\n\n"
+                    "═══ مقتطفات من الكتاب المنهجي (RAG) ═══\n"
+                    f"{rag_context}"
+                )
+        except Exception:
+            logger.warning(f"{log_prefix}rag_provider_failed — poursuite sans RAG")
 
     messages = [
         {"role": "system", "content": SYSTEM_PROMPT_AR},

@@ -1,3 +1,4 @@
+import type { Highlight } from "@/components/methodology/HighlightedAnswer"
 import { getActionVerb, type ActionVerbRule } from "@/lib/methodology-v1"
 
 export type MethodologyCriterionResult = {
@@ -22,6 +23,9 @@ export type MethodologyEvaluation = {
   advice: string
   allowSecondAttempt: boolean
   dominantErrorCode?: string
+
+  highlights?: Highlight[]
+  source?: "sanity" | "llm" | "llm_recovered" | "llm_error"
 }
 
 export type EvaluateMethodologyInput = {

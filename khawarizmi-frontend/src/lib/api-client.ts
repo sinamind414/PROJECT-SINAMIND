@@ -703,6 +703,41 @@ class KhawarizmiApiClient {
     })
   }
 
+  async evaluateDaAnswersV2(payload: {
+    scenario_id: string
+    chapter_slug: string | null
+    answers: Array<{ verb_slug: string; answer: string; question_id?: string }>
+  }) {
+    return this.request<{
+      session_id: string
+      score_global: number
+      score_max: number
+      percentage: number
+      evaluations: Array<{
+        question_id: string
+        verb_slug: string
+        score: number
+        score_max: number
+        percentage: number
+        highlights: Array<{
+          start: number
+          end: number
+          type: "gibberish" | "off_topic" | "missing_link" |
+                "wrong_formulation" | "irrelevant" | "good_element"
+          message_ar: string
+        }>
+        matched_criteria: string[]
+        unmatched_criteria: Array<{ criterion: string; why_ar: string; from_model_answer: string }>
+        feedback_ar: string
+        advice_ar: string
+        source: "sanity" | "llm" | "llm_recovered" | "llm_error"
+      }>
+    }>("/api/document-analysis/evaluate-v2", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    })
+  }
+
   async getDaProgress(): Promise<DaProgressResponse> {
     return this.request<DaProgressResponse>(
       "/api/document-analysis/progress"

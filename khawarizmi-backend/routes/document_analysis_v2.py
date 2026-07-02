@@ -24,9 +24,27 @@ from rate_limit import evaluate_limit, limiter
 from schemas.document_analysis import EvaluateRequest
 from services.correction_v2 import evaluate_answer_v2
 from services.llm import _call_with_fallback
+from services.rag_service import rag_search, format_rag_context
 
 logger = logging.getLogger("khawarizmi.document_analysis_v2")
 router = APIRouter(prefix="/api/document-analysis", tags=["Document Analysis V2"])
+
+
+async def _make_rag_provider(db: AsyncSession):
+    """Fabrique un provider RAG filtré par verbe du LIVRE MANHADJIYA.
+
+    Si aucun chunk trouvé (ingestion pas encore faite / verbe non couvert),
+    retourne "" — le correcteur dégrade proprement vers la méthodo hardcode.
+    """
+    async def _provider(*, verb_slug: str, question_prompt: str, student_answer: str) -> str:
+        query = f"{verb_slug} {question_prompt[:200]}"
+        try:
+            chunks = await rag_search(db, message=query, chapter=verb_slug)
+        except Exception:
+            return ""
+        return format_rag_context(chunks[:3])
+
+    return _provider
 
 
 @router.post("/evaluate-v2")
@@ -96,6 +114,8 @@ async def evaluer_reponses_v2(
     total_score = 0
     total_max = 0
 
+    rag_provider = await _make_rag_provider(db)
+
     for ans in body.answers:
         # 4. Charger la question ciblée
         if ans.question_id:
@@ -141,6 +161,7 @@ async def evaluer_reponses_v2(
             llm_call=_call_with_fallback,
             primary_client=openai_client,
             primary_model=cfg.openai_model,
+            rag_context_provider=rag_provider,
             request_id=str(uuid.uuid4()),
         )
 

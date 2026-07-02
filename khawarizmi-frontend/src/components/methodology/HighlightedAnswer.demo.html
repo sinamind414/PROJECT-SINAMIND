@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8" />
+<title>HighlightedAnswer — démo</title>
+<style>
+  :root { color-scheme: dark; }
+  body {
+    margin: 0;
+    padding: 40px;
+    background: #0f1720;
+    color: #e5e7eb;
+    font-family: "Segoe UI", "Cairo", "Amiri", Arial, sans-serif;
+    line-height: 1.6;
+  }
+  h1 { color: #93c5fd; font-size: 20px; margin-bottom: 24px; }
+  h2 { color: #a3e635; font-size: 16px; margin: 24px 0 8px; }
+  .card {
+    background: #182730;
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 16px;
+    padding: 16px 20px;
+    margin-bottom: 20px;
+    max-width: 900px;
+  }
+  .label {
+    color: #9ca3af;
+    font-size: 12px;
+    font-weight: bold;
+    margin: 0 0 8px;
+  }
+  .answer { white-space: pre-wrap; line-height: 1.9; color: #e5e7eb; margin: 0; }
+  .legend {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+    font-size: 13px;
+  }
+  .legend mark {
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+  }
+  mark {
+    border-radius: 4px;
+    padding: 1px 3px;
+    margin: 0 1px;
+    cursor: help;
+  }
+</style>
+</head>
+<body>
+
+<h1>مثال : تصحيح إجابة تلميذ مع تحديد الأخطاء (HighlightedAnswer)</h1>
+
+<div class="legend">
+  <mark style="background:rgba(220,38,38,0.35); color:#fecaca; border:1px solid rgba(220,38,38,0.6)">غير مفهوم</mark>
+  <mark style="background:rgba(239,68,68,0.28); color:#fecaca; border:1px solid rgba(239,68,68,0.5)">خارج الموضوع</mark>
+  <mark style="background:rgba(249,115,22,0.28); color:#fed7aa; border:1px solid rgba(249,115,22,0.5)">رابط ناقص</mark>
+  <mark style="background:rgba(234,179,8,0.28); color:#fef08a; border:1px solid rgba(234,179,8,0.5)">صياغة خاطئة</mark>
+  <mark style="background:rgba(148,163,184,0.30); color:#e2e8f0; border:1px solid rgba(148,163,184,0.5)">غير مفيد</mark>
+  <mark style="background:rgba(16,185,129,0.25); color:#bbf7d0; border:1px solid rgba(16,185,129,0.5)">عنصر جيد</mark>
+</div>
+
+
+<h2>الحالة 1 : الرد بالحروف العشوائية (Q4 من لقطات الشاشة)</h2>
+<div class="card">
+  <p class="label">إجابتك</p>
+  <p class="answer"><mark title="غير مفهوم — نص غير مفهوم، لا يحتوي كلمات عربية" style="background:rgba(220,38,38,0.35); color:#fecaca; border:1px solid rgba(220,38,38,0.6)">BVCGGCVUVUY</mark></p>
+</div>
+
+
+<h2>الحالة 2 : فرضية ناقصة (مقبولة جزئيا)</h2>
+<div class="card">
+  <p class="label">إجابتك</p>
+  <p class="answer"><mark title="عنصر جيد — صيغة الفرضية مستعملة" style="background:rgba(16,185,129,0.25); color:#bbf7d0; border:1px solid rgba(16,185,129,0.5)">نفترض أن</mark> هناك مشكلة في <mark title="صياغة خاطئة — مصطلح عام، يجب تحديد ماذا يحدث في المورثة" style="background:rgba(234,179,8,0.28); color:#fef08a; border:1px solid rgba(234,179,8,0.5)">المورثة</mark>. <mark title="رابط ناقص — لم تشر إلى الوثيقة 3 المطلوبة صراحة في التعليمة" style="background:rgba(249,115,22,0.28); color:#fed7aa; border:1px solid rgba(249,115,22,0.5)">هذا يفسر المرض.</mark></p>
+</div>
+
+
+<h2>الحالة 3 : فرضية جيدة</h2>
+<div class="card">
+  <p class="label">إجابتك</p>
+  <p class="answer"><mark title="عنصر جيد — صيغة صحيحة" style="background:rgba(16,185,129,0.25); color:#bbf7d0; border:1px solid rgba(16,185,129,0.5)">نفترض أن</mark> انخفاض البروتين الوظيفي عند الشخص المصاب يعود إلى <mark title="عنصر جيد — سبب واضح" style="background:rgba(16,185,129,0.25); color:#bbf7d0; border:1px solid rgba(16,185,129,0.5)">حدوث تغير في المورثة</mark> يؤدي إلى إنتاج ARNm غير عادي، مما يسبب تركيب بروتين ناقص أو غير وظيفي.</p>
+</div>
+
+
+<h2>الحالة 4 : إجابة خارج الموضوع (تفسير بدل فرضية)</h2>
+<div class="card">
+  <p class="label">إجابتك</p>
+  <p class="answer">لأن البروتين مهم للجسم <mark title="خارج الموضوع — التعليمة تطلب فرضية لا شرحا عاما" style="background:rgba(239,68,68,0.28); color:#fecaca; border:1px solid rgba(239,68,68,0.5)">وبدونه يمرض الإنسان</mark> ويتعرض لمشاكل صحية.</p>
+</div>
+
+</body>
+</html>

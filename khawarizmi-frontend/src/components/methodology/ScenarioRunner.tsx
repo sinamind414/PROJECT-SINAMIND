@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react"
 import { DocumentSetRenderer } from "@/components/methodology/DocumentRenderer"
+import { HighlightedAnswer } from "@/components/methodology/HighlightedAnswer"
 import { evaluateMethodologyAnswer, type MethodologyEvaluation } from "@/lib/methodology-evaluator"
 import { awardXP, saveMethodologyEvaluations, type GamificationAward } from "@/lib/progress-store"
 import { apiClient } from "@/lib/api-client"
@@ -71,7 +72,11 @@ function CorrectionCard({
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div className="rounded-2xl p-4 bg-white/[0.03] border border-white/[0.05]">
           <p className="text-gray-400 text-xs font-bold mb-2">إجابتك</p>
-          <p className="text-gray-200 text-sm leading-relaxed whitespace-pre-wrap">{item.answer || "إجابة فارغة"}</p>
+          <HighlightedAnswer
+            answer={item.answer}
+            highlights={item.evaluation.highlights ?? []}
+            emptyLabel="إجابة فارغة"
+          />
         </div>
         <div className="rounded-2xl p-4 bg-emerald-500/10 border border-emerald-500/20">
           <p className="text-emerald-300 text-xs font-bold mb-2">تصحيح نموذجي مرتبط بالوثائق</p>
@@ -156,7 +161,7 @@ export function ScenarioRunner({
 
   async function submit() {
     setSubmitting(true)
-    const chapterSlug = chapterLink?.slug || undefined
+    const chapterSlug: string | null = chapterLink?.slug ?? null
 
     try {
       const payload = {
@@ -168,7 +173,7 @@ export function ScenarioRunner({
           answer: answers[q.id] || "",
         })),
       }
-      const resp = await apiClient.evaluateDaAnswers(payload)
+      const resp = await apiClient.evaluateDaAnswersV2(payload)
 
       const evaluations = questions.map((question) => {
         const evalData = resp.evaluations.find((e) => e.verb_slug === question.verbSlug)
@@ -178,14 +183,15 @@ export function ScenarioRunner({
               score: evalData.score,
               scoreMax: evalData.score_max,
               percentage: evalData.percentage,
-              success: evalData.success,
-              errors: evalData.errors,
-              missingMarkers: evalData.missing_markers,
-              forbiddenMarkersFound: evalData.forbidden_found,
+              success: evalData.matched_criteria,
+              errors: evalData.unmatched_criteria.map((u) => u.why_ar),
+              missingMarkers: [],
+              forbiddenMarkersFound: [],
               criteria: [],
-              advice: evalData.advice,
-              allowSecondAttempt: true,
-              dominantErrorCode: evalData.dominant_error_code,
+              advice: evalData.advice_ar,
+              allowSecondAttempt: evalData.percentage < 85,
+              highlights: evalData.highlights,
+              source: evalData.source,
             }
           : evaluateMethodologyAnswer({ verbSlug: question.verbSlug, answer: answers[question.id] || "" })
 
