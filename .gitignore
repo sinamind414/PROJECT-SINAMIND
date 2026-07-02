@@ -60,5 +60,3 @@ khawarizmi-backend/data/
 
 # Local Netlify folder
 .netlify
-
-.vercel
