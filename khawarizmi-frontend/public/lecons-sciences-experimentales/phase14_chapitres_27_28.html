@@ -11,7 +11,7 @@
         :root {
             --bg-main: #0c151a;
             --surface: #131e24;
-            --primary: #5eead4;
+            --primary: #2dd4bf;
             --accent: #2563eb;
             --accent-light: rgba(255, 255, 255, 0.05);
             --success: #16a34a;
@@ -116,9 +116,9 @@
         }
 
         .ch-btn.active {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
+            background: var(--accent);
+            color: #0c151a;
+            border-color: var(--accent);
         }
 
         @media (max-width: 768px) {
@@ -231,7 +231,7 @@
         }
 
         .step-num {
-            background: #ffe4e6;
+            background: rgba(255, 255, 255, 0.05);
             color: #9f1239;
             width: 38px;
             height: 38px;
@@ -245,7 +245,7 @@
         }
 
         .step-num-amber {
-            background: #fef3c7;
+            background: rgba(255, 255, 255, 0.05);
             color: #fbbf24;
         }
 
@@ -378,7 +378,7 @@
         }
 
         .option-btn {
-            background: white;
+            background: #131e24;
             border: 1.5px solid var(--border);
             padding: 12px 16px;
             border-radius: 10px;
@@ -393,7 +393,7 @@
 
         .option-btn:hover {
             border-color: #9f1239;
-            background: #fff1f2;
+            background: rgba(255, 255, 255, 0.05);
         }
 
         .option-btn.correct {
@@ -417,6 +417,16 @@
             display: none;
             line-height: 1.6;
         }
+    </style>
+
+    <style id="dark-theme-override">
+        body, html { background-color: #0c151a !important; color: #f8fafc !important; }
+        .navbar { background: rgba(19, 30, 36, 0.85) !important; backdrop-filter: blur(12px); border-color: rgba(255, 255, 255, 0.08) !important; }
+        .card, .doc-viewer, .problem-box, .summary-box, .interactive-box { background: rgba(255, 255, 255, 0.03) !important; border-color: rgba(255, 255, 255, 0.08) !important; color: #f8fafc !important; }
+        .ch-btn { background: rgba(255, 255, 255, 0.04) !important; color: #94a3b8 !important; border-color: rgba(255, 255, 255, 0.08) !important; }
+        .ch-btn.active { background: #2dd4bf !important; color: #0c151a !important; border-color: #2dd4bf !important; font-weight: 900 !important; }
+        .ch-btn:hover:not(.active) { border-color: #2dd4bf !important; color: #2dd4bf !important; }
+        input[type="radio"], input[type="checkbox"] { accent-color: #2dd4bf; }
     </style>
 </head>
 <body>
@@ -500,7 +510,7 @@
                     </div>
 
                     <div class="doc-analysis">
-                        <span class="method-tag" style="background: #fff1f2; color: #9f1239;">خطوات الفسفرة التأكسدية</span>
+                        <span class="method-tag" style="background: rgba(255, 255, 255, 0.05); color: #9f1239;">خطوات الفسفرة التأكسدية</span>
                         <h4 style="margin: 8px 0; color: var(--primary);">كيف يركب الميتوكندرون 38 ATP؟</h4>
                         <ol style="padding-right: 1.2rem; line-height: 1.8;">
                             <li><strong>أكسدة النواقل المرجعة :</strong> تتأكسد جزيئات <span class="ltr-seq">NADH, H⁺</span> عند الناقل <span class="ltr-seq">T₁</span> وتتأكسد <span class="ltr-seq">FADH₂</span> عند <span class="ltr-seq">T₂</span>، محررة إلكترونات وبروتونات.</li>
@@ -614,7 +624,7 @@
                     </div>
 
                     <div class="doc-analysis">
-                        <span class="method-tag" style="background: #fef3c7; color: #fbbf24;">التفاصيل الكيميائية في البكالوريا</span>
+                        <span class="method-tag" style="background: rgba(255, 255, 255, 0.05); color: #fbbf24;">التفاصيل الكيميائية في البكالوريا</span>
                         <h4 style="margin: 8px 0; color: var(--primary);">ما هو الفرق بين التخمرين؟</h4>
                         <ul style="list-style-type: none; line-height: 1.8;">
                             <li>• <strong>التخمر الكحولي (<span class="ltr-seq">Fermentation Alcoolique الخميرة</span>) :</strong> يطرح حمض البيروفيك جزيئتي <span class="ltr-seq">2 CO₂</span>، ثم يرجع بواسطة <span class="ltr-seq">2 NADH, H⁺</span> ليعطي كحول الإيثانول (<span class="ltr-seq">CH₃-CH₂OH</span>).</li>
@@ -719,10 +729,10 @@
 
             fb.style.display = 'block';
             if (isCorrect) {
-                fb.style.background = '#f0fdf4'; fb.style.color = '#166534'; fb.style.border = '1px solid #bbf7d0';
+                fb.style.background = 'rgba(255, 255, 255, 0.05)'; fb.style.color = '#166534'; fb.style.border = '1px solid #bbf7d0';
                 fb.innerHTML = '<strong>✅ إجابة صحيحة ممتاز!</strong> الأكسجين يختزل إلى ماء وهو محرك سحب الإلكترونات في السلسلة.';
             } else {
-                fb.style.background = '#fef2f2'; fb.style.color = '#991b1b'; fb.style.border = '1px solid #fecaca';
+                fb.style.background = 'rgba(255, 255, 255, 0.05)'; fb.style.color = '#991b1b'; fb.style.border = '1px solid #fecaca';
                 fb.innerHTML = '<strong>❌ إجابة خاطئة.</strong> الأكسجين O₂ هو المستقبل النهائي الحصري في التنفس الهوائي.';
             }
         }
@@ -739,10 +749,10 @@
 
             fb.style.display = 'block';
             if (isCorrect) {
-                fb.style.background = '#f0fdf4'; fb.style.color = '#166534'; fb.style.border = '1px solid #bbf7d0';
+                fb.style.background = 'rgba(255, 255, 255, 0.05)'; fb.style.color = '#166534'; fb.style.border = '1px solid #bbf7d0';
                 fb.innerHTML = '<strong>✅ إجابة صحيحة ممتاز!</strong> الهدم الجزئي يعني بقاء الطاقة في الروابط الكيميائية للكحول أو حمض اللبن.';
             } else {
-                fb.style.background = '#fef2f2'; fb.style.color = '#991b1b'; fb.style.border = '1px solid #fecaca';
+                fb.style.background = 'rgba(255, 255, 255, 0.05)'; fb.style.color = '#991b1b'; fb.style.border = '1px solid #fecaca';
                 fb.innerHTML = '<strong>❌ إجابة خاطئة.</strong> السبب الأساسي هو عدم اكتمال الأكسدة وبقاء منتج عضوي غني بالطاقة.';
             }
         }

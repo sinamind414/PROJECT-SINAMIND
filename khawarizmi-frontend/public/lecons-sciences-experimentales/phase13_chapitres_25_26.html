@@ -11,7 +11,7 @@
         :root {
             --bg-main: #0c151a;
             --surface: #131e24;
-            --primary: #5eead4;
+            --primary: #2dd4bf;
             --accent: #2563eb;
             --accent-light: rgba(255, 255, 255, 0.05);
             --success: #16a34a;
@@ -116,9 +116,9 @@
         }
 
         .ch-btn.active {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
+            background: var(--accent);
+            color: #0c151a;
+            border-color: var(--accent);
         }
 
         @media (max-width: 768px) {
@@ -231,7 +231,7 @@
         }
 
         .step-num {
-            background: #ffedd5;
+            background: rgba(255, 255, 255, 0.05);
             color: #fb923c;
             width: 38px;
             height: 38px;
@@ -245,7 +245,7 @@
         }
 
         .step-num-red {
-            background: #fee2e2;
+            background: rgba(255, 255, 255, 0.05);
             color: #f87171;
         }
 
@@ -378,7 +378,7 @@
         }
 
         .option-btn {
-            background: white;
+            background: #131e24;
             border: 1.5px solid var(--border);
             padding: 12px 16px;
             border-radius: 10px;
@@ -393,7 +393,7 @@
 
         .option-btn:hover {
             border-color: #ea580c;
-            background: #fff7ed;
+            background: rgba(255, 255, 255, 0.05);
         }
 
         .option-btn.correct {
@@ -417,6 +417,16 @@
             display: none;
             line-height: 1.6;
         }
+    </style>
+
+    <style id="dark-theme-override">
+        body, html { background-color: #0c151a !important; color: #f8fafc !important; }
+        .navbar { background: rgba(19, 30, 36, 0.85) !important; backdrop-filter: blur(12px); border-color: rgba(255, 255, 255, 0.08) !important; }
+        .card, .doc-viewer, .problem-box, .summary-box, .interactive-box { background: rgba(255, 255, 255, 0.03) !important; border-color: rgba(255, 255, 255, 0.08) !important; color: #f8fafc !important; }
+        .ch-btn { background: rgba(255, 255, 255, 0.04) !important; color: #94a3b8 !important; border-color: rgba(255, 255, 255, 0.08) !important; }
+        .ch-btn.active { background: #2dd4bf !important; color: #0c151a !important; border-color: #2dd4bf !important; font-weight: 900 !important; }
+        .ch-btn:hover:not(.active) { border-color: #2dd4bf !important; color: #2dd4bf !important; }
+        input[type="radio"], input[type="checkbox"] { accent-color: #2dd4bf; }
     </style>
 </head>
 <body>
@@ -626,7 +636,7 @@
                     </div>
 
                     <div class="doc-analysis">
-                        <span class="method-tag" style="background: #fef2f2; color: #f87171;">تفاعلات المادة الأساسية في البكالوريا</span>
+                        <span class="method-tag" style="background: rgba(255, 255, 255, 0.05); color: #f87171;">تفاعلات المادة الأساسية في البكالوريا</span>
                         <h4 style="margin: 8px 0; color: var(--primary);">ما هي خطوات هدم البيروفيك؟</h4>
                         <ol style="padding-right: 1.2rem; line-height: 1.8;">
                             <li><strong>المرحلة التمهيدية (تشكل الأستيل-CoA) :</strong> يخضع حمض البيروفيك (<span class="ltr-seq">C₃</span>) في المادة الأساسية لنزع كربون (<span class="ltr-seq">CO₂ ↑</span>) ونزع هيدروجين (<span class="ltr-seq">NADH, H⁺</span>) ويرتبط بمرافق الإنزيم أ ليعطي مركب ثنائي الكربون <strong>الأستيل-CoA (<span class="ltr-seq">C₂</span>)</strong>.</li>
@@ -741,10 +751,10 @@
 
             fb.style.display = 'block';
             if (isCorrect) {
-                fb.style.background = '#f0fdf4'; fb.style.color = '#166534'; fb.style.border = '1px solid #bbf7d0';
+                fb.style.background = 'rgba(255, 255, 255, 0.05)'; fb.style.color = '#166534'; fb.style.border = '1px solid #bbf7d0';
                 fb.innerHTML = '<strong>✅ إجابة صحيحة ممتاز!</strong> حساب الحصيلة الصافية يستوجب خصم الـ 2 ATP المستهلكة في مرحلة التنشيط.';
             } else {
-                fb.style.background = '#fef2f2'; fb.style.color = '#991b1b'; fb.style.border = '1px solid #fecaca';
+                fb.style.background = 'rgba(255, 255, 255, 0.05)'; fb.style.color = '#991b1b'; fb.style.border = '1px solid #fecaca';
                 fb.innerHTML = '<strong>❌ إجابة خاطئة.</strong> التحلل السكري ينتج 4 ATP ويستهلك 2 ATP، فالحصيلة الصافية هي 2 ATP.';
             }
         }
@@ -761,10 +771,10 @@
 
             fb.style.display = 'block';
             if (isCorrect) {
-                fb.style.background = '#f0fdf4'; fb.style.color = '#166534'; fb.style.border = '1px solid #bbf7d0';
+                fb.style.background = 'rgba(255, 255, 255, 0.05)'; fb.style.color = '#166534'; fb.style.border = '1px solid #bbf7d0';
                 fb.innerHTML = '<strong>✅ إجابة صحيحة ممتاز!</strong> الحساب الدقيق لنواقل المادة الأساسية هو 8 NADH و 2 FADH₂ لكل غلوكوز.';
             } else {
-                fb.style.background = '#fef2f2'; fb.style.color = '#991b1b'; fb.style.border = '1px solid #fecaca';
+                fb.style.background = 'rgba(255, 255, 255, 0.05)'; fb.style.color = '#991b1b'; fb.style.border = '1px solid #fecaca';
                 fb.innerHTML = '<strong>❌ إجابة خاطئة.</strong> تذكر أن كل حمض بيروفيك ينتج 1 NADH في التمهيدي و 3 NADH + 1 FADH₂ في كريبس، والمجموع × 2 للغلوكوز.';
             }
         }

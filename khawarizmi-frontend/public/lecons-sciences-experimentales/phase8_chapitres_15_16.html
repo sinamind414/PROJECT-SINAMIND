@@ -11,7 +11,7 @@
         :root {
             --bg-main: #0c151a;
             --surface: #131e24;
-            --primary: #5eead4;
+            --primary: #2dd4bf;
             --accent: #2563eb;
             --accent-light: rgba(255, 255, 255, 0.05);
             --success: #16a34a;
@@ -116,9 +116,9 @@
         }
 
         .ch-btn.active {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
+            background: var(--accent);
+            color: #0c151a;
+            border-color: var(--accent);
         }
 
         @media (max-width: 768px) {
@@ -231,7 +231,7 @@
         }
 
         .step-num {
-            background: #ccfbf1;
+            background: rgba(255, 255, 255, 0.05);
             color: #0d9488;
             width: 38px;
             height: 38px;
@@ -378,7 +378,7 @@
         }
 
         .option-btn {
-            background: white;
+            background: #131e24;
             border: 1.5px solid var(--border);
             padding: 12px 16px;
             border-radius: 10px;
@@ -393,7 +393,7 @@
 
         .option-btn:hover {
             border-color: #0d9488;
-            background: #f0fdf4;
+            background: rgba(255, 255, 255, 0.05);
         }
 
         .option-btn.correct {
@@ -417,6 +417,16 @@
             display: none;
             line-height: 1.6;
         }
+    </style>
+
+    <style id="dark-theme-override">
+        body, html { background-color: #0c151a !important; color: #f8fafc !important; }
+        .navbar { background: rgba(19, 30, 36, 0.85) !important; backdrop-filter: blur(12px); border-color: rgba(255, 255, 255, 0.08) !important; }
+        .card, .doc-viewer, .problem-box, .summary-box, .interactive-box { background: rgba(255, 255, 255, 0.03) !important; border-color: rgba(255, 255, 255, 0.08) !important; color: #f8fafc !important; }
+        .ch-btn { background: rgba(255, 255, 255, 0.04) !important; color: #94a3b8 !important; border-color: rgba(255, 255, 255, 0.08) !important; }
+        .ch-btn.active { background: #2dd4bf !important; color: #0c151a !important; border-color: #2dd4bf !important; font-weight: 900 !important; }
+        .ch-btn:hover:not(.active) { border-color: #2dd4bf !important; color: #2dd4bf !important; }
+        input[type="radio"], input[type="checkbox"] { accent-color: #2dd4bf; }
     </style>
 </head>
 <body>
@@ -571,7 +581,7 @@
                     <span class="step-num step-num-sky">1</span>
                     <span>الإشكالية الأيونية لكمون العمل</span>
                 </div>
-                <div class="problem-box" style="border-right-color: #0284c7; background: #f0f9ff;">
+                <div class="problem-box" style="border-right-color: #0284c7; background: rgba(255, 255, 255, 0.05);">
                     <div class="problem-title" style="color: #38bdf8;">⚠️ كيف تتولد وتنتقل السيالة العصبية على طول الليف العصبي في أجزاء من الملي ثانية؟</div>
                     <p>عند إحداث تنبيه فعال لليف عصبي (تنبيه يفوق عتبة زوال الاستقطاب <span class="ltr-seq">Seuil > -50 mV</span>)، يسجل راسم الاهتزاز موجة سريعة ومميزة تسمى <strong>كمون العمل (<span class="ltr-seq">Potentiel d'Action PA</span>)</strong> يبلغ ذروته عند <span class="ltr-seq">+30 mV</span> ثم يعود للراحة. <strong>ما هي القنوات الغشائية التي تنفتح وتنغلق بدقة زمنية فائقة لتوليد هذا الكمون؟</strong></p>
                 </div>
@@ -717,10 +727,10 @@
 
             fb.style.display = 'block';
             if (isCorrect) {
-                fb.style.background = '#f0fdf4'; fb.style.color = '#166534'; fb.style.border = '1px solid #bbf7d0';
+                fb.style.background = 'rgba(255, 255, 255, 0.05)'; fb.style.color = '#166534'; fb.style.border = '1px solid #bbf7d0';
                 fb.innerHTML = '<strong>✅ إجابة صحيحة ممتاز!</strong> المضخة تعمل عكس التدرج التركيزي ولذلك تتطلب طاقة ATP.';
             } else {
-                fb.style.background = '#fef2f2'; fb.style.color = '#991b1b'; fb.style.border = '1px solid #fecaca';
+                fb.style.background = 'rgba(255, 255, 255, 0.05)'; fb.style.color = '#991b1b'; fb.style.border = '1px solid #fecaca';
                 fb.innerHTML = '<strong>❌ إجابة خاطئة.</strong> النقل السلبي هو الذي يتم عبر قنوات الميز وفق التدرج دون طاقة.';
             }
         }
@@ -737,10 +747,10 @@
 
             fb.style.display = 'block';
             if (isCorrect) {
-                fb.style.background = '#f0fdf4'; fb.style.color = '#166534'; fb.style.border = '1px solid #bbf7d0';
+                fb.style.background = 'rgba(255, 255, 255, 0.05)'; fb.style.color = '#166534'; fb.style.border = '1px solid #bbf7d0';
                 fb.innerHTML = '<strong>✅ إجابة صحيحة ممتاز!</strong> قانون الكل أو لا شيء يثبت أن سعة كمون العمل لا تعتمد على شدة التنبيه ما دام يفوق العتبة.';
             } else {
-                fb.style.background = '#fef2f2'; fb.style.color = '#991b1b'; fb.style.border = '1px solid #fecaca';
+                fb.style.background = 'rgba(255, 255, 255, 0.05)'; fb.style.color = '#991b1b'; fb.style.border = '1px solid #fecaca';
                 fb.innerHTML = '<strong>❌ إجابة خاطئة.</strong> سعة كمون العمل تبقى ثابتة دوماً (+30 mV) مهما زادت شدة التنبيه.';
             }
         }

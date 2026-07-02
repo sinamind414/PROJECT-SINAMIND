@@ -11,7 +11,7 @@
         :root {
             --bg-main: #0c151a;
             --surface: #131e24;
-            --primary: #5eead4;
+            --primary: #2dd4bf;
             --accent: #2563eb;
             --accent-light: rgba(255, 255, 255, 0.05);
             --success: #16a34a;
@@ -395,7 +395,7 @@
         }
 
         .option-btn {
-            background: white;
+            background: #131e24;
             border: 1.5px solid var(--border);
             padding: 12px 16px;
             border-radius: 10px;
@@ -437,7 +437,7 @@
 
         /* BAC Methodology Corner */
         .bac-tip {
-            background: #f0fdf4;
+            background: rgba(255, 255, 255, 0.05);
             border: 1px solid #bbf7d0;
             border-radius: 12px;
             padding: 1.5rem;
@@ -445,13 +445,23 @@
         }
 
         .bac-tip-header {
-            color: #166534;
+            color: #4ade80;
             font-weight: 800;
             display: flex;
             align-items: center;
             gap: 8px;
             margin-bottom: 0.8rem;
         }
+    </style>
+
+    <style id="dark-theme-override">
+        body, html { background-color: #0c151a !important; color: #f8fafc !important; }
+        .navbar { background: rgba(19, 30, 36, 0.85) !important; backdrop-filter: blur(12px); border-color: rgba(255, 255, 255, 0.08) !important; }
+        .card, .doc-viewer, .problem-box, .summary-box, .interactive-box { background: rgba(255, 255, 255, 0.03) !important; border-color: rgba(255, 255, 255, 0.08) !important; color: #f8fafc !important; }
+        .ch-btn { background: rgba(255, 255, 255, 0.04) !important; color: #94a3b8 !important; border-color: rgba(255, 255, 255, 0.08) !important; }
+        .ch-btn.active { background: #2dd4bf !important; color: #0c151a !important; border-color: #2dd4bf !important; font-weight: 900 !important; }
+        .ch-btn:hover:not(.active) { border-color: #2dd4bf !important; color: #2dd4bf !important; }
+        input[type="radio"], input[type="checkbox"] { accent-color: #2dd4bf; }
     </style>
 </head>
 <body>
@@ -517,7 +527,7 @@
                             <!-- Cell 1: t=15 min -->
                             <rect x="10" y="20" width="180" height="180" rx="90" fill="#1e293b" stroke="#3b82f6" stroke-width="2"/>
                             <circle cx="100" cy="110" r="45" fill="#334155" stroke="#60a5fa" stroke-width="2" stroke-dasharray="4"/>
-                            <text x="100" y="40" fill="#e2e8f0" font-size="12" text-anchor="middle" font-weight="bold">الزمن t = 15 دقيقة</text>
+                            <text x="100" y="40" fill="rgba(255, 255, 255, 0.05)" font-size="12" text-anchor="middle" font-weight="bold">الزمن t = 15 دقيقة</text>
                             <text x="100" y="115" fill="#94a3b8" font-size="11" text-anchor="middle">النواة</text>
                             <!-- Red dots inside nucleus -->
                             <circle cx="90" cy="100" r="4.5" fill="#ef4444"/>
@@ -532,7 +542,7 @@
                             <!-- Cell 2: t=90 min -->
                             <rect x="210" y="20" width="180" height="180" rx="90" fill="#1e293b" stroke="#3b82f6" stroke-width="2"/>
                             <circle cx="300" cy="110" r="45" fill="#334155" stroke="#60a5fa" stroke-width="2" stroke-dasharray="4"/>
-                            <text x="300" y="40" fill="#e2e8f0" font-size="12" text-anchor="middle" font-weight="bold">الزمن t = 90 دقيقة</text>
+                            <text x="300" y="40" fill="rgba(255, 255, 255, 0.05)" font-size="12" text-anchor="middle" font-weight="bold">الزمن t = 90 دقيقة</text>
                             <text x="300" y="115" fill="#94a3b8" font-size="11" text-anchor="middle">النواة</text>
                             <!-- Red dots outside nucleus (cytoplasm) -->
                             <circle cx="250" cy="80" r="4.5" fill="#ef4444"/>
@@ -556,7 +566,7 @@
                                 <br>• بعد <strong>15 دقيقة</strong>: يتمركز الإشعاع كليا داخل <strong>النواة</strong>.
                                 <br>• بعد <strong>90 دقيقة</strong>: ينتقل الإشعاع من النواة ليستقر في <strong>الهيولى</strong>.
                             </li>
-                            <li style="margin-bottom: 0; background: #eff6ff; padding: 12px; border-radius: 8px; border-right: 3px solid var(--accent);">
+                            <li style="margin-bottom: 0; background: rgba(255, 255, 255, 0.05); padding: 12px; border-radius: 8px; border-right: 3px solid var(--accent);">
                                 <strong>3. الاستنتاج الدقيق :</strong> يتم تركيب الـ <span class="ltr-seq">ARNm</span> داخل <strong>النواة</strong>، ثم ينتقل إلى <strong>الهيولى</strong> حاملا معه نسخة من المعلومات الوراثية.
                             </li>
                         </ul>
@@ -756,12 +766,12 @@
 
             feedback.style.display = 'block';
             if (isCorrect) {
-                feedback.style.background = '#f0fdf4';
+                feedback.style.background = 'rgba(255, 255, 255, 0.05)';
                 feedback.style.color = '#166534';
                 feedback.style.border = '1px solid #bbf7d0';
                 feedback.innerHTML = '<strong>✅ إجابة صحيحة، ممتاز!</strong> التبرير العلمي مضبوط بدقة وفق مبادئ الدرس.';
             } else {
-                feedback.style.background = '#fef2f2';
+                feedback.style.background = 'rgba(255, 255, 255, 0.05)';
                 feedback.style.color = '#991b1b';
                 feedback.style.border = '1px solid #fecaca';
                 if (qIndex === 1) {

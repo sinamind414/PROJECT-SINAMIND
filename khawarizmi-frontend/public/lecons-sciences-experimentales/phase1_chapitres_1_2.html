@@ -11,7 +11,7 @@
         :root {
             --bg-main: #0c151a;
             --surface: #131e24;
-            --primary: #5eead4;
+            --primary: #2dd4bf;
             --accent: #2563eb;
             --accent-light: rgba(255, 255, 255, 0.05);
             --success: #16a34a;
@@ -114,9 +114,9 @@
         }
 
         .ch-btn.active {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
+            background: var(--accent);
+            color: #0c151a;
+            border-color: var(--accent);
         }
 
         @media (max-width: 768px) {
@@ -424,7 +424,7 @@
         }
 
         .option-btn {
-            background: white;
+            background: #131e24;
             border: 1.5px solid var(--border);
             padding: 12px 16px;
             border-radius: 10px;
@@ -462,6 +462,16 @@
             font-size: 0.95rem;
             display: none;
         }
+    </style>
+
+    <style id="dark-theme-override">
+        body, html { background-color: #0c151a !important; color: #f8fafc !important; }
+        .navbar { background: rgba(19, 30, 36, 0.85) !important; backdrop-filter: blur(12px); border-color: rgba(255, 255, 255, 0.08) !important; }
+        .card, .doc-viewer, .problem-box, .summary-box, .interactive-box { background: rgba(255, 255, 255, 0.03) !important; border-color: rgba(255, 255, 255, 0.08) !important; color: #f8fafc !important; }
+        .ch-btn { background: rgba(255, 255, 255, 0.04) !important; color: #94a3b8 !important; border-color: rgba(255, 255, 255, 0.08) !important; }
+        .ch-btn.active { background: #2dd4bf !important; color: #0c151a !important; border-color: #2dd4bf !important; font-weight: 900 !important; }
+        .ch-btn:hover:not(.active) { border-color: #2dd4bf !important; color: #2dd4bf !important; }
+        input[type="radio"], input[type="checkbox"] { accent-color: #2dd4bf; }
     </style>
 </head>
 <body>
@@ -551,7 +561,7 @@
                         <ul style="list-style-type: none; padding-right: 0;">
                             <li style="margin-bottom: 10px;">• <strong>الأحماض الأمينية</strong> هي الوحدات البنائية الأساسية لتركيب البروتينات.</li>
                             <li style="margin-bottom: 10px;">• <strong>العنصر المشع (التريتيوم ³H)</strong> يسمح بتحديد المقر الدقيق ومتابعة الحركية الزمنية داخل العضيات الخلوية.</li>
-                            <li style="background: #eff6ff; padding: 12px; border-radius: 8px; border-right: 3px solid var(--accent);">
+                            <li style="background: rgba(255, 255, 255, 0.05); padding: 12px; border-radius: 8px; border-right: 3px solid var(--accent);">
                                 <strong>النتيجة الحاسمة :</strong> بعد مدة قصيرة (3 دقائق)، يظهر الإشعاع حصريا على مستوى <strong>الشبكة الهيولية الداخلية المحببة <span class="ltr-seq">REG</span></strong>، مما يثبت أنها المقر الحقيقي لتركيب البروتين في الخلية.
                             </li>
                         </ul>
@@ -705,7 +715,7 @@
                     </div>
 
                     <div class="doc-analysis">
-                        <span class="method-tag" style="background: #f3e8ff; color: #6b21a8;">خطوات التنشيط في البكالوريا</span>
+                        <span class="method-tag" style="background: rgba(255, 255, 255, 0.05); color: #c084fc;">خطوات التنشيط في البكالوريا</span>
                         <p style="margin-top: 5px;">1. يتوضع كل من الحمض الأميني والـ <span class="ltr-seq">ARNt</span> في المواقع الفعالة النوعية لإنزيم التنشيط.</p>
                         <p>2. يتم إماتة جزيئة الـ <span class="ltr-seq">ATP</span> لربط الحمض الأميني بالـ <span class="ltr-seq">ARNt</span> برابطة إسترية غنية بالطاقة.</p>
                         <p>3. يتحرر المعقد <strong>(حمض أميني - <span class="ltr-seq">ARNt</span> منشط)</strong> وينفصل عن الإنزيم ليتجه نحو الريبوزوم.</p>
@@ -826,10 +836,10 @@
 
             fb.style.display = 'block';
             if (isCorrect) {
-                fb.style.background = '#f0fdf4'; fb.style.color = '#166534'; fb.style.border = '1px solid #bbf7d0';
+                fb.style.background = 'rgba(255, 255, 255, 0.05)'; fb.style.color = '#166534'; fb.style.border = '1px solid #bbf7d0';
                 fb.innerHTML = '<strong>✅ إجابة صحيحة ممتاز!</strong> الريبوزومات هي العضيات المسؤولة عن تجميع الأحماض الأمينية وتمنح الشبكة مظهرها المحبب.';
             } else {
-                fb.style.background = '#fef2f2'; fb.style.color = '#991b1b'; fb.style.border = '1px solid #fecaca';
+                fb.style.background = 'rgba(255, 255, 255, 0.05)'; fb.style.color = '#991b1b'; fb.style.border = '1px solid #fecaca';
                 fb.innerHTML = '<strong>❌ إجابة خاطئة.</strong> الشبكة الهيولية تسمى محببة لأن غشاءها الخارجي مرصع بالريبوزومات التي تظهر كحبيبات دقيقة تحت المجهر الإلكتروني.';
             }
         }
@@ -846,10 +856,10 @@
 
             fb.style.display = 'block';
             if (isCorrect) {
-                fb.style.background = '#f0fdf4'; fb.style.color = '#166534'; fb.style.border = '1px solid #bbf7d0';
+                fb.style.background = 'rgba(255, 255, 255, 0.05)'; fb.style.color = '#166534'; fb.style.border = '1px solid #bbf7d0';
                 fb.innerHTML = '<strong>✅ إجابة صحيحة ممتاز!</strong> تعليل علمي دقيق ومتوافق مع المنهج الرسمي.';
             } else {
-                fb.style.background = '#fef2f2'; fb.style.color = '#991b1b'; fb.style.border = '1px solid #fecaca';
+                fb.style.background = 'rgba(255, 255, 255, 0.05)'; fb.style.color = '#991b1b'; fb.style.border = '1px solid #fecaca';
                 if (qIdx === 1) {
                     fb.innerHTML = '<strong>❌ إجابة خاطئة.</strong> توجد 3 رامزات توقف في جدول الشفرة الوراثية (UAA, UAG, UGA) ولا تقابلها أي جزيئة ARNt.';
                 } else {

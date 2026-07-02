@@ -11,7 +11,7 @@
         :root {
             --bg-main: #0c151a;
             --surface: #131e24;
-            --primary: #5eead4;
+            --primary: #2dd4bf;
             --accent: #2563eb;
             --accent-light: rgba(255, 255, 255, 0.05);
             --success: #16a34a;
@@ -116,9 +116,9 @@
         }
 
         .ch-btn.active {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
+            background: var(--accent);
+            color: #0c151a;
+            border-color: var(--accent);
         }
 
         @media (max-width: 768px) {
@@ -231,7 +231,7 @@
         }
 
         .step-num {
-            background: #d1fae5;
+            background: rgba(255, 255, 255, 0.05);
             color: #047857;
             width: 38px;
             height: 38px;
@@ -245,7 +245,7 @@
         }
 
         .step-num-fuchsia {
-            background: #fae8ff;
+            background: rgba(255, 255, 255, 0.05);
             color: #c026d3;
         }
 
@@ -378,7 +378,7 @@
         }
 
         .option-btn {
-            background: white;
+            background: #131e24;
             border: 1.5px solid var(--border);
             padding: 12px 16px;
             border-radius: 10px;
@@ -393,7 +393,7 @@
 
         .option-btn:hover {
             border-color: #059669;
-            background: #ecfdf5;
+            background: rgba(255, 255, 255, 0.05);
         }
 
         .option-btn.correct {
@@ -417,6 +417,16 @@
             display: none;
             line-height: 1.6;
         }
+    </style>
+
+    <style id="dark-theme-override">
+        body, html { background-color: #0c151a !important; color: #f8fafc !important; }
+        .navbar { background: rgba(19, 30, 36, 0.85) !important; backdrop-filter: blur(12px); border-color: rgba(255, 255, 255, 0.08) !important; }
+        .card, .doc-viewer, .problem-box, .summary-box, .interactive-box { background: rgba(255, 255, 255, 0.03) !important; border-color: rgba(255, 255, 255, 0.08) !important; color: #f8fafc !important; }
+        .ch-btn { background: rgba(255, 255, 255, 0.04) !important; color: #94a3b8 !important; border-color: rgba(255, 255, 255, 0.08) !important; }
+        .ch-btn.active { background: #2dd4bf !important; color: #0c151a !important; border-color: #2dd4bf !important; font-weight: 900 !important; }
+        .ch-btn:hover:not(.active) { border-color: #2dd4bf !important; color: #2dd4bf !important; }
+        input[type="radio"], input[type="checkbox"] { accent-color: #2dd4bf; }
     </style>
 </head>
 <body>
@@ -580,8 +590,8 @@
                     <span class="step-num step-num-fuchsia">1</span>
                     <span>الإشكالية الحسابية للخلية العصبية المحركة</span>
                 </div>
-                <div class="problem-box" style="border-right-color: #c026d3; background: #fae8ff;">
-                    <div class="problem-title" style="color: #701a75;">⚠️ كيف تتخذ الخلية العصبية الحركية قرار الانقباض أو الاسترخاء عندما تتلقى آلاف السيالات المتضادة؟</div>
+                <div class="problem-box" style="border-right-color: #c026d3; background: rgba(255, 255, 255, 0.05);">
+                    <div class="problem-title" style="color: #e879f9;">⚠️ كيف تتخذ الخلية العصبية الحركية قرار الانقباض أو الاسترخاء عندما تتلقى آلاف السيالات المتضادة؟</div>
                     <p>تتصل الخلية العصبية المحركة في النخاع الشوكي بآلاف النهايات العصبية. بعضها يرسل أوامر تنبيهية (انقباض) وبعضها يرسل أوامر تثبيطية (استرخاء كبح). <strong>كيف تقوم هذه الخلية بدمج وحساب كل هذه الرسائل الكيميائية المتضادة في القطعة الابتدائية (<span class="ltr-seq">Segment Initial SI</span>) لتقرر توليد كمون عمل واحد أو الصمت؟</strong></p>
                 </div>
             </section>
@@ -617,7 +627,7 @@
                     </div>
 
                     <div class="doc-analysis">
-                        <span class="method-tag" style="background: #fae8ff; color: #a21caf;">مبدأ الإدماج في البكالوريا</span>
+                        <span class="method-tag" style="background: rgba(255, 255, 255, 0.05); color: #a21caf;">مبدأ الإدماج في البكالوريا</span>
                         <h4 style="margin: 8px 0; color: var(--primary);">كيف يحسب القطعة الابتدائية (<span class="ltr-seq">SI</span>) الحصيلة؟</h4>
                         <p>تقوم الخلية العصبية بعد المشبكية بدمج الكمونات القادمة وفق آليتين :</p>
                         <ul style="list-style-type: none; line-height: 1.8;">
@@ -728,10 +738,10 @@
 
             fb.style.display = 'block';
             if (isCorrect) {
-                fb.style.background = '#f0fdf4'; fb.style.color = '#166534'; fb.style.border = '1px solid #bbf7d0';
+                fb.style.background = 'rgba(255, 255, 255, 0.05)'; fb.style.color = '#166534'; fb.style.border = '1px solid #bbf7d0';
                 fb.innerHTML = '<strong>✅ إجابة صحيحة ممتاز!</strong> القنوات الكهربائية حساسة لفرق الجهد، والقنوات الكيميائية حساسة للمبلغ الكيميائي.';
             } else {
-                fb.style.background = '#fef2f2'; fb.style.color = '#991b1b'; fb.style.border = '1px solid #fecaca';
+                fb.style.background = 'rgba(255, 255, 255, 0.05)'; fb.style.color = '#991b1b'; fb.style.border = '1px solid #fecaca';
                 fb.innerHTML = '<strong>❌ إجابة خاطئة.</strong> التمييز بين القنوات المبوبة كهربائياً وكيميائياً هو أساس فهم الاتصال العصبي في البكالوريا.';
             }
         }
@@ -748,10 +758,10 @@
 
             fb.style.display = 'block';
             if (isCorrect) {
-                fb.style.background = '#f0fdf4'; fb.style.color = '#166534'; fb.style.border = '1px solid #bbf7d0';
+                fb.style.background = 'rgba(255, 255, 255, 0.05)'; fb.style.color = '#166534'; fb.style.border = '1px solid #bbf7d0';
                 fb.innerHTML = '<strong>✅ إجابة صحيحة ممتاز!</strong> حمض الغابا (GABA) هو المبلغ التثبيطي الرئيسي في النخاع الشوكي والدماغ.';
             } else {
-                fb.style.background = '#fef2f2'; fb.style.color = '#991b1b'; fb.style.border = '1px solid #fecaca';
+                fb.style.background = 'rgba(255, 255, 255, 0.05)'; fb.style.color = '#991b1b'; fb.style.border = '1px solid #fecaca';
                 fb.innerHTML = '<strong>❌ إجابة خاطئة.</strong> الأستيل كولين مبلغ تنبيهي في الغالب، أما الغابا فهو المبلغ التثبيطي.';
             }
         }

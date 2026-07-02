@@ -11,7 +11,7 @@
         :root {
             --bg-main: #0c151a;
             --surface: #131e24;
-            --primary: #5eead4;
+            --primary: #2dd4bf;
             --accent: #2563eb;
             --accent-light: rgba(255, 255, 255, 0.05);
             --success: #16a34a;
@@ -116,9 +116,9 @@
         }
 
         .ch-btn.active {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
+            background: var(--accent);
+            color: #0c151a;
+            border-color: var(--accent);
         }
 
         @media (max-width: 768px) {
@@ -231,7 +231,7 @@
         }
 
         .step-num {
-            background: #dcfce7;
+            background: rgba(255, 255, 255, 0.05);
             color: #4ade80;
             width: 38px;
             height: 38px;
@@ -245,8 +245,8 @@
         }
 
         .step-num-yellow {
-            background: #fef9c3;
-            color: #854d0e;
+            background: rgba(255, 255, 255, 0.05);
+            color: #fde047;
         }
 
         .problem-box {
@@ -378,7 +378,7 @@
         }
 
         .option-btn {
-            background: white;
+            background: #131e24;
             border: 1.5px solid var(--border);
             padding: 12px 16px;
             border-radius: 10px;
@@ -393,7 +393,7 @@
 
         .option-btn:hover {
             border-color: #16a34a;
-            background: #f0fdf4;
+            background: rgba(255, 255, 255, 0.05);
         }
 
         .option-btn.correct {
@@ -417,6 +417,16 @@
             display: none;
             line-height: 1.6;
         }
+    </style>
+
+    <style id="dark-theme-override">
+        body, html { background-color: #0c151a !important; color: #f8fafc !important; }
+        .navbar { background: rgba(19, 30, 36, 0.85) !important; backdrop-filter: blur(12px); border-color: rgba(255, 255, 255, 0.08) !important; }
+        .card, .doc-viewer, .problem-box, .summary-box, .interactive-box { background: rgba(255, 255, 255, 0.03) !important; border-color: rgba(255, 255, 255, 0.08) !important; color: #f8fafc !important; }
+        .ch-btn { background: rgba(255, 255, 255, 0.04) !important; color: #94a3b8 !important; border-color: rgba(255, 255, 255, 0.08) !important; }
+        .ch-btn.active { background: #2dd4bf !important; color: #0c151a !important; border-color: #2dd4bf !important; font-weight: 900 !important; }
+        .ch-btn:hover:not(.active) { border-color: #2dd4bf !important; color: #2dd4bf !important; }
+        input[type="radio"], input[type="checkbox"] { accent-color: #2dd4bf; }
     </style>
 </head>
 <body>
@@ -507,7 +517,7 @@
                             <li><strong>تهيج مركز التفاعل (<span class="ltr-seq">Photo-oxydation</span>) :</strong> يمتص النظام الضوئي الثاني (<span class="ltr-seq">PS II</span>) طاقة الفوتونات، فينتقل جزيء اليخضور المركزي (<span class="ltr-seq">P680</span>) إلى حالة تهيج عالية الطاقة ويفقد إلكترونين (<span class="ltr-seq">2e⁻</span>)، فيصبح مؤكسداً وغير مستقر (<span class="ltr-seq">P680⁺</span>).</li>
                             <li><strong>التحلل الضوئي للماء (<span class="ltr-seq">Photolyse de l'eau</span>) :</strong> لاسترجاع استقراره وإلكتروناته المفقودة، يقوم إنزيم متصل بـ <span class="ltr-seq">PS II</span> في تجويف التيلاكويد بأكسدة جزيئات الماء وفق المعادلة الشهيرة :</li>
                         </ol>
-                        <div style="background: #f0fdf4; padding: 10px; border-radius: 8px; text-align: center; font-family: monospace; font-weight: bold; color: #4ade80; direction: ltr; margin: 10px 0;">2 H₂O  →  O₂ ↑  +  4 H⁺  +  4 e⁻</div>
+                        <div style="background: rgba(255, 255, 255, 0.05); padding: 10px; border-radius: 8px; text-align: center; font-family: monospace; font-weight: bold; color: #4ade80; direction: ltr; margin: 10px 0;">2 H₂O  →  O₂ ↑  +  4 H⁺  +  4 e⁻</div>
                     </div>
                 </div>
             </section>
@@ -571,8 +581,8 @@
                     <span class="step-num step-num-yellow">1</span>
                     <span>الإشكالية الكيميائية للمرحلة الضوئية</span>
                 </div>
-                <div class="problem-box" style="border-right-color: #ca8a04; background: #fef9c3;">
-                    <div class="problem-title" style="color: #854d0e;">⚠️ كيف تتحول طاقة الإلكترونات المتحركة إلى جزيئات بطارية (ATP)؟</div>
+                <div class="problem-box" style="border-right-color: #ca8a04; background: rgba(255, 255, 255, 0.05);">
+                    <div class="problem-title" style="color: #fde047;">⚠️ كيف تتحول طاقة الإلكترونات المتحركة إلى جزيئات بطارية (ATP)؟</div>
                     <p>تنتقل الإلكترونات المنطلقة من النظام الضوئي <span class="ltr-seq">PS II</span> عبر سلسلة من النواقل البروتينية الغشائية (السلسلة التركيبية الضوئية) حتى تصل إلى المستقبل النهائي في الحشوة وهو مرافق الإنزيم <strong><span class="ltr-seq">NADP⁺</span></strong> ليتم إرجاعه إلى <strong><span class="ltr-seq">NADPH, H⁺</span></strong>. وفي نفس الوقت يُنتج كمية هائلة من جزيئات الطاقة <strong><span class="ltr-seq">ATP</span></strong>. <strong>كيف يتم اقتران نقل الإلكترونات بضخ البروتونات وتدوير إنزيم الـ <span class="ltr-seq">ATP synthase</span> (الفسفرة الضوئية)؟</strong></p>
                 </div>
             </section>
@@ -611,7 +621,7 @@
                     </div>
 
                     <div class="doc-analysis">
-                        <span class="method-tag" style="background: #fef9c3; color: #854d0e;">خطوات الفسفرة في البكالوريا</span>
+                        <span class="method-tag" style="background: rgba(255, 255, 255, 0.05); color: #fde047;">خطوات الفسفرة في البكالوريا</span>
                         <h4 style="margin: 8px 0; color: var(--primary);">كيف تعمل الكرية المذذبة (<span class="ltr-seq">ATP synthase</span>)؟</h4>
                         <ol style="padding-right: 1.2rem; line-height: 1.8;">
                             <li><strong>نشأة التدرج الكهروكيميائي :</strong> تتراكم البروتونات <span class="ltr-seq">H⁺</span> في تجويف التيلاكويد (من أكسدة الماء ومن ضخ الناقل <span class="ltr-seq">T₂</span>)، بينما يقل تركيزها في الحشوة، فينشأ تدرج تركيز قوي.</li>
@@ -715,10 +725,10 @@
 
             fb.style.display = 'block';
             if (isCorrect) {
-                fb.style.background = '#f0fdf4'; fb.style.color = '#166534'; fb.style.border = '1px solid #bbf7d0';
+                fb.style.background = 'rgba(255, 255, 255, 0.05)'; fb.style.color = '#166534'; fb.style.border = '1px solid #bbf7d0';
                 fb.innerHTML = '<strong>✅ إجابة صحيحة ممتاز!</strong> تراكم H⁺ في التجويف هو المحرك الأساسي لعمل الكرية المذذبة لاحقاً.';
             } else {
-                fb.style.background = '#fef2f2'; fb.style.color = '#991b1b'; fb.style.border = '1px solid #fecaca';
+                fb.style.background = 'rgba(255, 255, 255, 0.05)'; fb.style.color = '#991b1b'; fb.style.border = '1px solid #fecaca';
                 fb.innerHTML = '<strong>❌ إجابة خاطئة.</strong> التحلل الضوئي للماء يتم حصرياً جهة تجويف التيلاكويد.';
             }
         }
@@ -735,10 +745,10 @@
 
             fb.style.display = 'block';
             if (isCorrect) {
-                fb.style.background = '#f0fdf4'; fb.style.color = '#166534'; fb.style.border = '1px solid #bbf7d0';
+                fb.style.background = 'rgba(255, 255, 255, 0.05)'; fb.style.color = '#166534'; fb.style.border = '1px solid #bbf7d0';
                 fb.innerHTML = '<strong>✅ إجابة صحيحة ممتاز!</strong> سلامة الغشاء وعدم نفاذيته للبروتونات شرط شارط لنشأة التدرج والفسفرة الضوئية.';
             } else {
-                fb.style.background = '#fef2f2'; fb.style.color = '#991b1b'; fb.style.border = '1px solid #fecaca';
+                fb.style.background = 'rgba(255, 255, 255, 0.05)'; fb.style.color = '#991b1b'; fb.style.border = '1px solid #fecaca';
                 fb.innerHTML = '<strong>❌ إجابة خاطئة.</strong> الكرية المذذبة لا تعمل إلا إذا كان هناك تدرج تركيز يجبر البروتونات على العبور من خلالها.';
             }
         }

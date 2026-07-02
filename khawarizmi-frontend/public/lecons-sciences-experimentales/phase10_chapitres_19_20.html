@@ -11,7 +11,7 @@
         :root {
             --bg-main: #0c151a;
             --surface: #131e24;
-            --primary: #5eead4;
+            --primary: #2dd4bf;
             --accent: #2563eb;
             --accent-light: rgba(255, 255, 255, 0.05);
             --success: #16a34a;
@@ -116,9 +116,9 @@
         }
 
         .ch-btn.active {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
+            background: var(--accent);
+            color: #0c151a;
+            border-color: var(--accent);
         }
 
         @media (max-width: 768px) {
@@ -231,8 +231,8 @@
         }
 
         .step-num {
-            background: #e2e8f0;
-            color: #334155;
+            background: rgba(255, 255, 255, 0.05);
+            color: #e2e8f0;
             width: 38px;
             height: 38px;
             flex-shrink: 0;
@@ -245,7 +245,7 @@
         }
 
         .step-num-lime {
-            background: #dcfce7;
+            background: rgba(255, 255, 255, 0.05);
             color: #4ade80;
         }
 
@@ -354,7 +354,7 @@
 
         .text-part h4 {
             font-size: 0.95rem;
-            color: #334155;
+            color: #e2e8f0;
             margin-bottom: 0.3rem;
             font-weight: 800;
         }
@@ -378,7 +378,7 @@
         }
 
         .option-btn {
-            background: white;
+            background: #131e24;
             border: 1.5px solid var(--border);
             padding: 12px 16px;
             border-radius: 10px;
@@ -392,7 +392,7 @@
         }
 
         .option-btn:hover {
-            border-color: #334155;
+            border-color: #e2e8f0;
             background: rgba(255, 255, 255, 0.06);
         }
 
@@ -417,6 +417,16 @@
             display: none;
             line-height: 1.6;
         }
+    </style>
+
+    <style id="dark-theme-override">
+        body, html { background-color: #0c151a !important; color: #f8fafc !important; }
+        .navbar { background: rgba(19, 30, 36, 0.85) !important; backdrop-filter: blur(12px); border-color: rgba(255, 255, 255, 0.08) !important; }
+        .card, .doc-viewer, .problem-box, .summary-box, .interactive-box { background: rgba(255, 255, 255, 0.03) !important; border-color: rgba(255, 255, 255, 0.08) !important; color: #f8fafc !important; }
+        .ch-btn { background: rgba(255, 255, 255, 0.04) !important; color: #94a3b8 !important; border-color: rgba(255, 255, 255, 0.08) !important; }
+        .ch-btn.active { background: #2dd4bf !important; color: #0c151a !important; border-color: #2dd4bf !important; font-weight: 900 !important; }
+        .ch-btn:hover:not(.active) { border-color: #2dd4bf !important; color: #2dd4bf !important; }
+        input[type="radio"], input[type="checkbox"] { accent-color: #2dd4bf; }
     </style>
 </head>
 <body>
@@ -482,7 +492,7 @@
 
                             <!-- Inhibitory Interneuron Enkephaline (Top Left) -->
                             <path d="M40 50 H 135 C 145 50, 150 60, 150 70 V 90 H 40 Z" fill="#7c3aed" stroke="#c084fc" stroke-width="2"/>
-                            <text x="90" y="72" fill="#f3e8ff" font-size="9" text-anchor="middle" font-weight="bold">عصبون جامع (أنكيفالين)</text>
+                            <text x="90" y="72" fill="rgba(255, 255, 255, 0.05)" font-size="9" text-anchor="middle" font-weight="bold">عصبون جامع (أنكيفالين)</text>
 
                             <!-- Opioid Receptors on presynaptic sensory neuron -->
                             <path d="M148 75 V 85" stroke="#fbbf24" stroke-width="6"/>
@@ -571,7 +581,7 @@
                     <span class="step-num step-num-lime">1</span>
                     <span>الإشكالية الطاقوية الكبرى للمجال الثاني</span>
                 </div>
-                <div class="problem-box" style="border-right-color: #16a34a; background: #f0fdf4;">
+                <div class="problem-box" style="border-right-color: #16a34a; background: rgba(255, 255, 255, 0.05);">
                     <div class="problem-title" style="color: #4ade80;">⚠️ كيف تحول النباتات الخضراء أشعة الشمس إلى سكر النشا؟</div>
                     <p>تعتبر النباتات اليخضورات المنتجات الأولية للطاقة في المحيط الحيوي، حيث تقوم بظاهرة <strong>التركيب الضوئي (<span class="ltr-seq">Photosynthèse</span>)</strong> التي تحول الطاقة الضوئية الفزيائية إلى طاقة كيميائية كامنة مخزنة في الروابط الكربونية للجزيئات العضوية (النشا والغلوكوز). <strong>أين تتم هذه الظاهرة بالتحديد داخل الخلية النباتية؟ وكيف تتلاءم البنية المجهرية الفوقية لعضية "الصانعة الخضراء" مع أداء هذه التفاعلات المعقدة؟</strong></p>
                 </div>
@@ -591,7 +601,7 @@
                             <!-- Outer/Inner membrane -->
                             <ellipse cx="200" cy="100" rx="180" ry="85" fill="#047857" stroke="#34d399" stroke-width="4"/>
                             <ellipse cx="200" cy="100" rx="170" ry="76" fill="#065f46" stroke="#6ee7b7" stroke-width="2" stroke-dasharray="6 3"/>
-                            <text x="200" y="35" fill="#d1fae5" font-size="11" text-anchor="middle" font-weight="bold">غشاء خارجي وغشاء داخلي يفصل بينهما فراغ بين غشائي</text>
+                            <text x="200" y="35" fill="rgba(255, 255, 255, 0.05)" font-size="11" text-anchor="middle" font-weight="bold">غشاء خارجي وغشاء داخلي يفصل بينهما فراغ بين غشائي</text>
 
                             <!-- Stroma -->
                             <text x="310" y="140" fill="#a7f3d0" font-size="12" font-weight="bold">الحشوة (Stroma)</text>
@@ -610,7 +620,7 @@
 
                             <!-- Intergranal lamella -->
                             <path d="M120 85 H 180 M 120 98 H 180" stroke="#34d399" stroke-width="4"/>
-                            <text x="150" y="75" fill="#d1fae5" font-size="9" text-anchor="middle">تيلاكويد حشوي</text>
+                            <text x="150" y="75" fill="rgba(255, 255, 255, 0.05)" font-size="9" text-anchor="middle">تيلاكويد حشوي</text>
 
                             <!-- Starch / ADN -->
                             <circle cx="270" cy="85" r="14" fill="#fef08a" stroke="#fbbf24"/>
@@ -620,7 +630,7 @@
                     </div>
 
                     <div class="doc-analysis">
-                        <span class="method-tag" style="background: #ecfdf5; color: #4ade80;">أساسيات المجال الثاني في البكالوريا</span>
+                        <span class="method-tag" style="background: rgba(255, 255, 255, 0.05); color: #4ade80;">أساسيات المجال الثاني في البكالوريا</span>
                         <h4 style="margin: 8px 0; color: var(--primary);">مقارنة المقصورتين الفعالتين في الصانعة</h4>
                         <ul style="list-style-type: none; line-height: 1.8;">
                             <li>• <strong>التيلاكويد (<span class="ltr-seq">Thylakoïde أو الكيسات</span>) :</strong> أكياس غشائية مسطحة تتوضع أحياناً فوق بعضها مشكلة البذرة (<span class="ltr-seq">Granum</span>). يحتوي غشاؤها على <strong>أصبغة اليخضور (<span class="ltr-seq">Chlorophylle</span>) والأنظمة الضوئية (<span class="ltr-seq">PS I و PS II</span>) وإنزيم الـ <span class="ltr-seq">ATP synthase</span></strong> $\leftarrow$ مقر المرحلة الكيميوضوئية.</li>
@@ -728,10 +738,10 @@
 
             fb.style.display = 'block';
             if (isCorrect) {
-                fb.style.background = '#f0fdf4'; fb.style.color = '#166534'; fb.style.border = '1px solid #bbf7d0';
+                fb.style.background = 'rgba(255, 255, 255, 0.05)'; fb.style.color = '#166534'; fb.style.border = '1px solid #bbf7d0';
                 fb.innerHTML = '<strong>✅ إجابة صحيحة ممتاز!</strong> التثبيط قبل المشبكي هو سر آلية تسكين المورفين.';
             } else {
-                fb.style.background = '#fef2f2'; fb.style.color = '#991b1b'; fb.style.border = '1px solid #fecaca';
+                fb.style.background = 'rgba(255, 255, 255, 0.05)'; fb.style.color = '#991b1b'; fb.style.border = '1px solid #fecaca';
                 fb.innerHTML = '<strong>❌ إجابة خاطئة.</strong> المستقبلات الأفيونية توجد على غشاء نهاية العصبون الحسي للألم.';
             }
         }
@@ -748,10 +758,10 @@
 
             fb.style.display = 'block';
             if (isCorrect) {
-                fb.style.background = '#f0fdf4'; fb.style.color = '#166534'; fb.style.border = '1px solid #bbf7d0';
+                fb.style.background = 'rgba(255, 255, 255, 0.05)'; fb.style.color = '#166534'; fb.style.border = '1px solid #bbf7d0';
                 fb.innerHTML = '<strong>✅ إجابة صحيحة ممتاز!</strong> التقسيم إلى مقصورات يسمح بعزل التفاعلات وتوفير التراكيز المثالية لكل مرحلة.';
             } else {
-                fb.style.background = '#fef2f2'; fb.style.color = '#991b1b'; fb.style.border = '1px solid #fecaca';
+                fb.style.background = 'rgba(255, 255, 255, 0.05)'; fb.style.color = '#991b1b'; fb.style.border = '1px solid #fecaca';
                 fb.innerHTML = '<strong>❌ إجابة خاطئة.</strong> التقسيم لمقصورات هو خاصية بنيوية ووظيفية أساسية في الصانعة الخضراء.';
             }
         }

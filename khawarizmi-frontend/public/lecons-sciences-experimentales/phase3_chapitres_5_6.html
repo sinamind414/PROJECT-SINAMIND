@@ -11,7 +11,7 @@
         :root {
             --bg-main: #0c151a;
             --surface: #131e24;
-            --primary: #5eead4;
+            --primary: #2dd4bf;
             --accent: #2563eb;
             --accent-light: rgba(255, 255, 255, 0.05);
             --success: #16a34a;
@@ -116,9 +116,9 @@
         }
 
         .ch-btn.active {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
+            background: var(--accent);
+            color: #0c151a;
+            border-color: var(--accent);
         }
 
         @media (max-width: 768px) {
@@ -378,7 +378,7 @@
         }
 
         .option-btn {
-            background: white;
+            background: #131e24;
             border: 1.5px solid var(--border);
             padding: 12px 16px;
             border-radius: 10px;
@@ -393,7 +393,7 @@
 
         .option-btn:hover {
             border-color: var(--cyan);
-            background: #ecfeff;
+            background: rgba(255, 255, 255, 0.05);
         }
 
         .option-btn.correct {
@@ -417,6 +417,16 @@
             display: none;
             line-height: 1.6;
         }
+    </style>
+
+    <style id="dark-theme-override">
+        body, html { background-color: #0c151a !important; color: #f8fafc !important; }
+        .navbar { background: rgba(19, 30, 36, 0.85) !important; backdrop-filter: blur(12px); border-color: rgba(255, 255, 255, 0.08) !important; }
+        .card, .doc-viewer, .problem-box, .summary-box, .interactive-box { background: rgba(255, 255, 255, 0.03) !important; border-color: rgba(255, 255, 255, 0.08) !important; color: #f8fafc !important; }
+        .ch-btn { background: rgba(255, 255, 255, 0.04) !important; color: #94a3b8 !important; border-color: rgba(255, 255, 255, 0.08) !important; }
+        .ch-btn.active { background: #2dd4bf !important; color: #0c151a !important; border-color: #2dd4bf !important; font-weight: 900 !important; }
+        .ch-btn:hover:not(.active) { border-color: #2dd4bf !important; color: #2dd4bf !important; }
+        input[type="radio"], input[type="checkbox"] { accent-color: #2dd4bf; }
     </style>
 </head>
 <body>
@@ -594,7 +604,7 @@
                         <svg class="svg-container" viewBox="0 0 400 200" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <!-- Enzyme un-bound -->
                             <path d="M40 140 C 30 90, 80 50, 110 70 C 120 78, 125 90, 135 90 C 145 90, 150 78, 160 70 C 190 50, 240 90, 230 140 Z" fill="#0e7490" stroke="#22d3ee" stroke-width="2"/>
-                            <text x="135" y="130" fill="#cffafe" font-size="11" text-anchor="middle" font-weight="bold">الإنزيم (E) قبل الارتباط</text>
+                            <text x="135" y="130" fill="rgba(255, 255, 255, 0.05)" font-size="11" text-anchor="middle" font-weight="bold">الإنزيم (E) قبل الارتباط</text>
                             
                             <!-- Substrate approaching -->
                             <path d="M120 20 L 135 45 L 150 20 Z" fill="#fbbf24" stroke="#f59e0b" stroke-width="2"/>
@@ -613,7 +623,7 @@
                     </div>
 
                     <div class="doc-analysis">
-                        <span class="method-tag" style="background: #ecfeff; color: #0891b2;">مفاهيم البكالوريا الأساسية</span>
+                        <span class="method-tag" style="background: rgba(255, 255, 255, 0.05); color: #0891b2;">مفاهيم البكالوريا الأساسية</span>
                         <h4 style="margin: 8px 0; color: var(--primary);">ما هو الموقع الفعال (<span class="ltr-seq">Site Actif</span>)؟</h4>
                         <p>هو تجويف أو منطقة محددة في البنية الفراغية للإنزيم، يتكون من عدد قليل من الأحماض الأمينية المحددة وراثياً، وينقسم إلى قسمين :</p>
                         <p>• <strong>موقع التثبيت (<span class="ltr-seq">Site de fixation</span>) :</strong> يتعرف ويثبت مادة التفاعل (<span class="ltr-seq">Substrat S</span>).</p>
@@ -721,10 +731,10 @@
 
             fb.style.display = 'block';
             if (isCorrect) {
-                fb.style.background = '#f0fdf4'; fb.style.color = '#166534'; fb.style.border = '1px solid #bbf7d0';
+                fb.style.background = 'rgba(255, 255, 255, 0.05)'; fb.style.color = '#166534'; fb.style.border = '1px solid #bbf7d0';
                 fb.innerHTML = '<strong>✅ إجابة صحيحة ممتاز!</strong> حمض الفالين كاره للماء فيؤدي لتراص جزيئات الهيموغلوبين لتجنب الماء في هيولى الكرية.';
             } else {
-                fb.style.background = '#fef2f2'; fb.style.color = '#991b1b'; fb.style.border = '1px solid #fecaca';
+                fb.style.background = 'rgba(255, 255, 255, 0.05)'; fb.style.color = '#991b1b'; fb.style.border = '1px solid #fecaca';
                 fb.innerHTML = '<strong>❌ إجابة خاطئة.</strong> السبب هو الخاصية الكيميائية لجذر الفالين (كاره للماء) مقارنة بالغلوتاميك (محب للماء ومحمل بشحنة سالبة).';
             }
         }
@@ -741,10 +751,10 @@
 
             fb.style.display = 'block';
             if (isCorrect) {
-                fb.style.background = '#f0fdf4'; fb.style.color = '#166534'; fb.style.border = '1px solid #bbf7d0';
+                fb.style.background = 'rgba(255, 255, 255, 0.05)'; fb.style.color = '#166534'; fb.style.border = '1px solid #bbf7d0';
                 fb.innerHTML = '<strong>✅ إجابة صحيحة ممتاز!</strong> الخصوصية المزدوجة هي تخصص الإنزيم في مادة التفاعل وفي نوع التفاعل في آن واحد.';
             } else {
-                fb.style.background = '#fef2f2'; fb.style.color = '#991b1b'; fb.style.border = '1px solid #fecaca';
+                fb.style.background = 'rgba(255, 255, 255, 0.05)'; fb.style.color = '#991b1b'; fb.style.border = '1px solid #fecaca';
                 fb.innerHTML = '<strong>❌ إجابة خاطئة.</strong> الخصوصية المزدوجة تعني الجمع بين خصوصية مادة التفاعل (Substrat) وخصوصية نوع التفاعل (Réaction).';
             }
         }
