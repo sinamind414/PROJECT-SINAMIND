@@ -223,23 +223,43 @@ GÉNÉRATION PROGRESSIVE (LAZY LOADING) :
             # 3. Formatage + sauvegarde
             await _update_task(task_id, "running", progress="save", db=db)
 
-            def format_node_lazy(node: dict, level=0):
+            def format_node_lazy(node: dict, level=0, parent_branch_color=None):
                 if "id" not in node or not node["id"] or len(node["id"]) < 5:
                     node["id"] = str(uuid.uuid4())
                 node["niveau"] = level
                 if "maitrise_eleve" not in node:
                     node["maitrise_eleve"] = 0
+
                 importance = node.get("importance", "moyenne")
                 if importance not in ["critique", "haute", "moyenne"]:
                     node["importance"] = "moyenne"
                     importance = "moyenne"
-                node["couleur"] = {"critique": "#E74C3C", "haute": "#F39C12", "moyenne": "#3498DB"}[importance]
+
+                if "details" not in node:
+                    node["details"] = ""
+
+                if level == 1:
+                    if "couleur_branche" not in node or not node["couleur_branche"]:
+                        node["couleur_branche"] = BRANCH_COLORS[0]
+                    node["couleur"] = node["couleur_branche"]
+                elif level > 1 and parent_branch_color:
+                    node["couleur_branche"] = parent_branch_color
+                    node["couleur"] = node["couleur_branche"]
+                else:
+                    if "couleur_branche" not in node:
+                        node["couleur_branche"] = node["couleur"]
+                    node["couleur"] = node.get("couleur_branche", "#3498DB")
+
                 if "flashcard_auto" not in node:
                     node["flashcard_auto"] = importance in ["critique", "haute"]
                 node["enfants"] = node.get("enfants", [])
                 node["expanded"] = False
-                for child in node["enfants"]:
-                    format_node_lazy(child, level + 1)
+
+                for idx, child in enumerate(node["enfants"]):
+                    if level == 0:
+                        if "couleur_branche" not in child or not child["couleur_branche"]:
+                            child["couleur_branche"] = BRANCH_COLORS[idx % len(BRANCH_COLORS)]
+                    format_node_lazy(child, level + 1, parent_branch_color=node.get("couleur_branche"))
 
             format_node_lazy(generated_data["racine"], level=0)
 
@@ -281,18 +301,17 @@ GÉNÉRATION PROGRESSIVE (LAZY LOADING) :
 
 
 async def expand_node(
-    node_id: str, node_label: str, chapitre: str, matiere: str, user_id: str, db: AsyncSession, openai_client
+    node_id: str, node_label: str, chapitre: str, matiere: str, user_id: str, db: AsyncSession, openai_client,
+    node_parent_color: str | None = None,
 ) -> dict:
-    """Lazy loading : génère les sous-nœuds d'un nœud à la demande.
-
-    Évite de générer l'arbre complet en une seule fois.
-    """
+    """Lazy loading : génère les sous-nœuds d'un nœud à la demande."""
     from config import get_settings
     from services.embedder import embedder
     from services.llm_parser import parse_llm_json as extract_json_from_gemini
     from services.reranker import rerank
 
-    # 1. RAG ciblé sur le nœud spécifique + re-ranking
+    parent_color = node_parent_color or "#3498DB"
+
     query_text = f"{matiere} {chapitre} {node_label}"
     try:
         query_vector = embedder.encode([query_text])[0]
@@ -330,34 +349,23 @@ async def expand_node(
 
     context_text = _compact_mindmap_context(chunks, excerpt_len=180) if chunks else ""
 
-    expand_prompt = f"""
-    Tu es un expert pédagogique. Génère les sous-nœuds (niveau enfant) du nœud suivant.
-
-    NŒUD PARENT : {node_label}
-    CHAPITRE : {chapitre}
-    MATIERE : {matiere}
-
-    CONTEXTE RAG :
-    {context_text}
-
-    RÈGLES :
-    1. Maximum 5 sous-nœuds
-    2. Labels en ARABE (termes scientifiques en FR entre parenthèses)
-    3. Maximum 5 mots par label
-    4. Format JSON : {{"enfants": [{{"label": "...", "type": "...", "importance": "..."}}]}}
-
-    Réponds UNIQUEMENT avec le JSON.
-    """
+    expand_prompt = EXPAND_PROMPT_V2.format(
+        node_label=node_label,
+        chapitre=chapitre,
+        matiere=matiere,
+        context_text=context_text,
+        parent_color=parent_color,
+    )
 
     model = get_settings().openai_model
     try:
         response = await openai_client.chat.completions.create(
             model=model,
             temperature=0.2,
-            max_tokens=800,
-            timeout=15.0,
+            max_tokens=2000,
+            timeout=20.0,
             messages=[
-                {"role": "system", "content": "Tu génères des sous-nœuds pédagogiques en JSON."},
+                {"role": "system", "content": MINDMAP_SYSTEM_PROMPT_V2},
                 {"role": "user", "content": expand_prompt},
             ],
         )
@@ -369,7 +377,6 @@ async def expand_node(
 
     enfants = data.get("enfants", []) if data else []
 
-    # Formater les nouveaux nœuds
     for child in enfants:
         child["id"] = str(uuid.uuid4())
         child["niveau"] = 2
@@ -377,71 +384,18 @@ async def expand_node(
         importance = child.get("importance", "moyenne")
         child["couleur"] = {"critique": "#E74C3C", "haute": "#F39C12", "moyenne": "#3498DB"}.get(importance, "#3498DB")
         child["flashcard_auto"] = importance in ["critique", "haute"]
+        child["couleur_branche"] = parent_color
+        child["details"] = child.get("details", "")
         child["enfants"] = []
         child["expanded"] = False
 
     return {"node_id": node_id, "enfants": enfants}
 
 
-MINDMAP_SYSTEM_PROMPT = """
-INSTRUCTIONS LANGUE OBLIGATOIRES :
 
-1. TOUS les labels en ARABE.
-2. Termes scientifiques universels en FR entre parenthèses :
-   ADN, ARN, ATP, polymérase, ribosome.
-3. Exemples corrects :
-   "تركيب البروتين"
-   "الانزيم بوليمراز (ARN polymérase)"
-4. INTERDIT : labels entièrement en français.
+from services.mindmap_prompt_v2 import MINDMAP_SYSTEM_PROMPT_V2, EXPAND_PROMPT_V2, BRANCH_COLORS
 
-═══════════════════════════════════════════
-
-Tu es un expert pédagogique spécialisé dans le Bac algérien.
-Ta tâche est de générer un Mind Map JSON structuré.
-
-RÈGLES OBLIGATOIRES :
-1. Maximum 3 niveaux de profondeur
-2. Maximum 7 enfants par nœud
-3. Maximum 5 mots par label
-4. flashcard_auto = true si importance = critique ou haute
-5. Couleurs : critique=#E74C3C haute=#F39C12 moyenne=#3498DB
-
-FORMAT JSON OBLIGATOIRE — tu DOIS remplir "enfants" avec 3 à 7 sous-nœuds :
-{
-  "racine": {
-    "id": "uuid",
-    "label": "string max 5 mots — EN ARABE OBLIGATOIREMENT",
-    "type": "concept|definition|formule|processus|exception",
-    "niveau": 0,
-    "importance": "critique|haute|moyenne",
-    "bac_frequent": boolean,
-    "flashcard_auto": boolean,
-    "maitrise_eleve": 0,
-    "couleur": "#hex",
-    "enfants": [
-      {
-        "id": "uuid",
-        "label": "string max 5 mots — EN ARABE",
-        "type": "concept|definition|formule|processus|exception",
-        "niveau": 1,
-        "importance": "critique|haute|moyenne",
-        "bac_frequent": boolean,
-        "flashcard_auto": boolean,
-        "maitrise_eleve": 0,
-        "couleur": "#hex",
-        "enfants": [],
-        "liens": []
-      }
-    ],
-    "liens": []
-  },
-  "liens_transversaux": []
-}
-
-IMPORTANT : "enfants" ne doit JAMAIS être vide. Génère 3 à 7 sous-nœuds
-qui couvrent les concepts essentiels du chapitre.
-Réponds UNIQUEMENT avec le JSON. Aucun texte autour.
-"""
+MINDMAP_SYSTEM_PROMPT = MINDMAP_SYSTEM_PROMPT_V2
 
 
 async def generate_mindmap(
@@ -561,7 +515,7 @@ async def generate_mindmap(
         racine_sync["enfants"] = _build_default_enfants(chapitre, matiere)
 
     # 4. Formater récursivement l'arbre généré pour typage et clés uniques
-    def format_node_recursive(node: dict, level=0):
+    def format_node_recursive(node: dict, level=0, parent_branch_color=None):
         if "id" not in node or not node["id"] or len(node["id"]) < 5:
             node["id"] = str(uuid.uuid4())
         node["niveau"] = level
@@ -573,14 +527,30 @@ async def generate_mindmap(
             node["importance"] = "moyenne"
             importance = "moyenne"
 
-        node["couleur"] = {"critique": "#E74C3C", "haute": "#F39C12", "moyenne": "#3498DB"}[importance]
+        if "details" not in node:
+            node["details"] = ""
+
+        if level == 1:
+            if "couleur_branche" not in node or not node["couleur_branche"]:
+                node["couleur_branche"] = BRANCH_COLORS[0]
+            node["couleur"] = node["couleur_branche"]
+        elif level > 1 and parent_branch_color:
+            node["couleur_branche"] = parent_branch_color
+            node["couleur"] = node["couleur_branche"]
+        else:
+            if "couleur_branche" not in node:
+                node["couleur_branche"] = node["couleur"]
+            node["couleur"] = node.get("couleur_branche", "#3498DB")
 
         if "flashcard_auto" not in node:
             node["flashcard_auto"] = node["importance"] in ["critique", "haute"]
 
         node["enfants"] = node.get("enfants", [])
-        for child in node["enfants"]:
-            format_node_recursive(child, level + 1)
+        for idx, child in enumerate(node["enfants"]):
+            if level == 0:
+                if "couleur_branche" not in child or not child["couleur_branche"]:
+                    child["couleur_branche"] = BRANCH_COLORS[idx % len(BRANCH_COLORS)]
+            format_node_recursive(child, level + 1, parent_branch_color=node.get("couleur_branche"))
 
     format_node_recursive(generated_data["racine"], level=0)
 

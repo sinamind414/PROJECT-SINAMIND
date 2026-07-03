@@ -118,6 +118,7 @@ export type Maitrise = 0 | 1 | 2
 export interface MindMapNode {
   id: string
   label: string
+  details?: string
   type: NodeType
   niveau: number
   importance: Importance
@@ -125,6 +126,7 @@ export interface MindMapNode {
   flashcard_auto: boolean
   maitrise_eleve: Maitrise
   couleur: string
+  couleur_branche?: string
   enfants: MindMapNode[]
   fsrs_card_id?: string
   expanded?: boolean
@@ -180,6 +182,7 @@ export interface ExpandNodePayload {
   node_label: string
   chapitre: string
   matiere: string
+  node_parent_color?: string
 }
 
 // ── Health ──────────────────────────────────────

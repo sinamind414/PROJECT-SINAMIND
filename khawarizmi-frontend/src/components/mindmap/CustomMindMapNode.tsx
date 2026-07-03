@@ -18,13 +18,15 @@ export function CustomMindMapNode({ data }: CustomMindMapNodeProps) {
   const masteryLabels = [UI_AR.non, UI_AR.en_cours, UI_AR.maitrisee]
   const masteryLabel = masteryLabels[node.maitrise_eleve] || UI_AR.non
 
+  const branchColor = node.couleur_branche || node.couleur || "#475569"
+
   return (
     <div
       className="px-4 py-3.5 rounded-xl bg-slate-900/90 border border-slate-800/80
                  backdrop-blur-md shadow-lg min-w-[200px] max-w-[280px]
                  hover:shadow-xl hover:border-slate-700/80 transition-all group relative"
       style={{
-        borderLeft: `4px solid ${node.couleur || "#475569"}`
+        borderLeft: `4px solid ${branchColor}`
       }}
     >
       {node.niveau > 0 && (
@@ -55,6 +57,12 @@ export function CustomMindMapNode({ data }: CustomMindMapNodeProps) {
                        leading-snug transition-colors line-clamp-2">
           {trAr(node.label)}
         </h4>
+
+        {node.details && (
+          <p className="text-[10px] text-slate-400 leading-relaxed line-clamp-3 mt-0.5">
+            {trAr(node.details)}
+          </p>
+        )}
 
         <div className="flex items-center gap-2 mt-1 border-t border-slate-800/60 pt-2 text-[10px] text-slate-400">
           <span

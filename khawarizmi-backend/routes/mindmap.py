@@ -43,6 +43,7 @@ class ExpandNodeRequest(BaseModel):
     node_label: str = Field(..., min_length=1, max_length=200)
     chapitre: str = Field(..., min_length=2, max_length=100)
     matiere: str = Field(..., min_length=2, max_length=50)
+    node_parent_color: str | None = Field(None, max_length=20)
 
 
 # ── Génération asynchrone (non-bloquante) ────────────────────────────────────
@@ -172,6 +173,7 @@ async def expand_node_endpoint(
         user_id=str(current_user["id"]),
         db=db,
         openai_client=openai_client,
+        node_parent_color=request.node_parent_color,
     )
     return {"status": "success", "enfants": result["enfants"]}
 

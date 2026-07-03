@@ -333,6 +333,7 @@ class KhawarizmiApiClient {
     node_label: string
     chapitre: string
     matiere: string
+    node_parent_color?: string
   }): Promise<{ status: string; enfants: MindMapNode[] }> {
     return this.request<{ status: string; enfants: MindMapNode[] }>("/api/mindmap/expand", {
       method: "POST",

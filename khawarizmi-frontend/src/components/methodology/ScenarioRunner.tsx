@@ -181,12 +181,25 @@ export function ScenarioRunner({
     methodology_step: string
   }>>({})
 
+  const [enabledOptional, setEnabledOptional] = useState<Record<string, boolean>>({})
+
   const questions = getActiveQuestions(scenario, chapterLink)
 
-  const completedCount = useMemo(
-    () => questions.filter((q) => (answers[q.id] || "").trim().length > 0).length,
-    [answers, questions],
+  const mandatoryQuestions = questions.filter((q) => q.mandatory)
+  const optionalQuestions = questions.filter((q) => !q.mandatory)
+
+  const activeQuestions = questions.filter(
+    (q) => q.mandatory || enabledOptional[q.id]
   )
+
+  const completedCount = useMemo(
+    () => activeQuestions.filter((q) => (answers[q.id] || "").trim().length > 0).length,
+    [answers, activeQuestions],
+  )
+
+  function toggleOptional(qId: string) {
+    setEnabledOptional((prev) => ({ ...prev, [qId]: !prev[qId] }))
+  }
 
   function updateAnswer(id: string, value: string) {
     setAnswers((prev) => ({ ...prev, [id]: value }))
@@ -197,18 +210,20 @@ export function ScenarioRunner({
     setSubmitting(true)
     const chapterSlug: string | null = chapterLink?.slug ?? null
 
+    const questionsToSubmit = activeQuestions
+
     try {
       const payload = {
         scenario_id: scenario.id,
         chapter_slug: chapterSlug,
-        answers: questions.map((q) => ({
+        answers: questionsToSubmit.map((q) => ({
           verb_slug: q.verbSlug,
           answer: answers[q.id] || "",
         })),
       }
       const resp = await apiClient.evaluateDaAnswersV2(payload)
 
-      const evaluations = questions.map((question) => {
+      const evaluations = questionsToSubmit.map((question) => {
         const evalData = resp.evaluations.find((e) => e.verb_slug === question.verbSlug)
         const evaluation: MethodologyEvaluation = evalData
           ? {
@@ -251,7 +266,7 @@ export function ScenarioRunner({
       setAward(awardXP("مهمة استغلال وثيقة", 60))
     } catch {
       setApiSource(false)
-      const evaluations = questions.map((question) => ({
+      const evaluations = questionsToSubmit.map((question) => ({
         question,
         answer: answers[question.id] || "",
         evaluation: evaluateMethodologyAnswer({ verbSlug: question.verbSlug, answer: answers[question.id] || "" }),
@@ -348,50 +363,145 @@ export function ScenarioRunner({
           <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
             <div>
               <h2 className="text-2xl font-bold text-white">أسئلة السيناريو</h2>
-              <p className="text-gray-500 text-sm mt-1">{completedCount}/{questions.length} إجابات مكتملة</p>
+              <p className="text-gray-500 text-sm mt-1">{completedCount}/{activeQuestions.length} إجابات مكتملة</p>
             </div>
           </div>
 
-          <div className="space-y-5">
-            {questions.map((q) => (
-              <div key={q.id} className="rounded-2xl p-4 bg-white/[0.03] border border-white/[0.05]">
-                <div className="flex gap-4 mb-3">
-                  <div className="w-10 h-10 rounded-xl bg-mint/20 text-mint-soft flex items-center justify-center font-bold flex-shrink-0">
-                    {q.n}
-                  </div>
-                  <div>
-                    <div className="flex flex-wrap items-center gap-2">
-                      <h3 className="text-white font-bold">{q.title}</h3>
-                      <span className="px-2 py-0.5 rounded-full bg-white/[0.05] text-mint-soft text-[10px]">{q.docRef}</span>
-                    </div>
-                    <p className="text-mint-soft text-xs mt-1">المهارة: {q.skill}</p>
-                    <p className="text-gray-300 text-sm mt-2 leading-relaxed">{q.prompt}</p>
-                  </div>
-                </div>
-                <textarea
-                  value={answers[q.id] || ""}
-                  onChange={(e) => updateAnswer(q.id, e.target.value)}
-                  rows={4}
-                  className="w-full rounded-xl bg-[#0C151A] border border-white/[0.08] text-white p-4 outline-none focus:border-mint"
-                  placeholder={q.placeholder}
-                />
-                <div className="flex flex-wrap items-center gap-2 mt-2">
-                  <button
-                    onClick={() => requestHint(q)}
-                    disabled={requestingHint}
-                    className="px-3 py-1.5 rounded-lg bg-amber-500/20 text-amber-200 border border-amber-500/30 text-xs font-bold hover:bg-amber-500/30 transition disabled:opacity-50"
-                  >
-                    {requestingHint ? "..." : "طلب تلميح سُقراطي"}
-                  </button>
-                  {hints[q.id] && (
-                    <span className="text-amber-300 text-[10px]">
-                      {hints[q.id].hint_ar}
-                    </span>
-                  )}
-                </div>
+          {mandatoryQuestions.length > 0 && (
+            <div className="space-y-5 mb-8">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="px-2.5 py-1 rounded-lg bg-red-500/15 text-red-300 text-xs font-bold border border-red-500/25">إلزامي</span>
+                <span className="text-gray-400 text-xs">هذه الأسئلة تصحّح تلقائياً — لا تحتاج تفعيل</span>
               </div>
-            ))}
-          </div>
+              {mandatoryQuestions.map((q) => (
+                <div key={q.id} className="rounded-2xl p-4 bg-white/[0.03] border border-red-500/10">
+                  <div className="flex gap-4 mb-3">
+                    <div className="w-10 h-10 rounded-xl bg-red-500/20 text-red-300 flex items-center justify-center font-bold flex-shrink-0">
+                      {q.n}
+                    </div>
+                    <div>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <h3 className="text-white font-bold">{q.title}</h3>
+                        <span className="px-2 py-0.5 rounded-full bg-white/[0.05] text-mint-soft text-[10px]">{q.docRef}</span>
+                        <span className="px-1.5 py-0.5 rounded bg-red-500/15 text-red-300 text-[9px] font-bold">إلزامي</span>
+                      </div>
+                      <p className="text-mint-soft text-xs mt-1">المهارة: {q.skill}</p>
+                      <p className="text-gray-300 text-sm mt-2 leading-relaxed">{q.prompt}</p>
+                    </div>
+                  </div>
+                  <textarea
+                    value={answers[q.id] || ""}
+                    onChange={(e) => updateAnswer(q.id, e.target.value)}
+                    rows={4}
+                    className="w-full rounded-xl bg-[#0C151A] border border-white/[0.08] text-white p-4 outline-none focus:border-red-400"
+                    placeholder={q.placeholder}
+                  />
+                  <div className="flex flex-wrap items-center gap-2 mt-2">
+                    <button
+                      onClick={() => requestHint(q)}
+                      disabled={requestingHint}
+                      className="px-3 py-1.5 rounded-lg bg-amber-500/20 text-amber-200 border border-amber-500/30 text-xs font-bold hover:bg-amber-500/30 transition disabled:opacity-50"
+                    >
+                      {requestingHint ? "..." : "طلب تلميح سُقراطي"}
+                    </button>
+                    {hints[q.id] && (
+                      <span className="text-amber-300 text-[10px]">
+                        {hints[q.id].hint_ar}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {optionalQuestions.length > 0 && (
+            <div className="space-y-5">
+              <div className="flex items-center gap-2 mb-2 pt-6 border-t border-white/[0.06]">
+                <span className="px-2.5 py-1 rounded-lg bg-blue-500/15 text-blue-300 text-xs font-bold border border-blue-500/25">اختياري</span>
+                <span className="text-gray-400 text-xs">فعّل الأسئلة التي تريد تصحيحها — أزل التفعيل لتجاهلها</span>
+              </div>
+              {optionalQuestions.map((q) => {
+                const isEnabled = !!enabledOptional[q.id]
+                return (
+                  <div
+                    key={q.id}
+                    className={`rounded-2xl p-4 transition-all duration-200 ${
+                      isEnabled
+                        ? "bg-white/[0.03] border border-blue-500/15"
+                        : "bg-white/[0.01] border border-white/[0.03] opacity-60"
+                    }`}
+                  >
+                    <div className="flex items-center justify-between gap-3 mb-3">
+                      <div className="flex gap-3 items-start">
+                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold flex-shrink-0 ${
+                          isEnabled ? "bg-blue-500/20 text-blue-300" : "bg-white/[0.05] text-gray-500"
+                        }`}>
+                          {q.n}
+                        </div>
+                        <div>
+                          <div className="flex flex-wrap items-center gap-2">
+                            <h3 className={`font-bold ${isEnabled ? "text-white" : "text-gray-400"}`}>{q.title}</h3>
+                            <span className="px-2 py-0.5 rounded-full bg-white/[0.05] text-mint-soft text-[10px]">{q.docRef}</span>
+                            <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold ${
+                              isEnabled
+                                ? "bg-blue-500/15 text-blue-300"
+                                : "bg-white/[0.04] text-gray-500"
+                            }`}>اختياري</span>
+                          </div>
+                          <p className={`text-xs mt-1 ${isEnabled ? "text-mint-soft" : "text-gray-500"}`}>المهارة: {q.skill}</p>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => toggleOptional(q.id)}
+                        className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors duration-200 flex-shrink-0 ${
+                          isEnabled ? "bg-blue-500" : "bg-gray-700"
+                        }`}
+                        title={isEnabled ? "إلغاء التفعيل — لن يتم تصحيح هذا السؤال" : "فعّل ليقوم المصحح بتصحيح هذا السؤال"}
+                      >
+                        <span
+                          className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform duration-200 ${
+                            isEnabled ? "translate-x-6" : "translate-x-1"
+                          }`}
+                        />
+                      </button>
+                    </div>
+
+                    {isEnabled ? (
+                      <>
+                        <p className="text-gray-300 text-sm mb-3 leading-relaxed">{q.prompt}</p>
+                        <textarea
+                          value={answers[q.id] || ""}
+                          onChange={(e) => updateAnswer(q.id, e.target.value)}
+                          rows={4}
+                          className="w-full rounded-xl bg-[#0C151A] border border-white/[0.08] text-white p-4 outline-none focus:border-blue-400"
+                          placeholder={q.placeholder}
+                        />
+                        <div className="flex flex-wrap items-center gap-2 mt-2">
+                          <button
+                            onClick={() => requestHint(q)}
+                            disabled={requestingHint}
+                            className="px-3 py-1.5 rounded-lg bg-amber-500/20 text-amber-200 border border-amber-500/30 text-xs font-bold hover:bg-amber-500/30 transition disabled:opacity-50"
+                          >
+                            {requestingHint ? "..." : "طلب تلميح سُقراطي"}
+                          </button>
+                          {hints[q.id] && (
+                            <span className="text-amber-300 text-[10px]">
+                              {hints[q.id].hint_ar}
+                            </span>
+                          )}
+                        </div>
+                      </>
+                    ) : (
+                      <p className="text-gray-500 text-xs leading-relaxed">
+                        {q.prompt.slice(0, 80)}... — فعّل هذا السؤال لإظهار حقل الإجابة وتصحيحه.
+                      </p>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+          )}
 
           <div className="mt-6 flex flex-wrap gap-3">
             <button
@@ -399,7 +509,10 @@ export function ScenarioRunner({
               disabled={submitting}
               className="px-5 py-3 rounded-xl bg-mint text-white font-bold hover:bg-mint-soft transition disabled:opacity-50"
             >
-              {submitting ? "جاري التقييم..." : "تحقق من المنهجية وسجل الخطأ"}
+              {submitting
+                ? "جاري التقييم..."
+                : `تحقق من المنهجية (${activeQuestions.length} أسئلة) وسجل الخطأ`
+              }
             </button>
             <button
               onClick={reset}
@@ -408,6 +521,20 @@ export function ScenarioRunner({
               إعادة من الصفر
             </button>
           </div>
+
+          {optionalQuestions.length > 0 && (
+            <div className="mt-3 rounded-xl p-3 bg-white/[0.02] border border-white/[0.04] text-xs text-gray-400">
+              <span className="text-red-300 font-bold">{mandatoryQuestions.length} إلزامي</span>
+              {" · "}
+              <span className="text-blue-300 font-bold">
+                {Object.values(enabledOptional).filter(Boolean).length}/{optionalQuestions.length} اختياري مفعّل
+              </span>
+              {" · "}
+              <span className="text-gray-300">
+                سيتم تصحيح {activeQuestions.length} من أصل {questions.length} أسئلة
+              </span>
+            </div>
+          )}
         </section>
 
         <aside className="space-y-4">

@@ -241,7 +241,8 @@ function ChapterMindMapContent() {
         node_id: node.id,
         node_label: node.label,
         chapitre: chapterInfo.fr,
-        matiere: "SVT"
+        matiere: "SVT",
+        node_parent_color: node.couleur_branche || node.couleur
       })
       if (result.enfants && result.enfants.length > 0) {
         const expandedMindmap = {
