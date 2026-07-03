@@ -1,0 +1,9 @@
+khawarizmi-backend
+data
+node_modules
+.next
+*.pyc
+__pycache__
+.git
+.env
+.env.*
