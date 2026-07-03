@@ -469,7 +469,7 @@ async def get_cours(
 ):
     decoded = chapitre_title.replace("%20", " ").replace("+", " ")
 
-    keywords = CHAPTER_MAPPING.get(decoded, None)
+    keywords = CHAPTER_MAPPING.get(decoded)
 
     if keywords:
         conditions = " OR ".join(f"LOWER(chapitre) LIKE LOWER(:kw{i})" for i in range(len(keywords)))

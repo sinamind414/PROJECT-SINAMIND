@@ -6,7 +6,7 @@ et le contexte de l'instruction.
 """
 from __future__ import annotations
 
-from .verb_database import get_verb, get_complex_verbs
+from .verb_database import get_verb
 
 # Mots-clés indiquant une tâche complexe (hors verbes)
 COMPLEX_KEYWORDS: list[str] = [

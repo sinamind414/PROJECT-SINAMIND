@@ -1,6 +1,6 @@
 """Guidage en temps reel — Bac Blanc Intelligent (Semaine 6)"""
 
-from typing import Dict, Any, List
+from typing import Any
 
 GUIDANCE_TEMPLATES = {
     "وضّح في نص علمي": {
@@ -35,7 +35,7 @@ def generate_real_time_guidance(
     instruction: str,
     current_text: str,
     verb_info: dict
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     verb = verb_info.get("arabic", "")
 
     guidance = {

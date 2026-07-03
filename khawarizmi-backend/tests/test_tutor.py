@@ -2,8 +2,8 @@
 
 import pytest
 
-from methodology.tutor_prompts import get_verb_explanation, VERB_EXPLANATIONS
 from methodology.chat_tutor import tutor_methodology_mode
+from methodology.tutor_prompts import VERB_EXPLANATIONS, get_verb_explanation
 
 
 class TestVerbExplanations:

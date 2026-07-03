@@ -1,13 +1,13 @@
 """Plan d'action personnalise — Bac Blanc Intelligent"""
 
-from typing import Dict, Any, List
+from typing import Any
 
 
 def generate_personalized_action_plan(
     maturity_level: str,
-    error_profiles: List[dict],
-    weak_verbs: List[str] = None
-) -> Dict[str, Any]:
+    error_profiles: list[dict],
+    weak_verbs: list[str] = None
+) -> dict[str, Any]:
     plan = {
         "level": maturity_level,
         "priority_actions": [],

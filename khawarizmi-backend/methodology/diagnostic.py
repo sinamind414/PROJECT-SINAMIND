@@ -258,7 +258,7 @@ from pathlib import Path
 
 _PROFILES_PATH = Path(__file__).parent / "error_profiles.json"
 
-with open(_PROFILES_PATH, "r", encoding="utf-8") as _f:
+with open(_PROFILES_PATH, encoding="utf-8") as _f:
     _ERROR_PROFILES_JSON = json.load(_f)["profiles"]
 
 

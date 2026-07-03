@@ -10,10 +10,8 @@ Couvre :
 - Cas limites (mixte arabe/latin, chiffres, ponctuation)
 """
 
-import pytest
 
 from services.answer_sanity import check_answer_sanity
-
 
 # ── Les 5 charabias de production ─────────────────
 

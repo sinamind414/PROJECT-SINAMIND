@@ -1,4 +1,4 @@
-﻿FALLBACK_PROGRAMME_DATA = {
+FALLBACK_PROGRAMME_DATA = {
   "matiere": "SVT",
   "filiere": "Sciences Experimentales",
   "niveau": "Terminale",
@@ -556,4 +556,3 @@
     }
   ]
 }
-

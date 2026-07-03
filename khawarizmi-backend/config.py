@@ -66,6 +66,9 @@ class Settings(BaseSettings):
     ALLOWED_ORIGINS: str = ""
 
     data_dir: str = ""
+    ONNX_MODEL_PATH: str = ""
+    ADMIN_SECRET: str = ""
+    BACKUP_DIR: str = ""
 
     chargily_secret_key: str = ""
     CHARGILY_API_KEY: str = ""

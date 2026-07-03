@@ -15,17 +15,15 @@ Fallback sur rate limit (429/quota) et, si un validateur est fourni,
 sur réponse HTTP 200 inexploitable (ex. JSON invalide).
 """
 
-import json
 import logging
-import re
 from collections.abc import Callable
 
 from openai import AsyncOpenAI
 from tenacity import retry, stop_after_attempt, wait_exponential
 
 from config import get_settings
-from services.llm_parser import parse_llm_json
 from prompts.evaluation_prompt import EVALUATION_SYSTEM_PROMPT, build_evaluation_prompt
+from services.llm_parser import parse_llm_json
 
 logger = logging.getLogger("khawarizmi.llm")
 
@@ -33,8 +31,8 @@ logger = logging.getLogger("khawarizmi.llm")
 def _tag_response_provider(response: object, provider: str, model: str) -> object:
     """Ajoute des métadonnées non bloquantes pour l'audit."""
     try:
-        setattr(response, "_khawarizmi_provider", provider)
-        setattr(response, "_khawarizmi_model", model)
+        response._khawarizmi_provider = provider
+        response._khawarizmi_model = model
     except Exception:
         pass
     return response

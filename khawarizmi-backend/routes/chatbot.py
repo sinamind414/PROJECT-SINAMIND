@@ -17,8 +17,8 @@ from openai import AsyncOpenAI
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from cache import get_cache, make_cache_key, set_cache
-from deps import get_current_user, get_openai_optional
 from database import get_db
+from deps import get_current_user, get_openai_optional
 from rate_limit import chat_limit, limiter
 from services.chatbot_orchestrator import handle_chatbot_message
 

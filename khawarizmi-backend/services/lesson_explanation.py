@@ -2,9 +2,9 @@
 Mode "Explication de lecon" (0 token quand possible)
 """
 
-from typing import Dict, Any
+from typing import Any
 
-LESSON_EXPLANATIONS: Dict[str, Dict[str, Any]] = {
+LESSON_EXPLANATIONS: dict[str, dict[str, Any]] = {
 
     "proteines": {
         "title": "Les Proteines",
@@ -55,7 +55,7 @@ LESSON_EXPLANATIONS: Dict[str, Dict[str, Any]] = {
 }
 
 
-def get_lesson_explanation(lesson_key: str) -> Dict[str, Any]:
+def get_lesson_explanation(lesson_key: str) -> dict[str, Any]:
     lesson = LESSON_EXPLANATIONS.get(lesson_key.lower())
 
     if not lesson:
@@ -69,7 +69,7 @@ def get_lesson_explanation(lesson_key: str) -> Dict[str, Any]:
         f"**{lesson['title']}**\n\n"
         f"**Introduction :**\n{lesson['introduction']}\n\n"
         f"**Points cles :**\n" + "\n".join([f"- {p}" for p in lesson['key_points']]) + "\n\n"
-        f"**Verbes du Bac souvent utilises :**\n" + "\n".join([f"- {v}" for v in lesson['bac_verbs']]) + "\n\n"
+        "**Verbes du Bac souvent utilises :**\n" + "\n".join([f"- {v}" for v in lesson['bac_verbs']]) + "\n\n"
         f"**Conseil methodologique :**\n{lesson['methodological_advice']}\n\n"
         f"-> {lesson['next_question']}"
     )
@@ -97,8 +97,7 @@ def detect_lesson_request(message: str) -> str | None:
     }
 
     for keyword, lesson in lesson_keywords.items():
-        if keyword in message_lower:
-            if any(word in message_lower for word in ["explique", "cours", "lecon", "chapitre", "resume"]):
-                return lesson
+        if keyword in message_lower and any(word in message_lower for word in ["explique", "cours", "lecon", "chapitre", "resume"]):
+            return lesson
 
     return None

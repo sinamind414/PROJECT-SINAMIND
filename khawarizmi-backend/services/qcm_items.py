@@ -14,9 +14,11 @@ import logging
 import os
 from typing import Any
 
+from config import get_settings
+
 logger = logging.getLogger("khawarizmi.qcm")
 
-_data_dir = os.environ.get("DATA_DIR", os.path.join(os.path.dirname(__file__), "..", "data"))
+_data_dir = get_settings().data_dir or os.path.join(os.path.dirname(__file__), "..", "data")
 QCM_PATH = os.path.join(_data_dir, "qcm_items.json")
 
 qcm_db: dict[str, dict[str, Any]] = {}

@@ -1,8 +1,9 @@
 """Feedback structure apres exercice — Bac Blanc Intelligent"""
 
-from typing import Dict, Any
-from .evaluator import evaluate_methodology
+from typing import Any
+
 from .diagnostic import generate_diagnostic_report
+from .evaluator import evaluate_methodology
 
 
 async def generate_bac_blanc_structured_feedback(
@@ -11,7 +12,7 @@ async def generate_bac_blanc_structured_feedback(
     student_answer: str,
     documents: list = None,
     previous_answers: list = None
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     if documents is None:
         documents = []
     if previous_answers is None:

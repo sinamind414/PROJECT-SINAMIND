@@ -1,6 +1,7 @@
 """Routes Flashcards Méthodologiques — Semaine 5"""
 
 from fastapi import APIRouter
+
 from methodology.methodology_flashcards import (
     get_all_methodology_flashcards,
     get_flashcards_by_category,

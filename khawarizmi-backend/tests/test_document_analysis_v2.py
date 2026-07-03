@@ -5,11 +5,11 @@ Tests d'intégration pour la route v2 du correcteur :
 POST /api/document-analysis/evaluate-v2
 """
 
-from unittest.mock import AsyncMock, patch
+from unittest.mock import patch
 
 import pytest
 
-from tests.conftest import MockAsyncExecResult, MockRow
+from tests.conftest import MockAsyncExecResult
 
 
 @pytest.mark.asyncio

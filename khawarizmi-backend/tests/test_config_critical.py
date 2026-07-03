@@ -135,7 +135,9 @@ class TestRagChunksSchema:
     Les requêtes SQL doivent utiliser `chapitre AS chapter` pour aliasser proprement.
     """
 
-    _SQL_FILES: list[str] = [
+    from typing import ClassVar as _ClassVar
+
+    _SQL_FILES: _ClassVar[list[str]] = [
         "services/rag_service.py",
     ]
 

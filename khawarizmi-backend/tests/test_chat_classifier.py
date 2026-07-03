@@ -9,10 +9,8 @@
   - Priorité des intents
 """
 
-import pytest
 
 from services.chat_classifier import classify, detect_language, normalize_arabic
-
 
 # ── Tests normalize_arabic ────────────────────────
 

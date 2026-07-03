@@ -1,5 +1,6 @@
-from pydantic import BaseModel, model_validator
 from typing import Literal
+
+from pydantic import BaseModel, model_validator
 
 
 class ChatOrchestratorRequest(BaseModel):
@@ -18,11 +19,10 @@ class ChatOrchestratorRequest(BaseModel):
 
     @model_validator(mode="after")
     def validate_mode_fields(self) -> "ChatOrchestratorRequest":
-        if self.mode in ("guided", "methodology"):
-            if not self.sujet_id or not self.question_id:
-                raise ValueError(
-                    f"mode={self.mode} requiert sujet_id et question_id"
-                )
+        if self.mode in ("guided", "methodology") and (not self.sujet_id or not self.question_id):
+            raise ValueError(
+                f"mode={self.mode} requiert sujet_id et question_id"
+            )
         if not self.message or not self.message.strip():
             raise ValueError("message ne peut pas être vide")
         if len(self.message) > 5000:

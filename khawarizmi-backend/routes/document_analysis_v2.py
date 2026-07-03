@@ -24,9 +24,9 @@ from rate_limit import evaluate_limit, limiter
 from schemas.document_analysis import EvaluateRequest
 from services.correction_audit import log_correction_audit
 from services.correction_v2_retry import evaluate_answer_v2_with_retry
-from services.socratic_tutor import get_socratic_hint
 from services.llm import _call_with_fallback
-from services.rag_service import rag_search, format_rag_context
+from services.rag_service import format_rag_context, rag_search
+from services.socratic_tutor import get_socratic_hint
 
 logger = logging.getLogger("khawarizmi.document_analysis_v2")
 router = APIRouter(prefix="/api/document-analysis", tags=["Document Analysis V2"])

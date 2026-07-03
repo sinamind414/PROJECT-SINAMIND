@@ -4,8 +4,8 @@ Test du moteur pédagogique optimisé — 5 cas BAC SVT
 Mesure : taille prompt, qualité pédagogique, stabilité JSON.
 """
 import json
-import sys
 import os
+import sys
 import time
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
@@ -136,9 +136,9 @@ def run_tests():
     results = []
 
     for i, tc in enumerate(TEST_CASES):
-        print(f"\n{'='*60}")
+        print(f"\n{'=' * 60}")
         print(f"  {tc['name']}")
-        print(f"{'='*60}")
+        print(f"{'=' * 60}")
 
         try:
             prompt = tutor.build_system_prompt(
@@ -162,7 +162,7 @@ def run_tests():
 
         print(f"  Taille prompt  : {prompt_chars} chars (~{prompt_tokens} tokens)")
         print(f"  Solutions leak : {'AUCUN' if not leaks else 'LEAK: ' + str(leaks)}")
-        print(f"  Qualité pédago :")
+        print("  Qualité pédago :")
         for k, v in quality.items():
             print(f"    {k}: {'V' if v else 'X'}")
 
@@ -175,9 +175,9 @@ def run_tests():
             "quality_checks": quality,
         })
 
-    print(f"\n{'='*60}")
+    print(f"\n{'=' * 60}")
     print("  RESUME DES TESTS")
-    print(f"{'='*60}")
+    print(f"{'=' * 60}")
     total_chars = sum(r["prompt_chars"] for r in results)
     total_tokens = sum(r["prompt_tokens"] for r in results)
     avg_chars = total_chars // len(results)
@@ -193,7 +193,7 @@ def run_tests():
                 all_quality[k] = []
             all_quality[k].append(v)
 
-    print(f"\n  Score qualité par critere :")
+    print("\n  Score qualité par critere :")
     perfect = 0
     for k, vals in all_quality.items():
         score = sum(vals) / len(vals) * 10

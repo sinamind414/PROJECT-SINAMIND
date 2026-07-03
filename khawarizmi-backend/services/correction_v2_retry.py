@@ -64,11 +64,7 @@ def _is_transient_error(result: dict[str, Any]) -> bool:
         if marker in error_str.lower():
             return False
 
-    for pattern in _TRANSIENT_EXCEPTION_PATTERNS:
-        if pattern.search(error_str):
-            return True
-
-    return False
+    return any(pattern.search(error_str) for pattern in _TRANSIENT_EXCEPTION_PATTERNS)
 
 
 def _is_sanity_result(result: dict[str, Any]) -> bool:

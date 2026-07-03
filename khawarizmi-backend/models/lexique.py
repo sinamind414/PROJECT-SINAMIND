@@ -2,7 +2,13 @@
 # Index sur les colonnes de recherche fréquente (lookup rapide)
 
 from sqlalchemy import (
-    Column, String, Text, Boolean, DateTime, ARRAY, Index,
+    ARRAY,
+    Boolean,
+    Column,
+    DateTime,
+    Index,
+    String,
+    Text,
 )
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.sql import func

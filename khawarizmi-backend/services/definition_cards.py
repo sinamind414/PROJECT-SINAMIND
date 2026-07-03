@@ -20,18 +20,20 @@ import json
 import logging
 import os
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
+
+from config import get_settings
 
 logger = logging.getLogger("khawarizmi.definition_cards")
 
 # Résolution du chemin du fichier de concepts
-_data_dir = os.environ.get("DATA_DIR", os.path.join(os.path.dirname(__file__), "..", "data"))
+_data_dir = get_settings().data_dir or os.path.join(os.path.dirname(__file__), "..", "data")
 MICRO_CONCEPTS_PATH = os.path.join(_data_dir, "micro_concepts.json")
 
 MIN_DEF_LEN = 25  # Longueur minimale pour considérer une définition exploitable
 
 
-def load_definition_cards() -> List[Dict[str, Any]]:
+def load_definition_cards() -> list[dict[str, Any]]:
     """Charge les cartes définition depuis micro_concepts.json."""
     if not Path(MICRO_CONCEPTS_PATH).exists():
         logger.warning(f"Fichier micro_concepts.json introuvable ({MICRO_CONCEPTS_PATH})")

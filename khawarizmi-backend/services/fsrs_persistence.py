@@ -1,6 +1,5 @@
 import json
 import logging
-from datetime import UTC, datetime
 
 from fsrs import Card
 from sqlalchemy import bindparam, text

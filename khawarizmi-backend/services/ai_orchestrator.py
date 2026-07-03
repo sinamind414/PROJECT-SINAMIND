@@ -4,10 +4,10 @@ import time
 from openai import AsyncOpenAI
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from schemas.ai_request import ChatOrchestratorRequest, EvaluateOrchestratorRequest
 from services.ai_modes.evaluation_mode import handle_evaluation
 from services.ai_modes.free_mode import handle_free_chat
 from services.ai_modes.guided_mode import handle_guided_chat
-from schemas.ai_request import ChatOrchestratorRequest, EvaluateOrchestratorRequest
 
 logger = logging.getLogger("khawarizmi.orchestrator")
 

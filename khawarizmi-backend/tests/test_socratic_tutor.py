@@ -10,7 +10,7 @@ Couvre :
 
 from __future__ import annotations
 
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import MagicMock, patch
 
 import pytest
 
@@ -59,7 +59,7 @@ class TestGetSocraticHint:
 
     @pytest.mark.asyncio
     async def test_fallback_on_empty_response(self):
-        from services.socratic_tutor import get_socratic_hint, DEFAULT_HINT
+        from services.socratic_tutor import DEFAULT_HINT, get_socratic_hint
 
         mock_response = MagicMock()
         mock_response.choices = [MagicMock()]

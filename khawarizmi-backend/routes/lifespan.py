@@ -3,7 +3,7 @@
 import asyncio
 import logging
 import pathlib
-from contextlib import asynccontextmanager, suppress
+from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from typing import Any
 

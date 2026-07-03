@@ -1,11 +1,11 @@
 """Tests Diagnostic Avancé — Semaine 3"""
 
 from methodology.diagnostic import (
-    detect_verb_confusion,
-    detect_error_profiles,
     calculate_methodology_maturity,
-    generate_diagnostic_report,
+    detect_error_profiles,
+    detect_verb_confusion,
     diagnose_methodology_level,
+    generate_diagnostic_report,
 )
 
 

@@ -1,11 +1,11 @@
 """Tests Flashcards Méthodologiques — Semaine 5"""
 
 from methodology.methodology_flashcards import (
-    get_all_methodology_flashcards,
-    get_flashcards_by_category,
-    VERB_FLASHCARDS,
     ERROR_FLASHCARDS,
     STRUCTURE_FLASHCARDS,
+    VERB_FLASHCARDS,
+    get_all_methodology_flashcards,
+    get_flashcards_by_category,
 )
 
 

@@ -3,6 +3,7 @@ Analyseur de structure du texte scientifique — Couche 3
 Vérifie si la réponse contient Introduction / Développement / Conclusion
 """
 
+
 def analyze_text_structure(answer: str) -> dict:
     has_intro = any(word in answer for word in [
         "مقدمة", "المشكل", "يهدف", "يتمثل", "الهدف من"

@@ -1,6 +1,6 @@
 from datetime import date, timedelta
 
-from sqlalchemy import func, text
+from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 

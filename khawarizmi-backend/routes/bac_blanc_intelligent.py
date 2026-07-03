@@ -1,12 +1,11 @@
 """Routes Bac Blanc Intelligent — Semaine 6"""
 
+
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-from typing import Optional
 
-from methodology.bac_blanc_guidance import generate_real_time_guidance
-from methodology.bac_blanc_feedback import generate_bac_blanc_structured_feedback
 from methodology.action_plan import generate_personalized_action_plan
+from methodology.bac_blanc_feedback import generate_bac_blanc_structured_feedback
 
 router = APIRouter(prefix="/api/bac-blanc", tags=["Bac Blanc Intelligent"])
 
@@ -15,8 +14,8 @@ class BacBlancRequest(BaseModel):
     context: str
     instruction: str
     student_answer: str
-    documents: Optional[list] = []
-    previous_answers: Optional[list] = []
+    documents: list | None = []
+    previous_answers: list | None = []
 
 
 @router.post("/feedback")

@@ -2,8 +2,8 @@
 Tuteur Méthodologique — Mode dédié dans le chat
 """
 
-from .tutor_prompts import get_verb_explanation
 from .evaluator import evaluate_methodology
+from .tutor_prompts import get_verb_explanation
 
 
 async def tutor_methodology_mode(

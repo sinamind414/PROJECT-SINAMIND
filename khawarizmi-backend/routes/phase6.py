@@ -5,7 +5,13 @@ from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from deps import get_current_user, get_db
-from services.phase6_service import get_funnel_metrics, get_gamification_metrics, get_top_performers, get_user_engagement, track_event
+from services.phase6_service import (
+    get_funnel_metrics,
+    get_gamification_metrics,
+    get_top_performers,
+    get_user_engagement,
+    track_event,
+)
 
 router = APIRouter(prefix="/api/phase6", tags=["Phase 6 - Analytics"])
 

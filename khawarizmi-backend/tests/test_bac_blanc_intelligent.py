@@ -1,8 +1,7 @@
 """Tests Bac Blanc Intelligent — Semaine 6"""
 
-import pytest
-from methodology.bac_blanc_guidance import get_guidance, generate_real_time_guidance
 from methodology.action_plan import generate_personalized_action_plan
+from methodology.bac_blanc_guidance import generate_real_time_guidance, get_guidance
 
 
 class TestGuidance:

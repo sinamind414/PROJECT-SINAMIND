@@ -2,9 +2,17 @@
 # Aligné sur migration 014 (création) + 016 (enhance)
 
 from sqlalchemy import (
-    Column, Integer, String, Text, Float, DateTime, ForeignKey, Boolean, Index,
+    Boolean,
+    Column,
+    DateTime,
+    Float,
+    ForeignKey,
+    Index,
+    Integer,
+    String,
+    Text,
 )
-from sqlalchemy.dialects.postgresql import JSONB, ARRAY
+from sqlalchemy.dialects.postgresql import ARRAY, JSONB
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 

@@ -10,6 +10,8 @@ import numpy as np
 import onnxruntime as ort
 from tokenizers import Tokenizer
 
+from config import get_settings
+
 logger = logging.getLogger("khawarizmi.embedder")
 
 
@@ -22,7 +24,7 @@ class KhawarizmiEmbedder:
 
     def __init__(self):
         # Résoudre le chemin absolu du modèle ONNX
-        model_path = os.getenv("ONNX_MODEL_PATH", "models/minilm_onnx_int8")
+        model_path = get_settings().ONNX_MODEL_PATH or "models/minilm_onnx_int8"
         if not os.path.isabs(model_path):
             base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
             model_path = os.path.join(base_dir, model_path)

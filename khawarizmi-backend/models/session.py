@@ -1,5 +1,19 @@
-from sqlalchemy import Column, Integer, BigInteger, SmallInteger, String, Float, Boolean, DateTime, ForeignKey, UniqueConstraint, func, text
+from sqlalchemy import (
+    BigInteger,
+    Boolean,
+    Column,
+    DateTime,
+    Float,
+    ForeignKey,
+    Integer,
+    SmallInteger,
+    String,
+    UniqueConstraint,
+    func,
+    text,
+)
 from sqlalchemy.dialects.postgresql import JSONB
+
 from database import Base
 
 

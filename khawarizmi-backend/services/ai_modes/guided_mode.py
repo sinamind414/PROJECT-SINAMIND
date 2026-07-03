@@ -4,9 +4,8 @@ import logging
 from openai import AsyncOpenAI
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from cache import get_cache, set_cache, make_cache_key
-from config import get_settings
-from services.calendar_context import get_calendar_context, get_user_stats
+from cache import get_cache, make_cache_key, set_cache
+from services.calendar_context import get_calendar_context
 from services.khawarizmi_engine import KhawarizmiTutor
 from services.metrics import MetricsCollector, record_request
 

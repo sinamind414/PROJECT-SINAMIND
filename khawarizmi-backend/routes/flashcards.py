@@ -10,7 +10,14 @@ from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from deps import get_current_user, get_db, get_openai, get_scheduler
-from schemas.flashcard import DrillRequest, DrillSubmitRequest, FlashcardCreateRequest, FlashcardReviewRequest, QcmSubmitRequest, ScheduleRequest
+from schemas.flashcard import (
+    DrillRequest,
+    DrillSubmitRequest,
+    FlashcardCreateRequest,
+    FlashcardReviewRequest,
+    QcmSubmitRequest,
+    ScheduleRequest,
+)
 
 logger = logging.getLogger("khawarizmi.api")
 router = APIRouter()

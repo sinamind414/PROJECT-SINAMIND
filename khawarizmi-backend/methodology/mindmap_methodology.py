@@ -2,7 +2,7 @@
 6 mindmaps statiques + generation dynamique par verbe
 """
 
-from typing import Dict, Any, List
+from typing import Any
 
 STATIC_MINDMAPS = {
     "structure_texte_scientifique": {
@@ -96,15 +96,15 @@ STATIC_MINDMAPS = {
 }
 
 
-def get_static_mindmap(mindmap_id: str) -> Dict[str, Any] | None:
+def get_static_mindmap(mindmap_id: str) -> dict[str, Any] | None:
     return STATIC_MINDMAPS.get(mindmap_id)
 
 
-def get_all_static_mindmaps() -> List[Dict[str, Any]]:
+def get_all_static_mindmaps() -> list[dict[str, Any]]:
     return list(STATIC_MINDMAPS.values())
 
 
-def generate_dynamic_mindmap(verb: str) -> Dict[str, Any]:
+def generate_dynamic_mindmap(verb: str) -> dict[str, Any]:
     base = {
         "id": f"dynamic_{verb.replace(' ', '_')}",
         "title": f"Mindmap dynamique - {verb}",

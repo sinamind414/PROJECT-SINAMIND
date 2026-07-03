@@ -7,8 +7,6 @@ from __future__ import annotations
 
 from typing import Any
 
-from .verb_database import get_verb
-
 
 def generate_feedback(
     verb_info: dict[str, Any],

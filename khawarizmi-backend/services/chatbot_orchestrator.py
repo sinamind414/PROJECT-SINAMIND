@@ -20,12 +20,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from services.chat_classifier import classify
 from services.chat_prompt import (
-    build_daily_check_prompt,
     build_explication_prompt,
     build_feedback_prompt,
     build_motivation_prompt,
-    build_navigation_prompt,
-    build_orientation_prompt,
     build_procrastination_prompt,
     build_smart_goal_prompt,
     build_socratique_prompt,
@@ -45,10 +42,10 @@ from services.chatbot_response import (
     normalize_cached,
     normalize_response,
 )
-from services.llm_helpers import sanitize_response, call_llm
+from services.llm_helpers import call_llm
 from services.metrics import MetricsCollector, record_request
 from services.orientation_service import calculer_orientation
-from services.rag_service import format_rag_context, rag_search, source_cards
+from services.rag_service import rag_search
 from services.remediation import build_due_concept_question, get_due_concept_for_question
 from services.semantic_cache import get_semantic_cache, set_semantic_cache
 

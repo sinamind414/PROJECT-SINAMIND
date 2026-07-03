@@ -9,11 +9,11 @@ from __future__ import annotations
 
 from typing import Any
 
-from .verb_detector import detect_verb
-from .task_classifier import classify_task
-from .text_structure_analyzer import analyze_text_structure
 from .document_usage_analyzer import analyze_document_usage
 from .feedback_engine import generate_feedback
+from .task_classifier import classify_task
+from .text_structure_analyzer import analyze_text_structure
+from .verb_detector import detect_verb
 
 
 def evaluate_answer(

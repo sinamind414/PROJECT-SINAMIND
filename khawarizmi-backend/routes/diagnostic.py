@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
 from deps import get_current_user
-from methodology.diagnostic import diagnose_methodology_level, ERROR_PROFILES, generate_diagnostic_report
+from methodology.diagnostic import ERROR_PROFILES, diagnose_methodology_level, generate_diagnostic_report
 
 router = APIRouter(prefix="/api/diagnostic", tags=["Diagnostic"])
 

@@ -4,6 +4,7 @@ Spaced Repetition basé sur FSRS (Free Spaced Repetition Scheduler)
 Entraîné sur 700M+ reviews réelles — supérieur à SM-2
 """
 
+import json
 import logging
 from datetime import UTC, datetime
 from typing import Any

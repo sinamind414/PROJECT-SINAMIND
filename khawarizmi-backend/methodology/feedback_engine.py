@@ -3,6 +3,7 @@ Feedback Engine Ultra-Spécifique — Couche 3
 Génère des feedbacks nommés et actionnables par verbe
 """
 
+
 def generate_detailed_feedback(
     verb: str,
     task_type: str,

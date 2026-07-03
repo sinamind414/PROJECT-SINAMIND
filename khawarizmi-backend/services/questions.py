@@ -3,12 +3,14 @@ import logging
 import os
 from typing import Any
 
+from config import get_settings
+
 logger = logging.getLogger("khawarizmi.questions")
 
 # Résolution du chemin du fichier de questions
 # 1. Variable d'environnement DATA_DIR (Docker / production)
 # 2. Fallback : chemin relatif (développement local)
-_data_dir = os.environ.get("DATA_DIR", os.path.join(os.path.dirname(__file__), "..", "data"))
+_data_dir = get_settings().data_dir or os.path.join(os.path.dirname(__file__), "..", "data")
 ANNALES_PATH = os.path.join(_data_dir, "annales_sciences_3as.json")
 TAGGEES_PATH = os.path.join(_data_dir, "questions_taggees.json")
 

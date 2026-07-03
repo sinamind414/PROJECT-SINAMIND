@@ -49,6 +49,7 @@ class TestFindChapterMeta:
 
 class TestCalculerOrientation:
     pytestmark = pytest.mark.asyncio
+
     async def test_returns_empty_priority_message_when_no_signals(self):
         db = SequencedDb([
             [],  # flashcards dues
@@ -293,7 +294,7 @@ class TestCalculerOrientation:
 
         types = [r["type"] for r in result["recommendations"]]
         assert "action_verb" in types
-        av_reco = [r for r in result["recommendations"] if r["type"] == "action_verb"][0]
+        av_reco = next(r for r in result["recommendations"] if r["type"] == "action_verb")
         assert av_reco["niveau_urgence"] is not None
         assert av_reco["nature_besoin"] == "methodologie"
         assert av_reco["moteur_source_principal"] == "action_verbs"

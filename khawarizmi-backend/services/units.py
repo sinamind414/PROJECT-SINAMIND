@@ -4,7 +4,6 @@ services/units.py — Catalogue canonique des 11 unités du programme SVT 3AS.
 Normalise les formats incohérents du champ `unit` des QCM.
 """
 
-import re
 
 UNITS_CATALOG = [
     {"id": "u1", "domain_ar": "التخصص الوظيفي للبروتينات", "unit_ar": "تركيب البروتين",

@@ -44,7 +44,6 @@ async def override_get_db():
     yield MockAsyncSession()
 
 
-
 class MockCard:
     stability = 0
     difficulty = 0

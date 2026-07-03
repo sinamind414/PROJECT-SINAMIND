@@ -1,11 +1,14 @@
-import logging, os, uuid
-from typing import List, Optional
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
+import logging
+import os
+import uuid
+
+from fastapi import APIRouter, Depends, File, UploadFile
+from pydantic import BaseModel
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
+
 from database import get_db
 from deps import get_current_user
-from pydantic import BaseModel
 
 router = APIRouter(prefix="/api/social", tags=["Social Hub"])
 
@@ -13,22 +16,26 @@ logger = logging.getLogger("social")
 UPLOAD_DIR = "uploads/social"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
+
 class MessageCreate(BaseModel):
     conversation_id: int
-    content: Optional[str] = None
-    file_url: Optional[str] = None
-    file_type: Optional[str] = None
+    content: str | None = None
+    file_url: str | None = None
+    file_type: str | None = None
+
 
 class ConversationCreate(BaseModel):
-    member_ids: List[int]
-    title: Optional[str] = None
+    member_ids: list[int]
+    title: str | None = None
     is_group: bool = False
+
 
 class PostCreate(BaseModel):
     title: str
     content: str
-    file_url: Optional[str] = None
-    chapter_id: Optional[str] = None
+    file_url: str | None = None
+    chapter_id: str | None = None
+
 
 class CommentCreate(BaseModel):
     post_id: int
@@ -136,7 +143,7 @@ async def create_post(payload: PostCreate, current_user: dict = Depends(get_curr
 
 
 @router.get("/blog")
-async def get_blog(chapter_id: Optional[str] = None, db: AsyncSession = Depends(get_db)):
+async def get_blog(chapter_id: str | None = None, db: AsyncSession = Depends(get_db)):
     q = "SELECT p.*, u.nom as author_name FROM community_posts p JOIN users u ON p.author_id = u.id"
     params = {}
     if chapter_id:

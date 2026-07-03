@@ -7,13 +7,10 @@ from __future__ import annotations
 
 from typing import Any
 
-from .verb_database import get_verb, get_verb_by_id
+from .feedback_generator import generate_feedback
 from .task_classifier import classify_task
 from .text_structure_validator import validate_text_structure
-from .feedback_generator import generate_feedback
-from .text_structure_analyzer import analyze_text_structure as analyze_structure_couche3
-from .document_usage_analyzer import analyze_document_usage_v2
-from .feedback_engine import generate_detailed_feedback
+from .verb_database import get_verb
 
 
 async def evaluate_methodology(

@@ -1,11 +1,10 @@
 """Tests Mindmap Methodologique — Semaine 7"""
 
-import pytest
 from methodology.mindmap_methodology import (
-    get_static_mindmap,
-    get_all_static_mindmaps,
-    generate_dynamic_mindmap,
     STATIC_MINDMAPS,
+    generate_dynamic_mindmap,
+    get_all_static_mindmaps,
+    get_static_mindmap,
 )
 
 

@@ -1,11 +1,11 @@
 """Tests Couche 3 — Évaluation Intelligente (Semaine 2)"""
 
-from methodology.text_structure_analyzer import analyze_text_structure
-from methodology.document_usage_analyzer import analyze_document_usage_v2
-from methodology.feedback_engine import generate_detailed_feedback
-from methodology.evaluator import evaluate_methodology
-
 import pytest
+
+from methodology.document_usage_analyzer import analyze_document_usage_v2
+from methodology.evaluator import evaluate_methodology
+from methodology.feedback_engine import generate_detailed_feedback
+from methodology.text_structure_analyzer import analyze_text_structure
 
 
 class TestTextStructureAnalyzer:

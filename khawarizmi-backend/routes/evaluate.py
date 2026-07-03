@@ -1,10 +1,7 @@
-import json
 import logging
-from datetime import UTC, datetime
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel
-from sqlalchemy import bindparam, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from deps import get_current_user, get_db, get_openai
@@ -53,7 +50,6 @@ class MethodologyResponse(BaseModel):
     recommandation: str = ""
 
 
-
 class EvaluateResponse(BaseModel):
     score: int
     statut: str
@@ -62,7 +58,6 @@ class EvaluateResponse(BaseModel):
     next_review_date: str | None = None
     source: str
     methodology: MethodologyResponse | None = None
-
 
 
 # ═══════════════════════════════

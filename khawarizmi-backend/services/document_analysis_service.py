@@ -52,6 +52,23 @@ COMPARISON_MARKERS = ["بينما", "مقارنة", "اكبر", "اقل", "مخ�
 RELATION_MARKERS = ["كلما", "العلاقة", "طردية", "عكسية", "العلاقه"]
 HYPOTHESIS_MARKERS = ["الفرضية", "نفترض", "قد تكون", "ربما", "الفرضيه"]
 SCIENTIFIC_TEXT_MARKERS = ["نستنتج", "ومنه", "خلاصة", "في الختام", "بناء على"]
+EXPLICATION_MARKERS = ["يتم", "يمر", "يؤدي", "عبر", "نتيجة", "خطوات"]
+CRITIQUE_MARKERS = ["لكن", "رغم", "نقص", "قصور", "ضعف", "تحسين"]
+DETERMINATION_MARKERS = ["نحدد", "يحدد", "التحديد", "نستنتج", "الفرق"]
+EXPLOIT_DOC_MARKERS = ["باستغلال", "من خلال", "تدل", "الوثيقة", "نلاحظ"]
+PROBLEM_MARKERS = ["لماذا", "كيف", "ما السبب", "الآلية", "المشكل"]
+PROOF_MARKERS = ["نثبت", "يتضح", "يدل", "صحة", "دليل"]
+COMMENT_MARKERS = ["نعلق", "من وجهة نظر", "يمكن القول", "رأيي"]
+NOMINATION_MARKERS = ["يسمى", "اسمه", "تسميته", "هو"]
+DEFINITION_MARKERS = ["هو", "تعرف", "تعريف", "الجنس"]
+DESCRIPTION_MARKERS = ["نلاحظ", "يظهر", "يتميز", "يتخذ"]
+CITATION_MARKERS = ["نذكر", "نحدد", "منها"]
+ENUMERATION_MARKERS = ["أولا", "ثانيا", "ثالثا"]
+CLASSIFICATION_MARKERS = ["فئة", "ينتمي", "يصنف", "نوع"]
+DISTINCTION_MARKERS = ["بينما", "على عكس", "يختلف", "الفرق"]
+SCHEMATISATION_MARKERS = ["رسم", "تسمية", "سهم", "عنوان"]
+EXTRACT_MARKERS = ["نستخلص", "المستخلص", "يتضح من", "النص", "يظهر"]
+PROVE_EXPERIMENTALLY_MARKERS = ["نثبت تجريبياً", "من خلال التجربة", "يثبت أن", "تظهر النتائج", "الملاحظة", "النتيجة"]
 
 
 # ── Règles de scoring par verbe ────────────────────
@@ -235,6 +252,146 @@ VERB_RULES: dict[str, dict] = {
                 "checkType": "keyword",
                 "keywordField": "required_markers",
             },
+        ],
+    },
+    # ── LOT 6 — 15 nouveaux verbes ──────────────────────
+    "expliquer": {
+        "required": EXPLICATION_MARKERS,
+        "forbidden": [],
+        "rules": [
+            {"code": "explication", "labelAr": "شرح الآلية أو الخطوات", "points": 3, "checkType": "keyword", "keywordField": "required_markers"},
+            {"code": "structure", "labelAr": "إجابة منظمة", "points": 2, "checkType": "structure"},
+        ],
+    },
+    "critiquer": {
+        "required": CRITIQUE_MARKERS,
+        "forbidden": [],
+        "rules": [
+            {"code": "critique", "labelAr": "نقد وتحليل النقائص", "points": 3, "checkType": "keyword", "keywordField": "required_markers"},
+            {"code": "structure", "labelAr": "إجابة منظمة", "points": 2, "checkType": "structure"},
+        ],
+    },
+    "determiner": {
+        "required": DETERMINATION_MARKERS,
+        "forbidden": [],
+        "rules": [
+            {"code": "determination", "labelAr": "تحديد واضح", "points": 3, "checkType": "keyword", "keywordField": "required_markers"},
+            {"code": "structure", "labelAr": "إجابة منظمة", "points": 2, "checkType": "structure"},
+        ],
+    },
+    "exploit-document": {
+        "required": EXPLOIT_DOC_MARKERS,
+        "forbidden": [],
+        "rules": [
+            {"code": "exploitation", "labelAr": "استغلال الوثيقة", "points": 3, "checkType": "keyword", "keywordField": "required_markers"},
+            {"code": "structure", "labelAr": "إجابة منظمة", "points": 2, "checkType": "structure"},
+        ],
+    },
+    "formulate-problem": {
+        "required": PROBLEM_MARKERS,
+        "forbidden": [],
+        "rules": [
+            {"code": "problem", "labelAr": "صياغة المشكل", "points": 3, "checkType": "keyword", "keywordField": "required_markers"},
+            {"code": "structure", "labelAr": "إجابة منظمة", "points": 2, "checkType": "structure"},
+        ],
+    },
+    "prove": {
+        "required": PROOF_MARKERS,
+        "forbidden": [],
+        "rules": [
+            {"code": "proof", "labelAr": "إثبات بالحجج", "points": 3, "checkType": "keyword", "keywordField": "required_markers"},
+            {"code": "structure", "labelAr": "إجابة منظمة", "points": 2, "checkType": "structure"},
+        ],
+    },
+    "comment": {
+        "required": COMMENT_MARKERS,
+        "forbidden": [],
+        "rules": [
+            {"code": "comment", "labelAr": "تعليق شخصي علمي", "points": 3, "checkType": "keyword", "keywordField": "required_markers"},
+            {"code": "structure", "labelAr": "إجابة منظمة", "points": 2, "checkType": "structure"},
+        ],
+    },
+    "nommer": {
+        "required": NOMINATION_MARKERS,
+        "forbidden": [],
+        "rules": [
+            {"code": "nomination", "labelAr": "تسمية دقيقة", "points": 3, "checkType": "keyword", "keywordField": "required_markers"},
+            {"code": "structure", "labelAr": "إجابة منظمة", "points": 2, "checkType": "structure"},
+        ],
+    },
+    "definir": {
+        "required": DEFINITION_MARKERS,
+        "forbidden": [],
+        "rules": [
+            {"code": "definition", "labelAr": "تعريف دقيق", "points": 3, "checkType": "keyword", "keywordField": "required_markers"},
+            {"code": "structure", "labelAr": "إجابة منظمة", "points": 2, "checkType": "structure"},
+        ],
+    },
+    "decrire": {
+        "required": DESCRIPTION_MARKERS,
+        "forbidden": [],
+        "rules": [
+            {"code": "description", "labelAr": "وصف الظاهرة", "points": 3, "checkType": "keyword", "keywordField": "required_markers"},
+            {"code": "structure", "labelAr": "إجابة منظمة", "points": 2, "checkType": "structure"},
+        ],
+    },
+    "citer": {
+        "required": CITATION_MARKERS,
+        "forbidden": [],
+        "rules": [
+            {"code": "citation", "labelAr": "ذكر العناصر المطلوبة", "points": 3, "checkType": "keyword", "keywordField": "required_markers"},
+            {"code": "structure", "labelAr": "إجابة منظمة", "points": 2, "checkType": "structure"},
+        ],
+    },
+    "enumerer": {
+        "required": ENUMERATION_MARKERS,
+        "forbidden": [],
+        "rules": [
+            {"code": "enumeration", "labelAr": "ترتيب enumeration", "points": 3, "checkType": "keyword", "keywordField": "required_markers"},
+            {"code": "structure", "labelAr": "إجابة منظمة", "points": 2, "checkType": "structure"},
+        ],
+    },
+    "classer": {
+        "required": CLASSIFICATION_MARKERS,
+        "forbidden": [],
+        "rules": [
+            {"code": "classification", "labelAr": "تصنيف صحيح", "points": 3, "checkType": "keyword", "keywordField": "required_markers"},
+            {"code": "structure", "labelAr": "إجابة منظمة", "points": 2, "checkType": "structure"},
+        ],
+    },
+    "distinguer": {
+        "required": DISTINCTION_MARKERS,
+        "forbidden": [],
+        "rules": [
+            {"code": "distinction", "labelAr": "تمييز واضح بين المفاهيم", "points": 3, "checkType": "keyword", "keywordField": "required_markers"},
+            {"code": "structure", "labelAr": "إجابة منظمة", "points": 2, "checkType": "structure"},
+        ],
+    },
+    "schematiser": {
+        "required": SCHEMATISATION_MARKERS,
+        "forbidden": [],
+        "rules": [
+            {"code": "schematisation", "labelAr": "رسم تخطيطي متكامل", "points": 3, "checkType": "keyword", "keywordField": "required_markers"},
+            {"code": "structure", "labelAr": "إجابة منظمة", "points": 2, "checkType": "structure"},
+        ],
+    },
+    # ── LOT 7 — فعلان جديدان ──────────────────────────
+    "extract": {
+        "required": EXTRACT_MARKERS,
+        "forbidden": [],
+        "rules": [
+            {"code": "extraction", "labelAr": "استخلاص المعلومة الأساسية", "points": 3, "checkType": "keyword", "keywordField": "required_markers"},
+            {"code": "structure", "labelAr": "إجابة مختصرة وواضحة", "points": 2, "checkType": "structure"},
+        ],
+    },
+    "prove-experimentally": {
+        "required": PROVE_EXPERIMENTALLY_MARKERS,
+        "forbidden": [],
+        "rules": [
+            {"code": "experiment_ref", "labelAr": "وصف التجربة", "points": 2, "checkType": "keyword", "keywordField": "required_markers"},
+            {"code": "observation", "labelAr": "ذكر الملاحظة", "points": 2, "checkType": "keyword", "keywordField": "required_markers"},
+            {"code": "conclusion", "labelAr": "استنتاج النتيجة", "points": 2, "checkType": "keyword", "keywordField": "required_markers"},
+            {"code": "structure", "labelAr": "ترتيب المراحل (تجربة ← ملاحظة ← نتيجة)", "points": 1, "checkType": "structure"},
         ],
     },
 }

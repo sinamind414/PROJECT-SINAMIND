@@ -3,9 +3,6 @@ Prompts du Tuteur Méthodologique — Chat Tuteur
 """
 from __future__ import annotations
 
-from typing import Any
-
-
 TUTOR_SYSTEM_PROMPT = """Tu es un tuteur méthodologique expert en Bac SVT Algérie.
 
 Ton rôle est d'expliquer les concepts méthodologiques aux élèves

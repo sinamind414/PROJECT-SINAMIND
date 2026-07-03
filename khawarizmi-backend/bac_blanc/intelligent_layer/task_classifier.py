@@ -7,7 +7,6 @@ et le contexte de l'instruction.
 """
 from __future__ import annotations
 
-
 # Verbes explicitement identifiés comme complexes
 COMPLEX_VERBS: list[str] = [
     "وضّح في نص علمي",

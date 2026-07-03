@@ -13,18 +13,18 @@ Type exporté : LLMCaller (Protocol pour injection de dépendance)
 
 from __future__ import annotations
 
+import hashlib
 import json
 import logging
 import re
-import hashlib
 from typing import Any, Protocol, runtime_checkable
 
-from services.answer_sanity import check_answer_sanity
-from services.remediation_service import get_remediation, get_generic_remediation
 from prompts.correction_prompt import (
     SYSTEM_PROMPT_AR,
     build_correction_prompt,
 )
+from services.answer_sanity import check_answer_sanity
+from services.remediation_service import get_generic_remediation, get_remediation
 
 logger = logging.getLogger("khawarizmi.correction_v2")
 
@@ -81,7 +81,7 @@ def _extract_json_from_response(raw: str) -> dict | None:
     end = raw.rfind("}")
     if start != -1 and end != -1 and end > start:
         try:
-            return json.loads(raw[start:end+1])
+            return json.loads(raw[start:end + 1])
         except (json.JSONDecodeError, ValueError):
             pass
 
@@ -96,7 +96,7 @@ def _extract_json_from_response(raw: str) -> dict | None:
             depth -= 1
             if depth == 0 and start_idx is not None:
                 try:
-                    return json.loads(raw[start_idx:i+1])
+                    return json.loads(raw[start_idx:i + 1])
                 except (json.JSONDecodeError, ValueError):
                     start_idx = None
 

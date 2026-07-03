@@ -1,6 +1,7 @@
-from sqlalchemy import Column, Integer, String, Text, ForeignKey, DateTime, Table
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Table, Text
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
+
 from database import Base
 
 conversation_members = Table(
@@ -8,6 +9,7 @@ conversation_members = Table(
     Column("conversation_id", Integer, ForeignKey("conversations.id"), primary_key=True),
     Column("user_id", Integer, ForeignKey("users.id"), primary_key=True),
 )
+
 
 class Conversation(Base):
     __tablename__ = "conversations"
@@ -17,6 +19,7 @@ class Conversation(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     members = relationship("User", secondary=conversation_members)
     messages = relationship("Message", back_populates="conversation", cascade="all, delete-orphan")
+
 
 class Message(Base):
     __tablename__ = "messages"
@@ -30,6 +33,7 @@ class Message(Base):
     conversation = relationship("Conversation", back_populates="messages")
     sender = relationship("User")
 
+
 class CommunityPost(Base):
     __tablename__ = "community_posts"
     id = Column(Integer, primary_key=True, index=True)
@@ -42,6 +46,7 @@ class CommunityPost(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     author = relationship("User")
     comments = relationship("Comment", back_populates="post", cascade="all, delete-orphan")
+
 
 class Comment(Base):
     __tablename__ = "comments"

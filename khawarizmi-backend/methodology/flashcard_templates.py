@@ -5,7 +5,6 @@ from __future__ import annotations
 
 from typing import Any
 
-
 # Cartes sur les verbes d'action (30 cartes)
 VERB_FLASHCARDS: list[dict[str, Any]] = [
     # --- وضّح في نص علمي (6 cartes) ---

@@ -15,7 +15,6 @@ from . import (
     cours,
     dashboard,
     diagnostic,
-    document_analysis,
     document_analysis_v2,
     dual_coding,
     exercices,
@@ -40,6 +39,9 @@ from . import (
     social,
     tutor,
     videos,
+)
+from . import (
+    document_analysis as document_analysis,
 )
 
 ALL_ROUTERS = [

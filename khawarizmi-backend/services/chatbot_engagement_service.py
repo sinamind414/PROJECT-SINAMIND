@@ -6,7 +6,7 @@ missions quotidiennes pour le chatbot Khawarizmi.
 """
 
 import logging
-from datetime import date, datetime, timezone
+from datetime import UTC, date, datetime
 
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -23,7 +23,7 @@ async def record_chat_interaction(
     feedback: str | None = None,
 ) -> None:
     """Enregistre une interaction chatbot en mémoire."""
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     try:
         await db.execute(
             text("""
@@ -64,7 +64,7 @@ async def record_chat_feedback(
         "confused": "concept_non_compris",
         "partial": "concept_partiellement_compris",
     }.get(feedback, "feedback_negatif")
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     try:
         await db.execute(
             text("""
@@ -88,7 +88,7 @@ async def update_socratic_streak(
     user_id: int,
 ) -> None:
     """Met à jour le streak socratique (incrémente si dernière interaction ≤ 24h)."""
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     try:
         result = await db.execute(
             text("""
@@ -220,7 +220,7 @@ async def complete_daily_mission(
     mission_id: int,
 ) -> dict:
     """Marque une mission quotidienne comme complétée."""
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     try:
         await db.execute(
             text("""
@@ -348,7 +348,7 @@ async def evaluate_explain_back(
                         occurrences = chatbot_weak_concepts.occurrences + 1,
                         updated_at = :now
                 """),
-                {"uid": user_id, "concept": concept, "now": datetime.now(timezone.utc)},
+                {"uid": user_id, "concept": concept, "now": datetime.now(UTC)},
             )
             await db.commit()
         except Exception as e:
@@ -474,7 +474,7 @@ async def submit_boss_fight(
     score_pct = round((correct / total) * 100, 1) if total > 0 else 0
     passed = score_pct >= 60
 
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     try:
         await db.execute(
             text("""

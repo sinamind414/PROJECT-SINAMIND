@@ -1,9 +1,7 @@
 import logging
-from datetime import UTC, datetime
 
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
-from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from deps import get_current_user, get_db
@@ -50,8 +48,8 @@ async def get_next_session(
 @router.get("/api/drill/units", tags=["Drill"])
 async def list_drill_units(current_user: dict = Depends(get_current_user)):
     """Catalogue des 11 unités du programme pour l'index /drill."""
-    from services.units import get_units_catalog
     from services.qcm_items import qcm_db
+    from services.units import get_units_catalog
 
     catalog = get_units_catalog()
     counts: dict[str, int] = {}
@@ -85,7 +83,7 @@ async def get_random_questions(
     """
     Fallback : questions aléatoires quand la queue FSRS est épuisée.
     """
-    from services.questions import get_all_question_ids, get_question
+    from services.questions import get_question
 
     all_ids = get_all_question_ids()
     exclude_set = set(req.exclude or [])

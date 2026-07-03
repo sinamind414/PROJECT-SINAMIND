@@ -1,5 +1,6 @@
-from sqlalchemy import Column, BigInteger, SmallInteger, String, Float, Text, DateTime, UniqueConstraint, func, text
+from sqlalchemy import BigInteger, Column, DateTime, Float, SmallInteger, String, Text, UniqueConstraint, func, text
 from sqlalchemy.dialects.postgresql import UUID
+
 from database import Base
 
 

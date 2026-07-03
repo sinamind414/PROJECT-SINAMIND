@@ -24,8 +24,8 @@ from datetime import UTC, datetime
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from services.questions import get_question, questions_db
 from services.qcm_items import get_all_qcm_ids, qcm_db
+from services.questions import get_question, questions_db
 
 logger = logging.getLogger("khawarizmi.drill_queue")
 

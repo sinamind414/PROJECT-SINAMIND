@@ -11,18 +11,16 @@ Couvre :
 """
 
 import json
-from typing import Any
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
 from services.correction_v2 import (
     _extract_json_from_response,
-    _validate_highlights,
     _normalize_unmatched,
+    _validate_highlights,
     evaluate_answer_v2,
 )
-
 
 # ── Helpers / Fixtures ───────────────────────────
 

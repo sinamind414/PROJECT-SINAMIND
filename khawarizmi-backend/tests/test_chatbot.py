@@ -2,9 +2,7 @@
 # Tests du chatbot v2 (RAG hybride + sources + engagement)
 # Refactored pour compatibilité avec chatbot_orchestrator
 
-from unittest.mock import AsyncMock, MagicMock
 
-import pytest
 from httpx import AsyncClient
 
 

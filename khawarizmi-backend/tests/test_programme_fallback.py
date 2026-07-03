@@ -1,9 +1,9 @@
 """Tests pour le fallback JSON du programme et la normalisation filiere."""
 
 from routes.programme import (
-    normalize_filiere,
     _load_programme_fallback,
     _restructure_json_to_response,
+    normalize_filiere,
 )
 
 

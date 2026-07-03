@@ -17,6 +17,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from database import get_db
 from deps import get_current_user
+from methodology.evaluator import evaluate_methodology
 from schemas.bac_blanc import (
     BacExercise,
     BacSubjectDetail,
@@ -34,7 +35,6 @@ from schemas.bac_blanc import (
     VerbScore,
 )
 from services.document_analysis_service import evaluate_answer
-from methodology.evaluator import evaluate_methodology
 
 logger = logging.getLogger("khawarizmi.api")
 router = APIRouter(prefix="/api/bac-blanc", tags=["Bac Blanc"])

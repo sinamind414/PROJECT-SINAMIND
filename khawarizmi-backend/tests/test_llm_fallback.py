@@ -15,7 +15,6 @@ import pytest
 from services.llm import _call_with_fallback
 from services.llm_parser import parse_llm_json
 
-
 # ═══════════════════════════════════════════════════════════════════════
 # parse_llm_json (4 tests)
 # ═══════════════════════════════════════════════════════════════════════
@@ -123,14 +122,13 @@ class TestCallWithFallback:
                 OPENAI_FALLBACK_API_KEY=None,
                 REAL_OPENAI_API_KEY=None,
             ),
-        ):
-            with pytest.raises(RuntimeError, match="Tous les providers"):
-                await _call_with_fallback(
-                    messages=[{"role": "user", "content": "test"}],
-                    primary_client=primary,
-                    primary_model="test-model",
-                    response_validator=validator,
-                )
+        ), pytest.raises(RuntimeError, match="Tous les providers"):
+            await _call_with_fallback(
+                messages=[{"role": "user", "content": "test"}],
+                primary_client=primary,
+                primary_model="test-model",
+                response_validator=validator,
+            )
 
         primary.chat.completions.create.assert_awaited_once()
 
@@ -156,13 +154,12 @@ class TestCallWithFallback:
                 OPENAI_FALLBACK_API_KEY=None,
                 REAL_OPENAI_API_KEY=None,
             ),
-        ):
-            with pytest.raises(RuntimeError, match="Tous les providers"):
-                await _call_with_fallback(
-                    messages=[{"role": "user", "content": "test"}],
-                    primary_client=primary,
-                    primary_model="test-model",
-                )
+        ), pytest.raises(RuntimeError, match="Tous les providers"):
+            await _call_with_fallback(
+                messages=[{"role": "user", "content": "test"}],
+                primary_client=primary,
+                primary_model="test-model",
+            )
 
     @pytest.mark.asyncio
     async def test_non_rate_limit_error_bubbles(self):
@@ -199,10 +196,9 @@ class TestCallWithFallback:
                 OPENAI_FALLBACK_API_KEY=None,
                 REAL_OPENAI_API_KEY=None,
             ),
-        ):
-            with pytest.raises(RuntimeError, match="Tous les providers"):
-                await _call_with_fallback(
-                    messages=[{"role": "user", "content": "test"}],
-                    primary_client=primary,
-                    primary_model="test-model",
-                )
+        ), pytest.raises(RuntimeError, match="Tous les providers"):
+            await _call_with_fallback(
+                messages=[{"role": "user", "content": "test"}],
+                primary_client=primary,
+                primary_model="test-model",
+            )

@@ -2,9 +2,9 @@
 0 Token API - Reponses locales structurees et methodologiques
 """
 
-from typing import Dict, Any
+from typing import Any
 
-METHODOLOGY_RESPONSES: Dict[str, Dict[str, str]] = {
+METHODOLOGY_RESPONSES: dict[str, dict[str, str]] = {
 
     # ============================================
     # VERBES SIMPLES (Note <= 10)
@@ -132,7 +132,7 @@ METHODOLOGY_RESPONSES: Dict[str, Dict[str, str]] = {
 }
 
 
-def get_local_methodology_response(verb: str, message: str = "") -> Dict[str, Any]:
+def get_local_methodology_response(verb: str, message: str = "") -> dict[str, Any]:
     verb_data = METHODOLOGY_RESPONSES.get(verb)
 
     if not verb_data:

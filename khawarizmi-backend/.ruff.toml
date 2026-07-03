@@ -34,6 +34,7 @@ ignore = [
     "RUF003",  # ambiguous-unicode-character-comment
     "RUF029",  # unused-async — FastAPI dependency overrides
     "RUF034",  # useless-if-else — cosmetic
+    "RUF067",  # non-empty-init-module — routes/__init__ is intentional
     "RUF069",  # float-equality-comparison — intentional in tests
     "RUF076",  # pytest-fixture-autouse — intentional
     "SIM108",  # if-else-block — cosmetic

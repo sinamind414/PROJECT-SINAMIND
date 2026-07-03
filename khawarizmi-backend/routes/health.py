@@ -81,10 +81,9 @@ async def health_check():
 
 
 def _check_backup_status():
-    import os
     import pathlib
 
-    backup_dir = pathlib.Path(os.environ.get("BACKUP_DIR", "backups"))
+    backup_dir = pathlib.Path(get_settings().BACKUP_DIR or "backups")
     if not backup_dir.exists():
         backup_dir = pathlib.Path(__file__).parent.parent / "backups"
     if not backup_dir.exists():

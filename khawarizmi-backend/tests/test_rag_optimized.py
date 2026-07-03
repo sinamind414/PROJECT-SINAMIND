@@ -3,15 +3,14 @@
 Test du moteur RAG optimisé — 6 cas BAC SVT
 Teste les composants purs sans DB : keyword extraction, reranker, format.
 """
-import json
-import sys
 import os
+import sys
 import time
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from services.rag_service import _extract_keywords, merge_chunks, format_rag_context, source_cards, rag_cache_stats
-from services.reranker import rerank, _tokenize, _keyword_coverage_score
+from services.rag_service import _extract_keywords, format_rag_context, merge_chunks, rag_cache_stats, source_cards
+from services.reranker import _tokenize, rerank
 
 # ── Mock chunks (simulent des résultats DB) ────────────────
 MOCK_VECTOR_CHUNKS = [
@@ -148,7 +147,7 @@ def test_reranker():
         print(f"    Top score : {reranked[0]['score_rerank']}")
         print(f"    Scores : {scores}")
         print(f"    Meilleur chapitre : {reranked[0].get('chapter', '?')}")
-        print(f"    OK — reranker fonctionne")
+        print("    OK — reranker fonctionne")
 
 
 def test_merge_chunks():
@@ -163,7 +162,7 @@ def test_merge_chunks():
     hybrid_count = sum(1 for c in merged if c.get("retrieval") == "hybrid")
     print(f"  Chunks hybrides : {hybrid_count}")
     assert len(merged) <= len(MOCK_VECTOR_CHUNKS) + len(MOCK_KEYWORD_CHUNKS), "Trop de chunks après fusion"
-    print(f"  OK — fusion fonctionne")
+    print("  OK — fusion fonctionne")
 
 
 def test_format_rag_context():
@@ -184,12 +183,12 @@ def test_format_rag_context():
         if line.startswith("•"):
             excerpt_part = line[2:].strip()
             assert len(excerpt_part) <= 180, f"Excerpt trop long : {len(excerpt_part)} chars"
-    print(f"  OK — format compact (180 chars max par excerpt, sans tags source)")
+    print("  OK — format compact (180 chars max par excerpt, sans tags source)")
 
     # Afficher un extrait
     lines = context.split("\n\n")
     if lines:
-        print(f"\n  Exemple :")
+        print("\n  Exemple :")
         print(f"  {lines[0][:120]}...")
 
 
@@ -205,7 +204,7 @@ def test_source_cards():
     for card in cards:
         print(f"    - {card['source']} / {card['chapter']}")
     assert len(cards) > 0, "Aucune source card"
-    print(f"  OK — source cards fonctionnent")
+    print("  OK — source cards fonctionnent")
 
 
 def test_tokenization():
@@ -222,7 +221,7 @@ def test_tokenization():
         tokens = _tokenize(text)
         print(f"  '{text[:40]}...' → {tokens}")
         assert all(len(t) > 1 for t in tokens), f"Tokens trop courts : {tokens}"
-    print(f"  OK — tokenisation fonctionne")
+    print("  OK — tokenisation fonctionne")
 
 
 def run_all_tests():
@@ -236,12 +235,12 @@ def run_all_tests():
     test_tokenization()
 
     elapsed = time.time() - start
-    print(f"\n{'='*60}")
-    print(f"  RESUME")
-    print(f"{'='*60}")
-    print(f"  Tests : 6/6")
+    print(f"\n{'=' * 60}")
+    print("  RESUME")
+    print(f"{'=' * 60}")
+    print("  Tests : 6/6")
     print(f"  Temps : {elapsed:.3f}s")
-    print(f"  Résultat : TOUS OK")
+    print("  Résultat : TOUS OK")
 
     return True
 
@@ -269,8 +268,8 @@ def test_chatbot_fallbacks():
     from services.chatbot_fallbacks import (
         fallback_motivation,
         fallback_procrastination,
-        fallback_socratique,
         fallback_smart_goal,
+        fallback_socratique,
     )
     assert isinstance(fallback_motivation({}), str)
     assert isinstance(fallback_procrastination(None), str)
@@ -281,7 +280,7 @@ def test_chatbot_fallbacks():
 
 
 def test_chatbot_response():
-    from services.chatbot_response import make_response, normalize_response, normalize_cached
+    from services.chatbot_response import make_response, normalize_cached, normalize_response
     r = make_response("test", type_="socratique")
     assert r["reponse"] == "test"
     assert r["type"] == "socratique"
