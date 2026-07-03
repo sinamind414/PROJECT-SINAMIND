@@ -601,3 +601,197 @@ def _build_knowledge_block(units: list[dict[str, Any]]) -> str:
         parts.append("\n".join(lines))
 
     return "\n".join(parts)
+
+
+# ═══════════════════════════════════════════════════════════════════
+# VERB_UNIT_MAP — Mapping verbe → unite scientifique
+# ═══════════════════════════════════════════════════════════════════
+
+VERB_UNIT_MAP: dict[str, list[str]] = {
+    "unite1-synthese-proteines": [
+        "analyse", "interpret", "deduce", "compare", "justify",
+        "scientific-text", "expliquer", "nommer", "definir", "citer",
+        "enumerer", "decrire", "schematiser", "prove", "prove-experimentally",
+        "classer", "distinguer", "formulate-problem",
+        "extract", "exploit-document", "determiner",
+    ],
+    "unite2-immunite": [
+        "analyse", "interpret", "deduce", "compare", "justify",
+        "scientific-text", "expliquer", "nommer", "definir", "citer",
+        "enumerer", "decrire", "schematiser", "prove", "prove-experimentally",
+        "classer", "distinguer", "formulate-problem",
+        "discuss", "comment", "hypothesis", "validate-hypothesis",
+        "extract", "exploit-document",
+    ],
+    "unite3-systeme-nerveux": [
+        "analyse", "interpret", "deduce", "compare", "justify",
+        "scientific-text", "expliquer", "nommer", "definir", "citer",
+        "enumerer", "decrire", "schematiser", "prove", "prove-experimentally",
+        "classer", "distinguer", "formulate-problem",
+        "relationship", "extract", "exploit-document",
+    ],
+    "unite4-geologie": [
+        "analyse", "interpret", "deduce", "compare", "justify",
+        "scientific-text", "expliquer", "nommer", "definir", "citer",
+        "enumerer", "decrire", "schematiser", "prove", "prove-experimentally",
+        "classer", "distinguer", "formulate-problem",
+        "critiquer", "relationship", "extract", "exploit-document",
+        "determiner",
+    ],
+    "unite5-energie": [
+        "analyse", "interpret", "deduce", "compare", "justify",
+        "scientific-text", "expliquer", "nommer", "definir", "citer",
+        "enumerer", "decrire", "schematiser", "prove", "prove-experimentally",
+        "classer", "distinguer", "formulate-problem",
+        "relationship", "extract", "exploit-document",
+        "determiner",
+    ],
+}
+
+
+def get_units_for_verb(verb_slug: str) -> list[str]:
+    """Retourne la liste des unites scientifiques associees a un verbe."""
+    result: list[str] = []
+    for unit_id, verbs in VERB_UNIT_MAP.items():
+        if verb_slug in verbs:
+            result.append(unit_id)
+    return result
+
+
+def get_unit_specific_errors(unit_key: str) -> list[str]:
+    """Retourne les erreurs specifiques a une unite pour la remediation."""
+    for unit in ALL_UNITS:
+        if unit["id"] == unit_key:
+            return unit.get("errors", [])[:_MAX_ERRORS]
+    return []
+
+
+def get_contextual_remediation_data(verb_slug: str, context: str = "") -> dict[str, Any]:
+    """Combine detection contexte + mapping verbe pour une remediation enrichie."""
+    units = get_units_for_verb(verb_slug)
+    if not units and context:
+        knowledge = get_relevant_knowledge_raw(context, max_units=1)
+        units = [u["id"] for u in knowledge]
+    result: dict[str, Any] = {
+        "verb": verb_slug,
+        "units": units,
+        "relevant_errors": [],
+    }
+    for unit_id in units:
+        errors = get_unit_specific_errors(unit_id)
+        result["relevant_errors"].extend(errors[:3])
+    return result
+
+
+# ═══════════════════════════════════════════════════════════════════
+# PRACTICAL_EXAMPLES — Exemples pratiques de la methodologie BAC
+# ═══════════════════════════════════════════════════════════════════
+
+PRACTICAL_EXAMPLES: dict[str, list[dict[str, str]]] = {
+    "analyse-tableau": [
+        {
+            "title": "تحليل جدول الإستجابة المناعية",
+            "context": "جدول يلخص نتائج تجربة زرع خلايا سرطانية في فأر",
+            "unit": "unite2-immunite",
+            "content": "نلاحظ من الجدول أن الفأر (أ) الذي حقن بالخلايا السرطانية فقط تطور لديه ورم (إيجابي) بينما الفأر (ب) الذي حقن بالخلايا السرطانية + LB لم يتطور لديه ورم (سلبي). نستنتج أن LB تلعب دوراً في القضاء على الخلايا السرطانية.",
+        },
+        {
+            "title": "تحليل جدول مصدر O₂ في الهواء والدم",
+            "context": "جدول مقارنة نسب O₂ و CO₂ في الهواء الداخل والخارج والشريان والوريد",
+            "unit": "unite5-energie",
+            "content": "نلاحظ أن نسبة O₂ في الهواء الداخل (21%) أعلى منها في الهواء الخارج (16%) بينما نسبة CO₂ العكس. أما في الدم فنسبة O₂ في الشريان (95%) أعلى منها في الوريد (70%). هذا يدل على أن O₂ ينتقل من الحويصلات إلى الدم ويستهلك في الأعضاء.",
+        },
+    ],
+    "analyse-experience": [
+        {
+            "title": "تحليل تجربة زرع متبادل في الأسيتابولاريا",
+            "context": "تجربة زرع نواة أسيتابولاريا مديفاتير في ساق أسيتابولاريا كريناتا",
+            "unit": "unite1-synthese-proteines",
+            "content": "التجربة: زرع نواة من نوع A.mediterranea في ساق من نوع A.crenulata. الملاحظة: تكون قبعة من نوع A.mediterranea. النتيجة: النواة هي المسؤولة عن تحديد شكل القبعة وبالتالي النواة تحتوي على المعلومة الوراثية.",
+        },
+    ],
+    "analyse-image": [
+        {
+            "title": "تحليل صورة النسخ المتزامن لـ ARNm",
+            "context": "صورة مجهرية لجزيء ADN مع عدة جزيئات ARNm في طور النسخ",
+            "unit": "unite1-synthese-proteines",
+            "content": "نلاحظ في الصورة جزيء ADN ممتد مع عدة جزيئات ARNm متصلة به في مراحل مختلفة من النسخ. الجزيئات أقصر في البداية وأطول في النهاية. هذا يدل على أن عملية النسخ تتقدم تدريجياً على طول جزيء ADN، وأن جزيء ADN الواحد يمكن نسخه عدة مرات في آن واحد.",
+        },
+        {
+            "title": "تحليل صورة قطر الثقب النووي",
+            "context": "رسم تخطيطي للنواة يظهر الثقب النووي وحجمه",
+            "unit": "unite1-synthese-proteines",
+            "content": "نلاحظ وجود ثقب في الغشاء النووي قطره حوالي 50 نانومتر. جزيء ARNm قطره 1 نانومتر يمكنه العبور، بينما الرايبوسوم (25 نانومتر) لا يمكنه العبور. هذا يفسر أن ARNm ينتقل من النواة إلى الهيولى عبر الثقب النووي، بينما تبقى الرايبوسومات في الهيولى.",
+        },
+    ],
+    "prouver-experimentalement": [
+        {
+            "title": "إثبات دور ARN بوليميراز تجريبياً",
+            "context": "تجربة بحضور ADN + نيوكليوتيدات + أو بدون ARN بوليميراز",
+            "unit": "unite1-synthese-proteines",
+            "content": "التجربة 1 (شاهد): حضانة ADN + نيوكليوتيدات مشعة → ظهور ARN مشع (النتيجة إيجابية). التجربة 2 (اختبار): حضانة ADN + نيوكليوتيدات مشعة + مثبط ARN بوليميراز → لا ظهور ARN مشع (النتيجة سلبية). الملاحظة: في وجود ARN بوليميراز يتكون ARN، في غيابه لا يتكون. النتيجة: ARN بوليميراز ضروري لتشكل ARN انطلاقاً من ADN.",
+        },
+    ],
+    "deduction-vs-extraction": [
+        {
+            "title": "الفرق بين الاستنتاج والاستخلاص",
+            "context": "نص علمي عن تركيب البروتين",
+            "unit": "unite1-synthese-proteines",
+            "content": "الاستخلاص: 'النص يتحدث عن دور ARNm في نقل المعلومة الوراثية من النواة إلى الرايبوسوم' (معلومة من النص مباشرة). الاستنتاج: 'بما أن ARNm يظهر في السيتوبلازم بعد ساعة من الحقن، إذن ARNm ينتقل من النواة إلى السيتوبلازم' (عملية منطقية من معطيات).",
+        },
+    ],
+    "analyse-vs-interpretation": [
+        {
+            "title": "الفرق بين التحليل والتفسير (مثال O₂)",
+            "context": "منحنى تركيز O₂ في الوسط الخارجي للخلية",
+            "unit": "unite5-energie",
+            "content": "التحليل (صحيح): 'نلاحظ ارتفاع تركيز O₂ في الوسط الخارجي للخلية من t₀ إلى t₁'. التفسير (صحيح): 'ارتفاع تركيز O₂ في الوسط الخارجي يعود إلى خروج O₂ من الخلية عبر الغشاء الهيولي أو إنتاجه في التفاعلات الأيضية'. ⛔ ممنوع في التحليل: 'ارتفاع O₂ → تم طرح O₂' (هذا تفسير وليس تحليلاً).",
+        },
+        {
+            "title": "الفرق بين التحليل والتفسير (مثال التصوير الإشعاعي)",
+            "context": "صور autoradiographie لتتبع هجرة mRNA",
+            "unit": "unite1-synthese-proteines",
+            "content": "التحليل: 'نلاحظ ظهور بقع سوداء في السيتوبلازم بعد ساعة من الحقن، بينما لا توجد بقع بعد 5 دقائق'. التفسير: 'ظهور البقع السوداء في السيتوبلازم يعود إلى هجرة جزيئات mRNA الموسومة من النواة إلى السيتوبلازم عبر الثقب النووي'. ⛔ ممنوع في التحليل: 'mRNA يهاجر من النواة' (هذا تفسير).",
+        },
+    ],
+}
+
+
+def get_practical_examples(category: str | None = None, unit: str | None = None) -> list[dict[str, str]]:
+    """Retourne les exemples pratiques filtres par categorie et/ou unite."""
+    result: list[dict[str, str]] = []
+    for cat, examples in PRACTICAL_EXAMPLES.items():
+        if category and cat != category:
+            continue
+        for ex in examples:
+            if unit and ex.get("unit") != unit:
+                continue
+            result.append({**ex, "category": cat})
+    return result
+
+
+def get_practical_example_block(context: str, verb_slug: str) -> str:
+    """Selectionne et formate un bloc d'exemples pratiques pour le prompt."""
+
+    verb_to_categories: dict[str, list[str]] = {
+        "analyse": ["analyse-tableau", "analyse-experience", "analyse-image", "analyse-vs-interpretation"],
+        "interpret": ["analyse-vs-interpretation"],
+        "deduce": ["deduction-vs-extraction"],
+        "extract": ["deduction-vs-extraction"],
+        "prove-experimentally": ["prouver-experimentalement"],
+        "prove": ["prouver-experimentalement"],
+    }
+    categories = verb_to_categories.get(verb_slug, [])
+    if not categories:
+        return ""
+
+    examples = get_practical_examples(category=categories[0]) if categories else []
+    if not examples:
+        return ""
+
+    parts: list[str] = []
+    parts.append("**أمثلة تطبيقية من المنهجية:**")
+    for ex in examples[:2]:
+        parts.append(f"\n📌 {ex['title']}:")
+        parts.append(ex["content"])
+    return "\n".join(parts)

@@ -19,7 +19,10 @@ from __future__ import annotations
 import re
 from typing import Any
 
-from prompts.scientific_knowledge import get_relevant_knowledge
+from prompts.scientific_knowledge import (
+    get_practical_example_block,
+    get_relevant_knowledge,
+)
 
 # ── Prompt système (instructions au LLM) ──────────
 
@@ -855,6 +858,13 @@ def build_correction_prompt(
     knowledge_text = get_relevant_knowledge(f"{scenario_context} {question_prompt}")
     if knowledge_text:
         parts.append(f"## المرجع العلمي من الكتاب المنهجي\n{knowledge_text}")
+
+    # Exemples pratiques (LOT8)
+    practical_text = get_practical_example_block(
+        f"{scenario_context} {question_prompt}", verb_slug
+    )
+    if practical_text:
+        parts.append(f"## أمثلة تطبيقية\n{practical_text}")
 
     # Focus pédagogique
     if learning_focus:

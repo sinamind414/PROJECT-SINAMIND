@@ -43,6 +43,7 @@ from . import (
 from . import (
     document_analysis as document_analysis,
 )
+from . import manhadjiya
 
 ALL_ROUTERS = [
     # ── Core ──
@@ -94,4 +95,6 @@ ALL_ROUTERS = [
     # ── Document Analysis (v2 uniquement — v1 désactivée) ──
     # document_analysis.router,  # DÉSACTIVÉ : v1 utilisait evaluate_answer (regex) qui notait 75% le charabia
     document_analysis_v2.router,
+    # ── Manhadjiya (LOT8 — Base de connaissance scientifique) ──
+    manhadjiya.router,
 ]

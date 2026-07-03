@@ -1207,6 +1207,53 @@ class KhawarizmiApiClient {
       body: JSON.stringify({ vote }),
     })
   }
+
+  // ── Manhadjiya (LOT9) ──────────────────────────
+
+  async getManhadjiyaRevisionTips(): Promise<{ data: Record<string, string[]>; count: number }> {
+    return this.request("/api/manhadjiya/revision-tips")
+  }
+
+  async getManhadjiyaCommonErrors(category?: string): Promise<{ data: Record<string, string[]>; count: number }> {
+    let path = "/api/manhadjiya/common-errors"
+    if (category) path += `?category=${encodeURIComponent(category)}`
+    return this.request(path)
+  }
+
+  async getManhadjiyaCognitiveLevels(): Promise<{ data: Record<string, string[]>; count: number }> {
+    return this.request("/api/manhadjiya/cognitive-levels")
+  }
+
+  async getManhadjiyaAnalysisTerms(): Promise<{ data: Record<string, Record<string, string>>; count: number }> {
+    return this.request("/api/manhadjiya/analysis-terms")
+  }
+
+  async getManhadjiyaVerbs(): Promise<{ data: Array<{ slug: string; methodology: string; rubrics?: Record<string, unknown>; cognitive_level?: string; units: string[] }>; count: number }> {
+    return this.request("/api/manhadjiya/verbs")
+  }
+
+  async getManhadjiyaVerbDetail(slug: string): Promise<{ slug: string; methodology: string; rubrics?: Record<string, unknown>; cognitive_level?: string; units: string[] }> {
+    return this.request(`/api/manhadjiya/verb/${encodeURIComponent(slug)}`)
+  }
+
+  async getManhadjiyaVerbUnits(): Promise<{ direct: Record<string, string[]>; inverse: Record<string, string[]> }> {
+    return this.request("/api/manhadjiya/verb-units")
+  }
+
+  async getManhadjiyaPracticalExamples(category?: string, unit?: string): Promise<{ data: Array<{ title: string; context: string; content: string; category: string; unit?: string }>; count: number }> {
+    const params = new URLSearchParams()
+    if (category) params.set("category", category)
+    if (unit) params.set("unit", unit)
+    const qs = params.toString()
+    return this.request(`/api/manhadjiya/practical-examples${qs ? `?${qs}` : ""}`)
+  }
+
+  async getManhadjiyaContextualRemediation(data: { verb_slug: string; context?: string }): Promise<{ data: { verb: string; units: string[]; relevant_errors: string[] } }> {
+    return this.request("/api/manhadjiya/contextual-remediation", {
+      method: "POST",
+      body: JSON.stringify(data),
+    })
+  }
 }
 
 // ── Export singleton ───────────────────────────────

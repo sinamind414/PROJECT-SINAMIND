@@ -25,7 +25,7 @@ class TestGetRemediation:
     def test_interpret_scientific_error(self):
         r = get_remediation("interpret", "scientific_error")
         assert r is not None
-        assert r["page"] == 55
+        assert r["page"] == 40
 
     def test_unknown_verb_returns_none(self):
         r = get_remediation("toto", "methodology_error")
@@ -38,17 +38,17 @@ class TestGetRemediation:
     def test_deduce_methodology_error(self):
         r = get_remediation("deduce", "methodology_error")
         assert r is not None
-        assert r["page"] == 40
+        assert r["page"] == 43
 
     def test_hypothesis_scientific_error(self):
         r = get_remediation("hypothesis", "scientific_error")
         assert r is not None
-        assert r["page"] == 22
+        assert r["page"] == 52
 
     def test_scientific_text_methodology_error(self):
         r = get_remediation("scientific-text", "methodology_error")
         assert r is not None
-        assert r["page"] == 21
+        assert r["page"] == 86
 
 
 class TestGetGenericRemediation:

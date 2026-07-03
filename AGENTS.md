@@ -1,12 +1,11 @@
 # AGENTS.md — IA Khawarizmi Pro
-# PATCH fabuleux V4 – 2026-06-24
-# - services/scheduler.py : + from sqlalchemy.ext.asyncio import AsyncSession
-# - tests/test_payment.py : ErrorResponse format aligné
-# - requirements.txt : numpy 2.4.2 → 1.26.4 (numba compat)
-# - khawarizmi-frontend/src/lib/api-client.ts : +18 méthodes manquantes
-# - khawarizmi-frontend/src/lib/methodology-evaluator.ts : evaluateMethodologyAnswer sync (fallback local)
-# - tsc --noEmit : 33 erreurs → 0
-# - pytest : 58 passed, 1 skipped
+# PATCH FABLE 5 PERMANENT – 2026-07-03
+# - Mode Fable 5 + Rigor Pack activé en permanence
+#   (plan-gate, scope-fence, live-state-truth, adversarial-verify,
+#    ruthless-editor, memory-hygiene, visuel, preuve réelle)
+# - skills fable 5, fabuleux et fabuleux-v3 supprimés
+# - LOT 8 : routes/manhadjiya.py, 9 endpoints REST,
+#   VERB_UNIT_MAP, PRACTICAL_EXAMPLES, get_full_remediation(), 99 tests
 #
 
 # Version : 2.1.0
@@ -36,6 +35,48 @@ Stack technique officiel :
 - Deploy   : Railway (Docker)
 - Frontend : Next.js 16 + React 19 + TailwindCSS 4
 - Mobile   : React Native + Expo 56
+
+##############################################################
+# SECTION 0b — MODE FABLE 5 + RIGOR PACK (ACTIF EN PERMANENCE)
+##############################################################
+
+Le protocole Fable 5 renforcé par Rigor Pack est **actif en permanence**
+sur chaque session, sans besoin d'invocation `/skill`.
+
+## Actes obligatoires
+
+Sauf tâche triviale (1 ligne, pas d'effet de bord) ou impossibilité
+réelle à signaler :
+
+1. **Classer** la tâche : ARTEFACT/AGENTIQUE, PROSE, ANALYSE/CONSEIL ou MÉMOIRE.
+2. **Définir le succès** : 2-4 critères concrets.
+3. **Plan-gate** si multi-étapes : plan court avant la première modification.
+4. **Scope-fence** si modification d'existant : exactement ce qui est demandé,
+   signaler le reste sans le corriger.
+5. **Live-state-truth** avant toute affirmation système : vérifier l'état réel.
+6. **Produire un premier jet fini** : livrable utilisable, pas une intention.
+7. **Observer** le résultat réel : exécuter, tester, lire, capturer.
+8. **Corriger** après observation.
+9. **Adversarial-verify** avant livraison : attaquer son propre travail.
+10. **Livrer sobrement** : produit, preuves, limites.
+
+## Règles Rigor Pack intégrées
+
+- **Plan-gate** : GOAL + UNKNOWNS + SUCCESS CRITERIA + STEPS + OUT OF SCOPE
+- **Scope-fence** : ne modifier que ce qui est demandé ; flagger le adjacent non touché
+- **Live-state-truth** : le système est la source de vérité, pas sa documentation
+- **Adversarial-verify** : verdict SURVIVED / REFUTED / UNTESTABLE HERE
+- **Ruthless-editor** : viser 20-30% plus court sans perte d'information
+- **Memory-hygiene** : dater, vérifier, ne pas persister de secrets
+
+## Route par type de tâche
+
+- **ARTEFACT/AGENTIQUE** : produire → observer (capture, test, rendu)
+  → corriger → vérifier → livrer avec preuve
+- **PROSE** : draft → ruthless-editor → relire → livrer le texte final
+- **ANALYSE/CONSEIL** : faits ≠ hypothèses ≠ jugement → vérifier faits décisifs
+  → adversarial-verify → dire la vérité utile
+- **MÉMOIRE** : memory-hygiene → l'état réel gagne toujours sur la mémoire
 
 ##############################################################
 # SECTION 1 — RÈGLES ABSOLUES (NE JAMAIS VIOLER)
@@ -486,6 +527,12 @@ STRATÉGIQUE — À faire ce trimestre :
   [x] Implémenter Lexique SVT bilingue (221 termes, 4 endpoints API, RAG)
   [x] Connecter Next.js frontend au backend (en cours)
   [x] Connecter Mind Map ↔ FSRS
+  [x] LOT 5 : Base connaissance scientifique (5 unités, 189 termes, 83 faits, 54 erreurs)
+  [x] LOT 6 : Alignement V1↔V2 (25 verbes), sécurité next-pwa supprimé, fix lint
+  [x] LOT 7 : 6 PDFs BAC, 37 erreurs, 72 verbes Bloom, 2 verbes nouveaux (27 total)
+  [x] LOT 8 : routes/manhadjiya.py (9 endpoints), VERB_UNIT_MAP (27 verbes),
+      PRACTICAL_EXAMPLES (11 exemples), get_full_remediation(), 99 tests
+  [x] Mode Fable 5 + Rigor Pack actif permanent
 
 ##############################################################
 # SECTION 11 — BUGS CRITIQUES CONNUS & RÉSOLUS
