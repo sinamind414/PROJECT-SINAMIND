@@ -146,7 +146,7 @@ async def create_post(payload: PostCreate, current_user: dict = Depends(get_curr
 async def get_blog(chapter_id: str | None = None, db: AsyncSession = Depends(get_db)):
     q = """
         SELECT p.id, p.title, p.content, p.file_url, p.chapter_id,
-               p.created_at, u.nom as author_name, u.id as author_id,
+               p.created_at, u.prenom as author_name, u.id as author_id,
                (SELECT COUNT(*) FROM post_likes WHERE post_id = p.id) as likes_count,
                COALESCE((SELECT AVG(rating)::numeric(3,2) FROM post_ratings WHERE post_id = p.id), 0) as avg_rating,
                (SELECT COUNT(*) FROM post_ratings WHERE post_id = p.id) as rating_count
@@ -162,7 +162,7 @@ async def get_blog(chapter_id: str | None = None, db: AsyncSession = Depends(get
     posts = [dict(r._mapping) for r in res.fetchall()]
     for p in posts:
         c_res = await db.execute(
-            text("SELECT c.*, u.nom as author_name FROM comments c JOIN users u ON c.author_id = u.id WHERE c.post_id = :pid ORDER BY c.created_at ASC"),
+            text("SELECT c.*, u.prenom as author_name FROM comments c JOIN users u ON c.author_id = u.id WHERE c.post_id = :pid ORDER BY c.created_at ASC"),
             {"pid": p["id"]},
         )
         p["comments"] = [dict(r._mapping) for r in c_res.fetchall()]
