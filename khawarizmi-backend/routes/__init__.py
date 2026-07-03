@@ -14,6 +14,7 @@ from . import (
     chapitres,
     chatbot,
     chatbot_engagement,
+    cities,
     cours,
     dashboard,
     diagnostic,
@@ -32,6 +33,7 @@ from . import (
     mindmap,
     mindmap_methodology,
     mystery_box,
+    onboarding,
     orientation,
     payment,
     phase1,
@@ -110,6 +112,9 @@ ALL_ROUTERS = [
     gems.router,
     duels.router,
     leaderboard.router,
+    # ── Gamification Sprint 3 ──
+    cities.router,
+    onboarding.router,
     # ── Manhadjiya (LOT8 — Base de connaissance scientifique) ──
     manhadjiya.router,
 ]

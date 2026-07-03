@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Cairo } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/providers";
+import { OnboardingOverlay } from "@/components/gamification/OnboardingOverlay";
 
 const cairo = Cairo({
   subsets: ["arabic", "latin"],
@@ -27,9 +28,12 @@ export default function RootLayout({
       className={`${cairo.variable} h-full antialiased`}
       suppressHydrationWarning
     >
-
+      <head>
+        <link rel="manifest" href="/manifest.json" />
+      </head>
       <body className="min-h-full flex flex-col" suppressHydrationWarning>
         <Providers>{children}</Providers>
+        <OnboardingOverlay />
       </body>
     </html>
   );
