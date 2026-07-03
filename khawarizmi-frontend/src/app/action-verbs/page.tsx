@@ -6,7 +6,7 @@ import { AuthGuard } from "@/components/auth/AuthGuard"
 import { AppShell } from "@/components/layout/AppShell"
 import { ProgressivePageHeader } from "@/components/ui/ProgressivePageHeader"
 import { RevealSection } from "@/components/ui/RevealSection"
-import { actionVerbs } from "@/lib/methodology-v1"
+import { ENRICHED_ACTION_VERBS, enrichedToLegacy } from "@/lib/methodology-v2"
 import apiClient from "@/lib/api-client"
 import type { ActionVerbSummary, VerbProgressResponse } from "@/lib/types"
 
@@ -38,10 +38,11 @@ export default function ActionVerbsPage() {
     return () => { cancelled = true }
   }, [])
 
-  const verbsWithProgress = actionVerbs.map((v) => {
+  const verbsWithProgress = ENRICHED_ACTION_VERBS.map((v) => {
+    const legacy = enrichedToLegacy(v)
     const apiProg = progress?.verbs.find((p) => p.verb_slug === v.slug)
     return {
-      ...v,
+      ...legacy,
       apiLevel: apiProg ? Math.round(apiProg.stability * 100) : v.level,
       apiDue: apiProg?.est_due ?? false,
       apiAttempts: apiProg?.attempts ?? 0,
@@ -136,7 +137,7 @@ export default function ActionVerbsPage() {
 
             {/* ── Secondary: full list behind RevealSection ── */}
             {remainingVerbs.length > 0 && (
-              <RevealSection title={`عرض كل الأفعال — ${remainingVerbs.length} فعل متبقي`} defaultOpen={false}>
+              <RevealSection title={`عرض كل الأفعال — ${remainingVerbs.length} فعل متبقي`} defaultOpen={true}>
                 <div className="py-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                     {remainingVerbs.map((verb) => (

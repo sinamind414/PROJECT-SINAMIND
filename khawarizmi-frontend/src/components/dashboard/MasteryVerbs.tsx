@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { actionVerbs } from "@/lib/methodology-v1"
+import { ENRICHED_ACTION_VERBS, enrichedToLegacy } from "@/lib/methodology-v2"
 
 function getStatus(level: number) {
   if (level >= 75) return { icon: "✓", label: "متقن", color: "text-emerald-400", bar: "#34D399" }
@@ -18,12 +18,13 @@ export function MasteryVerbs() {
           <p className="text-gray-500 text-xs mt-0.5">كل فعل يفرض طريقة إجابة مختلفة</p>
         </div>
         <Link href="/action-verbs" className="text-mint text-xs font-medium hover:underline">
-          عرض الكل ({actionVerbs.length})
+          عرض الكل ({ENRICHED_ACTION_VERBS.length})
         </Link>
       </div>
 
       <div className="space-y-2">
-        {actionVerbs.slice(0, 8).map((verb) => {
+        {ENRICHED_ACTION_VERBS.slice(0, 8).map((v) => {
+          const verb = enrichedToLegacy(v)
           const status = getStatus(verb.level)
           return (
             <Link
