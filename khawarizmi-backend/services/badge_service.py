@@ -1,132 +1,88 @@
-from datetime import date
-from typing import Any
+"""
+Badge Service — système de 12 badges secrets.
+"""
 
+from datetime import datetime
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from models.gamification import Badge, UserAvatar, UserBadge, UserPoints, UserStreak
 
-BADGES: list[dict[str, Any]] = [
-    {
-        "id": "methodology_beginner",
-        "name": "Débutant Méthodologie",
-        "description": "Utilise correctement tes premières méthodes de réponse",
-        "rarity": "common",
-        "icon": "📘",
-    },
-    {
-        "id": "points_100",
-        "name": "100 points",
-        "description": "Atteins 100 points cumulés",
-        "rarity": "common",
-        "icon": "⭐",
-    },
-    {
-        "id": "proteins_expert",
-        "name": "Expert Protéines",
-        "description": "Progresse fortement sur le chapitre des protéines",
-        "rarity": "rare",
-        "icon": "🧬",
-    },
-    {
-        "id": "streak_7",
-        "name": "Streak 7 jours",
-        "description": "Révise 7 jours de suite",
-        "rarity": "epic",
-        "icon": "🔥",
-    },
-    {
-        "id": "avatar_level_3",
-        "name": "Avatar Chercheur",
-        "description": "Atteins le niveau avatar 3",
-        "rarity": "rare",
-        "icon": "🔬",
-    },
-    {
-        "id": "methodology_master",
-        "name": "Maître Méthodologie",
-        "description": "Maîtrise les réflexes méthodologiques clés",
-        "rarity": "legendary",
-        "icon": "🏆",
-    },
+BADGES = [
+    {"code": "night_owl",       "icon": "🌙", "title_ar": "البومة الليلية",   "desc_ar": "3 تدريبات بعد 22h"},
+    {"code": "perseverant",     "icon": "🔥", "title_ar": "المثابر",          "desc_ar": "30 يوم متتالي من التدريب"},
+    {"code": "scholar",         "icon": "🎓", "title_ar": "العالم الصغير",     "desc_ar": "جميع الأفعال عند 100%"},
+    {"code": "bac_champion",    "icon": "🏆", "title_ar": "بطل البكالوريا",    "desc_ar": "نجحت في البوس النهائي"},
+    {"code": "lightning",       "icon": "⚡", "title_ar": "سريع البرق",         "desc_ar": "إجابة صحيحة في أقل من 30 ثانية"},
+    {"code": "diligent",        "icon": "📚", "title_ar": "الطالب المثالي",     "desc_ar": "50 تدريبا متتاليا"},
+    {"code": "spear",           "icon": "🎯", "title_ar": "الرمّاح",           "desc_ar": "10 تحديات مربوحة متتالية", "sprint2": True},
+    {"code": "weekly_star",     "icon": "🌟", "title_ar": "نجم الأسبوع",       "desc_ar": "Top 3 ترتيب الأسبوع",     "sprint2": True},
+    {"code": "lion",            "icon": "💪", "title_ar": "الأسد",             "desc_ar": "Score parfait (100%) على بوس"},
+    {"code": "brain",           "icon": "🧠", "title_ar": "العقل",             "desc_ar": "5 أفعال صعبة mastered",    "sprint2": True},
+    {"code": "regional",        "icon": "🏠", "title_ar": "ابن المنطقة",       "desc_ar": "Top 1 ولايتك",             "sprint2": True},
+    {"code": "generous",        "icon": "🎁", "title_ar": "الكريم",            "desc_ar": "ساعدت 3 أصدقاء",           "sprint2": True},
 ]
 
-BADGE_BY_ID = {badge["id"]: badge for badge in BADGES}
 
+async def get_user_badges(db: AsyncSession, user_id: str) -> list[dict]:
+    from models.badge import UserBadge
 
-def _serialize_badge(badge: Badge | dict[str, Any], unlocked: bool = False) -> dict[str, Any]:
-    if isinstance(badge, dict):
-        data = dict(badge)
-    else:
-        data = {
-            "id": badge.id,
-            "name": badge.name,
-            "description": badge.description,
-            "rarity": badge.rarity,
-            "icon": badge.icon,
+    result = await db.execute(
+        select(UserBadge.badge_code, UserBadge.unlocked_at)
+        .where(UserBadge.user_id == user_id)
+    )
+    unlocked = {row.badge_code: row.unlocked_at.isoformat() for row in result.all()}
+
+    return [
+        {
+            **badge,
+            "unlocked": badge["code"] in unlocked,
+            "unlocked_at": unlocked.get(badge["code"]),
         }
-    data["unlocked"] = unlocked
-    return data
+        for badge in BADGES
+    ]
 
 
-async def _ensure_badges(db: AsyncSession) -> None:
-    for badge_data in BADGES:
-        result = await db.execute(select(Badge).where(Badge.id == badge_data["id"]))
-        if result.scalar_one_or_none():
+async def check_and_unlock_badges(db: AsyncSession, user_id: str, event_type: str, event_data: dict = None) -> list[str]:
+    from models.badge import UserBadge
+
+    event_data = event_data or {}
+    newly_unlocked = []
+
+    existing = await db.execute(
+        select(UserBadge.badge_code).where(UserBadge.user_id == user_id)
+    )
+    owned = {row.badge_code for row in existing.all()}
+
+    for badge in BADGES:
+        code = badge["code"]
+        if code in owned or badge.get("sprint2"):
             continue
-        db.add(
-            Badge(
-                id=badge_data["id"],
-                name=badge_data["name"],
-                description=badge_data.get("description"),
-                rarity=badge_data.get("rarity"),
-                icon=badge_data.get("icon"),
-            )
-        )
-    await db.commit()
+
+        if _check_condition(code, event_data):
+            db.add(UserBadge(user_id=user_id, badge_code=code))
+            newly_unlocked.append(code)
+
+    if newly_unlocked:
+        await db.commit()
+
+    return newly_unlocked
 
 
-async def _unlock_badge(user_id: int, badge_id: str, db: AsyncSession) -> dict[str, Any] | None:
-    badge_data = BADGE_BY_ID.get(badge_id)
-    if not badge_data:
-        return None
-
-    result = await db.execute(select(UserBadge).where(UserBadge.user_id == user_id, UserBadge.badge_id == badge_id))
-    if result.scalar_one_or_none():
-        return None
-
-    db.add(UserBadge(user_id=user_id, badge_id=badge_id, unlocked_at=date.today()))
-    await db.commit()
-    return _serialize_badge(badge_data, unlocked=True)
-
-
-async def check_and_award_badges(user_id: int, db: AsyncSession) -> list[dict]:
-    await _ensure_badges(db)
-    awarded: list[dict] = []
-
-    points_result = await db.execute(select(UserPoints).where(UserPoints.user_id == user_id))
-    points = points_result.scalar_one_or_none()
-    if points and points.total_points >= 100:
-        badge = await _unlock_badge(user_id, "points_100", db)
-        if badge:
-            awarded.append(badge)
-
-    streak_result = await db.execute(select(UserStreak).where(UserStreak.user_id == user_id))
-    streak = streak_result.scalar_one_or_none()
-    if streak and streak.longest_streak >= 7:
-        badge = await _unlock_badge(user_id, "streak_7", db)
-        if badge:
-            awarded.append(badge)
-
-    avatar_result = await db.execute(select(UserAvatar).where(UserAvatar.user_id == user_id))
-    avatar = avatar_result.scalar_one_or_none()
-    if avatar and avatar.level >= 3:
-        badge = await _unlock_badge(user_id, "avatar_level_3", db)
-        if badge:
-            awarded.append(badge)
-
-    return awarded
-
-
-async def get_all_badges() -> list[dict]:
-    return [_serialize_badge(badge) for badge in BADGES]
+def _check_condition(code: str, data: dict) -> bool:
+    if code == "night_owl":
+        hour = data.get("hour", 0)
+        count = data.get("late_sessions", 0)
+        return hour >= 22 and count >= 3
+    if code == "perseverant":
+        return data.get("current_streak", 0) >= 30
+    if code == "scholar":
+        return data.get("all_verbs_100", False)
+    if code == "bac_champion":
+        return data.get("boss_score", 0) >= 80
+    if code == "lightning":
+        return data.get("duration_seconds", 999) < 30 and data.get("score", 0) >= 80
+    if code == "diligent":
+        return data.get("total_evaluations", 0) >= 50
+    if code == "lion":
+        return data.get("boss_score", 0) == 100
+    return False

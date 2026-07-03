@@ -9,6 +9,7 @@ from . import (
     annales,
     auth,
     avatar,
+    badges,
     bac_blanc_intelligent,
     chapitres,
     chatbot,
@@ -38,6 +39,7 @@ from . import (
     progress,
     session,
     social,
+    streaks,
     tutor,
     videos,
 )
@@ -98,6 +100,9 @@ ALL_ROUTERS = [
     document_analysis_v2.router,
     # ── Action Verbs ──
     action_verbs.router,
+    # ── Gamification Sprint 1 ──
+    streaks.router,
+    badges.router,
     # ── Manhadjiya (LOT8 — Base de connaissance scientifique) ──
     manhadjiya.router,
 ]

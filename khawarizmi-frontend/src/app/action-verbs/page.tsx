@@ -7,6 +7,8 @@ import { AppShell } from "@/components/layout/AppShell"
 import { ProgressivePageHeader } from "@/components/ui/ProgressivePageHeader"
 import { RevealSection } from "@/components/ui/RevealSection"
 import { ENRICHED_ACTION_VERBS, enrichedToLegacy } from "@/lib/methodology-v2"
+import { StreakBanner } from "@/components/gamification/StreakBanner"
+import { HardestVerbPoll } from "@/components/gamification/HardestVerbPoll"
 import apiClient from "@/lib/api-client"
 import type { ActionVerbSummary, VerbProgressResponse } from "@/lib/types"
 
@@ -68,6 +70,17 @@ export default function ActionVerbsPage() {
       <AppShell>
         <main className="flex-1 p-6 lg:p-8 overflow-auto">
           <div className="max-w-6xl mx-auto space-y-6">
+            {/* ── Streak Banner ── */}
+            <div className="flex items-center justify-between">
+              <StreakBanner />
+              <Link
+                href="/achievements"
+                className="text-xs text-white/40 hover:text-white/70 transition"
+              >
+                🏆 الإنجازات
+              </Link>
+            </div>
+
             <ProgressivePageHeader
               breadcrumb={[{ label: "المنهجية", href: "/exercises" }, { label: "الأفعال الأدائية" }]}
               title="الأفعال الأدائية"
@@ -180,6 +193,7 @@ export default function ActionVerbsPage() {
           </div>
         </main>
       </AppShell>
+      <HardestVerbPoll />
     </AuthGuard>
   )
 }
