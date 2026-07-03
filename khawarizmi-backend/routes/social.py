@@ -2,7 +2,7 @@ import logging
 import os
 import uuid
 
-from fastapi import APIRouter, Depends, File, UploadFile
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from pydantic import BaseModel
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -144,12 +144,20 @@ async def create_post(payload: PostCreate, current_user: dict = Depends(get_curr
 
 @router.get("/blog")
 async def get_blog(chapter_id: str | None = None, db: AsyncSession = Depends(get_db)):
-    q = "SELECT p.*, u.nom as author_name FROM community_posts p JOIN users u ON p.author_id = u.id"
+    q = """
+        SELECT p.id, p.title, p.content, p.file_url, p.chapter_id,
+               p.created_at, u.nom as author_name, u.id as author_id,
+               (SELECT COUNT(*) FROM post_likes WHERE post_id = p.id) as likes_count,
+               COALESCE((SELECT AVG(rating)::numeric(3,2) FROM post_ratings WHERE post_id = p.id), 0) as avg_rating,
+               (SELECT COUNT(*) FROM post_ratings WHERE post_id = p.id) as rating_count
+        FROM community_posts p
+        JOIN users u ON p.author_id = u.id
+    """
     params = {}
     if chapter_id:
         q += " WHERE p.chapter_id = :cid"
         params["cid"] = chapter_id
-    q += " ORDER BY p.votes DESC, p.created_at DESC"
+    q += " ORDER BY p.created_at DESC"
     res = await db.execute(text(q), params)
     posts = [dict(r._mapping) for r in res.fetchall()]
     for p in posts:
@@ -161,19 +169,69 @@ async def get_blog(chapter_id: str | None = None, db: AsyncSession = Depends(get
     return posts
 
 
-@router.post("/blog/{pid}/vote")
-async def vote_post(pid: int, current_user: dict = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
-    await db.execute(text("UPDATE community_posts SET votes = votes + 1 WHERE id = :pid"), {"pid": pid})
-    await db.execute(
-        text("UPDATE users SET xp = xp + 2 WHERE id = (SELECT author_id FROM community_posts WHERE id = :pid)"),
+@router.post("/blog/{pid}/like")
+async def like_post(pid: int, current_user: dict = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
+    uid = current_user["id"]
+    existing = await db.execute(
+        text("SELECT id FROM post_likes WHERE post_id = :pid AND user_id = :uid"),
+        {"pid": pid, "uid": uid},
+    )
+    if existing.fetchone():
+        await db.execute(
+            text("DELETE FROM post_likes WHERE post_id = :pid AND user_id = :uid"),
+            {"pid": pid, "uid": uid},
+        )
+        liked = False
+    else:
+        await db.execute(
+            text("INSERT INTO post_likes (post_id, user_id) VALUES (:pid, :uid)"),
+            {"pid": pid, "uid": uid},
+        )
+        await db.execute(
+            text("UPDATE users SET xp = xp + 2 WHERE id = (SELECT author_id FROM community_posts WHERE id = :pid)"),
+            {"pid": pid},
+        )
+        liked = True
+    count_res = await db.execute(
+        text("SELECT COUNT(*) FROM post_likes WHERE post_id = :pid"),
         {"pid": pid},
     )
+    likes_count = count_res.scalar()
     await db.commit()
-    return {"status": "voted"}
+    return {"status": "liked" if liked else "unliked", "liked": liked, "likes_count": likes_count}
+
+
+class RatePostRequest(BaseModel):
+    rating: int
+
+
+@router.post("/blog/{pid}/rate")
+async def rate_post(pid: int, payload: RatePostRequest, current_user: dict = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
+    if payload.rating < 1 or payload.rating > 5:
+        raise HTTPException(status_code=400, detail="La note doit être comprise entre 1 et 5")
+    uid = current_user["id"]
+    await db.execute(
+        text("""
+            INSERT INTO post_ratings (post_id, user_id, rating, updated_at)
+            VALUES (:pid, :uid, :rating, NOW())
+            ON CONFLICT (post_id, user_id)
+            DO UPDATE SET rating = :rating, updated_at = NOW()
+        """),
+        {"pid": pid, "uid": uid, "rating": payload.rating},
+    )
+    agg = await db.execute(
+        text("SELECT AVG(rating)::numeric(3,2), COUNT(*) FROM post_ratings WHERE post_id = :pid"),
+        {"pid": pid},
+    )
+    row = agg.fetchone()
+    await db.commit()
+    return {"status": "rated", "avg_rating": float(row[0]) if row[0] else 0, "rating_count": row[1]}
 
 
 @router.post("/blog/comment")
 async def add_comment(payload: CommentCreate, current_user: dict = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
+    if len(payload.content) > 500:
+        raise HTTPException(status_code=400, detail="Le commentaire ne doit pas dépasser 500 caractères")
     await db.execute(
         text("INSERT INTO comments (post_id, author_id, content) VALUES (:pid, :aid, :content)"),
         {"pid": payload.post_id, "aid": current_user["id"], "content": payload.content},
