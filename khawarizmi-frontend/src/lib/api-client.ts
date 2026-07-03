@@ -15,6 +15,7 @@ import {
   MindMap,
   MindMapGeneratePayload,
   MindMapGenerateResponse,
+  MindMapNode,
   MindMapTaskStatus,
   Rating,
   RegisterPayload,
@@ -325,6 +326,18 @@ class KhawarizmiApiClient {
       total: number
       message: string
     }>(`/api/mindmap/${mindmapId}/weak`)
+  }
+
+  async expandMindMapNode(payload: {
+    node_id: string
+    node_label: string
+    chapitre: string
+    matiere: string
+  }): Promise<{ status: string; enfants: MindMapNode[] }> {
+    return this.request<{ status: string; enfants: MindMapNode[] }>("/api/mindmap/expand", {
+      method: "POST",
+      body: JSON.stringify(payload)
+    })
   }
 
   // ── Flashcards FSRS ────────────────────────────

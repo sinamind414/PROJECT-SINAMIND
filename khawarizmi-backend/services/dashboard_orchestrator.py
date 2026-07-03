@@ -33,7 +33,7 @@ def _slug_to_lesson_href(chapter_slug: str | None) -> str:
 def _slug_to_mindmap_href(chapter_slug: str | None) -> str:
     if not chapter_slug:
         return "/mindmap"
-    return f"/mindmap?chapter={chapter_slug}"
+    return f"/mindmap/chapter/{chapter_slug}"
 
 
 def _build_priority_action(orientation: dict[str, Any], progress: dict[str, Any]) -> dict[str, Any]:

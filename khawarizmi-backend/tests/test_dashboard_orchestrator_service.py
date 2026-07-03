@@ -162,7 +162,7 @@ class TestDashboardOrchestratorService:
         assert payload["orchestration"]["continue_card"]["source"] == "fsrs"
         assert payload["orchestration"]["continue_card"]["href"] == "/cours/respiration_cellulaire"
         assert payload["orchestration"]["strategic_chapter"]["source"] == "fsrs"
-        assert payload["orchestration"]["strategic_chapter"]["mindmapHref"] == "/mindmap?chapter=respiration_cellulaire"
+        assert payload["orchestration"]["strategic_chapter"]["mindmapHref"] == "/mindmap/chapter/respiration_cellulaire"
         assert payload["orchestration"]["engine_pulse"]["urgentConceptsCount"] == 1
         assert payload["orchestration"]["engine_pulse"]["soonConceptsCount"] == 1
         assert payload["orchestration"]["engine_pulse"]["stableConceptsCount"] == 0

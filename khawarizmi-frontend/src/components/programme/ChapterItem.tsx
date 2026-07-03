@@ -3,6 +3,7 @@
 import Link from "next/link"
 import { Chapter } from "@/lib/types"
 import { trAr, UI_AR } from "@/lib/translations"
+import { getChapterSlugByTitle } from "@/lib/cours-data"
 import { ChapterBadge } from "./ChapterBadge"
 
 const CHAPTER_ICONS: Record<string, string> = {
@@ -104,7 +105,7 @@ export function ChapterItem({ chapter, onClick }: ChapterItemProps) {
         </Link>
         
         <Link
-          href={`/mindmap/${chapter.id}`}
+          href={`/mindmap/chapter/${getChapterSlugByTitle(chapter.titre_fr) || chapter.id}`}
           className="px-3 py-2 bg-mint/10 hover:bg-mint/20 
                      text-mint-soft border border-mint/30 
                      rounded-lg text-xs font-medium text-center 

@@ -172,7 +172,7 @@ function makeApi(): DashboardOrchestratorResponse {
       },
       strategic_chapter: {
         title: "التنفس الخلوي", subtitle: "هذا الفصل يحتاج استرجاعاً فورياً",
-        lessonHref: "/cours/respiration_cellulaire", mindmapHref: "/mindmap?chapter=respiration_cellulaire",
+        lessonHref: "/cours/respiration_cellulaire", mindmapHref: "/mindmap/chapter/respiration_cellulaire",
         chapterSlug: "respiration_cellulaire", source: "orientation",
       },
       engine_pulse: {

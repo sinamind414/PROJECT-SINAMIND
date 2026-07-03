@@ -23,11 +23,10 @@ import { UI_AR, trAr } from "@/lib/translations"
 import {
   MindMap as MindMapType,
   MindMapNode,
-  Chapter,
-  Programme,
   MAITRISE_COLORS
 } from "@/lib/types"
 import CustomMindMapNode from "@/components/mindmap/CustomMindMapNode"
+import { getChapterBySlug } from "@/lib/cours-data"
 
 const PROGRESS_LABELS: Record<string, string> = {
   init: "جاري التهيئة...",
@@ -38,16 +37,13 @@ const PROGRESS_LABELS: Record<string, string> = {
   done: "تم !"
 }
 
-const nodeTypes = { mindMapNode: CustomMindMapNode }
+const MAITRISE_BUTTONS = [
+  { value: 0 as const, label: "🔴 غير مفهوم", color: "border-red-500/40 bg-red-500/10 text-red-400" },
+  { value: 1 as const, label: "🟡 قيد التعلم", color: "border-amber-500/40 bg-amber-500/10 text-amber-400" },
+  { value: 2 as const, label: "🟢 مُتقن", color: "border-green-500/40 bg-green-500/10 text-green-400" },
+]
 
-function slugifyChapter(value: string): string {
-  return value
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-}
+const nodeTypes = { mindMapNode: CustomMindMapNode }
 
 function layoutTree(
   node: MindMapNode,
@@ -133,16 +129,35 @@ function resolveMindmapErrorMessage(error: unknown): string {
   return UI_AR.erreur_chargement_mindmap
 }
 
-export default function MindMapPage() {
+function findNodeInTree(node: MindMapNode, targetId: string): MindMapNode | null {
+  if (node.id === targetId) return node
+  for (const child of node.enfants || []) {
+    const found = findNodeInTree(child, targetId)
+    if (found) return found
+  }
+  return null
+}
+
+function updateNodeInTree(node: MindMapNode, targetId: string, updates: Partial<MindMapNode>): MindMapNode {
+  if (node.id === targetId) {
+    return { ...node, ...updates }
+  }
+  return {
+    ...node,
+    enfants: (node.enfants || []).map((child) => updateNodeInTree(child, targetId, updates))
+  }
+}
+
+export default function ChapterMindMapPage() {
   return (
     <AuthGuard>
-      <MindMapContent />
+      <ChapterMindMapContent />
     </AuthGuard>
   )
 }
 
-function MindMapContent() {
-  const { chapterId } = useParams()
+function ChapterMindMapContent() {
+  const { chapterSlug } = useParams<{ chapterSlug: string }>()
   const { user } = useAuth()
 
   const [loading, setLoading] = useState(true)
@@ -150,9 +165,10 @@ function MindMapContent() {
   const [error, setError] = useState<string | null>(null)
   const [progress, setProgress] = useState<string>("init")
 
-  const [chapter, setChapter] = useState<Chapter | null>(null)
+  const [chapterInfo, setChapterInfo] = useState<{ ar: string; fr: string; slug: string } | null>(null)
   const [mindmap, setMindmap] = useState<MindMapType | null>(null)
   const [selectedNode, setSelectedNode] = useState<MindMapNode | null>(null)
+  const [updatingMaitrise, setUpdatingMaitrise] = useState(false)
 
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([])
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([])
@@ -173,54 +189,94 @@ function MindMapContent() {
     throw new Error("timeout_mindmap_generation")
   }, [])
 
-  const handleNodeClick = (_event: React.MouseEvent, node: Node) => {
+  const relayout = useCallback((mm: MindMapType) => {
+    const layout = layoutTree(mm.racine)
+    const transversalEdges: Edge[] = (mm.liens_transversaux || []).map((link, idx) => ({
+      id: `transversal-${idx}`,
+      source: link.source,
+      target: link.target,
+      label: link.relation,
+      type: "bezier",
+      animated: true,
+      style: { stroke: "#e2e8f0", strokeWidth: 1.5, strokeDasharray: "4 4" },
+      labelStyle: { fill: "#94a3b8", fontSize: 9, fontWeight: 500 }
+    }))
+    setNodes(layout.nodes)
+    setEdges([...layout.edges, ...transversalEdges])
+  }, [setNodes, setEdges])
+
+  const handleNodeClick = useCallback((_event: React.MouseEvent, node: Node) => {
     const rawNode = node.data?.node as MindMapNode
     if (rawNode) {
       setSelectedNode(rawNode)
     }
-  }
+  }, [])
 
-  useEffect(() => {
-    setSelectedNode(null)
-  }, [selectedNode?.id])
+  const handleMaitriseChange = useCallback(async (nodeId: string, newMaitrise: 0 | 1 | 2) => {
+    setUpdatingMaitrise(true)
+    try {
+      await apiClient.updateNodeMaitrise(nodeId, newMaitrise)
+      if (mindmap) {
+        const updatedMindmap = {
+          ...mindmap,
+          racine: updateNodeInTree(mindmap.racine, nodeId, { maitrise_eleve: newMaitrise })
+        }
+        setMindmap(updatedMindmap)
+        relayout(updatedMindmap)
+        if (selectedNode?.id === nodeId) {
+          setSelectedNode(prev => prev ? { ...prev, maitrise_eleve: newMaitrise } : null)
+        }
+      }
+    } catch (err) {
+      console.error("Failed to update maitrise", err)
+    } finally {
+      setUpdatingMaitrise(false)
+    }
+  }, [mindmap, selectedNode, relayout])
+
+  const handleExpandNode = useCallback(async (node: MindMapNode) => {
+    if (!mindmap || !chapterInfo) return
+    try {
+      const result = await apiClient.expandMindMapNode({
+        node_id: node.id,
+        node_label: node.label,
+        chapitre: chapterInfo.fr,
+        matiere: "SVT"
+      })
+      if (result.enfants && result.enfants.length > 0) {
+        const expandedMindmap = {
+          ...mindmap,
+          racine: updateNodeInTree(mindmap.racine, node.id, {
+            enfants: [...(node.enfants || []), ...result.enfants],
+            expanded: true,
+            has_children: false
+          })
+        }
+        setMindmap(expandedMindmap)
+        relayout(expandedMindmap)
+      }
+    } catch (err) {
+      console.error("Failed to expand node", err)
+    }
+  }, [mindmap, chapterInfo, relayout])
 
   const loadChapterAndMindmap = useCallback(async () => {
     setLoading(true)
     setError(null)
     try {
-      const matiere = "SVT"
-      const filiere = user?.filiere || "Sciences Experimentales"
-      const prog: Programme = await apiClient.getProgramme(matiere, filiere)
-
-      const routeChapterId = String(chapterId)
-
-      let foundChapter: Chapter | null = null
-      for (const d of prog.domains) {
-        for (const u of d.units) {
-          const match = u.chapters.find((c) => {
-            const idMatch = String(c.id) === routeChapterId
-            const slugMatch = slugifyChapter(c.titre_fr) === routeChapterId
-            return idMatch || slugMatch
-          })
-          if (match) {
-            foundChapter = match
-            break
-          }
-        }
-        if (foundChapter) break
+      const ch = getChapterBySlug(chapterSlug as string)
+      if (!ch) {
+        throw new Error("تعذر العثور على الفصل المطلوب")
       }
 
-      if (!foundChapter) {
-        throw new Error(UI_AR.chapitre_introuvable)
-      }
-      setChapter(foundChapter)
+      setChapterInfo({ ar: ch.chapterAr, fr: ch.chapterFr, slug: ch.slug })
 
       setGenerating(true)
       setProgress("init")
       const res = await apiClient.generateMindMap({
-        matiere,
-        filiere,
-        chapitre: foundChapter.titre_fr,
+        matiere: "SVT",
+        filiere: user?.filiere || "Sciences Experimentales",
+        chapitre: ch.chapterFr,
         niveau_detail: "standard"
       })
 
@@ -248,23 +304,7 @@ function MindMapContent() {
       }
 
       setMindmap(mindmapData)
-
-      const layout = layoutTree(mindmapData.racine)
-
-      const transversalEdges: Edge[] = (mindmapData.liens_transversaux || []).map((link, idx) => ({
-        id: `transversal-${idx}`,
-        source: link.source,
-        target: link.target,
-        label: link.relation,
-        type: "bezier",
-        animated: true,
-        style: { stroke: "#e2e8f0", strokeWidth: 1.5, strokeDasharray: "4 4" },
-        labelStyle: { fill: "#94a3b8", fontSize: 9, fontWeight: 500 }
-      }))
-
-      setNodes(layout.nodes)
-      setEdges([...layout.edges, ...transversalEdges])
-
+      relayout(mindmapData)
       setSelectedNode(mindmapData.racine)
 
     } catch (err) {
@@ -274,13 +314,13 @@ function MindMapContent() {
       setLoading(false)
       setGenerating(false)
     }
-  }, [user, chapterId, setEdges, setNodes, pollTask])
+  }, [user, chapterSlug, pollTask, relayout])
 
   useEffect(() => {
-    if (user && chapterId) {
+    if (user && chapterSlug) {
       void loadChapterAndMindmap()
     }
-  }, [user, chapterId, loadChapterAndMindmap])
+  }, [user, chapterSlug, loadChapterAndMindmap])
 
   const importanceLabels: Record<string, string> = {
     critique: UI_AR.critique,
@@ -326,7 +366,7 @@ function MindMapContent() {
     )
   }
 
-  if (error || !mindmap || !chapter) {
+  if (error || !mindmap || !chapterInfo) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-slate-950 p-6">
         <div className="bg-red-500/10 border border-red-500/30 rounded-2xl p-8 max-w-md text-center space-y-4">
@@ -335,10 +375,10 @@ function MindMapContent() {
           <p className="text-slate-300 text-sm leading-relaxed">{error || UI_AR.impossible_charger_donnees}</p>
           <div className="flex justify-center gap-3">
             <Link
-              href="/dashboard"
+              href="/mindmap"
               className="px-4 py-2 bg-slate-800 text-slate-300 border border-slate-700 rounded-lg hover:bg-slate-700 text-sm transition"
             >
-              {UI_AR.retour_dashboard}
+              العودة إلى الخريطة
             </Link>
             <button
               onClick={loadChapterAndMindmap}
@@ -356,16 +396,16 @@ function MindMapContent() {
     <main className="flex flex-col h-screen bg-slate-950 overflow-hidden text-slate-100">
       <header className="border-b border-slate-900 bg-slate-950/80 backdrop-blur px-6 py-4 flex justify-between items-center z-10">
         <div className="flex items-center gap-4">
-          <Link href="/dashboard" className="text-slate-400 hover:text-white transition">
-            {UI_AR.retour_dashboard}
+          <Link href="/mindmap" className="text-slate-400 hover:text-white transition">
+            ← الخريطة
           </Link>
           <div className="h-4 w-px bg-slate-800" />
           <div>
             <h1 className="text-base sm:text-lg font-bold text-white leading-tight">
-              {trAr(chapter.titre_fr)}
+              {trAr(chapterInfo.ar)}
             </h1>
             <p className="text-xs text-slate-400">
-              {UI_AR.chapitre_label} {chapter.numero} • {UI_AR.svt_terminale}
+              {chapterInfo.fr}
             </p>
           </div>
         </div>
@@ -399,7 +439,6 @@ function MindMapContent() {
 
         <aside className="w-80 border-l border-slate-900 bg-slate-950/90 backdrop-blur-md p-6 overflow-y-auto space-y-6 flex flex-col justify-between h-full z-10 shadow-2xl">
           <div className="space-y-6">
-
             {selectedNode ? (
               <section className="space-y-4">
                 <div className="flex items-start justify-between gap-3">
@@ -436,16 +475,32 @@ function MindMapContent() {
 
                   <div className="bg-slate-900/40 border border-slate-800/40 rounded-lg p-2.5">
                     <span className="text-[10px] text-slate-500 block mb-1">{UI_AR.niveau_maitrise}</span>
-                    <div className="flex items-center gap-2">
-                      <span
-                        className="w-2.5 h-2.5 rounded-full"
-                        style={{ backgroundColor: MAITRISE_COLORS[selectedNode.maitrise_eleve] }}
-                      />
-                      <span className="text-xs font-semibold text-slate-300">
-                        {[UI_AR.non, UI_AR.en_cours, UI_AR.maitrisee][selectedNode.maitrise_eleve]}
-                      </span>
+                    <div className="flex gap-1.5">
+                      {MAITRISE_BUTTONS.map((btn) => (
+                        <button
+                          key={btn.value}
+                          disabled={updatingMaitrise}
+                          onClick={() => handleMaitriseChange(selectedNode.id, btn.value)}
+                          className={`flex-1 py-1.5 px-1 rounded-lg border text-[10px] font-bold transition-all disabled:opacity-40 ${
+                            selectedNode.maitrise_eleve === btn.value
+                              ? `${btn.color} ring-1 ring-current`
+                              : "border-slate-800 bg-slate-900/30 text-slate-500 hover:border-slate-700"
+                          }`}
+                        >
+                          {btn.label}
+                        </button>
+                      ))}
                     </div>
                   </div>
+
+                  {selectedNode.has_children && !selectedNode.expanded && (
+                    <button
+                      onClick={() => handleExpandNode(selectedNode)}
+                      className="w-full py-2 bg-violet-500/10 border border-violet-500/25 rounded-xl text-xs font-bold text-violet-400 hover:bg-violet-500/15 transition"
+                    >
+                      📂 توسيع العقد الفرعية
+                    </button>
+                  )}
                 </div>
 
                 <Link
@@ -499,7 +554,6 @@ function MindMapContent() {
                 </div>
               )}
             </section>
-
           </div>
 
           <div className="pt-4 border-t border-slate-900">
@@ -510,10 +564,8 @@ function MindMapContent() {
               {UI_AR.lancer_session_revision}
             </Link>
           </div>
-
         </aside>
       </div>
-
     </main>
   )
 }

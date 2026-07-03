@@ -1,4 +1,4 @@
-from unittest.mock import AsyncMock, patch
+from unittest.mock import AsyncMock, MagicMock, patch
 
 from httpx import AsyncClient
 
@@ -11,10 +11,12 @@ class TestMindMapMethodologyIntegration:
         )
         assert response.status_code in [401, 503]
 
+    @patch("routes.mindmap.get_openai")
     @patch("services.mindmap_service.generate_mindmap")
     async def test_enrich_mindmap_with_methodology(
-        self, mock_generate: AsyncMock, client: AsyncClient, auth_headers: dict
+        self, mock_generate: AsyncMock, mock_openai: MagicMock, client: AsyncClient, auth_headers: dict
     ):
+        mock_openai.return_value = MagicMock()
         mock_generate.return_value = {
             "status": "success",
             "mindmap": {

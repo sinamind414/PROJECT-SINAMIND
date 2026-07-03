@@ -1041,6 +1041,39 @@ async def update_node_maitrise(node_id: str, maitrise: int, user_id: str, db: As
     )
 
     await db.commit()
+
+    # Synchroniser la maîtrise dans le JSON data de la table mindmaps
+    mindmap_id_result = await db.execute(
+        text("SELECT mindmap_id FROM mindmap_nodes WHERE id = :node_id AND user_id = :user_id"),
+        {"node_id": node_id, "user_id": u_id},
+    )
+    mm_row = mindmap_id_result.fetchone()
+    if mm_row:
+        mindmap_id = mm_row[0]
+        mm_data_result = await db.execute(
+            text("SELECT data FROM mindmaps WHERE id = :mindmap_id AND user_id = :user_id"),
+            {"mindmap_id": mindmap_id, "user_id": u_id},
+        )
+        mm_data_row = mm_data_result.fetchone()
+        if mm_data_row and mm_data_row[0]:
+            try:
+                mindmap_json = json.loads(mm_data_row[0]) if isinstance(mm_data_row[0], str) else mm_data_row[0]
+
+                def _update_maitrise_in_tree(node: dict) -> bool:
+                    if node.get("id") == node_id:
+                        node["maitrise_eleve"] = maitrise
+                        return True
+                    return any(_update_maitrise_in_tree(child) for child in node.get("enfants", []))
+
+                if _update_maitrise_in_tree(mindmap_json.get("racine", {})):
+                    await db.execute(
+                        text("UPDATE mindmaps SET data = CAST(:data AS jsonb) WHERE id = :mindmap_id"),
+                        {"data": json.dumps(mindmap_json, ensure_ascii=False), "mindmap_id": mindmap_id},
+                    )
+                    await db.commit()
+            except Exception as e:
+                logger.warning(f"Échec sync JSON maitrise pour node {node_id}: {e}")
+
     return {"id": row[0], "maitrise_eleve": row[1]}
 
 

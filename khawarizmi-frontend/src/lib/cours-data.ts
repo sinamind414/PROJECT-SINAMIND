@@ -128,6 +128,25 @@ export function getChapterBySlug(
   return methodologyChapterLinks.find((ch) => ch.slug === slug)
 }
 
+export function getChapterSlugByTitle(titreFr: string): string | undefined {
+  const normalized = titreFr
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+  const match = methodologyChapterLinks.find((ch) => {
+    const chSlug = ch.chapterFr
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+    return chSlug === normalized
+  })
+  return match?.slug
+}
+
 export function getLessonForChapter(
   chapterSlug: string,
 ): ActiveLesson | undefined {

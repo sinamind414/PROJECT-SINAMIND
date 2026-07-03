@@ -140,7 +140,7 @@ class TestBuildStrategicChapter:
         assert result["source"] == "orientation"
         assert result["chapterSlug"] == "immunologie"
         assert result["lessonHref"] == "/cours/immunologie"
-        assert result["mindmapHref"] == "/mindmap?chapter=immunologie"
+        assert result["mindmapHref"] == "/mindmap/chapter/immunologie"
 
     def test_uses_due_fsrs_concept_when_no_orientation(self):
         orientation = {"recommendations": []}
@@ -156,7 +156,7 @@ class TestBuildStrategicChapter:
         assert result["source"] == "fsrs"
         assert result["chapterSlug"] == "respiration_cellulaire"
         assert result["lessonHref"] == "/cours/respiration_cellulaire"
-        assert result["mindmapHref"] == "/mindmap?chapter=respiration_cellulaire"
+        assert result["mindmapHref"] == "/mindmap/chapter/respiration_cellulaire"
 
     def test_returns_safe_fallback_when_no_signal_exists(self):
         orientation = {"recommendations": []}
