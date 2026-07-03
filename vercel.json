@@ -1,9 +1,3 @@
 {
-  "experimentalServices": {
-    "khawarizmi-backend": {
-      "root": "khawarizmi-backend",
-      "entrypoint": "main:app",
-      "routePrefix": "/"
-    }
-  }
+  "rootDirectory": "khawarizmi-frontend"
 }
