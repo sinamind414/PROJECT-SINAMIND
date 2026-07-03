@@ -1,4 +1,5 @@
 FROM python:3.12-slim
+ARG CACHEBUST=20260703
 
 WORKDIR /app
 
@@ -14,6 +15,7 @@ COPY khawarizmi-backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY khawarizmi-backend/ .
+RUN echo "CACHEBUST=${CACHEBUST}" && ls -la /app/data/ && ls -la /app/data/official/ && echo "✅ Data files verified"
 
 EXPOSE 8000
 
