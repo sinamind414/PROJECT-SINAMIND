@@ -619,22 +619,32 @@ Variables à configurer dans Railway Dashboard (PROJECT-SINAMIND → Variables) 
 ##############################################################
 # SECTION 14 — ANCRAGE DE SESSION
 ##############################################################
-# DERNIÈRE SESSION : 2026-07-03 — Correction TS methodology-v2.ts
+# DERNIÈRE SESSION : 2026-07-04 — Gamification Sprint 1
 #
-# État : 0 erreurs TypeScript (clean)
-# Contexte : 38 erreurs → 0 après :
-#   • corrigé feedbackTemplateAr Omit dans 3 enums
-#   • fixé 19 implicit any[] (forced explicit EnrichedVerbStep[])
-#   • supprimé relatedLessons invalide de 6 verbes
-#   • fusionné enrichedGoodExample_اذكر/_عدد → CITE
-#   • fusionné enrichedGoodExample_اذكر/_تعرّف_علل → DETERMINE
-#   • tsc --noEmit confirmé 0 erreurs
+# État : Build clean, 549/549 tests pass, Vercel deployé
+# Commit : e296d1d
+# URL : https://khawarizmi-ia-two.vercel.app
 #
-# Suspendu : getFullRemediation() → return type string[] conservé
-#   (discussion ouverte : string[] vs RemediationResult)
+# Sprint 1 livré (6/6 tâches) :
+#   ✅ Quick Win 1: 40 citations motivantes en darija
+#   ✅ Quick Win 2: HardestVerbPoll (mini-sondage footer)
+#   ✅ Quick Win 3: StreakBanner (localStorage + backend sync)
+#   ✅ Tâche 1: Streak backend (migration 027, service, routes)
+#   ✅ Tâche 3: 12 Badges backend + frontend (achievements page)
+#   ⏳ Tâche 2: Boss Final (en attente — 2-3j de travail)
 #
-# Prochaine piste (DeepSeek) : 4 prompts prêts (DEEPSEEK-PROMPT-*.txt)
-#   → intégration continue des verbes dans le frontend
+# Fichiers ajoutés Sprint 1 :
+#   Frontend (8) : achievements/page, StreakBanner,
+#     HardestVerbPoll, MotivationalQuote, useLocalStreak,
+#     motivational-quotes.ts
+#   Backend (6) : streaks router, badges router,
+#     streak_service, badge_service, models/streak, models/badge
+#   Migration : 027_gamification_sprint1.py
+#
+# Prochaine étape : Boss Final (Sprint 1 restant)
+#   → seed_boss_questions.py (24+12 questions Bac)
+#   → boss_service.py + routes/boss.py
+#   → app/action-verbs/boss/page.tsx
 ##############################################################
 
 # FIN — AGENTS.md v2.1.1 — IA KHAWARIZMI PRO

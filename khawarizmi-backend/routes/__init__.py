@@ -19,10 +19,13 @@ from . import (
     diagnostic,
     document_analysis_v2,
     dual_coding,
+    duels,
     exercices,
     flashcards,
     gamification,
+    gems,
     health,
+    leaderboard,
     lexique,
     methodology,
     methodology_flashcards,
@@ -103,6 +106,10 @@ ALL_ROUTERS = [
     # ── Gamification Sprint 1 ──
     streaks.router,
     badges.router,
+    # ── Gamification Sprint 2 ──
+    gems.router,
+    duels.router,
+    leaderboard.router,
     # ── Manhadjiya (LOT8 — Base de connaissance scientifique) ──
     manhadjiya.router,
 ]
