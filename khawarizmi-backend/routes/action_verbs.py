@@ -6,7 +6,7 @@ du BAC algérien via pratique guidée + répétition espacée FSRS.
 
 import json
 import logging
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 
 from fastapi import APIRouter, Depends, HTTPException
 from fsrs import Card
@@ -242,7 +242,7 @@ async def reviser_verbe(
     new_card = scheduler.review_card(card, fsrs_rating)
 
     now = datetime.now(UTC)
-    next_review = now + __import__("datetime").timedelta(days=new_card.scheduled_days)
+    next_review = now + timedelta(days=new_card.scheduled_days)
 
     fsrs_json = json.dumps(
         {

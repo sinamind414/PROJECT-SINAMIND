@@ -5,7 +5,12 @@ import Link from "next/link"
 import { notFound, useParams } from "next/navigation"
 import { AuthGuard } from "@/components/auth/AuthGuard"
 import { AppShell } from "@/components/layout/AppShell"
-import { getActionVerb, getCategoryLabel, getPriorityLabel } from "@/lib/methodology-v1"
+import { getCategoryLabel, getPriorityLabel } from "@/lib/methodology-v1"
+import {
+  getEnrichedActionVerb,
+  type EnrichedActionVerbRule,
+  enrichedToLegacy,
+} from "@/lib/methodology-v2"
 import { saveMethodologyEvaluation } from "@/lib/progress-store"
 import apiClient from "@/lib/api-client"
 import type { VerbEvaluateResponse, ActionVerbExercise } from "@/lib/types"
@@ -13,10 +18,17 @@ import type { VerbEvaluateResponse, ActionVerbExercise } from "@/lib/types"
 export default function ActionVerbDetailPage() {
   const params = useParams()
   const slug = params.slug as string
-  const verb = getActionVerb(slug)
-  if (!verb) notFound()
 
-  const totalPoints = verb.scoringRules.reduce((sum, rule) => sum + rule.points, 0)
+  // Charger la version enrichie (24 verbes avec 12 champs canoniques) ou
+  // retomber sur la version legacy si le verbe n'existe pas dans l'enrichi.
+  const enriched = getEnrichedActionVerb(slug)
+  if (!enriched) notFound()
+
+  // Compatibilité : transformer en legacy ActionVerbRule pour les usages
+  // qui n'ont pas encore migré (getCategoryLabel, getPriorityLabel,
+  // saveMethodologyEvaluation, etc.).
+  const verb = enrichedToLegacy(enriched)
+  const totalPoints = enriched.enrichedScoringRules.reduce((sum, r) => sum + r.points, 0)
 
   const [exercises, setExercises] = useState<ActionVerbExercise[]>([])
   const [answer, setAnswer] = useState("")
@@ -100,8 +112,11 @@ export default function ActionVerbDetailPage() {
       <AppShell>
         <main className="flex-1 p-6 lg:p-8 overflow-auto">
           <div className="max-w-6xl mx-auto space-y-6">
-            <Link href="/action-verbs" className="text-mint text-sm hover:underline">← العودة إلى الأفعال الأدائية</Link>
+            <Link href="/action-verbs" className="text-mint text-sm hover:underline">
+              ← العودة إلى الأفعال الأدائية
+            </Link>
 
+            {/* ─── Header ─── */}
             <header className="rounded-3xl p-7 glass border border-mint/10">
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div>
@@ -121,83 +136,184 @@ export default function ActionVerbDetailPage() {
                   <p className="text-gray-500 text-xs">المستوى الحالي</p>
                 </div>
               </div>
-              <p className="text-gray-300 leading-relaxed mt-5">{verb.definitionAr}</p>
-              <div className="mt-5 rounded-2xl p-4 bg-mint/10 border border-mint/20">
-                <p className="text-mint text-sm font-bold mb-1">هدف هذا الفعل</p>
-                <p className="text-gray-200 text-sm leading-relaxed">{verb.objectiveAr}</p>
+
+              {/* ─── تعريف كامل (enrichi) ─── */}
+              <div className="mt-5 space-y-3">
+                <p className="text-gray-300 leading-relaxed">
+                  <span className="text-mint font-bold">التعريف الكامل : </span>
+                  {enriched.enrichedDefinition.full}
+                </p>
+                <p className="rounded-2xl p-3 bg-amber-500/10 border border-amber-500/20 text-sm text-amber-100 leading-relaxed">
+                  <span className="font-bold">التمييز الحاسم : </span>
+                  {enriched.enrichedDefinition.keyDistinction}
+                </p>
               </div>
+
+              {/* ─── هدف هذا الفعل ─── */}
+              <div className="mt-4 rounded-2xl p-4 bg-mint/10 border border-mint/20">
+                <p className="text-mint text-sm font-bold mb-2">هدف هذا الفعل</p>
+                <p className="text-gray-200 text-sm leading-relaxed">{enriched.enrichedObjectives[0]}</p>
+              </div>
+
+              {/* ─── قراءة_hint (enrichi) ─── */}
+              <p className="mt-3 text-xs text-gray-500 italic">
+                <span className="font-bold">كيف تتعرف عليه في التعليمة : </span>
+                {enriched.readingHint}
+              </p>
             </header>
+
+            {/* ─── صريح / ضمني + مرادفات (enrichi) ─── */}
+            {enriched.enrichedVerbForms && (
+              <div className="rounded-3xl p-6 glass border border-mint/10">
+                <h2 className="text-2xl font-bold text-white mb-4">الفعل الصريح والضمني</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="rounded-2xl p-4 bg-mint/10 border border-mint/20">
+                    <p className="text-mint text-sm font-bold mb-2">📌 صريح</p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {enriched.enrichedVerbForms.explicit.map((m) => (
+                        <span key={m} className="px-2 py-1 rounded-full bg-mint/10 text-mint text-xs">
+                          {m}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="rounded-2xl p-4 bg-purple-500/10 border border-purple-500/20">
+                    <p className="text-purple-300 text-sm font-bold mb-2">🔄 ضمني</p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {enriched.enrichedVerbForms.implicit.map((m) => (
+                        <span key={m} className="px-2 py-1 rounded-full bg-purple-500/10 text-purple-200 text-xs">
+                          {m}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+                {enriched.enrichedVerbForms.warningFromBook && (
+                  <p className="mt-3 text-xs text-amber-200 bg-amber-500/10 rounded-xl p-3 border border-amber-500/20">
+                    <span className="font-bold">📖 من الكتاب : </span>
+                    {enriched.enrichedVerbForms.warningFromBook}
+                  </p>
+                )}
+              </div>
+            )}
 
             <div className="grid grid-cols-1 xl:grid-cols-[1fr_380px] gap-6">
               <section className="space-y-6">
+                {/* ─── الخطوات المنهجية (enrichi) ─── */}
                 <div className="rounded-3xl p-6 glass border border-mint/10">
                   <h2 className="text-2xl font-bold text-white mb-5">الخطوات المنهجية</h2>
                   <div className="space-y-3">
-                    {verb.steps.map((step, index) => (
-                      <div key={step.titleAr} className="rounded-2xl p-4 bg-white/[0.03] border border-white/[0.05] flex gap-4">
-                        <div className="w-9 h-9 rounded-xl bg-mint/20 text-mint flex items-center justify-center font-bold flex-shrink-0">{index + 1}</div>
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <h3 className="text-white font-bold">{step.titleAr}</h3>
-                            {step.required && <span className="text-[10px] px-2 py-0.5 rounded-full bg-red-500/10 text-red-300">إجباري</span>}
+                    {enriched.enrichedSteps.map((step) => (
+                      <div
+                        key={step.title}
+                        className="rounded-2xl p-4 bg-white/[0.03] border border-white/[0.05]"
+                      >
+                        <div className="flex items-start gap-4">
+                          <div className="w-9 h-9 rounded-xl bg-mint/20 text-mint flex items-center justify-center font-bold flex-shrink-0">
+                            {step.number}
                           </div>
-                          <p className="text-gray-400 text-sm mt-1 leading-relaxed">{step.descriptionAr}</p>
+                          <div className="flex-1">
+                            <h3 className="text-white font-bold">{step.title}</h3>
+                            <p className="text-gray-400 text-sm mt-1 leading-relaxed">
+                              {step.template}
+                            </p>
+                            {step.warning && (
+                              <p className="mt-2 text-xs text-amber-200 bg-amber-500/5 rounded-lg p-2 border-r-2 border-amber-500">
+                                <span className="font-bold">⚠️ تنبيه : </span>
+                                {step.warning}
+                              </p>
+                            )}
+                          </div>
                         </div>
                       </div>
                     ))}
                   </div>
                 </div>
 
-                <div className="rounded-3xl p-6 glass border border-mint/10 space-y-5">
-                  <div>
-                    <h2 className="text-xl font-bold text-white mb-2">الصيغة العملية</h2>
-                    <p className="rounded-2xl p-4 bg-white/[0.04] text-mint text-sm leading-relaxed">{verb.formula}</p>
-                  </div>
+                {/* ─── الصيغة العملية ─── */}
+                <div className="rounded-3xl p-6 glass border border-mint/10">
+                  <h2 className="text-xl font-bold text-white mb-2">الصيغة العملية</h2>
+                  <p className="rounded-2xl p-4 bg-white/[0.04] text-mint text-sm leading-relaxed font-mono" dir="rtl">
+                    {enriched.enrichedFormula}
+                  </p>
+                </div>
 
+                {/* ─── مؤشرات مطلوبة / ممنوعة (enrichi) ─── */}
+                <div className="rounded-3xl p-6 glass border border-mint/10 space-y-5">
+                  <h2 className="text-2xl font-bold text-white">المؤشرات</h2>
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                     <div className="rounded-2xl p-4 bg-emerald-500/10 border border-emerald-500/20">
-                      <p className="text-emerald-300 font-bold mb-3">مؤشرات مطلوبة</p>
-                      {verb.requiredMarkers.length ? (
+                      <p className="text-emerald-300 font-bold mb-3">✓ مؤشرات مطلوبة</p>
+                      {enriched.enrichedRequiredMarkers.length ? (
                         <div className="flex flex-wrap gap-2">
-                          {verb.requiredMarkers.map((marker) => (
-                            <span key={marker} className="px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-100 text-xs">{marker}</span>
+                          {enriched.enrichedRequiredMarkers.map((marker) => (
+                            <span key={marker} className="px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-100 text-xs">
+                              {marker}
+                            </span>
                           ))}
                         </div>
-                      ) : <p className="text-gray-400 text-sm">لا توجد مؤشرات لفظية إجبارية.</p>}
+                      ) : (
+                        <p className="text-gray-400 text-sm">لا توجد مؤشرات لفظية إجبارية.</p>
+                      )}
                     </div>
                     <div className="rounded-2xl p-4 bg-red-500/10 border border-red-500/20">
-                      <p className="text-red-300 font-bold mb-3">مؤشرات خطرة أو ممنوعة</p>
-                      {verb.forbiddenMarkers.length ? (
+                      <p className="text-red-300 font-bold mb-3">✗ مؤشرات خطرة أو ممنوعة</p>
+                      {enriched.enrichedForbiddenMarkers.length ? (
                         <div className="flex flex-wrap gap-2">
-                          {verb.forbiddenMarkers.map((marker) => (
-                            <span key={marker} className="px-3 py-1 rounded-full bg-red-500/10 text-red-100 text-xs">{marker}</span>
+                          {enriched.enrichedForbiddenMarkers.map((marker) => (
+                            <span key={marker} className="px-3 py-1 rounded-full bg-red-500/10 text-red-100 text-xs">
+                              {marker}
+                            </span>
                           ))}
                         </div>
-                      ) : <p className="text-gray-400 text-sm">لا توجد مؤشرات ممنوعة محددة.</p>}
+                      ) : (
+                        <p className="text-gray-400 text-sm">لا توجد مؤشرات ممنوعة محددة.</p>
+                      )}
                     </div>
                   </div>
                 </div>
 
-                {(verb.badExample || verb.goodExample) && (
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                    {verb.badExample && (
-                      <div className="rounded-3xl p-5 bg-red-500/10 border border-red-500/20">
-                        <p className="text-red-300 font-bold mb-2">مثال خاطئ</p>
-                        <p className="text-gray-100 text-sm leading-relaxed mb-3">{verb.badExample.answerAr}</p>
-                        <p className="text-red-200 text-xs leading-relaxed">الخلل: {verb.badExample.explanationAr}</p>
-                      </div>
-                    )}
-                    {verb.goodExample && (
-                      <div className="rounded-3xl p-5 bg-emerald-500/10 border border-emerald-500/20">
-                        <p className="text-emerald-300 font-bold mb-2">مثال صحيح</p>
-                        <p className="text-gray-100 text-sm leading-relaxed mb-3">{verb.goodExample.answerAr}</p>
-                        <p className="text-emerald-200 text-xs leading-relaxed">لماذا صحيح؟ {verb.goodExample.explanationAr}</p>
-                      </div>
-                    )}
+                {/* ─── مثال صحيح (enrichi : why_correct) ─── */}
+                {enriched.enrichedGoodExample && (
+                  <div className="rounded-3xl p-6 bg-emerald-500/10 border border-emerald-500/20">
+                    <p className="text-emerald-300 font-bold mb-2 text-lg">✓ مثال صحيح (تطبيقي كامل)</p>
+                    <div className="rounded-xl bg-black/20 p-4 mb-3">
+                      <p className="text-gray-100 text-sm leading-relaxed whitespace-pre-line" dir="rtl">
+                        {enriched.enrichedGoodExample.answer}
+                      </p>
+                    </div>
+                    <p className="text-emerald-200 text-xs leading-relaxed bg-emerald-500/5 rounded-lg p-3">
+                      <span className="font-bold">لماذا صحيح ؟ </span>
+                      {enriched.enrichedGoodExample.whyCorrect}
+                    </p>
                   </div>
                 )}
 
-                {/* Section pratique — évaluation backend */}
+                {/* ─── مثال خاطئ (enrichi : errors + how_to_fix) ─── */}
+                {enriched.enrichedBadExample && (
+                  <div className="rounded-3xl p-6 bg-red-500/10 border border-red-500/20">
+                    <p className="text-red-300 font-bold mb-2 text-lg">✗ مثال خاطئ</p>
+                    <div className="rounded-xl bg-black/20 p-4 mb-3">
+                      <p className="text-gray-100 text-sm leading-relaxed" dir="rtl">
+                        {enriched.enrichedBadExample.answer}
+                      </p>
+                    </div>
+                    <div className="space-y-2">
+                      <p className="text-red-200 text-xs font-bold">الخلل :</p>
+                      <ul className="text-red-200 text-xs space-y-1 mr-4">
+                        {enriched.enrichedBadExample.errors.map((e, i) => (
+                          <li key={i}>• {e}</li>
+                        ))}
+                      </ul>
+                      <p className="text-emerald-200 text-xs mt-3 bg-emerald-500/5 rounded-lg p-3 border-r-2 border-emerald-500">
+                        <span className="font-bold">💡 كيف نُصلحه : </span>
+                        {enriched.enrichedBadExample.howToFix}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* ─── Section pratique — évaluation backend ─── */}
                 <div className="rounded-3xl p-6 glass border border-mint/10">
                   <h2 className="text-2xl font-bold text-white mb-4">تدرب على هذا الفعل</h2>
                   {exercises.length > 0 && (
@@ -275,7 +391,6 @@ export default function ActionVerbDetailPage() {
                         </div>
                       )}
 
-                      {/* FSRS — marquer la révision */}
                       <div className="flex items-center gap-2 pt-2">
                         <p className="text-gray-400 text-xs">قيّم صعوبة هذا الفعل:</p>
                         <button onClick={() => markReviewed(1)} className="px-3 py-1.5 rounded-lg bg-red-500/10 text-red-300 text-xs font-bold hover:bg-red-500/20">صعب جدا</button>
@@ -288,37 +403,78 @@ export default function ActionVerbDetailPage() {
                 </div>
               </section>
 
+              {/* ─── Aside ─── */}
               <aside className="space-y-5">
+                {/* ─── الأخطاء المتكررة (enrichi : متى + كيف نتجنبه) ─── */}
                 <div className="rounded-3xl p-5 glass border border-mint/10">
                   <h2 className="text-white font-bold mb-4">الأخطاء المتكررة</h2>
-                  <div className="space-y-2">
-                    {verb.commonErrors.map((error) => (
-                      <p key={error} className="text-gray-300 text-sm">✗ {error}</p>
+                  <div className="space-y-3">
+                    {enriched.enrichedCommonErrors.map((err) => (
+                      <div key={err.error} className="rounded-xl bg-red-500/5 p-3 border-r-2 border-red-500/30">
+                        <p className="text-red-200 text-sm font-bold">✗ {err.error}</p>
+                        <p className="text-gray-500 text-xs mt-1">
+                          <span className="font-bold">متى : </span>{err.when}
+                        </p>
+                        <p className="text-emerald-300 text-xs mt-1">
+                          <span className="font-bold">كيف نتجنبه : </span>{err.howToAvoid}
+                        </p>
+                      </div>
                     ))}
                   </div>
                 </div>
 
-                {verb.scoringRules.length > 0 && (
+                {/* ─── شبكة التقييم (enrichi : checkType) ─── */}
+                {enriched.enrichedScoringRules.length > 0 && (
                   <div className="rounded-3xl p-5 glass border border-mint/10">
                     <div className="flex items-center justify-between mb-4">
                       <h2 className="text-white font-bold">شبكة تقييم أولية</h2>
                       <span className="text-mint text-sm font-bold">{totalPoints} ن</span>
                     </div>
                     <div className="space-y-2">
-                      {verb.scoringRules.map((rule) => (
-                        <div key={rule.code} className="flex items-center justify-between gap-3 rounded-xl bg-white/[0.03] p-3">
-                          <span className="text-gray-300 text-sm">{rule.labelAr}</span>
-                          <span className="text-white font-bold text-sm">{rule.points}</span>
+                      {enriched.enrichedScoringRules.map((rule) => (
+                        <div key={rule.code} className="rounded-xl bg-white/[0.03] p-3">
+                          <div className="flex items-center justify-between gap-3">
+                            <span className="text-gray-300 text-sm">{rule.labelAr}</span>
+                            <span className="text-white font-bold text-sm">{rule.points}</span>
+                          </div>
+                          <p className="text-xs text-gray-500 mt-1">
+                            <span className="font-bold">نوع الفحص : </span>
+                            <span className="text-purple-300">
+                              {rule.checkType === "keyword" && "كلمة مفتاحية"}
+                              {rule.checkType === "manual" && "يدوي"}
+                              {rule.checkType === "forbidden_absence" && "غياب كلمة ممنوعة"}
+                              {rule.checkType === "structure" && "بنية"}
+                            </span>
+                          </p>
                         </div>
                       ))}
                     </div>
                   </div>
                 )}
 
-                <div className="rounded-3xl p-5 bg-mint/10 border border-mint/20">
-                  <h2 className="text-mint font-bold mb-2">ملاحظات تلقائية</h2>
-                  <p className="text-gray-200 text-sm leading-relaxed">{verb.feedbackTemplateAr}</p>
-                </div>
+                {/* ─── المرجع في الكتاب (enrichi) ─── */}
+                {enriched.enrichedBookReference && (
+                  <div className="rounded-3xl p-5 bg-slate-800/40 border border-slate-700/30">
+                    <h2 className="text-slate-300 font-bold mb-2 text-sm">📖 المرجع في الكتاب</h2>
+                    <p className="text-gray-400 text-xs leading-relaxed">
+                      <span className="font-bold">المصدر : </span>
+                      {enriched.enrichedBookReference.source}
+                    </p>
+                    <p className="text-gray-400 text-xs leading-relaxed mt-1">
+                      <span className="font-bold">الصفحات : </span>
+                      {enriched.enrichedBookReference.pages}
+                    </p>
+                    {enriched.enrichedBookReference.keyPages && (
+                      <div className="text-gray-500 text-xs mt-2 space-y-1">
+                        {Object.entries(enriched.enrichedBookReference.keyPages).map(([k, v]) => (
+                          <p key={k}>
+                            <span className="font-bold">{k} : </span>ص {v}
+                          </p>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 <Link href="/document-analysis" className="block text-center px-5 py-3 rounded-xl bg-mint text-slate-deep font-bold hover:bg-mint-soft transition">
                   ابدأ تدريبا موجها

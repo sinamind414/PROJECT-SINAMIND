@@ -2,6 +2,7 @@
 # Registry centralisé de tous les routers API
 
 from . import (
+    action_verbs,
     admin_analytics,
     ai_chat,
     ai_evaluate,
@@ -95,6 +96,8 @@ ALL_ROUTERS = [
     # ── Document Analysis (v2 uniquement — v1 désactivée) ──
     # document_analysis.router,  # DÉSACTIVÉ : v1 utilisait evaluate_answer (regex) qui notait 75% le charabia
     document_analysis_v2.router,
+    # ── Action Verbs ──
+    action_verbs.router,
     # ── Manhadjiya (LOT8 — Base de connaissance scientifique) ──
     manhadjiya.router,
 ]

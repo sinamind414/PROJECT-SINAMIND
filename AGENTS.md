@@ -616,6 +616,27 @@ Variables à configurer dans Railway Dashboard (PROJECT-SINAMIND → Variables) 
 - SENTRY_DSN    = <Sentry DSN> (optionnel)
 
 ##############################################################
+##############################################################
+# SECTION 14 — ANCRAGE DE SESSION
+##############################################################
+# DERNIÈRE SESSION : 2026-07-03 — Correction TS methodology-v2.ts
+#
+# État : 0 erreurs TypeScript (clean)
+# Contexte : 38 erreurs → 0 après :
+#   • corrigé feedbackTemplateAr Omit dans 3 enums
+#   • fixé 19 implicit any[] (forced explicit EnrichedVerbStep[])
+#   • supprimé relatedLessons invalide de 6 verbes
+#   • fusionné enrichedGoodExample_اذكر/_عدد → CITE
+#   • fusionné enrichedGoodExample_اذكر/_تعرّف_علل → DETERMINE
+#   • tsc --noEmit confirmé 0 erreurs
+#
+# Suspendu : getFullRemediation() → return type string[] conservé
+#   (discussion ouverte : string[] vs RemediationResult)
+#
+# Prochaine piste (DeepSeek) : 4 prompts prêts (DEEPSEEK-PROMPT-*.txt)
+#   → intégration continue des verbes dans le frontend
+##############################################################
+
 # FIN — AGENTS.md v2.1.1 — IA KHAWARIZMI PRO
 # Ce fichier est la source de vérité du projet.
 # Toute décision de développement s'y réfère.
