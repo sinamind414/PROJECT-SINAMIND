@@ -1,10 +1,10 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { useState, useRef } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { 
-  ArrowRight, ArrowLeft, Play, Check, X, AlertTriangle, 
-  Target, BookOpen, Lightbulb 
+  ArrowRight, ArrowLeft, Play, Pause, Check, X, AlertTriangle, 
+  Target, BookOpen, Lightbulb, Volume2, Mic, MicOff 
 } from "lucide-react"
 import type { EnrichedActionVerbRule } from "@/lib/methodology-v2"
 
@@ -26,6 +26,7 @@ interface VerbLessonFlowProps {
   loading: boolean
   answer: string
   setAnswer: (v: string) => void
+  audioUrl?: string
 }
 
 function buildLesson(verb: EnrichedActionVerbRule) {
@@ -59,7 +60,7 @@ function buildLesson(verb: EnrichedActionVerbRule) {
 
   if (donts.length === 0) {
     donts = [
-      { text: "استخدام كلمات ممنوعة", fix: "تجنب كلمات التفسير dans les étapes d'analyse." },
+      { text: "استخدام كلمات ممنوعة", fix: "تجنب كلمات التفسير في خطوات التحليل." },
       { text: "استرجاع الدرس بدل السند", fix: "اربط كل جملة بمعطى في الوثيقة." }
     ]
   }
@@ -70,8 +71,21 @@ function buildLesson(verb: EnrichedActionVerbRule) {
   return { ar, fr, definition, recognition, method, dos, donts, practiceQuestion }
 }
 
-export function VerbLessonFlow({ enriched, onSubmitAnswer, evaluation, loading, answer, setAnswer }: VerbLessonFlowProps) {
+export function VerbLessonFlow({ 
+  enriched, 
+  onSubmitAnswer, 
+  evaluation, 
+  loading, 
+  answer, 
+  setAnswer,
+  audioUrl 
+}: VerbLessonFlowProps) {
   const lesson = buildLesson(enriched)
+  const audioRef = useRef<HTMLAudioElement>(null)
+  const [isPlaying, setIsPlaying] = useState(false)
+
+  const [isListening, setIsListening] = useState(false)
+  const recognitionRef = useRef<any>(null)
 
   const [currentStep, setCurrentStep] = useState<Step>("word")
   const [recognitionAnswer, setRecognitionAnswer] = useState<"yes" | "no" | null>(null)
@@ -80,6 +94,25 @@ export function VerbLessonFlow({ enriched, onSubmitAnswer, evaluation, loading, 
   const totalConceptualSteps = 6
   const currentIndex = ["word", "definition", "recognition", "method", "dos_donts", "practice"].indexOf(currentStep)
   const progress = Math.round(((currentIndex + 1) / totalConceptualSteps) * 100)
+
+  const hasAudio = !!audioUrl
+
+  const toggleAudio = async () => {
+    if (!audioRef.current || !hasAudio) return
+    try {
+      if (isPlaying) {
+        audioRef.current.pause()
+        setIsPlaying(false)
+      } else {
+        await audioRef.current.play()
+        setIsPlaying(true)
+      }
+    } catch (e) {
+      console.warn("Audio play failed", e)
+    }
+  }
+
+  const handleAudioEnded = () => setIsPlaying(false)
 
   function goToStep(step: Step) { setCurrentStep(step) }
 
@@ -98,9 +131,11 @@ export function VerbLessonFlow({ enriched, onSubmitAnswer, evaluation, loading, 
   function handleRecognition(choice: "yes" | "no") {
     const isCorrect = choice === lesson.recognition.correctAnswer
     setRecognitionAnswer(choice)
-    setRecognitionFeedback(isCorrect 
-      ? `✅ صحيح! هذا يناسب الفعل "${enriched.ar}".` 
-      : `❌ غير صحيح. هذا مثال sur une erreur courante avec ce verbe.`)
+    setRecognitionFeedback(
+      isCorrect 
+        ? `✅ صحيح! هذا يناسب الفعل "${enriched.ar}".` 
+        : `❌ غير صحيح. هذا مثال على خطأ شائع مع هذا الفعل.`
+    )
     if (isCorrect) setTimeout(next, 1100)
   }
 
@@ -109,14 +144,176 @@ export function VerbLessonFlow({ enriched, onSubmitAnswer, evaluation, loading, 
     await onSubmitAnswer(answer)
   }
 
+  function computeLiveSegments(text: string) {
+    if (!text.trim()) return [{ type: "plain" as const, text: "" }]
+
+    const required = (enriched as any).enrichedRequiredMarkers || []
+    const forbidden = (enriched as any).enrichedForbiddenMarkers || []
+
+    const lowerText = text.toLowerCase()
+    const segments: Array<{ type: "plain" | "good" | "bad"; text: string }> = []
+    const matches: Array<{ start: number; end: number; type: "good" | "bad"; word: string }> = []
+
+    required.forEach((marker: string) => {
+      const m = marker.toLowerCase()
+      let searchIdx = 0
+      while ((searchIdx = lowerText.indexOf(m, searchIdx)) !== -1) {
+        matches.push({ start: searchIdx, end: searchIdx + m.length, type: "good", word: marker })
+        searchIdx += m.length
+      }
+    })
+
+    forbidden.forEach((marker: string) => {
+      const m = marker.toLowerCase()
+      let searchIdx = 0
+      while ((searchIdx = lowerText.indexOf(m, searchIdx)) !== -1) {
+        const overlap = matches.some(mt => 
+          (searchIdx >= mt.start && searchIdx < mt.end) || 
+          (searchIdx + m.length > mt.start && searchIdx + m.length <= mt.end)
+        )
+        if (!overlap) {
+          matches.push({ start: searchIdx, end: searchIdx + m.length, type: "bad", word: marker })
+        }
+        searchIdx += m.length
+      }
+    })
+
+    matches.sort((a, b) => a.start - b.start)
+
+    let cursor = 0
+    matches.forEach(match => {
+      if (match.start > cursor) {
+        segments.push({ type: "plain", text: text.slice(cursor, match.start) })
+      }
+      segments.push({ type: match.type, text: text.slice(match.start, match.end) })
+      cursor = match.end
+    })
+
+    if (cursor < text.length) {
+      segments.push({ type: "plain", text: text.slice(cursor) })
+    }
+
+    return segments.length ? segments : [{ type: "plain" as const, text }]
+  }
+
+  const liveSegments = computeLiveSegments(answer)
+
+  const startVoiceInput = () => {
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
+    if (!SpeechRecognition) {
+      alert("Reconnaissance vocale non supportée sur ce navigateur. Essayez Chrome ou Edge.")
+      return
+    }
+
+    if (recognitionRef.current) {
+      try { recognitionRef.current.stop() } catch {}
+    }
+
+    const recognition = new SpeechRecognition()
+    recognition.lang = "ar-DZ"
+    recognition.continuous = true
+    recognition.interimResults = true
+
+    recognition.onresult = (event: any) => {
+      let transcript = ""
+      for (let i = event.resultIndex; i < event.results.length; ++i) {
+        transcript += event.results[i][0].transcript
+      }
+      const newVal = (answer + " " + transcript).trim()
+      setAnswer(newVal)
+    }
+
+    recognition.onerror = (event: any) => {
+      console.warn("Voice recognition error", event)
+      setIsListening(false)
+      if (event.error !== "no-speech") {
+        alert("Erreur de reconnaissance vocale. Réessayez.")
+      }
+    }
+
+    recognition.onend = () => { setIsListening(false) }
+
+    try {
+      recognition.start()
+      recognitionRef.current = recognition
+      setIsListening(true)
+    } catch (e) {
+      console.warn(e)
+      setIsListening(false)
+    }
+  }
+
+  const stopVoiceInput = () => {
+    if (recognitionRef.current) {
+      try { recognitionRef.current.stop() } catch {}
+      recognitionRef.current = null
+    }
+    setIsListening(false)
+  }
+
+  const toggleVoice = () => {
+    if (isListening) stopVoiceInput()
+    else startVoiceInput()
+  }
+
+  const renderVisualFeedback = () => {
+    if (!evaluation) return null
+
+    const successMarkers = evaluation.success || []
+    const errorMarkers = evaluation.errors || []
+    const forbidden = evaluation.forbidden_found || []
+    const missing = evaluation.missing_markers || []
+
+    return (
+      <div className="mt-6 space-y-4">
+        <div className="text-sm font-bold text-white mb-2">📝 Feedback visuel</div>
+        {successMarkers.length > 0 && (
+          <div className="rounded-2xl p-4 bg-emerald-500/10 border border-emerald-500/30">
+            <div className="text-emerald-300 text-xs font-bold mb-2">✓ Éléments validés</div>
+            <div className="flex flex-wrap gap-2">
+              {successMarkers.map((m: string, i: number) => (
+                <span key={i} className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-200 text-xs font-medium">{m}</span>
+              ))}
+            </div>
+          </div>
+        )}
+        {(forbidden.length > 0 || errorMarkers.length > 0) && (
+          <div className="rounded-2xl p-4 bg-red-500/10 border border-red-500/30">
+            <div className="text-red-300 text-xs font-bold mb-2">✗ À corriger</div>
+            <div className="space-y-1 text-sm text-red-200">
+              {forbidden.map((m: string, i: number) => (
+                <div key={i}>• Mot interdit : <span className="font-mono bg-red-900/30 px-1 rounded">{m}</span></div>
+              ))}
+              {errorMarkers.slice(0, 3).map((e: string, i: number) => (
+                <div key={i}>• {e}</div>
+              ))}
+            </div>
+          </div>
+        )}
+        {missing.length > 0 && (
+          <div className="rounded-2xl p-4 bg-amber-500/10 border border-amber-500/30">
+            <div className="text-amber-300 text-xs font-bold mb-2">⚠️ Mots-clés manquants</div>
+            <div className="flex flex-wrap gap-2">
+              {missing.map((m: string, i: number) => (
+                <span key={i} className="px-3 py-1 rounded-full bg-amber-500/20 text-amber-200 text-xs font-medium">{m}</span>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    )
+  }
+
   const stepComponents: Record<Step, React.ReactNode> = {
     word: (
       <div className="flex flex-col items-center justify-center min-h-[420px] text-center space-y-6">
         <div className="text-8xl font-black tracking-tighter text-white mb-2">{lesson.ar}</div>
         <div className="text-3xl text-gray-400 tracking-wide">{lesson.fr}</div>
-        <button onClick={() => {}} className="mt-4 flex items-center gap-2 px-6 py-3 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/20 text-white">
-          <Play className="w-5 h-5" /> استمع إلى النطق (Phase B)
+        <button onClick={toggleAudio} disabled={!hasAudio} className="mt-4 flex items-center gap-3 px-6 py-3 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/20 text-white transition disabled:opacity-40">
+          {isPlaying ? <Pause className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
+          {hasAudio ? (isPlaying ? "Pause" : "Écouter la prononciation") : "Audio non disponible"}
         </button>
+        {hasAudio && <audio ref={audioRef} src={audioUrl} onEnded={handleAudioEnded} />}
         <button onClick={next} className="px-10 py-4 text-xl font-bold rounded-3xl bg-mint text-slate-deep hover:bg-mint-soft transition flex items-center gap-3 shadow-lg mt-8">
           ابدأ الدرس <ArrowRight className="w-6 h-6" />
         </button>
@@ -215,20 +412,50 @@ export function VerbLessonFlow({ enriched, onSubmitAnswer, evaluation, loading, 
           <p className="text-sm text-mint font-medium mb-1">التمرين</p>
           <p className="text-white" dir="rtl">{lesson.practiceQuestion}</p>
         </div>
-        <textarea value={answer} onChange={(e) => setAnswer(e.target.value)} placeholder={`اكتب إجابتك باستخدام الفعل "${lesson.ar}"...`} className="w-full min-h-[160px] rounded-3xl p-6 bg-white/[0.03] border border-white/10 text-white text-base placeholder:text-gray-500 focus:outline-none focus:border-mint/40 resize-y" dir="rtl" />
-        <div className="flex gap-3 mt-4">
-          <button onClick={handlePracticeSubmit} disabled={loading || !answer.trim()} className="flex-1 py-4 rounded-2xl bg-mint font-bold text-lg text-slate-deep disabled:opacity-60">{loading ? "جاري التقييم..." : "قيّم إجابتي الآن"}</button>
-          <button onClick={() => { setAnswer(""); setRecognitionAnswer(null); setRecognitionFeedback(null) }} className="px-6 py-4 rounded-2xl border border-white/20">امسح</button>
+        <textarea
+          value={answer}
+          onChange={(e) => setAnswer(e.target.value)}
+          placeholder={`اكتب إجابتك باستخدام الفعل "${lesson.ar}"...`}
+          className="w-full min-h-[160px] rounded-3xl p-6 bg-white/[0.03] border border-white/10 text-white text-base placeholder:text-gray-500 focus:outline-none focus:border-mint/40 resize-y"
+          dir="rtl"
+        />
+        {answer.trim().length > 3 && (
+          <div className="mt-3 rounded-2xl p-4 bg-white/[0.02] border border-white/10 text-sm leading-relaxed" dir="rtl">
+            <div className="flex items-center gap-2 mb-2 text-[10px] uppercase tracking-widest text-mint/70 font-bold">
+              <Target className="w-3 h-3" /> APERÇU EN TEMPS RÉEL — SUR LIGNAGE
+            </div>
+            <div className="text-base text-white/90 whitespace-pre-wrap">
+              {liveSegments.map((seg, i) => {
+                if (seg.type === "good") return <span key={i} className="bg-emerald-500/30 text-emerald-200 px-0.5 rounded font-medium">{seg.text}</span>
+                if (seg.type === "bad") return <span key={i} className="bg-red-500/30 text-red-300 px-0.5 rounded font-medium line-through decoration-red-400/70">{seg.text}</span>
+                return <span key={i}>{seg.text}</span>
+              })}
+            </div>
+            <div className="mt-2 text-[10px] text-gray-500">Vert = marqueurs requis détectés • Rouge = mots interdits</div>
+          </div>
+        )}
+        <div className="flex gap-3 mt-4 items-center">
+          <button onClick={handlePracticeSubmit} disabled={loading || !answer.trim()} className="flex-1 py-4 rounded-2xl bg-mint font-bold text-lg text-slate-deep disabled:opacity-60">
+            {loading ? "جاري التقييم..." : "قيّم إجابتي الآن"}
+          </button>
+          <button onClick={toggleVoice} disabled={loading} className={`px-4 py-4 rounded-2xl border flex items-center justify-center transition ${isListening ? "bg-red-500/20 border-red-400 text-red-400" : "bg-white/5 border-white/20 hover:bg-white/10 text-white"}`} title={isListening ? "Arrêter l'écoute" : "Dicter avec la voix (arabe/français)"}>
+            {isListening ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+          </button>
+          <button onClick={() => { setAnswer(""); setRecognitionAnswer(null); setRecognitionFeedback(null); if (isListening) stopVoiceInput() }} className="px-6 py-4 rounded-2xl border border-white/20">امسح</button>
         </div>
+        {isListening && (
+          <div className="mt-2 flex items-center gap-2 text-xs text-red-400 font-medium px-1">
+            <span className="inline-block w-2 h-2 bg-red-400 rounded-full animate-pulse" /> Écoute en cours... Parlez clairement (arabe ou français)
+          </div>
+        )}
         {evaluation && (
           <div className="mt-6 p-6 rounded-3xl glass border border-mint/20">
-            <div className="flex justify-between items-baseline mb-3">
+            <div className="flex justify-between items-baseline mb-4">
               <div><span className="text-5xl font-black text-white">{evaluation.percentage}</span><span className="text-2xl text-gray-400">%</span></div>
-              <div className="text-right"><div className="text-emerald-400 font-bold">{evaluation.score}/{evaluation.score_max}</div></div>
+              <div className="text-right text-sm"><div className="text-emerald-400 font-bold">{evaluation.score}/{evaluation.score_max}</div></div>
             </div>
-            {evaluation.success?.length > 0 && <div className="space-y-1 text-emerald-300 text-sm mb-3">{evaluation.success.map((s:string,i:number)=><div key={i}>✓ {s}</div>)}</div>}
-            {evaluation.errors?.length > 0 && <div className="space-y-1 text-red-300 text-sm mb-3">{evaluation.errors.map((e:string,i:number)=><div key={i}>✗ {e}</div>)}</div>}
-            {evaluation.advice && <div className="text-mint text-sm mt-3 bg-mint/10 p-3 rounded-2xl">💡 {evaluation.advice}</div>}
+            {renderVisualFeedback()}
+            {evaluation.advice && <div className="text-mint text-sm mt-4 bg-mint/10 p-3 rounded-2xl">💡 {evaluation.advice}</div>}
             <button onClick={() => { setAnswer(""); }} className="mt-4 w-full py-2.5 text-sm border border-white/20 rounded-xl hover:bg-white/5">حاول مرة أخرى</button>
           </div>
         )}
@@ -244,7 +471,7 @@ export function VerbLessonFlow({ enriched, onSubmitAnswer, evaluation, loading, 
           <div>{currentIndex + 1} / {totalConceptualSteps}</div>
         </div>
         <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
-          <div className="h-full bg-gradient-to-r from-mint to-emerald-400 transition-all" style={{width: `${progress}%`}} />
+          <div className="h-full bg-gradient-to-r from-mint to-emerald-400 transition-all duration-300" style={{ width: `${progress}%` }} />
         </div>
         <div className="flex justify-between text-[10px] mt-1 px-1 text-gray-500">
           {(["word", "definition", "recognition", "method", "dos_donts", "practice"] as Step[]).map((s, i) => (
@@ -255,7 +482,7 @@ export function VerbLessonFlow({ enriched, onSubmitAnswer, evaluation, loading, 
 
       <div className="pt-8 pb-12">
         <AnimatePresence mode="wait">
-          <motion.div key={currentStep} initial={{opacity:0,y:12}} animate={{opacity:1,y:0}} exit={{opacity:0,y:-12}} transition={{duration:0.2}}>
+          <motion.div key={currentStep} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} transition={{ duration: 0.2 }}>
             {stepComponents[currentStep]}
           </motion.div>
         </AnimatePresence>
