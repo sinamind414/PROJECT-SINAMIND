@@ -25,6 +25,8 @@ import {
   Menu,
   Layers3,
   FlaskConical,
+  GitBranch,
+  User,
 } from "lucide-react"
 
 type MenuItem = { href: string; icon: LucideIcon; labelAr: string; labelFr: string }
@@ -76,11 +78,10 @@ export const MENU_PHASES: Phase[] = [
 ]
 
 const MOBILE_PRIMARY_NAV = [
-  { href: "/drill", icon: Repeat, labelAr: "نراجع" },
-  { href: "/exercises", icon: Dumbbell, labelAr: "نتدرب" },
-  { href: "/annales", icon: BookMarked, labelAr: "باك" },
   { href: "/dashboard", icon: LayoutDashboard, labelAr: "الرئيسية" },
-  { href: "/menu", icon: Layers3, labelAr: "المزيد" },
+  { href: "/action-verbs", icon: BookOpen, labelAr: "الأفعال" },
+  { href: "/mindmap", icon: GitBranch, labelAr: "خرائط" },
+  { href: "/lecons-sciences-experimentales", icon: User, labelAr: "حسابي" },
 ]
 
 type SidebarContentProps = { onNavigate?: () => void }
@@ -279,9 +280,9 @@ export function MobileDrawer({ open, onClose }: MobileDrawerProps) {
   )
 }
 
-type MobileBottomNavProps = { onOpenMenu: () => void }
+type MobileBottomNavProps = Record<string, never>
 
-export function MobileBottomNav({ onOpenMenu }: MobileBottomNavProps) {
+export function MobileBottomNav(_props: MobileBottomNavProps = {}) {
   const pathname = usePathname()
 
   return (
@@ -289,26 +290,10 @@ export function MobileBottomNav({ onOpenMenu }: MobileBottomNavProps) {
       className="fixed bottom-0 inset-x-0 z-[60] lg:hidden border-t border-white/10 bg-slate-950/95 backdrop-blur-xl px-2 py-2 pb-[calc(env(safe-area-inset-bottom)+0.5rem)]"
       dir="rtl"
     >
-      <div className="grid grid-cols-5 gap-1 max-w-xl mx-auto">
+      <div className="grid grid-cols-4 gap-1 max-w-xl mx-auto">
         {MOBILE_PRIMARY_NAV.map((item) => {
           const Icon = item.icon
-          const isMenu = item.href === "/menu"
-          const isActive = !isMenu && (pathname === item.href || pathname.startsWith(`${item.href}/`))
-
-          if (isMenu) {
-            return (
-              <button
-                key={item.labelAr}
-                type="button"
-                onClick={onOpenMenu}
-                aria-label="فتح المزيد من الأدوات"
-                className="flex flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2 text-slate-300 hover:text-white hover:bg-white/5 transition"
-              >
-                <Icon className="w-5 h-5" aria-hidden="true" />
-                <span className="text-[10px] font-bold">{item.labelAr}</span>
-              </button>
-            )
-          }
+          const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`)
 
           return (
             <Link

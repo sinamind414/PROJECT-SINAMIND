@@ -38,9 +38,6 @@ export default function DashboardPage() {
     navigator.vibrate?.([45, 25, 45])
   }
 
-  const updateWeek = (_id: number, _completed: boolean) => {
-  }
-
   return (
     <AuthGuard>
       <AppShell>
@@ -86,7 +83,7 @@ export default function DashboardPage() {
               <EnginePulseCard pulse={pulse} />
             </div>
 
-            <WeeklyPlanCard days={state.weekly} onToggleAction={updateWeek} />
+            <WeeklyPlanCard days={state.weekly} />
 
             <div className="grid gap-4 lg:grid-cols-3">
               <QuickAccessCard />

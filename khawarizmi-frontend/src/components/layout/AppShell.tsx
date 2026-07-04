@@ -4,9 +4,8 @@ import { ReactNode, useState } from "react"
 import {
   DesktopSidebar,
   MobileBottomNav,
-  MobileDrawer,
-  MobileTopBar,
 } from "@/components/layout/Sidebar"
+import { MobileHeader } from "@/components/layout/MobileHeader"
 import { SocialHubWidget } from "@/components/dashboard/social/SocialHubWidget"
 
 type AppShellProps = {
@@ -15,7 +14,6 @@ type AppShellProps = {
 }
 
 export function AppShell({ children, hideMobileNav = false }: AppShellProps) {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [theme, setTheme] = useState<"dark" | "light">("dark")
   const isDark = theme === "dark"
 
@@ -42,16 +40,15 @@ export function AppShell({ children, hideMobileNav = false }: AppShellProps) {
       )}
 
       <DesktopSidebar />
-      <MobileDrawer open={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} />
 
       <div className="flex-1 min-w-0 lg:mr-72">
-        {!hideMobileNav && <MobileTopBar onOpenMenu={() => setMobileMenuOpen(true)} />}
+        {!hideMobileNav && <MobileHeader />}
         <main className={`min-w-0 overflow-x-hidden px-3 py-3 sm:px-4 sm:py-4 md:px-5 md:py-5 ${hideMobileNav ? "pb-4" : "pb-[calc(4rem+env(safe-area-inset-bottom))] sm:pb-[calc(4.5rem+env(safe-area-inset-bottom))] lg:pb-5"}`}>
           {children}
         </main>
       </div>
 
-      {!hideMobileNav && <MobileBottomNav onOpenMenu={() => setMobileMenuOpen(true)} />}
+      {!hideMobileNav && <MobileBottomNav />}
 
       <SocialHubWidget />
     </div>
