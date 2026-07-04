@@ -4,7 +4,6 @@ import React from "react"
 import { useRouter } from "next/navigation"
 
 interface QuickWin {
-  label: string
   labelAr: string
   points: number
   time: string
@@ -12,9 +11,9 @@ interface QuickWin {
 }
 
 const quickWins: QuickWin[] = [
-  { label: "Mindmap rapide", labelAr: "خريطة ذهنية سريعة", points: 3, time: "5 دقائق", route: "/mindmap" },
-  { label: "3 verbes", labelAr: "٣ أفعال", points: 4, time: "4 دقائق", route: "/action-verbs" },
-  { label: "Quiz 5 questions", labelAr: "اختبار ٥ أسئلة", points: 5, time: "6 دقائق", route: "/exercices" },
+  { labelAr: "خريطة ذهنية سريعة", points: 3, time: "5 دقائق", route: "/mindmap" },
+  { labelAr: "٣ أفعال", points: 4, time: "4 دقائق", route: "/action-verbs" },
+  { labelAr: "اختبار ٥ أسئلة", points: 5, time: "6 دقائق", route: "/exercices" },
 ]
 
 export default function QuickWins() {
