@@ -40,7 +40,7 @@ export type EnrichedVerbContext = {
 
 export type EnrichedVerbForms = {
   explicit: string[];
-  implicit: string[];
+  implicit?: string[];
   synonyms?: string[];
   warningFromBook?: string;
   implicitRule?: string;

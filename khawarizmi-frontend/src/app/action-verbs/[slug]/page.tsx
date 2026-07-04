@@ -180,7 +180,7 @@ export default function ActionVerbDetailPage() {
                   <div className="rounded-2xl p-4 bg-purple-500/10 border border-purple-500/20">
                     <p className="text-purple-300 text-sm font-bold mb-2">🔄 ضمني</p>
                     <div className="flex flex-wrap gap-1.5">
-                      {enriched.enrichedVerbForms.implicit.map((m) => (
+                      {enriched.enrichedVerbForms.implicit?.map((m) => (
                         <span key={m} className="px-2 py-1 rounded-full bg-purple-500/10 text-purple-200 text-xs">
                           {m}
                         </span>

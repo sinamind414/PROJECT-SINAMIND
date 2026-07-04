@@ -619,29 +619,49 @@ Variables à configurer dans Railway Dashboard (PROJECT-SINAMIND → Variables) 
 ##############################################################
 # SECTION 14 — ANCRAGE DE SESSION
 ##############################################################
-# DERNIÈRE SESSION : 2026-07-04 — Gamification Sprint 1
+# DERNIÈRE SESSION : 2026-07-04 — Gamification Sprint 3 (final)
 #
 # État : Build clean, 549/549 tests pass, Vercel deployé
-# Commit : e296d1d
+# Commit : 0ff011c
 # URL : https://khawarizmi-ia-two.vercel.app
 #
-# Sprint 1 livré (6/6 tâches) :
+# Gamification complète (3 sprints, 12 tâches) :
+#
+# Sprint 1 (Streak + Boss + Badges) :
 #   ✅ Quick Win 1: 40 citations motivantes en darija
 #   ✅ Quick Win 2: HardestVerbPoll (mini-sondage footer)
 #   ✅ Quick Win 3: StreakBanner (localStorage + backend sync)
-#   ✅ Tâche 1: Streak backend (migration 027, service, routes)
-#   ✅ Tâche 3: 12 Badges backend + frontend (achievements page)
-#   ⏳ Tâche 2: Boss Final (en attente — 2-3j de travail)
+#   ✅ Streak backend (migration 027, service, routes)
+#   ✅ 12 Badges backend + frontend (achievements page)
+#   ⏳ Boss Final (en attente — 2-3j)
 #
-# Fichiers ajoutés Sprint 1 :
-#   Frontend (8) : achievements/page, StreakBanner,
-#     HardestVerbPoll, MotivationalQuote, useLocalStreak,
-#     motivational-quotes.ts
-#   Backend (6) : streaks router, badges router,
-#     streak_service, badge_service, models/streak, models/badge
-#   Migration : 027_gamification_sprint1.py
+# Sprint 2 (Social + Économie) :
+#   ✅ Duel 1v1 (create, share token, accept, submit, leaderboard)
+#   ✅ Leaderboard national/wilaya/school (weighted scoring)
+#   ✅ Gemmes system + shop (6 items, balance, spend, transactions)
+#   ✅ Migration 028: duels, gems, user_stats
 #
-# Prochaine étape : Boss Final (Sprint 1 restant)
+# Sprint 3 (Carte + Onboarding + Polish) :
+#   ✅ Carte des Verbes d'Algérie (24 villes = 24 verbes, SVG map)
+#   ✅ Onboarding 3 étapes (nouveaux utilisateurs guidés)
+#   ✅ Polish: useSound hook, manifest.json PWA
+#   ✅ Migration 029: verb_cities, city_progress, user_onboarding
+#
+# Fichiers ajoutés (total) :
+#   Frontend (17) : achievements, map, shop, duel(x2), leaderboard,
+#     StreakBanner, HardestVerbPoll, MotivationalQuote, GemsCounter,
+#     OnboardingOverlay, useLocalStreak, useSound, motivational-quotes
+#   Backend (14) : streaks, badges, gems, duels, leaderboard, cities,
+#     onboarding routers + services + shop_service
+#   Migrations : 027 (streaks/badges/boss), 028 (gems/duels/stats),
+#     029 (cities/onboarding)
+#
+# Routes API : 36 endpoints opérationnels
+#   /api/streaks/... (3), /api/badges/... (1), /api/gems/... (4),
+#   /api/duels/... (5), /api/leaderboard/... (3), /api/cities/... (5),
+#   /api/onboarding/... (3)
+#
+# Prochaine étape : Boss Final si souhaité
 #   → seed_boss_questions.py (24+12 questions Bac)
 #   → boss_service.py + routes/boss.py
 #   → app/action-verbs/boss/page.tsx

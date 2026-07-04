@@ -187,9 +187,9 @@ describe("enrichedToLegacy", () => {
       expect(legacy.slug).toBe(verb.slug);
       expect(legacy.ar).toBe(verb.ar);
       expect(legacy.fr).toBe(verb.fr);
-      expect(legacy.goodExample.answerAr).toBe(verb.enrichedGoodExample.answer);
-      expect(legacy.goodExample.explanationAr).toBe(verb.enrichedGoodExample.whyCorrect);
-      expect(legacy.badExample.answerAr).toBe(verb.enrichedBadExample.answer);
+      expect(legacy.goodExample!.answerAr).toBe(verb.enrichedGoodExample.answer);
+      expect(legacy.goodExample!.explanationAr).toBe(verb.enrichedGoodExample.whyCorrect);
+      expect(legacy.badExample!.answerAr).toBe(verb.enrichedBadExample.answer);
       expect(legacy.requiredMarkers).toEqual(verb.enrichedRequiredMarkers);
       expect(legacy.forbiddenMarkers).toEqual(verb.enrichedForbiddenMarkers);
       expect(legacy.formula).toBe(verb.enrichedFormula);
