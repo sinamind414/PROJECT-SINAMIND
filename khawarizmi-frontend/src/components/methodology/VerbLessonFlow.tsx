@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useRef } from "react"
+import React, { useState, useRef, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { 
   ArrowRight, ArrowLeft, Play, Pause, Check, X, AlertTriangle, 
@@ -86,6 +86,9 @@ export function VerbLessonFlow({
 
   const [isListening, setIsListening] = useState(false)
   const recognitionRef = useRef<any>(null)
+
+  const [showConfetti, setShowConfetti] = useState(false)
+  const [confettiKey, setConfettiKey] = useState(0)
 
   const [currentStep, setCurrentStep] = useState<Step>("word")
   const [recognitionAnswer, setRecognitionAnswer] = useState<"yes" | "no" | null>(null)
@@ -254,6 +257,62 @@ export function VerbLessonFlow({
   const toggleVoice = () => {
     if (isListening) stopVoiceInput()
     else startVoiceInput()
+  }
+
+  useEffect(() => {
+    if (evaluation && evaluation.percentage >= 75) {
+      setConfettiKey(prev => prev + 1)
+      setShowConfetti(true)
+      const timer = setTimeout(() => setShowConfetti(false), 2200)
+      return () => clearTimeout(timer)
+    }
+  }, [evaluation])
+
+  const speakModelAnswer = () => {
+    const modelAnswer = (enriched as any).enrichedGoodExample?.answer ||
+      (enriched as any).enrichedGoodExample?.fullAnswer ||
+      lesson.practiceQuestion ||
+      "لا توجد إجابة نموذجية متاحة حالياً."
+
+    if (!('speechSynthesis' in window)) {
+      alert("النطق غير مدعوم في هذا المتصفح. جرب Chrome.")
+      return
+    }
+    window.speechSynthesis.cancel()
+    const utterance = new SpeechSynthesisUtterance(modelAnswer)
+    utterance.lang = "ar-DZ"
+    utterance.rate = 0.92
+    utterance.pitch = 1.0
+    const voices = window.speechSynthesis.getVoices()
+    const arVoice = voices.find(v =>
+      v.lang.startsWith("ar") || v.name.toLowerCase().includes("arabic") || v.name.toLowerCase().includes("arabe")
+    )
+    if (arVoice) utterance.voice = arVoice
+    window.speechSynthesis.speak(utterance)
+  }
+
+  const ConfettiBurst = ({ keyProp }: { keyProp: number }) => {
+    if (!showConfetti) return null
+    const particles = Array.from({ length: 14 }).map((_, i) => {
+      const angle = (i * 25) + (Math.random() * 20 - 10)
+      const distance = 60 + Math.random() * 45
+      return (
+        <motion.div
+          key={`${keyProp}-${i}`}
+          className="absolute text-mint text-xl pointer-events-none"
+          initial={{ opacity: 1, x: 0, y: -10, scale: 0.6 + Math.random() * 0.6 }}
+          animate={{ opacity: 0, x: Math.cos(angle * Math.PI / 180) * distance, y: Math.sin(angle * Math.PI / 180) * distance - 30, scale: 0.3 }}
+          transition={{ duration: 1.6 + Math.random() * 0.5, delay: i * 0.015, ease: "easeOut" }}
+        >
+          {["★", "✦", "●", "◆"][i % 4]}
+        </motion.div>
+      )
+    })
+    return (
+      <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-0 h-0 z-50 pointer-events-none">
+        {particles}
+      </div>
+    )
   }
 
   const renderVisualFeedback = () => {
@@ -449,14 +508,18 @@ export function VerbLessonFlow({
           </div>
         )}
         {evaluation && (
-          <div className="mt-6 p-6 rounded-3xl glass border border-mint/20">
+          <div className="mt-6 p-6 rounded-3xl glass border border-mint/20 relative overflow-visible">
+            <ConfettiBurst keyProp={confettiKey} />
             <div className="flex justify-between items-baseline mb-4">
               <div><span className="text-5xl font-black text-white">{evaluation.percentage}</span><span className="text-2xl text-gray-400">%</span></div>
               <div className="text-right text-sm"><div className="text-emerald-400 font-bold">{evaluation.score}/{evaluation.score_max}</div></div>
             </div>
             {renderVisualFeedback()}
             {evaluation.advice && <div className="text-mint text-sm mt-4 bg-mint/10 p-3 rounded-2xl">💡 {evaluation.advice}</div>}
-            <button onClick={() => { setAnswer(""); }} className="mt-4 w-full py-2.5 text-sm border border-white/20 rounded-xl hover:bg-white/5">حاول مرة أخرى</button>
+            <button onClick={speakModelAnswer} className="mt-4 w-full flex items-center justify-center gap-2 py-3 text-sm font-semibold border border-mint/30 bg-mint/10 hover:bg-mint/20 text-mint rounded-2xl transition">
+              🔊 استمع إلى الإجابة النموذجية
+            </button>
+            <button onClick={() => { setAnswer(""); }} className="mt-3 w-full py-2.5 text-sm border border-white/20 rounded-xl hover:bg-white/5">حاول مرة أخرى</button>
           </div>
         )}
       </div>

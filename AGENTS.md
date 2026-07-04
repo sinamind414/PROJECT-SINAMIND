@@ -661,6 +661,21 @@ Variables à configurer dans Railway Dashboard (PROJECT-SINAMIND → Variables) 
 #   /api/duels/... (5), /api/leaderboard/... (3), /api/cities/... (5),
 #   /api/onboarding/... (3)
 #
+# Session 2026-07-04 — VerbLessonFlow Phase B+ (Highlight + Voice)
+#
+# ✅ Tâche D: Page verbe "analyse" interactive (VerbLessonFlow.tsx 6 étapes)
+# ✅ Tâche E: Rollout 24 verbes data-driven via buildLesson() + INTERACTIVE_LESSON_VERBS[]
+# ✅ Phase B+: computeLiveSegments() (vert requis, rouge interdits)
+# ✅ Phase B+: SpeechRecognition API (Mic/MicOff bouton)
+# ✅ Phase B+: renderVisualFeedback() chips succès/erreur/oubli
+# ✅ Phase B+: Audio play/pause
+# ✅ Déploiement: Vercel (khawarizmi-ia-two.vercel.app) + Railway (healthy)
+# ✅ Commit: 61fd54b — Build 37 routes, 0 erreurs
+#
+# Fichiers modifiés (1) :
+#   khawarizmi-frontend/src/components/methodology/VerbLessonFlow.tsx
+#     (248 insertions, 21 deletions, 23.9 KB final)
+#
 # Prochaine étape : Boss Final si souhaité
 #   → seed_boss_questions.py (24+12 questions Bac)
 #   → boss_service.py + routes/boss.py
