@@ -14,6 +14,7 @@ import {
 import { saveMethodologyEvaluation } from "@/lib/progress-store"
 import apiClient from "@/lib/api-client"
 import type { VerbEvaluateResponse, ActionVerbExercise } from "@/lib/types"
+import { VerbLessonFlow } from "@/components/methodology/VerbLessonFlow"
 
 export default function ActionVerbDetailPage() {
   const params = useParams()
@@ -29,6 +30,7 @@ export default function ActionVerbDetailPage() {
   // saveMethodologyEvaluation, etc.).
   const verb = enrichedToLegacy(enriched)
   const totalPoints = enriched.enrichedScoringRules.reduce((sum, r) => sum + r.points, 0)
+  const isAnalyseFlow = slug === "analyse"
 
   const [exercises, setExercises] = useState<ActionVerbExercise[]>([])
   const [answer, setAnswer] = useState("")
@@ -105,6 +107,33 @@ export default function ActionVerbDetailPage() {
     } catch {
       // silencieux
     }
+  }
+
+  if (isAnalyseFlow) {
+    return (
+      <AuthGuard>
+        <AppShell>
+          <main className="flex-1 p-4 lg:p-8 overflow-auto">
+            <div className="max-w-4xl mx-auto">
+              <Link href="/action-verbs" className="text-mint text-sm hover:underline inline-flex items-center gap-1 mb-4">← العودة إلى الأفعال الأدائية</Link>
+              <div className="mb-4">
+                <span className="px-4 py-1 rounded-full bg-mint/10 text-mint text-xs font-bold">{getCategoryLabel(verb.category)}</span>
+                <h1 className="text-5xl font-black text-white mt-1 tracking-tighter">{verb.ar}</h1>
+                <p className="text-gray-400">{verb.fr} — درس تفاعلي خطوة بخطوة</p>
+              </div>
+              <VerbLessonFlow
+                enriched={enriched}
+                onSubmitAnswer={async (userAnswer: string) => { setAnswer(userAnswer); await submitAnswer() }}
+                evaluation={evaluation}
+                loading={loading}
+                answer={answer}
+                setAnswer={setAnswer}
+              />
+            </div>
+          </main>
+        </AppShell>
+      </AuthGuard>
+    )
   }
 
   return (
