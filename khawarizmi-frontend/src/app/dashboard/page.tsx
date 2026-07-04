@@ -1,106 +1,85 @@
 "use client"
 
-import { useState } from "react"
-import confetti from "canvas-confetti"
+import React, { useState } from "react"
 import { AuthGuard } from "@/components/auth/AuthGuard"
 import { AppShell } from "@/components/layout/AppShell"
-import ContinueCard from "@/components/dashboard/orchestrator/ContinueCard"
-import CurrentStatusCard from "@/components/dashboard/orchestrator/CurrentStatusCard"
-import DailyMissionCard from "@/components/dashboard/orchestrator/DailyMissionCard"
-import DecisionSignalsPanel from "@/components/dashboard/orchestrator/DecisionSignalsPanel"
-import EnginePulseCard from "@/components/dashboard/orchestrator/EnginePulseCard"
-import ExecutionSummaryCard from "@/components/dashboard/orchestrator/ExecutionSummaryCard"
-import GuidedMissionsList from "@/components/dashboard/orchestrator/GuidedMissionsList"
-import HeroOrchestratorBanner from "@/components/dashboard/orchestrator/HeroOrchestratorBanner"
-import InstantHelpCard from "@/components/dashboard/orchestrator/InstantHelpCard"
-import MedicalOrientationCard from "@/components/dashboard/orchestrator/MedicalOrientationCard"
-import PriorityActionCard from "@/components/dashboard/orchestrator/PriorityActionCard"
-import QuickAccessCard from "@/components/dashboard/orchestrator/QuickAccessCard"
-import StrategicChapterCard from "@/components/dashboard/orchestrator/StrategicChapterCard"
-import WeeklyPlanCard from "@/components/dashboard/orchestrator/WeeklyPlanCard"
-import Header from "@/components/drive-design/Header"
+
+import GenZHeader from "@/components/dashboard/GenZHeader"
+import GenZHeroMission from "@/components/dashboard/GenZHeroMission"
+import UrgentLosses from "@/components/dashboard/UrgentLosses"
+import QuickWins from "@/components/dashboard/QuickWins"
+
 import { useDriveDashboard } from "@/hooks/useDriveDashboard"
 
-export default function DashboardPage() {
+export default function GenZDashboardPage() {
   const state = useDriveDashboard()
-  const [showAllMobile, setShowAllMobile] = useState(false)
+  const [showMore, setShowMore] = useState(false)
 
-  const dailyMission = state.missions.find((m) => m.status === "pending") || state.missions[0]
-  const totalExercises = state.exercises.length
-  const doneExercises = state.exercises.filter((e) => e.completed).length
-  const totalMistakes = state.mistakes.length
-  const reviewedMistakes = state.mistakes.filter((m) => m.reviewed).length
-  const pendingMissionCount = state.missions.filter((m) => m.status !== "done").length
-  const pulse = state.enginePulse
+  const dailyMission = state.missions?.find((m: any) => m.status === "pending") || state.missions?.[0]
 
-  const updateMission = (_id: number) => {
-    confetti({ particleCount: 90, spread: 68, origin: { y: 0.65 } })
-    navigator.vibrate?.([45, 25, 45])
-  }
+  const missionTitle = dailyMission?.title || "Volcans et leur distribution"
+  const missionPoints = dailyMission?.xp_reward || 7
+  const missionDuration = "12 min"
 
   return (
     <AuthGuard>
       <AppShell>
-        <div className="max-w-6xl mx-auto space-y-4">
-          <div className="hidden sm:block">
-            <Header profile={state.profile} onContinueAction={() => {}} />
+        <div className="max-w-2xl mx-auto pb-20">
+
+          <GenZHeader
+            userName={state.profile?.name || "Khalil"}
+            streak={7}
+            xpToday={124}
+          />
+
+          <GenZHeroMission
+            title={missionTitle}
+            duration={missionDuration}
+            points={missionPoints}
+            onStart={() => {
+              window.location.href = "/lecons-sciences-experimentales"
+            }}
+          />
+
+          <UrgentLosses
+            items={[
+              { title: "Volcans", count: 3, impact: "-6 pts" },
+              { title: "Réseaux nerveux", count: 2, impact: "-4 pts" },
+            ]}
+          />
+
+          <QuickWins />
+
+          <div className="mx-4 mt-6">
+            <div className="flex items-center justify-between mb-2 px-1">
+              <span className="font-bold text-white">Ta progression</span>
+              <span className="text-emerald-400 text-sm font-bold">68% vers le BAC</span>
+            </div>
+
+            <div className="h-2.5 bg-white/10 rounded-full overflow-hidden">
+              <div className="h-full w-[68%] bg-gradient-to-r from-mint to-emerald-400 rounded-full" />
+            </div>
+
+            <button
+              onClick={() => setShowMore(!showMore)}
+              className="mt-3 w-full text-xs text-white/60 hover:text-white py-1 active:opacity-70"
+            >
+              {showMore ? "Masquer les détails" : "Voir plus de détails ↓"}
+            </button>
+
+            {showMore && (
+              <div className="mt-3 text-xs text-white/70 space-y-1 px-1">
+                <div>• 12 missions terminées cette semaine</div>
+                <div>• Meilleur sujet : Photosynthèse</div>
+                <div>• À améliorer : Schémas fonctionnels</div>
+              </div>
+            )}
           </div>
 
-          <HeroOrchestratorBanner pendingMissionCount={pendingMissionCount} pulse={pulse} />
-
-          <section className="grid gap-4 lg:grid-cols-[1.35fr_1fr]">
-            <PriorityActionCard action={state.priorityAction} recommendation={state.enginePulse.topOrientation} />
-            <ContinueCard card={state.continueCard} />
-          </section>
-
-          <section className="grid gap-4 md:grid-cols-3">
-            <InstantHelpCard />
-            <StrategicChapterCard chapter={state.strategicChapter} />
-            <CurrentStatusCard
-              strongestTopic={state.strongestTopic}
-              weakestTopic={state.weakestTopic}
-              pulse={pulse}
-            />
-          </section>
-
-          {!showAllMobile && (
-            <button
-              type="button"
-              onClick={() => setShowAllMobile(true)}
-              className="md:hidden w-full rounded-2xl border border-mint/30 bg-mint/10 px-4 py-3 text-sm font-black text-mint hover:bg-mint/15 transition"
-            >
-              عرض التفاصيل الكاملة ↓
-            </button>
-          )}
-
-          <section className={`${showAllMobile ? "grid" : "hidden"} md:grid gap-4`}>
-            {state.enginePulse.topOrientation && <DecisionSignalsPanel recommendation={state.enginePulse.topOrientation} />}
-
-            <GuidedMissionsList missions={state.missions} />
-
-            <div className="grid gap-4 xl:grid-cols-[1.2fr_0.8fr]">
-              <DailyMissionCard mission={dailyMission} onMotivate={updateMission} />
-              <EnginePulseCard pulse={pulse} />
-            </div>
-
-            <WeeklyPlanCard days={state.weekly} />
-
-            <div className="grid gap-4 lg:grid-cols-3">
-              <QuickAccessCard />
-              <ExecutionSummaryCard
-                doneExercises={doneExercises}
-                totalExercises={totalExercises}
-                unresolvedMistakes={totalMistakes - reviewedMistakes}
-                soonConceptsCount={pulse.soonConceptsCount}
-              />
-              <MedicalOrientationCard />
-            </div>
-          </section>
+          <div className="mt-10 text-center text-[10px] text-white/40 px-4">
+            Chaque mission = points concrets pour ton BAC 2026
+          </div>
         </div>
-
-        <footer className="mt-6 text-center text-xs text-slate-500 font-semibold py-4 font-arabic">
-          منصة مراجعة البكالوريا — علوم الطبيعة والحياة · 2026 · لوحة قيادة تقودك إلى الفعل
-        </footer>
       </AppShell>
     </AuthGuard>
   )
