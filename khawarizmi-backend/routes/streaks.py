@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from auth import get_current_user
+from deps import get_current_user
 from database import get_db
 from services.streak_service import get_user_streak, record_activity, use_freeze
 

@@ -5,7 +5,7 @@ Routes Leaderboard — classements.
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from auth import get_current_user
+from deps import get_current_user
 from database import get_db
 from services.leaderboard_service import get_leaderboard, get_user_rank, update_user_stats
 
