@@ -441,3 +441,30 @@ a:focus-visible {
 .svt-text-glow-orange { text-shadow: 0 0 18px rgba(245,158,11,0.55); }
 .svt-divider-glow { height: 1px; background: linear-gradient(90deg, transparent, rgba(45,212,191,0.4), transparent); }
 .svt-tnum { font-variant-numeric: tabular-nums; }
+
+/* ════════════════════════════════════════
+   CAROUSEL — PERFECT SLIDE-BY-SLIDE (MOBILE)
+   ════════════════════════════════════════ */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.carousel-container {
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  overflow-x: auto;
+  display: flex;
+  flex-wrap: nowrap;
+  width: 100%;
+}
+
+.carousel-slide {
+  flex-shrink: 0;
+  width: 100%;
+  min-width: 100%;
+  scroll-snap-align: center;
+}
