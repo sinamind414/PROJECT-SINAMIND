@@ -5,6 +5,7 @@ from models.gamification import Badge, MysteryBox, UserAvatar, UserBadge, UserPo
 from models.lexique import LexiqueTerme
 from models.payment import Payment
 from models.phase1 import ComboState
+from models.pulse import DailyPulseCard
 from models.reference import CommonMistake, ReferenceEmbedding
 from models.session import MasteryMicroConcept
 from models.social import Comment, CommunityPost, Conversation, Message
@@ -30,4 +31,5 @@ __all__ = [
     "UserBadge",
     "MysteryBox",
     "ComboState",
+    "DailyPulseCard",
 ]

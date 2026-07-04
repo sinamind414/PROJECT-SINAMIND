@@ -36,6 +36,7 @@ from . import (
     onboarding,
     orientation,
     payment,
+    pulse,
     phase1,
     phase3,
     phase5,
@@ -117,4 +118,6 @@ ALL_ROUTERS = [
     onboarding.router,
     # ── Manhadjiya (LOT8 — Base de connaissance scientifique) ──
     manhadjiya.router,
+    # ── PULSE Dashboard ──
+    pulse.router,
 ]
