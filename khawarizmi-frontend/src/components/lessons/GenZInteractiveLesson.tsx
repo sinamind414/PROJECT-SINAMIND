@@ -21,7 +21,7 @@ function QCMItem({ item, onCorrect }: { item: { q: string; o: string[]; c: numbe
   const [sel, setSel] = useState<number | null>(null)
   return (
     <div className="mb-4 last:mb-0 bg-black/40 p-4 rounded-2xl">
-      <div className="font-medium text-white mb-2">{item.q}</div>
+      <div className="font-medium mb-2 text-white text-sm">{item.q}</div>
       {item.o.map((o, j) => (
         <button
           key={j}
@@ -76,10 +76,15 @@ export default function GenZInteractiveLesson({ lessonTitleAr, slug, phases, onC
     const found = keywords.filter((k) => ans.toLowerCase().includes(k.toLowerCase())).length
     const pct = Math.min(100, Math.max(48, Math.round((found / 3.5) * 100)))
 
-    const feedback = pct > 75 ? "ممتاز يا خويا! ربحت نقاط" : "ركز يا بطل! أضف: بنية-وظيفة + ACh + Ca²⁺"
+    const feedback =
+      pct > 75
+        ? "ممتاز يا خويا! ربحت نقاط"
+        : "ركز يا بطل! أضف: بنية-وظيفة + ACh + Ca²⁺"
+
     const modelAnswer = "الإشارة تصل إلى الزر → Ca²⁺ يدخل → إفراز ACh في الشق → يرتبط بالمستقبلات → فتح قنوات Na⁺."
 
-    setEvalResults((prev) => ({ ...prev, [phaseId]: { percentage: pct, feedback, modelAnswer } }))
+    const result = { percentage: pct, feedback, modelAnswer }
+    setEvalResults((prev) => ({ ...prev, [phaseId]: result }))
   }
 
   const runSim = (type: string, phaseId: string) => {
@@ -123,9 +128,14 @@ export default function GenZInteractiveLesson({ lessonTitleAr, slug, phases, onC
     const isACh = slug.includes("phase14") || slug.includes("27_28") || lessonTitleAr.includes("كولين")
 
     return (
-      <div key={phase.id} className="flex-shrink-0 w-[98%] sm:w-[97%] md:w-[74%] snap-start rounded-3xl border border-white/10 bg-white/[0.015] overflow-hidden mr-1 last:mr-0">
+      <div
+        key={phase.id}
+        className="flex-shrink-0 w-[98%] sm:w-[97%] md:w-[74%] snap-start rounded-3xl border border-white/10 bg-white/[0.015] overflow-hidden mr-1 last:mr-0"
+      >
         <div className="flex items-center gap-4 px-5 py-4 bg-gradient-to-r from-white/5 border-b border-white/10">
-          <div className="h-9 w-9 flex items-center justify-center rounded-full bg-mint text-black text-[22px] font-black shrink-0">{num}</div>
+          <div className="h-9 w-9 flex items-center justify-center rounded-full bg-mint text-black text-[22px] font-black shrink-0">
+            {num}
+          </div>
           <div className="min-w-0">
             <div className="font-black text-[19px] leading-tight tracking-[-0.3px] text-white truncate">{phase.titleAr}</div>
             <div className="text-[10px] text-white/40">إطار {num} / {totalFrames}</div>
@@ -148,7 +158,9 @@ export default function GenZInteractiveLesson({ lessonTitleAr, slug, phases, onC
               {Object.keys(simStates)
                 .filter((k) => k.startsWith(phase.id))
                 .map((k) => (
-                  <div key={k} className="mt-2 text-xs p-2.5 bg-black/60 rounded-xl border-l-4 border-mint">{simStates[k]}</div>
+                  <div key={k} className="mt-2 text-xs p-2.5 bg-black/60 rounded-xl border-l-4 border-mint">
+                    {simStates[k]}
+                  </div>
                 ))}
             </div>
           )}
@@ -156,9 +168,15 @@ export default function GenZInteractiveLesson({ lessonTitleAr, slug, phases, onC
           {phase.practice && (
             <div className="rounded-3xl border border-mint/30 bg-mint/5 p-4">
               <div className="text-mint font-black text-xs tracking-widest mb-2">دورك الحين يا خويا</div>
-              <textarea value={ans} onChange={(e) => updateAnswer(phase.id, e.target.value)} placeholder="اكتب إجابتك هنا..." className="w-full min-h-[105px] bg-black/30 border border-white/10 rounded-2xl p-4 text-white text-[15px]" dir="rtl" />
+              <textarea
+                value={ans}
+                onChange={(e) => updateAnswer(phase.id, e.target.value)}
+                placeholder="اكتب إجابتك هنا..."
+                className="w-full min-h-[105px] bg-black/30 border border-white/10 rounded-2xl p-4 text-white text-[15px]"
+                dir="rtl"
+              />
               <div className="flex gap-2 mt-3">
-                <button onClick={() => submitPractice(phase.id)} disabled={!ans.trim()} className="flex-1 h-12 rounded-2xl bg-mint text-black font-black text-sm disabled:opacity-50 active:scale-[0.985]">
+                <button onClick={() => submitPractice(phase.id)} disabled={!ans.trim()} className="flex-1 h-12 rounded-2xl bg-mint text-black font-black text-sm active:scale-[0.985] disabled:opacity-50">
                   قيّم إجابتي
                 </button>
                 <button
@@ -179,7 +197,9 @@ export default function GenZInteractiveLesson({ lessonTitleAr, slug, phases, onC
 
               {evalRes && (
                 <div className="mt-4 p-4 bg-black/30 border border-mint/30 rounded-2xl text-sm">
-                  <div className="text-5xl font-black text-mint">{evalRes.percentage}<span className="text-xl font-normal">%</span></div>
+                  <div className="text-5xl font-black text-mint">
+                    {evalRes.percentage}<span className="text-xl font-normal">%</span>
+                  </div>
                   <p className="mt-1 text-white/90">{evalRes.feedback}</p>
                   <button
                     onClick={() => {
@@ -226,7 +246,12 @@ export default function GenZInteractiveLesson({ lessonTitleAr, slug, phases, onC
           <span className="font-black text-mint">{currentFrame + 1} / {totalFrames}</span>
         </div>
 
-        <div ref={scrollRef} onScroll={handleScroll} className="flex overflow-x-auto snap-x snap-mandatory pb-5 -mx-0.5 px-0.5" style={{ scrollbarWidth: "none" }}>
+        <div
+          ref={scrollRef}
+          onScroll={handleScroll}
+          className="flex overflow-x-auto snap-x snap-mandatory pb-5 -mx-0.5 px-0.5"
+          style={{ scrollbarWidth: "none" }}
+        >
           {filteredPhases.map((p, i) => renderFrame(p, i))}
         </div>
 
