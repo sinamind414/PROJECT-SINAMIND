@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منصة المتفوق 3AS | المرحلة 14 : الدرس 27 والدرس 28</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #f8fafc;
+            --surface: #ffffff;
+            --primary: #0f172a;
+            --accent: #2563eb;
+            --accent-light: #eff6ff;
+            --success: #16a34a;
+            --success-light: #f0fdf4;
+            --warning: #d97706;
+            --warning-light: #fffbeb;
+            --danger: #dc2626;
+            --danger-light: #fef2f2;
+            --crimson-dark: #881337;
+            --crimson-light: #fff1f2;
+            --amber-dark: #92400e;
+            --amber-light: #fffbeb;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --radius: 16px;
+            --shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Cairo', 'Tajawal', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            line-height: 1.8;
+            padding-bottom: 60px;
+        }
+
+        .ltr-seq {
+            direction: ltr;
+            unicode-bidi: embed;
+            display: inline-block;
+            font-family: monospace;
+            font-weight: bold;
+            color: var(--accent);
+            background: #f1f5f9;
+            padding: 2px 8px;
+            border-radius: 6px;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 900;
+            font-size: 1.25rem;
+            color: var(--primary);
+        }
+
+        .brand-badge {
+            background: var(--crimson-dark);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            white-space: nowrap;
+        }
+
+        .chapter-switcher {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .ch-btn {
+            background: var(--bg-main);
+            border: 2px solid var(--border);
+            padding: 8px 18px;
+            border-radius: 12px;
+            font-family: inherit;
+            font-weight: 800;
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .ch-btn:hover {
+            border-color: var(--crimson-dark);
+            color: var(--crimson-dark);
+        }
+
+        .ch-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                padding: 1rem;
+                text-align: center;
+            }
+            .chapter-switcher {
+                justify-content: center;
+                width: 100%;
+            }
+            .ch-btn {
+                flex: 1;
+                font-size: 0.85rem;
+                padding: 8px 10px;
+            }
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 2rem auto;
+            padding: 0 1.2rem;
+        }
+
+        .chapter-view {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .chapter-view.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Hero Header */
+        .lesson-header {
+            border-radius: var(--radius);
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+            color: white;
+        }
+
+        .header-ch27 {
+            background: linear-gradient(135deg, #4c0519 0%, #9f1239 100%);
+        }
+
+        .header-ch28 {
+            background: linear-gradient(135deg, #78350f 0%, #b45309 100%);
+        }
+
+        .lesson-breadcrumb {
+            font-size: 0.85rem;
+            opacity: 0.9;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .lesson-header h1 {
+            font-size: 2.1rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+            line-height: 1.3;
+        }
+
+        .lesson-objectives {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--surface);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+        }
+
+        @media (max-width: 600px) {
+            .lesson-header { padding: 1.5rem; }
+            .lesson-header h1 { font-size: 1.5rem; }
+            .card { padding: 1.2rem; }
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid var(--bg-main);
+            padding-bottom: 0.8rem;
+        }
+
+        .step-num {
+            background: #ffe4e6;
+            color: #9f1239;
+            width: 38px;
+            height: 38px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            font-weight: 900;
+            font-size: 1.1rem;
+        }
+
+        .step-num-amber {
+            background: #fef3c7;
+            color: #b45309;
+        }
+
+        .problem-box {
+            background: var(--warning-light);
+            border-right: 5px solid var(--warning);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+        }
+
+        .problem-title {
+            font-weight: 800;
+            color: #92400e;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Document Analysis */
+        .doc-viewer {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        @media (max-width: 850px) {
+            .doc-viewer { grid-template-columns: 1fr; }
+        }
+
+        .doc-visual {
+            background: #0f172a;
+            border-radius: 12px;
+            padding: 1.5rem;
+            color: white;
+        }
+
+        .svg-container {
+            width: 100%;
+            height: auto;
+            max-height: 260px;
+        }
+
+        .doc-analysis {
+            background: var(--bg-main);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+        }
+
+        .method-tag {
+            display: inline-block;
+            background: #e0f2fe;
+            color: #0369a1;
+            font-size: 0.75rem;
+            font-weight: 800;
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+        }
+
+        /* Interactive simulators */
+        .interactive-box {
+            background: #1e293b;
+            border-radius: 12px;
+            padding: 1.5rem;
+            color: white;
+            margin: 1.5rem 0;
+        }
+
+        .btn-action {
+            background: #9f1239;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-family: inherit;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin: 5px;
+        }
+
+        .btn-action:hover { background: #881337; }
+        .btn-amber { background: #d97706; }
+        .btn-amber:hover { background: #b45309; }
+
+        /* Scientific text */
+        .scientific-text {
+            background: var(--surface);
+            border: 2px solid #cbd5e1;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .text-part {
+            margin-bottom: 1.2rem;
+            padding-right: 1rem;
+            border-right: 4px solid #9f1239;
+        }
+
+        .text-part.ch28-border { border-right-color: #d97706; }
+
+        .text-part h4 {
+            font-size: 0.95rem;
+            color: #9f1239;
+            margin-bottom: 0.3rem;
+            font-weight: 800;
+        }
+
+        .text-part.ch28-border h4 { color: #d97706; }
+
+        /* Quiz */
+        .question-item {
+            background: var(--bg-main);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin-top: 1rem;
+        }
+
+        .option-btn {
+            background: white;
+            border: 1.5px solid var(--border);
+            padding: 12px 16px;
+            border-radius: 10px;
+            text-align: right;
+            font-family: inherit;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text-main);
+        }
+
+        .option-btn:hover {
+            border-color: #9f1239;
+            background: #fff1f2;
+        }
+
+        .option-btn.correct {
+            background: var(--success-light);
+            border-color: var(--success);
+            color: var(--success);
+            font-weight: 700;
+        }
+
+        .option-btn.wrong {
+            background: var(--danger-light);
+            border-color: var(--danger);
+            color: var(--danger);
+        }
+
+        .feedback-box {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            display: none;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar with Phase Switcher -->
+    <nav class="navbar">
+        <div class="brand">
+            <span>منصة المتفوق 3AS</span>
+            <span class="brand-badge">المرحلة 14 (الدرس 27 و 28)</span>
+        </div>
+        <div class="chapter-switcher">
+            <button class="ch-btn active" onclick="showChapter('ch27', event)">⚡ الدرس 27 : السلسلة التنفسية والفسفرة التأكسدية (38 ATP)</button>
+            <button class="ch-btn" onclick="showChapter('ch28', event)">🍷 الدرس 28 : التخمر اللبني والكحولي في غياب O₂ (2 ATP)</button>
+        </div>
+    </nav>
+
+    <div class="container">
+
+        <!-- ================================================================= -->
+        <!-- CHAPTER 27 : LA CHAÎNE RESPIRATOIRE & 38 ATP (الدرس 27) -->
+        <!-- ================================================================= -->
+        <div id="ch27" class="chapter-view active">
+            
+            <header class="lesson-header header-ch27">
+                <div class="lesson-breadcrumb">المجال الثاني : التحولات الطاقوية • الوحدة 2 : آليات تحويل الطاقة الكيميائية الكامنة إلى ATP</div>
+                <h1>الدرس 27 : الفسفرة التأكسدية والسلسلة التنفسية في الغشاء الداخلي للميتوكندرون</h1>
+                <div class="lesson-objectives">
+                    <div>🎯 <strong>الهدف العلمي :</strong> توضيح دور النواقل البروتينية للأعراف الميتوكندرية في أكسدة النواقل المرجعة، وإرجاع الأكسجين إلى ماء، وفسفرة الـ ADP لإنتاج 38 ATP.</div>
+                    <div>⏱️ <strong>المدة التقديرية للتعلم الذاتي :</strong> 25 دقيقة</div>
+                </div>
+            </header>
+
+            <!-- Step 1: Problématique -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num">1</span>
+                    <span>وضعية الانطلاق وبناء الإشكالية العلميـة</span>
+                </div>
+                <div class="problem-box">
+                    <div class="problem-title">⚠️ لماذا نموت خلال دقائق معدودة إذا انقطع عنا الأكسجين؟</div>
+                    <p>خلال التحلل السكري وحلقة كريبس، أنتج الغلوكوز 4 جزيئات <span class="ltr-seq">ATP</span> فقط بشكل مباشر، بينما تحولت بقية الطاقة إلى 10 جزيئات <strong><span class="ltr-seq">NADH, H⁺</span></strong> وجزيئتي <strong><span class="ltr-seq">FADH₂</span></strong>. هذه النواقل المرجعة بمثابة شيكات بنكية لا تستطيع الخلية استهلاكها مباشرة! <strong>كيف يقوم الغشاء الداخلي للميتوكندرون (الأعراف) في حضور الأكسجين بصرف هذه الشيكات وإعادة أكسدتها لإنتاج الرصيد النهائي الضخم (38 ATP)؟</strong></p>
+                </div>
+            </section>
+
+            <!-- Step 2: Document Analyse -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num">2</span>
+                    <span>التحليل المنهجي للسلسلة التنفسية واقتران الأكسدة بالفسفرة</span>
+                </div>
+                <div class="doc-viewer">
+                    <div class="doc-visual" style="background: #4c0519;">
+                        <h4 style="color: #fda4af; margin-bottom: 1rem; font-size: 0.95rem;">مخطط السلسلة التنفسية على الغشاء الداخلي (الأعراف الميتوكندرية)</h4>
+                        <!-- SVG Respiratory Chain -->
+                        <svg class="svg-container" viewBox="0 0 400 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Membrane -->
+                            <rect x="20" y="80" width="360" height="60" fill="#881337"/>
+                            <text x="130" y="70" fill="#fca5a5" font-size="10">الفراغ بين غشائي (تركيز H⁺ مرتفع جداً)</text>
+                            <text x="130" y="165" fill="#fef08a" font-size="10">المادة الأساسية (Matrice - أكسجين O₂)</text>
+
+                            <!-- Complex I Proton Pump -->
+                            <rect x="100" y="80" width="26" height="60" fill="#f43f5e" stroke="#fda4af"/>
+                            <text x="113" y="113" fill="white" font-size="9" text-anchor="middle" font-weight="bold">T₁</text>
+                            <path d="M113 145 L 113 70" stroke="#4ade80" stroke-width="3" marker-end="url(#arrow)"/>
+                            <text x="75" y="180" fill="#fde047" font-size="9">NADH → NAD⁺</text>
+
+                            <!-- O2 reduction at T6 -->
+                            <rect x="200" y="80" width="26" height="60" fill="#e11d48" stroke="#fda4af"/>
+                            <text x="213" y="113" fill="white" font-size="9" text-anchor="middle" font-weight="bold">T₆</text>
+                            <path d="M213 145 L 213 70" stroke="#4ade80" stroke-width="3"/>
+                            <text x="213" y="180" fill="#38bdf8" font-size="9" text-anchor="middle" font-weight="bold">½ O₂ + 2 H⁺ + 2e⁻ → H₂O</text>
+
+                            <!-- ATP Synthase -->
+                            <rect x="300" y="80" width="30" height="60" fill="#16a34a" stroke="#86efac"/>
+                            <circle cx="315" cy="155" r="16" fill="#22c55e" stroke="#86efac"/>
+                            <text x="315" y="158" fill="white" font-size="8" text-anchor="middle" font-weight="bold">ATP synthase</text>
+                            <path d="M315 70 L 315 135" stroke="#38bdf8" stroke-width="3"/>
+                            <text x="350" y="158" fill="#4ade80" font-size="10" font-weight="bold">38 ATP</text>
+                        </svg>
+                        <p style="font-size: 0.85rem; color: #cbd5e1; margin-top: 10px;">💡 الأكسجين هو المستقبل النهائي للإلكترونات، ويتحول إلى ماء.</p>
+                    </div>
+
+                    <div class="doc-analysis">
+                        <span class="method-tag" style="background: #fff1f2; color: #9f1239;">خطوات الفسفرة التأكسدية</span>
+                        <h4 style="margin: 8px 0; color: var(--primary);">كيف يركب الميتوكندرون 38 ATP؟</h4>
+                        <ol style="padding-right: 1.2rem; line-height: 1.8;">
+                            <li><strong>أكسدة النواقل المرجعة :</strong> تتأكسد جزيئات <span class="ltr-seq">NADH, H⁺</span> عند الناقل <span class="ltr-seq">T₁</span> وتتأكسد <span class="ltr-seq">FADH₂</span> عند <span class="ltr-seq">T₂</span>، محررة إلكترونات وبروتونات.</li>
+                            <li><strong>نقل الإلكترونات وضخ البروتونات :</strong> تنتقل الإلكترونات عبر نواقل السلسلة التنفسية، وتستغل طاقتها لضخ البروتونات <span class="ltr-seq">H⁺</span> من المادة الأساسية نحو الفراغ بين غشائي، فينشأ تدرج تركيز.</li>
+                            <li><strong>إرجاع الأكسجين (<span class="ltr-seq">المستقبل النهائي</span>) :</strong> تصل الإلكترونات للناقل الأخير (<span class="ltr-seq">T₆</span>) فيتلتقطها الأكسجين الجزيئي (<span class="ltr-seq">O₂</span>) ويتحد مع بروتونات الحشوة ليعطي جزيئات الماء (<span class="ltr-seq">H₂O</span>).</li>
+                            <li><strong>إنتاج الـ ATP :</strong> تتدفق البروتونات المحبوسة عائدة نحو المادة الأساسية عبر <strong>الكرية المذذبة (<span class="ltr-seq">ATP synthase</span>)</strong>، فيتم فسفرة الـ <span class="ltr-seq">ADP</span> لإنتاج الرصيد النهائي الكبير : <strong><span class="ltr-seq">38 ATP</span></strong> (أو 36 حسب نوع الخلايا).</li>
+                        </ol>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 3: Interactive Respiratory Chain Simulator -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num">3</span>
+                    <span>محاكي السلسلة التنفسية وحساب الحصيلة</span>
+                </div>
+                <p>اضغط لمعاينة صرف النواقل المرجعة واختبار تأثير سم السيانيد القاتل :</p>
+                
+                <div class="interactive-box" style="background: #4c0519;">
+                    <div style="margin-bottom: 15px;">
+                        <button class="btn-action" onclick="simResp('normal')">🟢 تنفس هوائي سليم (أكسدة النواقل وإنتاج 38 ATP)</button>
+                        <button class="btn-action" style="background:#dc2626;" onclick="simResp('cn')">🔴 إضافة سم السيانيد (تثبيط الناقل T₆ والاختناق)</button>
+                    </div>
+                    <div id="respDisplayBox" style="background: #881337; border: 2px solid #fb7185; border-radius: 12px; padding: 1.5rem; text-align: center;">
+                        <h3 style="color: #4ade80; margin-bottom: 10px;">🟢 الحصيلة الطاقوية الكاملة للتنفس (38 ATP)</h3>
+                        <p style="color: #cbd5e1; line-height: 1.8;">كل جزيئة <span class="ltr-seq">1 NADH, H⁺</span> تعطي <strong>3 ATP</strong> (10 × 3 = 30 ATP). وكل جزيئة <span class="ltr-seq">1 FADH₂</span> تعطي <strong>2 ATP</strong> (2 × 2 = 4 ATP). زائد 4 ATP مباشرة (2 من التحلل + 2 من كريبس) = المجموع <strong><span class="ltr-seq">38 ATP</span></strong>.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 4: Quiz Ch27 -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num">4</span>
+                    <span>تقويم الدرس 27 : أسئلة البكالوريا المتكررة</span>
+                </div>
+
+                <div class="question-item" id="c27q1-container">
+                    <h4 style="margin-bottom: 12px;">1. ما هو المستقبل الإلكتروني والبروتوني النهائي في السلسلة التنفسية؟ وماذا ينتج عن إرجاعه؟</h4>
+                    <div class="options-grid">
+                        <button class="option-btn" onclick="checkCh27Answer(0, true)">أ) غاز الأكسجين (O₂) هو المستقبل النهائي، وينتج عن إرجاعه جزيء الماء (H₂O).</button>
+                        <button class="option-btn" onclick="checkCh27Answer(1, false)">ب) غاز ثاني أكسيد الكربون هو المستقبل النهائي.</button>
+                        <button class="option-btn" onclick="checkCh27Answer(2, false)">ج) حمض البيروفيك هو المستقبل النهائي.</button>
+                    </div>
+                    <div class="feedback-box" id="c27q1-feedback"></div>
+                </div>
+            </section>
+        </div>
+
+        <!-- ================================================================= -->
+        <!-- CHAPTER 28 : LA FERMENTATION EN ANAÉROBIOSE (الدرس 28) -->
+        <!-- ================================================================= -->
+        <div id="ch28" class="chapter-view">
+            
+            <header class="lesson-header header-ch28">
+                <div class="lesson-breadcrumb">المجال الثاني : التحولات الطاقوية • الوحدة 2 : آليات تحويل الطاقة الكيميائية الكامنة إلى ATP</div>
+                <h1>الدرس 28 : التخمر اللبني والكحولي والحصيلة الطاقوية في غياب الأكسجين (وسط لاهوائي)</h1>
+                <div class="lesson-objectives">
+                    <div>🎯 <strong>الهدف العلمي :</strong> مقارنة الهدم الكلي (التنفس 38 ATP) بالهدم الجزئي (التخمر 2 ATP)، وتفصيل تحول البيروفيك إلى إيثانول أو حمض اللبن لتجديد NAD⁺.</div>
+                    <div>⏱️ <strong>المدة التقديرية للتعلم الذاتي :</strong> 25 دقيقة</div>
+                </div>
+            </header>
+
+            <!-- Step 1: Problématique -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num step-num-amber">1</span>
+                    <span>الإشكالية الطاقوية للوسط اللاهوائي</span>
+                </div>
+                <div class="problem-box" style="border-right-color: var(--amber-dark); background: var(--amber-light);">
+                    <div class="problem-title" style="color: #92400e;">⚠️ كيف تعيش خلايا الخميرة أو عضلاتنا المجهدة دون أكسجين؟</div>
+                    <p>في غياب الأكسجين (<span class="ltr-seq">Anaérobiose</span>)، تتوقف السلسلة التنفسية وتتوقف حلقة كريبس في الميتوكندرون لعدم وجود مستقبل نهائي للإلكترونات. ومع ذلك، تستمر خلايا الخميرة في الحياة والنمو البطيء، وتستمر عضلاتنا بالانقباض لعدة دقائق! <strong>كيف يتم التخلص من حمض البيروفيك وتجديد الـ NAD⁺ في الهيولى لضمان استمرار التحلل السكري وإنتاج الحد الأدنى من الطاقة (2 ATP)؟</strong></p>
+                </div>
+            </section>
+
+            <!-- Step 2: Document Analyse -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num step-num-amber">2</span>
+                    <span>التحليل المنهجي لمساري التخمر الكحولي والتخمر اللبني</span>
+                </div>
+                <div class="doc-viewer">
+                    <div class="doc-visual" style="background: #451a03;">
+                        <h4 style="color: #fde047; margin-bottom: 1rem; font-size: 0.95rem;">مخطط التخمر اللبني والكحولي في الهيولى الأساسية (هدم جزئي للمادة العضوية)</h4>
+                        <!-- SVG Fermentation -->
+                        <svg class="svg-container" viewBox="0 0 400 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Pyruvate top -->
+                            <rect x="140" y="15" width="120" height="26" rx="6" fill="#dc2626"/>
+                            <text x="200" y="32" fill="white" font-size="11" text-anchor="middle" font-weight="bold">2 حمض بيروفيك (C₃)</text>
+
+                            <!-- Left: Alcoolique -->
+                            <path d="M165 41 L 100 90" stroke="#f59e0b" stroke-width="3"/>
+                            <text x="80" y="65" fill="#fde68a" font-size="8">نزع 2 CO₂ ↑</text>
+                            <rect x="40" y="90" width="120" height="26" rx="6" fill="#9a3412"/>
+                            <text x="100" y="107" fill="white" font-size="10" text-anchor="middle">أستالديهيد (C₂)</text>
+                            <path d="M100 116 V 150" stroke="#4ade80" stroke-width="3"/>
+                            <text x="45" y="135" fill="#86efac" font-size="8">إرجاع بـ 2 NADH</text>
+                            <rect x="40" y="155" width="120" height="28" rx="6" fill="#15803d"/>
+                            <text x="100" y="173" fill="white" font-size="10" text-anchor="middle" font-weight="bold">إيثانول (كحول C₂)</text>
+
+                            <!-- Right: Lactique -->
+                            <path d="M235 41 L 300 90" stroke="#f59e0b" stroke-width="3"/>
+                            <text x="325" y="65" fill="#fde68a" font-size="8">إرجاع مباشر بـ 2 NADH</text>
+                            <rect x="240" y="90" width="120" height="26" rx="6" fill="#b45309"/>
+                            <text x="300" y="107" fill="white" font-size="10" text-anchor="middle" font-weight="bold">حمض اللبن (C₃)</text>
+                            <rect x="240" y="155" width="120" height="28" rx="6" fill="#15803d"/>
+                            <text x="300" y="173" fill="white" font-size="10" text-anchor="middle" font-weight="bold">تعب عضلي / زبادي</text>
+                        </svg>
+                        <p style="font-size: 0.85rem; color: #cbd5e1; margin-top: 10px;">💡 الغرض البيولوجي للتخمر هو تجديد NAD⁺ لاستمرار التحلل السكري وإنتاج 2 ATP.</p>
+                    </div>
+
+                    <div class="doc-analysis">
+                        <span class="method-tag" style="background: #fef3c7; color: #b45309;">التفاصيل الكيميائية في البكالوريا</span>
+                        <h4 style="margin: 8px 0; color: var(--primary);">ما هو الفرق بين التخمرين؟</h4>
+                        <ul style="list-style-type: none; line-height: 1.8;">
+                            <li>• <strong>التخمر الكحولي (<span class="ltr-seq">Fermentation Alcoolique الخميرة</span>) :</strong> يطرح حمض البيروفيك جزيئتي <span class="ltr-seq">2 CO₂</span>، ثم يرجع بواسطة <span class="ltr-seq">2 NADH, H⁺</span> ليعطي كحول الإيثانول (<span class="ltr-seq">CH₃-CH₂OH</span>).</li>
+                            <li>• <strong>التخمر اللبني (<span class="ltr-seq">Fermentation Lactique العضلات / البكتيريا</span>) :</strong> يُرجع حمض البيروفيك مباشرة بواسطة <span class="ltr-seq">2 NADH, H⁺</span> دون طرح <span class="ltr-seq">CO₂</span>، ليعطي حمض اللبن الذي يسبب التعب العضلي.</li>
+                        </ul>
+                        <hr style="margin: 12px 0; border: none; border-top: 1px solid var(--border);">
+                        <p style="font-weight: bold; color: #b45309;">الحصيلة الطاقوية : 2 ATP فقط (لأن الكحول وحمض اللبن بقايا عضوية غنية بالطاقة لم تهدم).</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 3: Interactive Fermentation Simulator -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num step-num-amber">3</span>
+                    <span>مختبر مقارنة الهدم الكلي (التنفس) بالهدم الجزئي (التخمر)</span>
+                </div>
+                <p>قارن بين استهلاك الخميرة للغلوكوز في الوسط الهوائي والوسط اللاهوائي :</p>
+                
+                <div class="interactive-box" style="background: #451a03;">
+                    <div style="margin-bottom: 15px;">
+                        <button class="btn-action btn-amber" onclick="simFerm('resp')">🟢 وسط هوائي O₂ (تنفس : هدم كلي 38 ATP + تكاثر سريع)</button>
+                        <button class="btn-action" style="background:#dc2626;" onclick="simFerm('ferm')">🔴 وسط لاهوائي (تخمر : هدم جزئي 2 ATP + كحول إيثانول)</button>
+                    </div>
+                    <div id="fermDisplayBox" style="background: #78350f; border: 2px solid #fbbf24; border-radius: 12px; padding: 1.5rem; text-align: center;">
+                        <h3 style="color: #4ade80; margin-bottom: 10px;">🟢 وسط هوائي (التنفس الخلوي)</h3>
+                        <p style="color: #cbd5e1; line-height: 1.8;">يتم هدم الغلوكوز كلياً إلى مواد معدنية خالية من الطاقة (<span class="ltr-seq">CO₂ + H₂O</span>). تنتج كمية هائلة من الطاقة (<strong><span class="ltr-seq">38 ATP</span></strong>) تسمح بتكاثر ونمو سريع جداً لخلايا الخميرة.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 4: Quiz Ch28 -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num step-num-amber">4</span>
+                    <span>تقويم الدرس 28 : أسئلة البكالوريا المتكررة</span>
+                </div>
+
+                <div class="question-item" id="c28q1-container">
+                    <h4 style="margin-bottom: 12px;">1. لماذا تعتبر الحصيلة الطاقوية للتخمر (2 ATP) ضئيلة جداً مقارنة بالتنفس (38 ATP)؟</h4>
+                    <div class="options-grid">
+                        <button class="option-btn" onclick="checkCh28Answer(0, true)">أ) لأن التخمر هدم جزئي للغلوكوز، حيث تبقى معظم الطاقة الكيميائية الكامنة مخزنة في الروابط الكربونية للمنتج العضوي النهائي (كحول الإيثانول أو حمض اللبن).</button>
+                        <button class="option-btn" onclick="checkCh28Answer(1, false)">ب) لأن التخمر يستهلك 36 ATP في الهيولى.</button>
+                        <button class="option-btn" onclick="checkCh28Answer(2, false)">ج) لأن الخميرة لا تحتوي على إنزيمات.</button>
+                    </div>
+                    <div class="feedback-box" id="c28q1-feedback"></div>
+                </div>
+            </section>
+        </div>
+
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        function showChapter(chId, evt) {
+            document.querySelectorAll('.chapter-view').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.ch-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(chId).classList.add('active');
+            if (evt) evt.target.classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function simResp(state) {
+            let box = document.getElementById('respDisplayBox');
+            if (state === 'normal') {
+                box.innerHTML = `
+                    <h3 style="color: #4ade80; margin-bottom: 10px;">🟢 الحصيلة الطاقوية الكاملة للتنفس (38 ATP)</h3>
+                    <p style="color: #cbd5e1; line-height: 1.8;">كل جزيئة <span class="ltr-seq">1 NADH, H⁺</span> تعطي <strong>3 ATP</strong> (10 × 3 = 30 ATP). وكل جزيئة <span class="ltr-seq">1 FADH₂</span> تعطي <strong>2 ATP</strong> (2 × 2 = 4 ATP). زائد 4 ATP مباشرة (2 من التحلل + 2 من كريبس) = المجموع <strong><span class="ltr-seq">38 ATP</span></strong>.</p>
+                `;
+            } else {
+                box.innerHTML = `
+                    <h3 style="color: #ef4444; margin-bottom: 10px;">🔴 سم السيانيد - شلل السلسلة التنفسية والاختناق</h3>
+                    <p style="color: #cbd5e1; line-height: 1.8;">يرتبط السيانيد بالناقل الأخير (<span class="ltr-seq">T₆ - Cytochrome oxydase</span>) ويمنعه من نقل الإلكترونات إلى الأكسجين. تتوقف السلسلة التنفسية، يتوقف ضخ البروتونات، ويتوقف إنتاج الـ <span class="ltr-seq">ATP</span> تماماً فتموت العضوية اختناقاً في دقائق.</p>
+                `;
+            }
+        }
+
+        function simFerm(type) {
+            let box = document.getElementById('fermDisplayBox');
+            if (type === 'resp') {
+                box.innerHTML = `
+                    <h3 style="color: #4ade80; margin-bottom: 10px;">🟢 وسط هوائي (التنفس الخلوي)</h3>
+                    <p style="color: #cbd5e1; line-height: 1.8;">يتم هدم الغلوكوز كلياً إلى مواد معدنية خالية من الطاقة (<span class="ltr-seq">CO₂ + H₂O</span>). تنتج كمية هائلة من الطاقة (<strong><span class="ltr-seq">38 ATP</span></strong>) تسمح بتكاثر ونمو سريع جداً لخلايا الخميرة.</p>
+                `;
+            } else {
+                box.innerHTML = `
+                    <h3 style="color: #fb923c; margin-bottom: 10px;">🔴 وسط لاهوائي (التخمر الكحولي)</h3>
+                    <p style="color: #cbd5e1; line-height: 1.8;">يتم هدم الغلوكوز جزئياً ليعطي مادة عضوية غنية بالطاقة هي كحول الإيثانول. تنتج طاقة ضئيلة جداً (<strong><span class="ltr-seq">2 ATP</span></strong> فقط من التحلل السكري) فيكون تكاثر الخميرة بطيئاً جداً.</p>
+                `;
+            }
+        }
+
+        function checkCh27Answer(optIdx, isCorrect) {
+            let container = document.getElementById('c27q1-container');
+            let btns = container.querySelectorAll('.option-btn');
+            let fb = document.getElementById('c27q1-feedback');
+
+            btns.forEach((b, idx) => {
+                b.disabled = true;
+                if (idx === optIdx) b.classList.add(isCorrect ? 'correct' : 'wrong');
+            });
+
+            fb.style.display = 'block';
+            if (isCorrect) {
+                fb.style.background = '#f0fdf4'; fb.style.color = '#166534'; fb.style.border = '1px solid #bbf7d0';
+                fb.innerHTML = '<strong>✅ إجابة صحيحة ممتاز!</strong> الأكسجين يختزل إلى ماء وهو محرك سحب الإلكترونات في السلسلة.';
+            } else {
+                fb.style.background = '#fef2f2'; fb.style.color = '#991b1b'; fb.style.border = '1px solid #fecaca';
+                fb.innerHTML = '<strong>❌ إجابة خاطئة.</strong> الأكسجين O₂ هو المستقبل النهائي الحصري في التنفس الهوائي.';
+            }
+        }
+
+        function checkCh28Answer(optIdx, isCorrect) {
+            let container = document.getElementById('c28q1-container');
+            let btns = container.querySelectorAll('.option-btn');
+            let fb = document.getElementById('c28q1-feedback');
+
+            btns.forEach((b, idx) => {
+                b.disabled = true;
+                if (idx === optIdx) b.classList.add(isCorrect ? 'correct' : 'wrong');
+            });
+
+            fb.style.display = 'block';
+            if (isCorrect) {
+                fb.style.background = '#f0fdf4'; fb.style.color = '#166534'; fb.style.border = '1px solid #bbf7d0';
+                fb.innerHTML = '<strong>✅ إجابة صحيحة ممتاز!</strong> الهدم الجزئي يعني بقاء الطاقة في الروابط الكيميائية للكحول أو حمض اللبن.';
+            } else {
+                fb.style.background = '#fef2f2'; fb.style.color = '#991b1b'; fb.style.border = '1px solid #fecaca';
+                fb.innerHTML = '<strong>❌ إجابة خاطئة.</strong> السبب الأساسي هو عدم اكتمال الأكسدة وبقاء منتج عضوي غني بالطاقة.';
+            }
+        }
+    </script>
+</body>
+</html>

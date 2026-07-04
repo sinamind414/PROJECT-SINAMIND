@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منصة المتفوق 3AS | المرحلة 19 : الدرس 37 والدرس 38</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #f8fafc;
+            --surface: #ffffff;
+            --primary: #0f172a;
+            --accent: #2563eb;
+            --accent-light: #eff6ff;
+            --success: #16a34a;
+            --success-light: #f0fdf4;
+            --warning: #d97706;
+            --warning-light: #fffbeb;
+            --danger: #dc2626;
+            --danger-light: #fef2f2;
+            --blue-grey-dark: #334155;
+            --blue-grey-light: #f1f5f9;
+            --indigo-dark: #312e81;
+            --indigo-light: #eef2ff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --radius: 16px;
+            --shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Cairo', 'Tajawal', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            line-height: 1.8;
+            padding-bottom: 60px;
+        }
+
+        .ltr-seq {
+            direction: ltr;
+            unicode-bidi: embed;
+            display: inline-block;
+            font-family: monospace;
+            font-weight: bold;
+            color: var(--accent);
+            background: #f1f5f9;
+            padding: 2px 8px;
+            border-radius: 6px;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 900;
+            font-size: 1.25rem;
+            color: var(--primary);
+        }
+
+        .brand-badge {
+            background: var(--indigo-dark);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            white-space: nowrap;
+        }
+
+        .chapter-switcher {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .ch-btn {
+            background: var(--bg-main);
+            border: 2px solid var(--border);
+            padding: 8px 18px;
+            border-radius: 12px;
+            font-family: inherit;
+            font-weight: 800;
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .ch-btn:hover {
+            border-color: var(--indigo-dark);
+            color: var(--indigo-dark);
+        }
+
+        .ch-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                padding: 1rem;
+                text-align: center;
+            }
+            .chapter-switcher {
+                justify-content: center;
+                width: 100%;
+            }
+            .ch-btn {
+                flex: 1;
+                font-size: 0.85rem;
+                padding: 8px 10px;
+            }
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 2rem auto;
+            padding: 0 1.2rem;
+        }
+
+        .chapter-view {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .chapter-view.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Hero Header */
+        .lesson-header {
+            border-radius: var(--radius);
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+            color: white;
+        }
+
+        .header-ch37 {
+            background: linear-gradient(135deg, #1e1b4b 0%, #3730a3 100%);
+        }
+
+        .header-ch38 {
+            background: linear-gradient(135deg, #1e293b 0%, #475569 100%);
+        }
+
+        .lesson-breadcrumb {
+            font-size: 0.85rem;
+            opacity: 0.9;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .lesson-header h1 {
+            font-size: 2.1rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+            line-height: 1.3;
+        }
+
+        .lesson-objectives {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--surface);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+        }
+
+        @media (max-width: 600px) {
+            .lesson-header { padding: 1.5rem; }
+            .lesson-header h1 { font-size: 1.5rem; }
+            .card { padding: 1.2rem; }
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid var(--bg-main);
+            padding-bottom: 0.8rem;
+        }
+
+        .step-num {
+            background: #e0e7ff;
+            color: #3730a3;
+            width: 38px;
+            height: 38px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            font-weight: 900;
+            font-size: 1.1rem;
+        }
+
+        .step-num-slate {
+            background: #f1f5f9;
+            color: #334155;
+        }
+
+        .problem-box {
+            background: var(--warning-light);
+            border-right: 5px solid var(--warning);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+        }
+
+        .problem-title {
+            font-weight: 800;
+            color: #92400e;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Document Analysis */
+        .doc-viewer {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        @media (max-width: 850px) {
+            .doc-viewer { grid-template-columns: 1fr; }
+        }
+
+        .doc-visual {
+            background: #0f172a;
+            border-radius: 12px;
+            padding: 1.5rem;
+            color: white;
+        }
+
+        .svg-container {
+            width: 100%;
+            height: auto;
+            max-height: 260px;
+        }
+
+        .doc-analysis {
+            background: var(--bg-main);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+        }
+
+        .method-tag {
+            display: inline-block;
+            background: #e0f2fe;
+            color: #0369a1;
+            font-size: 0.75rem;
+            font-weight: 800;
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+        }
+
+        /* Interactive simulators */
+        .interactive-box {
+            background: #1e293b;
+            border-radius: 12px;
+            padding: 1.5rem;
+            color: white;
+            margin: 1.5rem 0;
+        }
+
+        .btn-action {
+            background: #3730a3;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-family: inherit;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin: 5px;
+        }
+
+        .btn-action:hover { background: #312e81; }
+        .btn-slate { background: #334155; }
+        .btn-slate:hover { background: #1e293b; }
+
+        /* Scientific text */
+        .scientific-text {
+            background: var(--surface);
+            border: 2px solid #cbd5e1;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .text-part {
+            margin-bottom: 1.2rem;
+            padding-right: 1rem;
+            border-right: 4px solid #3730a3;
+        }
+
+        .text-part.ch38-border { border-right-color: #334155; }
+
+        .text-part h4 {
+            font-size: 0.95rem;
+            color: #3730a3;
+            margin-bottom: 0.3rem;
+            font-weight: 800;
+        }
+
+        .text-part.ch38-border h4 { color: #334155; }
+
+        /* Quiz */
+        .question-item {
+            background: var(--bg-main);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin-top: 1rem;
+        }
+
+        .option-btn {
+            background: white;
+            border: 1.5px solid var(--border);
+            padding: 12px 16px;
+            border-radius: 10px;
+            text-align: right;
+            font-family: inherit;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text-main);
+        }
+
+        .option-btn:hover {
+            border-color: #3730a3;
+            background: #eef2ff;
+        }
+
+        .option-btn.correct {
+            background: var(--success-light);
+            border-color: var(--success);
+            color: var(--success);
+            font-weight: 700;
+        }
+
+        .option-btn.wrong {
+            background: var(--danger-light);
+            border-color: var(--danger);
+            color: var(--danger);
+        }
+
+        .feedback-box {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            display: none;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar with Phase Switcher -->
+    <nav class="navbar">
+        <div class="brand">
+            <span>منصة المتفوق 3AS</span>
+            <span class="brand-badge">المرحلة 19 (الدرس 37 و 38)</span>
+        </div>
+        <div class="chapter-switcher">
+            <button class="ch-btn active" onclick="showChapter('ch37', event)">📡 الدرس 37 : الموجات الزلزالية وانقطاعات باطن الأرض</button>
+            <button class="ch-btn" onclick="showChapter('ch38', event)">🪨 الدرس 38 : التركيب الصخري والمعدني للقشرة والبرنس</button>
+        </div>
+    </nav>
+
+    <div class="container">
+
+        <!-- ================================================================= -->
+        <!-- CHAPTER 37 : ONDES SISMIQUES & DISCONTINUITÉS (الدرس 37) -->
+        <!-- ================================================================= -->
+        <div id="ch37" class="chapter-view active">
+            
+            <header class="lesson-header header-ch37">
+                <div class="lesson-breadcrumb">المجال الثالث : التكتونية العامة • الوحدة 2 : بنية الكرة الأرضية</div>
+                <h1>الدرس 37 : انتشار الموجات الزلزالية (P و S) وتحديد الانقطاعات الرئيسية لباطن الأرض</h1>
+                <div class="lesson-objectives">
+                    <div>🎯 <strong>الهدف العلمي :</strong> استغلال اختلاف سرعة الموجات الزلزالية (P و S) لإثبات وجود الانقطاعات الثلاثة (موهو، غوتنبرغ، ليمان) وتحديد الحالة الفيزيائية للنواة الخارجية السائلة.</div>
+                    <div>⏱️ <strong>المدة التقديرية للتعلم الذاتي :</strong> 25 دقيقة</div>
+                </div>
+            </header>
+
+            <!-- Step 1: Problématique -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num">1</span>
+                    <span>وضعية الانطلاق وبناء الإشكالية العلميـة</span>
+                </div>
+                <div class="problem-box">
+                    <div class="problem-title">⚠️ كيف عرفنا أن باطن الأرض مكون من طبقات وأن نواتها الخارجية سائلة دون حفر الأرض؟</div>
+                    <p>أعمق بئر حفره الإنسان على وجه الأرض (بئر كولا في روسيا) لم يتجاوز عمقه 12 كيلومتراً، وهو لا يمثل سوى خدش بسيط في قشرة الأرض (نصف قطر الأرض = 6371 كم!). ومع ذلك، استطاع الجيولوجيون رسم خريطة دقيقة لكل أغلفة باطن الأرض. <strong>كيف تم استغلال سرعة وسلوك الموجات الزلزالية الطبيعية كـ "جهاز إيكوغرافيا" لكشف أسرار وأعماق الأرض؟</strong></p>
+                </div>
+            </section>
+
+            <!-- Step 2: Document Analyse -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num">2</span>
+                    <span>التحليل المنهجي لمنحنى سرعة الموجات الزلزالية (P و S) بدلالة العمق وانقطاعات الأرض</span>
+                </div>
+                <div class="doc-viewer">
+                    <div class="doc-visual" style="background: #1e1b4b;">
+                        <h4 style="color: #a5b4fc; margin-bottom: 1rem; font-size: 0.95rem;">منحنى سرعة الموجات P و S والانقطاعات الثلاثة لباطن الأرض</h4>
+                        <!-- SVG Seismic Waves -->
+                        <svg class="svg-container" viewBox="0 0 400 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Axes -->
+                            <path d="M50 20 V 190 H 370" stroke="#94a3b8" stroke-width="2"/>
+                            <text x="350" y="205" fill="#cbd5e1" font-size="10">العمق (كم)</text>
+                            <text x="30" y="30" fill="#cbd5e1" font-size="10" text-anchor="end">السرعة V</text>
+
+                            <!-- Discontinuities lines -->
+                            <!-- Moho ~30 km -->
+                            <path d="M70 20 V 190" stroke="#fbbf24" stroke-width="1.5" stroke-dasharray="4"/>
+                            <text x="65" y="35" fill="#fde68a" font-size="7" transform="rotate(-90,65,35)">موهو (30 كم)</text>
+
+                            <!-- Gutenberg ~2900 km -->
+                            <path d="M220 20 V 190" stroke="#ef4444" stroke-width="2" stroke-dasharray="4"/>
+                            <text x="215" y="35" fill="#fca5a5" font-size="8" transform="rotate(-90,215,35)">غوتنبرغ (2900 كم)</text>
+
+                            <!-- Lehmann ~5100 km -->
+                            <path d="M310 20 V 190" stroke="#a855f7" stroke-width="1.5" stroke-dasharray="4"/>
+                            <text x="305" y="35" fill="#e879f9" font-size="7" transform="rotate(-90,305,35)">ليمان (5100 كم)</text>
+
+                            <!-- P Wave Curve (blue) -->
+                            <path d="M50 160 L 70 140 L 220 60 L 225 110 L 310 90 L 360 80" stroke="#38bdf8" stroke-width="3.5" fill="none"/>
+                            <text x="150" y="75" fill="#38bdf8" font-size="10" font-weight="bold">الموجات P (تخترق كل شيء)</text>
+
+                            <!-- S Wave Curve (green) -->
+                            <path d="M50 170 L 70 155 L 220 85" stroke="#4ade80" stroke-width="3.5" fill="none"/>
+                            <circle cx="220" cy="85" r="5" fill="#ef4444"/>
+                            <text x="140" y="115" fill="#4ade80" font-size="10" font-weight="bold">الموجات S (تتوقف عند 2900 كم)</text>
+
+                            <!-- Core regions text -->
+                            <text x="265" y="170" fill="#fca5a5" font-size="9" text-anchor="middle">النواة الخارجية (سائلة)</text>
+                            <text x="340" y="170" fill="#e879f9" font-size="8" text-anchor="middle">النواة الداخلية</text>
+                        </svg>
+                        <p style="font-size: 0.85rem; color: #cbd5e1; margin-top: 10px;">💡 اختفاء الموجات S عند عمق 2900 كم هو الدليل القاطع على سيولة النواة الخارجية.</p>
+                    </div>
+
+                    <div class="doc-analysis">
+                        <span class="method-tag">منهجية البكالوريا : تفسير سلوك الموجات</span>
+                        <h4 style="margin: 8px 0; color: var(--primary);">ما هي خصائص الموجات والانقطاعات؟</h4>
+                        <p>1. <strong>خصائص الموجات الزلزالية :</strong></p>
+                        <ul style="list-style-type: none; line-height: 1.8;">
+                            <li>• <strong>الموجات الأولية (<span class="ltr-seq">Ondes P</span>) :</strong> طولية، سريعة جداً، <em>تنتشر في الأوساط الصلبة والسائلة</em>. سرعتها تزداد بازدياد كثافة وصلابة الوسط.</li>
+                            <li>• <strong>الموجات الثانوية (<span class="ltr-seq">Ondes S</span>) :</strong> عرضية، أقل سرعة، <em>تنتشر في الأوساط الصلبة فقط ولا تخترق السوائل أبداً</em>.</li>
+                        </ul>
+                        <hr style="margin: 12px 0; border: none; border-top: 1px solid var(--border);">
+                        <p>2. <strong>الانقطاعات الكبرى (<span class="ltr-seq">Discontinuités تغير مفاجئ للسرعة</span>) :</strong></p>
+                        <ul style="list-style-type: none; line-height: 1.8;">
+                            <li>• <strong>انقطاع موهو (<span class="ltr-seq">Moho</span>) :</strong> يفصل بين القشرة والبرنس (على عمق ~30 كم قارياً و ~7 كم محيطياً).</li>
+                            <li>• <strong>انقطاع غوتنبرغ (<span class="ltr-seq">Gutenberg عمق 2900 كم</span>) :</strong> يفصل بين البرنس الصلب والنواة الخارجية، حيث <strong>تنعدم سرعة الموجات S كلياً وتنخفض سرعة P</strong>، مما يثبت أن النواة الخارجية سائلة.</li>
+                            <li>• <strong>انقطاع ليمان (<span class="ltr-seq">Lehmann عمق 5100 كم</span>) :</strong> يفصل بين النواة الخارجية السائلة والنواة الداخلية الصلبة (البذرة).</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 3: Interactive Seismic Simulator -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num">3</span>
+                    <span>محاكي انتشار الموجات الزلزالية التفاعلي</span>
+                </div>
+                <p>اختر نوع الموجة الزلزالية لمعاينة قدرتها على اختراق طبقات باطن الأرض :</p>
+                
+                <div class="interactive-box" style="background: #1e1b4b;">
+                    <div style="margin-bottom: 15px;">
+                        <button class="btn-action" style="background:#0284c7;" onclick="simSeisme('p')">📡 الموجات الأولية (Ondes P)</button>
+                        <button class="btn-action" style="background:#16a34a;" onclick="simSeisme('s')">📡 الموجات الثانوية (Ondes S)</button>
+                    </div>
+                    <div id="seismeDisplayBox" style="background: #312e81; border: 2px solid #6366f1; border-radius: 12px; padding: 1.5rem; text-align: center;">
+                        <h3 style="color: #38bdf8; margin-bottom: 10px;">📡 الموجات الأولية (Ondes P - تخترق كل الأرض)</h3>
+                        <p style="color: #cbd5e1; line-height: 1.8;">تخترق القشرة والبرنس بسرعة عالية، وعند وصولها لعمق 2900 كم (انقطاع غوتنبرغ) تنخفض سرعتها فجأة وتنكسر لأنها دخلت في وسط سائل (النواة الخارجية)، ثم تزداد سرعتها مجدداً عند دخولها النواة الداخلية الصلبة عند 5100 كم.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 4: Quiz Ch37 -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num">4</span>
+                    <span>تقويم الدرس 37 : أسئلة البكالوريا المتكررة</span>
+                </div>
+
+                <div class="question-item" id="c37q1-container">
+                    <h4 style="margin-bottom: 12px;">1. ما هو الدليل العلمي القاطع الذي استنتجه العلماء من توقف واختفاء الموجات الزلزالية (<span class="ltr-seq">Ondes S</span>) عند انقطاع غوتنبرغ (عمق 2900 كم)؟</h4>
+                    <div class="options-grid">
+                        <button class="option-btn" onclick="checkCh37Answer(0, true)">أ) استنتجوا أن النواة الخارجية للكرة الأرضية توجد في حالة فيزيائية سائلة (مصهورة)، لأن الموجات S لا تنتشر في السوائل.</button>
+                        <button class="option-btn" onclick="checkCh37Answer(1, false)">ب) استنتجوا أن الأرض فارغة ومجوفة من الداخل.</button>
+                        <button class="option-btn" onclick="checkCh37Answer(2, false)">ج) استنتجوا أن النواة الخارجية أصلب من الماس.</button>
+                    </div>
+                    <div class="feedback-box" id="c37q1-feedback"></div>
+                </div>
+            </section>
+        </div>
+
+        <!-- ================================================================= -->
+        <!-- CHAPTER 38 : COMPOSITION CHIMIQUE CROÛTE & MANTEAU (الدرس 38) -->
+        <!-- ================================================================= -->
+        <div id="ch38" class="chapter-view">
+            
+            <header class="lesson-header header-ch38">
+                <div class="lesson-breadcrumb">المجال الثالث : التكتونية العامة • الوحدة 2 : بنية الكرة الأرضية</div>
+                <h1>الدرس 38 : التركيب الصخري والمعدني والكيميائي للقشرة الأرضية والبرنس (الستار)</h1>
+                <div class="lesson-objectives">
+                    <div>🎯 <strong>الهدف العلمي :</strong> المقارنة المعدنية بين القشرة القارية (غرانستية SIAL) والقشرة المحيطية (بازلتية SIMA)، وتوضيح الطبيعة الفوق قاعدية للبرنس (البيريدوتيت).</div>
+                    <div>⏱️ <strong>المدة التقديرية للتعلم الذاتي :</strong> 25 دقيقة</div>
+                </div>
+            </header>
+
+            <!-- Step 1: Problématique -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num step-num-slate">1</span>
+                    <span>الإشكالية الصخرية لأغلفة الأرض</span>
+                </div>
+                <div class="problem-box" style="border-right-color: var(--blue-grey-dark); background: var(--blue-grey-light);">
+                    <div class="problem-title" style="color: #1e293b;">⚠️ لماذا يختلف التركيب المعدني لصخور القارات عن صخور قاع المحيطات وأعماق البرنس؟</div>
+                    <p>تتباين كثافة أغلفة الأرض من 2.7 في القشرة القارية إلى 3.0 في القشرة المحيطية وتصل إلى 3.3 في البرنس العلوي. <strong>ما هي المعادن والصخور المميزة لكل غلاف؟ وكيف يفسر التغير التدريجي لسرعة الموجات الزلزالية داخل البرنس رغم ثبات صخره الأم (البيريدوتيت)؟</strong></p>
+                </div>
+            </section>
+
+            <!-- Step 2: Document Analyse -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num step-num-slate">2</span>
+                    <span>التحليل المنهجي للتركيب المعدني (الكوارتز، الفلسبار، الأوليفين والبيروكسين)</span>
+                </div>
+                <div class="doc-viewer">
+                    <div class="doc-visual" style="background: #1e293b;">
+                        <h4 style="color: #cbd5e1; margin-bottom: 1rem; font-size: 0.95rem;">مقارنة الصخور المميزة للأغلفة الصخرية والستار الأرضي</h4>
+                        <!-- SVG Rocks -->
+                        <svg class="svg-container" viewBox="0 0 400 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Continental Crust Granite -->
+                            <rect x="20" y="30" width="110" height="140" rx="8" fill="#64748b" stroke="#cbd5e1"/>
+                            <text x="75" y="55" fill="white" font-size="10" text-anchor="middle" font-weight="bold">القشرة القارية</text>
+                            <text x="75" y="75" fill="#fef08a" font-size="9" text-anchor="middle">صخر الغرانيت</text>
+                            <text x="75" y="105" fill="#e2e8f0" font-size="8" text-anchor="middle">كوارتز + فلسبار</text>
+                            <text x="75" y="145" fill="#94a3b8" font-size="8" text-anchor="middle">SIAL (سيليس + ألمنيوم)</text>
+                            <text x="75" y="160" fill="#4ade80" font-size="9" text-anchor="middle">الكثافة = 2.7</text>
+
+                            <!-- Oceanic Crust Basalt -->
+                            <rect x="145" y="30" width="110" height="140" rx="8" fill="#334155" stroke="#94a3b8"/>
+                            <text x="200" y="55" fill="white" font-size="10" text-anchor="middle" font-weight="bold">القشرة المحيطية</text>
+                            <text x="200" y="75" fill="#38bdf8" font-size="9" text-anchor="middle">بازلت + غابرو</text>
+                            <text x="200" y="105" fill="#e2e8f0" font-size="8" text-anchor="middle">بيروكسين + بلاجيوكلاز</text>
+                            <text x="200" y="145" fill="#94a3b8" font-size="8" text-anchor="middle">SIMA (سيليس + مغنيزيوم)</text>
+                            <text x="200" y="160" fill="#4ade80" font-size="9" text-anchor="middle">الكثافة = 3.0</text>
+
+                            <!-- Mantle Peridotite -->
+                            <rect x="270" y="30" width="110" height="140" rx="8" fill="#14532d" stroke="#4ade80"/>
+                            <text x="325" y="55" fill="white" font-size="10" text-anchor="middle" font-weight="bold">البرنس (الستار)</text>
+                            <text x="325" y="75" fill="#86efac" font-size="9" text-anchor="middle">صخر البيريدوتيت</text>
+                            <text x="325" y="105" fill="#e2e8f0" font-size="8" text-anchor="middle">أوليفين + بيروكسين</text>
+                            <text x="325" y="145" fill="#86efac" font-size="8" text-anchor="middle">صخر فوق قاعدي غني بالحديد</text>
+                            <text x="325" y="160" fill="#fef08a" font-size="9" text-anchor="middle">الكثافة = 3.3</text>
+                        </svg>
+                        <p style="font-size: 0.85rem; color: #cbd5e1; margin-top: 10px;">💡 تزداد نسبة الحديد والمغنيزيوم وتزداد الكثافة بالاتجاه نحو البرنس.</p>
+                    </div>
+
+                    <div class="doc-analysis">
+                        <span class="method-tag" style="background: #f1f5f9; color: #334155;">الخصائص الصخرية المعتمدة في البكالوريا</span>
+                        <h4 style="margin: 8px 0; color: var(--primary);">ما هو التغير البلوري للبيريدوتيت؟</h4>
+                        <p>يتكون البرنس الأرضي بالكامل من صخر واحد هو <strong>البيريدوتيت (<span class="ltr-seq">Péridotite</span>)</strong>. ولكن سرعة الموجات الزلزالية تزداد تدريجياً وبقفزات داخل البرنس مع زيادة العمق والضغط!</p>
+                        <hr style="margin: 12px 0; border: none; border-top: 1px solid var(--border);">
+                        <p><strong>التفسير العلمي :</strong> لا يتغير التركيب الكيميائي للبيريدوتيت، ولكن الضغط الهائل في الأعماق يجبر ذرات معادنه (الأوليفين) على إعادة الترتيب والاندماج في أشكال بلورية أكثر تراصاً وكثافة (تغير البنية البلورية من أوليفين إلى إسبينيل ثم بيروفسكايت)، مما يزيد من سرعة الموجات.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 3: Interactive Petrographic Lab -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num step-num-slate">3</span>
+                    <span>مختبر الصخور والمعادن التفاعلي</span>
+                </div>
+                <p>اضغط على الصخر لمعاينة تركيبه المعدني وموقعه في الطبقات :</p>
+                
+                <div class="interactive-box" style="background: #1e293b;">
+                    <div style="margin-bottom: 15px;">
+                        <button class="btn-action btn-slate" onclick="simRock('granite')">🪨 الغرانيت (Granite - قشرة قارية)</button>
+                        <button class="btn-action btn-slate" style="background:#0e7490;" onclick="simRock('basalte')">🪨 البازلت (Basalte - قشرة محيطية)</button>
+                        <button class="btn-action btn-slate" style="background:#15803d;" onclick="simRock('perido')">🪨 البيريدوتيت (Péridotite - البرنس)</button>
+                    </div>
+                    <div id="rockDisplayBox" style="background: #0f172a; border: 2px solid #64748b; border-radius: 12px; padding: 1.5rem; text-align: center;">
+                        <h3 style="color: #4ade80; margin-bottom: 10px;">🪨 صخر البيريدوتيت (Péridotite)</h3>
+                        <p style="color: #cbd5e1; line-height: 1.8;">هو الصخر المكون للبرنس (الستار) الأرضي بنسبة 100%. صخر فوق قاعدي غني جداً بمعدني <strong>الأوليفين والبيروكسين</strong> والحديد والمغنيزيوم، كثافته عالية (3.3 g/cm³).</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 4: Quiz Ch38 -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num step-num-slate">4</span>
+                    <span>تقويم الدرس 38 : أسئلة البكالوريا المتكررة</span>
+                </div>
+
+                <div class="question-item" id="c38q1-container">
+                    <h4 style="margin-bottom: 12px;">1. ما هو الصخر الأم الأساسي الذي يتكون منه ستار أو برنس الكرة الأرضية (<span class="ltr-seq">Manteau</span>) بالكامل؟</h4>
+                    <div class="options-grid">
+                        <button class="option-btn" onclick="checkCh38Answer(0, true)">أ) صخر البيريدوتيت (<span class="ltr-seq">Péridotite</span> الغني بالأوليفين والبيروكسين).</button>
+                        <button class="option-btn" onclick="checkCh38Answer(1, false)">ب) صخر الغرانيت.</button>
+                        <button class="option-btn" onclick="checkCh38Answer(2, false)">ج) صخر الكلس.</button>
+                    </div>
+                    <div class="feedback-box" id="c38q1-feedback"></div>
+                </div>
+            </section>
+        </div>
+
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        function showChapter(chId, evt) {
+            document.querySelectorAll('.chapter-view').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.ch-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(chId).classList.add('active');
+            if (evt) evt.target.classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function simSeisme(wave) {
+            let box = document.getElementById('seismeDisplayBox');
+            if (wave === 'p') {
+                box.innerHTML = `
+                    <h3 style="color: #38bdf8; margin-bottom: 10px;">📡 الموجات الأولية (Ondes P - تخترق كل الأرض)</h3>
+                    <p style="color: #cbd5e1; line-height: 1.8;">تخترق القشرة والبرنس بسرعة عالية، وعند وصولها لعمق 2900 كم (انقطاع غوتنبرغ) تنخفض سرعتها فجأة وتنكسر لأنها دخلت في وسط سائل (النواة الخارجية)، ثم تزداد سرعتها مجدداً عند دخولها النواة الداخلية الصلبة عند 5100 كم.</p>
+                `;
+            } else {
+                box.innerHTML = `
+                    <h3 style="color: #4ade80; margin-bottom: 10px;">📡 الموجات الثانوية (Ondes S - تتوقف عند 2900 كم)</h3>
+                    <p style="color: #cbd5e1; line-height: 1.8;">موجات عرضية لا تنتشر إلا في الأوساط الصلبة. تنتشر بشكل عادي في القشرة والبرنس الصلب/اللدن، وعند وصولها لعمق 2900 كم (انقطاع غوتنبرغ) <strong>تتوقف وتنعدم كلياً</strong> لأن النواة الخارجية سائلة ولا تنقل الموجات S.</p>
+                `;
+            }
+        }
+
+        function simRock(rock) {
+            let box = document.getElementById('rockDisplayBox');
+            if (rock === 'perido') {
+                box.innerHTML = `
+                    <h3 style="color: #4ade80; margin-bottom: 10px;">🪨 صخر البيريدوتيت (Péridotite - البرنس)</h3>
+                    <p style="color: #cbd5e1; line-height: 1.8;">هو الصخر المكون للبرنس (الستار) الأرضي بنسبة 100%. صخر فوق قاعدي غني جداً بمعدني <strong>الأوليفين والبيروكسين</strong> والحديد والمغنيزيوم، كثافته عالية (3.3 g/cm³).</p>
+                `;
+            } else if (rock === 'granite') {
+                box.innerHTML = `
+                    <h3 style="color: #fef08a; margin-bottom: 10px;">🪨 صخر الغرانيت (Granite - قشرة قارية)</h3>
+                    <p style="color: #cbd5e1; line-height: 1.8;">صخر بلوتوني محبب ومميز للقشرة القارية. غني بالسيليس والألمنيوم (<span class="ltr-seq">SIAL</span>) ويتكون من معادن الكوارتز والفلسبار والميكا، كثافته منخفضة (2.7 g/cm³).</p>
+                `;
+            } else {
+                box.innerHTML = `
+                    <h3 style="color: #38bdf8; margin-bottom: 10px;">🪨 صخر البازلت والغابرو (Basalte - قشرة محيطية)</h3>
+                    <p style="color: #cbd5e1; line-height: 1.8;">صخور مميزة لقاع المحيطات. غنية بالسيليس والمغنيزيوم (<span class="ltr-seq">SIMA</span>) وتتكون من معادن البيروكسين والبلاجيوكلاز الكلسي، كثافتها متوسطة (3.0 g/cm³).</p>
+                `;
+            }
+        }
+
+        function checkCh37Answer(optIdx, isCorrect) {
+            let container = document.getElementById('c37q1-container');
+            let btns = container.querySelectorAll('.option-btn');
+            let fb = document.getElementById('c37q1-feedback');
+
+            btns.forEach((b, idx) => {
+                b.disabled = true;
+                if (idx === optIdx) b.classList.add(isCorrect ? 'correct' : 'wrong');
+            });
+
+            fb.style.display = 'block';
+            if (isCorrect) {
+                fb.style.background = '#f0fdf4'; fb.style.color = '#166534'; fb.style.border = '1px solid #bbf7d0';
+                fb.innerHTML = '<strong>✅ إجابة صحيحة ممتاز!</strong> عدم نفاذية الموجات S في السوائل هو البرهان الزلزالي القاطع على سيولة النواة الخارجية.';
+            } else {
+                fb.style.background = '#fef2f2'; fb.style.color = '#991b1b'; fb.style.border = '1px solid #fecaca';
+                fb.innerHTML = '<strong>❌ إجابة خاطئة.</strong> توقف الموجات S يثبت التغير الجذري في الحالة الفيزيائية للوسط نحو السيولة.';
+            }
+        }
+
+        function checkCh38Answer(optIdx, isCorrect) {
+            let container = document.getElementById('c38q1-container');
+            let btns = container.querySelectorAll('.option-btn');
+            let fb = document.getElementById('c38q1-feedback');
+
+            btns.forEach((b, idx) => {
+                b.disabled = true;
+                if (idx === optIdx) b.classList.add(isCorrect ? 'correct' : 'wrong');
+            });
+
+            fb.style.display = 'block';
+            if (isCorrect) {
+                fb.style.background = '#f0fdf4'; fb.style.color = '#166534'; fb.style.border = '1px solid #bbf7d0';
+                fb.innerHTML = '<strong>✅ إجابة صحيحة ممتاز!</strong> البيريدوتيت هو الصخر الأم الحصري لكامل أجزاء البرنس.';
+            } else {
+                fb.style.background = '#fef2f2'; fb.style.color = '#991b1b'; fb.style.border = '1px solid #fecaca';
+                fb.innerHTML = '<strong>❌ إجابة خاطئة.</strong> الغرانيت خاص بالقشرة القارية فقط ولا يتواجد في البرنس.';
+            }
+        }
+    </script>
+</body>
+</html>

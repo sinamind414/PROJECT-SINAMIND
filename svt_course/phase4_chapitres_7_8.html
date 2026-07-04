@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منصة المتفوق 3AS | المرحلة 4 : الدرس 7 والدرس 8</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #f8fafc;
+            --surface: #ffffff;
+            --primary: #0f172a;
+            --accent: #2563eb;
+            --accent-light: #eff6ff;
+            --success: #16a34a;
+            --success-light: #f0fdf4;
+            --warning: #d97706;
+            --warning-light: #fffbeb;
+            --danger: #dc2626;
+            --danger-light: #fef2f2;
+            --indigo: #4f46e5;
+            --indigo-light: #eef2ff;
+            --orange: #ea580c;
+            --orange-light: #fff7ed;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --radius: 16px;
+            --shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Cairo', 'Tajawal', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            line-height: 1.8;
+            padding-bottom: 60px;
+        }
+
+        .ltr-seq {
+            direction: ltr;
+            unicode-bidi: embed;
+            display: inline-block;
+            font-family: monospace;
+            font-weight: bold;
+            color: var(--accent);
+            background: #f1f5f9;
+            padding: 2px 8px;
+            border-radius: 6px;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 900;
+            font-size: 1.25rem;
+            color: var(--primary);
+        }
+
+        .brand-badge {
+            background: var(--indigo);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            white-space: nowrap;
+        }
+
+        .chapter-switcher {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .ch-btn {
+            background: var(--bg-main);
+            border: 2px solid var(--border);
+            padding: 8px 18px;
+            border-radius: 12px;
+            font-family: inherit;
+            font-weight: 800;
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .ch-btn:hover {
+            border-color: var(--indigo);
+            color: var(--indigo);
+        }
+
+        .ch-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                padding: 1rem;
+                text-align: center;
+            }
+            .chapter-switcher {
+                justify-content: center;
+                width: 100%;
+            }
+            .ch-btn {
+                flex: 1;
+                font-size: 0.85rem;
+                padding: 8px 10px;
+            }
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 2rem auto;
+            padding: 0 1.2rem;
+        }
+
+        .chapter-view {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .chapter-view.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Hero Header */
+        .lesson-header {
+            border-radius: var(--radius);
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+            color: white;
+        }
+
+        .header-ch7 {
+            background: linear-gradient(135deg, #1e1b4b 0%, #4f46e5 100%);
+        }
+
+        .header-ch8 {
+            background: linear-gradient(135deg, #7c2d12 0%, #ea580c 100%);
+        }
+
+        .lesson-breadcrumb {
+            font-size: 0.85rem;
+            opacity: 0.9;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .lesson-header h1 {
+            font-size: 2.1rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+            line-height: 1.3;
+        }
+
+        .lesson-objectives {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--surface);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+        }
+
+        @media (max-width: 600px) {
+            .lesson-header { padding: 1.5rem; }
+            .lesson-header h1 { font-size: 1.5rem; }
+            .card { padding: 1.2rem; }
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid var(--bg-main);
+            padding-bottom: 0.8rem;
+        }
+
+        .step-num {
+            background: var(--indigo-light);
+            color: var(--indigo);
+            width: 38px;
+            height: 38px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            font-weight: 900;
+            font-size: 1.1rem;
+        }
+
+        .step-num-orange {
+            background: var(--orange-light);
+            color: var(--orange);
+        }
+
+        .problem-box {
+            background: var(--warning-light);
+            border-right: 5px solid var(--warning);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+        }
+
+        .problem-title {
+            font-weight: 800;
+            color: #92400e;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Document Analysis */
+        .doc-viewer {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        @media (max-width: 850px) {
+            .doc-viewer { grid-template-columns: 1fr; }
+        }
+
+        .doc-visual {
+            background: #0f172a;
+            border-radius: 12px;
+            padding: 1.5rem;
+            color: white;
+        }
+
+        .svg-container {
+            width: 100%;
+            height: auto;
+            max-height: 260px;
+        }
+
+        .doc-analysis {
+            background: var(--bg-main);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+        }
+
+        .method-tag {
+            display: inline-block;
+            background: #e0f2fe;
+            color: #0369a1;
+            font-size: 0.75rem;
+            font-weight: 800;
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+        }
+
+        /* Interactive simulators */
+        .interactive-box {
+            background: #1e293b;
+            border-radius: 12px;
+            padding: 1.5rem;
+            color: white;
+            margin: 1.5rem 0;
+        }
+
+        .btn-action {
+            background: var(--indigo);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-family: inherit;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin: 5px;
+        }
+
+        .btn-action:hover { background: #4338ca; }
+        .btn-orange { background: var(--orange); }
+        .btn-orange:hover { background: #c2410c; }
+
+        /* Scientific text */
+        .scientific-text {
+            background: var(--surface);
+            border: 2px solid #cbd5e1;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .text-part {
+            margin-bottom: 1.2rem;
+            padding-right: 1rem;
+            border-right: 4px solid var(--indigo);
+        }
+
+        .text-part.ch8-border { border-right-color: var(--orange); }
+
+        .text-part h4 {
+            font-size: 0.95rem;
+            color: var(--indigo);
+            margin-bottom: 0.3rem;
+            font-weight: 800;
+        }
+
+        .text-part.ch8-border h4 { color: var(--orange); }
+
+        /* Quiz */
+        .question-item {
+            background: var(--bg-main);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin-top: 1rem;
+        }
+
+        .option-btn {
+            background: white;
+            border: 1.5px solid var(--border);
+            padding: 12px 16px;
+            border-radius: 10px;
+            text-align: right;
+            font-family: inherit;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text-main);
+        }
+
+        .option-btn:hover {
+            border-color: var(--indigo);
+            background: #eef2ff;
+        }
+
+        .option-btn.correct {
+            background: var(--success-light);
+            border-color: var(--success);
+            color: var(--success);
+            font-weight: 700;
+        }
+
+        .option-btn.wrong {
+            background: var(--danger-light);
+            border-color: var(--danger);
+            color: var(--danger);
+        }
+
+        .feedback-box {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            display: none;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar with Phase Switcher -->
+    <nav class="navbar">
+        <div class="brand">
+            <span>منصة المتفوق 3AS</span>
+            <span class="brand-badge">المرحلة 4 (الدرس 7 و 8)</span>
+        </div>
+        <div class="chapter-switcher">
+            <button class="ch-btn active" onclick="showChapter('ch7', event)">🧪 الدرس 7 : تأثير درجة الحموضة (pH) على النشاط الإنزيمي</button>
+            <button class="ch-btn" onclick="showChapter('ch8', event)">🔥 الدرس 8 : تأثير درجة الحرارة وحركية التفاعل الإنزيمي</button>
+        </div>
+    </nav>
+
+    <div class="container">
+
+        <!-- ================================================================= -->
+        <!-- CHAPTER 7 : INFLUENCE DU pH SUR L'ACTIVITÉ ENZYMATIQUE (الدرس 7) -->
+        <!-- ================================================================= -->
+        <div id="ch7" class="chapter-view active">
+            
+            <header class="lesson-header header-ch7">
+                <div class="lesson-breadcrumb">المجال الأول : التخصص الوظيفي للبروتينات • الوحدة 3 : النشاط الإنزيمي للبروتينات</div>
+                <h1>الدرس 7 : تأثير درجة الحموضة (pH الوسط) على النشاط الإنزيمي</h1>
+                <div class="lesson-objectives">
+                    <div>🎯 <strong>الهدف العلمي :</strong> تحديد مفهوم درجة الحموضة المثلى (pH optimum)، وتفسير تأثير تغير الـ pH على الحالة الكهربائية (التأين) للجذور الحرة في الموقع الفعال.</div>
+                    <div>⏱️ <strong>المدة التقديرية للتعلم الذاتي :</strong> 25 دقيقة</div>
+                </div>
+            </header>
+
+            <!-- Step 1: Problématique -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num">1</span>
+                    <span>وضعية الانطلاق وبناء الإشكالية العلميـة</span>
+                </div>
+                <div class="problem-box">
+                    <div class="problem-title">⚠️ لماذا يعمل إنزيم الببسين في المعدة (pH = 2) ويتوقف في الأمعاء؟</div>
+                    <p>تعمل إنزيمات المعدة في وسط شديد الحموضة (<span class="ltr-seq">pH ≈ 2</span>)، بينما تعمل إنزيمات اللعاب في وسط معتدل (<span class="ltr-seq">pH ≈ 7</span>)، وإنزيمات البنكرياس في الأمعاء في وسط قاعدي (<span class="ltr-seq">pH ≈ 8.5</span>). وإذا نقلنا إنزيم المعدة إلى الأمعاء يتوقف نشاطه كلياً! <strong>كيف يؤثر تغير رقم الـ pH على البنية الجزيئية للموقع الفعال للإنزيم؟</strong></p>
+                </div>
+            </section>
+
+            <!-- Step 2: Document Analyse -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num">2</span>
+                    <span>التحليل المنهجي لمنحنى سرعة النشاط الإنزيمي بدلالة الـ pH</span>
+                </div>
+                <div class="doc-viewer">
+                    <div class="doc-visual" style="background: #1e1b4b;">
+                        <h4 style="color: #a5b4fc; margin-bottom: 1rem; font-size: 0.95rem;">منحنى النشاط الإنزيمي بدلالة الـ pH (شكل الجرس المنحني)</h4>
+                        <!-- SVG pH Curve -->
+                        <svg class="svg-container" viewBox="0 0 400 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Axes -->
+                            <path d="M50 180 L 370 180" stroke="#94a3b8" stroke-width="2"/>
+                            <path d="M50 180 L 50 20" stroke="#94a3b8" stroke-width="2"/>
+                            <text x="360" y="200" fill="#cbd5e1" font-size="11">pH الوسط</text>
+                            <text x="30" y="30" fill="#cbd5e1" font-size="11" text-anchor="end">السرعة Vi</text>
+
+                            <!-- Bell Curve -->
+                            <path d="M70 178 C 120 178, 170 30, 200 30 C 230 30, 280 178, 330 178" stroke="#818cf8" stroke-width="4" fill="none"/>
+
+                            <!-- Optimum dashed line -->
+                            <path d="M200 30 L 200 180" stroke="#4ade80" stroke-width="2" stroke-dasharray="4"/>
+                            <circle cx="200" cy="30" r="6" fill="#4ade80"/>
+                            <text x="200" y="15" fill="#4ade80" font-size="12" text-anchor="middle" font-weight="bold">السرعة الأعظمية Vmax</text>
+                            <text x="200" y="198" fill="#4ade80" font-size="11" text-anchor="middle" font-weight="bold">pH أمثل (Optimum)</text>
+
+                            <text x="110" y="150" fill="#fca5a5" font-size="10" text-anchor="middle">وسط حامضي (تأين موجـب)</text>
+                            <text x="290" y="150" fill="#fca5a5" font-size="10" text-anchor="middle">وسط قاعدي (تأين سالـب)</text>
+                        </svg>
+                        <p style="font-size: 0.85rem; color: #cbd5e1; margin-top: 10px;">📈 يبلغ النشاط الإنزيمي ذروته عند قيمة محددة تسمى الـ pH الأمثل، وينخفض يميناً ويساراً.</p>
+                    </div>
+
+                    <div class="doc-analysis">
+                        <span class="method-tag">منهجية البكالوريا : التفسير الجزيئي لتأثير الـ pH</span>
+                        <h4 style="margin: 8px 0; color: var(--primary);">لماذا ينخفض النشاط بالابتعاد عن الـ pH الأمثل؟</h4>
+                        <p>يتكون الموقع الفعال للإنزيم من أحماض أمينية ذات جذور حرة (<span class="ltr-seq">Radicaux R</span>) تحمل مجموعات كيميائية قابلة للتأين (الأمينية <span class="ltr-seq">-NH₂</span> والكربوكسيلية <span class="ltr-seq">-COOH</span>).</p>
+                        <hr style="margin: 12px 0; border: none; border-top: 1px solid var(--border);">
+                        <ul style="list-style-type: none; line-height: 1.8;">
+                            <li>• <strong>عند الـ pH الأمثل :</strong> تكون شحنات الجذور الحرة في الموقع الفعال مناسبة تماماً لنشأة الروابط الانتقالية مع مادة التفاعل، فيحدث التكامل البنيوي ويصل التفاعل لسرعته القصوى.</li>
+                            <li>• <strong>في وسط حامضي أو قاعدي جداً :</strong> تتغير الحالة الكهربائية (تأين الجذور الحرة)، فتتكسر الروابط الشاردية والهيدروجينية، مما يغير شكل الموقع الفعال ويمنع تثبيت مادة التفاعل.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 3: Interactive pH Simulator -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num">3</span>
+                    <span>محاكي تأين الموقع الفعال بدلالة pH الوسط</span>
+                </div>
+                <p>اختر حالة حموضة الوسط لمعاينة الشحنة الكهربائية للجذور الحرة في الموقع الفعال وسرعة الإنزيم :</p>
+                
+                <div class="interactive-box" style="background: #1e1b4b;">
+                    <div style="margin-bottom: 15px;">
+                        <button class="btn-action" style="background: #e11d48;" onclick="simPh('acid')">🔴 وسط حامضي قوي (pH < pH optimum)</button>
+                        <button class="btn-action" style="background: #16a34a;" onclick="simPh('opt')">🟢 الوسط الأمثل (pH = pH optimum)</button>
+                        <button class="btn-action" style="background: #2563eb;" onclick="simPh('base')">🔵 وسط قاعدي قوي (pH > pH optimum)</button>
+                    </div>
+                    <div id="phDisplayBox" style="background: #312e81; border: 2px solid #6366f1; border-radius: 12px; padding: 1.5rem; text-align: center;">
+                        <h3 style="color: #4ade80; margin-bottom: 10px;">🟢 الحالة عند الـ pH الأمثل (Optimum)</h3>
+                        <p style="direction:ltr; font-family:monospace; font-size:1.1rem; color:#a5b4fc; margin: 10px 0;">Radicaux R : -COO⁻   و   -NH₃⁺  (شحنات متوازنة ومثالية)</p>
+                        <p style="color: #cbd5e1; line-height: 1.8;">الشحنات الكهربائية لأحماض الموقع الفعال تتوافق هندسياً وكهربائياً مع شحنات مادة التفاعل (<span class="ltr-seq">Substrat</span>). يتشكل المعقد (<span class="ltr-seq">ES</span>) بسهولة وتكون سرعة النشاط الإنزيمي أعظمية (<span class="ltr-seq">Vmax = 100%</span>).</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 4: Quiz Ch7 -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num">4</span>
+                    <span>تقويم الدرس 7 : أسئلة البكالوريا المتكررة</span>
+                </div>
+
+                <div class="question-item" id="c7q1-container">
+                    <h4 style="margin-bottom: 12px;">1. ماذا يحدث للجذور الحرة الأمينية (<span class="ltr-seq">-NH₂</span>) في الموقع الفعال عند وضع الإنزيم في وسط شديد الحموضة (<span class="ltr-seq">pH حامضي جداً</span>)؟</h4>
+                    <div class="options-grid">
+                        <button class="option-btn" onclick="checkCh7Answer(0, true)">أ) تسلك سلوك القاعدة وتكتسب بروتونات (<span class="ltr-seq">H⁺</span>) فتصبح شحنتها موجبة (<span class="ltr-seq">-NH₃⁺</span>).</button>
+                        <button class="option-btn" onclick="checkCh7Answer(1, false)">ب) تفقد بروتونات وتصبح سالبة الشحنة.</button>
+                        <button class="option-btn" onclick="checkCh7Answer(2, false)">ج) تتحول إلى جسور ثنائية الكبريت.</button>
+                    </div>
+                    <div class="feedback-box" id="c7q1-feedback"></div>
+                </div>
+            </section>
+        </div>
+
+        <!-- ================================================================= -->
+        <!-- CHAPTER 8 : INFLUENCE DE LA TEMPÉRATURE & CINÉTIQUE (الدرس 8) -->
+        <!-- ================================================================= -->
+        <div id="ch8" class="chapter-view">
+            
+            <header class="lesson-header header-ch8">
+                <div class="lesson-breadcrumb">المجال الأول : التخصص الوظيفي للبروتينات • الوحدة 3 : النشاط الإنزيمي للبروتينات</div>
+                <h1>الدرس 8 : تأثير درجة الحرارة وحركية التفاعل الإنزيمي</h1>
+                <div class="lesson-objectives">
+                    <div>🎯 <strong>الهدف العلمي :</strong> التمييز بين التأثير الرجعي للتبريد (قلة الحركية الجزيئية) والتأثير غير الرجعي للحرارة المرتفعة (التخريب الحراري للروابط الضعيفة).</div>
+                    <div>⏱️ <strong>المدة التقديرية للتعلم الذاتي :</strong> 25 دقيقة</div>
+                </div>
+            </header>
+
+            <!-- Step 1: Problématique -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num step-num-orange">1</span>
+                    <span>الإشكالية الأساسية لختام الوحدة الثالثة</span>
+                </div>
+                <div class="problem-box" style="border-right-color: var(--orange); background: var(--orange-light);">
+                    <div class="problem-title" style="color: #c2410c;">⚠️ لماذا نحفظ اللحوم واللقاحات في الثلاجة (0°C إلى 4°C) ولا نغليها؟</div>
+                    <p>عند التبريد أو التجميد، يتوقف نشاط الإنزيمات الميكروبية المحللة، ولكن عند إعادة تسخينها إلى 37°C تسترجع الإنزيمات نشاطها كلياً! بينما إذا غلينا اللقاح أو الإنزيم عند 80°C يتوقف نشاطه نهائياً ولا يعود أبداً عند تبريده! <strong>لماذا يكون تأثير التبريد مؤقتاً (رجعي) بينما تأثير الغليان دائم (غير رجعي)؟</strong></p>
+                </div>
+            </section>
+
+            <!-- Step 2: Document Analyse -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num step-num-orange">2</span>
+                    <span>التحليل المنهجي لمنحنى النشاط الإنزيمي بدلالة درجة الحرارة</span>
+                </div>
+                <div class="doc-viewer">
+                    <div class="doc-visual" style="background: #431407;">
+                        <h4 style="color: #fdba74; margin-bottom: 1rem; font-size: 0.95rem;">منحنى تأثير الحرارة (غير متناظر : انخفاض تدريجي بالتبريد، وسقوط حاد بالغليان)</h4>
+                        <!-- SVG Temp Curve -->
+                        <svg class="svg-container" viewBox="0 0 400 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Axes -->
+                            <path d="M50 180 L 370 180" stroke="#94a3b8" stroke-width="2"/>
+                            <path d="M50 180 L 50 20" stroke="#94a3b8" stroke-width="2"/>
+                            <text x="350" y="200" fill="#cbd5e1" font-size="11">الحرارة (°C)</text>
+                            <text x="30" y="30" fill="#cbd5e1" font-size="11" text-anchor="end">السرعة Vi</text>
+
+                            <!-- Asymmetrical Curve -->
+                            <path d="M60 178 Q 150 170 210 30 Q 230 178 260 178" stroke="#fb923c" stroke-width="4" fill="none"/>
+
+                            <!-- Optimum -->
+                            <path d="M210 30 L 210 180" stroke="#4ade80" stroke-width="2" stroke-dasharray="4"/>
+                            <circle cx="210" cy="30" r="6" fill="#4ade80"/>
+                            <text x="210" y="15" fill="#4ade80" font-size="12" text-anchor="middle" font-weight="bold">37°C أمثـل</text>
+
+                            <text x="110" y="150" fill="#93c5fd" font-size="10" text-anchor="middle">تبريد (توقف مؤقت رجعي)</text>
+                            <text x="310" y="150" fill="#ef4444" font-size="10" text-anchor="middle">تسخين (تخريب لا رجعي)</text>
+                        </svg>
+                        <p style="font-size: 0.85rem; color: #cbd5e1; margin-top: 10px;">💡 عند 0°C تنخفض الطاقة الحركية، بينما عند 70°C تتكسر الروابط الهيدروجينية.</p>
+                    </div>
+
+                    <div class="doc-analysis">
+                        <span class="method-tag" style="background: #fff7ed; color: #c2410c;">التبرير المعتمد في البكالوريا</span>
+                        <h4 style="margin: 8px 0; color: var(--primary);">المقارنة الجزيئية الدقيقة بين التبريد والغليان</h4>
+                        <p>• <strong>عند درجات الحرارة المنخفضة (0°C إلى 4°C) :</strong> تقل الطاقة الحركية لجزيئات الإنزيم ومادة التفاعل، فتقل التصادمات الفعالة ويتوقف التفاعل، <em>لكن البنية الفراغية تبقى سليمة تماماً</em> (تأثير عكوس / رجعي).</p>
+                        <hr style="margin: 12px 0; border: none; border-top: 1px solid var(--border);">
+                        <p>• <strong>عند درجات الحرارة المرتفعة (> 60°C) :</strong> تزداد الاهتزازات الجزيئية بشدة مما يؤدي إلى <strong>تكسر الروابط الضعيفة (خاصة الهيدروجينية)</strong> المحافظة على استقرار البنية الثلاثية. يفقد الإنزيم شكله وموقعه الفعال نهائياً (تخريب غير رجعي - <span class="ltr-seq">Dénaturation irréversible</span>).</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 3: Interactive Temp Simulator -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num step-num-orange">3</span>
+                    <span>مختبر الحرارة الإنزيمي التفاعلي</span>
+                </div>
+                <p>اختر درجة الحرارة لمعاينة حركة الجزيئات وحالة الروابط الفراغية :</p>
+                
+                <div class="interactive-box" style="background: #431407;">
+                    <div style="margin-bottom: 15px;">
+                        <button class="btn-action" style="background: #0284c7;" onclick="simTemp(0)">❄️ تجميد (0°C)</button>
+                        <button class="btn-action" style="background: #16a34a;" onclick="simTemp(37)">🌡️ حرارة الجسم المثلى (37°C)</button>
+                        <button class="btn-action" style="background: #dc2626;" onclick="simTemp(75)">🔥 غليان حراري (> 75°C)</button>
+                    </div>
+                    <div id="tempDisplayBox" style="background: #7c2d12; border: 2px solid #fb923c; border-radius: 12px; padding: 1.5rem; text-align: center;">
+                        <h3 style="color: #4ade80; margin-bottom: 10px;">🌡️ درجة الحرارة المثلى (37°C)</h3>
+                        <p style="color: #cbd5e1; line-height: 1.8;">تكون الطاقة الحركية للجزيئات مثالية، فيحدث أقصى عدد ممكن من <strong>التصادمات الفعالة</strong> بين الموقع الفعال للإنزيم ومادة التفاعل في وحدة الزمن، مع بقاء البنية الفراغية مستقرة تماماً (<span class="ltr-seq">Vmax = 100%</span>).</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 4: Quiz Ch8 -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num step-num-orange">4</span>
+                    <span>تقويم الدرس 8 : أسئلة البكالوريا المتكررة</span>
+                </div>
+
+                <div class="question-item" id="c8q1-container">
+                    <h4 style="margin-bottom: 12px;">1. لماذا نستطيع استرجاع النشاط الإنزيمي بعد تبريده إلى 0°C، ولا نستطيع استرجاعه بعد تسخينه إلى 80°C؟</h4>
+                    <div class="options-grid">
+                        <button class="option-btn" onclick="checkCh8Answer(1, 0, true)">أ) لأن التبريد يقلل الحركة الجزيئية دون تخريب الروابط الفراغية، بينما التسخين يكسر الروابط الضعيفة ويخرب الموقع الفعال نهائياً.</button>
+                        <button class="option-btn" onclick="checkCh8Answer(1, 1, false)">ب) لأن الإنزيم يتجمد فيموت ثم يحيى عند التسخين.</button>
+                        <button class="option-btn" onclick="checkCh8Answer(1, 2, false)">ج) لأن التبريد يكسر الجسور ثنائية الكبريت فقط.</button>
+                    </div>
+                    <div class="feedback-box" id="c8q1-feedback"></div>
+                </div>
+            </section>
+        </div>
+
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        function showChapter(chId, evt) {
+            document.querySelectorAll('.chapter-view').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.ch-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(chId).classList.add('active');
+            if (evt) evt.target.classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // pH simulator
+        function simPh(type) {
+            let box = document.getElementById('phDisplayBox');
+            if (type === 'opt') {
+                box.innerHTML = `
+                    <h3 style="color: #4ade80; margin-bottom: 10px;">🟢 الحالة عند الـ pH الأمثل (Optimum)</h3>
+                    <p style="direction:ltr; font-family:monospace; font-size:1.1rem; color:#a5b4fc; margin: 10px 0;">Radicaux R : -COO⁻   و   -NH₃⁺  (شحنات متوازنة ومثالية)</p>
+                    <p style="color: #cbd5e1; line-height: 1.8;">الشحنات الكهربائية لأحماض الموقع الفعال تتوافق هندسياً وكهربائياً مع شحنات مادة التفاعل (<span class="ltr-seq">Substrat</span>). يتشكل المعقد (<span class="ltr-seq">ES</span>) بسهولة وتكون سرعة النشاط الإنزيمي أعظمية (<span class="ltr-seq">Vmax = 100%</span>).</p>
+                `;
+            } else if (type === 'acid') {
+                box.innerHTML = `
+                    <h3 style="color: #f43f5e; margin-bottom: 10px;">🔴 وسط حامضي قوي (تأين موجب زائد)</h3>
+                    <p style="direction:ltr; font-family:monospace; font-size:1.1rem; color:#fca5a5; margin: 10px 0;">Radicaux R : -COOH   و   -NH₃⁺  (اكتساب بروتونات H⁺)</p>
+                    <p style="color: #cbd5e1; line-height: 1.8;">في الوسط الشديد الحموضة، تسلك الجذور الحرة سلوك القاعدة وتكتسب بروتونات، فتصبح الشحنة الإجمالية للموقع الفعال موجبة، مما يؤدي لتنافر شحني وتكسر الروابط الشاردية وفقدان النشاط.</p>
+                `;
+            } else {
+                box.innerHTML = `
+                    <h3 style="color: #60a5fa; margin-bottom: 10px;">🔵 وسط قاعدي قوي (تأين سالب زائد)</h3>
+                    <p style="direction:ltr; font-family:monospace; font-size:1.1rem; color:#93c5fd; margin: 10px 0;">Radicaux R : -COO⁻   و   -NH₂  (فقدان بروتونات H⁺)</p>
+                    <p style="color: #cbd5e1; line-height: 1.8;">في الوسط الشديد القاعدية، تسلك الجذور الحرة سلوك الحمض وتفقد بروتونات، فتصبح الشحنة الإجمالية للموقع الفعال سالبة، مما يعيق ارتباط مادة التفاعل ويوقف النشاط الإنزيمي.</p>
+                `;
+            }
+        }
+
+        // Temp simulator
+        function simTemp(deg) {
+            let box = document.getElementById('tempDisplayBox');
+            if (deg === 37) {
+                box.innerHTML = `
+                    <h3 style="color: #4ade80; margin-bottom: 10px;">🌡️ درجة الحرارة المثلى (37°C)</h3>
+                    <p style="color: #cbd5e1; line-height: 1.8;">تكون الطاقة الحركية للجزيئات مثالية، فيحدث أقصى عدد ممكن من <strong>التصادمات الفعالة</strong> بين الموقع الفعال للإنزيم ومادة التفاعل في وحدة الزمن، مع بقاء البنية الفراغية مستقرة تماماً (<span class="ltr-seq">Vmax = 100%</span>).</p>
+                `;
+            } else if (deg === 0) {
+                box.innerHTML = `
+                    <h3 style="color: #38bdf8; margin-bottom: 10px;">❄️ التبريد والتجميد (0°C) - خمول مؤقت رجعي</h3>
+                    <p style="color: #cbd5e1; line-height: 1.8;">تنخفض الطاقة الحركية لجزيئات الإنزيم ومادة التفاعل وتصبح شبه معدومة. تقل أو تنعدم التصادمات الفعالة فيتوقف التفاعل (<span class="ltr-seq">Vi = 0</span>)، ولكن <strong>البنية الفراغية للموقع الفعال تبقى سليمة دون أي تخريب</strong>.</p>
+                `;
+            } else {
+                box.innerHTML = `
+                    <h3 style="color: #f43f5e; margin-bottom: 10px;">🔥 التسخين الشديد (> 75°C) - تخريب حراري لا رجعي</h3>
+                    <p style="color: #cbd5e1; line-height: 1.8;">تؤدي الاهتزازات الجزيئية العنيفة إلى <strong>تكسر الروابط الضعيفة (الروابط الهيدروجينية)</strong> التي تحافظ على ثبات البنية الثالثية. يتغير شكل الموقع الفعال نهائياً ولا يستطيع الارتباط بمادة التفاعل حتى لو قمنا بتبريد الوسط لاحقاً.</p>
+                `;
+            }
+        }
+
+        function checkCh7Answer(optIdx, isCorrect) {
+            let container = document.getElementById('c7q1-container');
+            let btns = container.querySelectorAll('.option-btn');
+            let fb = document.getElementById('c7q1-feedback');
+
+            btns.forEach((b, idx) => {
+                b.disabled = true;
+                if (idx === optIdx) b.classList.add(isCorrect ? 'correct' : 'wrong');
+            });
+
+            fb.style.display = 'block';
+            if (isCorrect) {
+                fb.style.background = '#f0fdf4'; fb.style.color = '#166534'; fb.style.border = '1px solid #bbf7d0';
+                fb.innerHTML = '<strong>✅ إجابة صحيحة ممتاز!</strong> الوسط الحامضي يوفر فائضاً من البروتونات H⁺ التي تكتسبها الوظائف الأمينية.';
+            } else {
+                fb.style.background = '#fef2f2'; fb.style.color = '#991b1b'; fb.style.border = '1px solid #fecaca';
+                fb.innerHTML = '<strong>❌ إجابة خاطئة.</strong> في الوسط الحامضي تسلك الأحماض سلوك القاعدة فتكتسب بروتونات H⁺ لتصبح شحنتها موجبة.';
+            }
+        }
+
+        function checkCh8Answer(qIdx, optIdx, isCorrect) {
+            let container = document.getElementById(`c8q${qIdx}-container`);
+            let btns = container.querySelectorAll('.option-btn');
+            let fb = document.getElementById(`c8q${qIdx}-feedback`);
+
+            btns.forEach((b, idx) => {
+                b.disabled = true;
+                if (idx === optIdx) b.classList.add(isCorrect ? 'correct' : 'wrong');
+            });
+
+            fb.style.display = 'block';
+            if (isCorrect) {
+                fb.style.background = '#f0fdf4'; fb.style.color = '#166534'; fb.style.border = '1px solid #bbf7d0';
+                fb.innerHTML = '<strong>✅ إجابة صحيحة ممتاز!</strong> التبريد يوقف الحركية فقط (خمول عكوس)، بينما الغليان يكسر الروابط الهيدروجينية (تخريب دائم).';
+            } else {
+                fb.style.background = '#fef2f2'; fb.style.color = '#991b1b'; fb.style.border = '1px solid #fecaca';
+                fb.innerHTML = '<strong>❌ إجابة خاطئة.</strong> التبريد لا يخرب الإنزيم، بل يقلل طاقتها الحركية فقط.';
+            }
+        }
+    </script>
+</body>
+</html>

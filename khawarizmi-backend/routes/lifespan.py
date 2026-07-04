@@ -98,6 +98,13 @@ async def lifespan(app: FastAPI):
                     model = "gemini-2.5-flash"
                 logger.info(f"IA Provider auto-détecté: Gemini ({model})")
 
+            # Auto-détection OpenRouter : sk-or-v1* prefix
+            elif api_key.startswith("sk-or-v1"):
+                base_url = "https://openrouter.ai/v1"
+                if not model or "gpt" in model:
+                    model = "google/gemini-2.5-flash"
+                logger.info(f"IA Provider auto-détecté: OpenRouter ({model})")
+
             state.openai = AsyncOpenAI(api_key=api_key, base_url=base_url)
             state.dual_coding = DualCodingService(state.openai)
             state.ai_model = model  # modèle réellement résolu — health lira ceci

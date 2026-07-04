@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منصة المتفوق 3AS | المرحلة 21 : الدرس 41 والدرس 42</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #f8fafc;
+            --surface: #ffffff;
+            --primary: #0f172a;
+            --accent: #2563eb;
+            --accent-light: #eff6ff;
+            --success: #16a34a;
+            --success-light: #f0fdf4;
+            --warning: #d97706;
+            --warning-light: #fffbeb;
+            --danger: #dc2626;
+            --danger-light: #fef2f2;
+            --cyan-dark: #0e7490;
+            --cyan-light: #ecfeff;
+            --stone-dark: #44403c;
+            --stone-light: #f5f5f4;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --radius: 16px;
+            --shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Cairo', 'Tajawal', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            line-height: 1.8;
+            padding-bottom: 60px;
+        }
+
+        .ltr-seq {
+            direction: ltr;
+            unicode-bidi: embed;
+            display: inline-block;
+            font-family: monospace;
+            font-weight: bold;
+            color: var(--accent);
+            background: #f1f5f9;
+            padding: 2px 8px;
+            border-radius: 6px;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 900;
+            font-size: 1.25rem;
+            color: var(--primary);
+        }
+
+        .brand-badge {
+            background: var(--cyan-dark);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            white-space: nowrap;
+        }
+
+        .chapter-switcher {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .ch-btn {
+            background: var(--bg-main);
+            border: 2px solid var(--border);
+            padding: 8px 18px;
+            border-radius: 12px;
+            font-family: inherit;
+            font-weight: 800;
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .ch-btn:hover {
+            border-color: var(--cyan-dark);
+            color: var(--cyan-dark);
+        }
+
+        .ch-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                padding: 1rem;
+                text-align: center;
+            }
+            .chapter-switcher {
+                justify-content: center;
+                width: 100%;
+            }
+            .ch-btn {
+                flex: 1;
+                font-size: 0.85rem;
+                padding: 8px 10px;
+            }
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 2rem auto;
+            padding: 0 1.2rem;
+        }
+
+        .chapter-view {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .chapter-view.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Hero Header */
+        .lesson-header {
+            border-radius: var(--radius);
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+            color: white;
+        }
+
+        .header-ch41 {
+            background: linear-gradient(135deg, #164e63 0%, #0891b2 100%);
+        }
+
+        .header-ch42 {
+            background: linear-gradient(135deg, #292524 0%, #57534e 100%);
+        }
+
+        .lesson-breadcrumb {
+            font-size: 0.85rem;
+            opacity: 0.9;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .lesson-header h1 {
+            font-size: 2.1rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+            line-height: 1.3;
+        }
+
+        .lesson-objectives {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--surface);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+        }
+
+        @media (max-width: 600px) {
+            .lesson-header { padding: 1.5rem; }
+            .lesson-header h1 { font-size: 1.5rem; }
+            .card { padding: 1.2rem; }
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid var(--bg-main);
+            padding-bottom: 0.8rem;
+        }
+
+        .step-num {
+            background: #cffafe;
+            color: #0e7490;
+            width: 38px;
+            height: 38px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            font-weight: 900;
+            font-size: 1.1rem;
+        }
+
+        .step-num-stone {
+            background: #e7e5e4;
+            color: #44403c;
+        }
+
+        .problem-box {
+            background: var(--warning-light);
+            border-right: 5px solid var(--warning);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+        }
+
+        .problem-title {
+            font-weight: 800;
+            color: #92400e;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Document Analysis */
+        .doc-viewer {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        @media (max-width: 850px) {
+            .doc-viewer { grid-template-columns: 1fr; }
+        }
+
+        .doc-visual {
+            background: #0f172a;
+            border-radius: 12px;
+            padding: 1.5rem;
+            color: white;
+        }
+
+        .svg-container {
+            width: 100%;
+            height: auto;
+            max-height: 260px;
+        }
+
+        .doc-analysis {
+            background: var(--bg-main);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+        }
+
+        .method-tag {
+            display: inline-block;
+            background: #e0f2fe;
+            color: #0369a1;
+            font-size: 0.75rem;
+            font-weight: 800;
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+        }
+
+        /* Interactive simulators */
+        .interactive-box {
+            background: #1e293b;
+            border-radius: 12px;
+            padding: 1.5rem;
+            color: white;
+            margin: 1.5rem 0;
+        }
+
+        .btn-action {
+            background: #0e7490;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-family: inherit;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin: 5px;
+        }
+
+        .btn-action:hover { background: #155e75; }
+        .btn-stone { background: #44403c; }
+        .btn-stone:hover { background: #292524; }
+
+        /* Scientific text */
+        .scientific-text {
+            background: var(--surface);
+            border: 2px solid #cbd5e1;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .text-part {
+            margin-bottom: 1.2rem;
+            padding-right: 1rem;
+            border-right: 4px solid #0e7490;
+        }
+
+        .text-part.ch42-border { border-right-color: #44403c; }
+
+        .text-part h4 {
+            font-size: 0.95rem;
+            color: #0e7490;
+            margin-bottom: 0.3rem;
+            font-weight: 800;
+        }
+
+        .text-part.ch42-border h4 { color: #44403c; }
+
+        /* Quiz */
+        .question-item {
+            background: var(--bg-main);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin-top: 1rem;
+        }
+
+        .option-btn {
+            background: white;
+            border: 1.5px solid var(--border);
+            padding: 12px 16px;
+            border-radius: 10px;
+            text-align: right;
+            font-family: inherit;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text-main);
+        }
+
+        .option-btn:hover {
+            border-color: #0e7490;
+            background: #ecfeff;
+        }
+
+        .option-btn.correct {
+            background: var(--success-light);
+            border-color: var(--success);
+            color: var(--success);
+            font-weight: 700;
+        }
+
+        .option-btn.wrong {
+            background: var(--danger-light);
+            border-color: var(--danger);
+            color: var(--danger);
+        }
+
+        .feedback-box {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            display: none;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar with Phase Switcher -->
+    <nav class="navbar">
+        <div class="brand">
+            <span>منصة المتفوق 3AS</span>
+            <span class="brand-badge">المرحلة 21 (الدرس 41 و 42)</span>
+        </div>
+        <div class="chapter-switcher">
+            <button class="ch-btn active" onclick="showChapter('ch41', event)">🌊 الدرس 41 : المغمايتية الثولييتية للظهرات (تخفيف الضغط)</button>
+            <button class="ch-btn" onclick="showChapter('ch42', event)">🏔️ الدرس 42 : التصادم القاري وتشكّل سلاسل الجبال (الهيمالايا)</button>
+        </div>
+    </nav>
+
+    <div class="container">
+
+        <!-- ================================================================= -->
+        <!-- CHAPTER 41 : MAGMATISME THOLÉIITIQUE DES DORSALES (الدرس 41) -->
+        <!-- ================================================================= -->
+        <div id="ch41" class="chapter-view active">
+            
+            <header class="lesson-header header-ch41">
+                <div class="lesson-breadcrumb">المجال الثالث : التكتونية العامة • الوحدة 3 : النشاط التكتوني والبنيات الجيولوجية المرتبطة به</div>
+                <h1>الدرس 41 : المغمايتية المميزة للظهرات المحيطية (الانصهار الجاف بتخفيف الضغط وتشكل البازلت والغابرو)</h1>
+                <div class="lesson-objectives">
+                    <div>🎯 <strong>الهدف العلمي :</strong> تفسير انصهار بيريدوتيت الاستينوسفير تحت الظهيرة بظاهرة تخفيف الضغط (Décompression adiabatique)، وتحديد خصائص البازلت الوسائدي والغابرو الثولييتي.</div>
+                    <div>⏱️ <strong>المدة التقديرية للتعلم الذاتي :</strong> 25 دقيقة</div>
+                </div>
+            </header>
+
+            <!-- Step 1: Problématique -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num">1</span>
+                    <span>وضعية الانطلاق وبناء الإشكالية العلميـة</span>
+                </div>
+                <div class="problem-box">
+                    <div class="problem-title">⚠️ كيف ينصهر البيريدوتيت الجاف تحت الظهيرة المحيطية رغم غياب الماء؟</div>
+                    <p>في الدرس 34 عرفنا أن انصهار البرنس في مناطق الغوص يتطلب وجود الماء (الإماهة) لخفض نقطة الانصهار. ولكن في محور الظهيرة المحيطية لا يوجد ماء محرر في العمق (صخر بيريدوتيت جاف تماماً)! ومع ذلك، تصعد ماغما بازلتية مائعة بكثافة هائلة وتبني القشرة المحيطية يومياً. <strong>ما هو العامل الترموديناميكي الخفي الذي يؤدي إلى انصهار البيريدوتيت الجاف أسفل الظهيرة المحيطية؟</strong></p>
+                </div>
+            </section>
+
+            <!-- Step 2: Document Analyse -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num">2</span>
+                    <span>التحليل المنهجي لصعود العمود الساخن والانصهار بتخفيف الضغط (Décompression adiabatique)</span>
+                </div>
+                <div class="doc-viewer">
+                    <div class="doc-visual" style="background: #083344;">
+                        <h4 style="color: #67e8f9; margin-bottom: 1rem; font-size: 0.95rem;">مقطع في محور الظهيرة يوضح صعود البيريدوتيت وتقاطع مساره مع منحنى الصلابة</h4>
+                        <!-- SVG Dorsale Magmatism -->
+                        <svg class="svg-container" viewBox="0 0 400 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Ocean water -->
+                            <rect x="20" y="20" width="360" height="40" fill="#0284c7" opacity="0.3"/>
+                            <text x="200" y="40" fill="#7dd3fc" font-size="10" text-anchor="middle">مياه المحيط (تبريد سريع لبازلت الوسائد Pillow Lavas)</text>
+
+                            <!-- Oceanic crust diverging -->
+                            <path d="M20 60 H 180 V 85 H 20 Z" fill="#334155" stroke="#94a3b8"/>
+                            <path d="M220 60 H 380 V 85 H 220 Z" fill="#334155" stroke="#94a3b8"/>
+
+                            <!-- Rift & Magma chamber -->
+                            <polygon points="180,60 220,60 210,110 190,110" fill="#ea580c"/>
+                            <text x="200" y="90" fill="white" font-size="8" text-anchor="middle" font-weight="bold">غرفة ماغماتية</text>
+
+                            <!-- Rising Asthenosphere Plume -->
+                            <path d="M160 200 C 180 160, 185 130, 195 110 H 205 C 215 130, 220 160, 240 200 Z" fill="#b91c1c" stroke="#f87171" stroke-width="2"/>
+                            <path d="M200 190 V 140" stroke="#fef08a" stroke-width="4" marker-end="url(#arrow)"/>
+                            <text x="200" y="165" fill="#fef08a" font-size="9" text-anchor="middle" font-weight="bold">صعود سريع للبيريدوتيت الساخن</text>
+                            <text x="200" y="180" fill="#fda4af" font-size="8" text-anchor="middle">(انخفاض الضغط P مع ثبات الحرارة T)</text>
+                        </svg>
+                        <p style="font-size: 0.85rem; color: #cbd5e1; margin-top: 10px;">💡 الصعود السريع يقلل الضغط الهيدروستاتيكي فيحدث الانصهار الجزئي الجاف.</p>
+                    </div>
+
+                    <div class="doc-analysis">
+                        <span class="method-tag" style="background: #ecfeff; color: #0e7490;">السر الترموديناميكي في البكالوريا</span>
+                        <h4 style="margin: 8px 0; color: var(--primary);">كيف ينصهر البيريدوتيت بتخفيف الضغط؟</h4>
+                        <ol style="padding-right: 1.2rem; line-height: 1.8;">
+                            <li><strong>الصعود الأدياباتيكي (<span class="ltr-seq">Montée adiabatique</span>) :</strong> تتسبب قوى الشد والتباعد في الظهيرة في صعود سريع لعمود ساخن من البيريدوتيت الاستينوسفيري نحو الأعلى.</li>
+                            <li><strong>انخفاض الضغط مع حفظ الحرارة :</strong> أثناء الصعود، ينخفض الضغط الواقع على الصخر بسرعة كبيرة جداً مقارنة بفقدان الحرارة، فيحتفظ البيريدوتيت بحرارته العالية (~1300°C) عند ضغط منخفض.</li>
+                            <li><strong>الانصهار الجزئي الجاف :</strong> يتقاطع مسار البيريدوتيت الصاعد مع منحنى تصلبه الجاف (<span class="ltr-seq">Solidus anhydre</span>)، فيحدث له انصهار جزئي بنسبة 20 إلى 30% مولداً <strong>ماغما ثولييتية مائعة (<span class="ltr-seq">Magma tholéiitique</span>)</strong> قليلة الغازات والماء.</li>
+                        </ol>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 3: Interactive Tholeiitic Magma Simulator -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num step-num-cyan">3</span>
+                    <span>محاكي صخور قاع المحيط (البازلت مقابل الغابرو)</span>
+                </div>
+                <p>اضغط لمعاينة سرعة التبريد وتشكل صخور القشرة المحيطية الجديدة :</p>
+                
+                <div class="interactive-box" style="background: #083344;">
+                    <div style="margin-bottom: 15px;">
+                        <button class="btn-action btn-cyan" onclick="simDors('pillow')">🌊 تبريد سطحي فوري في مياه المحيط (بازلت الوسائد Pillow Lavas)</button>
+                        <button class="btn-action btn-cyan" style="background:#15803d;" onclick="simDors('gabbro')">🪨 تبريد بطيء في الغرفة الماغماتية العميقة (صخر الغابرو Gabbro)</button>
+                    </div>
+                    <div id="dorsDisplayBox" style="background: #164e63; border: 2px solid #22d3ee; border-radius: 12px; padding: 1.5rem; text-align: center;">
+                        <h3 style="color: #67e8f9; margin-bottom: 10px;">🌊 بازلت الوسائد (Pillow Lavas - سطح القشرة المحيطية)</h3>
+                        <p style="color: #cbd5e1; line-height: 1.8;">عندما تتدفق الماغما البازلتية المائعة عبر خسف الظهيرة وتلامس مياه المحيط الباردة (2°C)، تتصلب قشرتها الخارجية فوراً على شكل وسائد كروية متتالية. تتميز ببنية ميكروليتية وزجاجية بسبب التبريد الصاعق.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 4: Quiz Ch41 -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num step-num-cyan">4</span>
+                    <span>تقويم الدرس 41 : أسئلة البكالوريا المتكررة</span>
+                </div>
+
+                <div class="question-item" id="c41q1-container">
+                    <h4 style="margin-bottom: 12px;">1. ما هو الفرق الأساسي في عامل الانصهار بين الظهيرة المحيطية (تباعد) ومنطقة الغوص (تقارب)؟</h4>
+                    <div class="options-grid">
+                        <button class="option-btn" onclick="checkCh41Answer(0, true)">أ) في الظهيرة العامل هو انخفاض الضغط (تخفيف الضغط الأدياباتيكي) في غياب الماء، بينما في الغوص العامل هو دخول الماء (الإماهة) الذي يخفض نقطة الانصهار.</button>
+                        <button class="option-btn" onclick="checkCh41Answer(1, false)">ب) لا يوجد فرق، فكلاهما انصهار مائي.</button>
+                        <button class="option-btn" onclick="checkCh41Answer(2, false)">ج) في الظهيرة ينصهر الغرانيت وفي الغوص ينصهر الكلس.</button>
+                    </div>
+                    <div class="feedback-box" id="c41q1-feedback"></div>
+                </div>
+            </section>
+        </div>
+
+        <!-- ================================================================= -->
+        <!-- CHAPTER 42 : COLLISION CONTINENTALE & OROGENÈSE (الدرس 42) -->
+        <!-- ================================================================= -->
+        <div id="ch42" class="chapter-view">
+            
+            <header class="lesson-header header-ch42">
+                <div class="lesson-breadcrumb">المجال الثالث : التكتونية العامة • الوحدة 3 : النشاط التكتوني والبنيات الجيولوجية المرتبطة به</div>
+                <h1>الدرس 42 : التكتونية والمغمايتية المميزة لمناطق التصادم القاري (تشكل سلاسل الجبال كالألب والهيمالايا)</h1>
+                <div class="lesson-objectives">
+                    <div>🎯 <strong>الهدف العلمي :</strong> تفسير تشكل سلاسل الجبال العظمى (الهيمالايا) باصطدام قارتين بعد إغلاق المحيط بالغوص، وتحديد شواهد التقصير والتسميك القاري والتراكبات.</div>
+                    <div>⏱️ <strong>المدة التقديرية للتعلم الذاتي :</strong> 25 دقيقة</div>
+                </div>
+            </header>
+
+            <!-- Step 1: Problématique -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num step-num-stone">1</span>
+                    <span>الإشكالية الجبلية لختام برنامج العلوم الطبيعية 3AS</span>
+                </div>
+                <div class="problem-box" style="border-right-color: var(--stone-dark); background: var(--stone-light);">
+                    <div class="problem-title" style="color: #1e293b;">⚠️ كيف تكونت قمة إيفرست (8848 متر) وسلسلة الأطلس التلي؟</div>
+                    <p>كانت الهند جزيرة قارية منفصلة عن آسيا يفصل بينهما محيط قديم يسمى (محيط التيثس <span class="ltr-seq">Téthys</span>). وبفعل الغوص المستمر، اختفى هذا المحيط تماماً واصطدمت قارة الهند بقارة آسيا! وبما أن القشرة القارية خفيفة جداً (<span class="ltr-seq">Kthafa = 2.7</span>)، فإنها <strong>لا تستطيع الغوص في الاستينوسفير الكثيف (3.3)</strong>. <strong>ماذا يحدث للقشرتين القاريتين المتصادمتين؟ وكيف تفسر هذه الظاهرة التسميك الهائل للقشرة الأرضية (جذر الجبل 70 كم) وتشكل غرانيت التصادم (أناتيكسيا)؟</strong></p>
+                </div>
+            </section>
+
+            <!-- Step 2: Document Analyse -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num step-num-stone">2</span>
+                    <span>التحليل المنهجي لخطوات التصادم القاري وتسميك القشرة (التراكبات والسدائم)</span>
+                </div>
+                <div class="doc-viewer">
+                    <div class="doc-visual" style="background: #292524;">
+                        <h4 style="color: #e7e5e4; margin-bottom: 1rem; font-size: 0.95rem;">مقطع رأسي في سلسلة جبال التصادم (الهيمالايا) يظهر تقصير وتسميك القشرة</h4>
+                        <!-- SVG Collision -->
+                        <svg class="svg-container" viewBox="0 0 400 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Asthenosphere -->
+                            <rect x="20" y="140" width="360" height="60" fill="#7f1d1d"/>
+                            <text x="200" y="180" fill="#fca5a5" font-size="10">الاستينوسفير (Asthénosphère)</text>
+
+                            <!-- Indian Continent pushing left to right -->
+                            <path d="M20 70 H 160 L 200 140 H 20 Z" fill="#57534e" stroke="#a8a29e" stroke-width="2"/>
+                            <text x="80" y="100" fill="white" font-size="10" font-weight="bold">قارة الهند (دافعة →)</text>
+
+                            <!-- Asian Continent overriding -->
+                            <path d="M240 40 H 380 V 140 H 180 L 240 40 Z" fill="#44403c" stroke="#a8a29e" stroke-width="2"/>
+                            <text x="310" y="100" fill="white" font-size="10" font-weight="bold">(← آسيا)</text>
+
+                            <!-- Mountain Peaks -->
+                            <polygon points="160,70 190,15 220,70" fill="#a8a29e"/>
+                            <polygon points="210,70 240,25 270,70" fill="#d6d3d1"/>
+                            <text x="215" y="12" fill="#fef08a" font-size="10" font-weight="bold">سلسلة جبال الهيمالايا (قمم شامخة)</text>
+
+                            <!-- Mountain Root (racine crustale 70 km) -->
+                            <path d="M160 140 Q 215 190 270 140" stroke="#f87171" stroke-width="3" stroke-dasharray="4"/>
+                            <text x="215" y="155" fill="#fca5a5" font-size="8" font-weight="bold">جذر الجبل (تسميك القشرة حتى 70 كم)</text>
+                        </svg>
+                        <p style="font-size: 0.85rem; color: #cbd5e1; margin-top: 10px;">💡 استحالة غوص القارة يؤدي إلى تقصير أفقي وتسميك رأسي ضخم.</p>
+                    </div>
+
+                    <div class="doc-analysis">
+                        <span class="method-tag" style="background: #f5f5f4; color: #44403c;">المميزات الجيولوجية للتصادم</span>
+                        <h4 style="margin: 8px 0; color: var(--primary);">ما هي شواهد التصادم القاري؟</h4>
+                        <ol style="padding-right: 1.2rem; line-height: 1.8;">
+                            <li><strong>اختفاء المحيط التام :</strong> غوص القشرة المحيطية بالكامل وانغلاق الحوض المحيطي (وجود بقايا صخور الأفيوليت المحيطية محصورة بين القارتين).</li>
+                            <li><strong>التقصير والتسميك القاري (<span class="ltr-seq">Raccourcissement et Épaississement</span>) :</strong> قوى الانضغاط الشديدة تؤدي لطي الطبقات وتكسيرها بفوالق معكوسة وتراكبات، فيقل عرض القارة ويزداد سمك القشرة من 30 كم إلى أكثر من 70 كم تشكل <strong>جذر الجبل (<span class="ltr-seq">Racine crustale</span>)</strong>.</li>
+                            <li><strong>الأناتيكسيا وغرانيت التصادم (<span class="ltr-seq">Anatexie crustale</span>) :</strong> التسميك الرأسي يزيد الحرارة والضغط في أسفل جذر الجبل، فتنصهر صخور القشرة القارية انصهاراً جزئياً لتولد <strong>غرانيت التصادم</strong> الحديث.</li>
+                        </ol>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 3: Interactive Orogenesis Simulator -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num step-num-stone">3</span>
+                    <span>محاكي تشكل الجبال والتسميك القاري التفاعلي</span>
+                </div>
+                <p>اضغط لمعاينة مراحل تطور تصادم قارة الهند بآسيا وتأسيس جبال الهيمالايا :</p>
+                
+                <div class="interactive-box" style="background: #292524;">
+                    <div style="margin-bottom: 15px;">
+                        <button class="btn-action btn-stone" onclick="simColl('sub')">1️⃣ قبل 50 مليون سنة (غوص المحيط الفاصل التيثس)</button>
+                        <button class="btn-action btn-stone" style="background:#b45309;" onclick="simColl('coll')">2️⃣ لحظة التصادم واختفاء المحيط (احتجاز الأفيوليت)</button>
+                        <button class="btn-action btn-stone" style="background:#15803d;" onclick="simColl('oro')">3️⃣ التسميك وبلوغ قمة إيفرست (الوضع الحالي)</button>
+                    </div>
+                    <div id="collDisplayBox" style="background: #44403c; border: 2px solid #a8a29e; border-radius: 12px; padding: 1.5rem; text-align: center;">
+                        <h3 style="color: #4ade80; margin-bottom: 10px;">3️⃣ التسميك وبلوغ قمة إيفرست (الوضع الحالي)</h3>
+                        <p style="color: #cbd5e1; line-height: 1.8;">تستمر الهند بالدفع شمالاً بمعدل 5 سم/سنة. تنضغط القشرة القارية وتتكدس في طيات وتراكبات ضخمة، فيرتفع السطح ليتجاوز 8800 متر، وينغرس جذر الجبل في العمق ليتجاوز 70 كيلومتراً.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 4: Quiz Ch42 -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num step-num-stone">4</span>
+                    <span>تقويم الدرس 42 : ختام أسئلة البكالوريا</span>
+                </div>
+
+                <div class="question-item" id="c42q1-container">
+                    <h4 style="margin-bottom: 12px;">1. لماذا تعتبر صخور "الأفيوليت" (<span class="ltr-seq">Ophiolites</span>) الموجودة فوق قمم جبال الألب والهيمالايا دليلاً قاطعاً على حدوث تصادم قاري مسبوق بغوص؟</h4>
+                    <div class="options-grid">
+                        <button class="option-btn" onclick="checkCh42Answer(0, true)">أ) لأن الأفيوليت يمثل بقايا القشرة المحيطية القديمة التي احتجزت وانحصرت ورفعت إلى القمم أثناء اصطدام القارتين وإغلاق المحيط الذي كان يفصل بينهما.</button>
+                        <button class="option-btn" onclick="checkCh42Answer(1, false)">ب) لأن الجبال تتكون من براكين بازلتية حديثة.</button>
+                        <button class="option-btn" onclick="checkCh42Answer(2, false)">ج) لأن قمة إيفرست كانت جزيرة بركانية.</button>
+                    </div>
+                    <div class="feedback-box" id="c42q1-feedback"></div>
+                </div>
+            </section>
+        </div>
+
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        function showChapter(chId, evt) {
+            document.querySelectorAll('.chapter-view').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.ch-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(chId).classList.add('active');
+            if (evt) evt.target.classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function simDors(type) {
+            let box = document.getElementById('dorsDisplayBox');
+            if (type === 'pillow') {
+                box.innerHTML = `
+                    <h3 style="color: #67e8f9; margin-bottom: 10px;">🌊 بازلت الوسائد (Pillow Lavas - سطح القشرة المحيطية)</h3>
+                    <p style="color: #cbd5e1; line-height: 1.8;">عندما تتدفق الماغما البازلتية المائعة عبر خسف الظهيرة وتلامس مياه المحيط الباردة (2°C)، تتصلب قشرتها الخارجية فوراً على شكل وسائد كروية متتالية. تتميز ببنية ميكروليتية وزجاجية بسبب التبريد الصاعق.</p>
+                `;
+            } else {
+                box.innerHTML = `
+                    <h3 style="color: #4ade80; margin-bottom: 10px;">🪨 صخر الغابرو (Gabbro - عمق القشرة المحيطية)</h3>
+                    <p style="color: #cbd5e1; line-height: 1.8;">جزء من الماغما الثولييتية يبقى محبوساً داخل الغرفة الماغماتية العميقة أسفل الظهيرة. يبرد ببطء شديد على مدى آلاف السنين، فتتاح الفرصة للأيونات لتشكل بلورات كبيرة مرئية للعين المجردة (بنية محببة كاملة التبلور).</p>
+                `;
+            }
+        }
+
+        function simColl(stage) {
+            let box = document.getElementById('collDisplayBox');
+            if (stage === 'sub') {
+                box.innerHTML = `
+                    <h3 style="color: #38bdf8; margin-bottom: 10px;">1️⃣ قبل 50 مليون سنة (غوص محيط التيثس)</h3>
+                    <p style="color: #cbd5e1; line-height: 1.8;">كانت قارة الهند تندفع شمالاً نحو آسيا. القشرة المحيطية الفاصلة بينهما تغوص بانتظام تحت آسيا مولدة قوساً بركانياً وخندقاً بحرياً.</p>
+                `;
+            } else if (stage === 'coll') {
+                box.innerHTML = `
+                    <h3 style="color: #fb923c; margin-bottom: 10px;">2️⃣ لحظة التصادم واحتجاز الأفيوليت</h3>
+                    <p style="color: #cbd5e1; line-height: 1.8;">استنفد الغلاف الصخري المحيطي بالكامل والتقت حافتا القارتين. يتم كشط واحتجاز أجزاء من القشرة المحيطية القديمة (الأفيوليت) بين القارتين المتصادمتين كشاهد قبر للمحيط المفقود.</p>
+                `;
+            } else {
+                box.innerHTML = `
+                    <h3 style="color: #4ade80; margin-bottom: 10px;">3️⃣ التسميك وبلوغ قمة إيفرست (الوضع الحالي)</h3>
+                    <p style="color: #cbd5e1; line-height: 1.8;">تستمر الهند بالدفع شمالاً بمعدل 5 سم/سنة. تنضغط القشرة القارية وتتكدس في طيات وتراكبات ضخمة، فيرتفع السطح ليتجاوز 8800 متر، وينغرس جذر الجبل في العمق ليتجاوز 70 كيلومتراً.</p>
+                `;
+            }
+        }
+
+        function checkCh41Answer(optIdx, isCorrect) {
+            let container = document.getElementById('c41q1-container');
+            let btns = container.querySelectorAll('.option-btn');
+            let fb = document.getElementById('c41q1-feedback');
+
+            btns.forEach((b, idx) => {
+                b.disabled = true;
+                if (idx === optIdx) b.classList.add(isCorrect ? 'correct' : 'wrong');
+            });
+
+            fb.style.display = 'block';
+            if (isCorrect) {
+                fb.style.background = '#f0fdf4'; fb.style.color = '#166534'; fb.style.border = '1px solid #bbf7d0';
+                fb.innerHTML = '<strong>✅ إجابة صحيحة ممتاز!</strong> المقارنة التكتونية بين انصهار تخفيف الضغط (دراس) وانصهار الإماهة (غوص) جوهرية في البكالوريا.';
+            } else {
+                fb.style.background = '#fef2f2'; fb.style.color = '#991b1b'; fb.style.border = '1px solid #fecaca';
+                fb.innerHTML = '<strong>❌ إجابة خاطئة.</strong> الظهيرة لا تحتوي على ماء محرر، فالانصهار فيها جاف وناجم عن الصعود الأدياباتيكي السريع.';
+            }
+        }
+
+        function checkCh42Answer(optIdx, isCorrect) {
+            let container = document.getElementById('c42q1-container');
+            let btns = container.querySelectorAll('.option-btn');
+            let fb = document.getElementById('c42q1-feedback');
+
+            btns.forEach((b, idx) => {
+                b.disabled = true;
+                if (idx === optIdx) b.classList.add(isCorrect ? 'correct' : 'wrong');
+            });
+
+            fb.style.display = 'block';
+            if (isCorrect) {
+                fb.style.background = '#f0fdf4'; fb.style.color = '#166534'; fb.style.border = '1px solid #bbf7d0';
+                fb.innerHTML = '<strong>✅ إجابة صحيحة ممتاز، تهانينا الختامية!</strong> الأفيوليت المحتجز هو الختم الذهبي لإثبات غوص سابق وتصادم قاري.';
+            } else {
+                fb.style.background = '#fef2f2'; fb.style.color = '#991b1b'; fb.style.border = '1px solid #fecaca';
+                fb.innerHTML = '<strong>❌ إجابة خاطئة.</strong> الأفيوليت ليس بركاناً بل هو التسلسل الصخري الكامل لقاع محيط قديم.';
+            }
+        }
+    </script>
+</body>
+</html>

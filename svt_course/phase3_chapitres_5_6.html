@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منصة المتفوق 3AS | المرحلة 3 : الدرس 5 والدرس 6</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #f8fafc;
+            --surface: #ffffff;
+            --primary: #0f172a;
+            --accent: #2563eb;
+            --accent-light: #eff6ff;
+            --success: #16a34a;
+            --success-light: #f0fdf4;
+            --warning: #d97706;
+            --warning-light: #fffbeb;
+            --danger: #dc2626;
+            --danger-light: #fef2f2;
+            --amber: #d97706;
+            --amber-light: #fffbeb;
+            --cyan: #0891b2;
+            --cyan-light: #ecfeff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --radius: 16px;
+            --shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Cairo', 'Tajawal', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            line-height: 1.8;
+            padding-bottom: 60px;
+        }
+
+        .ltr-seq {
+            direction: ltr;
+            unicode-bidi: embed;
+            display: inline-block;
+            font-family: monospace;
+            font-weight: bold;
+            color: var(--accent);
+            background: #f1f5f9;
+            padding: 2px 8px;
+            border-radius: 6px;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 900;
+            font-size: 1.25rem;
+            color: var(--primary);
+        }
+
+        .brand-badge {
+            background: var(--cyan);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            white-space: nowrap;
+        }
+
+        .chapter-switcher {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .ch-btn {
+            background: var(--bg-main);
+            border: 2px solid var(--border);
+            padding: 8px 18px;
+            border-radius: 12px;
+            font-family: inherit;
+            font-weight: 800;
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .ch-btn:hover {
+            border-color: var(--cyan);
+            color: var(--cyan);
+        }
+
+        .ch-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                padding: 1rem;
+                text-align: center;
+            }
+            .chapter-switcher {
+                justify-content: center;
+                width: 100%;
+            }
+            .ch-btn {
+                flex: 1;
+                font-size: 0.85rem;
+                padding: 8px 10px;
+            }
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 2rem auto;
+            padding: 0 1.2rem;
+        }
+
+        .chapter-view {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .chapter-view.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Hero Header */
+        .lesson-header {
+            border-radius: var(--radius);
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+            color: white;
+        }
+
+        .header-ch5 {
+            background: linear-gradient(135deg, #78350f 0%, #d97706 100%);
+        }
+
+        .header-ch6 {
+            background: linear-gradient(135deg, #0e7490 0%, #0891b2 100%);
+        }
+
+        .lesson-breadcrumb {
+            font-size: 0.85rem;
+            opacity: 0.9;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .lesson-header h1 {
+            font-size: 2.1rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+            line-height: 1.3;
+        }
+
+        .lesson-objectives {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--surface);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+        }
+
+        @media (max-width: 600px) {
+            .lesson-header { padding: 1.5rem; }
+            .lesson-header h1 { font-size: 1.5rem; }
+            .card { padding: 1.2rem; }
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid var(--bg-main);
+            padding-bottom: 0.8rem;
+        }
+
+        .step-num {
+            background: var(--amber-light);
+            color: var(--amber);
+            width: 38px;
+            height: 38px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            font-weight: 900;
+            font-size: 1.1rem;
+        }
+
+        .step-num-cyan {
+            background: var(--cyan-light);
+            color: var(--cyan);
+        }
+
+        .problem-box {
+            background: var(--warning-light);
+            border-right: 5px solid var(--warning);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+        }
+
+        .problem-title {
+            font-weight: 800;
+            color: #92400e;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Document Analysis */
+        .doc-viewer {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        @media (max-width: 850px) {
+            .doc-viewer { grid-template-columns: 1fr; }
+        }
+
+        .doc-visual {
+            background: #0f172a;
+            border-radius: 12px;
+            padding: 1.5rem;
+            color: white;
+        }
+
+        .svg-container {
+            width: 100%;
+            height: auto;
+            max-height: 260px;
+        }
+
+        .doc-analysis {
+            background: var(--bg-main);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+        }
+
+        .method-tag {
+            display: inline-block;
+            background: #e0f2fe;
+            color: #0369a1;
+            font-size: 0.75rem;
+            font-weight: 800;
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+        }
+
+        /* Interactive simulators */
+        .interactive-box {
+            background: #1e293b;
+            border-radius: 12px;
+            padding: 1.5rem;
+            color: white;
+            margin: 1.5rem 0;
+        }
+
+        .btn-action {
+            background: var(--cyan);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-family: inherit;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin: 5px;
+        }
+
+        .btn-action:hover { background: #0e7490; }
+        .btn-amber { background: var(--amber); }
+        .btn-amber:hover { background: #b45309; }
+
+        /* Scientific text */
+        .scientific-text {
+            background: var(--surface);
+            border: 2px solid #cbd5e1;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .text-part {
+            margin-bottom: 1.2rem;
+            padding-right: 1rem;
+            border-right: 4px solid var(--amber);
+        }
+
+        .text-part.ch6-border { border-right-color: var(--cyan); }
+
+        .text-part h4 {
+            font-size: 0.95rem;
+            color: var(--amber);
+            margin-bottom: 0.3rem;
+            font-weight: 800;
+        }
+
+        .text-part.ch6-border h4 { color: var(--cyan); }
+
+        /* Quiz */
+        .question-item {
+            background: var(--bg-main);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin-top: 1rem;
+        }
+
+        .option-btn {
+            background: white;
+            border: 1.5px solid var(--border);
+            padding: 12px 16px;
+            border-radius: 10px;
+            text-align: right;
+            font-family: inherit;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text-main);
+        }
+
+        .option-btn:hover {
+            border-color: var(--cyan);
+            background: #ecfeff;
+        }
+
+        .option-btn.correct {
+            background: var(--success-light);
+            border-color: var(--success);
+            color: var(--success);
+            font-weight: 700;
+        }
+
+        .option-btn.wrong {
+            background: var(--danger-light);
+            border-color: var(--danger);
+            color: var(--danger);
+        }
+
+        .feedback-box {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            display: none;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar with Phase Switcher -->
+    <nav class="navbar">
+        <div class="brand">
+            <span>منصة المتفوق 3AS</span>
+            <span class="brand-badge">المرحلة 3 (الدرس 5 و 6)</span>
+        </div>
+        <div class="chapter-switcher">
+            <button class="ch-btn active" onclick="showChapter('ch5', event)">🧬 الدرس 5 : العلاقة بين بنية ووظيفة البروتين وتأثير الطفرات</button>
+            <button class="ch-btn" onclick="showChapter('ch6', event)">⚡ الدرس 6 : مفهوم الإنزيم والخصوصية المزدوجة</button>
+        </div>
+    </nav>
+
+    <div class="container">
+
+        <!-- ================================================================= -->
+        <!-- CHAPTER 5 : RELATION STRUCTURE-FONCTION & MUTATIONS (الدرس 5) -->
+        <!-- ================================================================= -->
+        <div id="ch5" class="chapter-view active">
+            
+            <header class="lesson-header header-ch5">
+                <div class="lesson-breadcrumb">المجال الأول : التخصص الوظيفي للبروتينات • الوحدة 2 : العلاقة بين بنية ووظيفة البروتين</div>
+                <h1>الدرس 5 : العلاقة بين بنية ووظيفة البروتين وتأثير الطفرات الوراثية</h1>
+                <div class="lesson-objectives">
+                    <div>🎯 <strong>الهدف العلمي :</strong> إثبات تجريبي أن تخصص البروتين متوقف على بنيته الفراغية (تجربة أنفنصن Anfinsen)، وتفسير الأمراض الوراثية (مثل فقر الدم المنجلي) على المستوى الجزيئي.</div>
+                    <div>⏱️ <strong>المدة التقديرية للتعلم الذاتي :</strong> 25 دقيقة</div>
+                </div>
+            </header>
+
+            <!-- Step 1: Problématique -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num">1</span>
+                    <span>وضعية الانطلاق وبناء الإشكالية العلميـة</span>
+                </div>
+                <div class="problem-box">
+                    <div class="problem-title">⚠️ كيف يؤدي تغير حمض أميني واحد إلى مرض قاتل؟</div>
+                    <p>في مرض فقر الدم المنجلي (<span class="ltr-seq">Drépanocytose</span>)، تتحول كريات الدم الحمراء من الشكل القرصي المرن إلى شكل منجلي صلب، مما يسبب انسداد الأوعية الدموية واختناق الخلايا. <strong>السبب هو استبدال حمض أميني واحد فقط (الغلوتاميك <span class="ltr-seq">Glu</span> بالفالين <span class="ltr-seq">Val</span>) في السلسلة البيبتيدية للهيموغلوبين! كيف يفسر هذا على ضوء العلاقة بين البنية الفراغية والوظيفة؟</strong></p>
+                </div>
+            </section>
+
+            <!-- Step 2: Document Analyse -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num">2</span>
+                    <span>التحليل المنهجي للتجربة التاريخية للكرياتين أنفنصن (Anfinsen) على الريبونكلياز</span>
+                </div>
+                <div class="doc-viewer">
+                    <div class="doc-visual">
+                        <h4 style="margin-bottom: 1rem; color: #fde68a; font-size: 0.95rem;">خطوات تجربة أنفنصن على إنزيم الريبونكلياز (Ribonucléase) ذو 4 جسور ثنائية الكبريت</h4>
+                        <!-- SVG Anfinsen -->
+                        <svg class="svg-container" viewBox="0 0 400 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Native structure -->
+                            <circle cx="70" cy="80" r="35" fill="#1e293b" stroke="#f59e0b" stroke-width="3"/>
+                            <path d="M55 70 Q 70 60 85 70 Q 70 90 55 80" stroke="#f59e0b" stroke-width="4"/>
+                            <text x="70" y="135" fill="#fde68a" font-size="11" text-anchor="middle" font-weight="bold">1. بنية طبيعية فعالة (100%)</text>
+
+                            <!-- Arrow to denatured -->
+                            <path d="M115 80 H 155" stroke="#94a3b8" stroke-width="2"/>
+                            <text x="135" y="70" fill="#ef4444" font-size="9" text-anchor="middle">+ يوريا و β-مركابتوإيثانول</text>
+
+                            <!-- Denatured structure -->
+                            <path d="M170 80 Q 210 40 250 80 Q 210 120 250 100" stroke="#ef4444" stroke-width="3" stroke-dasharray="4"/>
+                            <text x="210" y="135" fill="#fca5a5" font-size="11" text-anchor="middle" font-weight="bold">2. فقدان البنية والفعالية (0%)</text>
+
+                            <!-- Arrow to renatured -->
+                            <path d="M265 80 H 305" stroke="#94a3b8" stroke-width="2"/>
+                            <text x="285" y="70" fill="#22c55e" font-size="9" text-anchor="middle">إزالة المواد الكيميائية</text>
+
+                            <!-- Renatured structure -->
+                            <circle cx="340" cy="80" r="35" fill="#1e293b" stroke="#22c55e" stroke-width="3"/>
+                            <path d="M325 70 Q 340 60 355 70 Q 340 90 325 80" stroke="#22c55e" stroke-width="4"/>
+                            <text x="340" y="135" fill="#86efac" font-size="11" text-anchor="middle" font-weight="bold">3. استرجاع البنية والفعالية (100%)</text>
+                        </svg>
+                        <p style="font-size: 0.85rem; color: #cbd5e1; margin-top: 10px;">🧪 مادة اليوريا تعيق الروابط الهيدروجينية، و β-مركابتوإيثانول يكسر الجسور ثنائية الكبريت.</p>
+                    </div>
+
+                    <div class="doc-analysis">
+                        <span class="method-tag">منهجية البكالوريا : الاستنتاج من خطوات التجربة</span>
+                        <h4 style="margin: 8px 0; color: var(--primary);">ماذا نستنتج من تجربة أنفنصن الحائزة على نوبل؟</h4>
+                        <p>1. تكسير الروابط الكيميائية (تخريب البنية الفراغية) يؤدي مباشرة إلى <strong>فقدان الوظيفة البيولوجية</strong> للبروتين.</p>
+                        <p>2. إزالة عوامل التخريب تسمح للبروتين بالانطواء التلقائي الصحيح واسترجاع بنيته وفعاليته.</p>
+                        <hr style="margin: 12px 0; border: none; border-top: 1px solid var(--border);">
+                        <p style="font-weight: bold; color: #b45309;">الاستنتاج الذهبي في البكالوريا :</p>
+                        <p>البنية الفراغية الثلاثية للبروتين محددة ومفروضة <strong>وراثياً</strong> بعدد ونوع وترتيب الأحماض الأمينية التي تشكل السلسلة البيبتيدية (البنية الأولية).</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 3: Interactive Mutation Simulator -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num">3</span>
+                    <span>محاكي الطفرات الوراثية وتأثيرها على بروتين الهيموغلوبين (HbA مقابل HbS)</span>
+                </div>
+                <p>تحدد المورثة (<span class="ltr-seq">ADN</span>) تسلسل الأحماض الأمينية في البروتين. اضغط لإحداث طفرة استبدال وملاحظة النتيجة الجزيئية والخلويـة :</p>
+                
+                <div class="interactive-box" style="background: #0f172a;">
+                    <div style="margin-bottom: 15px;">
+                        <button class="btn-action btn-amber" onclick="simMut('hba')">🟢 الحالة الطبيعية (الهيموغلوبين HbA)</button>
+                        <button class="btn-action" style="background: #e11d48;" onclick="simMut('hbs')">🔴 طفرة مرض فقر الدم المنجلي (الهيموغلوبين HbS)</button>
+                    </div>
+                    <div id="mutDisplayBox" style="background: #1e293b; border: 2px solid #334155; border-radius: 12px; padding: 1.5rem; text-align: center;">
+                        <h3 style="color: #4ade80; margin-bottom: 10px;">🟢 الهيموغلوبين الطبيعي (HbA)</h3>
+                        <p style="direction:ltr; font-family:monospace; font-size:1.1rem; color:#93c5fd; margin: 10px 0;">Codons : 5'- ... - CCU - GAG - GAG - ... -3'<br>Acides aminés : ... - Pro(4) - Glu(6) - Glu(7) - ...</p>
+                        <p style="color: #cbd5e1; line-height: 1.8;">الحمض الأميني رقم 6 هو <strong>حمض الغلوتاميك (<span class="ltr-seq">Glu</span> المحب للماء)</strong>. يبقى جزيء الهيموغلوبين ذائباً ومنفصلاً في هيولى كرية الدم الحمراء، فتحتفظ الكرية بشكلها القرصي المرن القادر على نقل الأكسجين والمرور بسلاسة في الشعيرات الدموية.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 4: Bilan & Quiz Ch5 -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num">4</span>
+                    <span>الخلاصة والتقويم الذاتي (الدرس 5)</span>
+                </div>
+                <div class="scientific-text">
+                    <div class="text-part">
+                        <h4>الخلاصة الشاملة للوحدة الثانية (تنقيط البكالوريا)</h4>
+                        <p>تتوقف التخصص الوظيفي للبروتين على <strong>بنيته الفراغية الدقيقة</strong>، والتي تتحدد وراثياً بتسلسل الأحماض الأمينية في سلسلته البيبتيدية. تنشأ روابط كيميائية دقيقة في مواضع محددة للحفاظ على استقرار هذه البنية. أي تغير وراثي (طفرة) قد يغير حمضاً أمينياً أو أكثر، مما يغير مواضع الروابط فيؤدي إلى تغير البنية الفراغية وبالتالي فقدان الوظيفة والإصابة بالمرض.</p>
+                    </div>
+                </div>
+
+                <div class="question-item" id="c5q1-container" style="margin-top: 1.5rem;">
+                    <h4 style="margin-bottom: 12px;">اختبر فهمك : لماذا تسبب طفرة استبدال (الغلوتاميك بالفالين) في الموضع 6 لمرض فقر الدم المنجلي؟</h4>
+                    <div class="options-grid">
+                        <button class="option-btn" onclick="checkCh5Answer(0, true)">أ) لأن الفالين (<span class="ltr-seq">Val</span>) كاره للماء، فيؤدي لتجمع وتراص جزيئات الهيموغلوبين في ألياف صلبة تشوه كرية الدم.</button>
+                        <button class="option-btn" onclick="checkCh5Answer(1, false)">ب) لأن الفالين يمنع حدوث عملية الاستنساخ داخل النواة.</button>
+                        <button class="option-btn" onclick="checkCh5Answer(2, false)">ج) لأن الفالين يكسر جميع الجسور ثنائية الكبريت في الريبوزوم.</button>
+                    </div>
+                    <div class="feedback-box" id="c5q1-feedback"></div>
+                </div>
+            </section>
+        </div>
+
+        <!-- ================================================================= -->
+        <!-- CHAPTER 6 : CONCEPT D'ENZYME & SPÉCIFICITÉ (الدرس 6 - بداية الوحدة 3) -->
+        <!-- ================================================================= -->
+        <div id="ch6" class="chapter-view">
+            
+            <header class="lesson-header header-ch6">
+                <div class="lesson-breadcrumb">المجال الأول : التخصص الوظيفي للبروتينات • الوحدة 3 : النشاط الإنزيمي للبروتينات</div>
+                <h1>الدرس 6 : مفهوم الإنزيم والخصوصية المزدوجة (الموقع الفعال والتوافق المحرض)</h1>
+                <div class="lesson-objectives">
+                    <div>🎯 <strong>الهدف العلمي :</strong> تعريف الإنزيم كوسيط حيوي، وتوضيح الخصوصية المزدوجة (تخصص مادة التفاعل وتخصص نوع التفاعل) ونموذج التوافق المحرض.</div>
+                    <div>⏱️ <strong>المدة التقديرية للتعلم الذاتي :</strong> 25 دقيقة</div>
+                </div>
+            </header>
+
+            <!-- Step 1: Problématique -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num step-num-cyan">1</span>
+                    <span>الإشكالية الأساسية للوحدة الثالثة</span>
+                </div>
+                <div class="problem-box" style="border-right-color: var(--cyan); background: var(--cyan-light);">
+                    <div class="problem-title" style="color: #0e7490;">⚠️ كيف تنجز الإنزيمات تفاعلات معقدة في درجة حرارة الجسم (37°C)؟</div>
+                    <p>تتطلب التفاعلات الكيميائية في المختبر درجات حرارة مرتفعة وأحماضاً قوية لتفكيك الجزيئات المعقدة، بينما تتم نفس التفاعلات داخل الخلايا الحية في درجة حرارة هادئة (37°C) وبسرعة فائقة جداً. <strong>يعود هذا الفضل للإنزيمات (<span class="ltr-seq">Enzymes</span>). ما هو السر البنيوي في الإنزيم الذي يمنحه هذه القدرة والخصوصية الفائقة؟</strong></p>
+                </div>
+            </section>
+
+            <!-- Step 2: Document Analyse -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num step-num-cyan">2</span>
+                    <span>التحليل المنهجي للموقع الفعال ونموذج التوافق المحرض (Adaptation Induite)</span>
+                </div>
+                <div class="doc-viewer">
+                    <div class="doc-visual" style="background: #083344;">
+                        <h4 style="color: #67e8f9; margin-bottom: 1rem; font-size: 0.95rem;">نموذج التوافق المحرض (التداخل والتكامل البنيوي أثناء اقتراب مادة التفاعل)</h4>
+                        <!-- SVG Induced Fit -->
+                        <svg class="svg-container" viewBox="0 0 400 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Enzyme un-bound -->
+                            <path d="M40 140 C 30 90, 80 50, 110 70 C 120 78, 125 90, 135 90 C 145 90, 150 78, 160 70 C 190 50, 240 90, 230 140 Z" fill="#0e7490" stroke="#22d3ee" stroke-width="2"/>
+                            <text x="135" y="130" fill="#cffafe" font-size="11" text-anchor="middle" font-weight="bold">الإنزيم (E) قبل الارتباط</text>
+                            
+                            <!-- Substrate approaching -->
+                            <path d="M120 20 L 135 45 L 150 20 Z" fill="#fbbf24" stroke="#f59e0b" stroke-width="2"/>
+                            <text x="135" y="15" fill="#fde68a" font-size="10" text-anchor="middle">مادة التفاعل (S)</text>
+
+                            <!-- Arrow -->
+                            <path d="M250 100 H 280" stroke="#67e8f9" stroke-width="2"/>
+                            <polygon points="285,100 275,95 275,105" fill="#67e8f9"/>
+
+                            <!-- Enzyme-Substrate Complex ES bound (induced fit) -->
+                            <path d="M300 140 C 290 90, 325 60, 340 65 L 350 85 L 360 65 C 375 60, 410 90, 400 140 Z" fill="#0e7490" stroke="#22d3ee" stroke-width="2"/>
+                            <path d="M340 65 L 350 85 L 360 65 Z" fill="#fbbf24" stroke="#f59e0b" stroke-width="2"/>
+                            <text x="350" y="130" fill="#86efac" font-size="11" text-anchor="middle" font-weight="bold">معقد (E - S) متوافق</text>
+                        </svg>
+                        <p style="font-size: 0.85rem; color: #cbd5e1; margin-top: 10px;">💡 عند اقتراب مادة التفاعل، يغير الإنزيم شكل موقعه الفعال ليتكامل بنيوياً مع مادة التفاعل.</p>
+                    </div>
+
+                    <div class="doc-analysis">
+                        <span class="method-tag" style="background: #ecfeff; color: #0891b2;">مفاهيم البكالوريا الأساسية</span>
+                        <h4 style="margin: 8px 0; color: var(--primary);">ما هو الموقع الفعال (<span class="ltr-seq">Site Actif</span>)؟</h4>
+                        <p>هو تجويف أو منطقة محددة في البنية الفراغية للإنزيم، يتكون من عدد قليل من الأحماض الأمينية المحددة وراثياً، وينقسم إلى قسمين :</p>
+                        <p>• <strong>موقع التثبيت (<span class="ltr-seq">Site de fixation</span>) :</strong> يتعرف ويثبت مادة التفاعل (<span class="ltr-seq">Substrat S</span>).</p>
+                        <p>• <strong>موقع التحفيز (<span class="ltr-seq">Site catalytique</span>) :</strong> ينجز التفاعل الكيميائي.</p>
+                        <hr style="margin: 12px 0; border: none; border-top: 1px solid var(--border);">
+                        <p><strong>التوافق المحرض (<span class="ltr-seq">Adaptation Induite</span>) :</strong> التكامل البنيوي بين الموقع الفعال ومادة التفاعل قد لا يكون موجوداً قبل الارتباط، بل يحرض اقتراب مادة التفاعل الإنزيمَ على تغيير شكله الفراغي ليصبح متكاملاً معها.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 3: Interactive Double Specificity -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num step-num-cyan">3</span>
+                    <span>مختبر الخصوصية المزدوجة للإنزيمات</span>
+                </div>
+                <p>تتميز الإنزيمات بخصوصية عالية جداً، فهي متخصصة بالنسبة <strong>لمادة التفاعل (<span class="ltr-seq">Substrat</span>)</strong> وبالنسبة <strong> لنوع التفاعل (<span class="ltr-seq">Type de réaction</span>)</strong>. اضغط لاختبار الخصوصية :</p>
+                
+                <div class="interactive-box" style="background: #164e63;">
+                    <div style="margin-bottom: 15px;">
+                        <button class="btn-action" onclick="simEnz('s1')">🧪 إنزيم السكراز (Saccharase) + سكر السكروز</button>
+                        <button class="btn-action" style="background:#be123c;" onclick="simEnz('s2')">🧪 إنزيم السكراز + سكر المالتوز</button>
+                    </div>
+                    <div id="enzDisplayBox" style="background: #083344; border: 2px solid #06b6d4; border-radius: 12px; padding: 1.5rem; text-align: center;">
+                        <h3 style="color: #67e8f9; margin-bottom: 10px;">🧪 اضغط على أحد التفاعلات أعلاه لمشاهدة تأثير الخصوصية</h3>
+                        <p style="color: #cbd5e1;">ستلاحظ هل يتشكل المعقد الإنزيمي (<span class="ltr-seq">ES</span>) أم يحدث تنافر بنيوي.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 4: Quiz Ch6 -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num step-num-cyan">4</span>
+                    <span>تقويم الدرس 6 : أسئلة البكالوريا المتكررة</span>
+                </div>
+
+                <div class="question-item" id="c6q1-container">
+                    <h4 style="margin-bottom: 12px;">1. ماذا نقصد بأن الإنزيم ذو "خصوصية مزدوجة"؟</h4>
+                    <div class="options-grid">
+                        <button class="option-btn" onclick="checkCh6Answer(1, 0, true)">أ) أنه متخصص في مادة تفاعل واحدة (أو مجموعة محددة) ومتخصص في نوع تفاعل كيميائي واحد (تحلل، بناء، أكسدة...).</button>
+                        <button class="option-btn" onclick="checkCh6Answer(1, 1, false)">ب) أنه يعمل في النواة وفي الهيولى في نفس الوقت.</button>
+                        <button class="option-btn" onclick="checkCh6Answer(1, 2, false)">ج) أنه يستهلك جزيئتين من الـ <span class="ltr-seq">ATP</span> لكل تفاعل.</button>
+                    </div>
+                    <div class="feedback-box" id="c6q1-feedback"></div>
+                </div>
+            </section>
+        </div>
+
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        function showChapter(chId, evt) {
+            document.querySelectorAll('.chapter-view').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.ch-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(chId).classList.add('active');
+            if (evt) evt.target.classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Mutation simulator
+        function simMut(type) {
+            let box = document.getElementById('mutDisplayBox');
+            if (type === 'hba') {
+                box.innerHTML = `
+                    <h3 style="color: #4ade80; margin-bottom: 10px;">🟢 الهيموغلوبين الطبيعي (HbA)</h3>
+                    <p style="direction:ltr; font-family:monospace; font-size:1.1rem; color:#93c5fd; margin: 10px 0;">Codons : 5'- ... - CCU - GAG - GAG - ... -3'<br>Acides aminés : ... - Pro(4) - Glu(6) - Glu(7) - ...</p>
+                    <p style="color: #cbd5e1; line-height: 1.8;">الحمض الأميني رقم 6 هو <strong>حمض الغلوتاميك (<span class="ltr-seq">Glu</span> المحب للماء)</strong>. يبقى جزيء الهيموغلوبين ذائباً ومنفصلاً في هيولى كرية الدم الحمراء، فتحتفظ الكرية بشكلها القرصي المرن القادر على نقل الأكسجين والمرور بسلاسة في الشعيرات الدموية.</p>
+                `;
+            } else {
+                box.innerHTML = `
+                    <h3 style="color: #f43f5e; margin-bottom: 10px;">🔴 طفرة مرض فقر الدم المنجلي (الهيموغلوبين HbS)</h3>
+                    <p style="direction:ltr; font-family:monospace; font-size:1.1rem; color:#fca5a5; margin: 10px 0;">Codons : 5'- ... - CCU - GUG - GAG - ... -3'<br>Acides aminés : ... - Pro(4) - Val(6) - Glu(7) - ...</p>
+                    <p style="color: #cbd5e1; line-height: 1.8;">استبدال الغلوتاميك بـ <strong>الفالين (<span class="ltr-seq">Val</span> الكاره للماء)</strong> يسبب نشأة نقطة كارهة للماء على سطح الهيموغلوبين. تتجاذب الجزيئات وتتراص على شكل ألياف أنبوبية صلبة وطويلة تشوه كرية الدم الحمراء إلى شكل منجلي، فتنسد الأوعية وتتكسر الكريات.</p>
+                `;
+            }
+        }
+
+        // Enzyme Simulator
+        function simEnz(sub) {
+            let box = document.getElementById('enzDisplayBox');
+            if (sub === 's1') {
+                box.innerHTML = `
+                    <h3 style="color: #4ade80; margin-bottom: 10px;">✅ تفاعل ناجح (تكامل بنيوي تام)</h3>
+                    <p style="line-height: 1.8;">مادة التفاعل (السكروز) تتكامل بنيوياً مع الموقع الفعال لإنزيم السكراز. يتشكل المعقد الإنزيمي (<span class="ltr-seq">ES</span>)، وينجز الإنزيم تفاعل التحلل المائي ليعطي غلوكوز + فركتوز ويتحرر الإنزيم سليماً.</p>
+                `;
+            } else {
+                box.innerHTML = `
+                    <h3 style="color: #f43f5e; margin-bottom: 10px;">❌ عدم حدوث تفاعل (غياب التكامل البنيوي)</h3>
+                    <p style="line-height: 1.8;">سكر المالتوز لا يتوافق هندسياً ولا كيميائياً مع الموقع الفعال لإنزيم السكراز. لا يتشكل المعقد الإنزيمي (<span class="ltr-seq">ES</span>) ولا يحدث تفاعل، مما يثبت <strong>الخصوصية العالية للإنزيم تجاه مادة التفاعل</strong>.</p>
+                `;
+            }
+        }
+
+        function checkCh5Answer(optIdx, isCorrect) {
+            let container = document.getElementById('c5q1-container');
+            let btns = container.querySelectorAll('.option-btn');
+            let fb = document.getElementById('c5q1-feedback');
+
+            btns.forEach((b, idx) => {
+                b.disabled = true;
+                if (idx === optIdx) b.classList.add(isCorrect ? 'correct' : 'wrong');
+            });
+
+            fb.style.display = 'block';
+            if (isCorrect) {
+                fb.style.background = '#f0fdf4'; fb.style.color = '#166534'; fb.style.border = '1px solid #bbf7d0';
+                fb.innerHTML = '<strong>✅ إجابة صحيحة ممتاز!</strong> حمض الفالين كاره للماء فيؤدي لتراص جزيئات الهيموغلوبين لتجنب الماء في هيولى الكرية.';
+            } else {
+                fb.style.background = '#fef2f2'; fb.style.color = '#991b1b'; fb.style.border = '1px solid #fecaca';
+                fb.innerHTML = '<strong>❌ إجابة خاطئة.</strong> السبب هو الخاصية الكيميائية لجذر الفالين (كاره للماء) مقارنة بالغلوتاميك (محب للماء ومحمل بشحنة سالبة).';
+            }
+        }
+
+        function checkCh6Answer(qIdx, optIdx, isCorrect) {
+            let container = document.getElementById(`c6q${qIdx}-container`);
+            let btns = container.querySelectorAll('.option-btn');
+            let fb = document.getElementById(`c6q${qIdx}-feedback`);
+
+            btns.forEach((b, idx) => {
+                b.disabled = true;
+                if (idx === optIdx) b.classList.add(isCorrect ? 'correct' : 'wrong');
+            });
+
+            fb.style.display = 'block';
+            if (isCorrect) {
+                fb.style.background = '#f0fdf4'; fb.style.color = '#166534'; fb.style.border = '1px solid #bbf7d0';
+                fb.innerHTML = '<strong>✅ إجابة صحيحة ممتاز!</strong> الخصوصية المزدوجة هي تخصص الإنزيم في مادة التفاعل وفي نوع التفاعل في آن واحد.';
+            } else {
+                fb.style.background = '#fef2f2'; fb.style.color = '#991b1b'; fb.style.border = '1px solid #fecaca';
+                fb.innerHTML = '<strong>❌ إجابة خاطئة.</strong> الخصوصية المزدوجة تعني الجمع بين خصوصية مادة التفاعل (Substrat) وخصوصية نوع التفاعل (Réaction).';
+            }
+        }
+    </script>
+</body>
+</html>

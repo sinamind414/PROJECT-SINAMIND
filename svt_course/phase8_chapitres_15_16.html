@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منصة المتفوق 3AS | المرحلة 8 : الدرس 15 والدرس 16</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #f8fafc;
+            --surface: #ffffff;
+            --primary: #0f172a;
+            --accent: #2563eb;
+            --accent-light: #eff6ff;
+            --success: #16a34a;
+            --success-light: #f0fdf4;
+            --warning: #d97706;
+            --warning-light: #fffbeb;
+            --danger: #dc2626;
+            --danger-light: #fef2f2;
+            --teal-dark: #134e4a;
+            --teal-light: #f0fdf4;
+            --sky-dark: #0369a1;
+            --sky-light: #f0f9ff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --radius: 16px;
+            --shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Cairo', 'Tajawal', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            line-height: 1.8;
+            padding-bottom: 60px;
+        }
+
+        .ltr-seq {
+            direction: ltr;
+            unicode-bidi: embed;
+            display: inline-block;
+            font-family: monospace;
+            font-weight: bold;
+            color: var(--accent);
+            background: #f1f5f9;
+            padding: 2px 8px;
+            border-radius: 6px;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 900;
+            font-size: 1.25rem;
+            color: var(--primary);
+        }
+
+        .brand-badge {
+            background: var(--teal-dark);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            white-space: nowrap;
+        }
+
+        .chapter-switcher {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .ch-btn {
+            background: var(--bg-main);
+            border: 2px solid var(--border);
+            padding: 8px 18px;
+            border-radius: 12px;
+            font-family: inherit;
+            font-weight: 800;
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .ch-btn:hover {
+            border-color: var(--teal-dark);
+            color: var(--teal-dark);
+        }
+
+        .ch-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                padding: 1rem;
+                text-align: center;
+            }
+            .chapter-switcher {
+                justify-content: center;
+                width: 100%;
+            }
+            .ch-btn {
+                flex: 1;
+                font-size: 0.85rem;
+                padding: 8px 10px;
+            }
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 2rem auto;
+            padding: 0 1.2rem;
+        }
+
+        .chapter-view {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .chapter-view.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Hero Header */
+        .lesson-header {
+            border-radius: var(--radius);
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+            color: white;
+        }
+
+        .header-ch15 {
+            background: linear-gradient(135deg, #0f766e 0%, #0d9488 100%);
+        }
+
+        .header-ch16 {
+            background: linear-gradient(135deg, #0369a1 0%, #0284c7 100%);
+        }
+
+        .lesson-breadcrumb {
+            font-size: 0.85rem;
+            opacity: 0.9;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .lesson-header h1 {
+            font-size: 2.1rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+            line-height: 1.3;
+        }
+
+        .lesson-objectives {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--surface);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+        }
+
+        @media (max-width: 600px) {
+            .lesson-header { padding: 1.5rem; }
+            .lesson-header h1 { font-size: 1.5rem; }
+            .card { padding: 1.2rem; }
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid var(--bg-main);
+            padding-bottom: 0.8rem;
+        }
+
+        .step-num {
+            background: #ccfbf1;
+            color: #0d9488;
+            width: 38px;
+            height: 38px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            font-weight: 900;
+            font-size: 1.1rem;
+        }
+
+        .step-num-sky {
+            background: #e0f2fe;
+            color: #0284c7;
+        }
+
+        .problem-box {
+            background: var(--warning-light);
+            border-right: 5px solid var(--warning);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+        }
+
+        .problem-title {
+            font-weight: 800;
+            color: #92400e;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Document Analysis */
+        .doc-viewer {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        @media (max-width: 850px) {
+            .doc-viewer { grid-template-columns: 1fr; }
+        }
+
+        .doc-visual {
+            background: #0f172a;
+            border-radius: 12px;
+            padding: 1.5rem;
+            color: white;
+        }
+
+        .svg-container {
+            width: 100%;
+            height: auto;
+            max-height: 260px;
+        }
+
+        .doc-analysis {
+            background: var(--bg-main);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+        }
+
+        .method-tag {
+            display: inline-block;
+            background: #e0f2fe;
+            color: #0369a1;
+            font-size: 0.75rem;
+            font-weight: 800;
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+        }
+
+        /* Interactive simulators */
+        .interactive-box {
+            background: #1e293b;
+            border-radius: 12px;
+            padding: 1.5rem;
+            color: white;
+            margin: 1.5rem 0;
+        }
+
+        .btn-action {
+            background: #0d9488;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-family: inherit;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin: 5px;
+        }
+
+        .btn-action:hover { background: #0f766e; }
+        .btn-sky { background: #0284c7; }
+        .btn-sky:hover { background: #0369a1; }
+
+        /* Scientific text */
+        .scientific-text {
+            background: var(--surface);
+            border: 2px solid #cbd5e1;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .text-part {
+            margin-bottom: 1.2rem;
+            padding-right: 1rem;
+            border-right: 4px solid #0d9488;
+        }
+
+        .text-part.ch16-border { border-right-color: #0284c7; }
+
+        .text-part h4 {
+            font-size: 0.95rem;
+            color: #0d9488;
+            margin-bottom: 0.3rem;
+            font-weight: 800;
+        }
+
+        .text-part.ch16-border h4 { color: #0284c7; }
+
+        /* Quiz */
+        .question-item {
+            background: var(--bg-main);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin-top: 1rem;
+        }
+
+        .option-btn {
+            background: white;
+            border: 1.5px solid var(--border);
+            padding: 12px 16px;
+            border-radius: 10px;
+            text-align: right;
+            font-family: inherit;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text-main);
+        }
+
+        .option-btn:hover {
+            border-color: #0d9488;
+            background: #f0fdf4;
+        }
+
+        .option-btn.correct {
+            background: var(--success-light);
+            border-color: var(--success);
+            color: var(--success);
+            font-weight: 700;
+        }
+
+        .option-btn.wrong {
+            background: var(--danger-light);
+            border-color: var(--danger);
+            color: var(--danger);
+        }
+
+        .feedback-box {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            display: none;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar with Phase Switcher -->
+    <nav class="navbar">
+        <div class="brand">
+            <span>منصة المتفوق 3AS</span>
+            <span class="brand-badge">المرحلة 8 (الدرس 15 و 16)</span>
+        </div>
+        <div class="chapter-switcher">
+            <button class="ch-btn active" onclick="showChapter('ch15', event)">⚡ الدرس 15 : كمون الراحة ومضخة Na⁺/K⁺</button>
+            <button class="ch-btn" onclick="showChapter('ch16', event)">📈 الدرس 16 : كمون العمل والقنوات المبوبة كهربائياً</button>
+        </div>
+    </nav>
+
+    <div class="container">
+
+        <!-- ================================================================= -->
+        <!-- CHAPTER 15 : LE POTENTIEL DE REPOS & POMPE Na+/K+ (الدرس 15) -->
+        <!-- ================================================================= -->
+        <div id="ch15" class="chapter-view active">
+            
+            <header class="lesson-header header-ch15">
+                <div class="lesson-breadcrumb">المجال الأول : التخصص الوظيفي للبروتينات • الوحدة 5 : دور البروتينات في الاتصال العصبي</div>
+                <h1>الدرس 15 : كمون الراحة والآليات الأيونية والغشائية للحفاظ عليه (-70 mV)</h1>
+                <div class="lesson-objectives">
+                    <div>🎯 <strong>الهدف العلمي :</strong> تحديد أصل كمون الراحة (توزع الأيونات غير المتكافئ) وتوضيح دور قنوات التسرب ومضخة الصوديوم/بوتاسيوم المستهلكة للـ ATP.</div>
+                    <div>⏱️ <strong>المدة التقديرية للتعلم الذاتي :</strong> 25 دقيقة</div>
+                </div>
+            </header>
+
+            <!-- Step 1: Problématique -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num">1</span>
+                    <span>وضعية الانطلاق وبناء الإشكالية العلميـة</span>
+                </div>
+                <div class="problem-box">
+                    <div class="problem-title">⚠️ لماذا يكون داخل الليف العصبي سالباً وخارجه موجباً أثناء الراحة؟</div>
+                    <p>عند وضع إلكترود داخل ليف عصبي حي غير مستثار وإلكترود آخر على سطحه، يسجل راسم الاهتزاز المهبطي (<span class="ltr-seq">Oscilloscope</span>) فرق جهد ثابت يقارب <strong><span class="ltr-seq">-70 mV</span></strong> يسمى <strong>كمون الراحة (<span class="ltr-seq">Potentiel de repos</span>)</strong>. وهذا يعني أن غشاء الليف العصبي مستقطب كهربائياً. <strong>ما هي البروتينات الغشائية المسؤولة عن نشأة وثبات هذا الاستقطاب رغم وجود ظاهرة الانتشار الغشائي للأيونات؟</strong></p>
+                </div>
+            </section>
+
+            <!-- Step 2: Document Analyse -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num">2</span>
+                    <span>التحليل المنهجي لقنوات التسرب المفتوحة باستمرار ومضخة Na⁺/K⁺-ATPase</span>
+                </div>
+                <div class="doc-viewer">
+                    <div class="doc-visual" style="background: #134e4a;">
+                        <h4 style="color: #99f6e4; margin-bottom: 1rem; font-size: 0.95rem;">البروتينات المتدخلة في كمون الراحة على الغشاء الهيولي لليف العصبي</h4>
+                        <!-- SVG PR -->
+                        <svg class="svg-container" viewBox="0 0 400 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Membrane -->
+                            <rect x="20" y="90" width="360" height="40" fill="#0f766e"/>
+                            <text x="200" y="80" fill="#99f6e4" font-size="11" text-anchor="middle">الوسط الخارجي (غني بـ Na⁺ موجب +)</text>
+                            <text x="200" y="150" fill="#fca5a5" font-size="11" text-anchor="middle">الوسط الداخلي (غني بـ K⁺ سالب -70 mV)</text>
+
+                            <!-- Leak Channel K+ -->
+                            <path d="M90 90 V 130" stroke="#fbbf24" stroke-width="14"/>
+                            <path d="M90 125 L 90 80" stroke="#ef4444" stroke-width="3" marker-end="url(#arrow)"/>
+                            <text x="90" y="65" fill="#fbbf24" font-size="9" text-anchor="middle">قناة تسرب K⁺ (خروج وفق التدرج)</text>
+
+                            <!-- Leak Channel Na+ -->
+                            <path d="M190 90 V 130" stroke="#38bdf8" stroke-width="12"/>
+                            <path d="M190 80 L 190 135" stroke="#38bdf8" stroke-width="3"/>
+                            <text x="190" y="175" fill="#38bdf8" font-size="9" text-anchor="middle">قناة تسرب Na⁺ (دخول وفق التدرج)</text>
+
+                            <!-- Pompe Na+/K+ ATPase -->
+                            <ellipse cx="290" cy="110" rx="24" ry="22" fill="#9333ea" stroke="#c084fc" stroke-width="2"/>
+                            <text x="290" y="113" fill="white" font-size="9" text-anchor="middle" font-weight="bold">مضخة ATP</text>
+                            <!-- 3 Na+ out -->
+                            <path d="M280 100 L 270 60" stroke="#ef4444" stroke-width="3"/>
+                            <text x="260" y="55" fill="#ef4444" font-size="8">خروج 3 Na⁺</text>
+                            <!-- 2 K+ in -->
+                            <path d="M300 70 L 310 115" stroke="#4ade80" stroke-width="3"/>
+                            <text x="325" y="75" fill="#4ade80" font-size="8">دخول 2 K⁺</text>
+                        </svg>
+                        <p style="font-size: 0.85rem; color: #cbd5e1; margin-top: 10px;">💡 تعمل المضخة عكس تدرج التركيز باستهلاك الطاقة (ATP) للحفاظ على ثبات كمون الراحة.</p>
+                    </div>
+
+                    <div class="doc-analysis">
+                        <span class="method-tag">منهجية البكالوريا : التفسير الأيوني الدقيق</span>
+                        <h4 style="margin: 8px 0; color: var(--primary);">كيف يثبت الكمون عند <span class="ltr-seq">-70 mV</span>؟</h4>
+                        <ol style="padding-right: 1.2rem; line-height: 1.8;">
+                            <li><strong>توزع غير متساوٍ للأيونات :</strong> تركيز <span class="ltr-seq">Na⁺</span> مرتفع في الخارج، وتركيز <span class="ltr-seq">K⁺</span> مرتفع في الداخل.</li>
+                            <li><strong>قنوات الميز (التسرب المفتوحة باستمرار) :</strong> يسمح نفاذية الغشاء لـ <span class="ltr-seq">K⁺</span> بالخروج نحو الخارج (نفاذية أكبر)، ودخول قليل لـ <span class="ltr-seq">Na⁺</span> نحو الداخل، مما يجعل الداخل سالباً والخارج موجباً.</li>
+                            <li><strong>مضخة الصوديوم/بوتاسيوم (<span class="ltr-seq">Pompe Na⁺/K⁺</span>) :</strong> لو استمر التسرب لتساوى التركيز وزال الكمون! لذلك تتدخل المضخة لتطرح <strong>3 شوارد <span class="ltr-seq">Na⁺</span> نحو الخارج</strong> وتدخل <strong>شاردتي <span class="ltr-seq">2 K⁺</span> نحو الداخل</strong> عكس تدرج التركيز باستهلاك طاقة <span class="ltr-seq">ATP</span>.</li>
+                        </ol>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 3: Interactive Pompe Simulator -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num">3</span>
+                    <span>محاكي مضخة الصوديوم/بوتاسيوم التفاعلي</span>
+                </div>
+                <p>اختبر تأثير تثبيط المضخة (بواسطة سم السيانيد أو الدنيتروفينول DNP المانع لإنتاج ATP) :</p>
+                
+                <div class="interactive-box" style="background: #134e4a;">
+                    <div style="margin-bottom: 15px;">
+                        <button class="btn-action" onclick="simRepos('normal')">🟢 الحالة العادية (مضخة نشطة بوجود ATP)</button>
+                        <button class="btn-action" style="background: #dc2626;" onclick="simRepos('dnp')">🔴 إضافة مادة DNP (توقف إنتاج ATP)</button>
+                    </div>
+                    <div id="reposDisplayBox" style="background: #0f766e; border: 2px solid #5eead4; border-radius: 12px; padding: 1.5rem; text-align: center;">
+                        <h3 style="color: #4ade80; margin-bottom: 10px;">🟢 ثبات كمون الراحة عند (-70 mV)</h3>
+                        <p style="color: #cbd5e1; line-height: 1.8;">تستهلك المضخة جزيئات الـ <span class="ltr-seq">ATP</span> لتعوض باستمرار شوارد <span class="ltr-seq">Na⁺</span> و <span class="ltr-seq">K⁺</span> المتسربة عبر قنوات الميز. يظل التباين الأيوني ثابتاً ويبقى الليف مستقطباً وجاهزاً لنقل السيالة العصبية.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 4: Quiz Ch15 -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num">4</span>
+                    <span>تقويم الدرس 15 : أسئلة البكالوريا المتكررة</span>
+                </div>
+
+                <div class="question-item" id="c15q1-container">
+                    <h4 style="margin-bottom: 12px;">1. ما هو نوع النقل الذي تقوم به مضخة (<span class="ltr-seq">Na⁺/K⁺-ATPase</span>)؟</h4>
+                    <div class="options-grid">
+                        <button class="option-btn" onclick="checkCh15Answer(0, true)">أ) نقل فعال (<span class="ltr-seq">Transport actif</span>) يتم عكس تدرج التركيز ويستهلك طاقة جزيئة الـ <span class="ltr-seq">ATP</span>.</button>
+                        <button class="option-btn" onclick="checkCh15Answer(1, false)">ب) انتشار حر وسلبي وفق تدرج التركيز دون طاقة.</button>
+                        <button class="option-btn" onclick="checkCh15Answer(2, false)">ج) بلعمة خلوية.</button>
+                    </div>
+                    <div class="feedback-box" id="c15q1-feedback"></div>
+                </div>
+            </section>
+        </div>
+
+        <!-- ================================================================= -->
+        <!-- CHAPTER 16 : LE POTENTIEL D'ACTION PA & CANAUX VOLTAGE (الدرس 16) -->
+        <!-- ================================================================= -->
+        <div id="ch16" class="chapter-view">
+            
+            <header class="lesson-header header-ch16">
+                <div class="lesson-breadcrumb">المجال الأول : التخصص الوظيفي للبروتينات • الوحدة 5 : دور البروتينات في الاتصال العصبي</div>
+                <h1>الدرس 16 : كمون العمل وآلية عمل القنوات المبوبة كهربائياً (Voltage-dépendantes)</h1>
+                <div class="lesson-objectives">
+                    <div>🎯 <strong>الهدف العلمي :</strong> تفسير أطوار منحنى كمون العمل (زوال الاستقطاب، عودة الاستقطاب، فرط الاستقطاب) بالعمل المتسلسل للقنوات الفولطية للـ Na⁺ والـ K⁺.</div>
+                    <div>⏱️ <strong>المدة التقديرية للتعلم الذاتي :</strong> 25 دقيقة</div>
+                </div>
+            </header>
+
+            <!-- Step 1: Problématique -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num step-num-sky">1</span>
+                    <span>الإشكالية الأيونية لكمون العمل</span>
+                </div>
+                <div class="problem-box" style="border-right-color: #0284c7; background: #f0f9ff;">
+                    <div class="problem-title" style="color: #0369a1;">⚠️ كيف تتولد وتنتقل السيالة العصبية على طول الليف العصبي في أجزاء من الملي ثانية؟</div>
+                    <p>عند إحداث تنبيه فعال لليف عصبي (تنبيه يفوق عتبة زوال الاستقطاب <span class="ltr-seq">Seuil > -50 mV</span>)، يسجل راسم الاهتزاز موجة سريعة ومميزة تسمى <strong>كمون العمل (<span class="ltr-seq">Potentiel d'Action PA</span>)</strong> يبلغ ذروته عند <span class="ltr-seq">+30 mV</span> ثم يعود للراحة. <strong>ما هي القنوات الغشائية التي تنفتح وتنغلق بدقة زمنية فائقة لتوليد هذا الكمون؟</strong></p>
+                </div>
+            </section>
+
+            <!-- Step 2: Document Analyse -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num step-num-sky">2</span>
+                    <span>التحليل المنهجي لمنحنى كمون العمل والقنوات المبوبة كهربائياً</span>
+                </div>
+                <div class="doc-viewer">
+                    <div class="doc-visual" style="background: #082f49;">
+                        <h4 style="color: #7dd3fc; margin-bottom: 1rem; font-size: 0.95rem;">منحنى كمون العمل أحادي الطور والأطوار الأيونية الموافقة</h4>
+                        <!-- SVG PA Curve -->
+                        <svg class="svg-container" viewBox="0 0 400 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Axes -->
+                            <path d="M40 160 L 370 160" stroke="#64748b" stroke-width="1.5" stroke-dasharray="4"/>
+                            <text x="30" y="163" fill="#cbd5e1" font-size="10">-70 mV</text>
+                            <path d="M40 50 L 370 50" stroke="#64748b" stroke-width="1.5" stroke-dasharray="4"/>
+                            <text x="30" y="53" fill="#cbd5e1" font-size="10">+30 mV</text>
+
+                            <!-- PA Curve -->
+                            <path d="M60 160 H 90 L 140 50 L 190 180 L 230 160 H 350" stroke="#38bdf8" stroke-width="4" fill="none"/>
+
+                            <!-- Labels -->
+                            <text x="100" y="100" fill="#fca5a5" font-size="10" font-weight="bold">1. زوال الاستقطاب (دخول Na⁺)</text>
+                            <text x="180" y="110" fill="#86efac" font-size="10" font-weight="bold">2. عودة الاستقطاب (خروج K⁺)</text>
+                            <text x="205" y="195" fill="#fde68a" font-size="9" font-weight="bold">3. فرط الاستقطاب</text>
+                        </svg>
+                        <p style="font-size: 0.85rem; color: #cbd5e1; margin-top: 10px;">📈 تنفتح قنوات Na⁺ الفولطية أولاً وبسرعة، ثم تنغلق وتفتح قنوات K⁺ الفولطية ببطء.</p>
+                    </div>
+
+                    <div class="doc-analysis">
+                        <span class="method-tag" style="background: #e0f2fe; color: #0284c7;">التفسير الأيوني المفصل في البكالوريا</span>
+                        <h4 style="margin: 8px 0; color: var(--primary);">ماذا يحدث في كل طور من أطوار كمون العمل؟</h4>
+                        <ol style="padding-right: 1.2rem; line-height: 1.8;">
+                            <li><strong>زوال الاستقطاب (<span class="ltr-seq">Dépolarisation من -70 إلى +30 mV</span>) :</strong> انفتح سريع للقنوات المبوبة كهربائياً للـ <span class="ltr-seq">Na⁺</span>، فيدخل الصوديوم بكثافة نحو الداخل وفق تدرج التركيز.</li>
+                            <li><strong>عودة الاستقطاب (<span class="ltr-seq">Repolarisation نحو -70 mV</span>) :</strong> انغلاق قنوات <span class="ltr-seq">Na⁺</span> الفولطية وانفتح القنوات المبوبة كهربائياً للـ <span class="ltr-seq">K⁺</span>، فيخرج البوتاسيوم نحو الخارج.</li>
+                            <li><strong>فرط الاستقطاب (<span class="ltr-seq">Hyperpolarisation نحو -80 mV</span>) :</strong> تأخر انغلاق قنوات <span class="ltr-seq">K⁺</span> الفولطية مما يؤدي لاستمرار خروج البوتاسيوم.</li>
+                            <li><strong>العودة للراحة :</strong> تدخل مضخة <span class="ltr-seq">Na⁺/K⁺-ATPase</span> لاسترجاع التراكيز الأصلية.</li>
+                        </ol>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 3: Interactive PA Simulator -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num step-num-sky">3</span>
+                    <span>محاكي أطوار كمون العمل التفاعلي</span>
+                </div>
+                <p>اضغط على الطور لمشاهدة حالة القنوات الفولطية في غشاء الليف :</p>
+                
+                <div class="interactive-box" style="background: #0c4a6e;">
+                    <div style="margin-bottom: 15px;">
+                        <button class="btn-action btn-sky" onclick="simPa(1)">1️⃣ طور زوال الاستقطاب</button>
+                        <button class="btn-action btn-sky" onclick="simPa(2)">2️⃣ طور عودة الاستقطاب</button>
+                        <button class="btn-action btn-sky" onclick="simPa(3)">3️⃣ طور فرط الاستقطاب</button>
+                    </div>
+                    <div id="paDisplayBox" style="background: #082f49; border: 2px solid #38bdf8; border-radius: 12px; padding: 1.5rem; text-align: center;">
+                        <h3 style="color: #fca5a5; margin-bottom: 10px;">1️⃣ زوال الاستقطاب الصاعق (+30 mV)</h3>
+                        <p style="color: #cbd5e1; line-height: 1.8;">تفتح <strong>قنوات الصوديوم الفولطية (<span class="ltr-seq">Canaux Na⁺ voltage-dépendants</span>)</strong> بسرعة فائقة. يدخل تيار جارف من شوارد <span class="ltr-seq">Na⁺</span> الموجبة إلى داخل الليف، فينقلب شحنته من سالب إلى موجب.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 4: Quiz Ch16 -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num step-num-sky">4</span>
+                    <span>تقويم الدرس 16 : أسئلة البكالوريا المتكررة</span>
+                </div>
+
+                <div class="question-item" id="c16q1-container">
+                    <h4 style="margin-bottom: 12px;">1. لماذا يتميز كمون العمل بخاصية "قانون الكل أو لا شيء" (<span class="ltr-seq">Loi du tout ou rien</span>)؟</h4>
+                    <div class="options-grid">
+                        <button class="option-btn" onclick="checkCh16Answer(0, true)">أ) لأن التنبيه الذي يقل عن العتبة (<span class="ltr-seq">Seuil</span>) لا يفتح القنوات الفولطية فلا يسجل أي كمون عمل، أما التنبيه الذي يفوق العتبة فيولد كمون عمل بسعة ثابتة دوماً (+30 mV).</button>
+                        <button class="option-btn" onclick="checkCh16Answer(1, false)">ب) لأن الليف العصبي يموت بعد كل تنبيه.</button>
+                        <button class="option-btn" onclick="checkCh16Answer(2, false)">ج) لأن سعة كمون العمل تزداد بازدياد شدة التنبيه إلى ما لا نهاية.</button>
+                    </div>
+                    <div class="feedback-box" id="c16q1-feedback"></div>
+                </div>
+            </section>
+        </div>
+
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        function showChapter(chId, evt) {
+            document.querySelectorAll('.chapter-view').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.ch-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(chId).classList.add('active');
+            if (evt) evt.target.classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function simRepos(state) {
+            let box = document.getElementById('reposDisplayBox');
+            if (state === 'normal') {
+                box.innerHTML = `
+                    <h3 style="color: #4ade80; margin-bottom: 10px;">🟢 ثبات كمون الراحة عند (-70 mV)</h3>
+                    <p style="color: #cbd5e1; line-height: 1.8;">تستهلك المضخة جزيئات الـ <span class="ltr-seq">ATP</span> لتعوض باستمرار شوارد <span class="ltr-seq">Na⁺</span> و <span class="ltr-seq">K⁺</span> المتسربة عبر قنوات الميز. يظل التباين الأيوني ثابتاً ويبقى الليف مستقطباً وجاهزاً لنقل السيالة العصبية.</p>
+                `;
+            } else {
+                box.innerHTML = `
+                    <h3 style="color: #ef4444; margin-bottom: 10px;">🔴 زوال كمون الراحة تدريجياً نحو (0 mV)</h3>
+                    <p style="color: #cbd5e1; line-height: 1.8;">بإضافة سم <span class="ltr-seq">DNP</span> أو السيانيد يتوقف إنتاج جزيئات <span class="ltr-seq">ATP</span> في الخلية. تتوقف مضخة <span class="ltr-seq">Na⁺/K⁺-ATPase</span> عن العمل، وبما أن قنوات التسرب تبقى مفتوحة، تتساوى التراكيز الأيونية داخل وخارج الليف فيموت الليف ويزول الكمون.</p>
+                `;
+            }
+        }
+
+        function simPa(step) {
+            let box = document.getElementById('paDisplayBox');
+            if (step === 1) {
+                box.innerHTML = `
+                    <h3 style="color: #fca5a5; margin-bottom: 10px;">1️⃣ زوال الاستقطاب الصاعق (+30 mV)</h3>
+                    <p style="color: #cbd5e1; line-height: 1.8;">تفتح <strong>قنوات الصوديوم الفولطية (<span class="ltr-seq">Canaux Na⁺ voltage-dépendants</span>)</strong> بسرعة فائقة. يدخل تيار جارف من شوارد <span class="ltr-seq">Na⁺</span> الموجبة إلى داخل الليف، فينقلب شحنته من سالب إلى موجب.</p>
+                `;
+            } else if (step === 2) {
+                box.innerHTML = `
+                    <h3 style="color: #86efac; margin-bottom: 10px;">2️⃣ عودة الاستقطاب السريعة (-70 mV)</h3>
+                    <p style="color: #cbd5e1; line-height: 1.8;">تنغلق قنوات <span class="ltr-seq">Na⁺</span> الفولطية وتفتح <strong>قنوات البوتاسيوم الفولطية (<span class="ltr-seq">Canaux K⁺ voltage-dépendants</span>)</strong>. يخرج تيار من شوارد <span class="ltr-seq">K⁺</span> الموجبة نحو الخارج، فيسترجع الليف شحنته السالبة الداخلية.</p>
+                `;
+            } else {
+                box.innerHTML = `
+                    <h3 style="color: #fde68a; margin-bottom: 10px;">3️⃣ فرط الاستقطاب المؤقت (-80 mV) واسترجاع الراحة</h3>
+                    <p style="color: #cbd5e1; line-height: 1.8;">تتأخر قنوات <span class="ltr-seq">K⁺</span> الفولطية في الانغلاق فيخرج فائض من البوتاسيوم. ثم تنغلق وتتدخل مضخة <span class="ltr-seq">Na⁺/K⁺</span> لإعادة توزيع الأيونات بدقة ليسترجع الليف كمون راحته الأصلي.</p>
+                `;
+            }
+        }
+
+        function checkCh15Answer(optIdx, isCorrect) {
+            let container = document.getElementById('c15q1-container');
+            let btns = container.querySelectorAll('.option-btn');
+            let fb = document.getElementById('c15q1-feedback');
+
+            btns.forEach((b, idx) => {
+                b.disabled = true;
+                if (idx === optIdx) b.classList.add(isCorrect ? 'correct' : 'wrong');
+            });
+
+            fb.style.display = 'block';
+            if (isCorrect) {
+                fb.style.background = '#f0fdf4'; fb.style.color = '#166534'; fb.style.border = '1px solid #bbf7d0';
+                fb.innerHTML = '<strong>✅ إجابة صحيحة ممتاز!</strong> المضخة تعمل عكس التدرج التركيزي ولذلك تتطلب طاقة ATP.';
+            } else {
+                fb.style.background = '#fef2f2'; fb.style.color = '#991b1b'; fb.style.border = '1px solid #fecaca';
+                fb.innerHTML = '<strong>❌ إجابة خاطئة.</strong> النقل السلبي هو الذي يتم عبر قنوات الميز وفق التدرج دون طاقة.';
+            }
+        }
+
+        function checkCh16Answer(optIdx, isCorrect) {
+            let container = document.getElementById('c16q1-container');
+            let btns = container.querySelectorAll('.option-btn');
+            let fb = document.getElementById('c16q1-feedback');
+
+            btns.forEach((b, idx) => {
+                b.disabled = true;
+                if (idx === optIdx) b.classList.add(isCorrect ? 'correct' : 'wrong');
+            });
+
+            fb.style.display = 'block';
+            if (isCorrect) {
+                fb.style.background = '#f0fdf4'; fb.style.color = '#166534'; fb.style.border = '1px solid #bbf7d0';
+                fb.innerHTML = '<strong>✅ إجابة صحيحة ممتاز!</strong> قانون الكل أو لا شيء يثبت أن سعة كمون العمل لا تعتمد على شدة التنبيه ما دام يفوق العتبة.';
+            } else {
+                fb.style.background = '#fef2f2'; fb.style.color = '#991b1b'; fb.style.border = '1px solid #fecaca';
+                fb.innerHTML = '<strong>❌ إجابة خاطئة.</strong> سعة كمون العمل تبقى ثابتة دوماً (+30 mV) مهما زادت شدة التنبيه.';
+            }
+        }
+    </script>
+</body>
+</html>

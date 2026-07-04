@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منصة المتفوق 3AS | المرحلة 15 : الدرس 29 والدرس 30</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #f8fafc;
+            --surface: #ffffff;
+            --primary: #0f172a;
+            --accent: #2563eb;
+            --accent-light: #eff6ff;
+            --success: #16a34a;
+            --success-light: #f0fdf4;
+            --warning: #d97706;
+            --warning-light: #fffbeb;
+            --danger: #dc2626;
+            --danger-light: #fef2f2;
+            --teal-dark: #0f766e;
+            --teal-light: #f0fdf4;
+            --amber-dark: #92400e;
+            --amber-light: #fffbeb;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --radius: 16px;
+            --shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Cairo', 'Tajawal', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            line-height: 1.8;
+            padding-bottom: 60px;
+        }
+
+        .ltr-seq {
+            direction: ltr;
+            unicode-bidi: embed;
+            display: inline-block;
+            font-family: monospace;
+            font-weight: bold;
+            color: var(--accent);
+            background: #f1f5f9;
+            padding: 2px 8px;
+            border-radius: 6px;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 900;
+            font-size: 1.25rem;
+            color: var(--primary);
+        }
+
+        .brand-badge {
+            background: var(--teal-dark);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            white-space: nowrap;
+        }
+
+        .chapter-switcher {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .ch-btn {
+            background: var(--bg-main);
+            border: 2px solid var(--border);
+            padding: 8px 18px;
+            border-radius: 12px;
+            font-family: inherit;
+            font-weight: 800;
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .ch-btn:hover {
+            border-color: var(--teal-dark);
+            color: var(--teal-dark);
+        }
+
+        .ch-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                padding: 1rem;
+                text-align: center;
+            }
+            .chapter-switcher {
+                justify-content: center;
+                width: 100%;
+            }
+            .ch-btn {
+                flex: 1;
+                font-size: 0.85rem;
+                padding: 8px 10px;
+            }
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 2rem auto;
+            padding: 0 1.2rem;
+        }
+
+        .chapter-view {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .chapter-view.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Hero Header */
+        .lesson-header {
+            border-radius: var(--radius);
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+            color: white;
+        }
+
+        .header-ch29 {
+            background: linear-gradient(135deg, #0f766e 0%, #115e59 100%);
+        }
+
+        .header-ch30 {
+            background: linear-gradient(135deg, #78350f 0%, #b45309 100%);
+        }
+
+        .lesson-breadcrumb {
+            font-size: 0.85rem;
+            opacity: 0.9;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .lesson-header h1 {
+            font-size: 2.1rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+            line-height: 1.3;
+        }
+
+        .lesson-objectives {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--surface);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+        }
+
+        @media (max-width: 600px) {
+            .lesson-header { padding: 1.5rem; }
+            .lesson-header h1 { font-size: 1.5rem; }
+            .card { padding: 1.2rem; }
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid var(--bg-main);
+            padding-bottom: 0.8rem;
+        }
+
+        .step-num {
+            background: #ccfbf1;
+            color: #0f766e;
+            width: 38px;
+            height: 38px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            font-weight: 900;
+            font-size: 1.1rem;
+        }
+
+        .step-num-amber {
+            background: #fef3c7;
+            color: #b45309;
+        }
+
+        .problem-box {
+            background: var(--warning-light);
+            border-right: 5px solid var(--warning);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+        }
+
+        .problem-title {
+            font-weight: 800;
+            color: #92400e;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Document Analysis */
+        .doc-viewer {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        @media (max-width: 850px) {
+            .doc-viewer { grid-template-columns: 1fr; }
+        }
+
+        .doc-visual {
+            background: #0f172a;
+            border-radius: 12px;
+            padding: 1.5rem;
+            color: white;
+        }
+
+        .svg-container {
+            width: 100%;
+            height: auto;
+            max-height: 260px;
+        }
+
+        .doc-analysis {
+            background: var(--bg-main);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+        }
+
+        .method-tag {
+            display: inline-block;
+            background: #e0f2fe;
+            color: #0369a1;
+            font-size: 0.75rem;
+            font-weight: 800;
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+        }
+
+        /* Interactive simulators */
+        .interactive-box {
+            background: #1e293b;
+            border-radius: 12px;
+            padding: 1.5rem;
+            color: white;
+            margin: 1.5rem 0;
+        }
+
+        .btn-action {
+            background: #0f766e;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-family: inherit;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin: 5px;
+        }
+
+        .btn-action:hover { background: #115e59; }
+        .btn-amber { background: #d97706; }
+        .btn-amber:hover { background: #b45309; }
+
+        /* Scientific text */
+        .scientific-text {
+            background: var(--surface);
+            border: 2px solid #cbd5e1;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .text-part {
+            margin-bottom: 1.2rem;
+            padding-right: 1rem;
+            border-right: 4px solid #0f766e;
+        }
+
+        .text-part.ch30-border { border-right-color: #d97706; }
+
+        .text-part h4 {
+            font-size: 0.95rem;
+            color: #0f766e;
+            margin-bottom: 0.3rem;
+            font-weight: 800;
+        }
+
+        .text-part.ch30-border h4 { color: #d97706; }
+
+        /* Quiz */
+        .question-item {
+            background: var(--bg-main);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin-top: 1rem;
+        }
+
+        .option-btn {
+            background: white;
+            border: 1.5px solid var(--border);
+            padding: 12px 16px;
+            border-radius: 10px;
+            text-align: right;
+            font-family: inherit;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text-main);
+        }
+
+        .option-btn:hover {
+            border-color: #0f766e;
+            background: #f0fdf4;
+        }
+
+        .option-btn.correct {
+            background: var(--success-light);
+            border-color: var(--success);
+            color: var(--success);
+            font-weight: 700;
+        }
+
+        .option-btn.wrong {
+            background: var(--danger-light);
+            border-color: var(--danger);
+            color: var(--danger);
+        }
+
+        .feedback-box {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            display: none;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar with Phase Switcher -->
+    <nav class="navbar">
+        <div class="brand">
+            <span>منصة المتفوق 3AS</span>
+            <span class="brand-badge">المرحلة 15 (الدرس 29 و 30)</span>
+        </div>
+        <div class="chapter-switcher">
+            <button class="ch-btn active" onclick="showChapter('ch29', event)">⚡ الدرس 29 : مقارنة الصانعة الخضراء والميتوكندرون</button>
+            <button class="ch-btn" onclick="showChapter('ch30', event)">🌍 الدرس 30 : دورة الطاقة والمادة في المحيط الحيوي</button>
+        </div>
+    </nav>
+
+    <div class="container">
+
+        <!-- ================================================================= -->
+        <!-- CHAPTER 29 : CHLOROPLASTE VS MITOCHONDRIE (الدرس 29) -->
+        <!-- ================================================================= -->
+        <div id="ch29" class="chapter-view active">
+            
+            <header class="lesson-header header-ch29">
+                <div class="lesson-breadcrumb">المجال الثاني : التحولات الطاقوية • الوحدة 3 : تحويل الطاقة على المستوى ما فوق البنية الخلوية</div>
+                <h1>الدرس 29 : المقارنة الشاملة بين آليات تحويل الطاقة في الصانعة الخضراء والميتوكندرون</h1>
+                <div class="lesson-objectives">
+                    <div>🎯 <strong>الهدف العلمي :</strong> استخراج أوجه التشابه البنيوي (الأغشية والكرية المذذبة) والتمايز الوظيفي (فسفرة ضوئية مقابل فسفرة تأكسدية) بين العضيتين الطاقويتين.</div>
+                    <div>⏱️ <strong>المدة التقديرية للتعلم الذاتي :</strong> 25 دقيقة</div>
+                </div>
+            </header>
+
+            <!-- Step 1: Problématique -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num">1</span>
+                    <span>وضعية الانطلاق وبناء الإشكالية العلميـة</span>
+                </div>
+                <div class="problem-box">
+                    <div class="problem-title">⚠️ لماذا تتشابه آليات إنتاج الـ ATP في الصانعة والميتوكندرون رغم اختلاف وظائفهما؟</div>
+                    <p>تقوم الصانعة الخضراء ببناء المادة العضوية (التركيب الضوئي)، بينما يقوم الميتوكندرون بهدم المادة العضوية (التنفس). ورغم هذا التضاد الوظيفي الظاهري، فإن كليهما يعتمد على غشاء داخلي متخصص يحمل سلاسل نقل إلكترونات ويضخ شوارد الهيدروجين (<span class="ltr-seq">H⁺</span>) لتوليد تدرج كهروكيميائي يدير نفس الإنزيم المعجز : <strong>الكرية المذذبة (<span class="ltr-seq">ATP synthase</span>)</strong>! <strong>ما هي أوجه التشابه والاختلاف الدقيقة بين هذين المحركين الخلويين المعتمدة في البكالوريا؟</strong></p>
+                </div>
+            </section>
+
+            <!-- Step 2: Document Analyse -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num">2</span>
+                    <span>التحليل المنهجي المزدوج لغشاء التيلاكويد مقابل غشاء العرف الميتوكندري</span>
+                </div>
+                <div class="doc-viewer">
+                    <div class="doc-visual" style="background: #134e4a;">
+                        <h4 style="color: #99f6e4; margin-bottom: 1rem; font-size: 0.95rem;">مقارنة اتجاه ضخ البروتونات وعمل الكرية المذذبة في العضيتين</h4>
+                        <!-- SVG Comparison -->
+                        <svg class="svg-container" viewBox="0 0 400 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Top: Chloroplast Thylakoid -->
+                            <rect x="20" y="45" width="360" height="20" fill="#15803d"/>
+                            <text x="200" y="35" fill="#86efac" font-size="10" text-anchor="middle" font-weight="bold">1. التيلاكويد في الصانعة الخضراء</text>
+                            <text x="80" y="20" fill="white" font-size="8">الحشوة (Stroma)</text>
+                            <text x="80" y="80" fill="#fde047" font-size="8">تجويف التيلاكويد (Lumen - تراكم H⁺)</text>
+                            <!-- Pump into lumen -->
+                            <path d="M150 25 L 150 60" stroke="#4ade80" stroke-width="2" marker-end="url(#arrow)"/>
+                            <!-- ATP synthase pointing to stroma -->
+                            <circle cx="280" cy="30" r="10" fill="#22c55e"/>
+                            <path d="M280 65 L 280 38" stroke="#38bdf8" stroke-width="2"/>
+                            <text x="320" y="32" fill="#fef08a" font-size="8">ATP في الحشوة</text>
+
+                            <!-- Bottom: Mitochondria Cristae -->
+                            <rect x="20" y="155" width="360" height="20" fill="#881337"/>
+                            <text x="200" y="145" fill="#fda4af" font-size="10" text-anchor="middle" font-weight="bold">2. الغشاء الداخلي (العرف) في الميتوكندرون</text>
+                            <text x="80" y="130" fill="#fde047" font-size="8">الفراغ بين غشائي (تراكم H⁺)</text>
+                            <text x="80" y="195" fill="white" font-size="8">المادة الأساسية (Matrice)</text>
+                            <!-- Pump out to intermembrane space -->
+                            <path d="M150 185 L 150 150" stroke="#f87171" stroke-width="2"/>
+                            <!-- ATP synthase pointing to matrix -->
+                            <circle cx="280" cy="188" r="10" fill="#16a34a"/>
+                            <path d="M280 150 L 280 178" stroke="#38bdf8" stroke-width="2"/>
+                            <text x="320" y="190" fill="#fef08a" font-size="8">ATP في المادة الأساسية</text>
+                        </svg>
+                        <p style="font-size: 0.85rem; color: #cbd5e1; margin-top: 10px;">💡 تخرج الـ ATP دائماً نحو المقصورة التي ستستهلكها (الحشوة للنشا، والمادة الأساسية للخلية).</p>
+                    </div>
+
+                    <div class="doc-analysis">
+                        <span class="method-tag">منهجية البكالوريا : جدول المقارنة النموذجي</span>
+                        <h4 style="margin: 8px 0; color: var(--primary);">أوجه الاختلاف الدقيقة</h4>
+                        <ul style="list-style-type: none; line-height: 1.8; font-size: 0.9rem;">
+                            <li>• <strong>المصدر الأولي للطاقة :</strong> طاقة ضوئية (فوتونات) في الصانعة، مقابل طاقة كيميائية (مستقلبات النواقل المرجعة <span class="ltr-seq">NADH</span>) في الميتوكندرون.</li>
+                            <li>• <strong>المستقبل النهائي للإلكترونات :</strong> مرافق الإنزيم <span class="ltr-seq">NADP⁺</span> في الصانعة، مقابل غاز الأكسجين <span class="ltr-seq">O₂</span> في الميتوكندرون.</li>
+                            <li>• <strong>جهة ضخ البروتونات <span class="ltr-seq">H⁺</span> :</strong> من الحشوة إلى تجويف التيلاكويد في الصانعة، ومن المادة الأساسية إلى الفراغ بين غشائي في الميتوكندرون.</li>
+                            <li>• <strong>مصير طاقة الـ <span class="ltr-seq">ATP</span> المنتجة :</strong> تستهلك محلياً في الحشوة لبناء السكر (حلقة كالفن)، مقابل تصديرها لهيولى الخلية لإنجاز مختلف الوظائف الحيوية.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 3: Interactive Duel Simulator -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num">3</span>
+                    <span>محاكي المقارنة التفاعلي بين محركي الخلية</span>
+                </div>
+                <p>اضغط على وجه المقارنة لاختبار حفظك لمعايير البكالوريا :</p>
+                
+                <div class="interactive-box" style="background: #134e4a;">
+                    <div style="margin-bottom: 15px;">
+                        <button class="btn-action" onclick="simComp('gradient')">🔬 تدرج تركيز البروتونات (H⁺)</button>
+                        <button class="btn-action" style="background:#0284c7;" onclick="simComp('accepteur')">🎯 المستقبل النهائي للإلكترونات</button>
+                        <button class="btn-action" style="background:#9f1239;" onclick="simComp('but')">⚡ الهدف الطاقوي والبيولوجي</button>
+                    </div>
+                    <div id="compDisplayBox" style="background: #0f766e; border: 2px solid #5eead4; border-radius: 12px; padding: 1.5rem; text-align: center;">
+                        <h3 style="color: #99f6e4; margin-bottom: 10px;">🔬 تدرج تركيز البروتونات (H⁺)</h3>
+                        <p style="color: #cbd5e1; line-height: 1.8;">في <strong>الصانعة الخضراء</strong> يتراكم الـ <span class="ltr-seq">H⁺</span> في داخل تجويف التيلاكويد (وسط حامضي). وفي <strong>الميتوكندرون</strong> يتراكم الـ <span class="ltr-seq">H⁺</span> في الفراغ بين غشائي. وفي كلتا الحالتين، يتدفق الـ <span class="ltr-seq">H⁺</span> عائداً عبر الكرية المذذبة لتركيب الـ <span class="ltr-seq">ATP</span>.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 4: Quiz Ch29 -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num">4</span>
+                    <span>تقويم الدرس 29 : أسئلة البكالوريا المتكررة</span>
+                </div>
+
+                <div class="question-item" id="c29q1-container">
+                    <h4 style="margin-bottom: 12px;">1. ما هو العامل المشترك الأساسي الذي يدير إنزيم الـ <span class="ltr-seq">ATP synthase</span> في كل من الصانعة الخضراء والميتوكندرون؟</h4>
+                    <div class="options-grid">
+                        <button class="option-btn" onclick="checkCh29Answer(0, true)">أ) التدرج الكهروكيميائي لشوارد الهيدروجين (<span class="ltr-seq">H⁺</span>) عبر الغشاء (النظرية الكيميوأسموزية).</button>
+                        <button class="option-btn" onclick="checkCh29Answer(1, false)">ب) غاز ثاني أكسيد الكربون.</button>
+                        <button class="option-btn" onclick="checkCh29Answer(2, false)">ج) أشعة الشمس المباشرة.</button>
+                    </div>
+                    <div class="feedback-box" id="c29q1-feedback"></div>
+                </div>
+            </section>
+        </div>
+
+        <!-- ================================================================= -->
+        <!-- CHAPTER 30 : CYCLE DE L'ÉNERGIE ET DE LA MATIÈRE (الدرس 30) -->
+        <!-- ================================================================= -->
+        <div id="ch30" class="chapter-view">
+            
+            <header class="lesson-header header-ch30">
+                <div class="lesson-breadcrumb">المجال الثاني : التحولات الطاقوية • الوحدة 3 : تحويل الطاقة على المستوى ما فوق البنية الخلوية</div>
+                <h1>الدرس 30 : دورة الطاقة والمادة في المحيط الحيوي (التكامل بين الذاتية والغير ذاتية التغذية)</h1>
+                <div class="lesson-objectives">
+                    <div>🎯 <strong>الهدف العلمي :</strong> إثبات أن المادة تدور في حلقة مغلقة بين التركيب الضوئي والتنفس، بينما الطاقة تتدفق في اتجاه واحد وتتبدد كحرارة.</div>
+                    <div>⏱️ <strong>المدة التقديرية للتعلم الذاتي :</strong> 25 دقيقة</div>
+                </div>
+            </header>
+
+            <!-- Step 1: Problématique -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num step-num-amber">1</span>
+                    <span>الإشكالية الكونية الختامية للمجال الثاني</span>
+                </div>
+                <div class="problem-box" style="border-right-color: var(--amber-dark); background: var(--amber-light);">
+                    <div class="problem-title" style="color: #92400e;">⚠️ كيف يستمر توازن الحياة على كوكب الأرض منذ ملايين السنين دون نفاذ الأكسجين أو الكربون؟</div>
+                    <p>تستهلك ملايين الحيوانات والبشر غاز الأكسجين والمادة العضوية يومياً وتطرح ثاني أكسيد الكربون والماء. ورغم هذا الاستهلاك الهائل، لا ينفد الأكسجين من الغلاف الجوي ولا يختنق العالم بالـ <span class="ltr-seq">CO₂</span>! <strong>كيف يحقق التكامل بين التركيب الضوئي (النباتات ذاتية التغذية) والتنفس الخلوي (الحيوانات غير ذاتية التغذية) دورة المادة وتدفق الطاقة في المحيط الحيوي؟</strong></p>
+                </div>
+            </section>
+
+            <!-- Step 2: Document Analyse -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num step-num-amber">2</span>
+                    <span>التحليل المنهجي لدورة المادة وتدفق الطاقة في المحيط الحيوي</span>
+                </div>
+                <div class="doc-viewer">
+                    <div class="doc-visual" style="background: #451a03;">
+                        <h4 style="color: #fde047; margin-bottom: 1rem; font-size: 0.95rem;">مخطط التكامل البيئي (دورة المادة المغلقة وتدفق الطاقة المفتوح)</h4>
+                        <!-- SVG Biosphere -->
+                        <svg class="svg-container" viewBox="0 0 400 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Sun -->
+                            <circle cx="50" cy="40" r="22" fill="#fbbf24"/>
+                            <text x="50" y="44" fill="#78350f" font-size="9" text-anchor="middle" font-weight="bold">الشمس</text>
+                            <path d="M75 50 L 130 75" stroke="#fbbf24" stroke-width="3" marker-end="url(#arrow)"/>
+                            <text x="100" y="55" fill="#fde68a" font-size="8">طاقة ضوئية</text>
+
+                            <!-- Plants Autotrophs -->
+                            <rect x="140" y="60" width="100" height="40" rx="8" fill="#15803d" stroke="#4ade80"/>
+                            <text x="190" y="83" fill="white" font-size="10" text-anchor="middle" font-weight="bold">النباتات (التركيب الضوئي)</text>
+
+                            <!-- Arrow to Animals -->
+                            <path d="M240 80 H 290" stroke="#4ade80" stroke-width="3"/>
+                            <text x="265" y="72" fill="#86efac" font-size="8" text-anchor="middle">O₂ + مادة عضوية</text>
+
+                            <!-- Animals Heterotrophs -->
+                            <rect x="290" y="60" width="95" height="40" rx="8" fill="#991b1b" stroke="#f87171"/>
+                            <text x="337" y="83" fill="white" font-size="10" text-anchor="middle" font-weight="bold">الحيوانات (التنفس)</text>
+
+                            <!-- Return arrow CO2 + H2O -->
+                            <path d="M337 100 V 150 H 190 V 100" stroke="#f87171" stroke-width="3" stroke-dasharray="6 3"/>
+                            <text x="265" y="165" fill="#fca5a5" font-size="9" text-anchor="middle">CO₂ + H₂O (دورة المادة المغلقة)</text>
+
+                            <!-- Heat loss -->
+                            <path d="M337 100 L 370 140" stroke="#fb923c" stroke-width="2"/>
+                            <text x="375" y="150" fill="#fdba74" font-size="8">حرارة متبددة</text>
+                        </svg>
+                        <p style="font-size: 0.85rem; color: #cbd5e1; margin-top: 10px;">💡 المادة تدور باستمرار دون ضياع، بينما الطاقة تتسرب كحرارة وتتطلب إمداداً شمسياً دائماً.</p>
+                    </div>
+
+                    <div class="doc-analysis">
+                        <span class="method-tag" style="background: #fef3c7; color: #b45309;">الخلاصة الكبرى للمجال الثاني في البكالوريا</span>
+                        <h4 style="margin: 8px 0; color: var(--primary);">ما هو الفرق بين مسار المادة ومسار الطاقة؟</h4>
+                        <ul style="list-style-type: none; line-height: 1.8;">
+                            <li>• <strong>دورة المادة مغلقة (<span class="ltr-seq">Cycle fermé de la matière</span>) :</strong> نواتج التنفس (<span class="ltr-seq">CO₂ + H₂O</span>) هي متطلبات التركيب الضوئي، ونواتج التركيب الضوئي (<span class="ltr-seq">O₂ + مادة عضوية</span>) هي متطلبات التنفس. ذرات الكربون والأكسجين والهيدروجين يعاد تدويرها إلى ما لا نهاية.</li>
+                            <li>• <strong>تدفق الطاقة وحيد الاتجاه (<span class="ltr-seq">Flux unidirectionnel de l'énergie</span>) :</strong> تدخل الطاقة للمحيط الحيوي كضوء شمس، تتحول في النبات لطاقة كيميائية، تستهلك في الخلية لإنجاز الأعمال، وتتبدد في النهاية على شكل <strong>حرارة (<span class="ltr-seq">Chaleur</span>)</strong> تتسرب للفضاء ولا يمكن إعادة استخدامها لبناء الغلوكوز!</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 3: Interactive Biosphere Simulator -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num step-num-amber">3</span>
+                    <span>محاكي توازن المحيط الحيوي التفاعلي</span>
+                </div>
+                <p>اختر سيناريو بيئي لمعاينة تأثيره على دورة الحياة الأرضية :</p>
+                
+                <div class="interactive-box" style="background: #451a03;">
+                    <div style="margin-bottom: 15px;">
+                        <button class="btn-action btn-amber" onclick="simBio('normal')">🌍 توازن بيئي طبيعي (نباتات + حيوانات + شمس)</button>
+                        <button class="btn-action" style="background:#dc2626;" onclick="simBio('nosun')">🌑 حجب أشعة الشمس (انقراض شامل)</button>
+                    </div>
+                    <div id="bioDisplayBox" style="background: #78350f; border: 2px solid #fbbf24; border-radius: 12px; padding: 1.5rem; text-align: center;">
+                        <h3 style="color: #4ade80; margin-bottom: 10px;">🌍 توازن بيئي مستدام</h3>
+                        <p style="color: #cbd5e1; line-height: 1.8;">تضمن الشمس الإمداد الطاقوي المستمر، ويضمن التركيب الضوئي والتنفس إعادة تدوير الكربون والأكسجين. الحياة مستمرة ومتجددة.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 4: Quiz Ch30 -->
+            <section class="card">
+                <div class="section-title">
+                    <span class="step-num step-num-amber">4</span>
+                    <span>تقويم الدرس 30 : أسئلة البكالوريا المتكررة</span>
+                </div>
+
+                <div class="question-item" id="c30q1-container">
+                    <h4 style="margin-bottom: 12px;">1. لماذا نقول إن الطاقة "تتدفق" في المحيط الحيوي ولا "تدور" مثل المادة؟</h4>
+                    <div class="options-grid">
+                        <button class="option-btn" onclick="checkCh30Answer(0, true)">أ) لأن الطاقة تتحول في النهاية إلى حرارة متبددة في الفضاء لا تستطيع النباتات التقاطها لإعادة بناء الغلوكوز، مما يتطلب إمداداً شمسياً يومياً مستمراً.</button>
+                        <button class="option-btn" onclick="checkCh30Answer(1, false)">ب) لأن الشمس تدور حول الأرض.</button>
+                        <button class="option-btn" onclick="checkCh30Answer(2, false)">ج) لأن الطاقة تنفد من الكون.</button>
+                    </div>
+                    <div class="feedback-box" id="c30q1-feedback"></div>
+                </div>
+            </section>
+        </div>
+
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        function showChapter(chId, evt) {
+            document.querySelectorAll('.chapter-view').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.ch-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(chId).classList.add('active');
+            if (evt) evt.target.classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function simComp(crit) {
+            let box = document.getElementById('compDisplayBox');
+            if (crit === 'gradient') {
+                box.innerHTML = `
+                    <h3 style="color: #99f6e4; margin-bottom: 10px;">🔬 تدرج تركيز البروتونات (H⁺)</h3>
+                    <p style="color: #cbd5e1; line-height: 1.8;">في <strong>الصانعة الخضراء</strong> يتراكم الـ <span class="ltr-seq">H⁺</span> في داخل تجويف التيلاكويد (وسط حامضي). وفي <strong>الميتوكندرون</strong> يتراكم الـ <span class="ltr-seq">H⁺</span> في الفراغ بين غشائي. وفي كلتا الحالتين، يتدفق الـ <span class="ltr-seq">H⁺</span> عائداً عبر الكرية المذذبة لتركيب الـ <span class="ltr-seq">ATP</span>.</p>
+                `;
+            } else if (crit === 'accepteur') {
+                box.innerHTML = `
+                    <h3 style="color: #38bdf8; margin-bottom: 10px;">🎯 المستقبل النهائي للإلكترونات</h3>
+                    <p style="color: #cbd5e1; line-height: 1.8;">في الصانعة الخضراء المستقبل النهائي هو مرافق الإنزيم <strong><span class="ltr-seq">NADP⁺</span></strong> الذي يرجع إلى <span class="ltr-seq">NADPH, H⁺</span>. وفي الميتوكندرون المستقبل النهائي هو <strong>غاز الأكسجين (<span class="ltr-seq">O₂</span>)</strong> الذي يرجع إلى ماء (<span class="ltr-seq">H₂O</span>).</p>
+                `;
+            } else {
+                box.innerHTML = `
+                    <h3 style="color: #fca5a5; margin-bottom: 10px;">⚡ الهدف الطاقوي والبيولوجي</h3>
+                    <p style="color: #cbd5e1; line-height: 1.8;">الصانعة الخضراء تحول الطاقة الضوئية إلى طاقة كيميائية مخزنة في المادة العضوية (بناء السكر). أما الميتوكندرون فيحرر الطاقة الكيميائية المخزنة في المادة العضوية على شكل طاقة جاهزة للاستعمال الحاظر (<span class="ltr-seq">ATP</span>).</p>
+                `;
+            }
+        }
+
+        function simBio(cond) {
+            let box = document.getElementById('bioDisplayBox');
+            if (cond === 'normal') {
+                box.innerHTML = `
+                    <h3 style="color: #4ade80; margin-bottom: 10px;">🌍 توازن بيئي مستدام</h3>
+                    <p style="color: #cbd5e1; line-height: 1.8;">تضمن الشمس الإمداد الطاقوي المستمر، ويضمن التركيب الضوئي والتنفس إعادة تدوير الكربون والأكسجين. الحياة مستمرة ومتجددة.</p>
+                `;
+            } else {
+                box.innerHTML = `
+                    <h3 style="color: #ef4444; margin-bottom: 10px;">🌑 حجب الشمس - انهيار المحيط الحيوي</h3>
+                    <p style="color: #cbd5e1; line-height: 1.8;">بحجب الشمس تتوقف المرحلة الكيميوضوئية في النباتات، فيتوقف التركيب الضوئي وينقطع إمداد الغذاء والأكسجين. تختنق وتجوع الحيوانات والبشر وتتوقف دورة الحياة بالكامل.</p>
+                `;
+            }
+        }
+
+        function checkCh29Answer(optIdx, isCorrect) {
+            let container = document.getElementById('c29q1-container');
+            let btns = container.querySelectorAll('.option-btn');
+            let fb = document.getElementById('c29q1-feedback');
+
+            btns.forEach((b, idx) => {
+                b.disabled = true;
+                if (idx === optIdx) b.classList.add(isCorrect ? 'correct' : 'wrong');
+            });
+
+            fb.style.display = 'block';
+            if (isCorrect) {
+                fb.style.background = '#f0fdf4'; fb.style.color = '#166534'; fb.style.border = '1px solid #bbf7d0';
+                fb.innerHTML = '<strong>✅ إجابة صحيحة ممتاز!</strong> نظرية ميتشل الكيميوأسموزية هي المبدأ الموحد لعمل الكرية المذذبة في العضيتين.';
+            } else {
+                fb.style.background = '#fef2f2'; fb.style.color = '#991b1b'; fb.style.border = '1px solid #fecaca';
+                fb.innerHTML = '<strong>❌ إجابة خاطئة.</strong> الكرية المذذبة تعمل حصرياً بتدفق شوارد H⁺.';
+            }
+        }
+
+        function checkCh30Answer(optIdx, isCorrect) {
+            let container = document.getElementById('c30q1-container');
+            let btns = container.querySelectorAll('.option-btn');
+            let fb = document.getElementById('c30q1-feedback');
+
+            btns.forEach((b, idx) => {
+                b.disabled = true;
+                if (idx === optIdx) b.classList.add(isCorrect ? 'correct' : 'wrong');
+            });
+
+            fb.style.display = 'block';
+            if (isCorrect) {
+                fb.style.background = '#f0fdf4'; fb.style.color = '#166534'; fb.style.border = '1px solid #bbf7d0';
+                fb.innerHTML = '<strong>✅ إجابة صحيحة ممتاز!</strong> تبدد الطاقة كحرارة هو سبب وحيدية اتجاه التدفق الطاقوي.';
+            } else {
+                fb.style.background = '#fef2f2'; fb.style.color = '#991b1b'; fb.style.border = '1px solid #fecaca';
+                fb.innerHTML = '<strong>❌ إجابة خاطئة.</strong> السبب القانوني في علم البيئة هو استحالة إعادة تحويل الحرارة المتبددة إلى ضوء أو روابط جلوكوز.';
+            }
+        }
+    </script>
+</body>
+</html>
