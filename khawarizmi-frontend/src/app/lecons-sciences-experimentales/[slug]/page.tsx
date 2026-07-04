@@ -3,85 +3,65 @@
 import { useParams } from "next/navigation"
 import Link from "next/link"
 import { AppShell } from "@/components/layout/AppShell"
-import { ChevronRight, BookOpen } from "lucide-react"
-import { useEffect, useState, useRef } from "react"
+import GenZInteractiveLesson from "@/components/lessons/GenZInteractiveLesson"
+import GenZQCMFlow from "@/components/lessons/GenZQCMFlow"
 
-const PHASE_LABELS: Record<string, { phase: number; label: string }> = {
-  phase1_chapitres_1_2: { phase: 1, label: "التركيب الكيميائي للبروتين · العلاقة بين بنية البروتين ووظيفته" },
-  phase2_chapitres_3_4: { phase: 2, label: "خصائص الإنزيمات · دور الإنزيمات في التفاعلات الحيوية" },
-  phase3_chapitres_5_6: { phase: 3, label: "التنظيم الهرموني · دور الهرمونات في الاتصال العصبي" },
-  phase4_chapitres_7_8: { phase: 4, label: "المناعة الخلطية · المناعة الخلوية" },
-  phase5_chapitres_9_10: { phase: 5, label: "الأجسام المضادة · سيروم ولقاح" },
-  phase6_chapitres_11_12: { phase: 6, label: "التنفس · التخمر" },
-  phase7_chapitres_13_14: { phase: 7, label: "مصادر الطاقة في الكائنات الحية · امتصاص المغذيات" },
-  phase8_chapitres_15_16: { phase: 8, label: "الهضم · النقل الدموي" },
-  phase9_chapitres_17_18: { phase: 9, label: "التبادل الغازي التنفسي · التنظيم الدقيق للتنفس" },
-  phase10_chapitres_19_20: { phase: 10, label: "الجهد العضلي · التعب العضلي" },
-  phase11_chapitres_21_22: { phase: 11, label: "الحركة عند الإنسان · وضعية الانتصاب" },
-  phase12_chapitres_23_24: { phase: 12, label: "البنية الدقيقة للعضلة الهيكلية · آلية التقبض العضلي" },
-  phase13_chapitres_25_26: { phase: 13, label: "الطاقة الكامنة · تحويل الطاقة في العضلة" },
-  phase14_chapitres_27_28: { phase: 14, label: "النشاط الإنزيمي للعضلة · تنظيم الفعل العضلي" },
-  phase15_chapitres_29_30: { phase: 15, label: "الخصائص العامة للظواهر التكتونية · تكتونية الصفائح" },
-  phase16_chapitres_31_32: { phase: 16, label: "بنية الغلاف الصخري · حركية الصفائح" },
-  phase17_chapitres_33_34: { phase: 17, label: "الحدود المتقاربة · الحدود المتباعدة" },
-  phase18_chapitres_35_36: { phase: 18, label: "التحولات الباطنية · البنية الداخلية للأرض" },
-  phase19_chapitres_37_38: { phase: 19, label: "الزلازل · الموجات الزلزالية" },
-  phase20_chapitres_39_40: { phase: 20, label: "التشوهات التكتونية · الطيات والفوالق" },
-  phase21_chapitres_41_42: { phase: 21, label: "تشكل السلاسل الجبلية · ظاهرة الحركات البانية" },
-  phase22_chapitres_43_44: { phase: 22, label: "العلاقة بين التكتونية والرسوبيات · التطبيقات الجيولوجية" },
+const GENZ_LESSONS: Record<string, { titleAr: string; phases: any[] }> = {
+  "phase15_chapitres_29_30": {
+    titleAr: "الخصائص العامة للظواهر التكتونية",
+    phases: [
+      { id: "1", titleAr: "شنو هي التكتونية؟", content: <div className="text-[17px] leading-relaxed">حركة الصفائح اللي تخلق البراكين والزلازل والجبال. كل شيء يتحرك ببطء.</div> },
+      { id: "2", titleAr: "أنواع الحدود", content: <div className="text-lg">• حدود متباعدة<br/>• حدود متقاربة<br/>• حدود منزلقة</div> },
+      { id: "3", titleAr: "الآن دورك", practice: true, content: <div>اشرح كيف تتكون البراكين من حركة الصفائح</div> },
+    ]
+  },
+  "phase2_chapitres_3_4": {
+    titleAr: "خصائص الإنزيمات",
+    phases: [
+      { id: "1", titleAr: "شنو هو الإنزيم؟", content: <div className="text-[17px]">بروتين يسرّع التفاعلات بدون ما يتغير.</div> },
+      { id: "2", titleAr: "الخصائص المهمة", content: <div>• خصوصية إنزيمية<br/>• تتأثر بالحرارة و pH<br/>• تعمل في الظروف الملائمة</div> },
+      { id: "3", titleAr: "تمرين سريع", practice: true, content: <div>لماذا الإنزيمات مهمة في الخلية؟</div> },
+    ]
+  },
+  default: {
+    titleAr: "درس تفاعلي",
+    phases: [
+      { id: "1", titleAr: "المقدمة", content: <div>الفكرة الأساسية للدرس.</div> },
+      { id: "2", titleAr: "الخطوة الرئيسية", content: <div>العلاقة والمفهوم.</div> },
+      { id: "3", titleAr: "تدرب", practice: true, content: <div>اكتب إجابتك باختصار.</div> },
+    ]
+  }
 }
 
-export default function PhasePage() {
+const QCMS: Record<string, any[]> = {
+  "phase15_chapitres_29_30": [
+    { id: 1, question: "سبب البراكين الرئيسي؟", options: ["حركة الصفائح", "الرياح", "الأمطار", "الشمس"], correct: 0 },
+    { id: 2, question: "الحدود المتقاربة تشكل؟", options: ["جبال", "براكين فقط", "سهول", "أنهار"], correct: 0 },
+  ],
+  "phase2_chapitres_3_4": [
+    { id: 1, question: "الإنزيم هو", options: ["بروتين", "سكر", "دهن", "ماء"], correct: 0 },
+    { id: 2, question: "يؤثر على الإنزيم", options: ["الحرارة و pH", "الضوء فقط", "الريح", "الصوت"], correct: 0 },
+  ],
+}
+
+export default function GenZPhaseLesson() {
   const params = useParams()
-  const slug = params?.slug as string
-  const iframeRef = useRef<HTMLIFrameElement>(null)
-  const [height, setHeight] = useState("100vh")
-
-  const meta = PHASE_LABELS[slug]
-  const phaseLabel = meta ? `المرحلة ${meta.phase} — ${meta.label}` : slug === "lecon_transcription" ? "أداة تحويل النص إلى درس تفاعلي" : slug
-  const src = `/lecons-sciences-experimentales/${slug}.html`
-
-  useEffect(() => {
-    const handleMessage = (event: MessageEvent) => {
-      if (event.data?.type === "iframe-height") {
-        setHeight(`${event.data.height}px`)
-      }
-    }
-    window.addEventListener("message", handleMessage)
-    return () => window.removeEventListener("message", handleMessage)
-  }, [])
+  const slug = (params?.slug as string) || "default"
+  const lesson = GENZ_LESSONS[slug] || GENZ_LESSONS.default
+  const qcms = QCMS[slug] || []
 
   return (
     <AppShell>
-      <div className="max-w-7xl mx-auto" dir="rtl">
-        <div className="flex items-center gap-2 mb-4 text-sm">
-          <Link href="/lecons-sciences-experimentales" className="text-mint hover:text-mint-soft transition font-bold">
-            <ChevronRight className="w-4 h-4 inline" aria-hidden="true" />
-            التجارب المقررة
-          </Link>
-          <span className="text-slate-500">/</span>
-          <span className="text-slate-300 font-semibold truncate">{phaseLabel}</span>
-        </div>
-
-        <div className="rounded-2xl overflow-hidden border border-white/10 bg-white/[0.02]">
-          <iframe
-            ref={iframeRef}
-            src={src}
-            title={phaseLabel}
-            className="w-full border-0"
-            style={{ height }}
-            sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
-            onLoad={() => {
-              try {
-                const doc = iframeRef.current?.contentDocument || iframeRef.current?.contentWindow?.document
-                if (doc) {
-                  const h = doc.documentElement.scrollHeight
-                  setHeight(`${Math.max(h, window.innerHeight)}px`)
-                }
-              } catch {}
-            }}
-          />
-        </div>
+      <div className="max-w-3xl mx-auto px-4 pt-5 pb-20" dir="rtl">
+        <Link href="/lecons-sciences-experimentales" className="text-mint text-sm font-semibold">← العودة</Link>
+        <h1 className="text-4xl font-black tracking-tighter mt-2">{lesson.titleAr}</h1>
+        <GenZInteractiveLesson lessonTitleAr={lesson.titleAr} phases={lesson.phases} slug={slug} />
+        {qcms.length > 0 && (
+          <div className="mt-14">
+            <h3 className="text-center font-bold text-2xl mb-5">اختبر نفسك الآن</h3>
+            <GenZQCMFlow titleAr="اختبار سريع" questions={qcms} />
+          </div>
+        )}
       </div>
     </AppShell>
   )
