@@ -1,4 +1,5 @@
 "use client"
+
 import React from "react"
 
 interface GenZHeaderProps {
@@ -8,15 +9,15 @@ interface GenZHeaderProps {
 }
 
 export default function GenZHeader({
-  userName = "Khalil",
-  streak = 7,
-  xpToday = 124
+  userName = "خليل",
+  streak = 0,
+  xpToday = 0
 }: GenZHeaderProps) {
   return (
-    <div className="flex items-center justify-between px-4 py-4">
+    <div className="flex items-center justify-between px-4 py-4" dir="rtl">
       <div>
-        <div className="text-sm text-white/60">Salut {userName} 👋</div>
-        <div className="text-2xl font-black tracking-tighter text-white">Prêt à gagner ?</div>
+        <div className="text-sm text-white/60">مرحبا {userName} 👋</div>
+        <div className="text-2xl font-black tracking-tighter text-white">جاهز للكسب؟</div>
       </div>
 
       <div className="text-right">
@@ -24,8 +25,9 @@ export default function GenZHeader({
           <span className="text-2xl">🔥</span>
           <span className="text-xl font-black">{streak}</span>
         </div>
-        <div className="text-[10px] text-emerald-400/70 font-bold -mt-0.5">jours streak</div>
-        <div className="mt-1 text-xs font-bold text-white/60">+{xpToday} XP aujourd'hui</div>
+        <div className="text-[10px] text-emerald-400/70 font-bold -mt-0.5">يوم متتالي</div>
+
+        <div className="mt-1 text-xs font-bold text-white/60">+{xpToday} نقطة اليوم</div>
       </div>
     </div>
   )

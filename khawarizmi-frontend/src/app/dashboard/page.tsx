@@ -10,41 +10,61 @@ import UrgentLosses from "@/components/dashboard/UrgentLosses"
 import QuickWins from "@/components/dashboard/QuickWins"
 
 import { useDriveDashboard } from "@/hooks/useDriveDashboard"
+import type { Mission } from "@/components/drive-design/api-types"
 
 export default function GenZDashboardPage() {
   const state = useDriveDashboard()
   const [showMore, setShowMore] = useState(false)
 
-  const dailyMission = state.missions?.find((m: any) => m.status === "pending") || state.missions?.[0]
+  // === B: real missions from hook ===
+  const missions: Mission[] = state.missions || []
+  const dailyMission = missions.find((m: Mission) => m.status === "pending") || missions[0] || null
 
-  const missionTitle = dailyMission?.title || "Volcans et leur distribution"
+  // priority: Arabic title
+  const missionTitle = dailyMission?.titleAr || dailyMission?.title || "البراكين وتوزيعها"
   const missionPoints = dailyMission?.xp_reward || 7
-  const missionDuration = "12 min"
+
+  // === A: smart route wiring ===
+  let missionHref = dailyMission?.href || "/lecons-sciences-experimentales"
+  const titleLower = (dailyMission?.title || dailyMission?.titleAr || "").toLowerCase()
+  if (titleLower.includes("volcan") || titleLower.includes("براكين") || titleLower.includes("تكتون")) {
+    missionHref = "/lecons-sciences-experimentales/phase15_chapitres_29_30"
+  }
+
+  // === C: real streak + XP from profile (gamification merged by mapper) ===
+  const profile = state.profile || {} as any
+  const realStreak = profile.streak ?? 0
+  const realXp = profile.xp ?? 0
+  const userName = profile.name || "خليل"
+
+  const handleStartMission = () => {
+    window.location.href = missionHref
+  }
 
   return (
     <AuthGuard>
       <AppShell>
-        <div className="max-w-2xl mx-auto pb-20">
+        <div className="max-w-2xl mx-auto pb-20" dir="rtl">
 
           <GenZHeader
-            userName={state.profile?.name || "Khalil"}
-            streak={7}
-            xpToday={124}
+            userName={userName}
+            streak={realStreak}
+            xpToday={realXp}
           />
 
           <GenZHeroMission
             title={missionTitle}
-            duration={missionDuration}
+            subtitle="خريطة + توزيع + تحليل"
+            duration="12 دقيقة"
             points={missionPoints}
-            onStart={() => {
-              window.location.href = "/lecons-sciences-experimentales"
-            }}
+            href={missionHref}
+            onStart={handleStartMission}
           />
 
           <UrgentLosses
             items={[
-              { title: "Volcans", count: 3, impact: "-6 pts" },
-              { title: "Réseaux nerveux", count: 2, impact: "-4 pts" },
+              { title: "البراكين", titleAr: "البراكين", count: 3, impact: "-6 نقاط" },
+              { title: "الشبكات العصبية", titleAr: "الشبكات العصبية", count: 2, impact: "-4 نقاط" },
             ]}
           />
 
@@ -52,8 +72,8 @@ export default function GenZDashboardPage() {
 
           <div className="mx-4 mt-6">
             <div className="flex items-center justify-between mb-2 px-1">
-              <span className="font-bold text-white">Ta progression</span>
-              <span className="text-emerald-400 text-sm font-bold">68% vers le BAC</span>
+              <span className="font-bold text-white">تقدمك</span>
+              <span className="text-emerald-400 text-sm font-bold">68% نحو البكالوريا</span>
             </div>
 
             <div className="h-2.5 bg-white/10 rounded-full overflow-hidden">
@@ -64,20 +84,20 @@ export default function GenZDashboardPage() {
               onClick={() => setShowMore(!showMore)}
               className="mt-3 w-full text-xs text-white/60 hover:text-white py-1 active:opacity-70"
             >
-              {showMore ? "Masquer les détails" : "Voir plus de détails ↓"}
+              {showMore ? "إخفاء التفاصيل" : "عرض المزيد ↓"}
             </button>
 
             {showMore && (
               <div className="mt-3 text-xs text-white/70 space-y-1 px-1">
-                <div>• 12 missions terminées cette semaine</div>
-                <div>• Meilleur sujet : Photosynthèse</div>
-                <div>• À améliorer : Schémas fonctionnels</div>
+                <div>• 12 مهمة مكتملة هذا الأسبوع</div>
+                <div>• أفضل موضوع: البناء الضوئي</div>
+                <div>• يحتاج تحسين: المخططات الوظيفية</div>
               </div>
             )}
           </div>
 
           <div className="mt-10 text-center text-[10px] text-white/40 px-4">
-            Chaque mission = points concrets pour ton BAC 2026
+            كل مهمة = نقاط حقيقية للبكالوريا 2026
           </div>
         </div>
       </AppShell>
