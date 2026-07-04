@@ -30,7 +30,17 @@ export default function ActionVerbDetailPage() {
   // saveMethodologyEvaluation, etc.).
   const verb = enrichedToLegacy(enriched)
   const totalPoints = enriched.enrichedScoringRules.reduce((sum, r) => sum + r.points, 0)
-  const isAnalyseFlow = slug === "analyse"
+  // VerbLessonFlow — Full Rollout (All 24 Verbs)
+  const INTERACTIVE_LESSON_VERBS = [
+    // Phase 1 (6)
+    "analyse", "interpret", "deduce", "hypothesis", "compare", "explain",
+    // Phase 2 (10)
+    "justify", "discuss", "define", "cite", "relationship", "describe", "classify", "distinguish", "comment", "criticize",
+    // Phase 3 (8) — full rollout
+    "validate-hypothesis", "scientific-text", "name", "extract", "determine",
+    "schematic-functional", "schematic-explanatory", "summarize-diagram",
+  ]
+  const useInteractiveFlow = INTERACTIVE_LESSON_VERBS.includes(slug)
 
   const [exercises, setExercises] = useState<ActionVerbExercise[]>([])
   const [answer, setAnswer] = useState("")
@@ -109,7 +119,7 @@ export default function ActionVerbDetailPage() {
     }
   }
 
-  if (isAnalyseFlow) {
+  if (useInteractiveFlow) {
     return (
       <AuthGuard>
         <AppShell>
