@@ -19,10 +19,12 @@ import logging
 import re
 from typing import Any, Protocol, runtime_checkable
 
+from cost_logger import get_logger
 from prompts.correction_prompt import (
     SYSTEM_PROMPT_AR,
     build_correction_prompt,
 )
+from prompts.correction_prompt_v2 import build_correction_prompt_v2
 from services.answer_sanity import check_answer_sanity
 from services.remediation_service import get_generic_remediation, get_remediation
 
@@ -339,14 +341,20 @@ async def evaluate_answer_v2(
     # RAG context provider (optionnel — dégradation silencieuse si absent)
     rag_context_provider: Any = None,
     request_id: str | None = None,
+    # Phase C — prompt v2 optimisé (réduction ~68% tokens)
+    use_v2_prompt: bool = False,
 ) -> dict[str, Any]:
     """Évalue une réponse d'élève avec le pipeline hybride sanity + LLM.
 
     Pipeline :
       1. Sanity check → rejet immédiat si charabia/vide
-      2. Build prompt → contexte complet pour le LLM
+      2. Build prompt → contexte complet pour le LLM (v1 ou v2)
       3. Appel LLM → via llm_call injectable
       4. Post-validation → parse JSON, clamp score, validate highlights
+
+    Args:
+        use_v2_prompt: Si True, utilise le prompt v2 optimisé (~918 tokens vs ~3742).
+                      Le format de sortie est mappé au format v1 pour compatibilité.
 
     Returns:
         dict conforme au format documenté dans le HANDOFF § 4
@@ -371,41 +379,56 @@ async def evaluate_answer_v2(
 
     # ── 2. BUILD PROMPT ──────────────────────────
 
-    user_prompt = build_correction_prompt(
-        scenario_context=scenario_context,
-        documents=documents,
-        question_prompt=question_prompt,
-        question_skill=question_skill,
-        verb_slug=verb_slug,
-        model_answer=model_answer,
-        learning_focus=learning_focus,
-        score_max=score_max,
-        student_answer=student_answer,
-    )
+    if use_v2_prompt:
+        # Phase C — prompt v2 optimisé (~918 tokens vs ~3742)
+        user_prompt, prompt_hash = build_correction_prompt_v2(
+            scenario_context=scenario_context,
+            model_answer=student_answer,
+            verb_methodology=question_skill,
+            documents=documents,
+            learning_focus=learning_focus or "",
+            verb_slug=verb_slug,
+        )
+        # Note: v2 inclut déjà le system prompt dans le user_prompt
+        messages = [{"role": "user", "content": user_prompt}]
+        logger.info(f"{log_prefix}using_v2_prompt | hash={prompt_hash}")
+    else:
+        # Prompt v1 original
+        user_prompt = build_correction_prompt(
+            scenario_context=scenario_context,
+            documents=documents,
+            question_prompt=question_prompt,
+            question_skill=question_skill,
+            verb_slug=verb_slug,
+            model_answer=model_answer,
+            learning_focus=learning_focus,
+            score_max=score_max,
+            student_answer=student_answer,
+        )
 
-    # RAG enrichment : injecter les extraits du LIVRE MANHADJIYA si disponible
-    if rag_context_provider is not None:
-        try:
-            rag_context = await rag_context_provider(
-                verb_slug=verb_slug,
-                question_prompt=question_prompt,
-                student_answer=student_answer,
-            )
-            if rag_context:
-                user_prompt = (
-                    f"{user_prompt}\n\n"
-                    "═══ مقتطفات من الكتاب المنهجي (RAG) ═══\n"
-                    f"{rag_context}"
+        # RAG enrichment : injecter les extraits du LIVRE MANHADJIYA si disponible
+        if rag_context_provider is not None:
+            try:
+                rag_context = await rag_context_provider(
+                    verb_slug=verb_slug,
+                    question_prompt=question_prompt,
+                    student_answer=student_answer,
                 )
-        except Exception:
-            logger.warning(f"{log_prefix}rag_provider_failed — poursuite sans RAG")
+                if rag_context:
+                    user_prompt = (
+                        f"{user_prompt}\n\n"
+                        "═══ مقتطفات من الكتاب المنهجي (RAG) ═══\n"
+                        f"{rag_context}"
+                    )
+            except Exception:
+                logger.warning(f"{log_prefix}rag_provider_failed — poursuite sans RAG")
 
-    prompt_hash = _sha256_text(user_prompt)
+        prompt_hash = _sha256_text(user_prompt)
 
-    messages = [
-        {"role": "system", "content": SYSTEM_PROMPT_AR},
-        {"role": "user", "content": user_prompt},
-    ]
+        messages = [
+            {"role": "system", "content": SYSTEM_PROMPT_AR},
+            {"role": "user", "content": user_prompt},
+        ]
 
     # ── 3. APPEL LLM ────────────────────────────
 
@@ -440,6 +463,24 @@ async def evaluate_answer_v2(
                 f"{log_prefix}llm_response_fr | "
                 f"fr={choice.finish_reason} rl={len(llm_raw)}"
             )
+
+            # ── Cost logging ─────────────────────────
+            usage = getattr(response, "usage", None)
+            if usage:
+                try:
+                    cost_log = get_logger()
+                    cost_log.record(
+                        model=model,
+                        input_tokens=getattr(usage, "prompt_tokens", 0) or 0,
+                        output_tokens=getattr(usage, "completion_tokens", 0) or 0,
+                        prompt_hash=prompt_hash,
+                        verb_slug=verb_slug,
+                        scenario_id=request_id or "",
+                        latency_ms=0,
+                    )
+                except Exception as log_err:
+                    logger.warning(f"{log_prefix}cost_log_failed | {log_err}")
+
         except Exception as extract_err:
             logger.error(f"{log_prefix}llm_extract_failed | {extract_err}")
             llm_raw = str(response)[:500]
@@ -475,56 +516,116 @@ async def evaluate_answer_v2(
             finish_reason=finish_reason,
         )
 
-    # Extraire les champs avec valeurs par défaut
-    source = "llm"
+    # ── Phase C — Mapping v2 → v1 si prompt v2 ──
+    if use_v2_prompt and "errors" in parsed:
+        # Le format v2 retourne: score (0-100), errors, feedback, grade
+        # On mappe au format v1 pour compatibilité
+        logger.info(f"{log_prefix}mapping_v2_to_v1 | score_raw={parsed.get('score')}")
 
-    raw_score = parsed.get("score", 0)
-    if not isinstance(raw_score, (int, float)):
-        try:
-            raw_score = int(raw_score)
-        except (ValueError, TypeError):
-            raw_score = 0
+        # Score: v2 retourne 0-100, on normalise vers 0-score_max
+        raw_score = parsed.get("score", 0)
+        if isinstance(raw_score, (int, float)):
+            score = _clamp(int(raw_score * score_max / 100), 0, score_max)
+        else:
+            score = 0
+
+        # Highlights: on mappe les erreurs v2 en highlights
+        v2_errors = parsed.get("errors", [])
+        highlights = []
+        if isinstance(v2_errors, list):
+            for err in v2_errors:
+                if isinstance(err, dict):
+                    # Essayer d'extraire les positions du texte original
+                    # Le format v2 ne fournit pas de start/end, on mettout le texte en erreur
+                    highlights.append({
+                        "start": 0,
+                        "end": len(student_answer),
+                        "type": "wrong_formulation",
+                        "message_ar": err.get("detail", err.get("fix", "")),
+                    })
+
+        # Critères: on déduit des erreurs
+        matched = []
+        unmatched = []
+        if isinstance(v2_errors, list):
+            for err in v2_errors:
+                if isinstance(err, dict):
+                    unmatched.append({
+                        "criterion": err.get("type", "erreur"),
+                        "why_ar": err.get("detail", ""),
+                        "from_model_answer": "",
+                    })
+
+        # Feedback
+        feedback_ar = parsed.get("feedback", "")
+        if not isinstance(feedback_ar, str):
+            feedback_ar = str(feedback_ar)
+
+        # Advice: on déduit du grade
+        grade = parsed.get("grade", "")
+        advice_map = {
+            "retenir": "أعد مراجعة هذا الموضوع وحاول مرة أخرى",
+            "acquis": "جيد، لكن يمكنك التعمق أكثر",
+            "maîtrisé": "ممتاز! واصل التقدم",
+        }
+        advice_ar = advice_map.get(grade, "")
+
+        # Confiance: on déduit du score
+        confidence = min(1.0, score / score_max) if score_max > 0 else 0.5
+
+        source = "llm_v2"
+
+    else:
+        # ── Format v1 standard ──────────────────────
+        raw_score = parsed.get("score", 0)
+        if not isinstance(raw_score, (int, float)):
+            try:
+                raw_score = int(raw_score)
+            except (ValueError, TypeError):
+                raw_score = 0
+                source = "llm_recovered"
+
+        score = _clamp(int(raw_score), 0, score_max)
+
+        # Highlights
+        raw_highlights = parsed.get("highlights", [])
+        if not isinstance(raw_highlights, list):
+            raw_highlights = []
+            source = "llm_recovered"
+        highlights = _validate_highlights(raw_highlights, student_answer)
+
+        # Critères matchés
+        matched = parsed.get("matched_criteria", [])
+        if not isinstance(matched, list):
+            matched = []
             source = "llm_recovered"
 
-    score = _clamp(int(raw_score), 0, score_max)
+        # Critères non matchés
+        raw_unmatched = parsed.get("unmatched_criteria", [])
+        if not isinstance(raw_unmatched, list):
+            raw_unmatched = []
+            source = "llm_recovered"
+        unmatched = _normalize_unmatched(raw_unmatched)
 
-    # Highlights
-    raw_highlights = parsed.get("highlights", [])
-    if not isinstance(raw_highlights, list):
-        raw_highlights = []
-        source = "llm_recovered"
-    highlights = _validate_highlights(raw_highlights, student_answer)
+        # Feedback
+        feedback_ar = parsed.get("feedback_ar", "")
+        if not isinstance(feedback_ar, str):
+            feedback_ar = str(feedback_ar)
 
-    # Critères matchés
-    matched = parsed.get("matched_criteria", [])
-    if not isinstance(matched, list):
-        matched = []
-        source = "llm_recovered"
+        advice_ar = parsed.get("advice_ar", "")
+        if not isinstance(advice_ar, str):
+            advice_ar = str(advice_ar)
 
-    # Critères non matchés
-    raw_unmatched = parsed.get("unmatched_criteria", [])
-    if not isinstance(raw_unmatched, list):
-        raw_unmatched = []
-        source = "llm_recovered"
-    unmatched = _normalize_unmatched(raw_unmatched)
+        # Confiance
+        raw_confidence = parsed.get("confidence", 0.5)
+        try:
+            confidence = float(raw_confidence)
+            confidence = max(0.0, min(1.0, confidence))
+        except (ValueError, TypeError):
+            confidence = 0.5
+            source = "llm_recovered"
 
-    # Feedback
-    feedback_ar = parsed.get("feedback_ar", "")
-    if not isinstance(feedback_ar, str):
-        feedback_ar = str(feedback_ar)
-
-    advice_ar = parsed.get("advice_ar", "")
-    if not isinstance(advice_ar, str):
-        advice_ar = str(advice_ar)
-
-    # Confiance
-    raw_confidence = parsed.get("confidence", 0.5)
-    try:
-        confidence = float(raw_confidence)
-        confidence = max(0.0, min(1.0, confidence))
-    except (ValueError, TypeError):
-        confidence = 0.5
-        source = "llm_recovered"
+        source = "llm"
 
     percentage = round((score / score_max) * 100) if score_max > 0 else 0
 
