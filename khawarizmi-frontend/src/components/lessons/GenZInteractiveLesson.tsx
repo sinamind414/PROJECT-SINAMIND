@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useRef } from "react"
+import React, { useState, useRef, useLayoutEffect } from "react"
 
 interface Phase {
   id: string
@@ -55,6 +55,11 @@ export default function GenZInteractiveLesson({ lessonTitleAr, slug, phases, onC
 
   const scrollRef = useRef<HTMLDivElement>(null)
 
+  useLayoutEffect(() => {
+    const el = scrollRef.current
+    if (el) el.scrollLeft = 0
+  }, [])
+
   const hasTabs = slug.includes("phase14") || slug.includes("27_28") || slug.includes("ch27")
 
   const filteredPhases = phases.filter((_, idx) => {
@@ -97,6 +102,11 @@ export default function GenZInteractiveLesson({ lessonTitleAr, slug, phases, onC
     setSimStates((prev) => ({ ...prev, [`${phaseId}_${type}`]: msg }))
   }
 
+  const scrollSign = () => {
+    const el = scrollRef.current
+    return el && getComputedStyle(el).direction === "rtl" ? -1 : 1
+  }
+
   const switchChapter = (ch: "ch27" | "ch28" | "all") => {
     setActiveChapter(ch)
     setCurrentFrame(0)
@@ -107,7 +117,7 @@ export default function GenZInteractiveLesson({ lessonTitleAr, slug, phases, onC
     const el = scrollRef.current
     if (!el) return
     const slideW = el.clientWidth
-    const frame = Math.round(el.scrollLeft / slideW)
+    const frame = Math.round(Math.abs(el.scrollLeft) / slideW)
     if (frame >= 0 && frame < totalFrames && frame !== currentFrame) {
       setCurrentFrame(frame)
     }
@@ -117,7 +127,7 @@ export default function GenZInteractiveLesson({ lessonTitleAr, slug, phases, onC
     const el = scrollRef.current
     if (!el) return
     const slideW = el.clientWidth
-    el.scrollTo({ left: i * slideW, behavior: "smooth" })
+    el.scrollTo({ left: scrollSign() * i * slideW, behavior: "smooth" })
     setCurrentFrame(i)
   }
 
@@ -128,9 +138,9 @@ export default function GenZInteractiveLesson({ lessonTitleAr, slug, phases, onC
     const el = scrollRef.current
     if (!el) return
     const slideW = el.clientWidth
-    const nearest = Math.round(el.scrollLeft / slideW)
+    const nearest = Math.round(Math.abs(el.scrollLeft) / slideW)
     const clamped = Math.max(0, Math.min(totalFrames - 1, nearest))
-    el.scrollTo({ left: clamped * slideW, behavior: "smooth" })
+    el.scrollTo({ left: scrollSign() * clamped * slideW, behavior: "smooth" })
     setCurrentFrame(clamped)
   }
 

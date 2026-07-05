@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef } from "react"
+import { useState, useRef, useLayoutEffect } from "react"
 import { getExperimentalLesson, ExperimentalLesson } from "@/lib/experimental-lessons-data"
 import LessonSlideContent from "./LessonSlideContent"
 
@@ -15,6 +15,12 @@ export default function ExperimentalLessonView({ slug, onComplete }: Props) {
   const [currentFrame, setCurrentFrame] = useState(0)
   const [qcmScore, setQcmScore] = useState(0)
   const scrollRef = useRef<HTMLDivElement>(null)
+
+  useLayoutEffect(() => {
+    const el = scrollRef.current
+    if (!el) return
+    el.scrollLeft = 0
+  }, [])
 
   const totalFrames = phases.length
 
