@@ -64,3 +64,5 @@ khawarizmi-backend/data/
 .vercel
 
 .vercel
+
+# Playwright MCP artifacts.playwright-mcp/
