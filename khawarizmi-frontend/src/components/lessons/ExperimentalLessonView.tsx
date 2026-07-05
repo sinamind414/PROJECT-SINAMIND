@@ -22,7 +22,8 @@ export default function ExperimentalLessonView({ slug, onComplete }: Props) {
     const el = scrollRef.current
     if (!el) return
     const slideW = el.clientWidth
-    el.scrollTo({ left: i * slideW, behavior: "smooth" })
+    const sign = getComputedStyle(el).direction === "rtl" ? -1 : 1
+    el.scrollTo({ left: sign * i * slideW, behavior: "smooth" })
     setCurrentFrame(i)
   }
 
@@ -30,7 +31,7 @@ export default function ExperimentalLessonView({ slug, onComplete }: Props) {
     const el = scrollRef.current
     if (!el) return
     const slideW = el.clientWidth
-    const frame = Math.round(el.scrollLeft / slideW)
+    const frame = Math.round(Math.abs(el.scrollLeft) / slideW)
     if (frame >= 0 && frame < totalFrames && frame !== currentFrame) {
       setCurrentFrame(frame)
     }
@@ -40,9 +41,10 @@ export default function ExperimentalLessonView({ slug, onComplete }: Props) {
     const el = scrollRef.current
     if (!el) return
     const slideW = el.clientWidth
-    const nearest = Math.round(el.scrollLeft / slideW)
+    const sign = getComputedStyle(el).direction === "rtl" ? -1 : 1
+    const nearest = Math.round(Math.abs(el.scrollLeft) / slideW)
     const clamped = Math.max(0, Math.min(totalFrames - 1, nearest))
-    el.scrollTo({ left: clamped * slideW, behavior: "smooth" })
+    el.scrollTo({ left: sign * clamped * slideW, behavior: "smooth" })
     setCurrentFrame(clamped)
   }
 
