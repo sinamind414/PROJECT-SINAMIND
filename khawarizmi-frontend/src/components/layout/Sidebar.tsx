@@ -59,7 +59,8 @@ export const MENU_PHASES: Phase[] = [
   {
     label: "المنهجية",
     items: [
-      { href: "/action-verbs", icon: Zap, labelAr: "أفعال الأداء", labelFr: "Méthode" },
+      { href: "/methodology", icon: ListChecks, labelAr: "منهجية البكالوريا", labelFr: "Méthode BAC" },
+      { href: "/action-verbs", icon: Zap, labelAr: "أفعال الأداء", labelFr: "Verbes" },
       { href: "/document-analysis", icon: Search, labelAr: "استغلال الوثائق", labelFr: "Documents" },
     ],
   },

@@ -7,6 +7,7 @@ import Link from "next/link"
 const pageTitles: Record<string, string> = {
   "/dashboard": "الرئيسية",
   "/action-verbs": "الأفعال الإجرائية",
+  "/methodology": "منهجية البكالوريا",
   "/mindmap": "خرائط ذهنية",
   "/drill": "المراجعة الذكية",
   "/exercises": "تمارين تفاعلية",

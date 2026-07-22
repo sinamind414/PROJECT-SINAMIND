@@ -20,6 +20,7 @@ select = [
     "SIM",  # Simplicité : code simplifiable
     "C4",   # Compréhension : list/set/dict comprehensions
     "RUF",  # Règles spécifiques Ruff
+    "ANN",  # Annotations de type
 ]
 ignore = [
     "E501",    # ligne trop longue (géré par formateur)

@@ -10,6 +10,7 @@ import { PillChip } from "@/components/ui/PillChip"
 import { clearStoredProgress, getProgressSnapshot, type ProgressSnapshot } from "@/lib/progress-store"
 import apiClient from "@/lib/api-client"
 import type { ProgressResponse } from "@/lib/types"
+import { getContractSnapshot } from "@/lib/lesson/evidenceService"
 
 function color(level: number) {
   if (level >= 75) return "#34D399"
@@ -47,14 +48,17 @@ export default function ProgressPage() {
     refreshLocal()
     window.addEventListener("sinamind-progress-updated", refreshLocal)
     window.addEventListener("storage", refreshLocal)
+    window.addEventListener("khawarizmi-contract-updated", refreshLocal)
     return () => {
       cancelled = true
       window.removeEventListener("sinamind-progress-updated", refreshLocal)
       window.removeEventListener("storage", refreshLocal)
+      window.removeEventListener("khawarizmi-contract-updated", refreshLocal)
     }
   }, [])
 
   const data = snapshot || getProgressSnapshot()
+  const contract = getContractSnapshot()
   const apiReady = apiProgress?.prediction_bac?.note_globale ?? null
   const apiDues = apiProgress?.dues_aujourd_hui ?? null
   const apiConcepts = apiProgress?.concepts ?? []
@@ -126,6 +130,27 @@ export default function ProgressPage() {
       {source === "local" && (
         <p className="text-amber-500/60 text-[10px] mb-4">(وضع محلي — البطاقة الخلفية غير متصلة)</p>
       )}
+
+      {/* Contrat preuves Kunz — pas de fausse maîtrise */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+        <SurfaceCard>
+          <p className="text-gray-400 text-[10px] mb-1">إثباتات وثيقة</p>
+          <p className="text-2xl font-bold text-sky-300">{contract.documentCount}</p>
+        </SurfaceCard>
+        <SurfaceCard>
+          <p className="text-gray-400 text-[10px] mb-1">إثبات منهجية BAC</p>
+          <p className="text-2xl font-bold text-emerald-300">{contract.methodCount}</p>
+        </SurfaceCard>
+        <SurfaceCard>
+          <p className="text-gray-400 text-[10px] mb-1">أخطاء مفتوحة</p>
+          <p className="text-2xl font-bold text-red-300">{contract.openErrorCount}</p>
+        </SurfaceCard>
+        <SurfaceCard>
+          <p className="text-gray-400 text-[10px] mb-1">بوابات FSRS</p>
+          <p className="text-2xl font-bold text-amber-300">{contract.openRecallCount}</p>
+          <p className="text-gray-500 text-[10px] mt-1">بعد إثبات فقط</p>
+        </SurfaceCard>
+      </div>
 
       {/* ── Secondary: detailed sections behind RevealSection ── */}
       <div className="space-y-4">
@@ -223,6 +248,74 @@ export default function ProgressPage() {
               </div>
             ))}
             {!data.history.length && <p className="text-gray-500 text-sm">لا يوجد تاريخ بعد.</p>}
+          </div>
+        </RevealSection>
+
+        <RevealSection title="سجل الإثباتات والأخطاء (عقد Kunz)">
+          <div className="space-y-4">
+            <div>
+              <p className="text-sky-300 text-xs font-bold mb-2">إثباتات حديثة</p>
+              {contract.evidences.length ? (
+                <div className="space-y-2">
+                  {contract.evidences
+                    .slice()
+                    .reverse()
+                    .slice(0, 8)
+                    .map((e) => (
+                      <div
+                        key={e.id}
+                        className="flex items-center justify-between gap-3 rounded-xl p-3"
+                        style={{ background: "rgba(255,255,255,0.02)" }}
+                      >
+                        <div>
+                          <p className="text-white text-sm font-bold">
+                            {e.kind === "method" ? "منهجية BAC" : "وثيقة"} · {e.verbSlug || "—"}
+                          </p>
+                          <p className="text-gray-500 text-[10px]" dir="ltr">
+                            {e.lessonId}
+                          </p>
+                        </div>
+                        <p className="text-white font-bold text-sm">{e.score}%</p>
+                      </div>
+                    ))}
+                </div>
+              ) : (
+                <p className="text-gray-500 text-sm">لا إثبات بعد — أنهِ محاولة ≥ 70٪.</p>
+              )}
+            </div>
+            <div>
+              <p className="text-red-300 text-xs font-bold mb-2">أخطاء العقد (مفتوحة)</p>
+              {contract.errors.filter((e) => !e.resolved).length ? (
+                <div className="space-y-2">
+                  {contract.errors
+                    .filter((e) => !e.resolved)
+                    .slice()
+                    .reverse()
+                    .slice(0, 8)
+                    .map((e) => (
+                      <div
+                        key={e.id}
+                        className="flex items-center justify-between gap-3 rounded-xl p-3"
+                        style={{ background: "rgba(248,113,113,0.06)" }}
+                      >
+                        <div>
+                          <p className="text-white text-sm font-bold">
+                            {e.source === "bac" ? "BAC" : "وثيقة"} · {e.verbSlug || "—"}
+                          </p>
+                          <p className="text-gray-500 text-[10px]" dir="ltr">
+                            {e.lessonId}
+                          </p>
+                        </div>
+                        <a href="/retry-errors" className="text-mint text-xs font-bold hover:underline">
+                          إصلاح ←
+                        </a>
+                      </div>
+                    ))}
+                </div>
+              ) : (
+                <p className="text-gray-500 text-sm">لا أخطاء عقد مفتوحة.</p>
+              )}
+            </div>
           </div>
         </RevealSection>
       </div>

@@ -8,6 +8,8 @@ import { getProgressSnapshot, type ProgressSnapshot, type ErrorStat } from "@/li
 import { methodologyErrors } from "@/lib/methodology-v1"
 import apiClient from "@/lib/api-client"
 import type { ProgressResponse } from "@/lib/types"
+import { CoachPanel } from "@/components/methodology/CoachPanel"
+import { listLearningErrors } from "@/lib/lesson/evidenceService"
 
 const SKILL_TARGETS: Record<string, { href: string; actionAr: string }> = {
   document_analysis: { href: "/document-analysis", actionAr: "تدرب على استغلال الوثائق" },
@@ -55,6 +57,11 @@ export default function RetryErrorsPage() {
   const data = snapshot || getProgressSnapshot()
   const errorsWithCount = data.errorStats.filter((e: ErrorStat) => e.count > 0)
   const dueConcepts = apiProgress?.concepts.filter((c) => c.est_due) ?? []
+  const localContractErrors = listLearningErrors().filter((e) => !e.resolved)
+  const topContract = localContractErrors
+    .slice()
+    .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))[0]
+  const topProgressError = errorsWithCount[0]
 
   return (
     <AuthGuard>
@@ -68,6 +75,22 @@ export default function RetryErrorsPage() {
                 راجع أخطاءك وتدرب على تصحيحها. كل خطأ مرتبط بمهارة منهجية محددة.
               </p>
             </header>
+
+            {(topProgressError || topContract) && (
+              <CoachPanel
+                verbSlug={topContract?.verbSlug ?? null}
+                percentage={40}
+                dominantErrorCode={topProgressError?.code}
+                errors={
+                  topProgressError
+                    ? [`${topProgressError.labelAr} (${topProgressError.count}×)`]
+                    : topContract
+                      ? [`خطأ ${topContract.source} — ${topContract.lessonId}`]
+                      : []
+                }
+                onlyIfFailed
+              />
+            )}
 
             {errorsWithCount.length === 0 ? (
               <div className="rounded-3xl p-10 glass border border-mint/10 text-center">

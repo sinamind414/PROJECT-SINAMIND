@@ -59,7 +59,7 @@ class Settings(BaseSettings):
     # ── NaraRouter (proxy OpenAI-compatible) ────────────────────
     NARA_API_KEY: str = ""
     nara_base_url: str = "https://router.bynara.id/v1"
-    nara_model: str = "deepseek-v4-flash"
+    nara_model: str = "grok-4.5"
 
     SENTRY_DSN: str = ""
 

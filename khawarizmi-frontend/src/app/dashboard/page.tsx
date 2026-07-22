@@ -8,6 +8,9 @@ import GenZHeader from "@/components/dashboard/GenZHeader"
 import GenZHeroMission from "@/components/dashboard/GenZHeroMission"
 import UrgentLosses from "@/components/dashboard/UrgentLosses"
 import QuickWins from "@/components/dashboard/QuickWins"
+import { ContractPulse } from "@/components/methodology/SessionExitButton"
+import { getProgressSnapshot } from "@/lib/progress-store"
+import { getContractSnapshot } from "@/lib/lesson/evidenceService"
 
 import { useDriveDashboard } from "@/hooks/useDriveDashboard"
 import type { Mission } from "@/components/drive-design/api-types"
@@ -41,6 +44,40 @@ export default function GenZDashboardPage() {
     window.location.href = missionHref
   }
 
+  // Pertes urgentes = erreurs réelles (progress + contrat), pas de fake hardcodé
+  const progressSnap = getProgressSnapshot()
+  const contractSnap = getContractSnapshot()
+  const urgentItems = (() => {
+    const items: Array<{ title: string; titleAr: string; count: number | string; impact: string }> = []
+    progressSnap.errorStats.slice(0, 2).forEach((e) => {
+      items.push({
+        title: e.labelFr || e.code,
+        titleAr: e.labelAr,
+        count: e.count,
+        impact: e.count >= 3 ? "متكرر" : "يحتاج إصلاح",
+      })
+    })
+    if (items.length < 2 && contractSnap.openErrorCount > 0) {
+      items.push({
+        title: "Contract errors",
+        titleAr: "أخطاء العقد",
+        count: contractSnap.openErrorCount,
+        impact: "بدون إثبات",
+      })
+    }
+    if (items.length === 0) {
+      items.push({
+        title: "Start diagnostic",
+        titleAr: "ابدأ التشخيص",
+        count: "—",
+        impact: "لا بيانات بعد",
+      })
+    }
+    return items.slice(0, 2)
+  })()
+
+  const readiness = progressSnap.readiness ?? 0
+
   return (
     <AuthGuard>
       <AppShell>
@@ -61,23 +98,23 @@ export default function GenZDashboardPage() {
             onStart={handleStartMission}
           />
 
-          <UrgentLosses
-            items={[
-              { title: "البراكين", titleAr: "البراكين", count: 3, impact: "-6 نقاط" },
-              { title: "الشبكات العصبية", titleAr: "الشبكات العصبية", count: 2, impact: "-4 نقاط" },
-            ]}
-          />
+          <ContractPulse />
+
+          <UrgentLosses items={urgentItems} />
 
           <QuickWins />
 
           <div className="mx-4 mt-6">
             <div className="flex items-center justify-between mb-2 px-1">
-              <span className="font-bold text-white">تقدمك</span>
-              <span className="text-emerald-400 text-sm font-bold">68% نحو البكالوريا</span>
+              <span className="font-bold text-white">تقدمك المنهجي</span>
+              <span className="text-emerald-400 text-sm font-bold">{readiness}% جاهزية</span>
             </div>
 
             <div className="h-2.5 bg-white/10 rounded-full overflow-hidden">
-              <div className="h-full w-[68%] bg-gradient-to-r from-mint to-emerald-400 rounded-full" />
+              <div
+                className="h-full bg-gradient-to-r from-mint to-emerald-400 rounded-full transition-all"
+                style={{ width: `${Math.min(100, Math.max(0, readiness))}%` }}
+              />
             </div>
 
             <button
@@ -89,9 +126,13 @@ export default function GenZDashboardPage() {
 
             {showMore && (
               <div className="mt-3 text-xs text-white/70 space-y-1 px-1">
-                <div>• 12 مهمة مكتملة هذا الأسبوع</div>
-                <div>• أفضل موضوع: البناء الضوئي</div>
-                <div>• يحتاج تحسين: المخططات الوظيفية</div>
+                <div>• إثباتات وثيقة: {contractSnap.documentCount}</div>
+                <div>• إثبات منهجية BAC: {contractSnap.methodCount}</div>
+                <div>• أخطاء مفتوحة: {contractSnap.openErrorCount}</div>
+                <div>• بوابات FSRS: {contractSnap.openRecallCount}</div>
+                <div>
+                  • أضعف مهارة: {progressSnap.weakestSkill?.labelAr || "—"}
+                </div>
               </div>
             )}
           </div>

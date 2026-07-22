@@ -7,6 +7,12 @@ import { AppShell } from "@/components/layout/AppShell"
 import { apiClient } from "@/lib/api-client"
 import { saveBacBlancCorrectionErrors } from "@/lib/progress-store"
 import type { CorrectionResponse } from "@/lib/types"
+import {
+  applyBacExamOutcome,
+  outcomeBannerClass,
+  type BacExamOutcomeResult,
+} from "@/lib/lesson/practiceOutcome"
+import { CoachPanel } from "@/components/methodology/CoachPanel"
 
 /* ------------------------------------------------------------------ */
 /*  Page "Correction" — Accessible UNIQUEMENT après l'examen        */
@@ -19,6 +25,7 @@ export default function CorrectionPage() {
   const rawSessionId = searchParams.get("session")
 
   const [result, setResult] = useState<CorrectionResponse | null>(null)
+  const [contract, setContract] = useState<BacExamOutcomeResult | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
 
@@ -53,6 +60,19 @@ export default function CorrectionPage() {
           sessionId,
           corrections: resp.corrections,
         })
+        const totalScore = resp.corrections.reduce((sum, item) => sum + Number(item.score || 0), 0)
+        const totalMax = resp.corrections.reduce((sum, item) => sum + Number(item.score_max || 0), 0)
+        const scoreGlobal = Math.round((totalScore / Math.max(totalMax, 1)) * 100)
+        setContract(
+          applyBacExamOutcome({
+            sessionId,
+            overallPercentage: scoreGlobal,
+            items: resp.corrections.map((c) => ({
+              verbSlug: c.verb_slug || "bac_blanc",
+              percentage: Number(c.percentage) || 0,
+            })),
+          })
+        )
         setResult(resp)
       } catch (err: any) {
         setError(err.message || "Erreur lors de la récupération des résultats.")
@@ -125,12 +145,44 @@ export default function CorrectionPage() {
                 background: "linear-gradient(135deg, rgba(45,212,191,0.12), rgba(251,191,36,0.06))",
               }}
             >
-              <p className="text-4xl">🎉</p>
+              <p className="text-4xl">{scoreGlobal >= 70 ? "🎉" : "📋"}</p>
               <h1 className="text-2xl font-bold text-white">نتائج الامتحان</h1>
               <p className="text-6xl font-bold" style={{ color: scoreColor }}>
                 {scoreGlobal}%
               </p>
               <p className="text-gray-400 text-sm">تمارين متخطاة: {skippedCount}</p>
+              {contract && (
+                <div className={`mx-auto max-w-md rounded-2xl border p-3 text-right ${outcomeBannerClass(contract.outcome)}`}>
+                  <p className="text-[10px] font-black uppercase opacity-70">
+                    Outcome · {contract.outcome}
+                  </p>
+                  <p className="text-sm font-bold mt-0.5">{contract.labelAr}</p>
+                  <p className="text-[11px] opacity-70" dir="ltr">{contract.labelFr}</p>
+                  {contract.mayShowMasteryBadge ? (
+                    <p className="text-[10px] mt-1 opacity-80">إثبات منهجية BAC مسجّل</p>
+                  ) : (
+                    <p className="text-[10px] mt-1 opacity-80">
+                      لا شارة إتقان — أعد المحاولة بعد مراجعة الأخطاء
+                      {contract.errorsCreated > 0 ? ` (${contract.errorsCreated})` : ""}
+                    </p>
+                  )}
+                </div>
+              )}
+              {contract?.outcome === "failed" && (() => {
+                const weakest = [...result.corrections]
+                  .filter((c) => !c.skipped)
+                  .sort((a, b) => Number(a.percentage) - Number(b.percentage))[0]
+                if (!weakest) return null
+                return (
+                  <div className="mx-auto max-w-md text-right">
+                    <CoachPanel
+                      verbSlug={weakest.verb_slug || "analyse"}
+                      percentage={Number(weakest.percentage) || 0}
+                      errors={weakest.feedback ? [weakest.feedback] : []}
+                    />
+                  </div>
+                )
+              })()}
             </div>
 
             {/* Détail par exercice */}

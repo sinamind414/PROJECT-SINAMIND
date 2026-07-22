@@ -82,10 +82,26 @@ export default function ActionVerbsPage() {
             </div>
 
             <ProgressivePageHeader
-              breadcrumb={[{ label: "المنهجية", href: "/exercises" }, { label: "الأفعال الأدائية" }]}
+              breadcrumb={[{ label: "المنهجية", href: "/methodology" }, { label: "الأفعال الأدائية" }]}
               title="الأفعال الأدائية"
               subtitle="كل فعل في سؤال البكالوريا يفرض طريقة إجابة. من لا يفرق بين حلّل وفسّر واستنتج يخسر نقاطا حتى لو كان يحفظ الدرس."
             />
+
+            <Link
+              href="/methodology"
+              className="block rounded-2xl p-4 glass border border-mint/25 bg-mint/5 hover:bg-mint/10 transition"
+            >
+              <div className="flex items-center gap-3">
+                <span className="text-2xl">🧭</span>
+                <div className="flex-1 min-w-0">
+                  <p className="text-mint font-bold text-sm">منهجية الإجابة — 6 أوضاع + قائمة تحقق</p>
+                  <p className="text-white/50 text-xs mt-0.5">
+                    قبل التدريب على الفعل: تعلّم كيف تجيب (Analyser · Interpréter · Comparer…)
+                  </p>
+                </div>
+                <span className="text-mint text-sm font-bold shrink-0">افتح الباب ←</span>
+              </div>
+            </Link>
 
             {/* ── Due badge ── */}
             {duesCount > 0 && (

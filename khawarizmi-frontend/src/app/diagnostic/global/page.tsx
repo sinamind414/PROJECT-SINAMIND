@@ -8,6 +8,12 @@ import { DocumentSetRenderer } from "@/components/methodology/DocumentRenderer"
 import { diagnosticScenario, type MethodologyQuestion } from "@/lib/methodology-documents"
 import { evaluateMethodologyAnswer, type MethodologyEvaluation } from "@/lib/methodology-evaluator"
 import { awardXP, claimBadge, saveMethodologyEvaluations, type GamificationAward } from "@/lib/progress-store"
+import {
+  applyDocumentScenarioOutcome,
+  outcomeBannerClass,
+  type DocumentScenarioOutcomeResult,
+} from "@/lib/lesson/practiceOutcome"
+import { CoachPanel } from "@/components/methodology/CoachPanel"
 
 const QUESTIONS = diagnosticScenario.questions
 
@@ -23,6 +29,7 @@ type DiagnosticResult = {
   strengths: string[]
   weaknesses: string[]
   priorityFixes: string[]
+  contract: DocumentScenarioOutcomeResult
 }
 
 function getSeverityLabel(percentage: number) {
@@ -67,6 +74,15 @@ function buildDiagnosticResult(answers: Record<string, string>): DiagnosticResul
   else if (weak.some((item) => item.question.id === "scientific-text")) profileAr = "معارفك قد تكون موجودة، لكنك لا تركبها في نص علمي يستغل الوثائق."
   else if (readiness < 75) profileAr = "مستواك متوسط: الأخطاء ليست كارثية لكنها متكررة وتمنعك من العلامة العالية."
 
+  const contract = applyDocumentScenarioOutcome({
+    scenarioId: diagnosticScenario.id || "diagnostic-global",
+    items: evaluations.map((item) => ({
+      verbSlug: item.question.verbSlug,
+      percentage: item.evaluation.percentage,
+      passed: item.evaluation.percentage >= 70,
+    })),
+  })
+
   return {
     evaluations,
     readiness,
@@ -75,6 +91,7 @@ function buildDiagnosticResult(answers: Record<string, string>): DiagnosticResul
     strengths: strong.map((item) => item.question.skill),
     weaknesses: weak.map((item) => item.question.skill),
     priorityFixes: buildPriorityFixes(evaluations),
+    contract,
   }
 }
 
@@ -177,9 +194,14 @@ export default function DiagnosticGlobalPage() {
       evaluation: item.evaluation,
     })))
     setSaved(true)
-    const xp = awardXP("تشخيص منهجي كامل", 150)
-    claimBadge("first_diagnostic")
-    setAward(xp)
+    // XP + badge seulement si contrat honnête (pas de fausse maîtrise)
+    if (next.contract.mayAwardXp) {
+      const xp = awardXP("تشخيص منهجي كامل", 150)
+      claimBadge("first_diagnostic")
+      setAward(xp)
+    } else {
+      setAward(null)
+    }
   }
 
   return (
@@ -265,6 +287,18 @@ export default function DiagnosticGlobalPage() {
                       <h3 className="text-white font-bold">نتيجة التشخيص</h3>
                       <span className="text-3xl font-bold text-white">{result.readiness}%</span>
                     </div>
+                    <div className={`rounded-2xl border p-3 ${outcomeBannerClass(result.contract.outcome)}`}>
+                      <p className="text-[10px] font-black uppercase opacity-70">
+                        Outcome · {result.contract.outcome}
+                      </p>
+                      <p className="text-sm font-bold mt-0.5">{result.contract.labelAr}</p>
+                      <p className="text-[11px] opacity-70" dir="ltr">{result.contract.labelFr}</p>
+                      {!result.contract.mayShowMasteryBadge && (
+                        <p className="text-[10px] opacity-70 mt-1">
+                          لا شارة إتقان منهجية BAC (تشخيص = وثيقة فقط)
+                        </p>
+                      )}
+                    </div>
                     {saved && <p className="text-emerald-300 text-xs font-bold">✓ تم تسجيل الأخطاء في التقدم والتوصيات</p>}
                     {award && (
                       <div className="rounded-2xl bg-emerald-500/10 border border-emerald-400/20 p-4 animate-fadeIn">
@@ -273,6 +307,27 @@ export default function DiagnosticGlobalPage() {
                         <p className="text-emerald-100/80 text-xs mt-1">وحصلت على شارة أول تشخيص 🎯</p>
                       </div>
                     )}
+                    {saved && !result.contract.mayAwardXp && (
+                      <p className="text-amber-200/80 text-xs">
+                        لا XP ولا شارة — النتيجة تحت 70٪. أعد المحاولة بعد الإصلاح.
+                      </p>
+                    )}
+                    {result.contract.outcome === "failed" && (() => {
+                      const worst = [...result.evaluations].sort(
+                        (a, b) => a.evaluation.percentage - b.evaluation.percentage
+                      )[0]
+                      if (!worst) return null
+                      return (
+                        <CoachPanel
+                          verbSlug={worst.question.verbSlug}
+                          percentage={worst.evaluation.percentage}
+                          dominantErrorCode={worst.evaluation.dominantErrorCode}
+                          errors={worst.evaluation.errors}
+                          missingMarkers={worst.evaluation.missingMarkers}
+                          forbiddenMarkers={worst.evaluation.forbiddenMarkersFound}
+                        />
+                      )
+                    })()}
 
                     <div>
                       <p className="text-mint font-bold mb-2">ملفك المنهجي:</p>

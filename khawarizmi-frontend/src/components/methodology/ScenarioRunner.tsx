@@ -8,6 +8,14 @@ import { awardXP, saveMethodologyEvaluations, type GamificationAward } from "@/l
 import { apiClient } from "@/lib/api-client"
 import type { MethodologyScenario, MethodologyQuestion } from "@/lib/methodology-documents"
 import type { MethodologyChapterLink } from "@/lib/methodology-chapters"
+import {
+  applyDocumentScenarioOutcome,
+  outcomeBannerClass,
+  type DocumentScenarioOutcomeResult,
+} from "@/lib/lesson/practiceOutcome"
+import { CoachPanel } from "@/components/methodology/CoachPanel"
+import { MethodPracticeGate } from "@/components/methodology/MethodPracticeGate"
+import { SessionExitButton } from "@/components/methodology/SessionExitButton"
 
 const VERB_LABELS: Record<string, string> = {
   analyse: "حلّل",
@@ -40,6 +48,7 @@ type ScenarioResult = {
     evaluation: MethodologyEvaluation
   }>
   readiness: number
+  contract: DocumentScenarioOutcomeResult
 }
 
 function getSeverityLabel(percentage: number) {
@@ -182,6 +191,8 @@ export function ScenarioRunner({
   }>>({})
 
   const [enabledOptional, setEnabledOptional] = useState<Record<string, boolean>>({})
+  /** Checklist prête par question (gate méthodologique) */
+  const [gatesReady, setGatesReady] = useState<Record<string, boolean>>({})
 
   const questions = getActiveQuestions(scenario, chapterLink)
 
@@ -197,6 +208,17 @@ export function ScenarioRunner({
     [answers, activeQuestions],
   )
 
+  const allGatesReady = useMemo(
+    () =>
+      activeQuestions.length > 0 &&
+      activeQuestions.every((q) => gatesReady[q.id] === true),
+    [activeQuestions, gatesReady],
+  )
+
+  function setGateReady(qId: string, ready: boolean) {
+    setGatesReady((prev) => (prev[qId] === ready ? prev : { ...prev, [qId]: ready }))
+  }
+
   function toggleOptional(qId: string) {
     setEnabledOptional((prev) => ({ ...prev, [qId]: !prev[qId] }))
   }
@@ -207,6 +229,7 @@ export function ScenarioRunner({
   }
 
   async function submit() {
+    if (!allGatesReady) return
     setSubmitting(true)
     const chapterSlug: string | null = chapterLink?.slug ?? null
 
@@ -252,7 +275,17 @@ export function ScenarioRunner({
         evaluations.reduce((sum, item) => sum + item.evaluation.percentage, 0) / evaluations.length,
       )
 
-      setResult({ evaluations, readiness })
+      const contract = applyDocumentScenarioOutcome({
+        scenarioId: scenario.id,
+        chapterSlug,
+        items: evaluations.map((item) => ({
+          verbSlug: item.question.verbSlug,
+          percentage: item.evaluation.percentage,
+          passed: item.evaluation.percentage >= 70,
+        })),
+      })
+
+      setResult({ evaluations, readiness, contract })
       setApiSource(true)
       saveMethodologyEvaluations(
         evaluations.map((item) => ({
@@ -263,7 +296,8 @@ export function ScenarioRunner({
         })),
       )
       setSaved(true)
-      setAward(awardXP("مهمة استغلال وثيقة", 60))
+      // XP seulement si outcome honnête (pas de fausse maîtrise)
+      setAward(contract.mayAwardXp ? awardXP("مهمة استغلال وثيقة", 60) : null)
     } catch {
       setApiSource(false)
       const evaluations = questionsToSubmit.map((question) => ({
@@ -276,7 +310,17 @@ export function ScenarioRunner({
         evaluations.reduce((sum, item) => sum + item.evaluation.percentage, 0) / evaluations.length,
       )
 
-      setResult({ evaluations, readiness })
+      const contract = applyDocumentScenarioOutcome({
+        scenarioId: scenario.id,
+        chapterSlug,
+        items: evaluations.map((item) => ({
+          verbSlug: item.question.verbSlug,
+          percentage: item.evaluation.percentage,
+          passed: item.evaluation.percentage >= 70,
+        })),
+      })
+
+      setResult({ evaluations, readiness, contract })
       saveMethodologyEvaluations(
         evaluations.map((item) => ({
           source: "document-analysis" as const,
@@ -286,7 +330,7 @@ export function ScenarioRunner({
         })),
       )
       setSaved(true)
-      setAward(awardXP("مهمة استغلال وثيقة", 60))
+      setAward(contract.mayAwardXp ? awardXP("مهمة استغلال وثيقة", 60) : null)
     } finally {
       setSubmitting(false)
     }
@@ -320,6 +364,7 @@ export function ScenarioRunner({
     setAward(null)
     setApiSource(false)
     setHints({})
+    setGatesReady({})
   }
 
   return (
@@ -365,6 +410,11 @@ export function ScenarioRunner({
               <h2 className="text-2xl font-bold text-white">أسئلة السيناريو</h2>
               <p className="text-gray-500 text-sm mt-1">{completedCount}/{activeQuestions.length} إجابات مكتملة</p>
             </div>
+            <SessionExitButton
+              lessonId={`da:${scenario.id}${chapterLink?.slug ? `:${chapterLink.slug}` : ""}`}
+              verbSlug={activeQuestions[0]?.verbSlug ?? null}
+              currentState="DOCUMENT_IN_PROGRESS"
+            />
           </div>
 
           {mandatoryQuestions.length > 0 && (
@@ -389,17 +439,27 @@ export function ScenarioRunner({
                       <p className="text-gray-300 text-sm mt-2 leading-relaxed">{q.prompt}</p>
                     </div>
                   </div>
+                  <MethodPracticeGate
+                    verbSlug={q.verbSlug}
+                    compact
+                    onGateChange={(ready) => setGateReady(q.id, ready)}
+                  />
                   <textarea
                     value={answers[q.id] || ""}
                     onChange={(e) => updateAnswer(q.id, e.target.value)}
                     rows={4}
-                    className="w-full rounded-xl bg-[#0C151A] border border-white/[0.08] text-white p-4 outline-none focus:border-red-400"
-                    placeholder={q.placeholder}
+                    disabled={!gatesReady[q.id]}
+                    className="w-full rounded-xl bg-[#0C151A] border border-white/[0.08] text-white p-4 outline-none focus:border-red-400 disabled:opacity-50 disabled:cursor-not-allowed"
+                    placeholder={
+                      gatesReady[q.id]
+                        ? q.placeholder
+                        : "علّم قائمة التحقق أولاً ثم اكتب..."
+                    }
                   />
                   <div className="flex flex-wrap items-center gap-2 mt-2">
                     <button
                       onClick={() => requestHint(q)}
-                      disabled={requestingHint}
+                      disabled={requestingHint || !gatesReady[q.id]}
                       className="px-3 py-1.5 rounded-lg bg-amber-500/20 text-amber-200 border border-amber-500/30 text-xs font-bold hover:bg-amber-500/30 transition disabled:opacity-50"
                     >
                       {requestingHint ? "..." : "طلب تلميح سُقراطي"}
@@ -470,17 +530,27 @@ export function ScenarioRunner({
                     {isEnabled ? (
                       <>
                         <p className="text-gray-300 text-sm mb-3 leading-relaxed">{q.prompt}</p>
+                        <MethodPracticeGate
+                          verbSlug={q.verbSlug}
+                          compact
+                          onGateChange={(ready) => setGateReady(q.id, ready)}
+                        />
                         <textarea
                           value={answers[q.id] || ""}
                           onChange={(e) => updateAnswer(q.id, e.target.value)}
                           rows={4}
-                          className="w-full rounded-xl bg-[#0C151A] border border-white/[0.08] text-white p-4 outline-none focus:border-blue-400"
-                          placeholder={q.placeholder}
+                          disabled={!gatesReady[q.id]}
+                          className="w-full rounded-xl bg-[#0C151A] border border-white/[0.08] text-white p-4 outline-none focus:border-blue-400 disabled:opacity-50 disabled:cursor-not-allowed"
+                          placeholder={
+                            gatesReady[q.id]
+                              ? q.placeholder
+                              : "علّم قائمة التحقق أولاً ثم اكتب..."
+                          }
                         />
                         <div className="flex flex-wrap items-center gap-2 mt-2">
                           <button
                             onClick={() => requestHint(q)}
-                            disabled={requestingHint}
+                            disabled={requestingHint || !gatesReady[q.id]}
                             className="px-3 py-1.5 rounded-lg bg-amber-500/20 text-amber-200 border border-amber-500/30 text-xs font-bold hover:bg-amber-500/30 transition disabled:opacity-50"
                           >
                             {requestingHint ? "..." : "طلب تلميح سُقراطي"}
@@ -506,12 +576,14 @@ export function ScenarioRunner({
           <div className="mt-6 flex flex-wrap gap-3">
             <button
               onClick={submit}
-              disabled={submitting}
+              disabled={submitting || !allGatesReady}
               className="px-5 py-3 rounded-xl bg-mint text-white font-bold hover:bg-mint-soft transition disabled:opacity-50"
             >
               {submitting
                 ? "جاري التقييم..."
-                : `تحقق من المنهجية (${activeQuestions.length} أسئلة) وسجل الخطأ`
+                : !allGatesReady
+                  ? "أكمل قوائم التحقق أولاً"
+                  : `تحقق من المنهجية (${activeQuestions.length} أسئلة) وسجل الخطأ`
               }
             </button>
             <button
@@ -521,6 +593,11 @@ export function ScenarioRunner({
               إعادة من الصفر
             </button>
           </div>
+          {!allGatesReady && activeQuestions.length > 0 && (
+            <p className="mt-2 text-amber-200/80 text-xs">
+              لكل سؤال: علّم قائمة التحقق (Checklist) قبل الكتابة والإرسال.
+            </p>
+          )}
 
           {optionalQuestions.length > 0 && (
             <div className="mt-3 rounded-xl p-3 bg-white/[0.02] border border-white/[0.04] text-xs text-gray-400">
@@ -563,6 +640,34 @@ export function ScenarioRunner({
                 <h3 className="text-white font-bold">النتيجة الإجمالية</h3>
                 <span className="text-3xl font-bold text-white">{result.readiness}%</span>
               </div>
+
+              {/* Contrat Kunz — outcome honnête post-tentative */}
+              <div
+                className={`rounded-2xl border p-3 space-y-1 ${outcomeBannerClass(result.contract.outcome)}`}
+              >
+                <p className="text-xs font-black tracking-wide uppercase opacity-80">
+                  Outcome · {result.contract.outcome}
+                </p>
+                <p className="text-sm font-bold">{result.contract.labelAr}</p>
+                <p className="text-[11px] opacity-70" dir="ltr">
+                  {result.contract.labelFr}
+                </p>
+                <p className="text-[11px] opacity-80 pt-1">
+                  {result.contract.passedCount} مقبول · {result.contract.failedCount} ضعيف
+                  {result.contract.evidenceCreated > 0
+                    ? ` · ${result.contract.evidenceCreated} إثبات وثيقة`
+                    : ""}
+                  {result.contract.errorsCreated > 0
+                    ? ` · ${result.contract.errorsCreated} خطأ مسجّل`
+                    : ""}
+                </p>
+                {!result.contract.mayShowMasteryBadge && (
+                  <p className="text-[10px] opacity-70">
+                    لا شارة إتقان منهجية BAC (يتطلب تحدي BAC ناجح)
+                  </p>
+                )}
+              </div>
+
               {saved && (
                 <p className="text-emerald-300 text-xs font-bold">✓ تم تسجيل الأخطاء في التقدم</p>
               )}
@@ -577,6 +682,28 @@ export function ScenarioRunner({
                   <p className="text-white text-3xl font-black">+{award.amount} XP</p>
                 </div>
               )}
+              {result.contract && !result.contract.mayAwardXp && (
+                <p className="text-amber-200/80 text-xs">
+                  لا XP — النتيجة تحت العتبة (70٪). أعد المحاولة بعد التصحيح.
+                </p>
+              )}
+              {result.contract.outcome === "failed" && (() => {
+                const worst = [...result.evaluations].sort(
+                  (a, b) => a.evaluation.percentage - b.evaluation.percentage
+                )[0]
+                if (!worst) return null
+                return (
+                  <CoachPanel
+                    verbSlug={worst.question.verbSlug}
+                    percentage={worst.evaluation.percentage}
+                    dominantErrorCode={worst.evaluation.dominantErrorCode}
+                    errors={worst.evaluation.errors}
+                    missingMarkers={worst.evaluation.missingMarkers}
+                    forbiddenMarkers={worst.evaluation.forbiddenMarkersFound}
+                    onlyIfFailed
+                  />
+                )
+              })()}
 
               <div className="space-y-2">
                 <p className="text-white font-bold mb-2">تفصيل سريع</p>

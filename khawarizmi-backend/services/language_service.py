@@ -1,7 +1,11 @@
+import logging
+
 from openai import AsyncOpenAI
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from config import get_settings
+
+logger = logging.getLogger("khawarizmi.language")
 from models.exercise import Exercise
 
 PROMPT_ARABE = """
@@ -32,7 +36,7 @@ async def generate_arabic_version(question: str) -> str | None:
         )
         return response.choices[0].message.content.strip()
     except Exception as e:
-        print(f"Erreur génération arabe: {e}")
+        logger.error(f"Erreur génération arabe: {e}")
         return None
 
 

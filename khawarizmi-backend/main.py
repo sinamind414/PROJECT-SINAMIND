@@ -33,10 +33,16 @@ app.add_middleware(SlowAPIMiddleware)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=get_allowed_origins(),
-    allow_origin_regex=r"https://.*\.(vercel|netlify)\.app",
+    # NOTE: allow_origin_regex removed — all allowed origins are in get_allowed_origins()
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
-    allow_headers=["*"],
+    allow_headers=[
+        "Accept",
+        "Accept-Language",
+        "Authorization",
+        "Content-Type",
+        "X-Requested-With",
+    ],
 )
 
 app.include_router(admin_router)

@@ -20,6 +20,11 @@ def _get_state():
     return state
 
 
+@router.get("/", tags=["Système"])
+async def root():
+    return {"status": "ok", "app": "khawarizmi"}
+
+
 @router.get("/health", tags=["Système"])
 async def health_check():
     s = _get_state()

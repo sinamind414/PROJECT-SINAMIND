@@ -15,6 +15,8 @@ import { saveMethodologyEvaluation } from "@/lib/progress-store"
 import apiClient from "@/lib/api-client"
 import type { VerbEvaluateResponse, ActionVerbExercise } from "@/lib/types"
 import { VerbLessonFlow } from "@/components/methodology/VerbLessonFlow"
+import { applyVerbPracticeOutcome } from "@/lib/lesson/practiceOutcome"
+import { canScheduleRecallForVerb } from "@/lib/lesson/evidenceService"
 
 export default function ActionVerbDetailPage() {
   const params = useParams()
@@ -46,6 +48,7 @@ export default function ActionVerbDetailPage() {
   const [answer, setAnswer] = useState("")
   const [evaluation, setEvaluation] = useState<VerbEvaluateResponse | null>(null)
   const [loading, setLoading] = useState(false)
+  const [reviewBlocked, setReviewBlocked] = useState(false)
 
   useEffect(() => {
     let cancelled = false
@@ -70,6 +73,14 @@ export default function ActionVerbDetailPage() {
         answer,
       })
       setEvaluation(result)
+
+      // Contrat Kunz : preuve / erreur uniquement post-tentative (pas de fausse maîtrise)
+      applyVerbPracticeOutcome({
+        lessonId: `verb:${slug}`,
+        verbSlug: slug,
+        percentage: result.percentage,
+        threshold: 70,
+      })
 
       // Enregistrer dans إصلاح الأخطاء
       if (result.percentage < 75) {
@@ -112,6 +123,12 @@ export default function ActionVerbDetailPage() {
   }
 
   async function markReviewed(rating: 1 | 2 | 3 | 4) {
+    // Contrat Kunz : FSRS seulement après preuve / gate recall (pas après lecture seule)
+    if (!canScheduleRecallForVerb(slug)) {
+      setReviewBlocked(true)
+      return
+    }
+    setReviewBlocked(false)
     try {
       await apiClient.reviewVerb(slug, rating, evaluation?.percentage)
     } catch {
@@ -125,7 +142,17 @@ export default function ActionVerbDetailPage() {
         <AppShell>
           <main className="flex-1 p-4 lg:p-8 overflow-auto">
             <div className="max-w-4xl mx-auto">
-              <Link href="/action-verbs" className="text-mint text-sm hover:underline inline-flex items-center gap-1 mb-4">← العودة إلى الأفعال الأدائية</Link>
+              <div className="flex flex-wrap items-center gap-3 mb-4">
+                <Link href="/action-verbs" className="text-mint text-sm hover:underline inline-flex items-center gap-1">
+                  ← العودة إلى الأفعال الأدائية
+                </Link>
+                <Link
+                  href="/methodology"
+                  className="text-xs px-3 py-1 rounded-full border border-mint/30 bg-mint/10 text-mint font-bold hover:bg-mint/20 transition"
+                >
+                  منهجية البكالوريا · 6 أوضاع
+                </Link>
+              </div>
               <div className="mb-4">
                 <span className="px-4 py-1 rounded-full bg-mint/10 text-mint text-xs font-bold">{getCategoryLabel(verb.category)}</span>
                 <h1 className="text-5xl font-black text-white mt-1 tracking-tighter">{verb.ar}</h1>
@@ -151,9 +178,17 @@ export default function ActionVerbDetailPage() {
       <AppShell>
         <main className="flex-1 p-6 lg:p-8 overflow-auto">
           <div className="max-w-6xl mx-auto space-y-6">
-            <Link href="/action-verbs" className="text-mint text-sm hover:underline">
-              ← العودة إلى الأفعال الأدائية
-            </Link>
+            <div className="flex flex-wrap items-center gap-3">
+              <Link href="/action-verbs" className="text-mint text-sm hover:underline">
+                ← العودة إلى الأفعال الأدائية
+              </Link>
+              <Link
+                href="/methodology"
+                className="text-xs px-3 py-1 rounded-full border border-mint/30 bg-mint/10 text-mint font-bold hover:bg-mint/20 transition"
+              >
+                منهجية البكالوريا · 6 أوضاع
+              </Link>
+            </div>
 
             {/* ─── Header ─── */}
             <header className="rounded-3xl p-7 glass border border-mint/10">
@@ -430,13 +465,18 @@ export default function ActionVerbDetailPage() {
                         </div>
                       )}
 
-                      <div className="flex items-center gap-2 pt-2">
+                      <div className="flex flex-wrap items-center gap-2 pt-2">
                         <p className="text-gray-400 text-xs">قيّم صعوبة هذا الفعل:</p>
                         <button onClick={() => markReviewed(1)} className="px-3 py-1.5 rounded-lg bg-red-500/10 text-red-300 text-xs font-bold hover:bg-red-500/20">صعب جدا</button>
                         <button onClick={() => markReviewed(2)} className="px-3 py-1.5 rounded-lg bg-amber-500/10 text-amber-300 text-xs font-bold hover:bg-amber-500/20">صعب</button>
                         <button onClick={() => markReviewed(3)} className="px-3 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-300 text-xs font-bold hover:bg-emerald-500/20">جيد</button>
                         <button onClick={() => markReviewed(4)} className="px-3 py-1.5 rounded-lg bg-mint/10 text-mint text-xs font-bold hover:bg-mint/20">سهل</button>
                       </div>
+                      {reviewBlocked && (
+                        <p className="text-amber-200/90 text-xs mt-2">
+                          FSRS مقفول — أجب أولاً بنتيجة ≥ 70٪ لفتح بوابة التكرار المتباعد.
+                        </p>
+                      )}
                     </div>
                   )}
                 </div>
