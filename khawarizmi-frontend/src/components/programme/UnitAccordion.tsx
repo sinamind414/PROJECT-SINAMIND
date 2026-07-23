@@ -5,7 +5,7 @@
 import { useState } from "react"
 
 import { Unit } from "@/lib/types"
-import { UI_AR, trAr } from "@/lib/translations"
+import { trAr } from "@/lib/translations"
 import { ChapterItem } from "./ChapterItem"
 
 interface UnitAccordionProps {
@@ -21,20 +21,6 @@ interface UnitAccordionProps {
   onChapterClick?: (chapterId: string) => void
 }
 
-const UNIT_ICONS: Record<number, string> = {
-  1: "🧬",
-  2: "🔗",
-  3: "⚗️",
-  4: "🛡️",
-  5: "🧠",
-  6: "☀️",
-  7: "🔋",
-  8: "⚡",
-  9: "🌍",
-  10: "🌐",
-  11: "🗻"
-}
-
 export function UnitAccordion({
   unit,
   domainColors,
@@ -42,10 +28,6 @@ export function UnitAccordion({
   onChapterClick
 }: UnitAccordionProps) {
   const [isOpen, setIsOpen] = useState(defaultOpen)
-
-  const criticalCount = unit.chapters.filter(
-    c => c.importance === "critique"
-  ).length
 
   return (
     <div className={`

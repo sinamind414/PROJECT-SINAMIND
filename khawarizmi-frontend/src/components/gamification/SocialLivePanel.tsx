@@ -1,8 +1,8 @@
-"use client";
+﻿"use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { Activity, Crown, Flame, Search, Send, Trophy, UserPlus, Users, Zap, Target, TrendingUp } from "lucide-react";
+import { Activity, Crown, Flame, Search, Trophy, UserPlus, Users, Zap, Target } from "lucide-react";
 
 import apiClient from "@/lib/api-client";
 
@@ -35,7 +35,7 @@ type SearchUser = {
 const FALLBACK_PHASE3: Phase3LiveStats = { active_users: 0, completed_today: 0, top_3: [] };
 const FALLBACK_PHASE5: Phase5LiveStats = { active_students: 0, questions_answered: 0, top_3: [] };
 
-const MEDALS = ["🥇", "🥈", "🥉"];
+const MEDALS = ["ðŸ¥‡", "ðŸ¥ˆ", "ðŸ¥‰"];
 const RANK_COLORS = ["from-amber-400/20 to-amber-600/5 border-amber-400/30", "from-slate-300/20 to-slate-500/5 border-slate-300/30", "from-orange-700/20 to-orange-900/5 border-orange-700/30"];
 
 export default function SocialLivePanel({ chapter = "proteines" }: { chapter?: string }) {
@@ -80,7 +80,6 @@ export default function SocialLivePanel({ chapter = "proteines" }: { chapter?: s
   useEffect(() => { void loadLiveData(); }, [loadLiveData]);
 
   useEffect(() => {
-    if (searchQuery.trim().length < 2) { setSearchResults([]); return; }
     const timer = setTimeout(async () => {
       setSearching(true);
       try {
@@ -98,7 +97,7 @@ export default function SocialLivePanel({ chapter = "proteines" }: { chapter?: s
       const result = await apiClient.challengeFriend("demo-friend");
       setChallengeMessage(result.message);
     } catch {
-      setChallengeMessage("التحدي جاهز، الاتصال المباشر غير متاح حالياً.");
+      setChallengeMessage("Ø§Ù„ØªØ­Ø¯ÙŠ Ø¬Ø§Ù‡Ø²ØŒ Ø§Ù„Ø§ØªØµØ§Ù„ Ø§Ù„Ù…Ø¨Ø§Ø´Ø± ØºÙŠØ± Ù…ØªØ§Ø­ Ø­Ø§Ù„ÙŠØ§Ù‹.");
     } finally {
       setSendingChallenge(false);
     }
@@ -108,9 +107,9 @@ export default function SocialLivePanel({ chapter = "proteines" }: { chapter?: s
     setActionMsg(null);
     try {
       await apiClient.sendFriendRequestToUser(user.id);
-      setActionMsg(`✅ تم إرسال الطلب إلى ${user.name}`);
+      setActionMsg(`âœ… ØªÙ… Ø¥Ø±Ø³Ø§Ù„ Ø§Ù„Ø·Ù„Ø¨ Ø¥Ù„Ù‰ ${user.name}`);
     } catch {
-      setActionMsg(`❌ تعذر إرسال الطلب`);
+      setActionMsg(`âŒ ØªØ¹Ø°Ø± Ø¥Ø±Ø³Ø§Ù„ Ø§Ù„Ø·Ù„Ø¨`);
     }
     setTimeout(() => setActionMsg(null), 3000);
   }
@@ -119,9 +118,9 @@ export default function SocialLivePanel({ chapter = "proteines" }: { chapter?: s
     setActionMsg(null);
     try {
       await apiClient.challengeUser(user.id);
-      setActionMsg(`⚡ تم تحدي ${user.name}!`);
+      setActionMsg(`âš¡ ØªÙ… ØªØ­Ø¯ÙŠ ${user.name}!`);
     } catch {
-      setActionMsg(`❌ تعذر إرسال التحدي`);
+      setActionMsg(`âŒ ØªØ¹Ø°Ø± Ø¥Ø±Ø³Ø§Ù„ Ø§Ù„ØªØ­Ø¯ÙŠ`);
     }
     setTimeout(() => setActionMsg(null), 3000);
   }
@@ -142,24 +141,24 @@ export default function SocialLivePanel({ chapter = "proteines" }: { chapter?: s
       <div className="relative z-10 flex items-center justify-between gap-3 mb-5">
         <div className="flex items-center gap-3">
           <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-teal-500/10 border border-emerald-400/20 flex items-center justify-center text-xl">
-            🔴
+            ðŸ”´
           </div>
           <div>
-            <p className="text-[11px] text-mint-soft/80 font-black tracking-wide uppercase">SINAMIND · Social</p>
-            <h2 className="text-xl font-black text-white">القسم المباشر</h2>
+            <p className="text-[11px] text-mint-soft/80 font-black tracking-wide uppercase">SINAMIND Â· Social</p>
+            <h2 className="text-xl font-black text-white">Ø§Ù„Ù‚Ø³Ù… Ø§Ù„Ù…Ø¨Ø§Ø´Ø±</h2>
           </div>
         </div>
         <div className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[11px] font-bold transition ${activeCount > 0 ? "bg-emerald-500/15 border border-emerald-400/30 text-emerald-300" : "bg-slate-500/10 border border-slate-500/20 text-slate-400"}`}>
           <span className={`w-2 h-2 rounded-full ${activeCount > 0 ? "bg-emerald-400 animate-pulse" : "bg-slate-500"}`} />
-          {loading ? "مزامنة..." : activeCount > 0 ? `${activeCount} متصل` : "بانتظار الطلاب"}
+          {loading ? "Ù…Ø²Ø§Ù…Ù†Ø©..." : activeCount > 0 ? `${activeCount} Ù…ØªØµÙ„` : "Ø¨Ø§Ù†ØªØ¸Ø§Ø± Ø§Ù„Ø·Ù„Ø§Ø¨"}
         </div>
       </div>
 
       <div className="relative z-10 grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
-        <StatPill emoji="👥" icon={<Users className="w-4 h-4" />} label="نشطون الآن" value={activeCount} color="emerald" />
-        <StatPill emoji="📝" icon={<Activity className="w-4 h-4" />} label="إجابات اليوم" value={phase5.questions_answered} color="blue" />
-        <StatPill emoji="🎯" icon={<Target className="w-4 h-4" />} label="أكملوا الدرس" value={phase3.completed_today} color="amber" />
-        <StatPill emoji="🏆" icon={<Trophy className="w-4 h-4" />} label="تحديات نشطة" value={mergedTop.length} color="violet" />
+        <StatPill emoji="ðŸ‘¥" label="Ù†Ø´Ø·ÙˆÙ† Ø§Ù„Ø¢Ù†" value={activeCount} color="emerald" />
+        <StatPill emoji="ðŸ“" label="Ø¥Ø¬Ø§Ø¨Ø§Øª Ø§Ù„ÙŠÙˆÙ…" value={phase5.questions_answered} color="blue" />
+        <StatPill emoji="ðŸŽ¯" label="Ø£ÙƒÙ…Ù„ÙˆØ§ Ø§Ù„Ø¯Ø±Ø³" value={phase3.completed_today} color="amber" />
+        <StatPill emoji="ðŸ†" label="ØªØ­Ø¯ÙŠØ§Øª Ù†Ø´Ø·Ø©" value={mergedTop.length} color="violet" />
       </div>
 
       <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-4 mb-5">
@@ -167,9 +166,9 @@ export default function SocialLivePanel({ chapter = "proteines" }: { chapter?: s
         <div className="rounded-2xl bg-white/[0.03] border border-white/[0.08] p-4">
           <div className="flex items-center justify-between mb-3">
             <p className="text-white font-black text-sm flex items-center gap-2">
-              <Crown className="w-4 h-4 text-amber-400" /> المتصدرون اليوم
+              <Crown className="w-4 h-4 text-amber-400" /> Ø§Ù„Ù…ØªØµØ¯Ø±ÙˆÙ† Ø§Ù„ÙŠÙˆÙ…
             </p>
-            <span className="text-[10px] text-slate-500">🏆</span>
+            <span className="text-[10px] text-slate-500">ðŸ†</span>
           </div>
           <div className="space-y-2">
             {mergedTop.length ? mergedTop.slice(0, 3).map((player, index) => (
@@ -183,18 +182,18 @@ export default function SocialLivePanel({ chapter = "proteines" }: { chapter?: s
                 <span className="text-xl">{MEDALS[index]}</span>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm text-white font-bold truncate">{player.name}</p>
-                  <p className="text-[10px] text-slate-400">المرتبة {index + 1}</p>
+                  <p className="text-[10px] text-slate-400">Ø§Ù„Ù…Ø±ØªØ¨Ø© {index + 1}</p>
                 </div>
                 <div className="text-left">
                   <p className="text-base font-black text-mint">{player.score}</p>
-                  <p className="text-[9px] text-slate-500">نقطة</p>
+                  <p className="text-[9px] text-slate-500">Ù†Ù‚Ø·Ø©</p>
                 </div>
               </motion.div>
             )) : (
               <div className="text-center py-6">
-                <p className="text-3xl mb-2">🏆</p>
-                <p className="text-xs text-slate-500">كن أول المتصدرين!</p>
-                <p className="text-[10px] text-slate-600 mt-1">راجع درسا واحدا لتظهر هنا</p>
+                <p className="text-3xl mb-2">ðŸ†</p>
+                <p className="text-xs text-slate-500">ÙƒÙ† Ø£ÙˆÙ„ Ø§Ù„Ù…ØªØµØ¯Ø±ÙŠÙ†!</p>
+                <p className="text-[10px] text-slate-600 mt-1">Ø±Ø§Ø¬Ø¹ Ø¯Ø±Ø³Ø§ ÙˆØ§Ø­Ø¯Ø§ Ù„ØªØ¸Ù‡Ø± Ù‡Ù†Ø§</p>
               </div>
             )}
           </div>
@@ -203,15 +202,15 @@ export default function SocialLivePanel({ chapter = "proteines" }: { chapter?: s
         <div className="rounded-2xl bg-white/[0.03] border border-white/[0.08] p-4">
           <div className="flex items-center justify-between mb-3">
             <p className="text-white font-black text-sm flex items-center gap-2">
-              <Flame className="w-4 h-4 text-orange-400" /> النشاط الأخير
+              <Flame className="w-4 h-4 text-orange-400" /> Ø§Ù„Ù†Ø´Ø§Ø· Ø§Ù„Ø£Ø®ÙŠØ±
             </p>
-            <span className="text-[10px] text-slate-500">⚡</span>
+            <span className="text-[10px] text-slate-500">âš¡</span>
           </div>
           <div className="space-y-2">
             {activities.length ? activities.map((activity, index) => (
               <div key={`${activity.name}-${activity.time}-${index}`} className="flex items-start gap-2.5 rounded-xl bg-white/[0.02] px-3 py-2">
                 <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-mint/20 to-emerald-500/10 flex items-center justify-center text-xs flex-shrink-0">
-                  {activity.activity_type === "progress" ? "📈" : activity.activity_type === "challenge_sent" ? "⚡" : "📚"}
+                  {activity.activity_type === "progress" ? "ðŸ“ˆ" : activity.activity_type === "challenge_sent" ? "âš¡" : "ðŸ“š"}
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-xs text-white font-bold">{activity.name}</p>
@@ -221,9 +220,9 @@ export default function SocialLivePanel({ chapter = "proteines" }: { chapter?: s
               </div>
             )) : (
               <div className="text-center py-6">
-                <p className="text-3xl mb-2">📡</p>
-                <p className="text-xs text-slate-500">لا يوجد نشاط بعد</p>
-                <p className="text-[10px] text-slate-600 mt-1">أضف أصدقاء لرؤية نشاطهم</p>
+                <p className="text-3xl mb-2">ðŸ“¡</p>
+                <p className="text-xs text-slate-500">Ù„Ø§ ÙŠÙˆØ¬Ø¯ Ù†Ø´Ø§Ø· Ø¨Ø¹Ø¯</p>
+                <p className="text-[10px] text-slate-600 mt-1">Ø£Ø¶Ù Ø£ØµØ¯Ù‚Ø§Ø¡ Ù„Ø±Ø¤ÙŠØ© Ù†Ø´Ø§Ø·Ù‡Ù…</p>
               </div>
             )}
           </div>
@@ -239,11 +238,11 @@ export default function SocialLivePanel({ chapter = "proteines" }: { chapter?: s
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="🔍 ابحث عن صديق بالاسم أو البريد..."
+              placeholder="ðŸ” Ø§Ø¨Ø­Ø« Ø¹Ù† ØµØ¯ÙŠÙ‚ Ø¨Ø§Ù„Ø§Ø³Ù… Ø£Ùˆ Ø§Ù„Ø¨Ø±ÙŠØ¯..."
               className="w-full rounded-xl bg-white/[0.05] border border-white/[0.1] text-white text-sm px-3 py-2.5 pr-10 placeholder:text-slate-500 focus:outline-none focus:border-mint/50 transition"
             />
           </div>
-          {searching && <p className="text-xs text-slate-400 mt-2">⏳ جاري البحث...</p>}
+          {searching && <p className="text-xs text-slate-400 mt-2">â³ Ø¬Ø§Ø±ÙŠ Ø§Ù„Ø¨Ø­Ø«...</p>}
           {searchResults.length > 0 && (
             <div className="mt-2 space-y-1 max-h-32 overflow-y-auto">
               {searchResults.map((user) => (
@@ -258,14 +257,14 @@ export default function SocialLivePanel({ chapter = "proteines" }: { chapter?: s
                   <button
                     onClick={() => handleAddFriend(user)}
                     className="rounded-lg bg-emerald-500/15 text-emerald-300 p-2 hover:bg-emerald-500/25 transition"
-                    title="إضافة"
+                    title="Ø¥Ø¶Ø§ÙØ©"
                   >
                     <UserPlus className="w-3.5 h-3.5" />
                   </button>
                   <button
                     onClick={() => handleChallengeUser(user)}
                     className="rounded-lg bg-amber-500/15 text-amber-300 p-2 hover:bg-amber-500/25 transition"
-                    title="تحدي"
+                    title="ØªØ­Ø¯ÙŠ"
                   >
                     <Zap className="w-3.5 h-3.5" />
                   </button>
@@ -288,7 +287,7 @@ export default function SocialLivePanel({ chapter = "proteines" }: { chapter?: s
             className="flex-1 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-500 text-white font-black py-3 px-4 flex items-center justify-center gap-2 hover:opacity-90 transition disabled:opacity-60 shadow-lg shadow-amber-500/20"
           >
             <Zap className="w-5 h-5" />
-            {sendingChallenge ? "⏳" : "⚡ تحدَّ صديق"}
+            {sendingChallenge ? "â³" : "âš¡ ØªØ­Ø¯ÙŽÙ‘ ØµØ¯ÙŠÙ‚"}
           </button>
           {challengeMessage && (
             <p className="rounded-xl bg-mint/10 border border-mint/20 px-3 py-2 text-xs text-mint-soft font-bold text-center">
@@ -296,7 +295,7 @@ export default function SocialLivePanel({ chapter = "proteines" }: { chapter?: s
             </p>
           )}
           <div className="text-center">
-            <p className="text-[10px] text-slate-500">🎯 اربح 50 نقطة لكل تحدي</p>
+            <p className="text-[10px] text-slate-500">ðŸŽ¯ Ø§Ø±Ø¨Ø­ 50 Ù†Ù‚Ø·Ø© Ù„ÙƒÙ„ ØªØ­Ø¯ÙŠ</p>
           </div>
         </div>
       </div>
@@ -304,7 +303,7 @@ export default function SocialLivePanel({ chapter = "proteines" }: { chapter?: s
   );
 }
 
-function StatPill({ emoji, icon, label, value, color }: { emoji: string; icon: ReactNode; label: string; value: number; color: string }) {
+function StatPill({ emoji, label, value, color }: { emoji: string; label: string; value: number; color: string }) {
   const colors: Record<string, string> = {
     emerald: "from-emerald-500/10 to-teal-500/5 border-emerald-400/20 text-emerald-300",
     blue: "from-blue-500/10 to-cyan-500/5 border-blue-400/20 text-blue-300",

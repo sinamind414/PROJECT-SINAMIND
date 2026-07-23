@@ -1,8 +1,8 @@
 "use client"
 
-import React, { useState, useRef, useEffect } from "react"
+import React, { useState, useRef } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { ArrowRight, ArrowLeft, Mic, MicOff, Pause, Volume2, Check, X, AlertTriangle, Target, BookOpen, Lightbulb } from "lucide-react"
+import { ArrowRight, ArrowLeft, Mic, MicOff, Target } from "lucide-react"
 
 export interface Phase {
   id: string
@@ -19,74 +19,71 @@ interface GenZPhaseFlowProps {
   titleAr: string
   phases: Phase[]
   onComplete?: (answer: string, score: number) => void
-  onSubmitPractice?: (answer: string) => Promise<{
-    percentage: number
-    feedback: string
-    success?: string[]
-    errors?: string[]
-    forbidden_found?: string[]
-    missing_markers?: string[]
-    advice?: string
-    score?: number
-    score_max?: number
-    modelAnswer?: string
-  }>
+  onSubmitPractice?: (answer: string) => Promise<EvaluationResult>
   genZIntro?: string
 }
 
-type Step = "word" | "definition" | "recognition" | "method" | "dos_donts" | "practice"
+interface EvaluationResult {
+  percentage: number
+  feedback: string
+  success?: string[]
+  errors?: string[]
+  forbidden_found?: string[]
+  missing_markers?: string[]
+  advice?: string
+  score?: number
+  score_max?: number
+  modelAnswer?: string
+}
 
-const BASE_STEP_LABELS: Record<Step, string> = {
-  word: "الفعل",
-  definition: "التعريف",
-  recognition: "التعرف",
-  method: "الطريقة",
-  dos_donts: "افعل / لا تفعل",
-  practice: "التدريب",
+function ConfettiBurst({ keyProp, visible }: { keyProp: number; visible: boolean }) {
+  /* eslint-disable react-hooks/purity */
+  if (!visible) return null
+  const particles = Array.from({ length: 14 }).map((_, i) => {
+    const angle = (i * 25) + (Math.random() * 20 - 10)
+    const distance = 60 + Math.random() * 45
+    return (
+      <motion.div
+        key={`${keyProp}-${i}`}
+        className="absolute text-mint text-xl pointer-events-none"
+        initial={{ opacity: 1, x: 0, y: -10, scale: 0.6 + Math.random() * 0.6 }}
+        animate={{ opacity: 0, x: Math.cos(angle * Math.PI / 180) * distance, y: Math.sin(angle * Math.PI / 180) * distance - 30, scale: 0.3 }}
+        transition={{ duration: 1.6 + Math.random() * 0.5, delay: i * 0.015, ease: "easeOut" }}
+      >
+        {["★", "✦", "●", "◆"][i % 4]}
+      </motion.div>
+    )
+  })
+  return (
+    <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-0 h-0 z-50 pointer-events-none">
+      {particles}
+    </div>
+  )
 }
 
 export default function GenZPhaseFlow({
-  title,
   titleAr,
   phases,
   onComplete,
   onSubmitPractice,
-  genZIntro = "خطوة بخطوة • ركز وتربح نقاط 🔥"
 }: GenZPhaseFlowProps) {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [answer, setAnswer] = useState("")
-  const [evaluation, setEvaluation] = useState<any>(null)
+  const [evaluation, setEvaluation] = useState<EvaluationResult | null>(null)
   const [loading, setLoading] = useState(false)
   const [isListening, setIsListening] = useState(false)
-  const [recognitionAnswer, setRecognitionAnswer] = useState<"yes" | "no" | null>(null)
-  const [recognitionFeedback, setRecognitionFeedback] = useState<string | null>(null)
+  const [, setRecognitionAnswer] = useState<"yes" | "no" | null>(null)
+  const [, setRecognitionFeedback] = useState<string | null>(null)
   const [showConfetti, setShowConfetti] = useState(false)
   const [confettiKey, setConfettiKey] = useState(0)
-  const recognitionRef = useRef<any>(null)
+  const recognitionRef = useRef<SpeechRecognition | null>(null)
 
   const currentPhase = phases[currentIndex] || phases[0]
   const totalConceptualSteps = phases.length
   const progress = Math.round(((currentIndex + 1) / phases.length) * 100)
 
-  const toggleVoice = () => {
-    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
-    if (!SpeechRecognition) { alert("الصوت غير مدعوم — جرب كروم"); return }
-    if (isListening) { setIsListening(false); return }
-
-    const rec = new SpeechRecognition()
-    rec.lang = "ar-DZ"
-    rec.continuous = true
-    rec.onresult = (e: any) => {
-      let t = ""
-      for (let i = e.resultIndex; i < e.results.length; i++) t += e.results[i][0].transcript
-      setAnswer(prev => (prev + " " + t).trim())
-    }
-    rec.onend = () => setIsListening(false)
-    try { rec.start(); setIsListening(true) } catch {}
-  }
-
   const startVoiceInput = () => {
-    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
     if (!SpeechRecognition) {
       alert("Reconnaissance vocale non supportée sur ce navigateur. Essayez Chrome.")
       return
@@ -101,7 +98,7 @@ export default function GenZPhaseFlow({
     recognition.continuous = true
     recognition.interimResults = true
 
-    recognition.onresult = (event: any) => {
+    recognition.onresult = (event: SpeechRecognitionEvent) => {
       let transcript = ""
       for (let i = event.resultIndex; i < event.results.length; ++i) {
         transcript += event.results[i][0].transcript
@@ -110,7 +107,7 @@ export default function GenZPhaseFlow({
       setAnswer(newVal)
     }
 
-    recognition.onerror = (event: any) => {
+    recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
       console.warn("Voice recognition error", event)
       setIsListening(false)
       if (event.error !== "no-speech") {
@@ -297,42 +294,6 @@ export default function GenZPhaseFlow({
     )
   }
 
-  const ConfettiBurst = ({ keyProp }: { keyProp: number }) => {
-    if (!showConfetti) return null
-    const particles = Array.from({ length: 14 }).map((_, i) => {
-      const angle = (i * 25) + (Math.random() * 20 - 10)
-      const distance = 60 + Math.random() * 45
-      return (
-        <motion.div
-          key={`${keyProp}-${i}`}
-          className="absolute text-mint text-xl pointer-events-none"
-          initial={{ opacity: 1, x: 0, y: -10, scale: 0.6 + Math.random() * 0.6 }}
-          animate={{ opacity: 0, x: Math.cos(angle * Math.PI / 180) * distance, y: Math.sin(angle * Math.PI / 180) * distance - 30, scale: 0.3 }}
-          transition={{ duration: 1.6 + Math.random() * 0.5, delay: i * 0.015, ease: "easeOut" }}
-        >
-          {["★", "✦", "●", "◆"][i % 4]}
-        </motion.div>
-      )
-    })
-    return (
-      <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-0 h-0 z-50 pointer-events-none">
-        {particles}
-      </div>
-    )
-  }
-
-  const goToStep = (step: Step) => setCurrentIndex(["word", "definition", "recognition", "method", "dos_donts", "practice"].indexOf(step))
-
-  function nextStep() {
-    const order: Step[] = ["word", "definition", "recognition", "method", "dos_donts", "practice"]
-    const idx = order.indexOf(currentPhase.id as Step)
-    if (idx < order.length - 1) setCurrentIndex(currentIndex + 1)
-  }
-
-  function prevStep() {
-    if (currentIndex > 0) setCurrentIndex(currentIndex - 1)
-  }
-
   return (
     <div className="max-w-4xl mx-auto">
       <div className="sticky top-0 z-50 bg-slate-deep/95 backdrop-blur pb-3 pt-2">
@@ -401,7 +362,7 @@ export default function GenZPhaseFlow({
                   )}
                   {evaluation && (
                     <div className="mt-6 p-6 rounded-3xl glass border border-mint/20 relative overflow-visible">
-                      <ConfettiBurst keyProp={confettiKey} />
+                      <ConfettiBurst keyProp={confettiKey} visible={showConfetti} />
                       <div className="flex justify-between items-baseline mb-4">
                         <div><span className="text-5xl font-black text-white">{evaluation.percentage}</span><span className="text-2xl text-gray-400">%</span></div>
                         <div className="text-right text-sm"><div className="text-emerald-400 font-bold">{evaluation.score}/{evaluation.score_max}</div></div>

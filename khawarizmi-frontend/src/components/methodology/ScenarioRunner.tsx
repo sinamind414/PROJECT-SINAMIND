@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useState } from "react"
 import { DocumentSetRenderer } from "@/components/methodology/DocumentRenderer"
 import { HighlightedAnswer } from "@/components/methodology/HighlightedAnswer"
 import { evaluateMethodologyAnswer, type MethodologyEvaluation } from "@/lib/methodology-evaluator"
@@ -203,17 +203,11 @@ export function ScenarioRunner({
     (q) => q.mandatory || enabledOptional[q.id]
   )
 
-  const completedCount = useMemo(
-    () => activeQuestions.filter((q) => (answers[q.id] || "").trim().length > 0).length,
-    [answers, activeQuestions],
-  )
+  const completedCount = activeQuestions.filter((q) => (answers[q.id] || "").trim().length > 0).length
 
-  const allGatesReady = useMemo(
-    () =>
+  const allGatesReady =
       activeQuestions.length > 0 &&
-      activeQuestions.every((q) => gatesReady[q.id] === true),
-    [activeQuestions, gatesReady],
-  )
+      activeQuestions.every((q) => gatesReady[q.id] === true)
 
   function setGateReady(qId: string, ready: boolean) {
     setGatesReady((prev) => (prev[qId] === ready ? prev : { ...prev, [qId]: ready }))

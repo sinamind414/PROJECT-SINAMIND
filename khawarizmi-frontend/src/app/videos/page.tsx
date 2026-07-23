@@ -36,7 +36,7 @@ function VideosContent() {
     } catch (err) {
       console.error(err)
     } finally {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- async data fetching
+       
       setLoading(false)
     }
   }, [])

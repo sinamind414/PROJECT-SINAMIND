@@ -1,4 +1,4 @@
-// src/components/programme/ProgrammeView.tsx
+﻿// src/components/programme/ProgrammeView.tsx
 
 "use client"
 
@@ -37,7 +37,7 @@ export function ProgrammeView({
         : UI_AR.erreur_chargement
       setError(msg)
     } finally {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- async data fetching
+       
       setLoading(false)
     }
   }, [matiere, filiere])
@@ -65,7 +65,7 @@ export function ProgrammeView({
     return (
       <div className="bg-red-500/10 border border-red-500/30
                        rounded-xl p-6 text-center">
-        <p className="text-2xl mb-2">⚠️</p>
+        <p className="text-2xl mb-2">âš ï¸</p>
         <h3 className="text-red-300 font-semibold mb-1">
           {UI_AR.erreur_chargement}
         </h3>
@@ -102,7 +102,7 @@ export function ProgrammeView({
   return (
     <div className="space-y-6">
 
-      {/* Header — Statistiques */}
+      {/* Header â€” Statistiques */}
       <div className="grid grid-cols-3 gap-3">
         <div className="bg-slate-900 border border-slate-800
                         rounded-xl p-4">

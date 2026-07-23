@@ -56,9 +56,40 @@ print(f'  ENVIRONMENT: {cfg.ENVIRONMENT}')
           pip install pytest pytest-asyncio httpx
           pytest tests/test_methodology*.py tests/test_diagnostic.py tests/test_couche3.py tests/test_tutor.py tests/test_bac_blanc_intelligent.py tests/test_mindmap_methodology.py -v --tb=short
 
+  frontend-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: khawarizmi-frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: khawarizmi-frontend
+
+      - name: Lint
+        run: npm run lint
+        working-directory: khawarizmi-frontend
+        continue-on-error: true
+
+      - name: Tests
+        run: npm run test
+        working-directory: khawarizmi-frontend
+
+      - name: Build
+        run: npm run build
+        working-directory: khawarizmi-frontend
+        env:
+          NEXT_TELEMETRY_DISABLED: "1"
+
   deploy-railway:
     if: github.ref == 'refs/heads/main'
-    needs: backend-tests
+    needs: [backend-tests, frontend-tests]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

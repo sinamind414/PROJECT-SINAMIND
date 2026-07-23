@@ -1,5 +1,10 @@
 import { beforeEach, describe, expect, it } from "vitest"
-import { __resetEvidenceStoreForTests, hasDocumentEvidence, listLearningErrors } from "./evidenceService"
+import {
+  __resetEvidenceStoreForTests,
+  getRecallItemByLesson,
+  hasDocumentEvidence,
+  listLearningErrors,
+} from "./evidenceService"
 import {
   applyDocumentScenarioOutcome,
   applyVerbPracticeOutcome,
@@ -62,7 +67,7 @@ describe("applyVerbPracticeOutcome", () => {
     __resetEvidenceStoreForTests()
   })
 
-  it("≥ 70 → doc_only", () => {
+  it("≥ 70 → doc_only + RecallItem SCHEDULED", () => {
     const r = applyVerbPracticeOutcome({
       lessonId: "verb:analyse",
       verbSlug: "analyse",
@@ -71,6 +76,9 @@ describe("applyVerbPracticeOutcome", () => {
     expect(r.outcome).toBe("doc_only")
     expect(r.evidenceCreated).toBe(true)
     expect(r.mayShowMasteryBadge).toBe(false)
+    const recall = getRecallItemByLesson("verb:analyse")
+    expect(recall?.state).toBe("RECALL_SCHEDULED")
+    expect(recall?.context.conceptId).toBe("analyse")
   })
 
   it("< 70 → failed", () => {
@@ -89,7 +97,7 @@ describe("applyBacExamOutcome", () => {
     __resetEvidenceStoreForTests()
   })
 
-  it("≥ 70 → passed + method evidence", () => {
+  it("≥ 70 → passed + method evidence + RecallItem", () => {
     const r = applyBacExamOutcome({
       sessionId: "sess-1",
       overallPercentage: 78,
@@ -101,6 +109,7 @@ describe("applyBacExamOutcome", () => {
     expect(r.outcome).toBe("passed")
     expect(r.mayShowMasteryBadge).toBe(true)
     expect(r.methodEvidenceCreated).toBe(true)
+    expect(getRecallItemByLesson("bac:sess-1")?.state).toBe("RECALL_SCHEDULED")
   })
 
   it("< 70 → failed + errors", () => {

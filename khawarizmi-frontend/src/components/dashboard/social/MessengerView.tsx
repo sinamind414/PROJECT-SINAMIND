@@ -3,12 +3,24 @@ import React, { useState, useEffect, useRef } from "react"
 import { useSocial } from "@/hooks/useSocial"
 import { Send, MessageSquare, UserPlus, X } from "lucide-react"
 
+interface SearchUserResult {
+  id: number
+  nom?: string
+  strong_verb?: string
+}
+
+interface SuggestedPartner {
+  id: number
+  nom?: string
+  strong_verb?: string
+}
+
 export function MessengerView() {
   const { conversations, messages, loading, activeConvId, setActiveConvId, fetchMessages, sendMessage, apiClient } = useSocial()
   const [input, setInput] = useState("")
   const [searchQuery, setSearchQuery] = useState("")
-  const [searchResults, setSearchResults] = useState<any[]>([])
-  const [suggestedPartners, setSuggestedPartners] = useState<any[]>([])
+  const [searchResults, setSearchResults] = useState<SearchUserResult[]>([])
+  const [suggestedPartners, setSuggestedPartners] = useState<SuggestedPartner[]>([])
   const [isSearching, setIsSearching] = useState(false)
   const scrollRef = useRef<HTMLDivElement>(null)
 
@@ -21,7 +33,7 @@ export function MessengerView() {
   }, [messages])
 
   useEffect(() => {
-    apiClient.request<any>("/api/social/suggested-partners")
+    apiClient.request<{ partners: SuggestedPartner[] }>("/api/social/suggested-partners")
       .then(res => setSuggestedPartners(res.partners || []))
       .catch(() => {})
   }, [])
@@ -36,7 +48,7 @@ export function MessengerView() {
     if (!searchQuery.trim()) return
     setIsSearching(true)
     try {
-      const results = await apiClient.request<any[]>(
+      const results = await apiClient.request<SearchUserResult[]>(
         `/api/social/users/search?q=${encodeURIComponent(searchQuery)}`
       )
       setSearchResults(results)
@@ -45,7 +57,7 @@ export function MessengerView() {
 
   const startChat = async (userId: number) => {
     try {
-      const res = await apiClient.request<any>("/api/social/conversations", {
+      const res = await apiClient.request<{ conversation_id: number }>("/api/social/conversations", {
         method: "POST",
         body: JSON.stringify({ member_ids: [userId], is_group: false }),
       })
@@ -82,7 +94,7 @@ export function MessengerView() {
               <div className="text-right"><p className="text-xs font-bold text-white">{u.nom}</p><p className="text-[10px] text-mint/60">{u.strong_verb}</p></div>
             </button>
           ))}
-          {!isSearching && conversations.map((conv: any) => (
+          {!isSearching && conversations.map((conv) => (
             <button key={conv.id} onClick={() => { setActiveConvId(conv.id); setIsSearching(false) }} className={`w-full p-4 flex items-center gap-3 transition-all border-b border-white/5 ${activeConvId === conv.id ? "bg-mint/20 text-mint" : "hover:bg-white/5 text-slate-300"}`}>
               <div className="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center font-bold">{conv.title ? conv.title[0] : "U"}</div>
               <div className="flex-1 text-right overflow-hidden"><p className="font-bold truncate text-sm">{conv.title || "Membres"}</p></div>
@@ -98,7 +110,7 @@ export function MessengerView() {
             </div>
             <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-4" dir="rtl">
               {loading && <p className="text-center text-slate-500 text-xs">Chargement...</p>}
-              {messages.map((msg: any) => (
+              {messages.map((msg) => (
                 <div key={msg.id} className={`flex ${msg.sender_id === 1 ? "justify-start" : "justify-end"}`}>
                   <div className={`max-w-[80%] p-3 rounded-2xl text-sm ${msg.sender_id === 1 ? "bg-slate-700 text-white rounded-tr-none" : "bg-mint text-slate-deep font-medium rounded-tl-none"}`}>
                     <p className="text-[10px] opacity-60 mb-1 font-bold">{msg.sender_name}</p>

@@ -1,23 +1,23 @@
-"use client"
+﻿"use client"
 
 import { useState, useEffect, useCallback } from "react"
 import { apiClient } from "@/lib/api-client"
 import type { LessonBlock, CheckAnswerResponse } from "@/lib/types"
 
 const BLOCK_ICONS: Record<string, string> = {
-  summary: "📋",
-  concept: "💡",
-  analogy: "🔄",
-  mistake: "⚠️",
-  bac_link: "🎯",
+  summary: "ðŸ“‹",
+  concept: "ðŸ’¡",
+  analogy: "ðŸ”„",
+  mistake: "âš ï¸",
+  bac_link: "ðŸŽ¯",
 }
 
 const BLOCK_LABELS: Record<string, string> = {
-  summary: "ملخص",
-  concept: "مفهوم",
-  analogy: "تشبيه",
-  mistake: "خطأ شائع",
-  bac_link: "في البكالوريا",
+  summary: "Ù…Ù„Ø®Øµ",
+  concept: "Ù…ÙÙ‡ÙˆÙ…",
+  analogy: "ØªØ´Ø¨ÙŠÙ‡",
+  mistake: "Ø®Ø·Ø£ Ø´Ø§Ø¦Ø¹",
+  bac_link: "ÙÙŠ Ø§Ù„Ø¨ÙƒØ§Ù„ÙˆØ±ÙŠØ§",
 }
 
 type BlockState = "reading" | "answering" | "correct" | "wrong"
@@ -78,13 +78,13 @@ export function ActiveLesson({ chapterSlug }: { chapterSlug: string }) {
   }
 
   if (loading) {
-    return <div className="text-center text-gray-500 py-20">جاري التحميل...</div>
+    return <div className="text-center text-gray-500 py-20">Ø¬Ø§Ø±ÙŠ Ø§Ù„ØªØ­Ù…ÙŠÙ„...</div>
   }
   if (error || blocks.length === 0) {
     return (
       <div className="text-center py-20 space-y-4">
-        <p className="text-gray-400">لا توجد دروس نشطة لهذا الفصل بعد.</p>
-        <p className="text-gray-600 text-sm">الدروس المتوفرة: respiration-cellulaire, photosynthese, activite-enzymatique, expression-genetique, tectonique</p>
+        <p className="text-gray-400">Ù„Ø§ ØªÙˆØ¬Ø¯ Ø¯Ø±ÙˆØ³ Ù†Ø´Ø·Ø© Ù„Ù‡Ø°Ø§ Ø§Ù„ÙØµÙ„ Ø¨Ø¹Ø¯.</p>
+        <p className="text-gray-600 text-sm">Ø§Ù„Ø¯Ø±ÙˆØ³ Ø§Ù„Ù…ØªÙˆÙØ±Ø©: respiration-cellulaire, photosynthese, activite-enzymatique, expression-genetique, tectonique</p>
       </div>
     )
   }
@@ -148,8 +148,8 @@ export function ActiveLesson({ chapterSlug }: { chapterSlug: string }) {
                     className={`text-right rounded-xl p-3 border transition-all ${bg} ${bd} ${tx} ${!showResult ? "hover:bg-white/[0.06]" : ""}`}
                   >
                     <span className="text-sm">{opt}</span>
-                    {showResult && isCorrect && <span className="mr-2">✓</span>}
-                    {showResult && isSelected && !isCorrect && <span className="mr-2">✗</span>}
+                    {showResult && isCorrect && <span className="mr-2">âœ“</span>}
+                    {showResult && isSelected && !isCorrect && <span className="mr-2">âœ—</span>}
                   </button>
                 )
               })}
@@ -163,7 +163,7 @@ export function ActiveLesson({ chapterSlug }: { chapterSlug: string }) {
               onChange={(e) => setSelectedAnswer(e.target.value)}
               disabled={blockState === "correct" || blockState === "wrong"}
               rows={3}
-              placeholder="اكتب إجابتك هنا..."
+              placeholder="Ø§ÙƒØªØ¨ Ø¥Ø¬Ø§Ø¨ØªÙƒ Ù‡Ù†Ø§..."
               className="w-full rounded-xl bg-[#0C151A] border border-white/[0.08] text-white p-3 text-sm outline-none focus:border-mint"
             />
           )}
@@ -172,7 +172,7 @@ export function ActiveLesson({ chapterSlug }: { chapterSlug: string }) {
           {(blockState === "correct" || blockState === "wrong") && (
             <div className={`rounded-xl p-3 border ${blockState === "correct" ? "bg-emerald-500/10 border-emerald-500/20" : "bg-red-500/10 border-red-500/20"}`}>
               <p className={`font-bold text-sm mb-1 ${blockState === "correct" ? "text-emerald-300" : "text-red-300"}`}>
-                {blockState === "correct" ? "✓ إجابة صحيحة!" : "✗ إجابة خاطئة"}
+                {blockState === "correct" ? "âœ“ Ø¥Ø¬Ø§Ø¨Ø© ØµØ­ÙŠØ­Ø©!" : "âœ— Ø¥Ø¬Ø§Ø¨Ø© Ø®Ø§Ø·Ø¦Ø©"}
               </p>
               <p className="text-gray-300 text-xs leading-relaxed">{qc.explanation_ar}</p>
             </div>
@@ -186,22 +186,22 @@ export function ActiveLesson({ chapterSlug }: { chapterSlug: string }) {
                 disabled={!selectedAnswer.trim()}
                 className="px-5 py-2.5 rounded-xl bg-mint text-white font-bold text-sm hover:bg-mint-soft transition disabled:opacity-40"
               >
-                تحقق
+                ØªØ­Ù‚Ù‚
               </button>
             )}
             {blockState === "answering" && (
               <button disabled className="px-5 py-2.5 rounded-xl bg-mint text-white font-bold text-sm opacity-50">
-                جاري التحقق...
+                Ø¬Ø§Ø±ÙŠ Ø§Ù„ØªØ­Ù‚Ù‚...
               </button>
             )}
             {blockState === "correct" && currentIdx < blocks.length - 1 && (
               <button onClick={nextBlock} className="px-5 py-2.5 rounded-xl bg-mint text-white font-bold text-sm hover:bg-mint-soft transition">
-                التالي ←
+                Ø§Ù„ØªØ§Ù„ÙŠ â†
               </button>
             )}
             {blockState === "wrong" && (
               <button onClick={retry} className="px-5 py-2.5 rounded-xl bg-white/[0.05] text-gray-200 font-bold text-sm hover:bg-white/[0.08] transition">
-                حاول مرة أخرى
+                Ø­Ø§ÙˆÙ„ Ù…Ø±Ø© Ø£Ø®Ø±Ù‰
               </button>
             )}
           </div>
@@ -211,9 +211,9 @@ export function ActiveLesson({ chapterSlug }: { chapterSlug: string }) {
       {/* Lesson completed */}
       {lessonDone && (
         <div className="rounded-3xl p-6 text-center space-y-4" style={{ background: "linear-gradient(135deg, rgba(45,212,191,0.15), rgba(251,191,36,0.08))" }}>
-          <p className="text-4xl">🎉</p>
-          <h2 className="text-white font-bold text-xl">أحسنت! أكملت الدرس</h2>
-          <p className="text-gray-300 text-sm">تم تسجيل تقدمك في FSRS</p>
+          <p className="text-4xl">ðŸŽ‰</p>
+          <h2 className="text-white font-bold text-xl">Ø£Ø­Ø³Ù†Øª! Ø£ÙƒÙ…Ù„Øª Ø§Ù„Ø¯Ø±Ø³</h2>
+          <p className="text-gray-300 text-sm">ØªÙ… ØªØ³Ø¬ÙŠÙ„ ØªÙ‚Ø¯Ù…Ùƒ ÙÙŠ FSRS</p>
           {checkResult && (
             <p className="text-mint-soft font-bold text-lg">{checkResult.score_percentage}%</p>
           )}

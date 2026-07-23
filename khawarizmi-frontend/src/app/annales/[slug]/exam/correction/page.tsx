@@ -29,6 +29,43 @@ export default function CorrectionPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
 
+  const sessionId = rawSessionId
+
+  useEffect(() => {
+    if (!sessionId) return
+    const sid = sessionId
+
+    async function fetchResult() {
+      try {
+        const resp = await apiClient.getBacCorrection(sid)
+        saveBacBlancCorrectionErrors({
+          sessionId: sid,
+          corrections: resp.corrections,
+        })
+        const totalScore = resp.corrections.reduce((sum, item) => sum + Number(item.score || 0), 0)
+        const totalMax = resp.corrections.reduce((sum, item) => sum + Number(item.score_max || 0), 0)
+        const scoreGlobal = Math.round((totalScore / Math.max(totalMax, 1)) * 100)
+        setContract(
+          applyBacExamOutcome({
+            sessionId: sid,
+            overallPercentage: scoreGlobal,
+            items: resp.corrections.map((c) => ({
+              verbSlug: c.verb_slug || "bac_blanc",
+              percentage: Number(c.percentage) || 0,
+            })),
+          })
+        )
+        setResult(resp)
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : "Erreur lors de la récupération des résultats.")
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchResult()
+  }, [sessionId])
+
   if (!rawSessionId) {
     return (
       <AuthGuard>
@@ -37,7 +74,7 @@ export default function CorrectionPage() {
             <div className="text-center space-y-4 max-w-md">
               <div className="text-6xl">🚫</div>
               <h2 className="text-2xl font-bold text-white">وصول ممنوع</h2>
-              <p className="text-red-400">⚠️ Aucune session trouvée. Vous devez d'abord passer l'examen.</p>
+              <p className="text-red-400">⚠️ Aucune session trouvée. Vous devez d&apos;abord passer l&apos;examen.</p>
               <a href={`/annales/${slug}/exam`} className="inline-block px-6 py-3 bg-mint text-slate-deep rounded-xl font-semibold hover:bg-mint-soft transition">
                 اذهب إلى الامتحان
               </a>
@@ -47,42 +84,6 @@ export default function CorrectionPage() {
       </AuthGuard>
     )
   }
-
-  const sessionId = rawSessionId
-
-  useEffect(() => {
-
-    /* Récupérer les résultats depuis le backend */
-    async function fetchResult() {
-      try {
-        const resp = await apiClient.getBacCorrection(sessionId)
-        saveBacBlancCorrectionErrors({
-          sessionId,
-          corrections: resp.corrections,
-        })
-        const totalScore = resp.corrections.reduce((sum, item) => sum + Number(item.score || 0), 0)
-        const totalMax = resp.corrections.reduce((sum, item) => sum + Number(item.score_max || 0), 0)
-        const scoreGlobal = Math.round((totalScore / Math.max(totalMax, 1)) * 100)
-        setContract(
-          applyBacExamOutcome({
-            sessionId,
-            overallPercentage: scoreGlobal,
-            items: resp.corrections.map((c) => ({
-              verbSlug: c.verb_slug || "bac_blanc",
-              percentage: Number(c.percentage) || 0,
-            })),
-          })
-        )
-        setResult(resp)
-      } catch (err: any) {
-        setError(err.message || "Erreur lors de la récupération des résultats.")
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchResult()
-  }, [sessionId])
 
   /* ---- Affichage ---- */
   if (loading) {

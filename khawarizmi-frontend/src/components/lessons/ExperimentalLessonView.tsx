@@ -6,10 +6,9 @@ import LessonSlideContent from "./LessonSlideContent"
 
 interface Props {
   slug: string
-  onComplete?: (score: number) => void
 }
 
-export default function ExperimentalLessonView({ slug, onComplete }: Props) {
+export default function ExperimentalLessonView({ slug }: Props) {
   const lesson: ExperimentalLesson = getExperimentalLesson(slug)
   const phases = lesson.phases
   const [currentFrame, setCurrentFrame] = useState(0)
@@ -56,9 +55,6 @@ export default function ExperimentalLessonView({ slug, onComplete }: Props) {
 
   const goPrev = () => currentFrame > 0 && scrollToFrame(currentFrame - 1)
   const goNext = () => currentFrame < totalFrames - 1 && scrollToFrame(currentFrame + 1)
-
-  const currentPhase = phases[currentFrame]
-  const stepNum = currentPhase?.step || "1"
 
   return (
     <div dir="rtl" className="pb-12">

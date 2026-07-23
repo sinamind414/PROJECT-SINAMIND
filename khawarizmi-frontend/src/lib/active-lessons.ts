@@ -78,14 +78,6 @@ const TYPE_VERBS: Record<string, string[]> = {
   synthese: ["scientific-text", "compare", "relationship", "deduce"],
 }
 
-const TYPE_LABELS: Record<string, string> = {
-  concept: "مفهوم نظري أساسي",
-  processus: "عملية بيولوجية متسلسلة",
-  experience: "تجربة عملية وتحليل نتائج",
-  rappel: "تذكير بمعارف سابقة مهمة",
-  synthese: "تركيب وتجميع للمفاهيم",
-}
-
 const TYPE_BLOCKS: Record<string, { title: string; content: (ch: MethodologyChapterLink) => string }[]> = {
   concept: [
     { title: "المفهوم الأساسي", content: (ch) => `يركز هذا المفهوم على فهم المبادئ النظرية التي ستبني عليها باقي معارف الوحدة. ${ch.focusAr}` },

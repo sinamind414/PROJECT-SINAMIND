@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useEffect, useState } from "react"
 import { motion } from "framer-motion"
@@ -19,15 +19,15 @@ type Scope = "national" | "wilaya" | "school"
 type Period = "week" | "month" | "all_time"
 
 const SCOPE_TABS: { key: Scope; label: string; icon: string }[] = [
-  { key: "national", label: "الوطني", icon: "🇩🇿" },
-  { key: "wilaya",   label: "ولايتي", icon: "🏠" },
-  { key: "school",   label: ".lycée",  icon: "🏫" },
+  { key: "national", label: "Ø§Ù„ÙˆØ·Ù†ÙŠ", icon: "ðŸ‡©ðŸ‡¿" },
+  { key: "wilaya",   label: "ÙˆÙ„Ø§ÙŠØªÙŠ", icon: "ðŸ " },
+  { key: "school",   label: ".lycÃ©e",  icon: "ðŸ«" },
 ]
 
 const PERIOD_TABS: { key: Period; label: string }[] = [
-  { key: "week",     label: "هذا الأسبوع" },
-  { key: "month",    label: "هذا الشهر" },
-  { key: "all_time", label: "الكل" },
+  { key: "week",     label: "Ù‡Ø°Ø§ Ø§Ù„Ø£Ø³Ø¨ÙˆØ¹" },
+  { key: "month",    label: "Ù‡Ø°Ø§ Ø§Ù„Ø´Ù‡Ø±" },
+  { key: "all_time", label: "Ø§Ù„ÙƒÙ„" },
 ]
 
 function rankStyle(rank: number) {
@@ -61,9 +61,9 @@ export default function LeaderboardPage() {
         <main className="flex-1 p-6 lg:p-8 overflow-auto">
           <div className="max-w-4xl mx-auto space-y-6">
             <ProgressivePageHeader
-              breadcrumb={[{ label: "ترتيب الجزائر", href: "/leaderboard" }]}
-              title="🏆 ترتيب الجزائر"
-              subtitle="تنافس مع زملائك في كل أنحاء الوطن"
+              breadcrumb={[{ label: "ØªØ±ØªÙŠØ¨ Ø§Ù„Ø¬Ø²Ø§Ø¦Ø±", href: "/leaderboard" }]}
+              title="ðŸ† ØªØ±ØªÙŠØ¨ Ø§Ù„Ø¬Ø²Ø§Ø¦Ø±"
+              subtitle="ØªÙ†Ø§ÙØ³ Ù…Ø¹ Ø²Ù…Ù„Ø§Ø¦Ùƒ ÙÙŠ ÙƒÙ„ Ø£Ù†Ø­Ø§Ø¡ Ø§Ù„ÙˆØ·Ù†"
             />
 
             {/* Scope tabs */}
@@ -103,9 +103,9 @@ export default function LeaderboardPage() {
 
             {/* Leaderboard */}
             {loading ? (
-              <div className="text-center text-white/40 py-12">جاري التحميل...</div>
+              <div className="text-center text-white/40 py-12">Ø¬Ø§Ø±ÙŠ Ø§Ù„ØªØ­Ù…ÙŠÙ„...</div>
             ) : entries.length === 0 ? (
-              <div className="text-center text-white/40 py-12">لا يوجد متربين بعد</div>
+              <div className="text-center text-white/40 py-12">Ù„Ø§ ÙŠÙˆØ¬Ø¯ Ù…ØªØ±Ø¨ÙŠÙ† Ø¨Ø¹Ø¯</div>
             ) : (
               <div className="space-y-2">
                 {entries.map((entry, i) => {
@@ -122,12 +122,12 @@ export default function LeaderboardPage() {
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-bold text-white truncate">{entry.user_id.slice(0, 8)}...</p>
                         {entry.wilaya_code && (
-                          <p className="text-[10px] text-white/30">📍 ولاية {entry.wilaya_code}</p>
+                          <p className="text-[10px] text-white/30">ðŸ“ ÙˆÙ„Ø§ÙŠØ© {entry.wilaya_code}</p>
                         )}
                       </div>
                       <div className="text-right">
                         <p className="text-lg font-bold text-white">{Math.round(entry.weighted_score)}</p>
-                        <p className="text-[10px] text-white/30">{Math.round(entry.precision_score)}% précision</p>
+                        <p className="text-[10px] text-white/30">{Math.round(entry.precision_score)}% prÃ©cision</p>
                       </div>
                     </motion.div>
                   )
@@ -139,7 +139,7 @@ export default function LeaderboardPage() {
             {myRank && (
               <div className="sticky bottom-0 rounded-xl border border-white/10 bg-slate-900/95 p-4 backdrop-blur-lg text-center">
                 <p className="text-sm text-white/60">
-                  رتبتك: <span className="text-white font-bold">#{myRank}</span>
+                  Ø±ØªØ¨ØªÙƒ: <span className="text-white font-bold">#{myRank}</span>
                 </p>
               </div>
             )}

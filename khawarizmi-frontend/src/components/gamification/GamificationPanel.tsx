@@ -33,7 +33,7 @@ export default function GamificationPanel({ profile }: { profile?: { xp?: number
   const [multiplier, setMultiplier] = useState(1);
   const [comboMessage, setComboMessage] = useState("");
   const [nextActions, setNextActions] = useState<NextAction[]>([]);
-  const [lastAction, setLastAction] = useState("");
+  const [, setLastAction] = useState("");
   const [rewardMessage, setRewardMessage] = useState("");
 
   useEffect(() => {

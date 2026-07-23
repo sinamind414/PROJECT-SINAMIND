@@ -205,6 +205,18 @@ export function useChatbot(): UseChatbotReturn {
     }
   }, [addAssistantMessage])
 
+  const refreshChatbotState = useCallback(async () => {
+    try {
+      const state = await apiClient.getChatbotState()
+      setChatbotState(state)
+    } catch {
+    }
+  }, [])
+
+  const closeChat = useCallback(() => {
+    setIsOpen(false)
+  }, [])
+
   const openChat = useCallback(() => {
     setIsOpen(true)
     setBadge(0)
@@ -213,20 +225,7 @@ export function useChatbot(): UseChatbotReturn {
       initSent.current = true
       sendInit()
     }
-  }, [sendInit])
-
-  const closeChat = useCallback(() => {
-    setIsOpen(false)
-  }, [])
-
-  const refreshChatbotState = useCallback(async () => {
-    try {
-      const state = await apiClient.getChatbotState()
-      setChatbotState(state)
-    } catch {
-      // silencieux
-    }
-  }, [])
+  }, [sendInit, refreshChatbotState])
 
   const completeDailyMission = useCallback(async (): Promise<boolean> => {
     const mission = chatbotState?.daily_mission

@@ -3,12 +3,20 @@ import React, { useEffect, useState } from "react"
 import { useSocial } from "@/hooks/useSocial"
 import { FileText, Image, File, Download } from "lucide-react"
 
+interface SocialFile {
+  id: number
+  name: string
+  file_type?: string
+  file_url: string
+  shared_by?: string
+}
+
 export function LibraryView() {
   const { apiClient } = useSocial()
-  const [files, setFiles] = useState<any[]>([])
+  const [files, setFiles] = useState<SocialFile[]>([])
 
   useEffect(() => {
-    apiClient.request<any[]>("/api/social/files").then(setFiles).catch(() => {})
+    apiClient.request<SocialFile[]>("/api/social/files").then(setFiles).catch(() => {})
   }, [])
 
   const fileIcon = (type?: string) => {

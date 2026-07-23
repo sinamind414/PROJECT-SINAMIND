@@ -6,12 +6,6 @@ import { ProgressivePageHeader } from "@/components/ui/ProgressivePageHeader"
 import { ChoiceCardGrid } from "@/components/ui/ChoiceCardGrid"
 import { DOMAINS } from "@/lib/cours-data"
 
-const IMPORTANCE_BADGE: Record<string, { bg: string; text: string; label: string }> = {
-  critique: { bg: "bg-red-500/10 border-red-500/25", text: "text-red-400", label: "⚡ جد مهم" },
-  haute: { bg: "bg-amber-500/10 border-amber-500/25", text: "text-amber-400", label: "🔥 مهم" },
-  moyenne: { bg: "bg-blue-500/10 border-blue-500/25", text: "text-blue-400", label: "📖 عادي" },
-}
-
 export default function MindMapHubPage() {
   const domainCards = DOMAINS.map((d) => ({
     emoji: d.emoji,

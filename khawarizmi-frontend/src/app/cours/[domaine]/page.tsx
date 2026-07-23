@@ -6,7 +6,7 @@ import { useMemo } from "react"
 import { AuthGuard } from "@/components/auth/AuthGuard"
 import { AppShell } from "@/components/layout/AppShell"
 import { Breadcrumb } from "@/components/cours/Breadcrumb"
-import { getDomainBySlug, getUnitsForDomain, getChaptersForUnit, IMPORTANCE_CONFIG, TYPE_LABELS_AR } from "@/lib/cours-data"
+import { getDomainBySlug, getUnitsForDomain, getChaptersForUnit, IMPORTANCE_CONFIG } from "@/lib/cours-data"
 
 export default function DomainePage() {
   const params = useParams()

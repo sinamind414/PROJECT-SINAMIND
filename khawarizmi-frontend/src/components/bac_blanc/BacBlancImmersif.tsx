@@ -4,8 +4,6 @@ import { useState, useEffect, useRef, useCallback } from "react"
 import { apiClient } from "@/lib/api-client"
 import { saveBacBlancErrors } from "@/lib/progress-store"
 import type {
-  StartBacResponse,
-  ChooseSubjectResponse,
   SubmitBacResponse,
   BacSubjectSummary,
   BacSubjectDetail,

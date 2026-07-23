@@ -9,6 +9,12 @@ interface Phase {
   practice?: boolean
 }
 
+interface PracticeEvalResult {
+  percentage: number
+  feedback: string
+  modelAnswer: string
+}
+
 interface Props {
   lessonTitle?: string
   lessonTitleAr: string
@@ -48,7 +54,7 @@ export default function GenZInteractiveLesson({ lessonTitleAr, slug, phases, onC
   const [activeChapter, setActiveChapter] = useState<"ch27" | "ch28" | "all">("all")
   const [answers, setAnswers] = useState<Record<string, string>>({})
   const [simStates, setSimStates] = useState<Record<string, string>>({})
-  const [evalResults, setEvalResults] = useState<Record<string, any>>({})
+  const [evalResults, setEvalResults] = useState<Record<string, PracticeEvalResult>>({})
   const [currentFrame, setCurrentFrame] = useState(0)
   const [qcmDone, setQcmDone] = useState(false)
   const [qcmScore, setQcmScore] = useState(0)
@@ -195,11 +201,11 @@ export default function GenZInteractiveLesson({ lessonTitleAr, slug, phases, onC
                 </button>
                 <button
                   onClick={() => {
-                    const SR = (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition
+                    const SR = window.webkitSpeechRecognition || window.SpeechRecognition
                     if (SR) {
                       const r = new SR()
                       r.lang = "ar-DZ"
-                      r.onresult = (e: any) => updateAnswer(phase.id, ans + " " + e.results[0][0].transcript)
+                      r.onresult = (e: SpeechRecognitionEvent) => updateAnswer(phase.id, ans + " " + e.results[0][0].transcript)
                       r.start()
                     }
                   }}
@@ -245,7 +251,7 @@ export default function GenZInteractiveLesson({ lessonTitleAr, slug, phases, onC
       {hasTabs && (
         <div className="flex gap-2 mb-4">
           {[{ id: "all", l: "الكامل" }, { id: "ch27", l: "الدرس 27" }, { id: "ch28", l: "الدرس 28" }].map((t) => (
-            <button key={t.id} onClick={() => switchChapter(t.id as any)} className={`flex-1 py-2 text-sm font-bold rounded-2xl ${activeChapter === t.id ? "bg-mint text-black" : "bg-white/5"}`}>
+            <button key={t.id} onClick={() => switchChapter(t.id as "all" | "ch27" | "ch28")} className={`flex-1 py-2 text-sm font-bold rounded-2xl ${activeChapter === t.id ? "bg-mint text-black" : "bg-white/5"}`}>
               {t.l}
             </button>
           ))}

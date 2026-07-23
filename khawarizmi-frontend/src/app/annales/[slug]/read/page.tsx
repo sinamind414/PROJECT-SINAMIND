@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useEffect, useMemo, useRef, useState } from "react"
 import { useParams } from "next/navigation"
@@ -8,16 +8,13 @@ import { AppShell } from "@/components/layout/AppShell"
 import { getSujetBySlug } from "@/lib/annales-bac"
 
 function PdfViewer({ src, title }: { src: string; title: string }) {
-  const containerRef = useRef<HTMLDivElement>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
-  const [pdfAvailable, setPdfAvailable] = useState(true)
   const iframeRef = useRef<HTMLIFrameElement>(null)
 
   useEffect(() => {
     setLoading(true)
     setError(false)
-    setPdfAvailable(true)
     const timer = setTimeout(() => setLoading(false), 3000)
     return () => clearTimeout(timer)
   }, [src])
@@ -25,7 +22,6 @@ function PdfViewer({ src, title }: { src: string; title: string }) {
   const handleLoad = () => setLoading(false)
   const handleError = () => {
     setLoading(false)
-    setPdfAvailable(false)
     setError(true)
   }
 
@@ -38,19 +34,19 @@ function PdfViewer({ src, title }: { src: string; title: string }) {
         {loading && (
           <div className="flex items-center justify-center h-64">
             <div className="w-8 h-8 border-2 border-[#2dd4bf] border-t-transparent rounded-full animate-spin" />
-            <span className="mr-3 text-sm text-slate-400">جاري تحميل PDF...</span>
+            <span className="mr-3 text-sm text-slate-400">Ø¬Ø§Ø±ÙŠ ØªØ­Ù…ÙŠÙ„ PDF...</span>
           </div>
         )}
         {error ? (
           <div className="text-center py-12">
-            <p className="text-red-400 text-sm mb-2">خطأ في تحميل الملف</p>
+            <p className="text-red-400 text-sm mb-2">Ø®Ø·Ø£ ÙÙŠ ØªØ­Ù…ÙŠÙ„ Ø§Ù„Ù…Ù„Ù</p>
             <a
               href={src}
               target="_blank"
               rel="noopener noreferrer"
               className="mt-4 inline-block px-4 py-2 bg-[#2dd4bf] text-slate-900 rounded-lg text-xs font-semibold"
             >
-              تحميل مباشر
+              ØªØ­Ù…ÙŠÙ„ Ù…Ø¨Ø§Ø´Ø±
             </a>
           </div>
         ) : (
@@ -78,14 +74,14 @@ function ReadContent() {
     return (
       <AppShell>
         <main className="flex-1 flex items-center justify-center">
-          <p className="text-slate-400">الموضوع غير موجود</p>
+          <p className="text-slate-400">Ø§Ù„Ù…ÙˆØ¶ÙˆØ¹ ØºÙŠØ± Ù…ÙˆØ¬ÙˆØ¯</p>
         </main>
       </AppShell>
     )
   }
 
   const pdfSrc = showCorrection && sujet.url_corrige ? sujet.url_corrige : sujet.url_pdf
-  const pdfTitle = showCorrection && sujet.url_corrige ? "تصحيح الموضوع" : "الموضوع"
+  const pdfTitle = showCorrection && sujet.url_corrige ? "ØªØµØ­ÙŠØ­ Ø§Ù„Ù…ÙˆØ¶ÙˆØ¹" : "Ø§Ù„Ù…ÙˆØ¶ÙˆØ¹"
 
   return (
     <AppShell>
@@ -96,7 +92,7 @@ function ReadContent() {
               {sujet.titre} &#x2190;
             </Link>
             <span className="text-xs text-slate-600">/</span>
-            <span className="text-xs text-slate-300">قراءة</span>
+            <span className="text-xs text-slate-300">Ù‚Ø±Ø§Ø¡Ø©</span>
           </div>
           <div className="flex items-center gap-2">
             {sujet.url_corrige && (
@@ -104,7 +100,7 @@ function ReadContent() {
                 onClick={() => setShowCorrection((v) => !v)}
                 className="px-3 py-1.5 bg-emerald-500 text-white rounded-lg text-xs font-semibold hover:bg-emerald-600 transition"
               >
-                {showCorrection ? "عرض الموضوع" : "عرض التصحيح"}
+                {showCorrection ? "Ø¹Ø±Ø¶ Ø§Ù„Ù…ÙˆØ¶ÙˆØ¹" : "Ø¹Ø±Ø¶ Ø§Ù„ØªØµØ­ÙŠØ­"}
               </button>
             )}
             <a
@@ -113,7 +109,7 @@ function ReadContent() {
               rel="noopener noreferrer"
               className="px-3 py-1.5 bg-[#2dd4bf] text-slate-900 rounded-lg text-xs font-semibold hover:bg-[#5eead4] transition"
             >
-              تحميل
+              ØªØ­Ù…ÙŠÙ„
             </a>
           </div>
         </header>

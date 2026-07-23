@@ -23,7 +23,6 @@ import {
   Repeat,
   X,
   Menu,
-  Layers3,
   FlaskConical,
   GitBranch,
   User,
@@ -281,9 +280,7 @@ export function MobileDrawer({ open, onClose }: MobileDrawerProps) {
   )
 }
 
-type MobileBottomNavProps = Record<string, never>
-
-export function MobileBottomNav(_props: MobileBottomNavProps = {}) {
+export function MobileBottomNav() {
   const pathname = usePathname()
 
   return (

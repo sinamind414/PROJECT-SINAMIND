@@ -19,23 +19,8 @@ export function DomainSection({
 
   const [isOpen, setIsOpen] = useState(false)
 
-  const totalChapters = domain.units.reduce(
-    (sum, unit) => sum + unit.chapters.length,
-    0
-  )
-
-  const criticalCount = domain.units.reduce(
-    (sum, unit) =>
-      sum + unit.chapters.filter(
-        c => c.importance === "critique"
-      ).length,
-    0
-  )
-
   const domainIndex = Number(domain.numero) || 1;
   const colors = getDomainColors(domainIndex)
-
-  const progressPercent = domainIndex === 1 ? 45 : domainIndex === 2 ? 15 : 0;
 
   return (
     <section className="mb-8">

@@ -72,7 +72,7 @@ export default function UnitePage() {
             </header>
 
             <div className="space-y-3">
-              {chapters.map((ch, idx) => {
+              {chapters.map((ch) => {
                 const imp = IMPORTANCE_CONFIG[ch.chapterImportance]
                 const typeLabel = TYPE_LABELS_AR[ch.chapterType || "concept"]
                 return (

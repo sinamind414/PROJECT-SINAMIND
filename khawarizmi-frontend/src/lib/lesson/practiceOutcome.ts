@@ -7,7 +7,7 @@ import type { SessionOutcome } from "./tunnelTypes"
 import {
   createDocumentEvidence,
   createMethodEvidence,
-  openRecallGate,
+  openRecallGateAndScheduleItem,
   upsertLearningError,
   uiMayShowMethodMastery,
 } from "./evidenceService"
@@ -37,7 +37,7 @@ export function applyVerbPracticeOutcome(input: {
       verbSlug: input.verbSlug,
       score: input.percentage,
     })
-    openRecallGate({
+    openRecallGateAndScheduleItem({
       lessonId: input.lessonId,
       verbSlug: input.verbSlug,
       reason: "document_evidence",
@@ -114,7 +114,7 @@ export function applyDocumentScenarioOutcome(input: {
         verbSlug: item.verbSlug,
         score: item.percentage,
       })
-      openRecallGate({
+      openRecallGateAndScheduleItem({
         lessonId,
         verbSlug: item.verbSlug,
         reason: "document_evidence",
@@ -230,7 +230,7 @@ export function applyBacExamOutcome(input: {
       verbSlug: null,
       bacScore: input.overallPercentage,
     })
-    openRecallGate({
+    openRecallGateAndScheduleItem({
       lessonId,
       verbSlug: null,
       reason: "document_evidence",

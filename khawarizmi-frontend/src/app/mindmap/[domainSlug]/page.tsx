@@ -19,7 +19,7 @@ function DomainContent() {
       <div className="flex flex-col items-center justify-center min-h-screen bg-slate-950 text-white p-6">
         <p className="text-4xl mb-4">🔍</p>
         <h2 className="text-xl font-bold text-red-400">تعذر العثور على التخصص</h2>
-        <p className="text-slate-400 mt-2 text-sm">.slug "{domainSlug}" غير صالح</p>
+        <p className="text-slate-400 mt-2 text-sm">.slug &quot;{domainSlug}&quot; غير صالح</p>
         <Link href="/mindmap" className="mt-6 px-4 py-2 bg-slate-800 text-slate-300 border border-slate-700 rounded-lg hover:bg-slate-700 text-sm transition">
           العودة إلى الخريطة الذهنية
         </Link>

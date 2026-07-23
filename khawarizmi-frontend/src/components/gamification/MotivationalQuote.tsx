@@ -10,7 +10,6 @@ export function MotivationalQuote({ success }: { success: boolean }) {
   useEffect(() => {
     setQuote(pickRandomQuote(success))
   }, [success])
-
   return (
     <AnimatePresence>
       {quote && (

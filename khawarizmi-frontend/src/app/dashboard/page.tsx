@@ -35,10 +35,10 @@ export default function GenZDashboardPage() {
   }
 
   // === C: real streak + XP from profile (gamification merged by mapper) ===
-  const profile = state.profile || {} as any
-  const realStreak = profile.streak ?? 0
-  const realXp = profile.xp ?? 0
-  const userName = profile.name || "خليل"
+  const profile = (state.profile || {}) as unknown as Record<string, unknown>
+  const realStreak = Number(profile.streak ?? 0)
+  const realXp = Number(profile.xp ?? 0)
+  const userName = String(profile.name || "خليل")
 
   const handleStartMission = () => {
     window.location.href = missionHref

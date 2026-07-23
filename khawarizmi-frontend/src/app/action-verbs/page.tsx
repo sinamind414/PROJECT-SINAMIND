@@ -19,7 +19,7 @@ function statusColor(level: number) {
 }
 
 export default function ActionVerbsPage() {
-  const [apiVerbs, setApiVerbs] = useState<ActionVerbSummary[] | null>(null)
+  const [, setApiVerbs] = useState<ActionVerbSummary[] | null>(null)
   const [progress, setProgress] = useState<VerbProgressResponse | null>(null)
 
   useEffect(() => {

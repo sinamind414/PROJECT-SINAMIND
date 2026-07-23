@@ -8,7 +8,6 @@ import { AppShell } from "@/components/layout/AppShell"
 import { getCategoryLabel, getPriorityLabel } from "@/lib/methodology-v1"
 import {
   getEnrichedActionVerb,
-  type EnrichedActionVerbRule,
   enrichedToLegacy,
 } from "@/lib/methodology-v2"
 import { saveMethodologyEvaluation } from "@/lib/progress-store"

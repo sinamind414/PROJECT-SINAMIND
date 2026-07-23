@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useEffect, useState, useMemo, useCallback } from "react"
 import { useParams } from "next/navigation"
@@ -23,24 +23,23 @@ import { UI_AR, trAr } from "@/lib/translations"
 import {
   MindMap as MindMapType,
   MindMapNode,
-  MAITRISE_COLORS
 } from "@/lib/types"
 import CustomMindMapNode from "@/components/mindmap/CustomMindMapNode"
 import { getChapterBySlug } from "@/lib/cours-data"
 
 const PROGRESS_LABELS: Record<string, string> = {
-  init: "جاري التهيئة...",
-  rag: "البحث في الدروس...",
-  llm: "التوليد بالذكاء الاصطناعي...",
-  save: "جاري الحفظ...",
-  flashcards: "إنشاء البطاقات...",
-  done: "تم !"
+  init: "Ø¬Ø§Ø±ÙŠ Ø§Ù„ØªÙ‡ÙŠØ¦Ø©...",
+  rag: "Ø§Ù„Ø¨Ø­Ø« ÙÙŠ Ø§Ù„Ø¯Ø±ÙˆØ³...",
+  llm: "Ø§Ù„ØªÙˆÙ„ÙŠØ¯ Ø¨Ø§Ù„Ø°ÙƒØ§Ø¡ Ø§Ù„Ø§ØµØ·Ù†Ø§Ø¹ÙŠ...",
+  save: "Ø¬Ø§Ø±ÙŠ Ø§Ù„Ø­ÙØ¸...",
+  flashcards: "Ø¥Ù†Ø´Ø§Ø¡ Ø§Ù„Ø¨Ø·Ø§Ù‚Ø§Øª...",
+  done: "ØªÙ… !"
 }
 
 const MAITRISE_BUTTONS = [
-  { value: 0 as const, label: "🔴 غير مفهوم", color: "border-red-500/40 bg-red-500/10 text-red-400" },
-  { value: 1 as const, label: "🟡 قيد التعلم", color: "border-amber-500/40 bg-amber-500/10 text-amber-400" },
-  { value: 2 as const, label: "🟢 مُتقن", color: "border-green-500/40 bg-green-500/10 text-green-400" },
+  { value: 0 as const, label: "ðŸ”´ ØºÙŠØ± Ù…ÙÙ‡ÙˆÙ…", color: "border-red-500/40 bg-red-500/10 text-red-400" },
+  { value: 1 as const, label: "ðŸŸ¡ Ù‚ÙŠØ¯ Ø§Ù„ØªØ¹Ù„Ù…", color: "border-amber-500/40 bg-amber-500/10 text-amber-400" },
+  { value: 2 as const, label: "ðŸŸ¢ Ù…ÙØªÙ‚Ù†", color: "border-green-500/40 bg-green-500/10 text-green-400" },
 ]
 
 const nodeTypes = { mindMapNode: CustomMindMapNode }
@@ -115,27 +114,18 @@ function resolveMindmapErrorMessage(error: unknown): string {
   const message = error instanceof Error ? error.message : ""
 
   if (message.includes("no_context")) {
-    return "لا توجد بيانات كافية لهذا الفصل بعد. جرّب فصلا آخر مثل تركيب البروتينات."
+    return "Ù„Ø§ ØªÙˆØ¬Ø¯ Ø¨ÙŠØ§Ù†Ø§Øª ÙƒØ§ÙÙŠØ© Ù„Ù‡Ø°Ø§ Ø§Ù„ÙØµÙ„ Ø¨Ø¹Ø¯. Ø¬Ø±Ù‘Ø¨ ÙØµÙ„Ø§ Ø¢Ø®Ø± Ù…Ø«Ù„ ØªØ±ÙƒÙŠØ¨ Ø§Ù„Ø¨Ø±ÙˆØªÙŠÙ†Ø§Øª."
   }
   if (message.includes("chapitre") || message.includes("introuvable")) {
-    return "تعذر العثور على الفصل المطلوب. تحقق من الرابط أو من بيانات البرنامج."
+    return "ØªØ¹Ø°Ø± Ø§Ù„Ø¹Ø«ÙˆØ± Ø¹Ù„Ù‰ Ø§Ù„ÙØµÙ„ Ø§Ù„Ù…Ø·Ù„ÙˆØ¨. ØªØ­Ù‚Ù‚ Ù…Ù† Ø§Ù„Ø±Ø§Ø¨Ø· Ø£Ùˆ Ù…Ù† Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ø¨Ø±Ù†Ø§Ù…Ø¬."
   }
   if (message.includes("timeout") || message.includes("timeout_mindmap_generation")) {
-    return "الخريطة قيد الإنشاء في الخلفية. أعد تحميل الصفحة بعد 30 ثانية."
+    return "Ø§Ù„Ø®Ø±ÙŠØ·Ø© Ù‚ÙŠØ¯ Ø§Ù„Ø¥Ù†Ø´Ø§Ø¡ ÙÙŠ Ø§Ù„Ø®Ù„ÙÙŠØ©. Ø£Ø¹Ø¯ ØªØ­Ù…ÙŠÙ„ Ø§Ù„ØµÙØ­Ø© Ø¨Ø¹Ø¯ 30 Ø«Ø§Ù†ÙŠØ©."
   }
-  if (message.includes("503") || message.includes("Service IA non configuré")) {
-    return "خدمة الذكاء الاصطناعي غير مهيأة حاليا. تحقق من مفاتيح API."
+  if (message.includes("503") || message.includes("Service IA non configurÃ©")) {
+    return "Ø®Ø¯Ù…Ø© Ø§Ù„Ø°ÙƒØ§Ø¡ Ø§Ù„Ø§ØµØ·Ù†Ø§Ø¹ÙŠ ØºÙŠØ± Ù…Ù‡ÙŠØ£Ø© Ø­Ø§Ù„ÙŠØ§. ØªØ­Ù‚Ù‚ Ù…Ù† Ù…ÙØ§ØªÙŠØ­ API."
   }
   return UI_AR.erreur_chargement_mindmap
-}
-
-function findNodeInTree(node: MindMapNode, targetId: string): MindMapNode | null {
-  if (node.id === targetId) return node
-  for (const child of node.enfants || []) {
-    const found = findNodeInTree(child, targetId)
-    if (found) return found
-  }
-  return null
 }
 
 function updateNodeInTree(node: MindMapNode, targetId: string, updates: Partial<MindMapNode>): MindMapNode {
@@ -182,7 +172,7 @@ function ChapterMindMapContent() {
         return task.mindmap
       }
       if (task.status === "failed") {
-        throw new Error(task.error || "تعذر إنشاء الخريطة الذهنية")
+        throw new Error(task.error || "ØªØ¹Ø°Ø± Ø¥Ù†Ø´Ø§Ø¡ Ø§Ù„Ø®Ø±ÙŠØ·Ø© Ø§Ù„Ø°Ù‡Ù†ÙŠØ©")
       }
       await new Promise(r => setTimeout(r, 2000))
     }
@@ -267,7 +257,7 @@ function ChapterMindMapContent() {
     try {
       const ch = getChapterBySlug(chapterSlug as string)
       if (!ch) {
-        throw new Error("تعذر العثور على الفصل المطلوب")
+        throw new Error("ØªØ¹Ø°Ø± Ø§Ù„Ø¹Ø«ÙˆØ± Ø¹Ù„Ù‰ Ø§Ù„ÙØµÙ„ Ø§Ù„Ù…Ø·Ù„ÙˆØ¨")
       }
 
       setChapterInfo({ ar: ch.chapterAr, fr: ch.chapterFr, slug: ch.slug })
@@ -282,7 +272,7 @@ function ChapterMindMapContent() {
       })
 
       if (res.status === "no_context") {
-        throw new Error(`no_context: لا توجد بيانات RAG لهذا الفصل بعد.`)
+        throw new Error(`no_context: Ù„Ø§ ØªÙˆØ¬Ø¯ Ø¨ÙŠØ§Ù†Ø§Øª RAG Ù„Ù‡Ø°Ø§ Ø§Ù„ÙØµÙ„ Ø¨Ø¹Ø¯.`)
       }
 
       let mindmapData: MindMapType
@@ -291,8 +281,8 @@ function ChapterMindMapContent() {
           mindmapData = await pollTask(res.task_id)
         } catch (e) {
           const msg = e instanceof Error ? e.message : ""
-          if (msg.includes("مهلة") || msg.includes("timeout")) {
-            throw new Error("الخريطة قيد الإنشاء في الخلفية. أعد تحميل الصفحة بعد 30 ثانية.")
+          if (msg.includes("Ù…Ù‡Ù„Ø©") || msg.includes("timeout")) {
+            throw new Error("Ø§Ù„Ø®Ø±ÙŠØ·Ø© Ù‚ÙŠØ¯ Ø§Ù„Ø¥Ù†Ø´Ø§Ø¡ ÙÙŠ Ø§Ù„Ø®Ù„ÙÙŠØ©. Ø£Ø¹Ø¯ ØªØ­Ù…ÙŠÙ„ Ø§Ù„ØµÙØ­Ø© Ø¨Ø¹Ø¯ 30 Ø«Ø§Ù†ÙŠØ©.")
           }
           throw e
         }
@@ -301,7 +291,7 @@ function ChapterMindMapContent() {
       }
 
       if (!mindmapData || !mindmapData.racine) {
-        throw new Error("بنية الخريطة الذهنية غير صالحة")
+        throw new Error("Ø¨Ù†ÙŠØ© Ø§Ù„Ø®Ø±ÙŠØ·Ø© Ø§Ù„Ø°Ù‡Ù†ÙŠØ© ØºÙŠØ± ØµØ§Ù„Ø­Ø©")
       }
 
       setMindmap(mindmapData)
@@ -325,16 +315,16 @@ function ChapterMindMapContent() {
 
   const importanceLabels: Record<string, string> = {
     critique: UI_AR.critique,
-    haute: "مهم",
-    moyenne: "متوسط"
+    haute: "Ù…Ù‡Ù…",
+    moyenne: "Ù…ØªÙˆØ³Ø·"
   }
 
   const typeLabels: Record<string, string> = {
     concept: UI_AR.concept,
-    processus: "عملية",
-    definition: "تعريف",
-    formule: "صيغة",
-    exception: "استثناء"
+    processus: "Ø¹Ù…Ù„ÙŠØ©",
+    definition: "ØªØ¹Ø±ÙŠÙ",
+    formule: "ØµÙŠØºØ©",
+    exception: "Ø§Ø³ØªØ«Ù†Ø§Ø¡"
   }
 
   const weakNodes = useMemo(() => {
@@ -371,7 +361,7 @@ function ChapterMindMapContent() {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-slate-950 p-6">
         <div className="bg-red-500/10 border border-red-500/30 rounded-2xl p-8 max-w-md text-center space-y-4">
-          <p className="text-4xl">⚠️</p>
+          <p className="text-4xl">âš ï¸</p>
           <h3 className="text-red-300 font-bold text-lg">{UI_AR.erreur_chargement}</h3>
           <p className="text-slate-300 text-sm leading-relaxed">{error || UI_AR.impossible_charger_donnees}</p>
           <div className="flex justify-center gap-3">
@@ -379,7 +369,7 @@ function ChapterMindMapContent() {
               href="/mindmap"
               className="px-4 py-2 bg-slate-800 text-slate-300 border border-slate-700 rounded-lg hover:bg-slate-700 text-sm transition"
             >
-              العودة إلى الخريطة
+              Ø§Ù„Ø¹ÙˆØ¯Ø© Ø¥Ù„Ù‰ Ø§Ù„Ø®Ø±ÙŠØ·Ø©
             </Link>
             <button
               onClick={loadChapterAndMindmap}
@@ -398,7 +388,7 @@ function ChapterMindMapContent() {
       <header className="border-b border-slate-900 bg-slate-950/80 backdrop-blur px-6 py-4 flex justify-between items-center z-10">
         <div className="flex items-center gap-4">
           <Link href="/mindmap" className="text-slate-400 hover:text-white transition">
-            ← الخريطة
+            â† Ø§Ù„Ø®Ø±ÙŠØ·Ø©
           </Link>
           <div className="h-4 w-px bg-slate-800" />
           <div>
@@ -499,7 +489,7 @@ function ChapterMindMapContent() {
                       onClick={() => handleExpandNode(selectedNode)}
                       className="w-full py-2 bg-violet-500/10 border border-violet-500/25 rounded-xl text-xs font-bold text-violet-400 hover:bg-violet-500/15 transition"
                     >
-                      📂 توسيع العقد الفرعية
+                      ðŸ“‚ ØªÙˆØ³ÙŠØ¹ Ø§Ù„Ø¹Ù‚Ø¯ Ø§Ù„ÙØ±Ø¹ÙŠØ©
                     </button>
                   )}
                 </div>
@@ -508,7 +498,7 @@ function ChapterMindMapContent() {
                   href="/drill"
                   className="block w-full py-2.5 bg-slate-800/50 border border-slate-700 rounded-xl text-center text-xs font-bold text-mint hover:bg-slate-800 transition"
                 >
-                  🎯 راجع هذا الفصل في المراجعة السريعة ←
+                  ðŸŽ¯ Ø±Ø§Ø¬Ø¹ Ù‡Ø°Ø§ Ø§Ù„ÙØµÙ„ ÙÙŠ Ø§Ù„Ù…Ø±Ø§Ø¬Ø¹Ø© Ø§Ù„Ø³Ø±ÙŠØ¹Ø© â†
                 </Link>
               </section>
             ) : (

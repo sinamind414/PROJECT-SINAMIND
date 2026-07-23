@@ -20,8 +20,6 @@ import {
   getChapterBySlug,
   getLessonForChapter,
   getChapterNavigation,
-  IMPORTANCE_CONFIG,
-  TYPE_LABELS_AR,
 } from "@/lib/cours-data"
 import { apiClient } from "@/lib/api-client"
 import type { CoursResponse } from "@/lib/types"
@@ -208,9 +206,6 @@ export default function ChapitrePage() {
       </AuthGuard>
     )
   }
-
-  const imp = IMPORTANCE_CONFIG[chapter.chapterImportance]
-  const typeLabel = TYPE_LABELS_AR[chapter.chapterType || "concept"]
 
   return (
     <AuthGuard>

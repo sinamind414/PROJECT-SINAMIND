@@ -19,7 +19,11 @@ import {
   canScheduleRecallForLesson,
   canScheduleRecallForVerb,
   openRecallGate,
+  getRecallItemByLesson,
+  listRecallItems,
+  persistRecallItem,
 } from "./evidenceService"
+import { createScheduledRecallItem } from "../recall/recallReduce"
 
 const validTrace: DocumentTrace = {
   observation: "نلاحظ ارتفاع المنحنى",
@@ -88,6 +92,34 @@ describe("session tunnel — contrats Kunz", () => {
     runSessionEffects(effects, { documentScore: 80 })
     expect(hasDocumentEvidence("lec-analyse-1")).toBe(true)
     expect(canScheduleRecallForLesson("lec-analyse-1")).toBe(true)
+    const recall = getRecallItemByLesson("lec-analyse-1")
+    expect(recall).not.toBeNull()
+    expect(recall?.state).toBe("RECALL_SCHEDULED")
+    expect(recall?.context.conceptId).toBe("analyse")
+  })
+
+  it("scheduleSpacedRecall : RecallItem idempotent par lessonId", () => {
+    const effects = [
+      {
+        op: "scheduleSpacedRecall" as const,
+        lessonId: "lec-idem",
+        verbSlug: "analyse",
+        reason: "document_evidence" as const,
+      },
+    ]
+    runSessionEffects(effects)
+    runSessionEffects(effects)
+    expect(listRecallItems().filter((r) => r.context.lessonId === "lec-idem")).toHaveLength(1)
+    const first = getRecallItemByLesson("lec-idem")!
+    const second = persistRecallItem(
+      createScheduledRecallItem({
+        lessonId: "lec-idem",
+        conceptId: "other",
+        nowIso: "2099-01-01T00:00:00.000Z",
+      })
+    )
+    expect(second.context.conceptId).toBe(first.context.conceptId)
+    expect(second.context.recallItemId).toBe(first.context.recallItemId)
   })
 
   it("T3: doc OK puis BAC < 70 → error BAC, evidence doc conservée, pas method", () => {
@@ -147,7 +179,7 @@ describe("session tunnel — contrats Kunz", () => {
   })
 
   it("T5: skip BAC si bacRequired=false → doc_only", () => {
-    let snap: SessionSnapshot = {
+    const snap: SessionSnapshot = {
       state: "DOCUMENT_PASSED",
       context: initialSessionContext({
         lessonId: "lec-2",
@@ -219,5 +251,61 @@ describe("session tunnel — contrats Kunz", () => {
       reason: "document_evidence",
     })
     expect(canScheduleRecallForVerb("analyse")).toBe(true)
+  })
+
+  it("T6: remédiation → retry → succès → actualise erreur + crée evidence", () => {
+    const traceFail: DocumentTrace = { ...validTrace, observation: "" }
+
+    let snap = reduceSession(baseDoc(), {
+      type: "DOCUMENT_SUBMIT",
+      trace: traceFail,
+      score: 50,
+    })
+    expect(snap.snapshot.state).toBe("DOCUMENT_FEEDBACK")
+    runSessionEffects(snap.effects, { documentScore: 50 })
+
+    snap = reduceSession(snap.snapshot, { type: "FEEDBACK_ACK" })
+    expect(snap.snapshot.state).toBe("DOCUMENT_FAILED")
+
+    snap = reduceSession(snap.snapshot, { type: "REMEDIATION_OPEN" })
+    expect(snap.snapshot.state).toBe("REMEDIATION_OPEN")
+
+    snap = reduceSession(snap.snapshot, { type: "REMEDIATION_COMPLETE" })
+    expect(snap.snapshot.state).toBe("DOCUMENT_FAILED")
+
+    const retry = reduceSession(snap.snapshot, { type: "DOCUMENT_RETRY" })
+    expect(retry.snapshot.state).toBe("DOCUMENT_IN_PROGRESS")
+    expect(retry.snapshot.context.hintsUsed).toBe(0)
+    expect(retry.snapshot.context.documentTrace).toBeNull()
+
+    const success = reduceSession(retry.snapshot, {
+      type: "DOCUMENT_SUBMIT",
+      trace: validTrace,
+      score: 80,
+    })
+    expect(success.snapshot.state).toBe("DOCUMENT_FEEDBACK")
+    expect(success.effects.some((e) => e.op === "createDocumentEvidence")).toBe(true)
+    expect(success.effects.some((e) => e.op === "scheduleSpacedRecall")).toBe(true)
+    expect(success.effects.some((e) => e.op === "upsertLearningError")).toBe(false)
+  })
+
+  it("T10: services only — aucun effet sans runSessionEffects", () => {
+    const initialEvidences = listEvidences().length
+    const initialErrors = listLearningErrors().length
+
+    const { effects } = reduceSession(baseDoc(), {
+      type: "DOCUMENT_SUBMIT",
+      trace: validTrace,
+      score: 80,
+    })
+    expect(effects.length).toBeGreaterThan(0)
+
+    expect(listEvidences().length).toBe(initialEvidences)
+    expect(listLearningErrors().length).toBe(initialErrors)
+    expect(canScheduleRecallForLesson("lec-analyse-1")).toBe(false)
+
+    runSessionEffects(effects, { documentScore: 80 })
+    expect(listEvidences().length).toBe(initialEvidences + 1)
+    expect(canScheduleRecallForLesson("lec-analyse-1")).toBe(true)
   })
 })

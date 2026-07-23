@@ -3,7 +3,6 @@ import {
   ENRICHED_ACTION_VERBS,
   enrichedToLegacy,
   allEnrichedActionVerbs,
-  type EnrichedActionVerbRule,
   type EnrichedVerbDefinition,
   type EnrichedVerbContext,
   type EnrichedVerbForms,

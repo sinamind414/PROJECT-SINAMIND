@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { AppShell } from "@/components/layout/AppShell"
-import { BookOpen, Layers3, GraduationCap, Microscope, FlaskConical, ChevronLeft } from "lucide-react"
+import { Layers3, GraduationCap, Microscope, FlaskConical, ChevronLeft } from "lucide-react"
 
 type PhaseMeta = {
   slug: string
@@ -150,12 +150,6 @@ const DOMAIN_GRADIENTS: Record<string, string> = {
   blue: "from-blue-600 to-blue-500",
   emerald: "from-emerald-600 to-emerald-500",
   amber: "from-amber-600 to-amber-500",
-}
-
-const DOMAIN_BORDERS: Record<string, string> = {
-  blue: "border-blue-500/30 bg-blue-500/10 hover:border-blue-500/50",
-  emerald: "border-emerald-500/30 bg-emerald-500/10 hover:border-emerald-500/50",
-  amber: "border-amber-500/30 bg-amber-500/10 hover:border-amber-500/50",
 }
 
 export default function LeconsPage() {

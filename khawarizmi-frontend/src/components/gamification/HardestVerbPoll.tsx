@@ -18,7 +18,6 @@ export function HardestVerbPoll() {
     const shown = localStorage.getItem("hardest_verb_poll_shown")
     if (!shown) setVisible(true)
   }, [])
-
   const handleSubmit = async () => {
     if (!selected) return
     localStorage.setItem("hardest_verb_poll_shown", "true")

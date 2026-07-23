@@ -423,6 +423,7 @@ export function saveBacBlancErrors(input: {
     .filter((record) => !existing.has(record.marker))
 
   if (!records.length) return
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   saveMethodologyEvaluations(records.map(({ marker: _marker, ...record }) => record))
 }
 

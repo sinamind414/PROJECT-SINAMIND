@@ -4,7 +4,7 @@ import Link from "next/link"
 import { useMemo } from "react"
 import { AuthGuard } from "@/components/auth/AuthGuard"
 import { AppShell } from "@/components/layout/AppShell"
-import { DOMAINS, getUnitsForDomain, getChaptersForUnit, type DomainMeta } from "@/lib/cours-data"
+import { DOMAINS, getUnitsForDomain, type DomainMeta } from "@/lib/cours-data"
 
 function DomainCard({ domain, unitCount, chapterCount }: { domain: DomainMeta; unitCount: number; chapterCount: number }) {
   return (

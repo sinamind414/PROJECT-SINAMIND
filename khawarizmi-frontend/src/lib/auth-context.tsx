@@ -1,4 +1,4 @@
-// src/lib/auth-context.tsx
+﻿// src/lib/auth-context.tsx
 // Contexte d'authentification global
 
 "use client"
@@ -42,7 +42,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       apiClient.clearToken()
       setUser(null)
     } finally {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- async auth bootstrap
+       
       setLoading(false)
     }
   }, [])
@@ -88,12 +88,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   )
 }
 
-// Hook personnalisé
+// Hook personnalisÃ©
 export function useAuth() {
   const context = useContext(AuthContext)
   if (context === undefined) {
     throw new Error(
-      "useAuth doit être utilisé dans un AuthProvider"
+      "useAuth doit Ãªtre utilisÃ© dans un AuthProvider"
     )
   }
   return context

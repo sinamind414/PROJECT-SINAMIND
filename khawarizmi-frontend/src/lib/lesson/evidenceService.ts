@@ -10,11 +10,16 @@ import {
   outcomeAllowsMethodMastery,
 } from "./tunnelTypes"
 import type { SessionEffect, SessionSnapshot } from "./sessionReduce"
+import {
+  createScheduledRecallItem,
+  type RecallSnapshot,
+} from "../recall/recallReduce"
 
 const EVIDENCE_KEY = "khawarizmi.evidence.v1"
 const ERRORS_KEY = "khawarizmi.learning_errors.v1"
 const RECALL_GATE_KEY = "khawarizmi.recall_gate.v1"
 const SESSION_KEY = "khawarizmi.lesson_session.v1"
+const RECALL_ITEMS_KEY = "khawarizmi.recall_items.v1"
 
 export type EvidenceKind = "document" | "method"
 
@@ -85,7 +90,8 @@ function writeJson(key: string, value: unknown) {
       key === EVIDENCE_KEY ||
       key === ERRORS_KEY ||
       key === RECALL_GATE_KEY ||
-      key === SESSION_KEY
+      key === SESSION_KEY ||
+      key === RECALL_ITEMS_KEY
     ) {
       window.dispatchEvent(new Event("khawarizmi-contract-updated"))
       window.dispatchEvent(new Event("sinamind-progress-updated"))
@@ -103,6 +109,7 @@ export function __resetEvidenceStoreForTests() {
     window.localStorage.removeItem(ERRORS_KEY)
     window.localStorage.removeItem(RECALL_GATE_KEY)
     window.localStorage.removeItem(SESSION_KEY)
+    window.localStorage.removeItem(RECALL_ITEMS_KEY)
   }
 }
 
@@ -231,6 +238,27 @@ export function openRecallGate(input: {
   return record
 }
 
+/**
+ * Pont unique : gate + RecallItem SCHEDULED (idempotent par lessonId).
+ * Utilisé par runSessionEffects et le pont practiceOutcome.
+ */
+export function openRecallGateAndScheduleItem(input: {
+  lessonId: string
+  verbSlug: string | null
+  reason: "document_evidence"
+  nowIso?: string
+}): { gate: RecallGateRecord; recall: RecallSnapshot } {
+  const gate = openRecallGate(input)
+  const recall = persistRecallItem(
+    createScheduledRecallItem({
+      lessonId: input.lessonId,
+      conceptId: input.verbSlug ?? input.lessonId,
+      nowIso: input.nowIso,
+    })
+  )
+  return { gate, recall }
+}
+
 export function canScheduleRecallForLesson(lessonId: string): boolean {
   return listRecallGates().some((g) => g.lessonId === lessonId && g.allowed)
 }
@@ -346,7 +374,7 @@ export function runSessionEffects(
         break
       }
       case "scheduleSpacedRecall": {
-        openRecallGate({
+        openRecallGateAndScheduleItem({
           lessonId: effect.lessonId,
           verbSlug: effect.verbSlug,
           reason: effect.reason,
@@ -368,6 +396,23 @@ export function runSessionEffects(
   }
 
   return { evidenceIds, errorIds, recallOpened }
+}
+
+/** Idempotent : un RecallItem par lessonId (ne remplace pas un existant). */
+export function persistRecallItem(snapshot: RecallSnapshot): RecallSnapshot {
+  const all = listRecallItems()
+  const existing = all.find((s) => s.context.lessonId === snapshot.context.lessonId)
+  if (existing) return existing
+  writeJson(RECALL_ITEMS_KEY, [...all, snapshot])
+  return snapshot
+}
+
+export function listRecallItems(): RecallSnapshot[] {
+  return readJson<RecallSnapshot[]>(RECALL_ITEMS_KEY, [])
+}
+
+export function getRecallItemByLesson(lessonId: string): RecallSnapshot | null {
+  return listRecallItems().find((s) => s.context.lessonId === lessonId) ?? null
 }
 
 /** Garde UI : badge maîtrise méthodo seulement si outcome passed */

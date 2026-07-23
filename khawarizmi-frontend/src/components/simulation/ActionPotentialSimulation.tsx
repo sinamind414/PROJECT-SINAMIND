@@ -323,7 +323,7 @@ export function ActionPotentialSimulation() {
 
                 {curvePoints.length === 0 && (
                   <text x="200" y="100" textAnchor="middle" fill="#475569" fontSize="11">
-                    اضغط "نبّه الخلية" لتسجيل كمون الفعل
+                    اضغط &quot;نبّه الخلية&quot; لتسجيل كمون الفعل
                   </text>
                 )}
 

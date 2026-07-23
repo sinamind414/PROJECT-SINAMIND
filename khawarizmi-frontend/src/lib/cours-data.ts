@@ -68,10 +68,6 @@ function getUnitSlug(unitFr: string): string {
   return UNIT_SLUGS[unitFr] || `u${unitFr.length % 10}`
 }
 
-function getDomainByNumero(numero: number): DomainMeta | undefined {
-  return DOMAINS.find((d) => d.numero === numero)
-}
-
 export function getDomainBySlug(slug: string): DomainMeta | undefined {
   return DOMAINS.find((d) => d.slug === slug)
 }

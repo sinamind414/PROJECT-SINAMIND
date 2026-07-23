@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react"
+﻿import { useState, useEffect } from "react"
 import { apiClient } from "@/lib/api-client"
 
 export interface BlogPost {
@@ -25,20 +25,37 @@ export interface BlogComment {
   created_at: string
 }
 
+interface Conversation {
+  id: number
+  title?: string
+  last_message?: string
+  updated_at?: string
+}
+
+interface SocialMessage {
+  id: number
+  conversation_id: number
+  sender_id: number
+  sender_name: string
+  content: string
+  file_url?: string
+  created_at: string
+}
+
 export function useSocial() {
-  const [conversations, setConversations] = useState<any[]>([])
-  const [messages, setMessages] = useState<any[]>([])
+  const [conversations, setConversations] = useState<Conversation[]>([])
+  const [messages, setMessages] = useState<SocialMessage[]>([])
   const [posts, setPosts] = useState<BlogPost[]>([])
   const [loading, setLoading] = useState(false)
   const [activeConvId, setActiveConvId] = useState<number | null>(null)
 
   async function fetchConversations() {
-    try { const data = await apiClient.request<any[]>("/api/social/conversations"); setConversations(data) } catch {}
+    try { const data = await apiClient.request<Conversation[]>("/api/social/conversations"); setConversations(data) } catch {}
   }
 
   async function fetchMessages(cid: number) {
     setLoading(true)
-    try { const data = await apiClient.request<any[]>(`/api/social/conversations/${cid}/messages`); setMessages(data) } catch {}
+    try { const data = await apiClient.request<SocialMessage[]>(`/api/social/conversations/${cid}/messages`); setMessages(data) } catch {}
     finally { setLoading(false) }
   }
 

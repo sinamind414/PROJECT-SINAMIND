@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useCallback, useEffect, useState } from "react"
 import Link from "next/link"
@@ -34,9 +34,9 @@ export function VideosWidget({ chapitre }: { chapitre: string }) {
         setVideos(() => data.slice(0, 3))
       }
     } catch (err) {
-      console.error("Erreur vidéos:", err)
+      console.error("Erreur vidÃ©os:", err)
     } finally {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- async data fetching
+       
       setLoading(false)
     }
   }, [chapitre])
@@ -53,17 +53,17 @@ export function VideosWidget({ chapitre }: { chapitre: string }) {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h2 className="text-2xl font-bold text-white mb-1">
-            🎥 فيديوهات موصى بها
+            ðŸŽ¥ ÙÙŠØ¯ÙŠÙˆÙ‡Ø§Øª Ù…ÙˆØµÙ‰ Ø¨Ù‡Ø§
           </h2>
           <p className="text-gray-400 text-sm">
-            تعلم بصرياً مع أفضل القنوات الجزائرية
+            ØªØ¹Ù„Ù… Ø¨ØµØ±ÙŠØ§Ù‹ Ù…Ø¹ Ø£ÙØ¶Ù„ Ø§Ù„Ù‚Ù†ÙˆØ§Øª Ø§Ù„Ø¬Ø²Ø§Ø¦Ø±ÙŠØ©
           </p>
         </div>
         <Link
           href="/videos"
           className="text-mint-soft text-sm hover:underline"
         >
-          عرض الكل ←
+          Ø¹Ø±Ø¶ Ø§Ù„ÙƒÙ„ â†
         </Link>
       </div>
 
