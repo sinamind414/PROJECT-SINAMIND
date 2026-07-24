@@ -276,6 +276,23 @@ export default function MethodologyPortalPage() {
                 </Link>
 
                 <Link
+                  href="/methodology/exercices/analyse-gene-expression"
+                  className="rounded-2xl border border-mint/25 bg-mint/10 p-5 hover:bg-mint/15 transition group"
+                >
+                  <BookOpen className="w-6 h-6 text-mint mb-3" />
+                  <div className="font-black text-white text-lg">اضطراب تركيب بروتين</div>
+                  <div className="text-xs text-white/40 mt-0.5" dir="ltr">
+                    Analyse document — expression génétique
+                  </div>
+                  <p className="text-sm text-white/65 mt-2">
+                    تمرين كامل مع قائمة التحقق والتصحيح — بيّن أن تنشيط المورثة يزيد تركيب البروتين.
+                  </p>
+                  <span className="inline-block mt-3 text-mint text-sm font-bold group-hover:underline">
+                    ابدأ التمرين ←
+                  </span>
+                </Link>
+
+                <Link
                   href="/annales"
                   className="rounded-2xl border border-amber-500/25 bg-amber-500/10 p-5 hover:bg-amber-500/15 transition group md:col-span-2"
                 >

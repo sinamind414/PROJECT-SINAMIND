@@ -11,6 +11,11 @@ import {
   upsertLearningError,
   uiMayShowMethodMastery,
 } from "./evidenceService"
+import {
+  shouldScheduleRecall,
+  toRecallResult,
+  shouldApplyFailedEvalEffects,
+} from "../kunzUtils"
 
 export type PracticeOutcomeResult = {
   outcome: SessionOutcome
@@ -37,12 +42,15 @@ export function applyVerbPracticeOutcome(input: {
       verbSlug: input.verbSlug,
       score: input.percentage,
     })
-    openRecallGateAndScheduleItem({
-      lessonId: input.lessonId,
-      verbSlug: input.verbSlug,
-      reason: "document_evidence",
-    })
     const outcome: SessionOutcome = "doc_only"
+    if (shouldScheduleRecall(outcome)) {
+      openRecallGateAndScheduleItem({
+        lessonId: input.lessonId,
+        verbSlug: input.verbSlug,
+        reason: "document_evidence",
+        success: toRecallResult(outcome),
+      })
+    }
     return {
       outcome,
       mayShowMasteryBadge: uiMayShowMethodMastery(outcome),
@@ -51,13 +59,24 @@ export function applyVerbPracticeOutcome(input: {
     }
   }
 
-  upsertLearningError({
-    lessonId: input.lessonId,
-    verbSlug: input.verbSlug,
-    source: "document",
-  })
+  const failOutcome: SessionOutcome = "failed"
+  if (shouldApplyFailedEvalEffects(failOutcome)) {
+    upsertLearningError({
+      lessonId: input.lessonId,
+      verbSlug: input.verbSlug,
+      source: "document",
+    })
+  }
+  if (shouldScheduleRecall(failOutcome)) {
+    openRecallGateAndScheduleItem({
+      lessonId: input.lessonId,
+      verbSlug: input.verbSlug,
+      reason: "document_evidence",
+      success: toRecallResult(failOutcome),
+    })
+  }
   return {
-    outcome: "failed",
+    outcome: failOutcome,
     mayShowMasteryBadge: false,
     evidenceCreated: false,
     errorCreated: true,
@@ -114,19 +133,34 @@ export function applyDocumentScenarioOutcome(input: {
         verbSlug: item.verbSlug,
         score: item.percentage,
       })
-      openRecallGateAndScheduleItem({
-        lessonId,
-        verbSlug: item.verbSlug,
-        reason: "document_evidence",
-      })
+      const outcome: SessionOutcome = "doc_only"
+      if (shouldScheduleRecall(outcome)) {
+        openRecallGateAndScheduleItem({
+          lessonId,
+          verbSlug: item.verbSlug,
+          reason: "document_evidence",
+          success: toRecallResult(outcome),
+        })
+      }
       evidenceCreated += 1
     } else {
       failedCount += 1
-      upsertLearningError({
-        lessonId,
-        verbSlug: item.verbSlug,
-        source: "document",
-      })
+      const outcome: SessionOutcome = "failed"
+      if (shouldApplyFailedEvalEffects(outcome)) {
+        upsertLearningError({
+          lessonId,
+          verbSlug: item.verbSlug,
+          source: "document",
+        })
+      }
+      if (shouldScheduleRecall(outcome)) {
+        openRecallGateAndScheduleItem({
+          lessonId,
+          verbSlug: item.verbSlug,
+          reason: "document_evidence",
+          success: toRecallResult(outcome),
+        })
+      }
       errorsCreated += 1
     }
   }
@@ -230,14 +264,18 @@ export function applyBacExamOutcome(input: {
       verbSlug: null,
       bacScore: input.overallPercentage,
     })
-    openRecallGateAndScheduleItem({
-      lessonId,
-      verbSlug: null,
-      reason: "document_evidence",
-    })
+    const outcome: SessionOutcome = "passed"
+    if (shouldScheduleRecall(outcome)) {
+      openRecallGateAndScheduleItem({
+        lessonId,
+        verbSlug: null,
+        reason: "document_evidence",
+        success: toRecallResult(outcome),
+      })
+    }
     methodEvidenceCreated = true
     return {
-      outcome: "passed",
+      outcome,
       overallPercentage: input.overallPercentage,
       mayShowMasteryBadge: true,
       methodEvidenceCreated,
@@ -247,19 +285,30 @@ export function applyBacExamOutcome(input: {
     }
   }
 
-  for (const item of input.items) {
-    if (item.percentage < threshold) {
-      upsertLearningError({
-        lessonId: `${lessonId}:${item.verbSlug || "item"}`,
-        verbSlug: item.verbSlug || null,
-        source: "bac",
-      })
-      errorsCreated += 1
+  const failOutcome: SessionOutcome = "failed"
+  if (shouldApplyFailedEvalEffects(failOutcome)) {
+    for (const item of input.items) {
+      if (item.percentage < threshold) {
+        upsertLearningError({
+          lessonId: `${lessonId}:${item.verbSlug || "item"}`,
+          verbSlug: item.verbSlug || null,
+          source: "bac",
+        })
+        errorsCreated += 1
+      }
     }
+  }
+  if (shouldScheduleRecall(failOutcome)) {
+    openRecallGateAndScheduleItem({
+      lessonId,
+      verbSlug: null,
+      reason: "document_evidence",
+      success: toRecallResult(failOutcome),
+    })
   }
 
   return {
-    outcome: "failed",
+    outcome: failOutcome,
     overallPercentage: input.overallPercentage,
     mayShowMasteryBadge: false,
     methodEvidenceCreated: false,
@@ -267,4 +316,24 @@ export function applyBacExamOutcome(input: {
     labelAr: "امتحان تحت العتبة — لا شارة إتقان",
     labelFr: "Sous le seuil — pas de badge de maîtrise",
   }
+}
+
+export type AbortedOutcomeResult = {
+  outcome: "aborted"
+  effects: Array<"persistSession" | "markSuspended" | "clearSession">
+}
+
+/**
+ * Sortie volontaire / timeout / navigation : zéro evidence, error, recall.
+ * Effets uniquement : suspendre la position + persister pour reprise.
+ */
+export function applyAbortedOutcome(input: {
+  lessonId: string
+  reason?: "user_leave" | "timeout" | "navigation"
+}): AbortedOutcomeResult {
+  const effects: AbortedOutcomeResult["effects"] = ["markSuspended", "persistSession"]
+  if (input.reason === "timeout" || input.reason === "navigation") {
+    effects.push("clearSession")
+  }
+  return { outcome: "aborted", effects }
 }

@@ -21,6 +21,7 @@ os.environ.setdefault("ENVIRONMENT", "test")
 from database import get_db as db_get_db
 from deps import get_db, get_openai
 from main import app
+from tests.mock_store import inserted_emails as _inserted_emails, mock_store as _mock_orm_store
 
 TEST_PWD_HASH = "$2b$12$7.cA3KDwXgXygLhjVDrNl.fZPK3kqUcd5.LXeRZ2b0Yf7TkPwdjea"
 
@@ -82,9 +83,6 @@ class MockAsyncExecResult:
         return iter(self._rows)
 
 
-_inserted_emails = set()
-_mock_orm_store = {}
-
 
 class MockAsyncSession:
     def __init__(self):
@@ -98,6 +96,10 @@ class MockAsyncSession:
         }
 
     def _store_key_for_sql(self, sql: str):
+        if "tunnel_events" in sql:
+            return ("tunnel_events", 1)
+        if "recall_items" in sql:
+            return ("recall_items", 1)
         if "user_streaks" in sql:
             return ("user_streaks", 1)
         if "user_points" in sql:
@@ -156,6 +158,75 @@ class MockAsyncSession:
             )
             _inserted_emails.add(email)
             return MockAsyncExecResult([{"id": 1}])
+
+        if "tunnel_events" in sql and "SELECT" in sql and "client_event_id" in sql:
+            ceid = params.get("ceid", "") if isinstance(params, dict) else ""
+            if ceid:
+                for key, val in list(_mock_orm_store.items()):
+                    if isinstance(key, tuple) and key[0] == "tunnel_events":
+                        if isinstance(val, dict) and val.get("client_event_id") == ceid:
+                            return MockAsyncExecResult([val])
+            return MockAsyncExecResult()
+
+        if "recall_items" in sql and "next_review_at <= :now" in sql:
+            rows = []
+            store_val = _mock_orm_store.get(("recall_items", 1), {})
+            items = store_val.values() if isinstance(store_val, dict) else [store_val]
+            now_param = params.get("now") if isinstance(params, dict) else None
+            for val in items:
+                if not isinstance(val, dict):
+                    continue
+                lr = val.get("last_result")
+                if lr == "completed":
+                    continue
+                nra = val.get("next_review_at")
+                if now_param and nra and nra > now_param:
+                    continue
+                rows.append(val)
+            limit = params.get("lim", 50) if isinstance(params, dict) else 50
+            return MockAsyncExecResult(rows[:limit])
+
+        if "recall_items" in sql and "SELECT" in sql and ("id = :rid" in sql or "id = :rid AND" in sql):
+            rid = params.get("rid", "") if isinstance(params, dict) else ""
+            store_val = _mock_orm_store.get(("recall_items", 1), {})
+            items = store_val.values() if isinstance(store_val, dict) else []
+            for val in items:
+                if isinstance(val, dict) and val.get("id") == rid:
+                    return MockAsyncExecResult([val])
+            return MockAsyncExecResult()
+
+        if "UPDATE recall_items" in sql:
+            rid = params.get("rid", "") if isinstance(params, dict) else ""
+            store_val = _mock_orm_store.get(("recall_items", 1), {})
+            items = store_val if isinstance(store_val, dict) else {}
+            for item_id, val in list(items.items()):
+                if isinstance(val, dict) and val.get("id") == rid:
+                    if isinstance(params, dict):
+                        for field in ("stage", "last_result", "next_review_at"):
+                            if field in params:
+                                val[field] = params[field]
+                    _mock_orm_store[("recall_items", 1)] = items
+                    break
+            return MockAsyncExecResult([{"id": 1}])
+
+        if "INSERT INTO tunnel_events" in sql:
+            row_data: dict = {"id": params.get("id", "mock-event-id")} if isinstance(params, dict) else {"id": "mock-event-id"}
+            if isinstance(params, dict):
+                row_data.update(params)
+            # Normalize SQL param names → DB column names for mock lookups
+            if "ceid" in row_data and "client_event_id" not in row_data:
+                row_data["client_event_id"] = row_data.pop("ceid")
+            if "lid" in row_data and "lesson_id" not in row_data:
+                row_data["lesson_id"] = row_data.pop("lid")
+            if "uid" in row_data and "user_id" not in row_data:
+                row_data["user_id"] = row_data.pop("uid")
+            if "etype" in row_data and "event_type" not in row_data:
+                row_data["event_type"] = row_data.pop("etype")
+            if "sid" in row_data and "session_id" not in row_data:
+                row_data["session_id"] = row_data.pop("sid")
+            store_key = ("tunnel_events", 1)
+            _mock_orm_store[store_key] = row_data
+            return MockAsyncExecResult([row_data])
 
         if "SELECT" in sql:
             if "users" in sql:

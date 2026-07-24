@@ -60,15 +60,15 @@ describe("session tunnel — contrats Kunz", () => {
     __resetEvidenceStoreForTests()
   })
 
-  it("T1: doc invalide → erreur, 0 evidence, 0 recall gate", () => {
+  it("T1: doc invalide → erreur + recall (E0), 0 evidence", () => {
     const { snapshot, effects } = reduceSession(baseDoc(), {
       type: "DOCUMENT_SUBMIT",
       trace: { ...validTrace, observation: "" },
-      score: 90,
+      score: 50,
     })
     expect(snapshot.state).toBe("DOCUMENT_FEEDBACK")
     expect(effects.some((e) => e.op === "createDocumentEvidence")).toBe(false)
-    expect(effects.some((e) => e.op === "scheduleSpacedRecall")).toBe(false)
+    expect(effects.some((e) => e.op === "scheduleSpacedRecall")).toBe(true)
     expect(effects.some((e) => e.op === "upsertLearningError")).toBe(true)
 
     const result = runSessionEffects(effects, {
@@ -76,7 +76,12 @@ describe("session tunnel — contrats Kunz", () => {
     })
     expect(result.evidenceIds).toHaveLength(0)
     expect(result.errorIds.length).toBeGreaterThanOrEqual(1)
+    expect(result.recallOpened).toBe(true)
     expect(hasDocumentEvidence("lec-analyse-1")).toBe(false)
+
+    const recall = getRecallItemByLesson("lec-analyse-1")
+    expect(recall).not.toBeNull()
+    expect(recall?.context.expectedRecallResult).toBe(false)
   })
 
   it("T2: doc valide → evidence + recall gate", () => {
@@ -263,6 +268,9 @@ describe("session tunnel — contrats Kunz", () => {
     })
     expect(snap.snapshot.state).toBe("DOCUMENT_FEEDBACK")
     runSessionEffects(snap.effects, { documentScore: 50 })
+
+    snap = reduceSession(snap.snapshot, { type: "FEEDBACK_SEEN" })
+    expect(snap.snapshot.context.feedbackSeen).toBe(true)
 
     snap = reduceSession(snap.snapshot, { type: "FEEDBACK_ACK" })
     expect(snap.snapshot.state).toBe("DOCUMENT_FAILED")

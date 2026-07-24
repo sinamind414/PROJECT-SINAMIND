@@ -14,6 +14,7 @@ import {
   createScheduledRecallItem,
   type RecallSnapshot,
 } from "../recall/recallReduce"
+import { shouldScheduleRecall, toRecallResult } from "../kunzUtils"
 
 const EVIDENCE_KEY = "khawarizmi.evidence.v1"
 const ERRORS_KEY = "khawarizmi.learning_errors.v1"
@@ -38,7 +39,8 @@ export type LearningErrorRecord = {
   id: string
   lessonId: string
   verbSlug: string | null
-  source: "document" | "bac"
+  source: "document" | "bac" | "method"
+  code?: string
   createdAt: string
   updatedAt: string
   resolved: boolean
@@ -181,7 +183,8 @@ export function createMethodEvidence(input: {
 export function upsertLearningError(input: {
   lessonId: string
   verbSlug: string | null
-  source: "document" | "bac"
+  source: "document" | "bac" | "method"
+  code?: string
   nowIso?: string
 }): LearningErrorRecord {
   const all = listLearningErrors()
@@ -205,6 +208,7 @@ export function upsertLearningError(input: {
     lessonId: input.lessonId,
     verbSlug: input.verbSlug,
     source: input.source,
+    code: input.code,
     createdAt: now,
     updatedAt: now,
     resolved: false,
@@ -239,6 +243,13 @@ export function openRecallGate(input: {
 }
 
 /**
+ * STV locale uniquement — PAS de réseau (P2.3).
+ * Crée recall dans localStorage khawarizmi.recall_items.v1.
+ *
+ * RÈGLE : ne JAMAIS appeler fetch / POST /api/recall ici.
+ * Le BE n'a pas de recall_items pour cette leçon.
+ * Voir docs/kunz-recall-fe-be.md pour l'ownership matrix.
+ *
  * Pont unique : gate + RecallItem SCHEDULED (idempotent par lessonId).
  * Utilisé par runSessionEffects et le pont practiceOutcome.
  */
@@ -247,6 +258,7 @@ export function openRecallGateAndScheduleItem(input: {
   verbSlug: string | null
   reason: "document_evidence"
   nowIso?: string
+  success?: boolean | null
 }): { gate: RecallGateRecord; recall: RecallSnapshot } {
   const gate = openRecallGate(input)
   const recall = persistRecallItem(
@@ -254,6 +266,7 @@ export function openRecallGateAndScheduleItem(input: {
       lessonId: input.lessonId,
       conceptId: input.verbSlug ?? input.lessonId,
       nowIso: input.nowIso,
+      success: input.success ?? null,
     })
   )
   return { gate, recall }
@@ -374,12 +387,17 @@ export function runSessionEffects(
         break
       }
       case "scheduleSpacedRecall": {
-        openRecallGateAndScheduleItem({
-          lessonId: effect.lessonId,
-          verbSlug: effect.verbSlug,
-          reason: effect.reason,
-        })
-        recallOpened = true
+        const outcome: SessionOutcome =
+          (ctx.documentScore ?? 0) >= 70 ? "doc_only" : "failed"
+        if (shouldScheduleRecall(outcome)) {
+          openRecallGateAndScheduleItem({
+            lessonId: effect.lessonId,
+            verbSlug: effect.verbSlug,
+            reason: effect.reason,
+            success: toRecallResult(outcome),
+          })
+          recallOpened = true
+        }
         break
       }
       case "persistSession":

@@ -1,3 +1,4 @@
+import type { MethodRunState } from "@/lib/method/methodChecklistTypes"
 import type { LessonSessionContext, SessionEvent, SessionState } from "./tunnelTypes"
 import { SESSION_TERMINAL } from "./tunnelTypes"
 import {
@@ -28,7 +29,7 @@ export type SessionEffect =
   | {
       op: "upsertLearningError"
       lessonId: string
-      source: "document" | "bac"
+      source: "document" | "bac" | "method"
       verbSlug: string | null
     }
   | {
@@ -40,6 +41,19 @@ export type SessionEffect =
     }
   | { op: "persistSession"; snapshot: SessionSnapshot }
   | { op: "clearSession"; lessonId: string }
+
+function getCurrentMethodStepId(
+  run: Pick<MethodRunState, "stepIds" | "currentStepIndex"> | null
+): string | null {
+  if (!run) return null
+  return run.stepIds[run.currentStepIndex] ?? null
+}
+
+function hasNonEmptyMethodProof(proof: string | string[] | undefined): boolean {
+  if (proof == null) return false
+  if (typeof proof === "string") return proof.trim() !== ""
+  return proof.length > 0
+}
 
 function matches(
   row: SessionTransition,
@@ -136,7 +150,14 @@ function applyActions(
         }
         break
       case "setOutcome":
-        next = { ...next, outcome: action.outcome }
+        next = {
+          ...next,
+          outcome: action.outcome,
+          feedbackSeen: action.outcome === "failed" ? false : next.feedbackSeen,
+        }
+        break
+      case "setFeedbackSeen":
+        next = { ...next, feedbackSeen: true }
         break
       case "markSuspended":
         next = { ...next, suspendedFrom: state }
@@ -149,6 +170,79 @@ function applyActions(
       case "clearSession":
         effects.push({ op: "clearSession", lessonId: next.lessonId })
         break
+      // ── M7 — Runner méthode ────────────────────────────────
+      case "setMethodRun": {
+        if (event.type !== "METHOD_RUN_START") break
+        const { checklistId, stepIds, nowIso } = event.payload
+        next.methodRun = {
+          checklistId,
+          stepIds,
+          currentStepIndex: 0,
+          proofs: {},
+          committed: {},
+          selfCheck: {},
+          stepFlags: {},
+          hintsUsed: 0,
+          startedAt: nowIso ?? new Date().toISOString(),
+          contentWeakSelf: false,
+        }
+        break
+      }
+      case "setMethodProof": {
+        const _run1 = next.methodRun
+        if (!_run1 || event.type !== "METHOD_PROOF_SET") break
+        const currentStepId = getCurrentMethodStepId(_run1)
+        if (currentStepId !== event.payload.stepId) break
+        if (_run1.committed[event.payload.stepId]) break
+        _run1.proofs[event.payload.stepId] = event.payload.proof
+        break
+      }
+      case "commitMethodStep": {
+        const _run2 = next.methodRun
+        if (!_run2 || event.type !== "METHOD_STEP_COMMIT") break
+        const currentStepId = getCurrentMethodStepId(_run2)
+        if (currentStepId !== event.payload.stepId) break
+        if (_run2.committed[event.payload.stepId]) break
+        if (!hasNonEmptyMethodProof(_run2.proofs[event.payload.stepId])) break
+        _run2.committed[event.payload.stepId] = true
+        break
+      }
+      case "setMethodSelfCheck": {
+        const _run3 = next.methodRun
+        if (!_run3 || event.type !== "METHOD_SELF_CHECK_SET") break
+        const currentStepId = getCurrentMethodStepId(_run3)
+        if (currentStepId !== event.payload.stepId) break
+        if (!_run3.committed[event.payload.stepId]) break
+        _run3.selfCheck[event.payload.stepId] = {
+          present: event.payload.present,
+          absent: event.payload.absent,
+        }
+        const isLast = _run3.currentStepIndex >= _run3.stepIds.length - 1
+        if (isLast) {
+          _run3.completedAt = event.payload.nowIso ?? new Date().toISOString()
+        } else {
+          _run3.currentStepIndex += 1
+        }
+        break
+      }
+      case "setMethodContentWeakSelf": {
+        if (event.type !== "METHOD_CONTENT_WEAK_SET") break
+        const _run4 = next.methodRun
+        if (!_run4) break
+        _run4.contentWeakSelf = !!event.payload.value
+        break
+      }
+      case "incrementMethodHintsUsed": {
+        if (event.type !== "METHOD_HINT_USED") break
+        const _run5 = next.methodRun
+        if (!_run5) break
+        _run5.hintsUsed += 1
+        break
+      }
+      case "clearMethodRun": {
+        next.methodRun = null
+        break
+      }
       default: {
         const _exhaustive: never = action
         void _exhaustive
@@ -178,7 +272,8 @@ export function reduceSession(
     row.actions
   )
 
-  let to = row.to
+  const rawTo = row.to
+  let to: SessionState = rawTo === "*" ? snapshot.state : rawTo
   if (
     event.type === "SESSION_RESUME" &&
     snapshot.state === "SESSION_SUSPENDED" &&

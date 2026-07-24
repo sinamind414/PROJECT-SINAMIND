@@ -165,6 +165,11 @@ async def test_complete_card_idempotent():
 
     db.execute.side_effect = [result_mock, streak_result_mock]
 
+    from services import pulse_service
+    pulse_service.get_streak_summary = AsyncMock(return_value={
+        "current_streak": 0, "longest_streak": 0, "in_danger": True,
+    })
+
     result = await complete_card(user_id=42, card_id="card-1", db=db)
 
     assert result["already_completed"] is True

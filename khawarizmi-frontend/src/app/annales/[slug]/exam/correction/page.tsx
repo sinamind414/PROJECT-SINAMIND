@@ -170,16 +170,22 @@ export default function CorrectionPage() {
                 </div>
               )}
               {contract?.outcome === "failed" && (() => {
-                const weakest = [...result.corrections]
-                  .filter((c) => !c.skipped)
-                  .sort((a, b) => Number(a.percentage) - Number(b.percentage))[0]
-                if (!weakest) return null
+                const learningErrors = result.corrections
+                  .filter((c) => !c.skipped && Number(c.percentage) < 70)
+                  .map((c) => ({
+                    id: `bac:${sessionId}:${c.exercise_id}`,
+                    lessonId: `bac:${sessionId}:${c.verb_slug || "bac_blanc"}`,
+                    verbSlug: c.verb_slug || null,
+                    source: "bac" as const,
+                    createdAt: new Date().toISOString(),
+                  }))
                 return (
                   <div className="mx-auto max-w-md text-right">
                     <CoachPanel
-                      verbSlug={weakest.verb_slug || "analyse"}
-                      percentage={Number(weakest.percentage) || 0}
-                      errors={weakest.feedback ? [weakest.feedback] : []}
+                      outcome={contract.outcome}
+                      feedbackSeen={true}
+                      lessonId={`bac:${sessionId}`}
+                      learningErrors={learningErrors}
                     />
                   </div>
                 )

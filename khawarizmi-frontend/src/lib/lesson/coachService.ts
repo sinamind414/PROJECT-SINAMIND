@@ -5,6 +5,9 @@
 
 import { getModeForVerbSlug } from "@/lib/methodology-checklists"
 import { methodologyErrors } from "@/lib/methodology-v1"
+import type { SessionOutcome } from "./tunnelTypes"
+import { canShowCoachForOutcome } from "../kunzUtils"
+import { mapMethodErrorToCoachItem } from "../method/methodErrorsAdapter"
 
 export type CoachRoute = {
   href: string
@@ -24,6 +27,38 @@ export type CoachManque = {
 export type CoachPlan = {
   manques: CoachManque[]
   primaryRoute: CoachRoute
+}
+
+export type CoachPlanKind =
+  | "none"
+  | "reinforce"
+  | "micro_rappel"
+  | "remediation"
+  | "blocked"
+
+export type OutcomeCoachItem = {
+  id: string
+  conceptId: string
+  title: string
+  action: string
+  severity: number
+  sourceErrorId?: string
+}
+
+export type OutcomeCoachPlan = {
+  kind: CoachPlanKind
+  outcome: SessionOutcome
+  items: OutcomeCoachItem[]
+  headline?: string
+}
+
+export type LearningErrorLike = {
+  id: string
+  lessonId: string
+  verbSlug: string | null
+  source: "document" | "bac" | "method"
+  code?: string
+  createdAt: string
 }
 
 const VERB_ROUTE: Record<string, CoachRoute> = {
@@ -161,7 +196,9 @@ function routeForError(code: string | undefined): CoachRoute | null {
 }
 
 /**
- * Construit un plan coach : max 2 manques, chacun avec route réelle.
+ * @deprecated Utiliser buildCoachPlanFromOutcome à la place.
+ * Conservé pour retry-errors et diagnostic/global (non-Kunz).
+ * Ne PAS utiliser dans un nouveau flux.
  */
 export function buildCoachPlan(input: {
   verbSlug?: string | null
@@ -260,5 +297,99 @@ export function buildCoachPlan(input: {
   return {
     manques: manques.slice(0, 2),
     primaryRoute: manques[0]?.route ?? DEFAULT_METHOD,
+  }
+}
+
+function errorToCoachItem(err: LearningErrorLike): OutcomeCoachItem {
+  const mapped = err.source === "method" ? mapMethodErrorToCoachItem(err) : null
+  if (mapped) return mapped
+  return {
+    id: `coach:${err.id}`,
+    conceptId: err.verbSlug ?? err.lessonId,
+    title: err.source === "bac" ? "ضعف في تحدي BAC" : "ضعف في استغلال الوثيقة",
+    action: err.verbSlug
+      ? `درّب على «${err.verbSlug}» قبل إعادة المحاولة`
+      : "راجع المنهجية قبل إعادة المحاولة",
+    severity: err.source === "bac" ? 1 : 0,
+    sourceErrorId: err.id,
+  }
+}
+
+export function buildCoachPlanFromOutcome(input: {
+  outcome: SessionOutcome
+  feedbackSeen: boolean
+  errors: LearningErrorLike[]
+  context: {
+    lessonId: string
+    conceptId?: string
+    verbSlug?: string
+  }
+}): OutcomeCoachPlan {
+  if (input.outcome === "aborted") {
+    return { kind: "none", outcome: input.outcome, items: [] }
+  }
+
+  if (!canShowCoachForOutcome(input.outcome, input.feedbackSeen)) {
+    return { kind: "blocked", outcome: input.outcome, items: [] }
+  }
+
+  if (input.outcome === "passed") {
+    if (input.context.verbSlug) {
+      return {
+        kind: "reinforce",
+        outcome: "passed",
+        items: [
+          {
+            id: "reinforce:pass",
+            conceptId: input.context.verbSlug,
+            title: "أحسنت! استمر في التدريب",
+            action: `درّب على «${input.context.verbSlug}» مرة أخرى لتثبيت المنهجية`,
+            severity: 0,
+          },
+        ],
+        headline: "إتقان جيد — حافظ على المستوى",
+      }
+    }
+    return { kind: "reinforce", outcome: "passed", items: [] }
+  }
+
+  if (input.outcome === "doc_only") {
+    if (input.context.verbSlug) {
+      return {
+        kind: "micro_rappel",
+        outcome: "doc_only",
+        items: [
+          {
+            id: "rappel:doc",
+            conceptId: input.context.verbSlug,
+            title: "وثيقة مقبولة — أنت بحاجة لتحدي BAC",
+            action: `طبق «${input.context.verbSlug}» في سياق BAC للوصول إلى الإتقان`,
+            severity: 0,
+          },
+        ],
+        headline: "وثيقة OK — ارفع المستوى بتحدي BAC",
+      }
+    }
+    return { kind: "micro_rappel", outcome: "doc_only", items: [] }
+  }
+
+  const ranked = [...input.errors]
+    .sort((a, b) => {
+      const sa = a.source === "bac" ? 1 : 0
+      const sb = b.source === "bac" ? 1 : 0
+      if (sb !== sa) return sb - sa
+      return a.id.localeCompare(b.id)
+    })
+    .slice(0, 2)
+    .map(errorToCoachItem)
+
+  return {
+    kind: "remediation",
+    outcome: "failed",
+    items: ranked,
+    headline:
+      ranked.length > 0
+        ? "ركّز على هذين الخطأين قبل إعادة المحاولة"
+        : "لا توجد أخطاء مسجلة — راجع المنهجية العامة",
   }
 }

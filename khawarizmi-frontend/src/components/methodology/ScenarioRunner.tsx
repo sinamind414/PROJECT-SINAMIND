@@ -682,19 +682,22 @@ export function ScenarioRunner({
                 </p>
               )}
               {result.contract.outcome === "failed" && (() => {
-                const worst = [...result.evaluations].sort(
-                  (a, b) => a.evaluation.percentage - b.evaluation.percentage
-                )[0]
-                if (!worst) return null
+                const lessonBase = `da:${scenario.id}${chapterLink?.slug ? `:${chapterLink.slug}` : ""}`
+                const learningErrors = result.evaluations
+                  .filter(e => e.evaluation.errors.length > 0)
+                  .map(e => ({
+                    id: `${lessonBase}:${e.question.verbSlug}`,
+                    lessonId: `${lessonBase}:${e.question.verbSlug}`,
+                    verbSlug: e.question.verbSlug,
+                    source: "document" as const,
+                    createdAt: new Date().toISOString(),
+                  }))
                 return (
                   <CoachPanel
-                    verbSlug={worst.question.verbSlug}
-                    percentage={worst.evaluation.percentage}
-                    dominantErrorCode={worst.evaluation.dominantErrorCode}
-                    errors={worst.evaluation.errors}
-                    missingMarkers={worst.evaluation.missingMarkers}
-                    forbiddenMarkers={worst.evaluation.forbiddenMarkersFound}
-                    onlyIfFailed
+                    outcome={result.contract.outcome}
+                    feedbackSeen={true}
+                    lessonId={lessonBase}
+                    learningErrors={learningErrors}
                   />
                 )
               })()}

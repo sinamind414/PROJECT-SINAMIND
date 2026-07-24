@@ -3,6 +3,8 @@
  * Session (leçon) ∥ mémoire FSRS (backend) — pas de second scheduler J+1/3/7/14
  */
 
+import type { MethodRunState } from "@/lib/method/methodChecklistTypes"
+
 export type SessionOutcome =
   | "passed" // doc OK + BAC OK (ou BAC non requis)
   | "doc_only" // doc OK, BAC skippé (flag éditorial)
@@ -34,6 +36,10 @@ export type LessonSessionContext = {
   /** Preuves déjà émises cette session (anti double écriture) */
   documentEvidenceId: string | null
   methodEvidenceId: string | null
+  /** Feedback vu par l'élève (contrat Kunz — garde d'avancement si failed) */
+  feedbackSeen: boolean
+  /** Runner méthode checklist (M7 — null si pas de pilote méthode) */
+  methodRun: MethodRunState | null
 }
 
 export type SessionState =
@@ -72,6 +78,7 @@ export type SessionEvent =
   | { type: "HINT_USE" }
   | { type: "DOCUMENT_SUBMIT"; trace: DocumentTrace; score: number }
   | { type: "FEEDBACK_ACK" }
+  | { type: "FEEDBACK_SEEN" }
   | { type: "REMEDIATION_OPEN" }
   | { type: "REMEDIATION_COMPLETE" }
   | { type: "DOCUMENT_RETRY" }
@@ -82,6 +89,43 @@ export type SessionEvent =
   | { type: "SESSION_EXIT" }
   | { type: "SESSION_SUSPEND" }
   | { type: "SESSION_RESUME" }
+  // ── M7 — Runner méthode ─────────────────────────────────
+  | {
+      type: "METHOD_RUN_START"
+      payload: {
+        checklistId: string
+        stepIds: string[]
+        nowIso?: string
+      }
+    }
+  | {
+      type: "METHOD_PROOF_SET"
+      payload: {
+        stepId: string
+        proof: string | string[]
+      }
+    }
+  | {
+      type: "METHOD_STEP_COMMIT"
+      payload: {
+        stepId: string
+      }
+    }
+  | {
+      type: "METHOD_SELF_CHECK_SET"
+      payload: {
+        stepId: string
+        present: string[]
+        absent: string[]
+        nowIso?: string
+      }
+    }
+  | {
+      type: "METHOD_CONTENT_WEAK_SET"
+      payload: { value: boolean }
+    }
+  | { type: "METHOD_HINT_USED" }
+  | { type: "METHOD_RUN_CLEAR" }
 
 export const sessionGuards = {
   isLastBlock: (ctx: LessonSessionContext) =>
@@ -110,6 +154,32 @@ export const sessionGuards = {
 
   /** Interdit fausse maîtrise : outcome déjà posé */
   canExitWithoutOutcome: (ctx: LessonSessionContext) => ctx.outcome === null,
+  // ── M7 — Guards méthode ─────────────────────────────────
+  hasMethodRun: (ctx: LessonSessionContext) => !!ctx.methodRun,
+  canSetMethodProof: (ctx: LessonSessionContext, stepId: string) => {
+    const run = ctx.methodRun
+    if (!run) return false
+    const currentStepId = run.stepIds[run.currentStepIndex]
+    return currentStepId === stepId && !run.committed[stepId]
+  },
+  canCommitMethodStep: (ctx: LessonSessionContext, stepId: string) => {
+    const run = ctx.methodRun
+    if (!run) return false
+    const currentStepId = run.stepIds[run.currentStepIndex]
+    if (currentStepId !== stepId || run.committed[stepId]) return false
+    const proof = run.proofs[stepId]
+    const hasProof =
+      proof != null &&
+      !(typeof proof === "string" && proof.trim() === "") &&
+      !(Array.isArray(proof) && proof.length === 0)
+    return hasProof
+  },
+  canSetMethodSelfCheck: (ctx: LessonSessionContext, stepId: string) => {
+    const run = ctx.methodRun
+    if (!run) return false
+    const currentStepId = run.stepIds[run.currentStepIndex]
+    return currentStepId === stepId && !!run.committed[stepId]
+  },
 } as const
 
 export function initialSessionContext(
@@ -129,6 +199,8 @@ export function initialSessionContext(
     suspendedFrom: null,
     documentEvidenceId: null,
     methodEvidenceId: null,
+    feedbackSeen: false,
+    methodRun: null,
     ...partial,
   }
 }

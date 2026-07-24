@@ -557,12 +557,18 @@ export function VerbLessonFlow({
             {evaluation.advice && <div className="text-mint text-sm mt-4 bg-mint/10 p-3 rounded-2xl">💡 {evaluation.advice}</div>}
             <div className="mt-4">
               <CoachPanel
-                verbSlug={enriched.slug}
+                outcome={outcomeUi.outcome}
+                feedbackSeen={true}
+                lessonId={`verb:${enriched.slug}`}
+                learningErrors={evaluation.errors.length > 0 ? [{
+                  id: `verb:${enriched.slug}`,
+                  lessonId: `verb:${enriched.slug}`,
+                  verbSlug: enriched.slug,
+                  source: "document" as const,
+                  createdAt: new Date().toISOString(),
+                }] : []}
                 percentage={Number(evaluation.percentage) || 0}
-                dominantErrorCode={evaluation.dominant_error_code}
-                errors={evaluation.errors}
-                missingMarkers={evaluation.missing_markers}
-                forbiddenMarkers={evaluation.forbidden_found}
+                onlyIfFailed
               />
             </div>
             <button onClick={speakModelAnswer} className="mt-4 w-full flex items-center justify-center gap-2 py-3 text-sm font-semibold border border-mint/30 bg-mint/10 hover:bg-mint/20 text-mint rounded-2xl transition">

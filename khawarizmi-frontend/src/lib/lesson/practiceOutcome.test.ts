@@ -9,7 +9,9 @@ import {
   applyDocumentScenarioOutcome,
   applyVerbPracticeOutcome,
   applyBacExamOutcome,
+  applyAbortedOutcome,
 } from "./practiceOutcome"
+import { shouldScheduleRecall, canAdvance } from "../kunzUtils"
 
 describe("applyDocumentScenarioOutcome", () => {
   beforeEach(() => {
@@ -124,5 +126,47 @@ describe("applyBacExamOutcome", () => {
     expect(r.outcome).toBe("failed")
     expect(r.mayShowMasteryBadge).toBe(false)
     expect(r.errorsCreated).toBe(1)
+  })
+})
+
+describe("applyAbortedOutcome", () => {
+  it("A1: outcome = aborted", () => {
+    const r = applyAbortedOutcome({ lessonId: "lec-x", reason: "user_leave" })
+    expect(r.outcome).toBe("aborted")
+  })
+
+  it("A2: aucun openRecallGate* dans les effets", () => {
+    const r = applyAbortedOutcome({ lessonId: "lec-x" })
+    expect(r.effects).not.toContain("scheduleSpacedRecall" as never)
+  })
+
+  it("A3: aucun upsertLearningError dans les effets", () => {
+    const r = applyAbortedOutcome({ lessonId: "lec-x" })
+    expect(r.effects).not.toContain("upsertLearningError" as never)
+  })
+
+  it("A4: aucun create*Evidence dans les effets", () => {
+    const r = applyAbortedOutcome({ lessonId: "lec-x" })
+    expect(r.effects).not.toContain("createDocumentEvidence" as never)
+    expect(r.effects).not.toContain("createMethodEvidence" as never)
+  })
+
+  it("A5: coach none déjà testé K6 dans coachService", () => {
+    // K6 couvre déjà = kind:"none", items:[]
+  })
+
+  it("A6: persiste session + markSuspended", () => {
+    const r = applyAbortedOutcome({ lessonId: "lec-x", reason: "user_leave" })
+    expect(r.effects).toContain("persistSession")
+    expect(r.effects).toContain("markSuspended")
+  })
+
+  it("A7: canAdvance('aborted') → false", () => {
+    expect(canAdvance("aborted", false)).toBe(false)
+    expect(canAdvance("aborted", true)).toBe(false)
+  })
+
+  it("A8: shouldScheduleRecall('aborted') → false", () => {
+    expect(shouldScheduleRecall("aborted")).toBe(false)
   })
 })

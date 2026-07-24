@@ -10,6 +10,7 @@ export type RecallItemContext = {
   nextReviewAt: string
   completedAt: string | null
   lastResult: "success" | "fail" | null
+  expectedRecallResult?: boolean | null
 }
 
 export function initialRecallContext(input: {
@@ -17,6 +18,7 @@ export function initialRecallContext(input: {
   lessonId: string
   conceptId: string
   nowIso: string
+  expectedRecallResult?: boolean | null
 }): RecallItemContext {
   const stage: RecallStage = 0
   return {
@@ -27,6 +29,7 @@ export function initialRecallContext(input: {
     nextReviewAt: addDaysIso(input.nowIso, RECALL_DELAY_DAYS[stage]),
     completedAt: null,
     lastResult: null,
+    expectedRecallResult: input.expectedRecallResult ?? null,
   }
 }
 

@@ -48,6 +48,7 @@ from . import (
     social,
     streaks,
     videos,
+    kunz_tunnel,
 )
 
 ALL_ROUTERS = [
@@ -112,6 +113,10 @@ ALL_ROUTERS = [
     aujourdhui.router,
     lessons.router,
     bac_blanc.router,
+    # ── PULSE Dashboard ──
+    pulse.router,
+    # ── Kunz Tunnel (P1.3 — append-only events + recall) ──
+    kunz_tunnel.router,
 ]
 
 # ════════════════════════════════════════════════════════════════

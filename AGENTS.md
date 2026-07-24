@@ -619,7 +619,7 @@ Variables à configurer dans Railway Dashboard (PROJECT-SINAMIND → Variables) 
 ##############################################################
 # SECTION 14 — ANCRAGE DE SESSION
 ##############################################################
-# DERNIÈRE SESSION : 2026-07-04 — Gamification Sprint 3 (final)
+# DERNIÈRE SESSION : 2026-07-24 — Pilote C : 1er exercice réel (gene-expression)
 #
 # État : Build clean, 549/549 tests pass, Vercel deployé
 # Commit : 0ff011c
@@ -676,10 +676,109 @@ Variables à configurer dans Railway Dashboard (PROJECT-SINAMIND → Variables) 
 #   khawarizmi-frontend/src/components/methodology/VerbLessonFlow.tsx
 #     (248 insertions, 21 deletions, 23.9 KB final)
 #
-# Prochaine étape : Boss Final si souhaité
-#   → seed_boss_questions.py (24+12 questions Bac)
-#   → boss_service.py + routes/boss.py
-#   → app/action-verbs/boss/page.tsx
+# Session 2026-07-20 — Kunz P0 → P2.1 (Coach Panel Parents)
+#
+# P0 — Prédicats + feedbackSeen SM :
+#   ✅ kunzUtils.ts (canAdvance, shouldScheduleRecall, toRecallResult,
+#     canShowCoachForOutcome, shouldApplyFailedEvalEffects)
+#   ✅ LessonSessionContext.feedbackSeen, FEEDBACK_SEEN event, garde FEEDBACK_ACK
+#   ✅ reset feedbackSeen sur setOutcome("failed")
+#
+# P1.0 — toRecallResult + canAdvance branchés SM :
+#   ✅ 4 call sites passent success: toRecallResult(outcome), canAdvance SM guard
+#
+# P1.1 — buildCoachPlanFromOutcome :
+#   ✅ Builder pur, max 2 items, gated par canShowCoachForOutcome + tests K1–K8
+#
+# P1.1b — Wiring UI Coach :
+#   ✅ OutcomeCoachInner dans CoachPanel.tsx, legacy fallback conservé
+#
+# P1.2 — applyAbortedOutcome :
+#   ✅ Zéro evidence/error/recall, tests A1–A8
+#
+# P1.3 — BE tunnel (kunz_tunnel) :
+#   ✅ services/kunz_tunnel_service.py (append, list_due, apply_result)
+#   ✅ routes/kunz_tunnel.py (3 endpoints), migration 031, tests B-T1–B-T8 (11)
+#
+# P1.4 — Intégration T7–T10 + 2 fixes E0 :
+#   ✅ kunzIntegration.test.ts (8 tests)
+#   ✅ Fix practiceOutcome.ts (3 apply* manquaient recall sur failed)
+#   ✅ Fix sessionStateMachine.ts (SM invalid doc transition recall missing)
+#   ✅ T1 mis à jour
+#
+# P2.1 — Parents CoachPanel :
+#   ✅ ScenarioRunner.tsx → outcome / feedbackSeen / lessonId / learningErrors
+#   ✅ VerbLessonFlow.tsx → outcome / feedbackSeen / lessonId / learningErrors
+#   ✅ annales/correction/page.tsx → outcome / feedbackSeen / lessonId / learningErrors
+#   ✅ legacy buildCoachPlan retiré des 3 flux Kunz (fallback conservé pour
+#     retry-errors + diagnostic/global, hors scope Kunz)
+#
+# P2.3 — Doc FE↔BE recall (cette session) :
+#   ✅ Gap analysis validée : FE recall_items = localStorage STV,
+#     BE recall_items = 0 lignes (jamais créées)
+#   ✅ Option A adoptée : doc + garde-fous, 0 changement comportement
+#   ✅ docs/kunz-recall-fe-be.md : architecture, ownership matrix, règles
+#   ✅ Guard comment BE : append_event ne doit JAMAIS créer recall_items
+#   ✅ Guard comment FE : openRecallGateAndScheduleItem = local STV, pas de réseau
+#   Option B (POST /api/recall) repoussée en P2.3b si besoin multi-device
+#   Option C (create dans append_event) rejetée (contredit B3 P1.3)
+#
+# Fichiers modifiés Kunz (total) :
+#   Frontend (11) : kunzUtils.ts, CoachPanel.tsx, ScenarioRunner.tsx,
+#     VerbLessonFlow.tsx, correction/page.tsx, coachService.ts, tunnelTypes.ts,
+#     sessionStateMachine.ts, sessionReduce.ts, evidenceService.ts, practiceOutcome.ts
+#   Backend (4) : kunz_tunnel_service.py, routes/kunz_tunnel.py,
+#     migration 031, tests/test_kunz_tunnel.py
+#   Doc (1) : docs/kunz-recall-fe-be.md
+#
+# Tests : FE 616/616 (10 files) · BE 11/11 · 0 régression
+#
+# Session 2026-07-24 — Pilote C : 1er exercice réel (gene-expression)
+#
+# Fix : la route utilise désormais loadSessionSnapshot() comme initializer
+#   useReducer → createInitialSnapshot() : charge la snapshot localStorage si
+#   même lessonId, sinon initialise à LESSON_OPENED frais.
+#   useEffect auto-resume : si snapshot.state === "SESSION_SUSPENDED" →
+#   dispatch SESSION_RESUME au mount (reprise exacte, pas de perte).
+#   Les effets (persistSession) étaient déjà exécutés via dispatchSessionEvent
+#   (runSessionEffects appelé dans dispatchSessionEvent).
+#   Le gap était uniquement l'initializer : la snapshot persistée n'était jamais
+#   rechargée. Fixé en 2 lignes + 1 useEffect.
+#
+# ✅ data/checklists/analyse-gene-expression.ts :
+#   MéthodeChecklist concrète pour l'exercice "analyse doc 1"
+#   a1/short_text, a2/short_text, a3/keywords(["كلما","زاد","طردية"], required=2),
+#   a4/short_text, minExpectedMs=180000, modelByStepId complet (4 steps)
+#
+# ✅ MethodChecklistLab augmenté (prop checklist?: MethodChecklist) :
+#   - Quand checklist fournie : steps rendus depuis MethodStep (title/instruction),
+#     verdict utilise checklist (proofKind, expected.keywords, modelByStepId),
+#     placeholder depuis proofPlaceholder, minExpectedMs depuis checklist
+#   - Backward compat : sans checklist, comportement existant inchangé
+#
+# ✅ Page session-backed /methodology/exercices/analyse-gene-expression :
+#   useReducer + dispatchSessionEvent + initialSessionContext
+#   Passe checklist + methodRun + dispatchSessionEvent à MethodChecklistLab
+#   Consigne BAC affichée + header de navigation "العودة إلى المنهجية"
+#
+# ✅ Carte d'entrée dans /methodology (#challenge) :
+#   Carte "اضطراب تركيب بروتين" liée vers le nouvel exercice
+#
+# ✅ tsc 0 errors · FE 645/645 · BE 639/639
+#
+# Fichiers créés/modifiés :
+#   + khawarizmi-frontend/src/lib/method/checklists/analyse-gene-expression.ts  (112 lignes)
+#   + khawarizmi-frontend/src/lib/method/checklists/index.ts                     (1 ligne)
+#   + khawarizmi-frontend/src/app/methodology/exercices/analyse-gene-expression/page.tsx (79 lignes)
+#   M khawarizmi-frontend/src/components/methodology/MethodChecklistLab.tsx      (+45/-20 lignes)
+#   M khawarizmi-frontend/src/app/methodology/page.tsx                            (+17/-1 lignes)
+#   M khawarizmi-frontend/src/lib/lesson/kunzIntegration.test.ts                  (-1 ligne)
+#
+# Prochaine étape possible :
+#   P2.3b (POST /api/recall + fetch FE) — si besoin multi-device / analytics
+#   P2.5b (migrer retry-errors + diagnostic/global → hard-delete buildCoachPlan)
+#   2e exercice réel (interprétation, comparaison, ou compose)
+#   Ajouter @testing-library/react + jsdom pour smoke test composant MethodChecklistLab
 ##############################################################
 
 # FIN — AGENTS.md v2.1.1 — IA KHAWARIZMI PRO

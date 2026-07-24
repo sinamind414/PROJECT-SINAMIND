@@ -5,6 +5,7 @@ import type {
   SessionState,
 } from "./tunnelTypes"
 import { SESSION_TERMINAL, sessionGuards } from "./tunnelTypes"
+import { canAdvance } from "../kunzUtils"
 
 export type SessionActionName =
   | "resetPracticeFields"
@@ -18,10 +19,19 @@ export type SessionActionName =
   | "recordBacAttempt"
   | "createMethodEvidence"
   | "setOutcome"
+  | "setFeedbackSeen"
   | "markSuspended"
   | "clearSuspended"
   | "persistSession"
   | "clearSession"
+  // ── M7 — Runner méthode ─────────────────────────────────
+  | "setMethodRun"
+  | "setMethodProof"
+  | "commitMethodStep"
+  | "setMethodSelfCheck"
+  | "setMethodContentWeakSelf"
+  | "incrementMethodHintsUsed"
+  | "clearMethodRun"
 
 export type SessionAction =
   | { type: Exclude<SessionActionName, "setOutcome"> }
@@ -32,7 +42,7 @@ export type SessionTransition = {
   event: SessionEvent["type"]
   guard?: (ctx: LessonSessionContext, event: SessionEvent) => boolean
   actions: SessionAction[]
-  to: SessionState
+  to: SessionState | "*"
   note?: string
 }
 
@@ -119,10 +129,17 @@ export const sessionTransitions: readonly SessionTransition[] = [
     actions: [
       { type: "storeDocumentAttempt" },
       { type: "upsertLearningError" },
+      { type: "scheduleSpacedRecall" },
       { type: "persistSession" },
     ],
     to: "DOCUMENT_FEEDBACK",
-    note: "Échec = erreur, jamais preuve",
+    note: "Échec = error + recall(success:false) E0, jamais preuve",
+  },
+  {
+    from: "DOCUMENT_FEEDBACK",
+    event: "FEEDBACK_SEEN",
+    actions: [{ type: "setFeedbackSeen" }, { type: "persistSession" }],
+    to: "DOCUMENT_FEEDBACK",
   },
   {
     from: "DOCUMENT_FEEDBACK",
@@ -138,9 +155,10 @@ export const sessionTransitions: readonly SessionTransition[] = [
     from: "DOCUMENT_FEEDBACK",
     event: "FEEDBACK_ACK",
     guard: (ctx) =>
-      ctx.documentScore === null ||
-      ctx.documentTrace === null ||
-      !sessionGuards.isDocumentValid(ctx.documentTrace, ctx.documentScore),
+      canAdvance("failed", ctx.feedbackSeen) &&
+      (ctx.documentScore === null ||
+        ctx.documentTrace === null ||
+        !sessionGuards.isDocumentValid(ctx.documentTrace, ctx.documentScore)),
     actions: [{ type: "persistSession" }],
     to: "DOCUMENT_FAILED",
   },
@@ -255,6 +273,56 @@ export const sessionTransitions: readonly SessionTransition[] = [
     guard: (ctx) => sessionGuards.hasSuspended(ctx),
     actions: [{ type: "clearSuspended" }, { type: "persistSession" }],
     to: "LESSON_OPENED",
+  },
+  // ── M7 — self-loops méthode (depuis tout état non-terminal) ──
+  {
+    from: "*",
+    event: "METHOD_RUN_START",
+    actions: [{ type: "setMethodRun" }, { type: "persistSession" }],
+    to: "*",
+    note: "Init runner méthode — conserve l'état courant",
+  },
+  {
+    from: "*",
+    event: "METHOD_PROOF_SET",
+    guard: (ctx) => sessionGuards.hasMethodRun(ctx),
+    actions: [{ type: "setMethodProof" }, { type: "persistSession" }],
+    to: "*",
+  },
+  {
+    from: "*",
+    event: "METHOD_STEP_COMMIT",
+    guard: (ctx) => sessionGuards.hasMethodRun(ctx),
+    actions: [{ type: "commitMethodStep" }, { type: "persistSession" }],
+    to: "*",
+  },
+  {
+    from: "*",
+    event: "METHOD_SELF_CHECK_SET",
+    guard: (ctx) => sessionGuards.hasMethodRun(ctx),
+    actions: [{ type: "setMethodSelfCheck" }, { type: "persistSession" }],
+    to: "*",
+  },
+  {
+    from: "*",
+    event: "METHOD_CONTENT_WEAK_SET",
+    guard: (ctx) => sessionGuards.hasMethodRun(ctx),
+    actions: [{ type: "setMethodContentWeakSelf" }, { type: "persistSession" }],
+    to: "*",
+  },
+  {
+    from: "*",
+    event: "METHOD_HINT_USED",
+    guard: (ctx) => sessionGuards.hasMethodRun(ctx),
+    actions: [{ type: "incrementMethodHintsUsed" }, { type: "persistSession" }],
+    to: "*",
+  },
+  {
+    from: "*",
+    event: "METHOD_RUN_CLEAR",
+    guard: (ctx) => sessionGuards.hasMethodRun(ctx),
+    actions: [{ type: "clearMethodRun" }, { type: "persistSession" }],
+    to: "*",
   },
 ]
 

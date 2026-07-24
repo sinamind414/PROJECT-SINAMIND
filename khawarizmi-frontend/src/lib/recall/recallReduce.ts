@@ -23,6 +23,7 @@ export function createScheduledRecallItem(input: {
   conceptId: string
   nowIso?: string
   recallItemId?: string
+  success?: boolean | null
 }): RecallSnapshot {
   const nowIso = input.nowIso ?? new Date().toISOString()
   const recallItemId = input.recallItemId ?? `recall:${input.lessonId}`
@@ -33,6 +34,7 @@ export function createScheduledRecallItem(input: {
       lessonId: input.lessonId,
       conceptId: input.conceptId,
       nowIso,
+      expectedRecallResult: input.success ?? null,
     }),
   }
 }
