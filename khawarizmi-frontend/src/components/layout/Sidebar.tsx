@@ -26,17 +26,24 @@ import {
   FlaskConical,
   GitBranch,
   User,
+  MessageCircle,
+  Home,
+  Clock,
+  FileText,
 } from "lucide-react"
 
 type MenuItem = { href: string; icon: LucideIcon; labelAr: string; labelFr: string }
 type Phase = { label: string; items: MenuItem[] }
 
 const MAIN_NAV: MenuItem[] = [
+  { href: "/aujourdhui", icon: Home, labelAr: "اليوم", labelFr: "Aujourd'hui" },
+  { href: "/dix-minutes", icon: Clock, labelAr: "10 دقائق", labelFr: "10 minutes" },
   { href: "/drill", icon: Repeat, labelAr: "نراجع", labelFr: "Réviser" },
   { href: "/exercises", icon: Dumbbell, labelAr: "نتدرب", labelFr: "Exercices" },
   { href: "/annales", icon: BookMarked, labelAr: "باك", labelFr: "BAC blanc" },
   { href: "/chatbot", icon: Microscope, labelAr: "نسقسي", labelFr: "Question" },
-  { href: "/dashboard", icon: LayoutDashboard, labelAr: "الرئيسية", labelFr: "Accueil" },
+  { href: "/dashboard", icon: LayoutDashboard, labelAr: "نظرة عامة", labelFr: "Vue globale" },
+  { href: "/fiche-j1", icon: FileText, labelAr: "ورقة J-1", labelFr: "Fiche J-1" },
   { href: "/lecons-sciences-experimentales", icon: FlaskConical, labelAr: "التجارب المقررة", labelFr: "Expériences" },
 ]
 
@@ -77,11 +84,20 @@ export const MENU_PHASES: Phase[] = [
   },
 ]
 
-const MOBILE_PRIMARY_NAV = [
-  { href: "/dashboard", icon: LayoutDashboard, labelAr: "الرئيسية" },
-  { href: "/action-verbs", icon: BookOpen, labelAr: "الأفعال" },
-  { href: "/mindmap", icon: GitBranch, labelAr: "خرائط" },
-  { href: "/lecons-sciences-experimentales", icon: User, labelAr: "حسابي" },
+// Barre de navigation mobile — 4 piliers "assimilés" (pouce, 44px min)
+// Accueil · Réviser · Tuteur · Progrès (bouton central nébras en surbrillance)
+const MOBILE_PRIMARY_NAV: Array<{
+  href: string
+  icon: LucideIcon
+  labelAr: string
+  labelFr: string
+  accent?: boolean
+}> = [
+  { href: "/aujourdhui", icon: Home, labelAr: "اليوم", labelFr: "Aujourd'hui" },
+  { href: "/drill", icon: Repeat, labelAr: "نراجع", labelFr: "Réviser" },
+  { href: "/chatbot", icon: Microscope, labelAr: "نبراس", labelFr: "Tuteur", accent: true },
+  { href: "/exercises", icon: Dumbbell, labelAr: "تمارين", labelFr: "Exos" },
+  { href: "/progress", icon: TrendingUp, labelAr: "تقدمي", labelFr: "Progrès" },
 ]
 
 type SidebarContentProps = { onNavigate?: () => void }
@@ -145,9 +161,8 @@ function SidebarContent({ onNavigate }: SidebarContentProps) {
           </div>
         </div>
         <div className="flex items-center gap-2 mt-4 relative z-10 flex-wrap">
-          <div className="flex items-center gap-1.5 bg-orange/10 border border-orange/30 rounded-lg px-2.5 py-1">
-            <Flame className="w-3.5 h-3.5 text-orange flame-flicker" aria-hidden="true" />
-            <span className="text-xs font-bold text-orange tnum">5 يوم</span>
+          <div className="flex items-center gap-1.5 bg-mint/10 border border-mint/30 rounded-lg px-2.5 py-1">
+            <span className="text-xs font-bold text-mint">🎓 بكالوريا 2026</span>
           </div>
           <div className="flex items-center gap-1.5 bg-mint/10 border border-mint/30 rounded-lg px-2.5 py-1">
             <Microscope className="w-3.5 h-3.5 text-mint" aria-hidden="true" />
@@ -285,27 +300,44 @@ export function MobileBottomNav() {
 
   return (
     <nav
-      className="fixed bottom-0 inset-x-0 z-[60] lg:hidden border-t border-white/10 bg-slate-950/95 backdrop-blur-xl px-2 py-2 pb-[calc(env(safe-area-inset-bottom)+0.5rem)]"
+      className="fixed bottom-0 inset-x-0 z-[60] lg:hidden border-t border-white/10 bg-slate-950/95 backdrop-blur-xl px-2 pt-1.5 pb-[calc(env(safe-area-inset-bottom)+0.35rem)]"
       dir="rtl"
+      aria-label="التنقل السفلي"
     >
-      <div className="grid grid-cols-4 gap-1 max-w-xl mx-auto">
+      <div className="grid grid-cols-5 gap-0.5 max-w-xl mx-auto">
         {MOBILE_PRIMARY_NAV.map((item) => {
           const Icon = item.icon
           const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`)
+          const isAccent = !!item.accent
 
           return (
             <Link
               key={item.href}
               href={item.href}
               aria-current={isActive ? "page" : undefined}
-              className={`flex flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2 transition ${
-                isActive
-                  ? "bg-mint/15 text-mint border border-mint/30"
-                  : "text-slate-300 hover:text-white hover:bg-white/5 border border-transparent"
+              aria-label={`${item.labelAr} · ${item.labelFr}`}
+              className={`group relative flex flex-col items-center justify-center gap-0.5 rounded-2xl min-h-[52px] px-1 py-1 transition ${
+                isAccent
+                  ? isActive
+                    ? "bg-gradient-to-br from-mint to-teal-600 text-slate-deep shadow-lg shadow-mint/30"
+                    : "bg-mint/20 text-mint hover:bg-mint/30 border border-mint/30"
+                  : isActive
+                  ? "bg-white/10 text-mint"
+                  : "text-slate-300 hover:text-white hover:bg-white/5"
               }`}
             >
-              <Icon className="w-5 h-5" aria-hidden="true" />
-              <span className="text-[10px] font-bold">{item.labelAr}</span>
+              {isAccent && !isActive && (
+                <span
+                  className="absolute -top-2.5 right-1/2 translate-x-1/2 min-w-[36px] px-1.5 py-0.5 rounded-full bg-gradient-to-r from-mint to-teal-500 text-[9px] font-black text-slate-deep shadow-md shadow-mint/40"
+                  aria-hidden="true"
+                >
+                  نبراس
+                </span>
+              )}
+              <Icon className="w-[22px] h-[22px]" strokeWidth={isActive || isAccent ? 2.4 : 2} aria-hidden="true" />
+              <span className={`text-[10px] leading-none font-bold ${isAccent && !isActive ? "mt-1.5" : ""}`}>
+                {item.labelAr}
+              </span>
             </Link>
           )
         })}

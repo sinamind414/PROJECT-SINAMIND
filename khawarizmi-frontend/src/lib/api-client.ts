@@ -68,8 +68,13 @@ const API_BASE_URL =
 // JWT stocké en mémoire (pas de localStorage — AGENTS.md section 1.1)
 let _khawarizmiToken: string | null = null
 
+// État du refresh silencieux : une seule promesse de refresh en vol à la fois.
+let _refreshPromise: Promise<boolean> | null = null
+
 type ApiRequestOptions = RequestInit & {
   skipAuthRedirect?: boolean
+  /** Désactive le refresh silencieux pour cette requête (utilisé par /auth/refresh lui-même). */
+  _skipRefresh?: boolean
   /**
    * Timeout en ms. Par défaut 30s. Sans ça, un appel backend qui ne répond
    * jamais ( connexion DB/AI bloquée ) fait tourner le spinner à l'infini.
@@ -103,9 +108,11 @@ class KhawarizmiApiClient {
 
   async request<T>(
     endpoint: string,
-    options: ApiRequestOptions = {}
+    options: ApiRequestOptions & { _retried?: boolean } = {}
   ): Promise<T> {
-    const { skipAuthRedirect, timeoutMs = 30000, ...fetchOptions } = options
+    const { skipAuthRedirect, timeoutMs = 30000, _retried = false, ...fetchOptions } = options
+
+    const isSafeMethod = !fetchOptions.method || ["GET", "HEAD", "OPTIONS"].includes((fetchOptions.method || "GET").toUpperCase())
 
     const headers: HeadersInit = {
       "Content-Type": "application/json",
@@ -126,28 +133,52 @@ class KhawarizmiApiClient {
         { ...fetchOptions, headers, credentials: "include", signal: controller.signal }
       )
     } catch (err) {
+      clearTimeout(timeoutId)
+      // Retry automatique 1 fois sur les GET si c'est une erreur réseau
+      if (isSafeMethod && !_retried) {
+        await new Promise((r) => setTimeout(r, 600))
+        return this.request<T>(endpoint, { ...options, _retried: true })
+      }
       throw new Error(
         err instanceof DOMException && err.name === "AbortError"
-          ? `${UI_AR.erreur_http_prefix} : مهلة الاتصال ( timeout ) — الخادم لم يستجب.`
-          : `${UI_AR.erreur_http_prefix} : تعذر الاتصال بالخادم.`
+          ? `${UI_AR.erreur_http_prefix} : مهلة الاتصال — الخادم لم يستجب.`
+          : `${UI_AR.erreur_http_prefix} : تعذر الاتصال بالخادم. تحقق من اتصالك.`
       )
-    } finally {
-      clearTimeout(timeoutId)
     }
+    clearTimeout(timeoutId)
 
-    // Token expiré → déconnexion (sauf si skip ou déjà sur auth)
-    if (response.status === 401) {
+    // Token expiré → tentative de refresh silencieux (1 seule fois)
+    if (response.status === 401 && !_retried && !options._skipRefresh) {
+      const refreshed = await this._tryRefreshToken()
+      if (refreshed) {
+        // Rejoue la requête d'origine avec le nouveau token
+        return this.request<T>(endpoint, { ...options, _retried: true })
+      }
       this.clearToken()
       if (typeof window !== "undefined" && !skipAuthRedirect) {
         const currentPath = window.location.pathname
         if (!currentPath.startsWith("/auth/")) {
+          // Garde la page demandée en mémoire pour rediriger après login
+          try { sessionStorage.setItem("kh_login_redirect", window.location.pathname + window.location.search) } catch { /* empty */ }
           window.location.href = "/auth/login"
         }
       }
       throw new Error(UI_AR.session_expiree)
     }
 
-    // Rate limit
+    // Rate limit : retry once after Retry-After si la méthode est idempotente
+    if (response.status === 429 && isSafeMethod && !_retried) {
+      const retryAfter = Number(response.headers.get("Retry-After")) || 3
+      await new Promise((r) => setTimeout(r, Math.min(retryAfter * 1000, 5000)))
+      return this.request<T>(endpoint, { ...options, _retried: true })
+    }
+
+    // 5xx : retry 1 fois sur GET
+    if (response.status >= 500 && response.status < 600 && isSafeMethod && !_retried) {
+      await new Promise((r) => setTimeout(r, 800))
+      return this.request<T>(endpoint, { ...options, _retried: true })
+    }
+
     if (response.status === 429) {
       const data = await response.json().catch(() => ({}))
       throw new Error(
@@ -223,9 +254,39 @@ class KhawarizmiApiClient {
     }
   }
 
+  /**
+   * Tente un refresh silencieux du token via le cookie httpOnly refresh.
+   * Partage une promesse commune si plusieurs appels 401 arrivent en parallèle.
+   * Retourne true si le refresh a réussi (le nouveau token est en cookie + mémoire).
+   */
+  async _tryRefreshToken(): Promise<boolean> {
+    if (_refreshPromise) return _refreshPromise
+    _refreshPromise = (async () => {
+      try {
+        const resp = await fetch(`${API_BASE_URL}/api/auth/refresh`, {
+          method: "POST",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+        })
+        if (!resp.ok) return false
+        const data = (await resp.json()) as { access_token?: string }
+        if (data.access_token) {
+          this.setToken(data.access_token)
+          return true
+        }
+        return false
+      } catch {
+        return false
+      } finally {
+        _refreshPromise = null
+      }
+    })()
+    return _refreshPromise
+  }
+
   logout(): void {
     this.clearToken()
-    void this.request<{ status: string }>("/api/auth/logout", { method: "POST" }).catch(() => undefined)
+    void this.request<{ status: string }>("/api/auth/logout", { method: "POST", _skipRefresh: true }).catch(() => undefined)
   }
 
   // ── Chat (Tuteur IA) ───────────────────────────
@@ -594,6 +655,128 @@ class KhawarizmiApiClient {
     return this.sendTuteurMessage({ message: payload.message, context: payload.context, mode: payload.mode })
   }
 
+  /**
+   * Stream SSE du chatbot — pour réponses token par token.
+   * Renvoie un ReadableStreamReader et une promesse de résultat complet.
+   *
+   * @param onMeta      appelé avec { waiting, mode, chapitre } dès la connexion
+   * @param onToken     appelé à chaque fragment de texte
+   * @param onSources   appelé quand les sources RAG arrivent
+   * @param onCartes    appelé avec les boutons de suivi
+   * @param onDone      appelé à la fin avec le texte complet
+   * @param onError     appelé en cas d'erreur avec message fr + ar
+   */
+  async streamChatbotMessage(params: {
+    message: string
+    chapitre?: string
+    history?: Array<{ role: string; content: string }>
+    mode?: "quick" | "tutor" | "bac"
+    lang?: "fr" | "ar"
+    onMeta?: (meta: { waiting?: string; mode?: string; chapitre?: string | null }) => void
+    onToken?: (delta: string) => void
+    onSources?: (sources: Array<{ content: string; source: string; chapter?: string }>, ragFound: boolean) => void
+    onCartes?: (cartes: Array<{ titre: string; action: string; bouton: string }>) => void
+    onDone?: (final: { text: string; fallback: boolean }) => void
+    onError?: (err: { message_fr?: string; message_ar?: string }) => void
+    signal?: AbortSignal
+  }): Promise<void> {
+    const {
+      message, chapitre, history, mode = "quick", lang = "ar",
+      onMeta, onToken, onSources, onCartes, onDone, onError, signal,
+    } = params
+
+    const headers: Record<string, string> = { "Content-Type": "application/json" }
+    if (_khawarizmiToken) headers["Authorization"] = `Bearer ${_khawarizmiToken}`
+
+    const controller = new AbortController()
+    const effectiveSignal = signal ?? controller.signal
+    const timeoutId = setTimeout(() => controller.abort(), 30000)
+
+    try {
+      const resp = await fetch(`${API_BASE_URL}/api/chatbot/ask/stream`, {
+        method: "POST",
+        headers,
+        credentials: "include",
+        body: JSON.stringify({ message, chapitre, history: (history || []).slice(-8), mode, lang }),
+        signal: effectiveSignal,
+      })
+      if (!resp.ok || !resp.body) {
+        const err = await resp.json().catch(() => ({}))
+        onError?.({ message_fr: err.detail || "Erreur de connexion au tuteur.", message_ar: "تعذر الاتصال بالمدرس." })
+        return
+      }
+
+      const reader = resp.body.getReader()
+      const decoder = new TextDecoder()
+      let buf = ""
+      let fullText = ""
+
+      while (true) {
+        const { value, done } = await reader.read()
+        if (done) break
+        buf += decoder.decode(value, { stream: true })
+
+        // Parse les événements SSE séparés par \n\n
+        let sepIdx
+        while ((sepIdx = buf.indexOf("\n\n")) !== -1) {
+          const rawEvent = buf.slice(0, sepIdx)
+          buf = buf.slice(sepIdx + 2)
+
+          const lines = rawEvent.split("\n")
+          let eventName = "message"
+          let dataStr = ""
+          for (const line of lines) {
+            if (line.startsWith("event:")) eventName = line.slice(6).trim()
+            else if (line.startsWith("data:")) dataStr += line.slice(5).trim()
+          }
+          if (!dataStr) continue
+
+          try {
+            const data = JSON.parse(dataStr)
+            switch (eventName) {
+              case "meta":
+                onMeta?.(data)
+                break
+              case "sources":
+                onSources?.(data.sources || [], Boolean(data.rag_found))
+                break
+              case "token":
+                if (data.d) {
+                  fullText += data.d
+                  onToken?.(data.d)
+                }
+                break
+              case "cartes":
+                onCartes?.(data.cartes || [])
+                break
+              case "done":
+                fullText = data.text || fullText
+                onDone?.({ text: fullText, fallback: Boolean(data.fallback) })
+                return
+              case "error":
+                onError?.(data)
+                return
+              case "close":
+                if (!fullText) onDone?.({ text: fullText, fallback: true })
+                return
+            }
+          } catch (e) {
+            // ignore malformed event
+          }
+        }
+      }
+      onDone?.({ text: fullText, fallback: false })
+    } catch (err) {
+      if ((err as Error).name === "AbortError") {
+        onError?.({ message_fr: "Le tuteur met trop de temps à répondre. Réessaie.", message_ar: "المدرس يستغرق وقتاً طويلاً. حاول مجدداً." })
+      } else {
+        onError?.({ message_fr: "Connexion interrompue.", message_ar: "انقطع الاتصال." })
+      }
+    } finally {
+      clearTimeout(timeoutId)
+    }
+  }
+
   async getChatbotState(): Promise<{
     status: string
     memory?: { last_topic?: string; last_chapter?: string; preferred_mode?: string; total_messages?: number; last_interaction_at?: string }
@@ -659,6 +842,22 @@ class KhawarizmiApiClient {
     rarity: string; reward_type: string; reward_value: number; reward_data: Record<string, unknown>
   }> {
     return this.request("/api/chatbot/mystery-box/open", { method: "POST" })
+  }
+
+  /**
+   * Noter une réponse du tuteur (👍 utile / 👎 pas utile).
+   * Ne requiert pas d'authentification stricte ; utilisé pour améliorer les prompts.
+   */
+  async rateChatbotResponse(payload: {
+    helpful: boolean
+    comment?: string
+    question?: string
+    response_snippet?: string
+  }): Promise<{ status: string; id: string }> {
+    return this.request("/api/chatbot/feedback", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    })
   }
 
   // ── Bac Blanc ─────────────────────────────────
@@ -1267,6 +1466,62 @@ class KhawarizmiApiClient {
       method: "POST",
       body: JSON.stringify(data),
     })
+  }
+
+  // ── Coach Manhaj (Manhaj Khawarizmi) ────────────────────────────────
+
+  /** Valide une réponse élève auprès du moteur déterministe (0 LLM). */
+  async coachValidate(data: {
+    answer: string
+    action_verb?: string | null
+    doc_type?: "quantitative" | "qualitative" | "mixed"
+    is_neuromuscular?: boolean
+    domain?: string
+    expected_targets?: string[]
+  }): Promise<{
+    score_manhaj: number
+    score_max: number
+    passed: boolean
+    threshold: number
+    matched_reflex: string | null
+    matched_reflex_label: string | null
+    matched_lois: string[]
+    broken_lois: string[]
+    label: string
+    xp: number
+    template_hint: string | null
+    suggestions: string[]
+    errors: Array<{
+      code: string
+      severity: string
+      titleAr: string
+      whyAr: string
+      template: string
+      remediation60s: string
+      messageAr: string
+    }>
+    meta: Record<string, unknown>
+  }> {
+    return this.request("/api/coach/validate", {
+      method: "POST",
+      body: JSON.stringify({ doc_type: "mixed", ...data }),
+    })
+  }
+
+  async coachGetLois(): Promise<{ lois: Array<Record<string, unknown>>; count: number }> {
+    return this.request("/api/coach/lois")
+  }
+
+  async coachGetReflexes(): Promise<{ reflexes: Record<string, unknown>; supporting_skills: Record<string, unknown> }> {
+    return this.request("/api/coach/reflexes")
+  }
+
+  async coachGetSurvivalCards(): Promise<{
+    cards: Array<Record<string, unknown>>
+    principles: string[]
+    hypothesis_rbma_message: string
+  }> {
+    return this.request("/api/coach/survival-cards")
   }
 }
 

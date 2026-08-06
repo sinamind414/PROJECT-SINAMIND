@@ -29,7 +29,7 @@ export default function Home() {
   const { isAuthenticated } = useAuth()
   const router = useRouter()
   useEffect(() => {
-    if (isAuthenticated) router.replace("/dashboard")
+    if (isAuthenticated) router.replace("/aujourdhui")
   }, [isAuthenticated, router])
 
   return (
