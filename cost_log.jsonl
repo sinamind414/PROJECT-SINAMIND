@@ -1,2 +1,0 @@
-{"ts": "2026-08-06T17:26:49.939169+00:00", "model": "test-model", "input_tokens": 150, "output_tokens": 80, "total_tokens": 230, "cost_usd": 7.05e-05, "prompt_hash": "eb774922eb7c", "verb_slug": "expliquer", "scenario_id": "test-v2-001", "latency_ms": 0}
-{"ts": "2026-08-06T17:26:49.945105+00:00", "model": "test-model", "input_tokens": 150, "output_tokens": 80, "total_tokens": 230, "cost_usd": 7.05e-05, "prompt_hash": "a860dbf644b646cbcb5e6bca1523c8e190755d0d45358f6a62378a51fa71cdc3", "verb_slug": "expliquer", "scenario_id": "test-v1-001", "latency_ms": 0}

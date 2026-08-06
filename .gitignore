@@ -66,3 +66,4 @@ khawarizmi-backend/data/
 .vercel
 
 # Playwright MCP artifacts.playwright-mcp/
+cost_log.jsonl
