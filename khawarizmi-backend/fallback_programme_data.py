@@ -340,7 +340,7 @@ FALLBACK_PROGRAMME_DATA = {
         {
           "numero": 2,
           "titre_fr": "Mecanismes de conversion de l'energie chimique potentielle des molecules organiques en ATP",
-          "titre_ar": "آليات تحويل الطاقة الكيمائية الكامنة في الجزيئات العضوية إلى ATP",
+          "titre_ar": "آليات تحويل الطاقة الكيميائية الكامنة في الجزيئات العضوية إلى ATP",
           "page": 205,
           "chapters": [
             {

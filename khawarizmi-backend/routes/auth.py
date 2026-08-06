@@ -153,6 +153,8 @@ async def register(
     )
     user = result.fetchone()
 
+    await db.commit()
+
     token = create_access_token({"sub": user[0], "plan": user[3]})
     _set_auth_cookie(response, token)
     logger.info(f"Nouvel élève inscrit : {body.email} (wilaya={body.wilaya})")
@@ -186,6 +188,7 @@ async def login(
         )
 
     await db.execute(text("UPDATE users SET last_active = NOW() WHERE id = :id"), {"id": user[0]})
+    await db.commit()
 
     token = create_access_token({"sub": user[0], "plan": user[4]})
     _set_auth_cookie(response, token)

@@ -125,7 +125,7 @@ async def lifespan(app: FastAPI):
     if cfg.DATABASE_URL:
         try:
             db_url = cfg.DATABASE_URL
-            is_sqlite = db_url.startswith("sqlite://")
+            is_sqlite = db_url.startswith("sqlite://") or db_url.startswith("sqlite+aiosqlite://")
             if db_url.startswith("postgresql://") or db_url.startswith("postgres://"):
                 db_url = db_url.replace("postgresql://", "postgresql+asyncpg://", 1).replace(
                     "postgres://", "postgresql+asyncpg://", 1
