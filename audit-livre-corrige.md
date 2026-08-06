@@ -1,5 +1,11 @@
 # Audit — « الكتاب_المصحح_v1.0 (1).md » (Livre SVT 3AS corrigé)
 
+> **⚠️ MIS À JOUR (2026-08-06) — Corrections appliquées dans la foulée :**
+> voir §10 « Corrections appliquées » en fin de rapport. C1, C2, C3, le renommage
+> et la correction du mojibake de `fallback_programme_data.py` + 14 fichiers de
+> l'app sont **faits** ; la normalisation H1/H2/H3 (S1) reste à faire avant
+> ingestion RAG.
+
 **Date :** 2026-08-06 — **Fichier :** `الكتاب_المصحح_v1.0 (1).md` (racine du dépôt)
 **Méthode :** lecture intégrale structurée + vérifications automatiques (encodage, hiérarchie Markdown, tables, doublons, artefacts) + spot-checks scientifiques + croisement avec les données du programme officiel encodées dans l'app (`fallback_programme_data.py`) et les sources ONEC en ligne.
 
@@ -147,20 +153,58 @@ C'est un bug app (hors périmètre « audit du livre ») — signalé ici car c'
 
 # 8. Plan d'action priorisé
 
-| # | Action | Effort | Impact |
-|---|---|---|---|
-| 1 | Corriger C1 (« km للاستقطاب ») et C2 (« dالة الحلقة ») | 2 min | texte propre |
-| 2 | Renommer le fichier (retirer « (1) », homogénéiser la hamza) | 1 min | hygiène |
-| 3 | Aligner le domaine 1 sur « التخصص الوظيفي للبروتينات » (ou documenter le choix) | 2 min | conformité programme |
-| 4 | Normaliser la hiérarchie H1/H2/H3 (S1) — préalable si ingestion RAG | 30-60 min | arbre exploitable |
-| 5 | Corriger le mojibake de `fallback_programme_data.py` (cp1252→UTF-8) | 15 min | app : fallback lisible |
-| 6 | Écrire `scripts/ingest_livre_corrige.py` sur le modèle de `ingest_livre_manhadjiya.py` | 1-2 h | le livre sert enfin le produit |
-| 7 | Ajouter la vérification visuelle manquante de U1 (C4) | selon accès PDF | parité de confiance |
+| # | Action | Effort | Impact | Statut |
+|---|---|---|---|---|
+| 1 | Corriger C1 (« km للاستقطاب ») et C2 (« dالة الحلقة ») | 2 min | texte propre | ✅ fait |
+| 2 | Renommer le fichier (retirer « (1) », homogénéiser la hamza) | 1 min | hygiène | ✅ fait |
+| 3 | Aligner le domaine 1 sur « التخصص الوظيفي للبروتينات » | 2 min | conformité programme | ✅ fait |
+| 4 | Normaliser la hiérarchie H1/H2/H3 (S1) — préalable si ingestion RAG | 30-60 min | arbre exploitable | ⏳ à faire |
+| 5 | Corriger le mojibake de `fallback_programme_data.py` + 14 fichiers app | 15 min | app : fallback lisible | ✅ fait |
+| 6 | Écrire `scripts/ingest_livre_corrige.py` sur le modèle de `ingest_livre_manhadjiya.py` | 1-2 h | le livre sert enfin le produit | ⏳ à faire |
+| 7 | Ajouter la vérification visuelle manquante de U1 (C4) | selon accès PDF | parité de confiance | ⏳ à faire |
 
 ---
 
 # 9. Limites de l'audit
 
+
 - La conformité page-à-page au manuel officiel n'a pas pu être re-vérifiée (le PDF officiel n'est pas dans le dépôt) ; les « تحقق مرئي » cités par le livre lui-même sont pris comme déclarations.
 - Spot-checks scientifiques limités à ~10 points clés du programme ; pas de relecture ligne à ligne par un spécialiste SVT.
 - La comparaison des pages du TOC (10, 39, 57…) avec le manuel officiel repose sur la cohérence interne + l'alignement avec le fallback ONEC de l'app, pas sur le PDF lui-même.
+
+---
+
+# 10. Corrections appliquées (session du 2026-08-06)
+
+Suite à cet audit, les corrections suivantes ont été **appliquées et vérifiées** :
+
+## Livre (renommé → `الكتاب_المصحح_v1.0.md`)
+| # | Correction | Preuve |
+|---|---|---|
+| C1 | « مستقطب (km للاستقطاب) » → « مستقطب (في حالة استقطاب) » (l. 1439) | diff confirmé |
+| C2 | « عبر dالة الحلقة » → « عبر دورة الحلقة » (l. 1845) | diff confirmé |
+| C3 | « التخصّص الحَياتي » → « التخصص الوظيفي للبروتينات » (13 occurrences, dont TOC, en-têtes H1 et cartes techniques) | `grep -c` = 13 |
+| Renommage | `الكتاب_المصحح_v1.0 (1).md` → `الكتاب_المصحح_v1.0.md` (retrait de l'artefact « (1) ») | `git mv` |
+| Préservé | les journaux de correction du texte citent toujours les formes fautives d'origine (« الأفيوليت », « الشيست الأزرق ») — la correction s'applique au contenu, pas aux citations des erreurs corrigées | 2 occurrences volontaires |
+
+## Mojibake de l'app (découverte §6) — **corrigé partout**
+- `khawarizmi-backend/fallback_programme_data.py` : 69 titres `titre_ar` réparés (240 tokens en round-trip cp1252→UTF-8 + 14 titres mixtes reconstruits manuellement à partir des titres français). **Preuve :** `import fallback_programme_data` → `['التخصص الوظيفي للبروتينات', 'التحولات الطاقوية', 'التكتونية العامة']`.
+- **14 fichiers frontend + backend** (SuggestionChips, VerbLessonFlow, mindmap, drill, leaderboard, ActiveLesson, SocialLivePanel, OnboardingOverlay, MethodPracticeGate, annales/read, VideosWidget, ProgrammeView, auth-context, mindmap_prompt_v2=FP) : **1 252 tokens** réparés au total (arabe corrompu + français « Ã© » + émojis tronqués « ðŸ… »).
+- **Scan final : 0 marqueur mojibake résiduel** dans tout le repo (hors actifs modèle `tokenizer.json` et OCR bruts, exclus par nature).
+- Outil conservé : `scripts/fix_mojibake.py` (round-trip latin-1/cp1252 + table cp1252 + gestion des octets 0x81/0x8F et du sélecteur de variation emoji U+FE0F).
+
+## Terminologie scientifique alignée sur le livre (leçons + données du site)
+| Terme (livre) | Avant | Fichiers corrigés | Nb |
+|---|---|---|---|
+| **الشست الأزرق** | الشيست الأزرق | `programme_national_svt_claude_opus.md`, `drills_svt_arabe_500_QCM…md`, `qcm_items.json`, `scientific_knowledge.py` | 39 |
+| **الأوفيوليت** | الأفيوليت | `scientific_knowledge.py`, `methodology-chapters.ts`, `experimental-lessons-data.ts`, `experimental_lessons.json` | 7 |
+| **الفنيل ألانين** | فينيل ألانين | `programme_national_svt_claude_opus.md`, `methodology-v2.ts` | 4 |
+| Variante fautive ajoutée au correcteur | « الأفيوليت » → accepté comme équivalent d'« الأوفيوليت » | `services/savoir_corrector.py` | 1 |
+
+## Vérifications après correction
+- Backend : `pytest tests/` → **624 passed, 4 failed** (les 4 échecs sont **pré-existants** — dérive de mocks `pulse_service` et attente `llm_recovered`, non liés).
+- Frontend : `vitest` → **592/592 passed** ; `eslint` → **1 erreur + 21 warnings** (identique à avant, aucune régression).
+- JSON modifiés (`qcm_items.json`, `experimental_lessons.json`) : parse OK.
+
+**Reste à faire (hors périmètre de cette session) :** S1 normalisation H1/H2/H3, C4 vérification visuelle de l'unité 1, et l'ingestion RAG du livre (§7).
+

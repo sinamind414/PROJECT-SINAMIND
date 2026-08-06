@@ -580,7 +580,7 @@ export const methodologyChapterLinks: MethodologyChapterLink[] = [
     chapterNumero: 4, chapterAr: "تشكل السلاسل الجبلية", chapterFr: "Formation des chaines de montagnes",
     chapterType: "concept", chapterImportance: "haute",
     scenarioId: "subduction-collision-ridge-v1",
-    focusAr: "التركيز المنهجي: تحليل البنيات الجيولوجية المميزة للسلاسل الجبلية (الطيور، الفوالق، الأفيوليت).",
+    focusAr: "التركيز المنهجي: تحليل البنيات الجيولوجية المميزة للسلاسل الجبلية (الطيور، الفوالق، الأوفيوليت).",
     recommendedVerbs: ["analyse", "interpret", "compare", "relationship"],
   },
   {
