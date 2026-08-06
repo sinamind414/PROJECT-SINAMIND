@@ -208,3 +208,59 @@ Suite à cet audit, les corrections suivantes ont été **appliquées et vérifi
 
 **Reste à faire (hors périmètre de cette session) :** S1 normalisation H1/H2/H3, C4 vérification visuelle de l'unité 1, et l'ingestion RAG du livre (§7).
 
+# 11. Vague 2 — Alignement terminologique et structurel des leçons et données du site sur le livre
+
+Suite à la demande « ma base de données, leçons et autres rubriques doit respecter le livre »,
+toutes les **données actives** du site (cours, QCM, lexique, méthodologie, annales, prompts,
+simulations, leçons expérimentales, planificateur) ont été alignées sur la terminologie du livre
+`الكتاب_المصحح_v1.0.md` (termes standards extraits du livre lui-même et de ses journaux de correction).
+
+## 11.1 Terminologie scientifique corrigée (22 fichiers, ~290 remplacements)
+
+| Terme avant (site) | Terme selon le livre | Fichiers corrigés | Nb |
+|---|---|---|---|
+| أدينين (adénine) | **الأدنين** | lexique, programme_national, leçons expérimentales | 8 |
+| الكودون / كودون / كودونات | **الرامزة / الرامزات** (+ « الرامزة المضادة ») | scientific_knowledge, lexique, regex fallback_v2 | 18 |
+| الكلوروفيل | **اليخضور** | programme_national, lexique | 14 |
+| الاندساس / اندساس | **الغوص / غوص** | methodology-documents, scientific_knowledge, methodology-chapters, lexique | 27 |
+| البولي ريبوزوم | **متعدد الريبوزوم** | drills, qcm_items, programme_national | 39 |
+| الجلوكوز | **الغلوكوز** | scientific_knowledge, simulations, 3 JSON, methodology-chapters | 28 |
+| الميتوكوندري / الميتوكوندريا / الميتوكندرون | **الميتوكندري / الميتوكندريا** | 3 JSON, scientific_knowledge, lexique, programme_national, methodology-v2, free_chat_prompt, aujourdhui, simulations, leçons expérimentales | 125+ |
+| الستار (manteau, lexique) | **البرنس** | lexique_svt_terminale_complet | 13 |
+| الوشاح (manteau) | **البرنس** | scientific_knowledge, chapitres-traduction, methodology-documents, TectonicsSimulation, keyword units.py | 9 |
+| accord « الرامزة البادئ/الختامي » | **البادئة / الختامية** | scientific_knowledge | 2 |
+
+**Exclusions volontaires (documentées) :**
+- `savoir_corrector.py` : dictionnaire de reconnaissance orthographique — les variantes
+  (« الكودون », « الجلوكوز », « الوشاح »…) y restent pour **accepter** les écritures élèves,
+  la forme du livre étant déjà la forme principale reconnue.
+- `fallback_v2.py` : la regex accepte encore « كودون » (écriture élève), « رامزه » → « رامزة » corrigé.
+- `experimental-lessons-data.ts` : « الستار (البرنس) » / « البرنس (الستار) » — formes d'équivalence
+  identiques à l'usage du livre (« البرنس (الستار/المعطف) »), conservées.
+- Archives OCR (`data/annales_workspace/`, `data/ocr_output/`) : données sources brutes, non servies
+  par l'app (vérifié : aucune route ne les lit) — hors périmètre.
+
+## 11.2 Structure alignée sur le livre
+
+| Élément | Avant | Après (livre) |
+|---|---|---|
+| `services/units.py` u6 | التركيب الضوئي | **آليات تحويل الطاقة الضوئية إلى طاقة كيميائية كامنة** |
+| `services/units.py` u7 | التنفس الخلوي والتخمر | **آليات تحويل الطاقة الكيميائية الكامنة في الجزيئات العضوية إلى ATP** |
+| `services/units.py` u8 | الحصيلة الطاقوية على المستوى الخلوي | **تحويل الطاقة على المستوى ما فوق البنية الخلوية** |
+| `services/units.py` u11 | البنيات الجيولوجية المرتبطة بالنشاط التكتوني | **النشاط التكتوني والبنيات الجيولوجية المرتبطة به** |
+| keywords u6-u11 | — | élargis aux termes du livre (المرحلة الكيموضوئية/الكيموحيوية, التحلل السكري, الفسفرة التأكسدية, الأوفيوليت, الموجات الزلزالية…) |
+| `WeekSchedule.tsx` (unité 6) | « التركيب الضوئي » | « آليات تحويل الطاقة الضوئية إلى طاقة كيميائية كامنة » |
+
+**Preuve de non-régression :** `normalize_unit()` matche toujours les anciens libellés de QCM
+(« التركيب الضوئي » → u6, « التنفس الخلوي والتخمر » → u7, « الحصيلة الطاقوية » → u8,
+« البنيات الجيولوجية » → u11) et retourne désormais les noms officiels.
+
+## 11.3 Vérifications
+
+- Backend : `pytest` → **624 passed / 4 failed** (les 4 échecs sont pré-existants, non liés).
+- Frontend : `vitest` → **592/592 passed** ; `eslint` → 1 erreur + 21 warnings (inchangé).
+- JSON modifiés : tous valides (`json.load` OK sur les 6 gros fichiers de données).
+- Scan final : 0 occurrence fautive résiduelle dans les données actives (hors exclusions ci-dessus).
+
+**Reste (déjà signalé) :** S1 normalisation H1/H2/H3 du livre (préalable ingestion RAG) et
+`scripts/ingest_livre_corrige.py`.

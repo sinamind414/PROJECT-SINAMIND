@@ -15,7 +15,7 @@ const QUIZ = [
   { id: "q1", question: "ماذا يحدث عند حدود تباعد الصفائح؟", options: ["غوص صفيحة", "تكوّن قشرة جديدة وظهرة", "تصادم", "لا شيء"], correct: 1, explanation: "عند التباعد تتكون قشرة محيطية جديدة وتظهر ظهرة محيطية." },
   { id: "q2", question: "ماذا يحدث عندما تلتقي صفيحة محيطية بصفيحة قارية؟", options: ["تصعد القارية", "تغوص المحيطية", "تتوقف الحركة", "تتحدان"], correct: 1, explanation: "الصفيحة المحيطية الأكثف تغوص تحت القارية مما يكون خندق وبركان." },
   { id: "q3", question: "ماذا يتكون عند تصادم صفيحتين قاريتين؟", options: ["خندق عميق", "جبال", "ظهرة محيطية", "بركان"], correct: 1, explanation: "تصادم صفيحتين قاريتين يكون سلسلة جبلية." },
-  { id: "q4", question: "ما الذي يحرّك الصفائح التكتونية؟", options: ["الرياح", "تيارات الحمل في الوشاح", "جاذبية القمر", "دوران الأرض"], correct: 1, explanation: "تيارات الحمل في الوشاح هي المحرك للصفائح." },
+  { id: "q4", question: "ما الذي يحرّك الصفائح التكتونية؟", options: ["الرياح", "تيارات الحمل في البرنس", "جاذبية القمر", "دوران الأرض"], correct: 1, explanation: "تيارات الحمل في البرنس هي المحرك للصفائح." },
 ]
 
 export function TectonicsSimulation() {
@@ -51,7 +51,7 @@ export function TectonicsSimulation() {
 
               {/* Mantle */}
               <rect x="0" y="200" width="600" height="80" fill="rgba(220,38,38,0.15)" />
-              <text x="300" y="270" textAnchor="middle" fill="#DC2626" fontSize="10" opacity="0.6">الوشاح</text>
+              <text x="300" y="270" textAnchor="middle" fill="#DC2626" fontSize="10" opacity="0.6">البرنس</text>
 
               {/* Convection currents */}
               {running && (
@@ -159,7 +159,7 @@ export function TectonicsSimulation() {
             <h2 className="text-white font-bold text-lg">شرح</h2>
             <div className="rounded-2xl p-4" style={{ background: `${currentBoundary.color}0A`, border: `1px solid ${currentBoundary.color}33` }}>
               <p className="text-white text-sm leading-relaxed">
-                {boundary === "divergent" && "عند حدود التباعد، تبتعد صفيحتان عن بعضهما. ترتفع الصهارة من الوشاح لتكوّن قشرة محيطية جديدة. تتكون ظهرة محيطية على طول الحد."}
+                {boundary === "divergent" && "عند حدود التباعد، تبتعد صفيحتان عن بعضهما. ترتفع الصهارة من البرنس لتكوّن قشرة محيطية جديدة. تتكون ظهرة محيطية على طول الحد."}
                 {boundary === "oceanic-continental" && "عند تقارب صفيحة محيطية مع قارية، تغوص المحيطية (الأكثف) تحت القارية. يتكون خندق عميق وتظهر البراكين على القارية."}
                 {boundary === "continental-continental" && "عند تقارب صفيحتين قاريتين، لا تغوص أي منهما. تتصادمان وتتكون سلسلة جبلية. مثال: جبال الهيمالايا."}
               </p>
