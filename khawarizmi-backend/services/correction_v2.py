@@ -577,6 +577,7 @@ async def evaluate_answer_v2(
 
     else:
         # ── Format v1 standard ──────────────────────
+        source = "llm"  # valeur par défaut ; les branches de récupération ci-dessous la remplacent
         raw_score = parsed.get("score", 0)
         if not isinstance(raw_score, (int, float)):
             try:
@@ -624,8 +625,6 @@ async def evaluate_answer_v2(
         except (ValueError, TypeError):
             confidence = 0.5
             source = "llm_recovered"
-
-        source = "llm"
 
     percentage = round((score / score_max) * 100) if score_max > 0 else 0
 

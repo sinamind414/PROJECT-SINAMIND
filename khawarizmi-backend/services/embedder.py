@@ -22,12 +22,24 @@ class KhawarizmiEmbedder:
     Ultra-léger en mémoire (< 30 MB) et rapide pour le CPU de production.
     """
 
+    @property
+    def is_fallback(self) -> bool:
+        """Vrai si le mode fallback déterministe est actif (modèle ONNX absent/corrompu)."""
+        return self._fallback_mode
+
+    @property
+    def fallback_reason(self) -> str:
+        return self._fallback_reason
+
     def __init__(self):
         # Résoudre le chemin absolu du modèle ONNX
         model_path = get_settings().ONNX_MODEL_PATH or "models/minilm_onnx_int8"
         if not os.path.isabs(model_path):
             base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
             model_path = os.path.join(base_dir, model_path)
+
+        self._fallback_mode = False
+        self._fallback_reason = ""
 
         logger.info(f"Initialisation de l'embedder ONNX à : {model_path}")
 
@@ -66,9 +78,11 @@ class KhawarizmiEmbedder:
                 self.session = ort.InferenceSession(onnx_file, sess_options)
                 logger.info("Embedder ONNX (sans PyTorch) initialisé avec succès.")
             except Exception as e:
+                self._fallback_reason = f"ONNX Runtime: {e}"
                 logger.error(f"Erreur d'initialisation ONNX Runtime: {e}. Activation du mode Fallback.")
                 self._fallback_mode = True
         else:
+            self._fallback_reason = f"fichier ONNX manquant ({onnx_file})"
             logger.warning(f"Fichier ONNX manquant ({onnx_file}). Activation du mode Fallback déterministe TF-IDF.")
             self._fallback_mode = True
 

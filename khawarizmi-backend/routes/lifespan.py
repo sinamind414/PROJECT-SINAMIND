@@ -272,16 +272,6 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         logger.warning(f"STATIC_CONTENT_PRELOAD_FAILED | {e}")
 
-    # ── Worker pool arq (met des jobs en queue si Redis dispo) ────────
-    try:
-        if state.redis is not None:
-            from worker.worker import get_worker_pool
-
-            await get_worker_pool()
-            logger.info("✅ Worker pool arq initialisé (file d'attente prête)")
-    except Exception as e:
-        logger.warning(f"WORKER_POOL_FAILED | {e}")
-
     logger.info(f"Khawarizmi API prête [{cfg.ENVIRONMENT}]")
     yield
 
@@ -292,11 +282,6 @@ async def lifespan(app: FastAPI):
             await state.reconciliation_task
         except asyncio.CancelledError:
             pass
-    try:
-        from worker.worker import close_worker_pool
-        await close_worker_pool()
-    except Exception:
-        pass
     if state.redis:
         try:
             close = getattr(state.redis, "aclose", None) or getattr(state.redis, "close", None)

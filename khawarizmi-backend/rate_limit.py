@@ -38,4 +38,24 @@ def evaluate_limit(key: str) -> str:
     return "80/hour" if (key and ":pro" in key) else "15/hour"
 
 
+def configure_limiter_storage(redis) -> None:
+    """Branche le rate-limiter sur Redis quand il est disponible.
+
+    Appelé au startup (lifespan) : si Redis est connecté, le stockage des
+    compteurs passe de la mémoire (défaut) à Redis — les limites sont alors
+    partagées entre toutes les instances. Sinon, on reste en mémoire.
+    """
+    if redis is None:
+        return
+    try:
+        cfg = _get_cfg()
+        if not cfg.REDIS_URL:
+            return
+        from limits.storage import RedisStorage
+
+        limiter._limiter.storage = RedisStorage(cfg.REDIS_URL)
+    except Exception:
+        pass
+
+
 limiter = Limiter(key_func=get_user_key)

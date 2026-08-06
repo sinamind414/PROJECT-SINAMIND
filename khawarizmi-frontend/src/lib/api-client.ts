@@ -49,16 +49,6 @@ import {
   AdminGlobalResponse,
   AdminMethodologyGapsResponse,
   AdminStudentsAtRiskResponse,
-  SocialConversationsResponse,
-  SocialMessagesResponse,
-  SocialPostsResponse,
-  SocialConversation,
-  SocialMessage,
-  SocialPost,
-  VoteResponse,
-  SendMessageRequest,
-  CreatePostRequest,
-  CreateConversationRequest,
 } from "./types"
 
 // En dev: paths relatifs (proxy Next.js). En prod: Railway direct (CORS).
@@ -610,40 +600,32 @@ class KhawarizmiApiClient {
     context?: { page_source?: string; history?: Array<{ role: string; content: string }> | string[]; chapitre?: string }
     mode?: "free" | "quick" | "tutor" | "bac"
   }): Promise<TuteurResponse> {
+    // Endpoint unifié : /api/chatbot/ask (le /api/tuteur legacy n'existe plus).
     const chapitre = payload.context?.chapitre
     const history = (payload.context?.history as Array<{ role: string; content: string }> | undefined) || []
-    const tuteurBody: Record<string, unknown> = {
-      message: payload.message,
-      lang: "ar",
-      mode: payload.mode || "quick",
-    }
-    if (chapitre) {
-      tuteurBody.context = { chapitre, history: history.slice(-6) }
-    } else if (history.length > 0) {
-      tuteurBody.context = { history: history.slice(-6) }
-    }
-
-    try {
-      const d = await this.request<Record<string, unknown>>("/api/tuteur", {
-        method: "POST",
-        body: JSON.stringify(tuteurBody),
-      })
-      return {
-        reponse: (d.reponse as string) || (d.response as string) || (d.content as string) || "لم تصلني إجابة واضحة. أعد المحاولة من فضلك.",
-        type: ((d.type as TuteurResponse["type"]) || "socratique") as TuteurResponse["type"],
-        cartes: (d.cartes as TuteurResponse["cartes"]) || [],
-        flashcards_suggerees: (d.flashcards_suggerees as string[]) || [],
-        sources: (d.sources as TuteurResponse["sources"]) || [],
-        source_rag: d.source_rag as string | undefined,
-        fallback_active: Boolean(d.fallback_active),
-        question_suivante: d.question_suivante as string | undefined,
-        redirect: d.redirect as string | undefined,
+    const raw = await this.request<Record<string, unknown>>("/api/chatbot/ask", {
+      method: "POST",
+      body: JSON.stringify({
+        message: payload.message,
         lang: "ar",
-        tokens_used: d.tokens_used as number | undefined || d.tokens_utilises as number | undefined,
-        from_cache: Boolean(d.from_cache),
-      }
-    } catch {
-      throw new Error("Chatbot indisponible")
+        mode: (payload.mode === "free" ? "quick" : payload.mode) || "quick",
+        chapitre,
+        history: history.slice(-8),
+      }),
+    })
+    return {
+      reponse: (raw.response as string) || (raw.reponse as string) || (raw.content as string) || "لم تصلني إجابة واضحة. أعد المحاولة من فضلك.",
+      type: ((raw.type as TuteurResponse["type"]) || "explication") as TuteurResponse["type"],
+      cartes: (raw.cartes as TuteurResponse["cartes"]) || [],
+      flashcards_suggerees: (raw.flashcards_suggerees as string[]) || [],
+      sources: (raw.sources as TuteurResponse["sources"]) || [],
+      source_rag: raw.source_rag as string | undefined,
+      fallback_active: Boolean(raw.fallback_active),
+      question_suivante: raw.question_suivante as string | undefined,
+      redirect: raw.redirect as string | undefined,
+      lang: "ar",
+      tokens_used: (raw.tokens_used as number | undefined) || (raw.tokens_utilises as number | undefined),
+      from_cache: Boolean(raw.from_cache),
     }
   }
 
@@ -1377,49 +1359,6 @@ class KhawarizmiApiClient {
 
   // ── Social Hub (Messenger + Blog) ──────────────
 
-  async getSocialConversations(): Promise<SocialConversationsResponse> {
-    return this.request<SocialConversationsResponse>("/api/social/messenger/conversations")
-  }
-
-  async createSocialConversation(data: CreateConversationRequest): Promise<SocialConversation> {
-    return this.request<SocialConversation>("/api/social/messenger/conversations", {
-      method: "POST",
-      body: JSON.stringify(data),
-    })
-  }
-
-  async getSocialMessages(conversationId: number): Promise<SocialMessagesResponse> {
-    return this.request<SocialMessagesResponse>(
-      `/api/social/messenger/conversations/${conversationId}/messages`
-    )
-  }
-
-  async sendSocialMessage(conversationId: number, data: SendMessageRequest): Promise<SocialMessage> {
-    return this.request<SocialMessage>(
-      `/api/social/messenger/conversations/${conversationId}/messages`,
-      { method: "POST", body: JSON.stringify(data) }
-    )
-  }
-
-  async getSocialPosts(page = 1, tag?: string): Promise<SocialPostsResponse> {
-    let path = `/api/social/blog/posts?page=${page}`
-    if (tag) path += `&tag=${encodeURIComponent(tag)}`
-    return this.request<SocialPostsResponse>(path)
-  }
-
-  async createSocialPost(data: CreatePostRequest): Promise<SocialPost> {
-    return this.request<SocialPost>("/api/social/blog/posts", {
-      method: "POST",
-      body: JSON.stringify(data),
-    })
-  }
-
-  async voteSocialPost(postId: number, vote: -1 | 0 | 1): Promise<VoteResponse> {
-    return this.request<VoteResponse>(`/api/social/blog/posts/${postId}/vote`, {
-      method: "POST",
-      body: JSON.stringify({ vote }),
-    })
-  }
 
   // ── Manhadjiya (LOT9) ──────────────────────────
 
@@ -1471,58 +1410,6 @@ class KhawarizmiApiClient {
   // ── Coach Manhaj (Manhaj Khawarizmi) ────────────────────────────────
 
   /** Valide une réponse élève auprès du moteur déterministe (0 LLM). */
-  async coachValidate(data: {
-    answer: string
-    action_verb?: string | null
-    doc_type?: "quantitative" | "qualitative" | "mixed"
-    is_neuromuscular?: boolean
-    domain?: string
-    expected_targets?: string[]
-  }): Promise<{
-    score_manhaj: number
-    score_max: number
-    passed: boolean
-    threshold: number
-    matched_reflex: string | null
-    matched_reflex_label: string | null
-    matched_lois: string[]
-    broken_lois: string[]
-    label: string
-    xp: number
-    template_hint: string | null
-    suggestions: string[]
-    errors: Array<{
-      code: string
-      severity: string
-      titleAr: string
-      whyAr: string
-      template: string
-      remediation60s: string
-      messageAr: string
-    }>
-    meta: Record<string, unknown>
-  }> {
-    return this.request("/api/coach/validate", {
-      method: "POST",
-      body: JSON.stringify({ doc_type: "mixed", ...data }),
-    })
-  }
-
-  async coachGetLois(): Promise<{ lois: Array<Record<string, unknown>>; count: number }> {
-    return this.request("/api/coach/lois")
-  }
-
-  async coachGetReflexes(): Promise<{ reflexes: Record<string, unknown>; supporting_skills: Record<string, unknown> }> {
-    return this.request("/api/coach/reflexes")
-  }
-
-  async coachGetSurvivalCards(): Promise<{
-    cards: Array<Record<string, unknown>>
-    principles: string[]
-    hypothesis_rbma_message: string
-  }> {
-    return this.request("/api/coach/survival-cards")
-  }
 }
 
 // ── Export singleton ───────────────────────────────

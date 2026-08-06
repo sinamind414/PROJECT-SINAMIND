@@ -99,7 +99,24 @@ Vérifié : **189 routes, 0 doublon** (le doublon potentiel de `chat.py` n'est p
 
 ---
 
-# 5. Ce qui reste (documenté, hors périmètre)
+# 5. Suite — corrections appliquées (round 2)
+
+| Point restant | Correction | Preuve |
+|---|---|---|
+| 4 tests backend en dérive | **Test pulse_service réparés** (mocks configurés sur `db.execute` au lieu du mock obsolète `get_or_create_streak`, side_effect carte+streak pour `complete_card_idempotent`) + **bug réel corrigé** dans `correction_v2.py` : la ligne finale `source = "llm"` écrasait le marqueur `llm_recovered` posé quand le score LLM était illisible → initialisation `source = "llm"` en tête de bloc v1 | **628 passed / 0 failed** (avant 624/4) |
+| `configure_limiter_storage` inexistant | **Implémenté** dans `rate_limit.py` : bascule `limiter._limiter.storage` vers `RedisStorage(REDIS_URL)` au startup si Redis connecté (sinon mémoire) — testé unitairement (MemoryStorage → RedisStorage) | warning au boot éliminé |
+| `routes/static_content.py` manquant | **Créé** : `preload_static_cache()` charge `bac_essentials.json` + cours markdown en cache module ; `get_static_content(name)` | log boot « Contenus statiques préchargés : 3 » |
+| `worker/worker.py` manquant | **Bloc mort retiré du lifespan** (arq jamais installé, aucun job) — suppression du code mort au démarrage et à l'arrêt | warning `WORKER_POOL_FAILED` éliminé |
+| Méthodes mortes api-client (coach ×4, social ×7) | **Supprimées** + imports types orphelins nettoyés | lint api-client : 1 warning pré-existant |
+| `sendTuteurMessage` (→ `/api/tuteur` inexistant) | **Repointée vers `/api/chatbot/ask`** (le vrai endpoint JSON unifié, contrat identique) — le widget ChatBubble du dashboard fonctionne | 0 référence à `/api/tuteur` dans le frontend |
+| Embedder ONNX corrompu (pointeur LFS 118 Mo non fetché, `INVALID_PROTOBUF`) | **Non téléchargeable depuis le sandbox** (huggingface.co bloqué ; objet LFS inaccessible) ET **exclu du Dockerfile** (`.dockerignore` → `models/*.onnx`) : le RAG sémantique n'est pas prévu dans l'image prod. **Log corrigé** : `is_fallback` + `fallback_reason` exposés → le boot affiche honnêtement `EMBEDDER_FALLBACK_ACTIVE` avec la cause (avant : « ✅ Embedder ONNX chargé » mensonger) | boot vérifié |
+
+**Résultat : 628/628 backend · 592/592 frontend · boot sans warning factice · le seul endpoint encore mort côté frontend est le `e` inutilisé d'un catch (warning lint pré-existant).**
+
+---
+
+# 6. Ce qui reste (documenté, hors périmètre)
+
 
 1. **4 tests backend en dérive** : `test_pulse_service.py` ×3 (mock `last_activity`), `test_correction_v2_retry.py` (attente `llm_recovered`) — à réparer.
 2. **Méthodes mortes de l'api-client** (coach ×4, tuteur, blog/messenger ×4) : soit créer les endpoints backend, soit supprimer les méthodes — aucun impact utilisateur actuellement.
