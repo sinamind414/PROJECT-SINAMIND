@@ -131,6 +131,46 @@ Dans la route, le mode indice met `remediation: {"hint": hint}` alors que le for
 
 ---
 
+# 8. Correcteur local sans clé API (session du 2026-08-06)
+
+**Constat :** le site n'a **aucune clé API externe** (`llm_guard` bloque tous les providers
+par défaut, `ENABLE_EXTERNAL_LLM=1` requis pour les activer). Le correcteur v2
+(`/api/document-analysis/evaluate-v2`) retournait alors `llm_error` (« erreur technique »)
+à chaque correction — l'élève ne recevait **rien** sans clé.
+
+**Moteur local existant :** `services/fallback_v2.py` (évaluateur L2 : TF-IDF + regex
+structurelle + embeddings locaux) — utilisé par le legacy `routes/evaluate.py` mais
+**jamais branché sur le pipeline v2**.
+
+**Correctif appliqué (`75e3444`) :**
+- `evaluate_answer_v2` accepte `local_fallback: bool = False` + `local_fallback_db` (défaut
+  off → aucun changement pour les appels existants)
+- Nouveau `_evaluate_local_fallback` : construit `question_data` depuis la réponse modèle
+  (concepts requis = termes arabes significatifs extraits + skill du verbe), appelle
+  `evaluate_l2`, mappe `L2Result` → format v2 (`source="local"`)
+- Branché sur **les 2 points d'échec LLM** : exception d'appel + JSON illisible
+- **Ajustement embedder fallback** : si le modèle ONNX est absent (cas du site), le signal
+  sémantique s1 est du bruit → son poids (0.40) est redistribué sur TF-IDF + structurel
+- Route : `local_fallback=True, local_fallback_db=db`
+
+**Résultats testés (sans clé API) :**
+
+| Réponse élève | Score | Verdict | Détail |
+|---|---|---|---|
+| « الاستنساخ يتم في النواة بفضل إنزيم ARN بوليميراز الذي يقرأ المورثة وينتج ARNm » | 2/4 (50 %) | partial_correct | feedback listant les 6 concepts trouvés (الاستنساخ، النواة، إنزيم، بوليميراز، المورثة، ARNm) |
+| « المناعة هي قدرة الجسم على الدفاع ضد الميكروبات » | 0/4 (0 %) | insufficient | 0 concept trouvé |
+
+**Couverture sans clé API (état final du site) :**
+| Fonctionnalité | Moteur local |
+|---|---|
+| Chatbot (`/api/chatbot/ask`, `/ask/stream`) | fallback déterministe local (déjà en place) |
+| Correcteur v2 (`/api/document-analysis/evaluate-v2`) | **L2 branché (nouveau)** |
+| Correcteur legacy (`/api/evaluate` legacy) | L2 (déjà en place) |
+| Évaluateur L1 (`/api/ai/evaluate`) | fallback L2 via `evaluate_with_fallback` |
+
+Tests : +2 (fallback on/off) → **pytest complet 632 passed / 0 failed**.
+
+---
 # 6. Limites de l'audit
 
 - Pas d'appel LLM réel (mode local) : le comportement des providers n'est vérifié que par mocks/tests unitaires et lecture.
