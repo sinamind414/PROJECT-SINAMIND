@@ -2,6 +2,7 @@
 routes/chatbot.py — Endpoint dédié pour le chatbot v2 (Q&A libre).
 
 POST /api/chatbot/ask
+POST /api/chatbot/ask/stream  (SSE : meta → token* → cartes → sources → done)
 Body : { message, history?, lang?, chapitre?, mode? }
 Auth : JWT Bearer requis
 
@@ -9,10 +10,12 @@ Délègue au chatbot_orchestrator unifié.
 Maintient les endpoints legacy (state, feedback, daily-mission, etc.)
 """
 
+import asyncio
 import json
 import logging
 
 from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi.responses import StreamingResponse
 from openai import AsyncOpenAI
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -75,15 +78,17 @@ def _mode_instruction(mode: str) -> str:
 # ── Endpoint principal ────────────────────────────
 
 
-@router.post("/ask")
-@limiter.limit(chat_limit)
-async def ask_chatbot(
-    request: Request,
+async def _resolve_ask(
     body: dict,
-    current_user: dict = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db),
-    openai_client: AsyncOpenAI | None = Depends(get_openai_optional),
-):
+    current_user: dict,
+    db: AsyncSession,
+    openai_client: AsyncOpenAI | None,
+) -> tuple[dict, str | None]:
+    """Logique commune à /ask et /ask/stream.
+
+    Retourne (response_data, cache_key) — le cache_key permet de stocker
+    la réponse après succès (et de servir le cache sur /ask et /ask/stream).
+    """
     message = body.get("message", "").strip()
     if not message:
         raise HTTPException(status_code=400, detail="Le champ 'message' est requis")
@@ -99,18 +104,16 @@ async def ask_chatbot(
     chapter = body.get("chapitre") or None
     mode = body.get("mode", "quick")
 
-    # Cache lookup (simple, pas sémantique)
     cache_key = make_cache_key("chatbot", lang, mode, chapter or "-", message.strip().lower())
     cached = await get_cache(cache_key)
     if cached:
         try:
             payload = json.loads(cached)
             payload["from_cache"] = True
-            return payload
+            return payload, cache_key
         except json.JSONDecodeError:
             pass
 
-    # Déléguer au chatbot orchestrator unifié
     context = {
         "chapitre": chapter,
         "history": history,
@@ -126,7 +129,6 @@ async def ask_chatbot(
         mode=mode,
     )
 
-    # Mapper le format orchestrator → format legacy route
     response_data = {
         "response": result.get("reponse", ""),
         "lang": "ar",
@@ -141,13 +143,119 @@ async def ask_chatbot(
         "flashcards_suggerees": result.get("flashcards_suggerees", []),
     }
 
-    # Cache store (non bloquant)
     try:
         await set_cache(cache_key, json.dumps(response_data, ensure_ascii=False), ttl=900)
     except Exception:
         pass
 
+    return response_data, cache_key
+
+
+def _sse(event: str, data: dict) -> str:
+    """Sérialise un événement SSE (contrat frontend : `event:` + `data:` + \\n\\n)."""
+    return f"event: {event}\ndata: {json.dumps(data, ensure_ascii=False)}\n\n"
+
+
+def _tokenize_stream(text: str, chunk_size: int = 40) -> list[str]:
+    """Découpe la réponse en chunks lisibles (limites de mots) pour l'effet streaming."""
+    if not text:
+        return []
+    words = text.split(" ")
+    chunks: list[str] = []
+    current = ""
+    for w in words:
+        candidate = (current + " " + w).strip()
+        if len(candidate) > chunk_size and current:
+            chunks.append(current)
+            current = w
+        else:
+            current = candidate
+    if current:
+        chunks.append(current)
+    return chunks
+
+
+async def _stream_events(
+    response_data: dict,
+) -> object:
+    """Générateur SSE : meta → token* → cartes → sources → done."""
+    yield _sse("meta", {
+        "waiting": False,
+        "mode": response_data.get("type", "quick"),
+        "chapitre": response_data.get("source_rag"),
+    })
+
+    text = response_data.get("response", "")
+    for chunk in _tokenize_stream(text):
+        yield _sse("token", {"d": chunk})
+        await asyncio.sleep(0.015)
+
+    cartes = response_data.get("cartes", [])
+    if cartes:
+        yield _sse("cartes", {"cartes": cartes})
+
+    sources = response_data.get("sources", [])
+    yield _sse("sources", {
+        "sources": sources,
+        "rag_found": bool(sources),
+    })
+
+    yield _sse("done", {
+        "text": text,
+        "fallback": bool(response_data.get("fallback_active", False)),
+    })
+
+
+@router.post("/ask")
+@limiter.limit(chat_limit)
+async def ask_chatbot(
+    request: Request,
+    body: dict,
+    current_user: dict = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+    openai_client: AsyncOpenAI | None = Depends(get_openai_optional),
+):
+    response_data, _ = await _resolve_ask(body, current_user, db, openai_client)
     return response_data
+
+
+@router.post("/ask/stream")
+@limiter.limit(chat_limit)
+async def ask_chatbot_stream(
+    request: Request,
+    body: dict,
+    current_user: dict = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+    openai_client: AsyncOpenAI | None = Depends(get_openai_optional),
+):
+    """Version SSE du chatbot (contrat frontend : meta/token/cartes/sources/done)."""
+    try:
+        response_data, _ = await _resolve_ask(body, current_user, db, openai_client)
+    except HTTPException as exc:
+        return StreamingResponse(
+            iter([_sse("error", {
+                "message_fr": exc.detail,
+                "message_ar": "تعذر الاتصال بالمدرس.",
+            })]),
+            media_type="text/event-stream",
+            headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+        )
+    except Exception as exc:  # pragma: no cover — filet de sécurité
+        logger.exception("ask_stream_failed")
+        return StreamingResponse(
+            iter([_sse("error", {
+                "message_fr": "Erreur technique du tuteur.",
+                "message_ar": "حدث خطأ تقني في المدرس.",
+            })]),
+            media_type="text/event-stream",
+            headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+        )
+
+    return StreamingResponse(
+        _stream_events(response_data),
+        media_type="text/event-stream",
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+    )
 
 
 @router.get("/health")
