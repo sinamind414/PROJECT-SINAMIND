@@ -200,6 +200,10 @@ async def evaluer_reponses_v2(
             request_id=str(uuid.uuid4()),
             # Prompt v2 optimisé : -68 % tokens (3742 → ~918) — mapping v2→v1 testé
             use_v2_prompt=True,
+            # Correcteur local sans clé API : le site n'a pas de clé externe
+            # (llm_guard actif) → évaluation locale L2 au lieu de llm_error.
+            local_fallback=True,
+            local_fallback_db=db,
         )
 
         # 7. Persistance MINIMALE dans da_answers (décision validée).

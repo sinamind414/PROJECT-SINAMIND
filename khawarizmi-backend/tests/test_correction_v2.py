@@ -305,3 +305,51 @@ class TestPostValidation:
         assert len(result) == 2
         assert result[0]["criterion"] == "critère 1"
         assert result[0]["why_ar"] == ""
+
+
+# ── Tests : correcteur local sans clé API ────────
+
+
+class TestLocalFallback:
+    """Sans clé API (llm_guard actif), le correcteur doit évaluer localement."""
+
+    @pytest.mark.asyncio
+    async def test_local_fallback_when_llm_disabled(self):
+        """LLM indisponible + local_fallback=True → source='local', pas llm_error."""
+        from services.correction_v2 import evaluate_answer_v2
+
+        async def mock_llm_disabled(**kwargs):
+            from services.llm_guard import LLMDisabledError
+            raise LLMDisabledError("chat.completions.create (external LLM disabled)")
+
+        result = await evaluate_answer_v2(
+            **BASE_KWARGS,
+            student_answer="الاستنساخ يتم في النواة والترجمة في الهيولى",
+            llm_call=mock_llm_disabled,
+            primary_client=MagicMock(),
+            primary_model="test",
+            local_fallback=True,
+        )
+        assert result["source"] == "local"
+        assert result["score"] >= 0
+        assert result["score_max"] == BASE_KWARGS["score_max"]
+        assert isinstance(result["feedback_ar"], str)
+        assert result["percentage"] == round(result["score"] / result["score_max"] * 100)
+
+    @pytest.mark.asyncio
+    async def test_local_fallback_off_keeps_llm_error(self):
+        """Sans local_fallback → comportement historique (llm_error)."""
+        from services.correction_v2 import evaluate_answer_v2
+
+        async def mock_llm_disabled(**kwargs):
+            from services.llm_guard import LLMDisabledError
+            raise LLMDisabledError("chat.completions.create (external LLM disabled)")
+
+        result = await evaluate_answer_v2(
+            **BASE_KWARGS,
+            student_answer="الاستنساخ يتم في النواة والترجمة في الهيولى",
+            llm_call=mock_llm_disabled,
+            primary_client=MagicMock(),
+            primary_model="test",
+        )
+        assert result["source"] == "llm_error"
