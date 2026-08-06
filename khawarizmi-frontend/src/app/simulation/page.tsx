@@ -29,7 +29,7 @@ const SIMULATIONS = [
     titleAr: "التركيب الضوئي",
     titleFr: "تحويل الطاقة الضوئية",
     descAr: "تحكم في الإضاءة وCO2 ولاحظ إنتاج O2 والغلوكوز",
-    chapter: "تحويل الطاقة",
+    chapter: "التحولات الطاقوية",
     color: "linear-gradient(135deg, #10B981, #059669, #F59E0B)",
   },
   {

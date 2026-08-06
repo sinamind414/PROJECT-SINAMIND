@@ -33,8 +33,8 @@ export const DOMAINS: DomainMeta[] = [
   {
     numero: 2,
     slug: "d2",
-    ar: "تحويل الطاقة",
-    fr: "Conversion de l'énergie",
+    ar: "التحولات الطاقوية",
+    fr: "Les transformations énergétiques",
     emoji: "⚡",
     gradient: "from-amber-500/20 to-orange-500/20",
     accentBorder: "border-amber-500/30",
@@ -42,8 +42,8 @@ export const DOMAINS: DomainMeta[] = [
   {
     numero: 3,
     slug: "d3",
-    ar: "ديناميكية الكرة الأرضية",
-    fr: "Dynamique du globe terrestre",
+    ar: "التكتونية العامة",
+    fr: "La tectonique générale",
     emoji: "🌍",
     gradient: "from-emerald-500/20 to-teal-500/20",
     accentBorder: "border-emerald-500/30",
@@ -56,12 +56,12 @@ const UNIT_SLUGS: Record<string, string> = {
   "L'activité enzymatique des protéines": "u3",
   "Rôle des protéines dans la défense de soi": "u4",
   "Rôle des protéines dans la communication nerveuse": "u5",
-  "Mécanismes de conversion de l'énergie lumineuse en énergie chimique potentielle": "u1",
-  "Mécanismes de conversion de l'énergie chimique potentielle des molécules organiques en ATP": "u2",
-  "Conversion de l'énergie au niveau ultrastructural cellulaire": "u3",
-  "L'activité tectonique des plaques": "u1",
-  "Structure du globe terrestre": "u2",
-  "L'activité tectonique et les structures géologiques associées": "u3",
+  "Mécanismes de conversion de l'énergie lumineuse en énergie chimique potentielle": "u6",
+  "Mécanismes de conversion de l'énergie chimique potentielle des molécules organiques en ATP": "u7",
+  "Conversion de l'énergie au niveau ultrastructural cellulaire": "u8",
+  "L'activité tectonique des plaques": "u9",
+  "Structure du globe terrestre": "u10",
+  "L'activité tectonique et les structures géologiques associées": "u11",
 }
 
 function getUnitSlug(unitFr: string): string {

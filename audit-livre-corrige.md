@@ -264,3 +264,47 @@ simulations, leçons expérimentales, planificateur) ont été alignées sur la 
 
 **Reste (déjà signalé) :** S1 normalisation H1/H2/H3 du livre (préalable ingestion RAG) et
 `scripts/ingest_livre_corrige.py`.
+
+
+# 12. Vague 3 — Leçons et rubriques alignées sur le livre (structure + labels)
+
+Vérification approfondie des **leçons** : le contenu pédagogique (23 leçons interactives
+dans `experimental-lessons-data.ts`) était **déjà aligné sur le livre** — les 11 unités y sont
+couvertes dans l'ordre du programme. En revanche, la **page liste** (`/lecons-sciences-experimentales`)
+affichait des labels d'un ancien programme et un **mapping phases→unités décalé** (dès l'unité 2).
+Corrections appliquées :
+
+## 12.1 Page « التجارب المقررة » (`lecons-sciences-experimentales/page.tsx`)
+- **Domaines** → noms officiels du livre : « المواد العضوية والبروتينات » → **التخصص الوظيفي للبروتينات**,
+  « تحويل الطاقة » → **التحولات الطاقوية**, « الظواهر التكتونية » → **التكتونية العامة**.
+- **Unités** → noms officiels : « العلاقة بين بنية البروتين ووظيفته » → **العلاقة بين بنية ووظيفة البروتين**,
+  « آليات تحويل الطاقة الكيميائية الكامنة إلى ATP » → **…في الجزيئات العضوية إلى ATP**,
+  « تحويل الطاقة على المستوى ما فوق البنيوي الخلوي » → **ما فوق البنية الخلوية**.
+- **Labels des 22 phases** → renommés selon le contenu réel de chaque leçon et le vocabulaire du livre
+  (ex. « التنظيم الهرموني · دور الهرمونات » → « النقل المشبكي: عبور السيالة العصبية »,
+  « الهضم · النقل الدموي » → « المرحلة الكيميوحيوية: تثبيت CO₂ (حلقة كالفن) », etc.).
+- **Mapping phases→unités corrigé** : le découpage `PHASES.slice(...)` était décalé d'une phase à
+  partir de l'unité 2 (l'unité « الاتصال العصبي » pointait vers des leçons de respiration/muscle).
+  Désormais : u1→2 leçons, u2→1, u3→1, u4→3, u5→3, u6→2, u7→2, u8→1, u9→3, u10→2, u11→2 (22 phases).
+- **Stats** : « 44 تجربة مقررة » (chiffre de l'ancien programme) → « 23 تجربة تفاعلية · 11 وحدات دراسية · 3 مجالات ».
+
+## 12.2 Catalogue des cours (`lib/cours-data.ts`)
+- Domaines d2/d3 : « تحويل الطاقة » → **التحولات الطاقوية**, « ديناميكية الكرة الأرضية » → **التكتونية العامة**.
+- **Bug `UNIT_SLUGS` corrigé** : les unités françaises des domaines 2 et 3 renvoyaient **u1/u2/u3**
+  au lieu de **u6/u7/u8** et **u9/u10/u11** → les slugs d'unités des cours étaient faux.
+
+## 12.3 Méthodologie (`lib/methodology-chapters.ts`) et simulations
+- 18 chapitres de méthodologie du domaine 2 → « التحولات الطاقوية », 18 du domaine 3 → « التكتونية العامة »
+  (le nom de l'unité 8 « تحويل الطاقة على المستوى ما فوق البنية الخلوية » reste intact — remplacement ciblé sur le champ domaine).
+- Simulation photosynthesis : `chapter: "تحويل الطاقة"` → « التحولات الطاقوية ».
+
+## 12.4 Vérifications
+- `tsc --noEmit` : **aucune erreur dans les 4 fichiers modifiés** (8 erreurs pré-existantes dans les pages
+  des routes mortes `/aujourdhui`, `/dix-minutes`, `/fiche-j1`, `/progress` — déjà documentées §P0-2 de l'audit global).
+- `vitest` : **592/592 passed** ; `eslint` : 1 erreur + 21 warnings (inchangé).
+- Scan : plus aucun ancien label de domaine (« المواد العضوية والبروتينات », « الظواهر التكتونية »,
+  « ديناميكية الكرة الأرضية », « ما فوق البنيوي ») dans le frontend.
+
+**Couverture finale livre ↔ site :** unités (units.py), chapitres (chapitres-traduction.ts, fallback),
+leçons interactives (23), cours (cours-data.ts), méthodologie (methodology-chapters.ts), planificateur
+(WeekSchedule), simulations — tous alignés sur les 11 unités et la terminologie de `الكتاب_المصحح_v1.0.md`.
