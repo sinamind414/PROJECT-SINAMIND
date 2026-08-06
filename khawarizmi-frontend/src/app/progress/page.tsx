@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link"
 import { useEffect, useState } from "react"
 import { PageShell } from "@/components/ui/PageShell"
 import { ProgressivePageHeader } from "@/components/ui/ProgressivePageHeader"
@@ -8,7 +9,7 @@ import { SurfaceCard } from "@/components/ui/SurfaceCard"
 import { SectionHeader } from "@/components/ui/SectionHeader"
 import { PillChip } from "@/components/ui/PillChip"
 import { clearStoredProgress, getProgressSnapshot, type ProgressSnapshot } from "@/lib/progress-store"
-import apiClient from "@/lib/api-client"
+import { apiClient } from "@/lib/api-client"
 import type { ProgressResponse } from "@/lib/types"
 import { getContractSnapshot } from "@/lib/lesson/evidenceService"
 
@@ -18,10 +19,21 @@ function color(level: number) {
   return "#F87171"
 }
 
+type MatrixUnit = {
+  unit_id: string
+  titre_ar: string
+  titre_fr: string
+  position: number
+  mc_count: number
+  items: Array<{ id: string; titre: string; etat: "vert" | "jaune" | "rouge" }>
+}
+type Matrix = { total: number; unites: MatrixUnit[] }
+
 export default function ProgressPage() {
   const [snapshot, setSnapshot] = useState<ProgressSnapshot | null>(null)
   const [apiProgress, setApiProgress] = useState<ProgressResponse | null>(null)
   const [source, setSource] = useState<"api" | "local">("local")
+  const [matrix, setMatrix] = useState<Matrix | null>(null)
 
   useEffect(() => {
     let cancelled = false
@@ -42,6 +54,17 @@ export default function ProgressPage() {
         if (cancelled) return
         refreshLocal()
         setSource("local")
+      }
+    })()
+
+    // Thermomètre 57 micro-concepts du bac
+    ;(async () => {
+      try {
+        const r = await apiClient.get("/api/aujourdhui/matrix")
+        const j = await r.json()
+        if (!cancelled) setMatrix(j)
+      } catch {
+        /* ignore */
       }
     })()
 
@@ -131,7 +154,80 @@ export default function ProgressPage() {
         <p className="text-amber-500/60 text-[10px] mb-4">(وضع محلي — البطاقة الخلفية غير متصلة)</p>
       )}
 
-      {/* Contrat preuves Kunz — pas de fausse maîtrise */}
+      {/* ── Thermomètre 57 micro-concepts ── */}
+      {matrix && (
+        <SurfaceCard className="mb-6">
+          <div className="flex items-center justify-between mb-3">
+            <div>
+              <p className="text-white font-black text-base">🌡️ الميزان الحراري — {matrix.total} مفهوم</p>
+              <p className="text-slate-400 text-[11px]">أخضر = متقن، أحمر = يحتاج مراجعة</p>
+            </div>
+            <Link
+              href="/aujourdhui"
+              className="text-xs font-bold text-mint hover:text-mint-soft px-3 py-1.5 rounded-lg bg-mint/10 border border-mint/30"
+            >
+              تابع المهمة ←
+            </Link>
+          </div>
+          {(() => {
+            const verts = matrix.unites.reduce(
+              (s, u) => s + u.items.filter((i) => i.etat === "vert").length,
+              0,
+            )
+            const pct = Math.round((verts / matrix.total) * 100)
+            return (
+              <div className="mb-4">
+                <div className="flex justify-between text-xs mb-1">
+                  <span className="text-slate-400">التقدم</span>
+                  <span className="text-white font-bold">
+                    {verts}/{matrix.total} ({pct}%)
+                  </span>
+                </div>
+                <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-gradient-to-l from-emerald-400 to-mint transition-all"
+                    style={{ width: `${pct}%` }}
+                  />
+                </div>
+              </div>
+            )
+          })()}
+          <div className="space-y-3">
+            {matrix.unites.map((u) => {
+              const uv = u.items.filter((i) => i.etat === "vert").length
+              return (
+                <div key={u.unit_id}>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <p className="text-xs font-bold text-white">
+                      {u.titre_ar}
+                      <span className="text-slate-500 mr-1">
+                        ({uv}/{u.mc_count})
+                      </span>
+                    </p>
+                  </div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {u.items.map((it, idx) => (
+                      <div
+                        key={it.id}
+                        title={it.titre}
+                        className={`w-7 h-7 rounded-md flex items-center justify-center text-[10px] font-bold transition ${
+                          it.etat === "vert"
+                            ? "bg-emerald-400 text-slate-deep"
+                            : "bg-white/5 border border-red-500/30 text-red-300"
+                        }`}
+                      >
+                        {idx + 1}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </SurfaceCard>
+      )}
+
+      {/* Contrat preuves Khawarizmi — pas de fausse maîtrise */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
         <SurfaceCard>
           <p className="text-gray-400 text-[10px] mb-1">إثباتات وثيقة</p>
@@ -251,7 +347,7 @@ export default function ProgressPage() {
           </div>
         </RevealSection>
 
-        <RevealSection title="سجل الإثباتات والأخطاء (عقد Kunz)">
+        <RevealSection title="سجل الإثباتات والأخطاء (عقد Khawarizmi)">
           <div className="space-y-4">
             <div>
               <p className="text-sky-300 text-xs font-bold mb-2">إثباتات حديثة</p>

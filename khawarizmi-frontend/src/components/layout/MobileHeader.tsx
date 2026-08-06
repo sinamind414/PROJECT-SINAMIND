@@ -5,7 +5,10 @@ import { User, Zap, GitBranch } from "lucide-react"
 import Link from "next/link"
 
 const pageTitles: Record<string, string> = {
-  "/dashboard": "الرئيسية",
+  "/aujourdhui": "اليوم",
+  "/dix-minutes": "10 دقائق",
+  "/fiche-j1": "ورقة المراجعة",
+  "/dashboard": "نظرة عامة",
   "/action-verbs": "الأفعال الإجرائية",
   "/methodology": "منهجية البكالوريا",
   "/mindmap": "خرائط ذهنية",
