@@ -115,6 +115,22 @@ Dans la route, le mode indice met `remediation: {"hint": hint}` alors que le for
 
 ---
 
+# 7. Corrections appliquées (session du 2026-08-06)
+
+| # | Action | État | Preuve |
+|---|---|---|---|
+| 1 | **RGPD** : `da_answers.answer_text` stocke désormais `_sha256_text(ans.answer)` (hash SHA-256), plus jamais la copie en clair — aligné sur `correction_audit` et AGENTS.md §1.2 | ✅ fait | `answer_text` n'était lu par aucune route (vérifié) → aucun impact fonctionnel |
+| 2 | **Legacy documenté** (pas de refonte risquée) : `call_gpt4o_evaluator` marqué « MOTEUR LEGACY — maintenu uniquement pour la réconciliation L1/L2 » ; `evaluation_mode` note que `/api/ai/evaluate` n'est appelé par aucun frontend | ✅ fait | docstrings ajoutés ; `/api/evaluate` reste non exposé |
+| 3 | **`use_v2_prompt=True`** activé sur la route evaluate-v2 → prompt optimisé -68 % tokens (3742 → ~918) avec mapping v2→v1 testé | ✅ fait | paramètre passé dans l'appel retry |
+| 4 | **Fallback score_max loggé** : verbe absent de VERB_RULES ou sans points → `logger.warning` au lieu du silence | ✅ fait | 26 verbes couverts, 2 warnings possibles |
+| 5 | **Couverture socratic_tutor** : faux positif de mesure — les 6 tests existants donnent en réalité **92 %** (la mesure initiale de 32 % excluait le fichier de test) | ✅ documenté | `--cov` avec test_socratic_tutor : 92 % |
+| 6 | **`llm_raw` retiré du contrat public** (retours sanity + succès) — conservé uniquement dans `llm_error` (debug interne, jamais exposé) ; `llm_raw_hash` reste pour l'audit | ✅ fait | test `llm_error` (l.249) inchangé, 59 tests correcteur verts |
+| 7 | **`remediation` mode socratique** : faux positif — le type frontend `remediation` accepte les deux formes (`{page, lesson_title, advice_ar}` **et** `{hint: {hint_ar, focus_area, methodology_step}}`) et `ScenarioRunner.tsx` gère les deux (l.142-159) | ✅ documenté | aucun changement nécessaire |
+
+**Vérifications :** pytest complet **628 passed / 0 failed** · boot serveur OK · aucun fichier frontend modifié.
+
+---
+
 # 6. Limites de l'audit
 
 - Pas d'appel LLM réel (mode local) : le comportement des providers n'est vérifié que par mocks/tests unitaires et lecture.

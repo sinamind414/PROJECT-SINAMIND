@@ -12,6 +12,9 @@ logger = logging.getLogger("khawarizmi.evaluation_mode")
 
 
 async def handle_evaluation(req, user: dict, db: AsyncSession, openai_client):
+    # NOTE : route /api/ai/evaluate — moteur LEGACY (score/10, seuils 0.85/0.35).
+    # Le correcteur actif est evaluate_answer_v2 (via /api/document-analysis/evaluate-v2).
+    # Route non appelée par le frontend actuel ; conservée pour compatibilité API.
     from routes.evaluate import evaluate_with_fallback, normalize_result
 
     user_id = user["id"]

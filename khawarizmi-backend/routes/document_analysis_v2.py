@@ -198,6 +198,8 @@ async def evaluer_reponses_v2(
             primary_model=cfg.openai_model,
             rag_context_provider=rag_provider,
             request_id=str(uuid.uuid4()),
+            # Prompt v2 optimisé : -68 % tokens (3742 → ~918) — mapping v2→v1 testé
+            use_v2_prompt=True,
         )
 
         # 7. Persistance MINIMALE dans da_answers (décision validée).
@@ -222,7 +224,8 @@ async def evaluer_reponses_v2(
                     "question_id": str(q["id"]),
                     "verb_slug": q["verb_slug"],
                     "chapter_slug": body.chapter_slug or "",
-                    "answer_text": ans.answer,
+                    # RGPD (AGENTS.md §1.2) : jamais la copie en clair — hash SHA-256 uniquement
+                    "answer_text": _sha256_text(ans.answer),
                     "score": result["score"],
                     "score_max": result["score_max"],
                     "percentage": result["percentage"],
@@ -317,6 +320,12 @@ async def evaluer_reponses_v2(
     }
 
 
+def _sha256_text(value: str) -> str:
+    """Hash SHA-256 hexadécimal — utilisé à la place de toute donnée élève en clair."""
+    import hashlib
+    return hashlib.sha256(value.encode("utf-8")).hexdigest()
+
+
 def _compute_score_max_for_verb(verb_slug: str) -> int:
     """Score max par verbe. Aligné sur les VERB_RULES existants
     dans services/document_analysis_service.py pour ne pas
@@ -325,8 +334,13 @@ def _compute_score_max_for_verb(verb_slug: str) -> int:
 
     rules = VERB_RULES.get(verb_slug)
     if not rules:
+        logger.warning("score_max_fallback | verbe inconnu de VERB_RULES : %s → 4 pts", verb_slug)
         return 4  # fallback raisonnable
-    return sum(r.get("points", 0) for r in rules.get("rules", [])) or 4
+    total = sum(r.get("points", 0) for r in rules.get("rules", []))
+    if total <= 0:
+        logger.warning("score_max_fallback | VERB_RULES '%s' sans points → 4 pts", verb_slug)
+        return 4
+    return total
 
 
 async def _update_fsrs_v2(

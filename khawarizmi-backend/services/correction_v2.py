@@ -218,7 +218,6 @@ def _build_sanity_result(
         "advice_ar": "أعد كتابة إجابتك بشكل واضح ومنظم باللغة العربية.",
         "confidence": 1.0,
         "sanity_code": sanity_code,
-        "llm_raw": None,
         "provider": "none",
         "model": "none",
         "finish_reason": "sanity",
@@ -669,7 +668,8 @@ async def evaluate_answer_v2(
         "advice_ar": advice_ar,
         "confidence": confidence,
         "sanity_code": "ok",
-        "llm_raw": llm_raw,
+        # NOTE : llm_raw volontairement absent du contrat public (fuite potentielle).
+        # Conservé uniquement dans le résultat llm_error (debug interne, jamais exposé).
         "provider": provider,
         "model": model,
         "finish_reason": finish_reason,

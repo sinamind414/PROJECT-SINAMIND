@@ -168,6 +168,13 @@ async def _call_with_fallback(
 
 @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=1, max=4))
 async def call_gpt4o_evaluator(client: AsyncOpenAI, question: dict, reponse: str, tentative: int) -> dict:
+    """MOTEUR LEGACY — maintenu uniquement pour la réconciliation L1/L2
+    (services/reconciliation_queue.py) et la route legacy /api/evaluate (non exposée).
+
+    Le correcteur actif est evaluate_answer_v2 (services/correction_v2.py), utilisé
+    par /api/document-analysis/evaluate-v2. Ne PAS brancher de nouvelle route sur
+    ce moteur : deux notations cohabitent (score/10 ici vs score/score_max en v2).
+    """
     concepts = question.get("concepts_requis", [])
     if not concepts and question.get("concept_cle"):
         concepts = [question["concept_cle"]]
