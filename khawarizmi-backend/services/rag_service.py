@@ -44,6 +44,9 @@ def _extract_keywords(message: str, limit: int = 4) -> list[str]:
     keywords = []
     seen = set()
     for token in tokens:
+        # retirer la ponctuation arabe/française collée (؟؟!،) : déjà exclue par \w,
+        # mais certains caractères passent via les plages arabes — purge simple
+        token = token.strip("؟?!،.;:")
         if len(token) <= 2 or token in STOP_WORDS_RAG or token in seen:
             continue
         seen.add(token)
@@ -60,7 +63,12 @@ async def vector_rag_search(
     limit: int = 8,
 ) -> list[dict]:
     try:
-        from services.embedder import embedder
+        # Embedder en fallback (ONNX absent) → vecteurs aléatoires déterministes
+        # (bruit) : inutile d'interroger pgvector, le keyword search est le signal.
+        from services.embedder import embedder, get_embedder
+
+        if bool(getattr(get_embedder(), "is_fallback", False)):
+            return []
 
         query_vector = embedder.encode([message])[0]
         query_emb = str(query_vector.tolist())
