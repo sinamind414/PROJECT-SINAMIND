@@ -2,8 +2,7 @@
 Modèle UserOnboarding — statut d'onboarding d'un utilisateur.
 """
 
-import uuid
-from sqlalchemy import Boolean, Column, DateTime, ForeignKey, func, text
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, text
 from sqlalchemy.dialects.postgresql import UUID
 
 from database import Base

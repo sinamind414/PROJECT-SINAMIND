@@ -2,8 +2,6 @@
 Modèle UserBadge — badges débloqués par l'utilisateur.
 """
 
-import uuid
-from datetime import datetime
 
 from sqlalchemy import Column, DateTime, ForeignKey, String, UniqueConstraint, func, text
 from sqlalchemy.dialects.postgresql import UUID

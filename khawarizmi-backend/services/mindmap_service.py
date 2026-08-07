@@ -256,9 +256,8 @@ GÉNÉRATION PROGRESSIVE (LAZY LOADING) :
                 node["expanded"] = False
 
                 for idx, child in enumerate(node["enfants"]):
-                    if level == 0:
-                        if "couleur_branche" not in child or not child["couleur_branche"]:
-                            child["couleur_branche"] = BRANCH_COLORS[idx % len(BRANCH_COLORS)]
+                    if level == 0 and ("couleur_branche" not in child or not child["couleur_branche"]):
+                        child["couleur_branche"] = BRANCH_COLORS[idx % len(BRANCH_COLORS)]
                     format_node_lazy(child, level + 1, parent_branch_color=node.get("couleur_branche"))
 
             format_node_lazy(generated_data["racine"], level=0)
@@ -392,8 +391,7 @@ async def expand_node(
     return {"node_id": node_id, "enfants": enfants}
 
 
-
-from services.mindmap_prompt_v2 import MINDMAP_SYSTEM_PROMPT_V2, EXPAND_PROMPT_V2, BRANCH_COLORS
+from services.mindmap_prompt_v2 import BRANCH_COLORS, EXPAND_PROMPT_V2, MINDMAP_SYSTEM_PROMPT_V2
 
 MINDMAP_SYSTEM_PROMPT = MINDMAP_SYSTEM_PROMPT_V2
 
@@ -547,9 +545,8 @@ async def generate_mindmap(
 
         node["enfants"] = node.get("enfants", [])
         for idx, child in enumerate(node["enfants"]):
-            if level == 0:
-                if "couleur_branche" not in child or not child["couleur_branche"]:
-                    child["couleur_branche"] = BRANCH_COLORS[idx % len(BRANCH_COLORS)]
+            if level == 0 and ("couleur_branche" not in child or not child["couleur_branche"]):
+                child["couleur_branche"] = BRANCH_COLORS[idx % len(BRANCH_COLORS)]
             format_node_recursive(child, level + 1, parent_branch_color=node.get("couleur_branche"))
 
     format_node_recursive(generated_data["racine"], level=0)

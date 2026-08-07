@@ -6,8 +6,8 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from deps import get_current_user
 from database import get_db
+from deps import get_current_user
 from services import duel_service
 
 router = APIRouter(prefix="/api/duels", tags=["duels"])
@@ -36,8 +36,9 @@ async def get_duel_by_token(share_token: str, db: AsyncSession = Depends(get_db)
 
 @router.post("/{duel_id}/accept")
 async def accept_duel(duel_id: str, current_user=Depends(get_current_user), db: AsyncSession = Depends(get_db)):
-    from models.duel import Duel
     from sqlalchemy import select
+
+    from models.duel import Duel
     result = await db.execute(select(Duel).where(Duel.id == duel_id))
     duel = result.scalar_one_or_none()
     if not duel:

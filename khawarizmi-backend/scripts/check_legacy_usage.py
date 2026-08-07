@@ -1,5 +1,6 @@
 """Vérifie que les routes legacy sont bien vivantes avant dépréciation."""
 import asyncio
+
 from httpx import AsyncClient
 
 LEGACY = [

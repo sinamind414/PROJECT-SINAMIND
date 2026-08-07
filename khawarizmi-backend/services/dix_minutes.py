@@ -1,13 +1,13 @@
 """services/dix_minutes.py — Mode 10 minutes : 5 MCs enchaînés, 0 LLM, 100% déterministe."""
 from __future__ import annotations
 
+import json
 import random as _r
+from datetime import date
+from pathlib import Path
 from typing import Any
 
-from services.aujourdhui import _load, _build_qcm
-from pathlib import Path
-from datetime import date
-import json
+from services.aujourdhui import _build_qcm, _load
 
 _MASTERY_DIR = Path(__file__).resolve().parent.parent / "data" / "mastery"
 _MASTERY_DIR.mkdir(parents=True, exist_ok=True)

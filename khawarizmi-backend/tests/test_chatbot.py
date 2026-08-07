@@ -286,7 +286,7 @@ class TestAskStreamSSE:
 
     async def test_stream_events_contract(self):
         """Les événements SSE suivent le contrat : meta → token* → cartes/sources → done."""
-        from routes.chatbot import _tokenize_stream, _sse
+        from routes.chatbot import _sse, _tokenize_stream
 
         chunks = _tokenize_stream("phrase une deux trois quatre cinq six sept huit", chunk_size=10)
         assert len(chunks) >= 2

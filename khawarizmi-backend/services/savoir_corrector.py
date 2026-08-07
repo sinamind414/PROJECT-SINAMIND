@@ -17,7 +17,6 @@ import re
 import unicodedata
 from typing import Any
 
-
 # ──────────────────────────────────────────────────────────────────────
 # Lexique de synonymes scientifiques FR/AR/arabe dialectal
 # ──────────────────────────────────────────────────────────────────────
@@ -30,8 +29,8 @@ _SYNONYMS: dict[str, list[str]] = {
     "ribose":         ["ribose", "سكر ريبوز", "الريبوز", "ريبوز"],
     "thymine":        ["thymine", "الثايمين", "ثايمين", "القاعدة الثايمين", "t"],
     "uracile":        ["uracile", "اليوراسيل", "يوراسيل", "قاعدة يوراسيل", "u"],
-    "adn_double_brin":["double brin", "double hélice", "ثنائي السلاسل", "ثنايي السلسله", "مزدوج", "سلسلتان", "حلزون مزدوج"],
-    "arn_simple_brin":["simple brin", "brin simple", "أحادي السلسلة", "احادي السلسله", "سلسلة واحدة"],
+    "adn_double_brin": ["double brin", "double hélice", "ثنائي السلاسل", "ثنايي السلسله", "مزدوج", "سلسلتان", "حلزون مزدوج"],
+    "arn_simple_brin": ["simple brin", "brin simple", "أحادي السلسلة", "احادي السلسله", "سلسلة واحدة"],
     "bases_azotees":  ["bases azotées", "القواعد الآزوتية", "قواعد آزوتية", "القواعد النيتروجينية", "تسلسل القواعد", "تسلسل القواعد الآزوتية", "تسلسل القواعد الازوتيه"],
     "arm":            ["arnm", "mrna", "arn messager", "الرنا الرسول", "الرنا الرسول", "رنا رسول"],
     "trn":            ["arnt", "trna", "arn de transfert", "arn transférable", "الرنا الناقل", "رنا ناقل", "arn الناقل", "الرنا الناقل", "ينقل arnt", "arn ناقل"],
@@ -49,16 +48,16 @@ _SYNONYMS: dict[str, list[str]] = {
 
     # ── Structure des protéines ──
     "prot_primaire":  ["structure primaire", "البنية الأولية", "البنية الاوليه", "التركيب الأولي", "التركيب الاولي", "تسلسل الأحماض الأمينية", "تسلسل الاحماض الامينيه", "sequence des acides amines", "سلسلة ببتيدية ببتيدية", "تتابع الأحماض الأمينية"],
-    "prot_secondaire":["structure secondaire", "بنية ثانوية", "البنية الثانوية", "التركيب الثانوي", "حلزون ألفا", "حلزون الفا", "hélice alpha", "helice α", "الصحيفة بيتا", "الصفيحة بيتا", "صحيفة مطوية", "الوريقات المطوية", "الورقة المطوية", "وريقات مطوية", "feuillet bêta", "feuillet beta", "رابطة هيدروجينية", "روابط هيدروجينية", "liaisons hydrogène", "لولبي", "حلزوني", "الشكل الحلزوني", "البنية الحلزونية", "بنية حلزونية", "شكل حلزوني", "أشكال حلزونية", "التفاف السلسلة الببتيدية", "انطواء السلسلة", "الانطواء"],
+    "prot_secondaire": ["structure secondaire", "بنية ثانوية", "البنية الثانوية", "التركيب الثانوي", "حلزون ألفا", "حلزون الفا", "hélice alpha", "helice α", "الصحيفة بيتا", "الصفيحة بيتا", "صحيفة مطوية", "الوريقات المطوية", "الورقة المطوية", "وريقات مطوية", "feuillet bêta", "feuillet beta", "رابطة هيدروجينية", "روابط هيدروجينية", "liaisons hydrogène", "لولبي", "حلزوني", "الشكل الحلزوني", "البنية الحلزونية", "بنية حلزونية", "شكل حلزوني", "أشكال حلزونية", "التفاف السلسلة الببتيدية", "انطواء السلسلة", "الانطواء"],
     "prot_tertiaire": ["structure tertiaire", "بنية ثالثية", "بنية ثلاثية", "البنية الثالثية", "البنيه الثالثيه", "التركيب الثالثي", "التركيب الثالثى", "التفاف", "التلاف", "الانطواء", "انطواء", "انطواء السلسلة", "تلتف", "شكل كروي", "شكلا كرويا", "كروي", "كروية", "repliement", "repliement tridimensionnel", "بنية ثلاثية الأبعاد", "الشكل ثلاثي الأبعاد", "بنيات ثانوية حلزونية ووريقات"],
-    "prot_quaternaire":["structure quaternaire", "بنية رباعية", "البنية الرباعية", "التركيب الرباعي", "عدة سلاسل ببتيدية", "plusieurs chaînes peptidiques", "وحدات فرعية", "تحت الوحدات", "تحت الوحدة", "تحت وحدات", "لسلسلتين ببتيديتين أو أكثر", "تجمع تحت وحدات"],
+    "prot_quaternaire": ["structure quaternaire", "بنية رباعية", "البنية الرباعية", "التركيب الرباعي", "عدة سلاسل ببتيدية", "plusieurs chaînes peptidiques", "وحدات فرعية", "تحت الوحدات", "تحت الوحدة", "تحت وحدات", "لسلسلتين ببتيديتين أو أكثر", "تجمع تحت وحدات"],
     "pont_disulfure": ["pont disulfure", "ponts disulfures", "جسور ثنائية الكبريت", "جسور كبريتية", "الجسور الكبريتية", "رابطة ثنائية الكبريت", "liaison disulfure", "جسر كبريتي"],
     "liaison_h":      ["liaison hydrogène", "liaisons hydrogène", "رابطة هيدروجينية", "روابط هيدروجينية"],
-    "liaison_ionique":["liaison ionique", "pont salin", "ponts salins", "رابطة أيونية", "روابط أيونية", "روابط شاردية", "رابطة شاردية", "الروابط الملحية", "رابطة ملحية", "تفاعلات كهربائية", "تفاعلات الشحنات"],
-    "liaison_hydrophobe":["interaction hydrophobe", "interactions hydrophobes", "تفاعلات كارهة للماء", "تداخل الجذور الكارهة للماء", "تجاذب كاره للماء", "تداخل كاره للماء", "تأثير كاره للماء"],
+    "liaison_ionique": ["liaison ionique", "pont salin", "ponts salins", "رابطة أيونية", "روابط أيونية", "روابط شاردية", "رابطة شاردية", "الروابط الملحية", "رابطة ملحية", "تفاعلات كهربائية", "تفاعلات الشحنات"],
+    "liaison_hydrophobe": ["interaction hydrophobe", "interactions hydrophobes", "تفاعلات كارهة للماء", "تداخل الجذور الكارهة للماء", "تجاذب كاره للماء", "تداخل كاره للماء", "تأثير كاره للماء"],
     "groupe_r":       ["groupes latéraux", "groupe r", "المجموعات الجانبية", "مجموعات جانبية", "السلاسل الجانبية r", "chaînes latérales", "chaîne latérale", "مجموعات R", "مجموعات الجانب", "المجموعات الجانبيه", "المجموعة الجانبية", "الجذور r", "جذر r", "جذور الأحماض الأمينية", "الجذور الكيميائية"],
-    "chaine_peptidique":["chaîne peptidique", "سلسلة ببتيدية", "السلسلة الببتيدية", "سلسلة بيبتيدية", "السلسلة البيبتيدية", "سلسل بيبتيدي"],
-    "liaison_peptidique":["liaison peptidique", "روابط ببتيدية", "رابطة ببتيدية", "الرابطة الببتيدية", "الروابط الببتيدية"],
+    "chaine_peptidique": ["chaîne peptidique", "سلسلة ببتيدية", "السلسلة الببتيدية", "سلسلة بيبتيدية", "السلسلة البيبتيدية", "سلسل بيبتيدي"],
+    "liaison_peptidique": ["liaison peptidique", "روابط ببتيدية", "رابطة ببتيدية", "الرابطة الببتيدية", "الروابط الببتيدية"],
     "sequence_aa":    ["séquence des acides aminés", "تسلسل الأحماض الأمينية", "ترتيب الأحماض الأمينية", "تسلسل", "متسلسل", "الترتيب المتسلسل"],
     "ordre_aa":       ["ترتيب", "الترتيب", "ترتيب الأحماض", "ترتيب متسلسل"],
     "feuillet_beta_nom": ["صفائح", "الصفائح", "الصفائحية", "الشكل الصفائحي", "بنية صفائحية", "مناطق صفائحية"],
@@ -69,7 +68,6 @@ _SYNONYMS: dict[str, list[str]] = {
     "complementarite_nom": ["تمامة", "التمامة", "متمم", "متممة", "تكامل", "التكامل"],
     "globules_rouges": ["كرات الدم الحمراء", "كريات حمراء"],
     "codon_stop":     ["codon stop", "codon de terminaison", "كودون التوقف", "كودون توقف", "توقف الترجمة"],
-    "acide_amine":    ["acide aminé", "acides amines", "aminoacide", "حمض أميني", "أحماض أمينية", "الاحماض الامينيه"],
 
     # ── Enzymologie ──
     "enzyme":         ["enzyme", "إنزيم", "أنزيم", "إنظيم", "الإنزيم", "الانزيم", "الإنزميم", "الانزيمات"],
@@ -102,7 +100,7 @@ _SYNONYMS: dict[str, list[str]] = {
     # ── Conformation / structure-fonction ──
     "conformation":   ["conformation", "بنية مكانية", "البنية المكانية", "بنيه مكانيه", "البنية ثلاثية الأبعاد", "الشكل ثلاثي الأبعاد", "البنية الفراغية", "التخصص البنيوي", "البنية ثلاثية الابعاد"],
     "relation_struct_fonction": ["relation structure-fonction", "علاقة بين البنية والوظيفة", "البنية تحدد الوظيفة", "تغير البنية", "تغير البنية يؤدي", "تغير الوظيفة", "تفقد الانزيم وظيفته", "فقدان الوظيفة", "perte de fonction"],
-    "complementarite":["complémentarité", "تكامل", "التكامل", "التكامل البنيوي", "تمام", "التمامة", "متمم", "متممة", "تتطابق", "تطابق", "تطابق شكلي", "التكامل الشكلي", "complémentarité de forme", "التعرف النوعي", "يتعرف"],
+    "complementarite": ["complémentarité", "تكامل", "التكامل", "التكامل البنيوي", "تمام", "التمامة", "متمم", "متممة", "تتطابق", "تطابق", "تطابق شكلي", "التكامل الشكلي", "complémentarité de forme", "التعرف النوعي", "يتعرف"],
     "globuline":      ["globuline", "الغلوبولينات", "غلوبولينات", "الغلوبولين", "غلوبولين", "الجلوبيولينات", "بروتينات الدم"],
     "reconnaissance": ["reconnaissance", "التعرف", "يتعرف على", "تتعرف على", "التعرف النوعي", "التعرف على المستضد"],
     # ── Traduction/transcription plus ──
@@ -120,7 +118,7 @@ _SYNONYMS: dict[str, list[str]] = {
     "chaine_resp":    ["chaîne respiratoire", "chaîne de transport d'électrons", "السلسلة التنفسية", "سلسلة التنفس"],
     "phosphorylation_oxydative": ["phosphorylation oxydative", "الفسفرة التأكسدية", "الفسفرة المؤكسدة", "فسفرة تأكسدية"],
     "oxygene":        ["o2", "dioxygène", "oxygène", "الأكسجين", "أكسجين", "الاوكسجين", "اكسجين"],
-    "38_atp":         ["38 atp", "38atp", "38 جزيئة atp", "38 جزيء atp", "38atp", "38 أتب", "38 جزيء atp" ],
+    "38_atp":         ["38 atp", "38atp", "38 جزيئة atp", "38 جزيء atp", "38atp", "38 أتب", "38 جزيء atp"],
     "pyruvate":       ["pyruvate", "acide pyruvique", "البيروفات", "بيروفات", "حمض البيروفيك", "الحمض البيروفي", "البيروفيك", "مركب ثلاثي الكربون"],
     "acetyl_coa":     ["acétyl-coa", "acetyl-coa", "acétyl coenzyme a", "أستيل كوآ", "أستيل مرافق أ", "أسيتيل كوآ", "الأسيتيل كوآ", "أستيل كو إنزيم أ", "استيل كو"],
     "chloroplaste":   ["chloroplaste", "البلاستيدات الخضراء", "بلاستيدات خضراء", "الكلوروبلاست", "الصانعات الخضراء", "الصانعة الخضراء", "صانعات يخضورية", "صانعة خضراء"],
@@ -133,7 +131,7 @@ _SYNONYMS: dict[str, list[str]] = {
     "glucose":        ["glucose", "جلوكوز", "الغلوكوز", "الغلوكوز", "مادة عضوية", "المادة العضوية", "ماده عضويه", "مواد عضوية", "سكر", "الجلوكوز"],
     "o2_degage":      ["dégagement d'o2", "libération d'oxygène", "انطلاق الأكسجين", "إطلاق الأكسجين", "ينطلق الأكسجين"],
     "eau":            ["eau", "الماء", "ماء", "h2o"],
-    "energie_lumineuse":["énergie lumineuse", "طاقة ضوئية", "الطاقة الضوئية", "طاقه ضوييه", "الطاقه الضوييه", "طاقة الشمس", "ضوء", "lumière"],
+    "energie_lumineuse": ["énergie lumineuse", "طاقة ضوئية", "الطاقة الضوئية", "طاقه ضوييه", "الطاقه الضوييه", "طاقة الشمس", "ضوء", "lumière"],
     "mat_organique":  ["matière organique", "المادة العضوية", "ماده عضويه", "مواد عضوية", "matieres organiques", "glucides", "sucres"],
     "mat_minerale":   ["matière minérale", "المادة المعدنية", "ماده معدنيه", "مواد معدنية", "sels minéraux", "املاح معدنية", "co2 et eau"],
 
@@ -180,15 +178,15 @@ _SYNONYMS: dict[str, list[str]] = {
     "ach":            ["acétylcholine", "ach", "الأستيل كولين", "أستيل كولين", "استيل كولين", "أسيتيل كولين", "الاستيل كولين", "الأستيل كولين", "الاستل كولين", "الأستيلكولين"],
     "canal_na":       ["canaux na+", "canaux sodium", "قنوات الصوديوم", "قنوات صوديوم", "قنوات na+", "قنوات شوارد الصوديوم"],
     "canal_k":        ["canaux k+", "canaux potassium", "قنوات البوتاسيوم", "قنوات بوتاسيوم", "قنوات k+"],
-    "canaux_ioniques":["canaux ioniques", "قنوات أيونية", "قنوات شاردية", "القنوات الغشائية", "قنوات الغشاء"],
+    "canaux_ioniques": ["canaux ioniques", "قنوات أيونية", "قنوات شاردية", "القنوات الغشائية", "قنوات الغشاء"],
     "canaux_voltage": ["canaux voltage-dépendants", "قنوات فولطية", "قنوات الفولطية", "القنوات الفولطية", "canaux tensiodépendants"],
     "pompe_na_k":     ["pompe na/k", "pompe sodium potassium", "مضخة الصوديوم والبوتاسيوم", "مضخة na+ k", "مضخة صوديوم بوتاسيوم", "atpase", "مضخة na k", "مضخة na/k atpase"],
     "myeline":        ["myéline", "غمد المايلين", "النخاعين", "غمد نخاعيني", "غمد الميالين", "غمد النخاعين"],
     "ppm":            ["ppm", "plaque motrice", "الصفيحة المحركة", "المشبك العصبي العضلي", "اللوحة المحركة", "الصفيحة المحركة العضلية"],
     "contraction":    ["contraction musculaire", "تقلص عضلي", "انقباض عضلي", "التقلص العضلي"],
     "ca":             ["ca2+", "calcium", "أيونات الكالسيوم", "الكالسيوم", "شوارد الكالسيوم", "كالسيوم", "ايونات الكالسيوم", "ca2+", "شوارد ca"],
-    "synapse_chimique":["synapse chimique", "المشبك الكيميائي", "مشبك كيميائي", "مشبك كيميايي", "الناقل الكيميائي", "ناقل كيميائي", "المشابك الكيميائية", "وسيط كيميائي", "بواسطة مادة كيميائية", "المرسل الكيميائي", "مبلغ كيميائي"],
-    "fente_synaptique":["fente synaptique", "الشق المشبكي", "شق مشبكي", "الفراغ المشبكي", "الفراغ بين المشبكي"],
+    "synapse_chimique": ["synapse chimique", "المشبك الكيميائي", "مشبك كيميائي", "مشبك كيميايي", "الناقل الكيميائي", "ناقل كيميائي", "المشابك الكيميائية", "وسيط كيميائي", "بواسطة مادة كيميائية", "المرسل الكيميائي", "مبلغ كيميائي"],
+    "fente_synaptique": ["fente synaptique", "الشق المشبكي", "شق مشبكي", "الفراغ المشبكي", "الفراغ بين المشبكي"],
     "terminaison":    ["terminaison présynaptique", "الطرف قبل المشبكي", "نهاية قبل مشبكية", "الطرف المشبكي", "الحويصلات المشبكية", "النهاية قبل المشبكية", "النهاية العصبية", "النهاية قبل المشبكية"],
     "postsynaptique": ["postsynaptique", "بعد المشبكي", "الغشاء بعد المشبكي", "الخلية بعد المشبكية", "البعد مشبكي", "الخلية البعد مشبكية"],
     "presynaptique":  ["présynaptique", "قبل المشبكي", "قبل مشبكي", "الطرف قبل المشبكي", "القبل مشبكي", "الخلية قبل المشبكية"],
@@ -196,7 +194,7 @@ _SYNONYMS: dict[str, list[str]] = {
     "vesicule":       ["vésicule", "vésicules synaptiques", "حويصلات", "حويصلات مشبكية", "الحويصلات", "حويصلات المبلغ", "حويصلات الأستيل كولين"],
     "depolarisation": ["dépolarisation", "زوال الاستقطاب", "إزالة الاستقطاب", "زوال استقطاب", "اندفاع الصوديوم", "دخول الصوديوم", "انفتاح قنوات الصوديوم", "انعكاس قطبية الغشاء", "انعكاس قطبية", "انقلاب الاستقطاب", "انعكاس سريع لقطبية", "يصبح داخل الليف موجبا"],
     "polarisation":   ["قطبية الغشاء", "الاستقطاب الغشائي", "قطبية", "استقطاب الغشاء", "الشحنة السالبة", "داخل سالب خارج موجب", "سالبة داخل"],
-    "potentiel_actif":["تنبيه فعال", "التنبيه الفعال", "المنبه الفعال", "تنبيه كاف"],
+    "potentiel_actif": ["تنبيه فعال", "التنبيه الفعال", "المنبه الفعال", "تنبيه كاف"],
     "repolarisation": ["repolarisation", "عودة الاستقطاب", "إعادة استقطاب", "عودة استقطاب", "خروج البوتاسيوم", "انفتاح قنوات البوتاسيوم", "العودة لكمون الراحة", "يعود لكمون الراحة"],
     "seuil":          ["seuil", "العتبة", "عتبة", "عتبة كمون العمل", "-50mv", "عتبة التنبيه"],
     "conduction_saltatoire": ["conduction saltatoire", "التوصيل القفزي", "النقل القفزي", "التوصيل القفزي على طول ليف النخاعين", "انتشار قفزي"],
@@ -268,14 +266,14 @@ _GRAVE_ERRORS = [
     (r"36\s+\w+\s+atp|36\s+atp",
      "عدد جزيئات ATP هو 38 وليس 36 (البرنامج الرسمي ONEC)", 1.0),
     (r"32\s+\w*\s*atp|32\s+atp",
-     "عدد جزيئات ATP هو 38 وليس 32",                        1.0),
+     "عدد جزيئات ATP هو 38 وليس 32", 1.0),
     (r"(?:2\s+atp.*(?:التنفس|تنفس|respir)|38\s+atp.*(?:تخم|ferment|تخمر))",
      "التنفس الهوائي ينتج 38 ATP والتخمر ينتج 2 ATP — خلط بينهما", 1.0),
     # ── Localisation erronée de la traduction / ADN ──
     (r"الترجم?ه\s+في\s+النوا|ribosome[^.]*noyau",
      "تتم الترجمة في الريبوزومات (الهيولى) وليس في النواة", 1.0),
     (r"الريبوزوم\s+في\s+النوا",
-     "الريبوزوم يوجد في الهيولى وليس في النواة",             1.0),
+     "الريبوزوم يوجد في الهيولى وليس في النواة", 1.0),
     # ADN localisé explicitement DANS le hyaloplasme/cytoplasme (ERREUR).
     # Règle stricte : "ADN ... في hyaloplasme" SANS mention de النواة/noyau entre les deux.
     (r"adn\b(?!(?:(?!adn\b)[^.]){0,80}(?:النواة|النواه|noyau))(?:(?!adn\b)[^.]){0,30}(?:في|est|se trouve|se situe|localis|present|يوجد|يتواجد|موجود|يحتوي)(?:(?!adn\b)[^.]){0,20}(?:الهيول|هيول|hyaloplasme|cytoplasme|السايتوبلازم|السيتوبلازم)",
@@ -299,10 +297,10 @@ _GRAVE_ERRORS = [
 
 # Règles numériques DZ à vérifier dans les réponses quantitatives
 _NUMERIC_RULES = {
-    "atp_resp":  {"patterns": [r"bilan.{0,20}atp", r"atp.{0,20}respir", r"atp.{0,20}تنفس"],  "expected": 38},
-    "atp_ferm":  {"patterns": [r"atp.{0,20}ferment", r"atp.{0,20}تخم"],                      "expected": 2},
-    "po_nadh":   {"patterns": [r"p/o.{0,15}nadh", r"nadh.{0,20}atp", r"p/o"],                "expected": 3},
-    "po_fadh":   {"patterns": [r"p/o.{0,15}fadh", r"fadh.{0,20}atp"],                        "expected": 2},
+    "atp_resp":  {"patterns": [r"bilan.{0,20}atp", r"atp.{0,20}respir", r"atp.{0,20}تنفس"], "expected": 38},
+    "atp_ferm":  {"patterns": [r"atp.{0,20}ferment", r"atp.{0,20}تخم"], "expected": 2},
+    "po_nadh":   {"patterns": [r"p/o.{0,15}nadh", r"nadh.{0,20}atp", r"p/o"], "expected": 3},
+    "po_fadh":   {"patterns": [r"p/o.{0,15}fadh", r"fadh.{0,20}atp"], "expected": 2},
 }
 
 
@@ -331,6 +329,7 @@ def _normalize(text: str) -> str:
     # ـك (ton/masculin), ـكم (votre).
     # On les retire seulement si le mot d'origine contient au moins 3
     # caractères arabes avant le suffixe.
+
     def _strip_possessive(m: re.Match) -> str:
         prefix = m.group(1)
         # Conserver ة de féminin (devient ه en dernier ressort) : si le
@@ -359,13 +358,14 @@ def _normalize(text: str) -> str:
     t = re.sub(r"(\S{2,})ها\b", _poss_replacer, t)
     t = re.sub(r"(\S{2,})هم\b", _poss_replacer, t)
     t = re.sub(r"(\S{2,})كم\b", _poss_replacer, t)
-    t = re.sub(r"(\S{2,})ك\b",  _poss_replacer, t)
+    t = re.sub(r"(\S{2,})ك\b", _poss_replacer, t)
     # Pour ه final : retirer seulement si ce n'est pas une ة/ت précédente,
     # ni un mot se terminant par ئ/ي/ى long (adjectifs : هوائي, ثنائي, عالي…),
     # et si le mot est suffisamment long pour être un nom+possessif.
     # Après normalisation ة est toujours U+0629 à ce stade, et ئ a été
     # décomposé par NFKD → ي + Hamza suscrite (puis le combining est enlevé)
     # → ئ devient ي. Donc il suffit de protéger le ي final aussi.
+
     def _h_final(m: re.Match) -> str:
         prefix = m.group(1)
         last = prefix[-1] if prefix else ""

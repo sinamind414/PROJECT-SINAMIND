@@ -156,11 +156,12 @@ async def lifespan(app: FastAPI):
                 from sqlalchemy import event as _sa_event
 
                 @_sa_event.listens_for(state.db_engine.sync_engine, "connect")
-                def _sqlite_now_patch(dbapi_conn, rec):  # noqa: ARG001
+                def _sqlite_now_patch(dbapi_conn, rec):
                     try:
                         dbapi_conn.create_function("NOW", 0, lambda: None)
                         # NOW() en SQLite : utiliser strftime
                         import datetime as _dt
+
                         def _now():
                             return _dt.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
                         dbapi_conn.create_function("NOW", 0, _now)

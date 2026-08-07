@@ -2,7 +2,7 @@
 Leaderboard Service — classements nationaux, wilaya, lycée, amis.
 """
 
-from sqlalchemy import select, func, text
+from sqlalchemy import func, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from models.user_stats import UserStats

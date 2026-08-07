@@ -23,50 +23,59 @@ select = [
     "ANN",  # Annotations de type
 ]
 ignore = [
-    "E501",    # ligne trop longue (géré par formateur)
-    "E741",    # noms vague (i, j, k) — acceptable
-    "E402",    # import pas en haut — nécessaire pour config bootstrap
-    "E701",    # multi-statements sur une ligne (ok pour guards)
-    "N802",    # noms fonctions en lower_case — accepté
-    "N803",    # noms arguments en lower_case — accepté
-    "E402",    # module-import-not-at-top — TestClient init order
-    "RUF001",  # ambiguous-unicode-character — Arabic/emoji
-    "RUF002",  # ambiguous-unicode-character-docstring
-    "RUF003",  # ambiguous-unicode-character-comment
-    "RUF029",  # unused-async — FastAPI dependency overrides
-    "RUF034",  # useless-if-else — cosmetic
-    "RUF067",  # non-empty-init-module — routes/__init__ is intentional
-    "RUF069",  # float-equality-comparison — intentional in tests
-    "RUF076",  # pytest-fixture-autouse — intentional
-    "SIM108",  # if-else-block — cosmetic
-    "B008",    # function-call-in-default — FastAPI Depends() pattern
-    "B904",    # raise-without-from — existing code
-    "B905",    # zip-without-explicit-strict — existing code
-    "B007",    # unused-loop-control-variable — existing code
-    "E701",    # multiple-statements-on-one-line-colon — existing code
-    "E702",    # multiple-statements-on-one-line-semicolon — existing code
-    "W291",    # trailing-whitespace — existing code
-    "W293",    # blank-line-with-whitespace — existing code
-    "N806",    # non-lowercase-variable-in-function — existing code
-    "N815",    # mixed-case-variable-in-class-scope — existing code
-    "F841",    # unused-variable — existing code
-    "C408",    # unnecessary-collection-call — existing code
-    "C401",    # unnecessary-generator-set — existing code
-    "C403",    # unnecessary-list-comprehension-set — existing code
-    "SIM105",  # suppressible-exception — existing code
-    "SIM103",  # needless-bool — existing code
-    "SIM115",  # open-file-with-context-handler — existing code
-    "SIM118",  # in-dict-keys — existing code
-    "RUF005",  # collection-literal-concatenation — existing code
-    "RUF010",  # explicit-f-string-type-conversion — existing code
-    "RUF013",  # implicit-optional — existing code
-    "RUF022",  # unsorted-dunder-all — existing code
-    "RUF027",  # missing-f-string-syntax — existing code
-    "RUF046",  # unnecessary-cast-to-int — existing code
-    "RUF052",  # used-dummy-variable — existing code
-    "RUF055",  # unnecessary-regular-expression — existing code
-    "RUF059",  # unused-unpacked-variable — existing code
-    "RUF075",  # fallible-context-manager — existing code
+    "missing-type-function-argument",  # missing-type-function-argument — annotations non obligatoires (dette historique)
+    "missing-type-args",  # missing-type-args
+    "missing-type-kwargs",  # missing-type-kwargs
+    "missing-return-type-undocumented-public-function",  # missing-return-type-undocumented-public-function
+    "missing-return-type-private-function",  # missing-return-type-private-function
+    "missing-return-type-special-method",  # missing-return-type-special-method
+    "missing-return-type-class-method",  # ANN203 — annotations non obligatoires
+    "any-type",  # any-type
+    "camelcase-imported-as-constant",  # N814 — alias volontaires (_TD, _GF…)
+    "line-too-long",    # ligne trop longue (géré par formateur)
+    "ambiguous-variable-name",    # noms vague (i, j, k) — acceptable
+    "module-import-not-at-top-of-file",    # import pas en haut — nécessaire pour config bootstrap
+    "multiple-statements-on-one-line-colon",    # multi-statements sur une ligne (ok pour guards)
+    "invalid-function-name",    # noms fonctions en lower_case — accepté
+    "invalid-argument-name",    # noms arguments en lower_case — accepté
+    "module-import-not-at-top-of-file",    # module-import-not-at-top — TestClient init order
+    "ambiguous-unicode-character-string",  # ambiguous-unicode-character — Arabic/emoji
+    "ambiguous-unicode-character-docstring",  # ambiguous-unicode-character-docstring
+    "ambiguous-unicode-character-comment",  # ambiguous-unicode-character-comment
+    "unused-async",  # unused-async — FastAPI dependency overrides
+    "useless-if-else",  # useless-if-else — cosmetic
+    "non-empty-init-module",  # non-empty-init-module — routes/__init__ is intentional
+    "float-equality-comparison",  # float-equality-comparison — intentional in tests
+    "pytest-fixture-autouse",  # pytest-fixture-autouse — intentional
+    "if-else-block-instead-of-if-exp",  # if-else-block — cosmetic
+    "function-call-in-default-argument",    # function-call-in-default — FastAPI Depends() pattern
+    "raise-without-from-inside-except",    # raise-without-from — existing code
+    "zip-without-explicit-strict",    # zip-without-explicit-strict — existing code
+    "unused-loop-control-variable",    # unused-loop-control-variable — existing code
+    "multiple-statements-on-one-line-colon",    # multiple-statements-on-one-line-colon — existing code
+    "multiple-statements-on-one-line-semicolon",    # multiple-statements-on-one-line-semicolon — existing code
+    "trailing-whitespace",    # trailing-whitespace — existing code
+    "blank-line-with-whitespace",    # blank-line-with-whitespace — existing code
+    "non-lowercase-variable-in-function",    # non-lowercase-variable-in-function — existing code
+    "mixed-case-variable-in-class-scope",    # mixed-case-variable-in-class-scope — existing code
+    "unused-variable",    # unused-variable — existing code
+    "unnecessary-collection-call",    # unnecessary-collection-call — existing code
+    "unnecessary-generator-set",    # unnecessary-generator-set — existing code
+    "unnecessary-list-comprehension-set",    # unnecessary-list-comprehension-set — existing code
+    "suppressible-exception",  # suppressible-exception — existing code
+    "needless-bool",  # needless-bool — existing code
+    "open-file-with-context-handler",  # open-file-with-context-handler — existing code
+    "in-dict-keys",  # in-dict-keys — existing code
+    "collection-literal-concatenation",  # collection-literal-concatenation — existing code
+    "explicit-f-string-type-conversion",  # explicit-f-string-type-conversion — existing code
+    "implicit-optional",  # implicit-optional — existing code
+    "unsorted-dunder-all",  # unsorted-dunder-all — existing code
+    "missing-f-string-syntax",  # missing-f-string-syntax — existing code
+    "unnecessary-cast-to-int",  # unnecessary-cast-to-int — existing code
+    "used-dummy-variable",  # used-dummy-variable — existing code
+    "unnecessary-regular-expression",  # unnecessary-regular-expression — existing code
+    "unused-unpacked-variable",  # unused-unpacked-variable — existing code
+    "fallible-context-manager",  # fallible-context-manager — existing code
 ]
 fixable = ["ALL"]
 unfixable = []

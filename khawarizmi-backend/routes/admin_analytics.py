@@ -14,8 +14,8 @@ from fastapi import APIRouter, Depends, Header, HTTPException
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from deps import get_current_user, get_db
 from config import get_settings
+from deps import get_current_user, get_db
 
 logger = logging.getLogger("khawarizmi.admin_analytics")
 router = APIRouter(prefix="/api/admin/analytics", tags=["Admin Analytics"])

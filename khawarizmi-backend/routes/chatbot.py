@@ -202,7 +202,7 @@ async def _stream_events(
 
     yield _sse("done", {
         "text": text,
-        "fallback": bool(response_data.get("fallback_active", False)),
+        "fallback": bool(response_data.get("fallback_active")),
     })
 
 

@@ -1,7 +1,6 @@
 """Tests pour l'intégration Phase C: cost_logger + correction_prompt_v2."""
-import asyncio
 import json
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import MagicMock, patch
 
 import pytest
 

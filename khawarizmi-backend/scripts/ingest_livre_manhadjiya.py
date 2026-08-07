@@ -35,15 +35,14 @@ from __future__ import annotations
 
 import argparse
 import asyncio
-import json
 import logging
 import os
 import re
 import sys
 import uuid
+from collections.abc import Iterable
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Iterable
 
 logger = logging.getLogger("ingest_livre_manhadjiya")
 logging.basicConfig(level=logging.INFO, format="%(levelname)s | %(message)s")
@@ -81,7 +80,7 @@ IMPORTANCE_HAUTE_KEYWORDS = [
     "الفعل الأدائي",     # section principale d'un verbe
     "المسعى العلمي",     # démarche scientifique
     "الاستدلال العلمي",  # raisonnement
-    "الكلمات المفتاحية", # mots-clés
+    "الكلمات المفتاحية",  # mots-clés
     "المنهجية الجديدة",  # méthodo 2022
 ]
 

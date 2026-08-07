@@ -3,7 +3,8 @@ Duel Service — defi 1v1 entre amis.
 """
 
 import uuid
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
+
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -12,11 +13,10 @@ from models.duel import Duel
 
 async def create_duel(db: AsyncSession, host_user_id: str, verb_slug: str | None = None) -> dict:
     if not verb_slug:
-        from services.leaderboard_service import WEIGHTS
         verb_slug = "analyse"
 
     share_token = uuid.uuid4().hex[:12]
-    expires_at = datetime.now(timezone.utc) + timedelta(hours=24)
+    expires_at = datetime.now(UTC) + timedelta(hours=24)
 
     duel = Duel(
         verb_slug=verb_slug,
@@ -57,7 +57,7 @@ async def accept_duel(db: AsyncSession, guest_user_id: str, share_token: str) ->
 
     if not duel:
         raise ValueError("Duel introuvable")
-    if duel.expires_at and duel.expires_at < datetime.now(timezone.utc):
+    if duel.expires_at and duel.expires_at < datetime.now(UTC):
         raise ValueError("Duel expiré")
     if str(duel.host_user_id) == guest_user_id:
         raise ValueError("Tu ne peux pas te défier toi-même")
@@ -80,7 +80,7 @@ async def submit_duel_answer(db: AsyncSession, user_id: str, duel_id: str, score
     if not duel:
         raise ValueError("Duel introuvable")
 
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     is_host = str(duel.host_user_id) == user_id
 
     if is_host:

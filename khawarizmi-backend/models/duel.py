@@ -2,7 +2,6 @@
 Modèle Duel — defi 1v1 entre amis.
 """
 
-import uuid
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, func, text
 from sqlalchemy.dialects.postgresql import UUID
 

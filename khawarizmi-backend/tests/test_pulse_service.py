@@ -2,22 +2,23 @@
 tests/test_pulse_service.py — Tests unitaires pour pulse_service.
 """
 
-import pytest
 from datetime import date, datetime, timedelta
 from unittest.mock import AsyncMock, MagicMock
+
+import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from models.pulse import DailyPulseCard
 from services.pulse_service import (
     SEED_CARDS,
     _select_3_cards_for_date,
-    get_or_create_today_cards,
     complete_card,
+    get_or_create_today_cards,
     get_streak_summary,
 )
 
-
 # ── Tests SEED ─────────────────────────────────────────────
+
 
 def test_seed_cards_count():
     assert len(SEED_CARDS) == 7

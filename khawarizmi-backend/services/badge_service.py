@@ -2,24 +2,22 @@
 Badge Service — système de 12 badges secrets.
 """
 
-from datetime import datetime
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-
 BADGES = [
-    {"code": "night_owl",       "icon": "🌙", "title_ar": "البومة الليلية",   "desc_ar": "3 تدريبات بعد 22h"},
-    {"code": "perseverant",     "icon": "🔥", "title_ar": "المثابر",          "desc_ar": "30 يوم متتالي من التدريب"},
-    {"code": "scholar",         "icon": "🎓", "title_ar": "العالم الصغير",     "desc_ar": "جميع الأفعال عند 100%"},
-    {"code": "bac_champion",    "icon": "🏆", "title_ar": "بطل البكالوريا",    "desc_ar": "نجحت في البوس النهائي"},
-    {"code": "lightning",       "icon": "⚡", "title_ar": "سريع البرق",         "desc_ar": "إجابة صحيحة في أقل من 30 ثانية"},
-    {"code": "diligent",        "icon": "📚", "title_ar": "الطالب المثالي",     "desc_ar": "50 تدريبا متتاليا"},
-    {"code": "spear",           "icon": "🎯", "title_ar": "الرمّاح",           "desc_ar": "10 تحديات مربوحة متتالية", "sprint2": True},
-    {"code": "weekly_star",     "icon": "🌟", "title_ar": "نجم الأسبوع",       "desc_ar": "Top 3 ترتيب الأسبوع",     "sprint2": True},
-    {"code": "lion",            "icon": "💪", "title_ar": "الأسد",             "desc_ar": "Score parfait (100%) على بوس"},
-    {"code": "brain",           "icon": "🧠", "title_ar": "العقل",             "desc_ar": "5 أفعال صعبة mastered",    "sprint2": True},
-    {"code": "regional",        "icon": "🏠", "title_ar": "ابن المنطقة",       "desc_ar": "Top 1 ولايتك",             "sprint2": True},
-    {"code": "generous",        "icon": "🎁", "title_ar": "الكريم",            "desc_ar": "ساعدت 3 أصدقاء",           "sprint2": True},
+    {"code": "night_owl", "icon": "🌙", "title_ar": "البومة الليلية", "desc_ar": "3 تدريبات بعد 22h"},
+    {"code": "perseverant", "icon": "🔥", "title_ar": "المثابر", "desc_ar": "30 يوم متتالي من التدريب"},
+    {"code": "scholar", "icon": "🎓", "title_ar": "العالم الصغير", "desc_ar": "جميع الأفعال عند 100%"},
+    {"code": "bac_champion", "icon": "🏆", "title_ar": "بطل البكالوريا", "desc_ar": "نجحت في البوس النهائي"},
+    {"code": "lightning", "icon": "⚡", "title_ar": "سريع البرق", "desc_ar": "إجابة صحيحة في أقل من 30 ثانية"},
+    {"code": "diligent", "icon": "📚", "title_ar": "الطالب المثالي", "desc_ar": "50 تدريبا متتاليا"},
+    {"code": "spear", "icon": "🎯", "title_ar": "الرمّاح", "desc_ar": "10 تحديات مربوحة متتالية", "sprint2": True},
+    {"code": "weekly_star", "icon": "🌟", "title_ar": "نجم الأسبوع", "desc_ar": "Top 3 ترتيب الأسبوع", "sprint2": True},
+    {"code": "lion", "icon": "💪", "title_ar": "الأسد", "desc_ar": "Score parfait (100%) على بوس"},
+    {"code": "brain", "icon": "🧠", "title_ar": "العقل", "desc_ar": "5 أفعال صعبة mastered", "sprint2": True},
+    {"code": "regional", "icon": "🏠", "title_ar": "ابن المنطقة", "desc_ar": "Top 1 ولايتك", "sprint2": True},
+    {"code": "generous", "icon": "🎁", "title_ar": "الكريم", "desc_ar": "ساعدت 3 أصدقاء", "sprint2": True},
 ]
 
 

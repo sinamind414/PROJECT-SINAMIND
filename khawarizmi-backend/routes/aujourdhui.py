@@ -15,10 +15,7 @@ from pathlib import Path
 
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
-from sqlalchemy import text
-from sqlalchemy.ext.asyncio import AsyncSession
 
-from database import get_db
 from deps import get_current_user
 
 router = APIRouter(prefix="/api/aujourdhui", tags=["Aujourd'hui"])
@@ -53,7 +50,7 @@ def _save_mastered(user_id: str, mastered: set[str]) -> None:
 
 # ── Import tardif du service ──
 def _mission(user_id: str, mastered: set[str]):
-    from services.aujourdhui import get_mission_du_jour, get_matrix, get_fiche_j1
+    from services.aujourdhui import get_mission_du_jour
     return get_mission_du_jour(user_id, mastered)
 
 
@@ -101,7 +98,7 @@ class DixMinutesBody(BaseModel):
 @router.post("/valider")
 async def valider(body: ValiderBody, user=Depends(get_current_user)):
     """Valide la réponse QCM du jour. Si juste, marque MC comme vert."""
-    from services.aujourdhui import get_carte_concept, _build_qcm, _load
+    from services.aujourdhui import _build_qcm, _load
     user_id = str(user.get("id", "guest"))
 
     data = _load()

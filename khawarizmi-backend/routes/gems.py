@@ -6,8 +6,8 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from deps import get_current_user
 from database import get_db
+from deps import get_current_user
 from services import gems_service
 from services.shop_service import get_shop_catalogue, get_shop_item
 

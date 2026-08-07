@@ -2,7 +2,7 @@
 Onboarding Service — parcours guidé nouveaux utilisateurs.
 """
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from models.onboarding import UserOnboarding

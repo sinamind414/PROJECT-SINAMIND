@@ -3,11 +3,10 @@ Routes Cities — API de la carte des verbes d'Algérie.
 """
 
 from fastapi import APIRouter, Depends, HTTPException
-from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from deps import get_current_user
 from database import get_db
+from deps import get_current_user
 from services import city_service
 
 router = APIRouter(prefix="/api/cities", tags=["cities"])

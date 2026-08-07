@@ -18,7 +18,6 @@ import types
 from contextlib import asynccontextmanager
 
 from fastapi import HTTPException
-from sqlalchemy import JSON
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import declarative_base
 
@@ -29,27 +28,35 @@ def _sqlite_compat() -> None:
     """Patche les types PostgreSQL (JSONB/ARRAY/UUID) et le constructeur
     ARRAY générique, et remplace les casts `::jsonb`/`::text` etc. pour
     permettre aux modèles de compiler sous SQLite (preview/dev)."""
-    from sqlalchemy import JSON as _JSON, String as _String, TypeDecorator as _TD
+    import re
+
+    import sqlalchemy as _sa
+    from sqlalchemy import JSON as _JSON
+    from sqlalchemy import String as _String
+    from sqlalchemy import TypeDecorator as _TD
     from sqlalchemy.ext.compiler import compiles
     from sqlalchemy.sql.elements import TextClause
-    import sqlalchemy as _sa
-    import re
 
     class _CompatUUID(_TD):
         impl = _String(36)
         cache_ok = True
+
         def process_bind_param(self, value, dialect):
             return str(value) if value else None
+
         def process_result_value(self, value, dialect):
             return value
 
     class _CompatARRAY(_TD):
         impl = _JSON
         cache_ok = True
+
         def __init__(self, item_type=None, as_tuple=False, dimensions=None, zero_indexes=False, **kw):
             super().__init__(**kw)
+
         def process_bind_param(self, value, dialect):
             return value if value is not None else []
+
         def process_result_value(self, value, dialect):
             return value or []
 
@@ -88,13 +95,12 @@ def _sqlite_compat() -> None:
     from sqlalchemy import ForeignKeyConstraint as _FKC
 
     @compiles(_FKC, "sqlite")
-    def _noop_fk_sqlite(element, compiler, **kw):  # noqa: ARG001
+    def _noop_fk_sqlite(element, compiler, **kw):
         return ""
 
     # Intercepte gen_random_uuid() → text('(lower(hex(randomblob(16))))')
     # Intercepte NOW() → CURRENT_TIMESTAMP pour compatibilité SQLite preview
-    from sqlalchemy.sql.functions import GenericFunction as _GF, Function as _F
-    import sqlalchemy.sql.functions as _sqlfunc
+    from sqlalchemy.sql.functions import GenericFunction as _GF
 
     @compiles(_GF, "sqlite")
     def _generic_func_sqlite(element, compiler, **kw):
@@ -126,17 +132,17 @@ Base = declarative_base()
 # retente la requête (une seule fois). Ça rend le preview 100% local,
 # 100% résilient aux oublis de schéma dans le DDL statique.
 import re as _re
+
 _NO_SUCH_COL = _re.compile(r"no such column:\s*([a-zA-Z_][a-zA-Z_0-9]*)", _re.IGNORECASE)
 _NO_SUCH_TBL = _re.compile(r"no such table:\s*([a-zA-Z_][a-zA-Z_0-9]*)", _re.IGNORECASE)
 
 
 def _install_sqlite_auto_alter(engine) -> None:
     """Installe un écouteur sur le moteur qui auto-Ajoute colonnes/tables."""
-    from sqlalchemy import event
-    from sqlalchemy.engine import Engine
-
     # Il faut un flag thread-local pour éviter les boucles infinies.
     import threading
+
+    from sqlalchemy import event
     _in_retry = threading.local()
 
     @event.listens_for(engine, "handle_error")
@@ -565,7 +571,7 @@ def sqlite_preview_create_all(sync_connection, db_path: str) -> int:
     # Importer TOUS les modules modèles pour enregistrer leurs tables
     # dans Base.metadata (certains ne sont pas dans __init__.py).
     try:
-        import models  # noqa: F401
+        import models  # ruff: ignore[unused-import]
     except Exception:
         pass
     for _, mod, _ in pkgutil.iter_modules([__import__("models").__path__[0]]):

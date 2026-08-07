@@ -10,9 +10,9 @@ from . import (
     aujourdhui,
     auth,
     avatar,
-    badges,
     bac_blanc,
     bac_blanc_intelligent,
+    badges,
     chapitres,
     chatbot,
     chatbot_engagement,
@@ -32,6 +32,7 @@ from . import (
     leaderboard,
     lessons,
     lexique,
+    manhadjiya,
     methodology,
     methodology_flashcards,
     mindmap,
@@ -40,20 +41,19 @@ from . import (
     onboarding,
     orientation,
     payment,
-    pulse,
     phase1,
     phase3,
     phase5,
     phase6,
     programme,
     progress,
+    pulse,
     session,
     social,
     streaks,
     tutor,
     videos,
 )
-from . import manhadjiya
 
 ALL_ROUTERS = [
     # ── Core ──
