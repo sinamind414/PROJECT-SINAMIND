@@ -19,6 +19,7 @@ from typing import Any, Protocol, runtime_checkable
 
 from config import get_settings
 from cost_logger import get_logger
+from grading.mapping import map_v2_to_v1
 from grading.parser import parse_correction_response, record_parse_strategy
 from grading.schemas.correction_output import (
     CORRECTION_V1_JSON_SCHEMA,
@@ -532,11 +533,14 @@ async def evaluate_answer_v2(
     # O7 : JSON natif provider. Le schéma doit correspondre au format demandé
     # par le prompt (v2 en prod : score 0-100 / errors / feedback / grade —
     # cf. grading/schemas/correction_output.py pour la divergence documentée).
-    # Kill-switch : config json_mode_enabled=False → aucun response_format.
+    # Activation PROGRESSIVE : json_mode_providers (config) — défaut vide =
+    # aucun response_format (comportement pré-O7). Le contrôle fin par
+    # provider se fait dans apply_json_mode (services/llm_providers.py).
     cfg = get_settings()
+    enabled_providers = getattr(cfg, "json_mode_providers", None) or []
     json_schema = (
         CORRECTION_V2_JSON_SCHEMA if use_v2_prompt else CORRECTION_V1_JSON_SCHEMA
-    ) if cfg.json_mode_enabled else None
+    ) if enabled_providers else None
 
     def _llm_response_validator(content: str) -> bool:
         """Valide que la réponse LLM contient du JSON exploitable."""
@@ -618,7 +622,10 @@ async def evaluate_answer_v2(
     parsed, parse_strategy = parse_correction_response(
         llm_raw, json_mode_used=json_mode_used
     )
-    record_parse_strategy(parse_strategy)
+    # Label provider (audit O7) : permet de savoir QUI produit des stratégies
+    # de rattrapage (ex. 90 % des fence sur Groq → alerte d'intégration) et
+    # de décider quels providers activer en JSON natif en priorité.
+    record_parse_strategy(parse_strategy, provider)
 
     if parsed is None:
         logger.warning(
@@ -649,63 +656,22 @@ async def evaluate_answer_v2(
         )
 
     # ── Phase C — Mapping v2 → v1 si prompt v2 ──
+    # Fonction pure extraite (audit O7, point 2) : grading/mapping.py —
+    # testable unitairement avec du JSON natif parfait.
+    v2_mapped: dict | None = None
     if use_v2_prompt and "errors" in parsed:
-        # Le format v2 retourne: score (0-100), errors, feedback, grade
-        # On mappe au format v1 pour compatibilité
         logger.info(f"{log_prefix}mapping_v2_to_v1 | score_raw={parsed.get('score')}")
-
-        # Score: v2 retourne 0-100, on normalise vers 0-score_max
-        raw_score = parsed.get("score", 0)
-        if isinstance(raw_score, (int, float)):
-            score = _clamp(int(raw_score * score_max / 100), 0, score_max)
-        else:
-            score = 0
-
-        # Highlights: on mappe les erreurs v2 en highlights
-        v2_errors = parsed.get("errors", [])
-        highlights = []
-        if isinstance(v2_errors, list):
-            for err in v2_errors:
-                if isinstance(err, dict):
-                    # Essayer d'extraire les positions du texte original
-                    # Le format v2 ne fournit pas de start/end, on mettout le texte en erreur
-                    highlights.append({
-                        "start": 0,
-                        "end": len(student_answer),
-                        "type": "wrong_formulation",
-                        "message_ar": err.get("detail", err.get("fix", "")),
-                    })
-
-        # Critères: on déduit des erreurs
-        matched = []
-        unmatched = []
-        if isinstance(v2_errors, list):
-            for err in v2_errors:
-                if isinstance(err, dict):
-                    unmatched.append({
-                        "criterion": err.get("type", "erreur"),
-                        "why_ar": err.get("detail", ""),
-                        "from_model_answer": "",
-                    })
-
-        # Feedback
-        feedback_ar = parsed.get("feedback", "")
-        if not isinstance(feedback_ar, str):
-            feedback_ar = str(feedback_ar)
-
-        # Advice: on déduit du grade
-        grade = parsed.get("grade", "")
-        advice_map = {
-            "retenir": "أعد مراجعة هذا الموضوع وحاول مرة أخرى",
-            "acquis": "جيد، لكن يمكنك التعمق أكثر",
-            "maîtrisé": "ممتاز! واصل التقدم",
-        }
-        advice_ar = advice_map.get(grade, "")
-
-        # Confiance: on déduit du score
-        confidence = min(1.0, score / score_max) if score_max > 0 else 0.5
-
-        source = "llm_v2"
+        v2_mapped = map_v2_to_v1(
+            parsed, score_max=score_max, student_answer=student_answer
+        )
+        score = v2_mapped["score"]
+        highlights = v2_mapped["highlights"]
+        matched = v2_mapped["matched"]
+        unmatched = v2_mapped["unmatched"]
+        feedback_ar = v2_mapped["feedback_ar"]
+        advice_ar = v2_mapped["advice_ar"]
+        confidence = v2_mapped["confidence"]
+        source = v2_mapped["source"]
 
     else:
         # ── Format v1 standard ──────────────────────
@@ -778,12 +744,16 @@ async def evaluate_answer_v2(
         for u in unmatched if isinstance(u, dict)
     ]
     errors = list(unmatched)  # alias spec-compatible
-    dominant_error_code = _compute_dominant_error_code(
-        highlights=highlights,
-        unmatched=unmatched,
-        sanity_code="ok",
-        score=score,
-        score_max=score_max,
+    dominant_error_code = (
+        v2_mapped["dominant_error_code"]
+        if v2_mapped is not None
+        else _compute_dominant_error_code(
+            highlights=highlights,
+            unmatched=unmatched,
+            sanity_code="ok",
+            score=score,
+            score_max=score_max,
+        )
     )
 
     # Guide p.2 — remédiation automatique

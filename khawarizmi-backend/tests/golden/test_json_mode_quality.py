@@ -67,18 +67,24 @@ def _item_to_kwargs(item: dict) -> dict:
     }
 
 
+# Providers JSON-capables pour le test nightly (openai/groq/gemini/zai) —
+# l'activation progressive par provider (point O7-1) ne change rien ici : on
+# teste la qualité des DEUX modes sur l'ensemble des providers compatibles.
+_JSON_CAPABLE = ["openai", "groq", "gemini", "zai"]
+
+
 async def _grade(item: dict, json_native: bool) -> dict:
     """Corrige une copie modèle (réponse correcte) — mode natif ou libre.
 
-    Le mode est contrôlé par le kill-switch config (json_mode_enabled) ;
-    on le bascule par appel avec restauration en finally (settings est un
-    singleton — on ne veut pas fuiter l'état entre appels).
+    Le mode est contrôlé par la liste config json_mode_providers (activation
+    par provider, point O7-1) ; on la bascule par appel avec restauration en
+    finally (settings est un singleton — on ne veut pas fuiter l'état).
     """
     from openai import AsyncOpenAI
 
     cfg = get_settings()
-    previous = cfg.json_mode_enabled
-    cfg.json_mode_enabled = json_native
+    previous = list(cfg.json_mode_providers)
+    cfg.json_mode_providers = list(_JSON_CAPABLE) if json_native else []
     try:
         client = AsyncOpenAI(api_key=cfg.OPENAI_API_KEY, base_url=cfg.openai_base_url)
         result = await evaluate_answer_v2(
@@ -90,7 +96,7 @@ async def _grade(item: dict, json_native: bool) -> dict:
         )
         return result
     finally:
-        cfg.json_mode_enabled = previous
+        cfg.json_mode_providers = previous
 
 
 def _ratio(result: dict) -> float:

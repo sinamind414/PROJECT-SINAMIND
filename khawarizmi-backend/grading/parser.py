@@ -26,19 +26,33 @@ from typing import Any
 logger = logging.getLogger("khawarizmi.grading_parser")
 
 _PARSE_STATS: dict[str, int] = {}
+_PARSE_BY_PROVIDER: dict[str, dict[str, int]] = {}
 
 
-def record_parse_strategy(strategy: str) -> None:
-    """Incrémente parse_strategy_total{strategy} et logge au format métrique."""
+def record_parse_strategy(strategy: str, provider: str = "unknown") -> None:
+    """Incrémente parse_strategy_total{strategy,provider} et logge.
+
+    Le label provider (audit O7) permet d'identifier QUI produit les
+    stratégies de rattrapage (ex. 90 % des fence sur Groq → alerte) et de
+    décider quels providers activer en JSON natif en priorité.
+    """
     _PARSE_STATS[strategy] = _PARSE_STATS.get(strategy, 0) + 1
+    provider_stats = _PARSE_BY_PROVIDER.setdefault(provider, {})
+    provider_stats[strategy] = provider_stats.get(strategy, 0) + 1
     logger.info(
-        f"parse_strategy_total{{strategy={strategy}}} | total={_PARSE_STATS[strategy]}"
+        f"parse_strategy_total{{strategy={strategy},provider={provider}}} "
+        f"| total={_PARSE_STATS[strategy]}"
     )
 
 
 def parse_stats() -> dict[str, int]:
     """Snapshot des compteurs de stratégies de parsing (tests / dashboard)."""
     return dict(_PARSE_STATS)
+
+
+def parse_stats_by_provider() -> dict[str, dict[str, int]]:
+    """Snapshot des compteurs par provider (tests / dashboard)."""
+    return {p: dict(s) for p, s in _PARSE_BY_PROVIDER.items()}
 
 
 _FENCE_RE = re.compile(r"```(?:json)?\s*[\r\n]+(.+?)[\r\n]+\s*```", re.DOTALL)

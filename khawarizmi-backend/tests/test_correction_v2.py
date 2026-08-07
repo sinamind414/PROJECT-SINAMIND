@@ -359,8 +359,12 @@ class TestJsonNativeMode:
     """Audit O7 — intégration du JSON natif provider dans evaluate_answer_v2."""
 
     @pytest.mark.asyncio
-    async def test_json_schema_passed_to_llm_call_in_v2(self):
-        """Le schéma natif (format v2) est transmis au llm_call en mode v2."""
+    async def test_json_schema_passed_to_llm_call_in_v2(self, monkeypatch):
+        """Le schéma natif (format v2) est transmis au llm_call en mode v2
+        quand le JSON natif est ACTIVÉ (json_mode_providers non vide)."""
+        from config import get_settings
+
+        monkeypatch.setattr(get_settings(), "json_mode_providers", ["openai"])
         captured: dict = {}
 
         async def mock_llm(**kwargs):
@@ -392,13 +396,19 @@ class TestJsonNativeMode:
         assert result["source"] == "llm_v2"
         assert result["score"] == round(75 * BASE_KWARGS["score_max"] / 100)
         assert result["percentage"] == 75
+        # Amélioration O7 point 2 : erreur scientifique → scientific_error
+        # (au lieu de methodology_error aveugle), remédiation contenu.
+        assert result["dominant_error_code"] == "scientific_error"
 
     @pytest.mark.asyncio
-    async def test_native_json_strategy_recorded(self):
-        """json_mode_used=True → stratégie native_json comptée."""
-        from grading.parser import parse_stats
+    async def test_native_json_strategy_recorded(self, monkeypatch):
+        """json_mode_used=True → stratégie native_json comptée AVEC le label
+        provider (audit O7 point 3)."""
+        from config import get_settings
+        from grading.parser import parse_stats_by_provider
 
-        before = parse_stats().get("native_json", 0)
+        monkeypatch.setattr(get_settings(), "json_mode_providers", ["openai"])
+        before = parse_stats_by_provider().get("primary", {}).get("native_json", 0)
 
         async def mock_llm(**kwargs):
             resp = _make_llm_response(json.dumps({
@@ -417,13 +427,13 @@ class TestJsonNativeMode:
             primary_model="test",
             use_v2_prompt=True,
         )
-        assert parse_stats().get("native_json", 0) == before + 1
+        assert parse_stats_by_provider().get("primary", {}).get(
+            "native_json", 0) == before + 1
 
     @pytest.mark.asyncio
-    async def test_kill_switch_disables_json_schema(self, monkeypatch):
-        """json_mode_enabled=False → aucun json_schema transmis (pré-O7)."""
-        from config import get_settings
-
+    async def test_default_no_json_mode(self):
+        """Défaut : json_mode_providers=[] → aucun json_schema transmis
+        (pré-O7 — activation progressive, pas de flag global)."""
         captured: dict = {}
 
         async def mock_llm(**kwargs):
@@ -436,7 +446,6 @@ class TestJsonNativeMode:
             resp._khawarizmi_model = "test"
             return resp
 
-        monkeypatch.setattr(get_settings(), "json_mode_enabled", False)
         await evaluate_answer_v2(
             **BASE_KWARGS,
             student_answer="الاستنساخ يتم في النواة",

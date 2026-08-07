@@ -416,11 +416,46 @@ def _count_keyword_hits(text: str, keywords: list[str]) -> tuple[int, list[str]]
     for kw in keywords:
         # Essayer le synonyme le plus long qui correspond
         syns = _SYNONYMS.get(kw, [kw])
-        best = max(syns, key=len) if syns else kw
         if _contains_any(text, syns):
             hits += 1
             hit_list.append(kw)
     return hits, hit_list
+
+
+def _detect_lexicon_concepts(question: str, model_answer: str) -> list[str]:
+    """Concepts du lexique présents dans (question + réponse modèle).
+
+    Même logique que la déduction automatique des mots-clés de
+    deterministic_correct : pour chaque entrée du lexique, on regarde si
+    l'un de ses synonymes apparaît dans l'énoncé ou la réponse modèle.
+    """
+    q_norm = _normalize(question or "")
+    m_norm = _normalize(model_answer or "")
+    found: list[str] = []
+    for kw_id, syns in _SYNONYMS.items():
+        if _contains_any(q_norm, syns) or _contains_any(m_norm, syns):
+            found.append(kw_id)
+    return found
+
+
+def can_handle(question: str, model_answer: str = "") -> bool:
+    """Le moteur SAVOIR couvre-t-il cette question ?
+
+    Filtre d'applicabilité (audit — le moteur ne doit JAMAIS être utilisé
+    comme correcteur généraliste) : au moins 2 concepts du lexique détectés
+    dans (énoncé + réponse modèle). En dessous, le moteur tomberait dans son
+    fallback générique bienveillant (0.3-0.5×barème) — inacceptable.
+    """
+    return len(_detect_lexicon_concepts(question, model_answer)) >= 2
+
+
+def confidence_for(question: str, model_answer: str = "") -> float:
+    """Confiance = couverture du lexique sur la question (0..1).
+
+    min(1.0, concepts_détectés / 3) : ≥ 0.92 ⟺ ≥ 3 concepts couverts par le
+    lexique — seuil de promotion « local_savoir » (étage haute confiance).
+    """
+    return min(1.0, len(_detect_lexicon_concepts(question, model_answer)) / 3.0)
 
 
 # ──────────────────────────────────────────────────────────────────────

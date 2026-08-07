@@ -61,6 +61,29 @@ Le modèle est **multilingue** (formé sur 50+ langues dont l'arabe). Le test AU
 
 # 2c. Sprint 1 (étape 2) — O7 : sortie JSON native provider ✅
 
+## Correctifs de validation O7 (points 1-3) ✅
+
+1. **Activation PROGRESSIVE par provider** (plus de kill-switch global) :
+   `config.json_mode_providers: list[str] = []` (défaut VIDE = aucun provider
+   en JSON natif, comportement pré-O7). `should_use_json_mode(provider, cfg)`
+   vérifie la capacité (caps.json_mode != "none") ET la présence du nom
+   canonique dans la liste → rollback d'un seul provider sans toucher les
+   autres. Étapes conseillées : `["openai"]` (semaine 1) → +groq → +gemini,
+   en surveillant `parse_strategy_total{strategy,provider}`.
+2. **Mapping v2→v1 extrait en fonction pure** `grading/mapping.py::map_v2_to_v1`
+   (testable avec du JSON natif parfait) + **amélioration type-aware** du
+   dominant_error_code : une erreur scientifique v2 → `scientific_error`
+   (remédiation contenu) au lieu du fallback aveugle `methodology_error`
+   (toutes les erreurs v2 → unmatched → methodology_error). Le plan supposait
+   `grade → dominant_error_code` : faux vs code réel (grade → advice_ar,
+   dominant dérivé des errors/score) — documenté et testé.
+3. **Label `provider` sur `parse_strategy_total{strategy,provider}`** :
+   `record_parse_strategy(strategy, provider)` — permet de savoir QUI produit
+   les stratégies de rattrapage (ex. 90 % des fence sur Groq → alerte
+   d'intégration) et quels providers activer en priorité.
+
+## Étape suivante — Golden metrics CI ✅ (cf. section 2d)
+
 Livré : `services/llm_providers.py` (capacités par provider), `grading/parser.py`
 (stratégies + compteur), `grading/schemas/correction_output.py` (schémas),
 `_call_with_fallback(json_schema=...)` (dispatch par appel), `correction_v2.py`
@@ -172,6 +195,52 @@ dessus sans friction). Route `document_analysis_v2.py` branchée.
   version → invalidation passive ; sans Redis → calcul direct ; single-flight
   10 concurrents → 1 appel ; source d'origine préservée) → **693 passed,
   1 skipped, 5 xfailed** · ruff vert.
+
+---
+
+# 2d. Sprint 1 (étape 3) — Golden metrics CI (prérequis O1/savoir_corrector) ✅
+
+Livré : `tests/golden/metrics.py` (MAE, exact, severe, bias, κ, std_ratio),
+`tests/golden/test_golden_local.py` (CI, 0 token, 0 clé), 
+`tests/golden/build_golden_annotated.py` + `golden_annotated.json` (125 items),
+`can_handle`/`confidence_for` créés sur savoir_corrector (réponse à la
+question : le moteur n'avait PAS de can_handle — sa fonction publique était
+`deterministic_correct`).
+
+- **Annotation (réponse à la question 1)** : pas d'expert SVT disponible dans
+  le sandbox → **approche B améliorée** : annotations SYNTHÉTIQUES
+  déterministes (human_score = barème × proportion de mots-clés présents dans
+  la copie, tolérance à l'article défini ال). Format IDENTIQUE à l'annotation
+  humaine du plan (human_score, human_dominant_error, annotator,
+  annotation_date) — remplacer annotator "synthetic_keyword_v1" par
+  "expert_svt" quand les vraies annotations existent, la mécanique ne change
+  pas. 125 items : 43 all_correct / 55 partial_correct / 25 empty /
+  2 insufficient.
+- **Seuils bloquants CI** (première exécution = calibration) :
+  - L2 (n=100, copies vides exclues — elles passent par sanity dans le
+    pipeline réel) : **MAE=0.27** (seuil 0.85) · severe=0.01 (≤ 0.10) ·
+    **κ=0.714** (≥ 0.45) · bias=-0.07
+  - savoir (n=119/125, coverage 95 %, périmètre can_handle ET confiance
+    ≥ 0.92 — le périmètre EXACT du futur branchement haute confiance) :
+    **MAE=0.327** (≤ 0.35) · **severe=0.0** (spécialiste) · κ=0.449 ·
+    bias=-0.265 (léger pessimisme à surveiller)
+  - sanity : 0 faux rejet sur copies notées > 0 ; tous les "empty" rejetés
+  - Cohérence : un rejet sanity implique un code humain de rejet
+- **2 artefacts d'annotation corrigés en cours de route** (détectés par le
+  test lui-même) : matching littéral des mots-clés vs formes définies arabes
+  (gs_016 : « حرارة مثلى » vs « الحرارة المثلى ») → normalisation ال par mot ;
+  score de la copie parfaite forcé à bareme sans vérifier les mots-clés →
+  définition unique (proportion réelle).
+- **savoir_corrector.can_handle / confidence_for** : `can_handle` = ≥ 2
+  concepts du lexique dans (question + réponse modèle) ; `confidence_for` =
+  min(1.0, concepts/3) → ≥ 0.92 ⟺ ≥ 3 concepts couverts (seuil de promotion
+  local_savoir du design validé). Le test golden mesure sur CE périmètre.
+- **CI** : job `golden set (local, 0 token — BLOQUANT)` ajouté à
+  `docs/ci/ci.yml.amelioree` (build_golden_annotated.py + test_golden_local.py)
+  + job `golden-llm-nightly` (test_json_mode_quality, sur schedule, clé LLM).
+  ⚠️ Toujours non poussable dans `.github/workflows/` (permission workflows
+  absente — vérifié) : le fichier attend une permission accordée.
+- **Tests** : +18 → **751 passed, 3 skipped, 5 xfailed** · ruff vert.
 
 ---
 

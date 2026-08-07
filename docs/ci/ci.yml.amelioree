@@ -42,7 +42,7 @@ jobs:
           assert n > 100
           "
 
-      - name: Full test suite (632 tests, preview SQLite)
+      - name: Full test suite (633 tests, preview SQLite)
         run: |
           cd khawarizmi-backend
           SECRET_KEY=ci-test-key-for-smoke-tests-only \
@@ -50,6 +50,18 @@ jobs:
           DATABASE_URL=sqlite+aiosqlite:///./ci_test.db \
           REDIS_URL=redis://localhost:6379/9 \
           python -m pytest tests/ -q --no-header
+
+      - name: Golden set (local, 0 token — BLOQUANT)
+        run: |
+          cd khawarizmi-backend
+          python tests/golden/build_golden_annotated.py
+          SECRET_KEY=ci-test-key-for-smoke-tests-only \
+          ENVIRONMENT=ci \
+          DATABASE_URL=sqlite+aiosqlite:///./ci_test.db \
+          REDIS_URL=redis://localhost:6379/9 \
+          python -m pytest tests/golden/test_golden_local.py -v --tb=short
+        # Seuils : L2 MAE ≤ 0.85 · severe ≤ 0.10 · κ ≥ 0.45
+        #          savoir MAE ≤ 0.35 · severe == 0.0 (spécialiste, conf ≥ 0.92)
 
   frontend-tests:
     runs-on: ubuntu-latest
@@ -80,6 +92,34 @@ jobs:
         working-directory: khawarizmi-frontend
         env:
           NEXT_TELEMETRY_DISABLED: "1"
+
+  golden-llm-nightly:
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          cd khawarizmi-backend
+          pip install -r requirements.txt
+
+      - name: Golden set (LLM, nightly — qualité JSON natif)
+        run: |
+          cd khawarizmi-backend
+          SECRET_KEY=ci-test-key-for-smoke-tests-only \
+          ENVIRONMENT=ci \
+          ENABLE_EXTERNAL_LLM=1 \
+          OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} \
+          DATABASE_URL=sqlite+aiosqlite:///./ci_test.db \
+          REDIS_URL=redis://localhost:6379/9 \
+          python -m pytest tests/golden/test_json_mode_quality.py -m nightly -v --tb=short
+        # Seuils : MAE(json, libre) ≤ 0.15 · std(json) ≥ 0.70×std(libre)
 
   deploy-railway:
     if: github.ref == 'refs/heads/main'

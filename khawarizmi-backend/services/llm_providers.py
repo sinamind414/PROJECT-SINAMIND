@@ -65,34 +65,50 @@ def primary_json_mode(cfg: Any) -> JsonMode:
     return "openai"
 
 
-def caps_for(provider_name: str, cfg: Any = None) -> ProviderCapabilities:
-    """Capacités du provider, résolues par nom (matching mots-clés).
+def canonical_name(provider_name: str, cfg: Any = None) -> str:
+    """Nom canonique (clé de PROVIDER_CAPS) d'un provider de la cascade.
 
-    "primary" est résolu par la clé (cfg). Les noms réels de la cascade
-    ("Gemini 2.5 Flash", "Cloudflare GLM-5.2", "GLM-4.7", "ZenMux GLM-5.2",
-    "NaraRouter", "OpenAI gpt-4o-mini") matchent par mots-clés.
-    Inconnu → none (prudent : jamais de response_format non validé).
+    "primary" est résolu par la clé (cfg). Les noms réels ("Gemini 2.5 Flash",
+    "Cloudflare GLM-5.2", "GLM-4.7", "ZenMux GLM-5.2", "NaraRouter",
+    "OpenAI gpt-4o-mini") matchent par mots-clés. Inconnu → "none".
     """
     name = _normalize(provider_name)
     if name == "primary":
-        return PROVIDER_CAPS[primary_json_mode(cfg)]
-
+        return primary_json_mode(cfg)
     if "gemini" in name:
-        return PROVIDER_CAPS["gemini"]
+        return "gemini"
     if "groq" in name or "llama" in name:
-        return PROVIDER_CAPS["groq"]
+        return "groq"
     if "cloudflare" in name:
-        return PROVIDER_CAPS["cloudflare"]
+        return "cloudflare"
     if "glm-4.7" in name or "zai" in name:
-        return PROVIDER_CAPS["zai"]
+        return "zai"
     if "zenmux" in name:
-        return PROVIDER_CAPS["zenmux"]
+        return "zenmux"
     if "nara" in name:
-        return PROVIDER_CAPS["nara"]
+        return "nara"
     if "openai" in name or "gpt" in name:
-        return PROVIDER_CAPS["openai"]
+        return "openai"
+    return name if name in PROVIDER_CAPS else "none"
 
-    return PROVIDER_CAPS["none"]
+
+def caps_for(provider_name: str, cfg: Any = None) -> ProviderCapabilities:
+    """Capacités du provider, résolues par nom canonique."""
+    return PROVIDER_CAPS[canonical_name(provider_name, cfg)]
+
+
+def should_use_json_mode(provider_name: str, cfg: Any = None) -> bool:
+    """Le JSON natif est-il activé pour CE provider ?
+
+    Deux conditions : le provider supporte le JSON mode (caps.json_mode !=
+    "none") ET son nom canonique est dans la liste config json_mode_providers
+    (défaut vide = aucun — activation progressive, rollback par provider).
+    """
+    caps = caps_for(provider_name, cfg)
+    if caps.json_mode == "none":
+        return False
+    enabled = getattr(cfg, "json_mode_providers", None) or []
+    return canonical_name(provider_name, cfg) in enabled
 
 
 def apply_json_mode(
@@ -101,18 +117,21 @@ def apply_json_mode(
     json_schema: dict | None,
     cfg: Any = None,
 ) -> bool:
-    """Injecte response_format dans call_kwargs si le provider le supporte.
+    """Injecte response_format dans call_kwargs si JSON natif ACTIVÉ pour ce
+    provider (capacité + liste config). Fonction PURE — testable sans réseau.
 
     Retourne True si le mode JSON natif a été appliqué (pour tagger la
-    réponse avec _khawarizmi_json_mode). Fonction PURE — testable sans réseau.
+    réponse avec _khawarizmi_json_mode).
 
     - json_schema  → response_format={"type":"json_schema","json_schema":
                      {"name":"correction_output","strict":True,"schema":...}}
     - json_object  → response_format={"type":"json_object"}
                      (garantit du JSON valide, ne valide pas le schéma)
-    - none / inconnu → rien ajouté (le parser fallback fait le travail)
+    - none / non activé → rien ajouté (le parser fallback fait le travail)
     """
     if json_schema is None:
+        return False
+    if not should_use_json_mode(provider_name, cfg):
         return False
     caps = caps_for(provider_name, cfg)
     if caps.json_mode == "json_schema":
