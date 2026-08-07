@@ -16,9 +16,13 @@ from __future__ import annotations
 import asyncio
 import logging
 import re
+import time
 from typing import Any
 
 from services.correction_v2 import evaluate_answer_v2
+
+# Budget global de la cascade LLM (audit C3) : partagé entre les retries.
+LLM_DEADLINE_SECONDS = 20.0
 
 logger = logging.getLogger("khawarizmi.correction_v2_retry")
 
@@ -107,8 +111,29 @@ async def evaluate_answer_v2_with_retry(
     """
     request_id = kwargs.get("request_id")
 
+    # Budget global (audit C3 révisé) : le retry externe ne doit PAS multiplier
+    # la deadline de la cascade LLM. Chaque tentative reçoit le temps restant ;
+    # le LLM interne (_call_with_fallback) a déjà son propre budget de 20 s.
+    deadline_at = time.monotonic() + LLM_DEADLINE_SECONDS
+
     for attempt in range(1, max_attempts + 1):
-        result = await evaluate_answer_v2(**kwargs)
+        remaining = deadline_at - time.monotonic()
+        if remaining < 2.0:
+            logger.warning(
+                f"[{request_id}] budget global LLM épuisé après {attempt - 1} tentative(s) "
+                f"— abandon du retry."
+            )
+            return _build_retry_result(
+                {"source": "llm_error", "score": 0,
+                 "score_max": kwargs.get("score_max", 0),
+                 "percentage": 0, "highlights": [], "matched_criteria": [],
+                 "unmatched_criteria": [], "feedback_ar": "",
+                 "advice_ar": "", "confidence": 0.0, "sanity_code": "ok",
+                 "error_message": "LLM budget global épuisé"},
+                attempts=attempt - 1,
+                was_retried=False,
+            )
+        result = await evaluate_answer_v2(**kwargs, llm_timeout=remaining)
 
         # Sanity check : jamais de retry pour du charabia
         if _is_sanity_result(result):

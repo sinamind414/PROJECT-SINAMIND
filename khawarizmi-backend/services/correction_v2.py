@@ -461,6 +461,9 @@ async def evaluate_answer_v2(
     # on évalue par pattern-matching local (fallback_v2 L2) au lieu de llm_error.
     local_fallback: bool = False,
     local_fallback_db: Any = None,
+    # Budget LLM restant (audit C3) : partagé entre les retries — la cascade
+    # interne (_call_with_fallback) a déjà son propre deadline de 20 s.
+    llm_timeout: float | None = None,
 ) -> dict[str, Any]:
     """Évalue une réponse d'élève avec le pipeline hybride sanity + LLM.
 
@@ -566,7 +569,7 @@ async def evaluate_answer_v2(
             primary_model=primary_model,
             temperature=LLM_TEMPERATURE,
             max_tokens=LLM_MAX_TOKENS,
-            timeout=LLM_TIMEOUT_SECONDS,
+            timeout=llm_timeout if llm_timeout is not None else LLM_TIMEOUT_SECONDS,
             response_validator=_llm_response_validator,
         )
 

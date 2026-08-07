@@ -30,6 +30,14 @@ async def set_cache(key: str, value: str, ttl: int = 3600):
 # ou de format qui rendrait les réponses cachées obsolètes.
 CACHE_CONTRACT_VERSION = "v2"
 
+# Version du prompt chatbot (audit O2 révisé) : bump quand les prompts de
+# chat_prompt.py changent — les réponses cachées deviennent obsolètes.
+PROMPT_VERSION = "chat_v1"
+
+# Modèle LLM actif (audit O2 révisé) : isole les réponses par modèle pour
+# éviter de servir une réponse d'un ancien modèle. "local" en mode sans clé.
+MODEL_ID = "local"
+
 
 def make_cache_key(*parts) -> str:
     raw = ":".join(str(p) for p in parts)

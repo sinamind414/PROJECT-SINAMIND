@@ -19,7 +19,7 @@ from fastapi.responses import StreamingResponse
 from openai import AsyncOpenAI
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from cache import get_cache, make_cache_key, set_cache
+from cache import MODEL_ID, PROMPT_VERSION, get_cache, make_cache_key, set_cache
 from database import get_db
 from deps import get_current_user, get_openai_optional
 from rate_limit import chat_limit, limiter
@@ -104,7 +104,30 @@ async def _resolve_ask(
     chapter = body.get("chapitre") or None
     mode = body.get("mode", "quick")
 
-    cache_key = make_cache_key("chatbot", lang, mode, chapter or "-", message.strip().lower())
+    context = {
+        "chapitre": chapter,
+        "history": history,
+        "mode": mode,
+    }
+
+    # Clé fine (audit O2 révisé) : isole prompt_version + modèle + niveau
+    # pédagogique (bucket FSRS) pour ne jamais servir une réponse personnalisée
+    # à un autre contexte. Bucket "default" quand la stabilité est absente.
+    level_bucket = "default"
+    stability = context.get("fsrs_stability")
+    if stability is not None:
+        level_bucket = "low" if stability < 3.0 else "high"
+
+    cache_key = make_cache_key(
+        "chatbot",
+        "prompt", PROMPT_VERSION,
+        "model", MODEL_ID,
+        "lang", lang,
+        "mode", mode,
+        "chapter", chapter or "-",
+        "level", level_bucket,
+        "msg", message.strip().lower(),
+    )
     cached = await get_cache(cache_key)
     if cached:
         try:
@@ -113,12 +136,6 @@ async def _resolve_ask(
             return payload, cache_key
         except json.JSONDecodeError:
             pass
-
-    context = {
-        "chapitre": chapter,
-        "history": history,
-        "mode": mode,
-    }
 
     result = await handle_chatbot_message(
         message=message,
