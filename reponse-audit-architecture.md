@@ -377,6 +377,38 @@ FSRS unifié (4 systèmes → 1).
 
 ---
 
+# 2g. S2.1a — Refactor grading/ : contracts.py + context.py ✅
+
+Objectif S2.1 : passer de services/correction_v2.py (700+ l.) à un pipeline
+modulaire `grading/` (pipeline.py orchestrateur), avec
+`services/correction_v2.py` conservé comme façade de compatibilité.
+Invariant : AUCUN changement d'API — les imports publics restent valides.
+
+- `grading/contracts.py` : SourceV2 (inclut "local_savoir" — l'étage savoir
+  S1, absent du Literal Pydantic ; écart documenté, à unifier au refactor des
+  schémas), ParseStatus (7 valeurs réelles dont "not_called" — absente du
+  plan), DominantErrorCode, CACHEABLE_SOURCES / CACHEABLE_PARSE_STATUS
+  (alignés sur la politique C2), TypedDict EvaluationV2 (SUPERSET du modèle
+  Pydantic Public + champs internes réels : llm_raw marqué INTERNE,
+  error_message, from_cache, remediation_reason).
+- `grading/context.py` : GradingContext (dataclass request-scoped, jamais
+  global) — remplace la liste de 14+ arguments ; aligné sur les paramètres
+  réels de evaluate_answer_v2 + wrapper cache.
+- Tests d'alignement (test_grading_contracts.py) : le TypedDict couvre les
+  champs Public ET Internal du schéma Pydantic ; seuls champs
+  Internal-only = {llm_raw} ; les sources/parse_status réels du pipeline
+  sont tous dans les Literals ; CACHEABLE_* = politique du cache.
+- Aucun import de ces modules dans le pipeline existant → zéro changement de
+  comportement (S2.1a purement additif). Tests : 794 passed (+8), 3 skipped,
+  5 xfailed · ruff vert.
+
+Prochaines étapes S2.1 : b (context utilisé par le constructeur) → c/d
+(parser/mapping : supprimer duplications) → e/f (sanity + L2/savoir) →
+g (prompt + LLM) → h (post-validation/remediation) → i (pipeline.py + façade)
+→ j (non-régression intégrale + code mort).
+
+---
+
 # 3. Réponses aux 3 questions de l'audit
 
 1. **Quel modèle ONNX ?** → `paraphrase-multilingual-MiniLM-L12-v2` (multilingue, pas anglais-only). C4 reste à mesurer (AUC 50 paires arabes) mais le remplacement d'urgence n'est pas nécessaire.
