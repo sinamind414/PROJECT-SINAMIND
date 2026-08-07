@@ -344,7 +344,7 @@ def _sqlite_extra_ddl() -> list[str]:
             feedback_global TEXT, created_at {ts}
         )""",
         f"""CREATE TABLE IF NOT EXISTS da_documents (
-            id {pk}, session_id TEXT, title_ar TEXT, caption_ar TEXT,
+            id {pk}, session_id TEXT, scenario_id TEXT, title_ar TEXT, caption_ar TEXT,
             data TEXT, doc_type TEXT, contenu TEXT, sort_order INTEGER DEFAULT 0,
             type_document TEXT, created_at {ts}
         )""",
@@ -413,7 +413,8 @@ def _sqlite_extra_ddl() -> list[str]:
             titre_fr TEXT, titre_ar TEXT, position_index INTEGER DEFAULT 0
         )""",
         f"""CREATE TABLE IF NOT EXISTS lesson_blocks (
-            id {pk}, chapter_id TEXT, block_type TEXT DEFAULT 'markdown',
+            id {pk}, chapter_id TEXT, chapter_slug TEXT,
+            block_type TEXT DEFAULT 'markdown',
             type_block TEXT DEFAULT 'markdown', title_ar TEXT, body_ar TEXT,
             contenu TEXT, visual_hint TEXT, quick_check TEXT,
             ordre INTEGER DEFAULT 0, sort_order INTEGER DEFAULT 0,
@@ -434,7 +435,7 @@ def _sqlite_extra_ddl() -> list[str]:
             status TEXT DEFAULT 'started', score REAL DEFAULT 0
         )""",
         f"""CREATE TABLE IF NOT EXISTS bac_subjects (
-            id {pk}, session_id TEXT, subject_number INTEGER DEFAULT 1,
+            id {pk}, session_id TEXT, annale_slug TEXT, subject_number INTEGER DEFAULT 1,
             title_ar TEXT, themes_ar TEXT DEFAULT '[]', exercises TEXT DEFAULT '[]',
             estimated_minutes INTEGER DEFAULT 0, enonce TEXT, matiere TEXT,
             points INTEGER DEFAULT 10
