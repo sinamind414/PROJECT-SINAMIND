@@ -69,7 +69,10 @@ function DrillSessionContent() {
       .finally(() => setLoading(false))
   }
 
-  useEffect(() => { loadSession() }, [unit_id])
+  useEffect(() => {
+    loadSession()
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- loadSession définit la session par unit_id
+  }, [unit_id])
 
   const current = cards[currentIdx]
 

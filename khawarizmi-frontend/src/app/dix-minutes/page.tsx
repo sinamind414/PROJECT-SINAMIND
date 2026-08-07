@@ -56,7 +56,7 @@ function DixContent() {
   const [submitted, setSubmitted] = useState(false)
   const [result, setResult] = useState<Correction | null>(null)
   const [loading, setLoading] = useState(true)
-  const [sel, setSel] = useState<number | null>(null)
+  const [, setSel] = useState<number | null>(null)
 
   const load = useCallback(async () => {
     setLoading(true)

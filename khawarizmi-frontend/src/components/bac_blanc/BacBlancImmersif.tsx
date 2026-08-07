@@ -96,6 +96,7 @@ export function BacBlancImmersif({ annaleSlug }: { annaleSlug: string }) {
       if (timerRef.current) clearInterval(timerRef.current)
       if (saveRef.current) clearInterval(saveRef.current)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- timer par phase, doSubmit volontairement hors deps
   }, [phase, saveAll])
 
   function updateAnswer(exId: string, text: string) {

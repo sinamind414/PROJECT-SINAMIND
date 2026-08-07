@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { Activity, Crown, Flame, Search, Trophy, UserPlus, Users, Zap, Target } from "lucide-react";
+import { Crown, Flame, Search, UserPlus, Zap } from "lucide-react";
 
 import apiClient from "@/lib/api-client";
 

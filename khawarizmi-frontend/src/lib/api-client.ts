@@ -775,7 +775,7 @@ class KhawarizmiApiClient {
                 if (!fullText) onDone?.({ text: fullText, fallback: true })
                 return
             }
-          } catch (e) {
+          } catch {
             // ignore malformed event
           }
         }
