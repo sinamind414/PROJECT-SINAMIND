@@ -44,6 +44,11 @@ class Settings(BaseSettings):
     # (comportement pré-O7). Rollback d'un seul provider sans toucher les
     # autres ; mesurer parse_strategy_total{strategy,provider} avant d'étendre.
     json_mode_providers: list[str] = []
+    # Étage savoir_corrector (étage local haute confiance, 0 token) — feature
+    # flag PAR VERBE (slugs de la route : analyse, extract, interpret…).
+    # Défaut VIDE = savoir jamais activé. Activation progressive en prod
+    # (J1 : 1 verbe → J3 : 2 → J7 : bilan — cf. reponse-audit-architecture.md).
+    savoir_enabled_verbs: list[str] = []
 
     VISION_API_KEY: str = ""
     vision_base_url: str = "https://api.openai.com/v1"

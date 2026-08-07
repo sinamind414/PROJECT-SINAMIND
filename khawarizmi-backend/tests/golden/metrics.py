@@ -45,9 +45,9 @@ def compute_golden_metrics(
 ) -> dict:
     """Calcule toutes les métriques de qualité de notation."""
     n = len(human_scores)
-    assert n == len(system_scores) == len(human_codes) == len(system_codes), (
-        "tailles incohérentes"
-    )
+    assert n == len(system_scores), "tailles de scores incohérentes"
+    # Les listes de codes peuvent être vides (appel sans codes : κ = None)
+    has_codes = len(human_codes) == n == len(system_codes) and n > 0
     if n == 0:
         return {"n": 0, "mae": None, "exact_match": None, "severe_error_rate": None,
                 "bias": None, "kappa": None, "std_ratio": None}
@@ -64,13 +64,14 @@ def compute_golden_metrics(
 
     bias = float(np.mean(np.asarray(system_scores) - np.asarray(human_scores)))
 
-    # Cohen κ : ≥ 2 classes au total, sinon non calculable → None
+    # Cohen κ : nécessite des codes fournis ET ≥ 2 classes, sinon None
     kappa = None
-    try:
-        if len(set(human_codes) | set(system_codes)) >= 2:
-            kappa = float(cohen_kappa_score(human_codes, system_codes))
-    except ValueError:
-        kappa = None
+    if has_codes:
+        try:
+            if len(set(human_codes) | set(system_codes)) >= 2:
+                kappa = float(cohen_kappa_score(human_codes, system_codes))
+        except ValueError:
+            kappa = None
 
     std_h = float(np.std(human_scores))
     std_ratio = float(np.std(system_scores) / max(std_h, 0.01))

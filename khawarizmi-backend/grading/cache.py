@@ -56,10 +56,11 @@ from grading.cache_key import (
 )
 from services.answer_sanity import check_answer_sanity
 from services.hashing import hash_answer
+from services.savoir_corrector import is_savoir_enabled
 
 logger = logging.getLogger("khawarizmi.grading_cache")
 
-# Piège 3 — seules ces sources sont cachaables. Le futur étage savoir_corrector
+# Piège 3 — seules ces sources sont cachaables. L'étage savoir_corrector
 # haute confiance (local_savoir / local_l2_high_conf) est déjà dans le contrat.
 CACHE_WRITE_ALLOWED = {
     "llm",
@@ -72,8 +73,10 @@ CACHE_WRITE_ALLOWED = {
 # NOTE (piège factuel relevé en audit) : on n'accepte PAS parse_status == "ok"
 # strict — correction_v2.py:825 fait `"ok" if source == "llm" else "recovered"`,
 # donc en production (use_v2_prompt=True → source="llm_v2") tout est
-# "recovered". "ok" strict rendrait le cache mort. On garde {"ok", "recovered"}.
-CACHE_PARSE_ALLOWED = {"ok", "recovered"}
+# "recovered". "ok" strict rendrait le cache mort. On garde {"ok", "recovered"}
+# + "local" pour l'étage savoir (déterministe, 0 token, fiable : MAE golden
+# 0.308 sur son périmètre).
+CACHE_PARSE_ALLOWED = {"ok", "recovered", "local"}
 
 # Piège 2 — champs dépendant de (question, réponse) uniquement. Le reste
 # (hashes, attempts, parse_status, finish_reason…) est recalculé au hit.
@@ -126,6 +129,33 @@ def _record(result: str, verb_slug: str) -> None:
         f"correction_cache_ops_total{{result={result},verb={verb_slug}}} "
         f"| total={_stats[result]}"
     )
+
+
+# ── grading_source_total{source, verb_slug} (audit étape 5) ─────────
+_grading_sources: dict[str, int] = {}
+_grading_sources_by_verb: dict[str, dict[str, int]] = {}
+
+
+def record_grading_source(source: str, verb_slug: str) -> None:
+    """Compteur de source de notation (local_savoir, cache, llm, sanity…).
+
+    Objectif prod : grading_source_total{source="local_savoir"} / total > 15 %
+    après activation [1-2 verbes] ; corrélé négativement à llm_tokens_total.
+    """
+    _grading_sources[source] = _grading_sources.get(source, 0) + 1
+    verb_map = _grading_sources_by_verb.setdefault(verb_slug, {})
+    verb_map[source] = verb_map.get(source, 0) + 1
+    logger.info(
+        f"grading_source_total{{source={source},verb={verb_slug}}} "
+        f"| total={_grading_sources[source]}"
+    )
+
+
+def grading_source_stats() -> dict[str, Any]:
+    return {
+        "total": dict(_grading_sources),
+        "by_verb": {v: dict(m) for v, m in _grading_sources_by_verb.items()},
+    }
 
 
 # ── Offsets (piège 1) ────────────────────────────────────────────────
@@ -352,6 +382,64 @@ async def evaluate_with_cache(
             if rehydrated is not None:
                 _record("hit_after_wait", verb_slug)
                 return rehydrated
+
+        # 2. Étage savoir_corrector (0 token, avant LLM/L2) — feature flag PAR
+        # VERBE (config.savoir_enabled_verbs, défaut vide). Promotion UNIQUEMENT
+        # si can_handle (question couverte par le lexique, jamais généraliste)
+        # ET ≥ SAVOIR_HIGH_CONFIDENCE_MIN_CONCEPTS concepts trouvés DANS la
+        # copie (périmètre validé : MAE golden 0.308, severe=0.0).
+        savoir_promoted = False
+        try:
+            if is_savoir_enabled(verb_slug):
+                from services.savoir_corrector import (
+                    SAVOIR_HIGH_CONFIDENCE_MIN_CONCEPTS,
+                    deterministic_correct_v2,
+                )
+                savoir_result = deterministic_correct_v2(
+                    question=kwargs.get("question_prompt", ""),
+                    student_answer=canonical,
+                    score_max=score_max,
+                    language="ar",
+                    model_answer=kwargs.get("model_answer", ""),
+                )
+                if (savoir_result["_savoir_can_handle"]
+                        and savoir_result["_savoir_n_concepts"]
+                        >= SAVOIR_HIGH_CONFIDENCE_MIN_CONCEPTS):
+                    savoir_promoted = True
+                    result = savoir_result
+                    result["attempts"] = 0
+                    result["parse_status"] = "local"
+                    result["finish_reason"] = "savoir_high_confidence"
+                    # κ modéré (0.449 < 0.65) : le code d'erreur n'est pas assez
+                    # fiable pour orienter la remédiation → jamais de page de
+                    # livre erronée (audit V0.2).
+                    result["remediation"] = None
+                    result["remediation_reason"] = "local_savoir_no_remediation"
+                    record_grading_source("local_savoir", verb_slug)
+        except Exception as exc:
+            logger.warning(
+                f"savoir_etage_failed | verb={verb_slug} error={exc} — "
+                "poursuite sans étage savoir"
+            )
+
+        if savoir_promoted:
+            # Payload caché : highlights en espace CANONIQUE (project exclut
+            # les _savoir_*), reprojection sur la copie réelle au retour.
+            cached_payload = to_cache_payload(result)
+            result["highlights"] = _reproject_offsets(
+                result.get("highlights"), delta, len(student_answer)
+            )
+            result["student_answer_hash"] = hash_answer(student_answer)
+            if is_cacheable(result):
+                await set_cache(
+                    key,
+                    json.dumps(cached_payload, ensure_ascii=False),
+                    ttl=CORRECTION_CACHE_TTL,
+                )
+                _record("store", verb_slug)
+            else:
+                _record("skip_uncacheable", verb_slug)
+            return result
 
         # Miss : évaluation réelle sur le texte canonique (offsets cohérents)
         result = await evaluate_fn(**kwargs, student_answer=canonical)

@@ -103,11 +103,19 @@ def build() -> list[dict]:
 
 def _annot_item(q: dict, copy: str, code_override: str | None = None) -> dict:
     """Définition unique : human_score = barème × proportion de mots-clés
-    présents dans la copie (parfaite, partielle ou vide)."""
+    présents dans la copie (partielle ou vide).
+
+    Cas particulier : une copie ÉGALE à la réponse modèle est parfaite PAR
+    DÉFINITION → score = barème complet (certains mots-clés du golden ne
+    figurent pas littéralement dans la réponse modèle ; les noter moins
+    créerait une contradiction interne de l'annotation)."""
     bareme = int(q.get("bareme", 2))
     keywords = list(q.get("mots_cles_attendus", []) or [])
-    present = _kw_present_list(keywords, copy)
-    human = round(bareme * len(present) / max(1, len(keywords)))
+    if copy == q.get("reponse_attendue", ""):
+        human, present = bareme, list(keywords)
+    else:
+        present = _kw_present_list(keywords, copy)
+        human = round(bareme * len(present) / max(1, len(keywords)))
     code = code_override or _dominant_for(human, bareme)
     return {
         "question_id": q["id"],

@@ -458,6 +458,183 @@ def confidence_for(question: str, model_answer: str = "") -> float:
     return min(1.0, len(_detect_lexicon_concepts(question, model_answer)) / 3.0)
 
 
+# ── Seuil de promotion (audit A1) ────────────────────────────────────
+# Un item est "haute confiance" ssi ≥ 3 concepts détectés DANS LA COPIE.
+# 0.92 est un seuil DÉRIVÉ (3/3) — informatif, à NE PAS ajuster
+# dynamiquement : c'est la formule confidence_for qui devrait évoluer.
+SAVOIR_HIGH_CONFIDENCE_MIN_CONCEPTS = 3
+SAVOIR_HIGH_CONFIDENCE_THRESHOLD = 0.92  # dérivé = 3 / 3 — informatif
+
+
+def is_high_confidence(n_concepts_matched: int) -> bool:
+    """Un résultat savoir est promu ssi ≥ MIN_CONCEPTS concepts trouvés
+    dans la copie de l'élève (périmètre validé par le golden set :
+    MAE=0.308, severe=0.0 sur ce sous-groupe)."""
+    return n_concepts_matched >= SAVOIR_HIGH_CONFIDENCE_MIN_CONCEPTS
+
+
+def is_savoir_enabled(verb_slug: str) -> bool:
+    """Feature flag PAR VERBE (activation progressive en prod).
+
+    Défaut vide = savoir jamais activé. La liste contient les verb_slug de
+    la route (ex. 'analyse', 'extract', 'interpret' — la route reçoit des
+    slugs, pas les noms arabes).
+    """
+    from config import get_settings
+    return verb_slug in (get_settings().savoir_enabled_verbs or [])
+
+
+# ── Highlights sur la copie élève (offsets BRUTS) ────────────────────
+
+def find_keyword_occurrences(text: str, keyword_id: str) -> list[tuple[int, int]]:
+    """Occurrences d'un concept dans le texte BRUT (start, end).
+
+    Cherche chaque variante du lexique dans le texte non normalisé
+    (case-insensitive) — le texte normalisé (_normalize) retire ponctuation
+    et diacritiques : les positions y seraient fausses vs la copie affichée.
+    Variantes < 3 caractères ignorées (faux positifs : 'b', 't'...).
+    """
+    occs: list[tuple[int, int]] = []
+    text_lower = text.lower()
+    for variant in _SYNONYMS.get(keyword_id, [keyword_id]):
+        v = variant.strip().lower()
+        if len(v) < 3:
+            continue
+        start = 0
+        while True:
+            idx = text_lower.find(v, start)
+            if idx == -1:
+                break
+            occs.append((idx, idx + len(v)))
+            start = idx + max(1, len(v))
+    # Trier par position puis dédupliquer les occurrences IMBRIQUÉES
+    # (ex. 'نواة' ⊂ 'النواة' — deux spans pour le même mot) : garder le
+    # premier span (le plus long à la position de début), ignorer ceux qui
+    # chevauchent un span déjà retenu.
+    occs.sort()
+    dedup: list[tuple[int, int]] = []
+    for occ in occs:
+        if dedup and occ[0] < dedup[-1][1]:
+            continue  # chevauche le span précédent → imbriqué
+        dedup.append(occ)
+    return dedup
+
+
+def build_savoir_highlights(
+    student_answer: str,
+    matched_keywords: list[str],
+) -> list[dict]:
+    """Surligne (good_element) les concepts trouvés DANS la copie.
+
+    Uniquement les matches — on ne surligne jamais ce qui est absent
+    (les `missing` sont un champ missing[], pas un highlight[]). Les offsets
+    pointent dans le texte brut de l'élève, pas dans la réponse modèle.
+    """
+    highlights: list[dict] = []
+    for kw in matched_keywords:
+        for start, end in find_keyword_occurrences(student_answer, kw):
+            if start >= end:
+                continue
+            highlights.append({
+                "start": start,
+                "end": end,
+                "type": "good_element",
+                "message_ar": f"جيد: {kw}",
+            })
+    return highlights
+
+
+def _savoir_dominant_error(raw: dict, score: int, score_max: int) -> str:
+    """Code d'erreur dominant pour un résultat savoir.
+
+    κ modéré (0.449) : le code est une heuristique, la remédiation est
+    désactivée (remediation=None) tant que κ < 0.65 sur golden humain.
+    """
+    if any("خطأ مفاهيمي" in e for e in raw.get("erreurs", [])):
+        return "scientific_error"
+    if score >= score_max:
+        return "all_correct"
+    if score > 0:
+        return "partial_correct"
+    return "insufficient"
+
+
+def deterministic_correct_v2(
+    *,
+    question: str,
+    student_answer: str,
+    score_max: int,
+    language: str = "ar",
+    expected_keywords: list[str] | None = None,
+    mandatory_keywords: list[str] | None = None,
+    expected_numeric: dict[str, float] | None = None,
+    model_answer: str = "",
+) -> dict:
+    """Version de deterministic_correct compatible contrat v2 (CACHEABLE).
+
+    Retourne un dict au format du contrat v2 (score, score_max, percentage,
+    confidence, matched_criteria, missing, success, errors, highlights,
+    feedback_ar, advice_ar, dominant_error_code, sanity_code, provider,
+    model) + métadonnées internes _savoir_* (retirées avant mise en cache).
+
+    ⚠️ Concepts attendus : déduits de la RÉPONSE MODÈLE UNIQUEMENT (pas de
+    l'énoncé). Déduire depuis la question piégerait la copie parfaite : un
+    concept présent dans l'énoncé mais absent du modèle (ex. gs_022
+    'immunite'/'rep_humorale') deviendrait un manquant inévitable → la copie
+    modèle n'obtiendrait pas le barème. Mesuré sur le golden : MAE copies
+    parfaites 0.104 → 0.000 ; MAE globale 0.361 → 0.279.
+    """
+    if expected_keywords is None:
+        expected_keywords = _detect_lexicon_concepts("", model_answer)
+
+    raw = deterministic_correct(
+        question=question,
+        student_answer=student_answer,
+        points=score_max,
+        language=language,
+        expected_keywords=expected_keywords,
+        mandatory_keywords=mandatory_keywords,
+        expected_numeric=expected_numeric,
+        model_answer=model_answer,
+    )
+
+    matched = list(raw.get("mots_cles_trouves", []) or [])
+    missing = list(raw.get("mots_cles_manquants", []) or [])
+    n_concepts = len(matched)
+    confidence = min(1.0, n_concepts / SAVOIR_HIGH_CONFIDENCE_MIN_CONCEPTS)
+
+    score = int(round(float(raw.get("score", 0.0))))
+    score = max(0, min(score_max, score))
+    percentage = round(100 * score / max(score_max, 1))
+
+    return {
+        "source": "local_savoir",
+        "score": score,
+        "score_max": score_max,
+        "percentage": percentage,
+        "confidence": confidence,
+        "highlights": build_savoir_highlights(student_answer, matched),
+        "matched_criteria": matched,
+        "unmatched_criteria": [],
+        "missing": [
+            {"expected": k, "why_ar": f"مطلوب: {k}", "from_model_answer": ""}
+            for k in missing
+        ],
+        "success": [f"تم اكتشاف: {k}" for k in matched],
+        "errors": [f"مفقود: {k}" for k in missing],
+        "feedback_ar": raw.get("explication", ""),
+        "advice_ar": " ".join(raw.get("conseils", "").split()),
+        "dominant_error_code": _savoir_dominant_error(raw, score, score_max),
+        "sanity_code": "ok",
+        "provider": "local",
+        "model": "savoir_v1",
+        # Métadonnées internes (observabilité, retirées avant cache)
+        "_savoir_can_handle": can_handle(question, model_answer),
+        "_savoir_confidence": confidence,
+        "_savoir_n_concepts": n_concepts,
+    }
+
+
 # ──────────────────────────────────────────────────────────────────────
 # Correcteur public
 # ──────────────────────────────────────────────────────────────────────

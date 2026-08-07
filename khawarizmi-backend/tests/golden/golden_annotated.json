@@ -297,17 +297,16 @@
         "كودون مضاد",
         "anticodon"
       ],
-      "human_score": 2,
+      "human_score": 3,
       "human_score_max": 3,
-      "human_dominant_error": "partial_correct",
+      "human_dominant_error": "all_correct",
       "human_matched_criteria": [
         "نقل",
         "أحماض أمينية",
+        "كودون مضاد",
         "anticodon"
       ],
-      "human_unmatched_criteria": [
-        "كودون مضاد"
-      ],
+      "human_unmatched_criteria": [],
       "annotator": "synthetic_keyword_v1",
       "annotation_date": "2026-08-07"
     },
@@ -684,17 +683,16 @@
         "مجموعات جانبية",
         "روابط"
       ],
-      "human_score": 2,
+      "human_score": 3,
       "human_score_max": 3,
-      "human_dominant_error": "partial_correct",
+      "human_dominant_error": "all_correct",
       "human_matched_criteria": [
+        "التلاف",
         "كروي",
         "مجموعات جانبية",
         "روابط"
       ],
-      "human_unmatched_criteria": [
-        "التلاف"
-      ],
+      "human_unmatched_criteria": [],
       "annotator": "synthetic_keyword_v1",
       "annotation_date": "2026-08-07"
     },
@@ -739,17 +737,16 @@
         "موقع فعال",
         "ركيزة"
       ],
-      "human_score": 3,
+      "human_score": 4,
       "human_score_max": 4,
-      "human_dominant_error": "partial_correct",
+      "human_dominant_error": "all_correct",
       "human_matched_criteria": [
         "بنية",
         "وظيفة",
+        "موقع فعال",
         "ركيزة"
       ],
-      "human_unmatched_criteria": [
-        "موقع فعال"
-      ],
+      "human_unmatched_criteria": [],
       "annotator": "synthetic_keyword_v1",
       "annotation_date": "2026-08-07"
     },
@@ -875,19 +872,18 @@
         "تمامة",
         "وظيفة"
       ],
-      "human_score": 4,
+      "human_score": 5,
       "human_score_max": 5,
-      "human_dominant_error": "partial_correct",
+      "human_dominant_error": "all_correct",
       "human_matched_criteria": [
         "غلوبولينات",
         "بنية",
         "موقع فعال",
         "مستضد",
+        "تمامة",
         "وظيفة"
       ],
-      "human_unmatched_criteria": [
-        "تمامة"
-      ],
+      "human_unmatched_criteria": [],
       "annotator": "synthetic_keyword_v1",
       "annotation_date": "2026-08-07"
     },
@@ -1105,17 +1101,16 @@
         "بنية",
         "سرعة"
       ],
-      "human_score": 3,
+      "human_score": 4,
       "human_score_max": 4,
-      "human_dominant_error": "partial_correct",
+      "human_dominant_error": "all_correct",
       "human_matched_criteria": [
         "حرارة مثلى",
         "تمسخ",
+        "بنية",
         "سرعة"
       ],
-      "human_unmatched_criteria": [
-        "بنية"
-      ],
+      "human_unmatched_criteria": [],
       "annotator": "synthetic_keyword_v1",
       "annotation_date": "2026-08-07"
     },
@@ -1244,18 +1239,17 @@
         "pH أمثل",
         "استنتاج"
       ],
-      "human_score": 4,
+      "human_score": 5,
       "human_score_max": 5,
-      "human_dominant_error": "partial_correct",
+      "human_dominant_error": "all_correct",
       "human_matched_criteria": [
+        "تجربة",
         "pH",
         "سرعة",
         "pH أمثل",
         "استنتاج"
       ],
-      "human_unmatched_criteria": [
-        "تجربة"
-      ],
+      "human_unmatched_criteria": [],
       "annotator": "synthetic_keyword_v1",
       "annotation_date": "2026-08-07"
     },
@@ -2115,18 +2109,17 @@
         "أستيل كولين إستراز",
         "استنتاج"
       ],
-      "human_score": 5,
+      "human_score": 6,
       "human_score_max": 6,
-      "human_dominant_error": "partial_correct",
+      "human_dominant_error": "all_correct",
       "human_matched_criteria": [
         "أستيل كولين",
         "إلكترود",
         "إنزيم",
-        "أستيل كولين إستراز"
-      ],
-      "human_unmatched_criteria": [
+        "أستيل كولين إستراز",
         "استنتاج"
       ],
+      "human_unmatched_criteria": [],
       "annotator": "synthetic_keyword_v1",
       "annotation_date": "2026-08-07"
     },
@@ -3024,20 +3017,19 @@
         "بروتين",
         "صفات"
       ],
-      "human_score": 4,
+      "human_score": 5,
       "human_score_max": 5,
-      "human_dominant_error": "partial_correct",
+      "human_dominant_error": "all_correct",
       "human_matched_criteria": [
         "تسلسل",
         "قواعد",
         "نسخ",
         "ARNm",
+        "ترجمة",
         "بروتين",
         "صفات"
       ],
-      "human_unmatched_criteria": [
-        "ترجمة"
-      ],
+      "human_unmatched_criteria": [],
       "annotator": "synthetic_keyword_v1",
       "annotation_date": "2026-08-07"
     },

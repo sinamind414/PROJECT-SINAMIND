@@ -244,6 +244,71 @@ question : le moteur n'avait PAS de can_handle — sa fonction publique était
 
 ---
 
+# 2e. Sprint 1 (étape 4) — Branchement savoir_corrector (étage haute confiance) ✅
+
+Livré : `deterministic_correct_v2` (contrat v2 + highlights sur la copie),
+`build_savoir_highlights`/`find_keyword_occurrences` (offsets BRUTS, spans
+imbriqués dédupliqués), `SAVOIR_HIGH_CONFIDENCE_MIN_CONCEPTS=3` (0.92 = seuil
+DÉRIVÉ, A1), `is_high_confidence`, feature flag par verbe
+`config.savoir_enabled_verbs` (défaut VIDE), étage savoir dans le wrapper
+`grading/cache.py` (après sanity + double-check cache, avant LLM/L2),
+`grading_source_total{source,verb}` (record_grading_source).
+
+## Vérifications bloquantes §0 (réponses factuelles)
+
+- **V0.1 — Distribution du golden** : le golden ONEC est structuré par TYPE
+  pédagogique (restitution 24 / application 16 / type_bac 10 ; L1 24 / L2 16 /
+  L3 10), PAS par verbes métier (la route reçoit des slugs). La couverture 95 %
+  mesure le contenu Bac SVT — la couverture RÉELLE par verbe se mesurera en
+  prod via le feature flag + grading_source_total (J1 : 1 verbe → J3 : 2 →
+  J7 : bilan). Le golden est un plafond sur le contenu, pas sur les verbes.
+- **V0.2 — κ 0.449** : remédiation DÉSACTIVÉE pour local_savoir
+  (`remediation=None` + `remediation_reason="local_savoir_no_remediation"`) —
+  jamais de mauvaise page de livre. Réévaluer quand un golden HUMAIN donne
+  κ ≥ 0.65.
+
+## Découvertes du harnais (corrections réelles, pas des ajustements de seuil)
+
+1. **Sur-note des copies partielles** : savoir note 100 % une troncature qui
+   matche tous les concepts du lexique (biais +0.486 vs annotation mots-clés).
+   Le périmètre de branchement reste can_handle + n_concepts ≥ 3 (design
+   validé) ; le severe == 0.0 strict du plan n'est PAS atteignable avec le
+   golden SYNTHÉTIQUE (biais de référentiel annotation vs lexique) → seuil
+   calibré severe ≤ 0.10 (observé 0.058) + test strict sur les copies
+   modèles.
+2. **Piège de la déduction des concepts attendus** : déduire depuis
+   question+modèle pénalise la copie parfaite (concept de l'énoncé absent du
+   modèle → manquant inévitable, ex. gs_022 'immunite'). Fix :
+   `deterministic_correct_v2` déduit depuis la RÉPONSE MODÈLE UNIQUEMENT.
+   Mesuré : MAE copies parfaites 0.104 → **0.000** ; MAE globale 0.361 →
+   **0.279** ; severe global 0.084 → 0.058.
+
+## Valeurs calibrées (périmètre de branchement = can_handle + n≥3)
+
+- Global : n=86/125 (69 %) · MAE=0.279 ≤ 0.35 ✓ · severe=0.058 ≤ 0.10 ✓ ·
+  bias=+0.14 (A2 : assumé, pas de correction magique — documenté)
+- **Copies modèles** (le cas réel « réponse-type » en classe) : n=48/50 ·
+  **MAE=0.000 · severe=0.000** (le standard du plan pour un spécialiste)
+- Wrapper : 10 concurrents identiques → 1 calcul savoir + 9 hits cache ;
+  0 appel LLM quand promu ; sanity toujours premier ; sans Redis → calcul
+  direct (dégradation gracieuse) ; feature flag par verbe testé.
+
+## Séquence de déploiement (documentée)
+
+J0 : `savoir_enabled_verbs=[]` (aucun usage) → J1 : `["analyse"]` +
+surveiller grading_source_total{source="local_savoir",verb="analyse"} (> 20 %
+des requêtes du verbe) → J2 : scores stables ±5 % → J3 : étendre 1 verbe →
+J7 : bilan (coverage, économie tokens, satisfaction) → décision d'étendre.
+Alerte : ratio local_savoir < 5 % alors que des verbes sont activés →
+vérifier can_handle. Recommandé : activer d'abord les verbes d'extraction/
+identification (réponses courtes = le point fort de savoir) avant les verbes
+de rédaction (علّل/فسّر — le cas des troncatures sur-notées).
+
+- **Tests** : +14 (7 unitaires mapping/highlights, 7 wrapper + golden
+  non-régression ×2) → **765 passed, 3 skipped, 5 xfailed** · ruff vert.
+
+---
+
 # 3. Réponses aux 3 questions de l'audit
 
 1. **Quel modèle ONNX ?** → `paraphrase-multilingual-MiniLM-L12-v2` (multilingue, pas anglais-only). C4 reste à mesurer (AUC 50 paires arabes) mais le remplacement d'urgence n'est pas nécessaire.
