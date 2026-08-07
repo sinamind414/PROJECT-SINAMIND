@@ -20,11 +20,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from config import get_settings
 from deps import get_current_user, get_db, get_openai
+from grading.cache import evaluate_with_cache
 from rate_limit import evaluate_limit, limiter
 from schemas.document_analysis import EvaluateRequest
 from services.correction_audit import log_correction_audit
 from services.correction_v2_retry import evaluate_answer_v2_with_retry
-from services.grading_cache import evaluate_with_cache
 from services.hashing import hash_answer
 from services.llm import _call_with_fallback
 from services.rag_service import format_rag_context, rag_search
@@ -288,6 +288,9 @@ async def evaluer_reponses_v2(
             "feedback_ar": result["feedback_ar"],
             "advice_ar": result["advice_ar"],
             "source": result["source"],
+            # Observabilité C2 : un hit cache garde la source d'origine
+            # (grading_source_total fidèle) + from_cache=True
+            "from_cache": result.get("from_cache", False),
             # Spec §3.1 — feedback enrichi
             "missing": result.get("missing", []),
             "dominant_error_code": result.get("dominant_error_code", "unknown"),

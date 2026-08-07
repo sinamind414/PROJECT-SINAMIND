@@ -1,28 +1,37 @@
-"""services/grading_cache.py — Cache de correction exact (audit C2, corr_full_exact).
+"""grading/cache.py — Cache de correction exact (audit C2, corr_full_exact).
 
-Réutilise la note d'une copie IDENTIQUE (après normalisation d'espaces sûre)
-pour une même (question, verbe, barème, version de prompt, modèle configuré)
-— sans appel LLM, sans user_id, et sans jamais exposer llm_raw.
+Wrapper autour du correcteur (evaluate_answer_v2_with_retry) : réutilise une
+note complète pour une copie IDENTIQUE après normalisation d'espaces minimale
+(grading/cache_key.py) — sans appel LLM, sans user_id, sans llm_raw.
 
-Trois invariants (audit C2 — pièges de corruption silencieuse) :
+Garde-fous (audit C2) :
 
-1. La SEULE normalisation autorisée est celle à décalage *calculable*
-   (key_normalize) : \\r\\n→\\n (appliquée aussi au texte envoyé au LLM, sinon
-   divergence), lstrip (décalage uniforme `delta`, reprojeté sur les
-   highlights), rstrip (fin de chaîne — n'affecte aucun offset).
-   Les highlights sont reprojetés de +delta puis clampés aux bornes de la
-   copie réelle — jamais désalignés sur le texte affiché à l'élève.
-   Interdit : collapse d'espaces internes, normalisation arabe, tashkîl.
+1. Offsets (piège 1) — la seule normalisation autorisée est celle à décalage
+   calculable (lstrip/rstrip). Le texte canonique est envoyé au LLM : cache et
+   LLM voient le même référentiel ; les highlights stockés sont en espace
+   canonique et reprojetés +delta (clamp aux bornes) sur la copie réelle au
+   retour — hit ET miss, même convention.
 
-2. Le payload caché ne contient QUE des champs dépendant de (question, réponse).
-   Les hash élève (HMAC-SHA256 RGPD), attempts, parse_status, source,
-   finish_reason, prompt_hash, llm_raw_hash sont RECALCULÉS à chaque hit,
-   jamais relus du cache — sinon l'audit RGPD attribuerait le hash de l'élève A
-   à la copie de l'élève B.
+2. Champs par-élève (piège 2) — le payload caché ne contient QUE des champs
+   dépendant de (question, réponse) : les hash élève (HMAC-SHA256 RGPD),
+   attempts, parse_status, finish_reason, prompt_hash, llm_raw_hash sont
+   RECALCULÉS à chaque hit, jamais relus du cache. La source d'origine est
+   stockée (propriété déterministe de (question, réponse) pour les entrées
+   cacheables) et PRÉSERVÉE au hit avec `from_cache=True` — c'est la demande
+   explicite de l'audit : les métriques grading_source_total restent fidèles
+   à l'origine de la note, et from_cache permet de compter les hits.
+   to_cache_payload() vérifie par assert que llm_raw ET student_answer sont
+   structurellement absents du payload (contrat Public P0-4.1).
 
-3. Une note dégradée n'est JAMAIS cachée (source not in CACHE_WRITE_ALLOWED) :
-   on ne fige pas une panne LLM / un fallback local dans le cache pour les
-   14 prochains jours — équité élèves, pas seulement performance.
+3. Note dégradée (piège 3) — seules les notes LLM de confiance sont cachées
+   (llm/llm_v2/llm_retried + futurs étages locaux haute confiance) avec
+   sanity_code="ok" et parse_status ok/recovered. Jamais : local_fallback,
+   sanity (déterministe de toute façon), llm_error (une panne ne se fige pas
+   7 jours).
+
+4. Single-flight — verrou local + verrou Redis (Lua CAS, libération
+   conditionnée au token, attente bornée) : 30 élèves sur la même question
+   → 1 seul appel LLM. Dégradation gracieuse sans Redis (CI).
 
 Le refactor `grading/` de S2.1 déplacera l'implémentation de correction_v2.py
 sans jamais toucher à cette couche : c'est un wrapper autour du point d'entrée.
@@ -39,27 +48,37 @@ from contextlib import asynccontextmanager
 from typing import Any
 
 from app_state import state
-from cache import CACHE_CONTRACT_VERSION, get_cache, set_cache
+from cache import get_cache, set_cache
+from grading.cache_key import (
+    CORRECTION_CACHE_TTL,
+    build_correction_key,
+    key_normalize,
+)
+from services.answer_sanity import check_answer_sanity
 from services.hashing import hash_answer
 
 logger = logging.getLogger("khawarizmi.grading_cache")
 
-# ── Constantes de versionnage ────────────────────────────────────────
-# Bump manuel à chaque changement qui rend les entrées cachées obsolètes.
-CORRECTION_CACHE_VERSION = "c1"   # format du payload / champs
-CORRECTION_PROMPT_VERSION = "p1"  # texte des prompts correction_prompt*.py
+# Piège 3 — seules ces sources sont cachaables. Le futur étage savoir_corrector
+# haute confiance (local_savoir / local_l2_high_conf) est déjà dans le contrat.
+CACHE_WRITE_ALLOWED = {
+    "llm",
+    "llm_v2",
+    "llm_retried",
+    "local_savoir",
+    "local_l2_high_conf",
+}
 
-# Durée de vie : 14 j couvrent largement la fenêtre où une même classe traite
-# un même scénario. La clé porte déjà prompt/model/barème → un déploiement
-# invalide sélectivement.
-CACHE_TTL_SECONDS = 14 * 24 * 3600
-
-# Piège 3 — seules les notes produites par un vrai LLM sont cachaables.
-# sanity (0 token), local_fallback (L2 dégradé) et llm_error ne le sont pas.
-CACHE_WRITE_ALLOWED = {"llm", "llm_v2", "llm_recovered", "llm_retried"}
+# NOTE (piège factuel relevé en audit) : on n'accepte PAS parse_status == "ok"
+# strict — correction_v2.py:825 fait `"ok" if source == "llm" else "recovered"`,
+# donc en production (use_v2_prompt=True → source="llm_v2") tout est
+# "recovered". "ok" strict rendrait le cache mort. On garde {"ok", "recovered"}.
+CACHE_PARSE_ALLOWED = {"ok", "recovered"}
 
 # Piège 2 — champs dépendant de (question, réponse) uniquement. Le reste
-# (hashes, attempts, parse_status, source, timestamps…) est recalculé au hit.
+# (hashes, attempts, parse_status, finish_reason…) est recalculé au hit.
+# `source` est volontairement inclus : déterministe pour les entrées
+# cacheables, préservée au hit (from_cache=True) pour l'observabilité.
 CACHEABLE_FIELDS: tuple[str, ...] = (
     "score",
     "score_max",
@@ -76,8 +95,9 @@ CACHEABLE_FIELDS: tuple[str, ...] = (
     "feedback_ar",
     "advice_ar",
     "sanity_code",
-    "model",      # informatif : qui a produit la note d'origine
-    "provider",   # informatif : qui a produit la note d'origine
+    "source",      # origine de la note (llm / llm_v2 / …) — préservée au hit
+    "model",       # informatif : qui a produit la note d'origine
+    "provider",    # informatif : qui a produit la note d'origine
 )
 
 # ── Statistiques hit-rate par verbe (observabilité) ──────────────────
@@ -94,30 +114,21 @@ def grading_cache_stats() -> dict[str, Any]:
 
 
 def _record(result: str, verb_slug: str) -> None:
-    """Incrémente les compteurs et logge en format métrique labelisé."""
+    """Incrémente les compteurs et logge en format métrique labelisé.
+
+    Labels (audit C2) : hit | hit_after_wait | miss | store | skip_uncacheable
+    Hit rate par verbe = (hit + hit_after_wait) / (hit + hit_after_wait + miss).
+    """
     _stats[result] = _stats.get(result, 0) + 1
     verb_map = _by_verb.setdefault(verb_slug, {})
     verb_map[result] = verb_map.get(result, 0) + 1
     logger.info(
-        f"grading_cache_ops_total{{result={result},verb={verb_slug}}} "
+        f"correction_cache_ops_total{{result={result},verb={verb_slug}}} "
         f"| total={_stats[result]}"
     )
 
 
-# ── Normalisation sûre (piège 1) ─────────────────────────────────────
-
-def key_normalize(answer: str) -> tuple[str, int]:
-    """Retourne (texte_canonique, offset_delta) pour reprojeter les highlights.
-
-    La seule normalisation autorisée : celle qui produit un décalage
-    *calculable*. Le delta est le nombre de caractères supprimés en tête.
-    """
-    s = answer.replace("\r\n", "\n").replace("\r", "\n")
-    stripped = s.lstrip()
-    delta = len(s) - len(stripped)
-    # rstrip : n'affecte aucun offset (fin de chaîne)
-    return stripped.rstrip(), delta
-
+# ── Offsets (piège 1) ────────────────────────────────────────────────
 
 def _clamp(value: int, min_val: int, max_val: int) -> int:
     return max(min_val, min(value, max_val))
@@ -154,54 +165,26 @@ def _reproject_offsets(
     return out
 
 
-# ── Clé de cache ─────────────────────────────────────────────────────
-
-def build_correction_key(
-    *,
-    question_id: int | str,
-    verb_slug: str,
-    score_max: int,
-    answer: str,
-    model_id: str,
-    prompt_variant: str = "v2",
-) -> str:
-    """Clé du cache de correction exact.
-
-    - `answer` est normalisée par key_normalize AVANT hachage HMAC-SHA256
-      (pepper serveur — impossible de brute-forcer le contenu depuis la clé).
-    - `score_max` est dans la clé : un changement de barème (VERB_RULES)
-      invalide automatiquement le cache concerné, sans versionner VERB_RULES.
-    - `model_id` est le modèle CONFIGURÉ (calculable avant l'appel), pas
-      celui qui a répondu (stocké dans la valeur pour l'audit).
-    """
-    canonical, _ = key_normalize(answer)
-    digest = hash_answer(canonical)
-    return (
-        f"corr:{CACHE_CONTRACT_VERSION}:{CORRECTION_CACHE_VERSION}"
-        f":prompt:{CORRECTION_PROMPT_VERSION}:variant:{prompt_variant}"
-        f":model:{model_id}"
-        f":q:{question_id}"
-        f":verb:{verb_slug}"
-        f":smax:{score_max}"
-        f":ans:{digest}"
-    )
-
-
 # ── Sérialisation / relecture ────────────────────────────────────────
 
 def is_cacheable(result: dict[str, Any]) -> bool:
     """Piège 3 — ne jamais cacher une note dégradée (équité, pas perf)."""
     return (
         result.get("source") in CACHE_WRITE_ALLOWED
-        and result.get("parse_status") in {"ok", "recovered"}
+        and result.get("parse_status") in CACHE_PARSE_ALLOWED
+        and result.get("sanity_code") == "ok"  # jamais un rejet sanity
         and isinstance(result.get("score"), (int, float))
         and 0 <= result["score"] <= result.get("score_max", 0)
     )
 
 
-def project(result: dict[str, Any]) -> dict[str, Any]:
-    """Piège 2 — ne sérialise que les champs dépendant de (question, réponse)."""
-    return {field: result.get(field) for field in CACHEABLE_FIELDS}
+def to_cache_payload(result: dict[str, Any]) -> dict[str, Any]:
+    """Piège 2 + contrat Public — ne sérialise que les champs dépendant de
+    (question, réponse) ; garde-fous runtime : jamais llm_raw ni la copie."""
+    payload = {field: result.get(field) for field in CACHEABLE_FIELDS}
+    assert "llm_raw" not in payload  # contrat Public P0-4.1
+    assert "student_answer" not in payload  # jamais la copie élève
+    return payload
 
 
 def _rehydrate(
@@ -212,19 +195,20 @@ def _rehydrate(
 ) -> dict[str, Any] | None:
     """Reconstruit un résultat complet depuis le payload caché.
 
-    Ne lit JAMAIS du cache : source, attempts, parse_status, finish_reason,
-    hashes — tout est recalculé sur la copie réelle. Retourne None si le
-    payload est corrompu (traité comme un miss, puis écrasé).
+    Ne lit JAMAIS du cache : attempts, parse_status, finish_reason, hashes —
+    tout est recalculé sur la copie réelle. La source d'origine est PRÉSERVÉE
+    (grading_source_total fidèle) et `from_cache=True` marque le hit.
+    Retourne None si le payload est corrompu (traité comme un miss).
     """
     try:
         stored = json.loads(payload)
         result = dict(stored)
     except (json.JSONDecodeError, TypeError, ValueError):
-        logger.warning("grading_cache_corrupt_payload — traité comme miss")
+        logger.warning("correction_cache_corrupt_payload — traité comme miss")
         return None
 
     # Recalculés à chaque hit (traçabilité RGPD : hash de CETTE copie)
-    result["source"] = "cached_evaluation"
+    result["from_cache"] = True
     result["attempts"] = 0
     result["parse_status"] = "cached"
     result["finish_reason"] = "cache"
@@ -322,11 +306,23 @@ async def evaluate_with_cache(
         question_id, verb_slug, score_max, model_id : composants de la clé
         evaluate_fn : le correcteur réel (evaluate_answer_v2_with_retry)
 
-    La réponse est normalisée AVANT le correcteur (le LLM voit le texte
-    canonique → offsets cohérents) et les highlights sont reprojetés sur la
-    copie réelle au retour (hit ET miss → même convention d'offsets).
+    Ordre (audit C2) : sanity pré-check (jamais de lookup pour un rejet —
+    déterministe, ~µs) → lookup cache → single-flight + double-check →
+    évaluation réelle sur le texte canonique (offsets cohérents) → store
+    conditionnel. La réponse est normalisée AVANT le correcteur et les
+    highlights sont reprojetés sur la copie réelle au retour (hit ET miss →
+    même convention d'offsets).
     """
     canonical, delta = key_normalize(student_answer)
+
+    # Étape 0 — sanity d'abord : un rejet est déterministe et quasi gratuit
+    # (~µs) ; le cacher serait plus lent que le calcul. Le pipeline interne
+    # rejugera la copie (résultat identique, format garanti).
+    is_valid, _, _ = check_answer_sanity(canonical)
+    if not is_valid:
+        _record("skip_uncacheable", verb_slug)
+        return await evaluate_fn(**kwargs, student_answer=canonical)
+
     prompt_variant = "v2" if kwargs.get("use_v2_prompt") else "v1"
     key = build_correction_key(
         question_id=question_id,
@@ -337,15 +333,17 @@ async def evaluate_with_cache(
         prompt_variant=prompt_variant,
     )
 
-    # 1. Hit direct (chemin chaud — pas de lock)
+    # Étape 0.5 — hit direct (chemin chaud — pas de lock)
     hit = await get_cache(key)
     if hit is not None:
         rehydrated = _rehydrate(hit, raw_answer=student_answer, delta=delta)
         if rehydrated is not None:
             _record("hit", verb_slug)
             return rehydrated
+    else:
+        _record("miss", verb_slug)
 
-    # 2. Single-flight : la première copie corrige, les suivantes attendent
+    # Single-flight : la première copie corrige, les suivantes attendent
     async with _single_flight(key, ttl=30):
         # Double-check post-verrou : un autre worker a peut-être déjà corrigé
         hit = await get_cache(key)
@@ -359,9 +357,9 @@ async def evaluate_with_cache(
         result = await evaluate_fn(**kwargs, student_answer=canonical)
 
         # Payload caché : highlights en espace CANONIQUE (ce que le LLM a vu),
-        # reprojetables vers n'importe quelle copie au hit (piège 1 — sinon un
+        # reprojectables vers n'importe quelle copie au hit (piège 1 — sinon un
         # hit sur une copie au delta différent accumulerait les décalages).
-        cached_payload = project(result)
+        cached_payload = to_cache_payload(result)
 
         # Retour API : reprojection sur la copie réelle + hash RGPD réel
         result["highlights"] = _reproject_offsets(
@@ -369,15 +367,15 @@ async def evaluate_with_cache(
         )
         result["student_answer_hash"] = hash_answer(student_answer)
 
-        # 3. Écriture conditionnelle (piège 3 : jamais une note dégradée)
+        # Étape finale — écriture conditionnelle (piège 3)
         if is_cacheable(result):
             await set_cache(
                 key,
                 json.dumps(cached_payload, ensure_ascii=False),
-                ttl=CACHE_TTL_SECONDS,
+                ttl=CORRECTION_CACHE_TTL,
             )
-            _record("miss_stored", verb_slug)
+            _record("store", verb_slug)
         else:
-            _record("miss_skipped", verb_slug)
+            _record("skip_uncacheable", verb_slug)
 
         return result

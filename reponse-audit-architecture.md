@@ -61,10 +61,10 @@ Le modèle est **multilingue** (formé sur 50+ langues dont l'arabe). Le test AU
 
 # 2b. Sprint 1 (étape 1) — C2 : cache de correction exact (corr_full_exact) ✅
 
-Livré dans `services/grading_cache.py` — **wrapper** autour de
-`evaluate_answer_v2_with_retry` (aucune édition des 700 lignes de
-`correction_v2.py` ; le refactor `grading/` de S2.1 se posera dessus sans
-friction). Route `document_analysis_v2.py` branchée.
+Livré dans le **package `grading/`** (`grading/cache_key.py` + `grading/cache.py`)
+— **wrapper** autour de `evaluate_answer_v2_with_retry` (aucune édition des
+700 lignes de `correction_v2.py` ; le refactor `grading/` de S2.1 se posera
+dessus sans friction). Route `document_analysis_v2.py` branchée.
 
 - **Vérification préalable (bloquante)** : le prompt de correction est PUR —
   aucun champ élève (prenom/user/attempt/fsrs/stability/niveau) dans
@@ -77,33 +77,53 @@ friction). Route `document_analysis_v2.py` branchée.
   changement de barème (VERB_RULES) invalide seul ; un déploiement invalide
   sélectivement (14 j de TTL).
 - **Piège 1 (offsets)** : `key_normalize` — seule normalisation à décalage
-  calculable (`\r\n`→`\n` aussi appliqué au texte envoyé au LLM, lstrip avec
-  `delta` reprojeté, rstrip sans effet). Highlights stockés en espace
-  CANONIQUE, reprojetés de +delta puis clampés sur la copie réelle au retour
-  (hit ET miss → même convention). Interdit : collapse interne, ar_normalize.
+  calculable : **lstrip** (`delta` uniforme reprojeté) + **rstrip** (sans
+  effet sur les offsets). Le texte canonique est envoyé au LLM (cache et LLM
+  même référentiel), highlights stockés en espace CANONIQUE, reprojetés +delta
+  puis clampés sur la copie réelle au retour (hit ET miss → même convention).
+  Interdits : collapse interne, ar_normalize, tashkîl **et conversion
+  `\r\n`→`\n`** (elle casserait la bijection : le frontend affiche la copie
+  brute qui garde ses `\r` → offsets JS faux d'un caractère par CRLF ; une
+  copie CRLF est un miss documenté, zéro risque).
 - **Piège 2 (champs par-élève)** : payload = `CACHEABLE_FIELDS` uniquement ;
   `student_answer_hash`, `prompt_hash`, `llm_raw_hash`, `attempts`,
   `parse_status`, `source` recalculés à chaque hit — jamais lus du cache.
   Aucun `llm_raw` dans le payload (vérifié par test).
-- **Piège 3 (note dégradée)** : `is_cacheable` — seules les notes LLM
-  (`llm`/`llm_v2`/`llm_recovered`/`llm_retried`, parse `ok`/`recovered`) sont
-  cachées ; `local_fallback`, `sanity`, `llm_error` jamais (équité : on ne
-  fige pas une panne LLM pour 14 j).
+- **Piège 3 (note dégradée)** : `is_cacheable` — seules les notes de confiance
+  (`llm`/`llm_v2`/`llm_retried` + contrat futur `local_savoir`/`local_l2_high_conf`,
+  sanity_code `ok`, parse `ok`/`recovered`) sont cachées ; `local_fallback`,
+  `sanity`, `llm_error` jamais (équité : on ne fige pas une panne LLM pour 7 j).
+  ⚠️ Point factuel : `parse_status == "ok"` STRICT tuerait le cache en prod —
+  `correction_v2.py:825` fait `"ok" if source == "llm" else "recovered"`, or la
+  route est en `use_v2_prompt=True` → `source="llm_v2"` → `"recovered"`. On
+  garde `{"ok", "recovered"}` (testé `test_llm_v2_is_cacheable`).
+- **Ordre pipeline** : sanity pré-check dans le wrapper AVANT le lookup (un
+  rejet sanity est déterministe et ~µs — jamais de lookup ni de store, vérifié
+  par compteurs) → lookup → single-flight + double-check → évaluation →
+  store conditionnel.
 - **Single-flight** : verrou local + verrou Redis (Lua CAS, libération
   conditionnée au token, attente bornée) — 30 élèves sur la même question →
   **1 seul appel LLM**.
-- **Hit** : `source="cached_evaluation"` (déjà présent dans `SourceV2`),
-  `attempts=0`, `parse_status="cached"`, 0 appel LLM.
-- **Observabilité** : `grading_cache_ops_total{result,verb}` par verbe
-  (logs structurés + compteurs in-process exposés par `grading_cache_stats()`).
+- **Hit** : `from_cache=True` + **source d'origine PRÉSERVÉE** (ex. `llm_v2` —
+  `grading_source_total` reste fidèle), `attempts=0`, `parse_status="cached"`,
+  0 appel LLM. Le champ `from_cache` est exposé dans la réponse API.
+- **Observabilité** : `correction_cache_ops_total{result,verb}` par verbe —
+  labels `hit | hit_after_wait | miss | store | skip_uncacheable` (logs
+  structurés + compteurs `grading_cache_stats()`). Hit rate par verbe =
+  (hit+hit_after_wait)/(hit+hit_after_wait+miss).
+- **TTL 7 jours** (`CORRECTION_CACHE_TTL`), invalidation 100 % passive via la
+  clé (prompt version, variant v1/v2, modèle configuré, score_max).
 - **Réserve B §7** : seuil FSRS `3.0` unifié dans `services/pedagogical.py`
   (`pedagogical_bucket`, absent ≡ 0.0 ≡ "low") — le namespace "default" de la
   clé chatbot est supprimé (poids mort) ; aligné sur la route chatbot,
   l'orchestrateur, chat_service, chat_prompt et remediation.
-- **Tests** : +40 (dont les 7 acceptations C2 : 2e envoi → cache, offsets
-  reprojetés, hash par copie, note dégradée non cachée, bump de version,
-  single-flight 10 concurrents, pas de llm_raw) → **684 passed, 1 skipped,
-  5 xfailed** · ruff vert.
+- **Tests** : les 10 acceptations C2 couvertes (2e envoi → cache avec
+  `from_cache=True` + source préservée ; espaces de bord → hit / espaces
+  internes & CRLF → miss documenté ; 1 caractère de différence → miss ;
+  payload sans llm_raw ni copie ; llm_error & sanity jamais cachés ; bump de
+  version → invalidation passive ; sans Redis → calcul direct ; single-flight
+  10 concurrents → 1 appel ; source d'origine préservée) → **693 passed,
+  1 skipped, 5 xfailed** · ruff vert.
 
 ---
 
