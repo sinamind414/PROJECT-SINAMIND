@@ -59,7 +59,55 @@ Le modèle est **multilingue** (formé sur 50+ langues dont l'arabe). Le test AU
 
 ---
 
-# 2b. Sprint 1 (étape 1) — C2 : cache de correction exact (corr_full_exact) ✅
+# 2c. Sprint 1 (étape 2) — O7 : sortie JSON native provider ✅
+
+Livré : `services/llm_providers.py` (capacités par provider), `grading/parser.py`
+(stratégies + compteur), `grading/schemas/correction_output.py` (schémas),
+`_call_with_fallback(json_schema=...)` (dispatch par appel), `correction_v2.py`
+(passe le schéma + parse avec `json_mode_used`), kill-switch
+`config.json_mode_enabled` (défaut True).
+
+- **Capacité déclarée par provider, pas de flag global** : `ProviderCapabilities`
+  (json_mode / max_output_tokens / supports_prefix_caching pour C1 futur).
+  Tous les providers passent par le SDK AsyncOpenAI (même Gemini via son
+  endpoint OpenAI-compatible) → dispatch OpenAI-style :
+  - primary auto-détecté par la clé (gsk_* → json_object, AIza* → json_object,
+    sinon json_schema strict) ; Gemini fallback → json_object ;
+    GLM-4.7 (Z.AI) → json_object ; Cloudflare/ZenMux/Nara → **none** (prudent,
+    jamais de response_format non validé — ajustable dans PROVIDER_CAPS).
+  - `apply_json_mode(call_kwargs, provider, schema)` : fonction PURE testable ;
+    la réponse est taggée `_khawarizmi_json_mode` → `json_mode_used` côté
+    correction_v2.
+- **⚠️ Divergence documentée vs plan** : le schéma natif doit matcher le format
+  DEMANDÉ par le prompt, pas le contrat public v1. Le prompt v2 (PROD,
+  use_v2_prompt=True) demande `{score: 0-100, errors:[{line,type,detail,fix}],
+  feedback, grade}` — forcer le schéma v1 déclencherait le mapping v2→v1 de
+  correction_v2.py sur du v1 → score multiplié par score_max/100 (catastrophe
+  silencieuse). `CORRECTION_V2_JSON_SCHEMA` = format v2 (PROD) ; le mapping
+  v2→v1 produit ensuite le contrat public inchangé. `CORRECTION_V1_JSON_SCHEMA`
+  (non utilisé en prod) aligné sur les types RÉELS du code : highlights.type =
+  gibberish/off_topic/missing_link/wrong_formulation/irrelevant/good_element
+  (le plan listait error/missing/good/partial — faux vs `_validate_highlights`),
+  dominant_error_code = 13 valeurs réelles (pas 8).
+- **Piège Gemini neutralisé par l'architecture** : response_schema du SDK
+  Google force tous les champs déclarés → on utilise l'endpoint
+  OpenAI-compatible avec `response_format={"type":"json_object"}` (JSON valide
+  garanti, aucun champ optionnel inventé). Pas de build_provider_schema.
+- **Strict-compat OpenAI** : chaque champ déclaré est required OU nullable
+  (`["T","null"]` — confidence/advice_ar optionnels comme prévu au plan).
+  Mini-validateur structurel maison (jsonschema n'est pas une dépendance).
+- **Parser fallback conservé et mesuré** : `grading/parser.py` —
+  native_json → direct → fence → regex → partial → failed ;
+  `parse_strategy_total{strategy}` compté à chaque correction.
+  Objectif : native_json > 95 % sur providers JSON-capables (alerte si < 90 %).
+- **Test nightly qualité** (`tests/golden/test_json_mode_quality.py`, marqué
+  `nightly`, skippé en CI / sans clé réelle) : MAE(json, baseline free) ≤ 0.15
+  et std(json) ≥ 0.70×std(free) sur 10 items du golden set ONEC (pas de scores
+  humains dans le set → baseline = mode texte libre, non-régression).
+- **Tests** : +40 → **733 passed, 3 skipped (2 nightly + 1 préexistant),
+  5 xfailed** · ruff vert. C2 inchangé (le cache opère sur le résultat parsé).
+
+---
 
 Livré dans le **package `grading/`** (`grading/cache_key.py` + `grading/cache.py`)
 — **wrapper** autour de `evaluate_answer_v2_with_retry` (aucune édition des

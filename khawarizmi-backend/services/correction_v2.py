@@ -13,12 +13,17 @@ Type exporté : LLMCaller (Protocol pour injection de dépendance)
 
 from __future__ import annotations
 
-import json
 import logging
 import re
 from typing import Any, Protocol, runtime_checkable
 
+from config import get_settings
 from cost_logger import get_logger
+from grading.parser import parse_correction_response, record_parse_strategy
+from grading.schemas.correction_output import (
+    CORRECTION_V1_JSON_SCHEMA,
+    CORRECTION_V2_JSON_SCHEMA,
+)
 from prompts.correction_prompt import (
     SYSTEM_PROMPT_AR,
     build_correction_prompt,
@@ -60,49 +65,14 @@ class LLMCaller(Protocol):
 
 
 def _extract_json_from_response(raw: str) -> dict | None:
-    if not raw:
-        return None
+    """Compat : délègue à grading/parser.parse_correction_response (O7).
 
-    # Essai 1: parsing direct
-    for attempt in (raw.strip(),):
-        try:
-            return json.loads(attempt)
-        except (json.JSONDecodeError, ValueError):
-            pass
-
-    # Essai 2: fences markdown
-    fence = re.search(r"```(?:json)?\s*[\r\n]+(.+?)[\r\n]+\s*```", raw, re.DOTALL)
-    if fence:
-        try:
-            return json.loads(fence.group(1).strip())
-        except (json.JSONDecodeError, ValueError):
-            pass
-
-    # Essai 3: premier { au dernier } (tolérant JSON tronqué)
-    start = raw.find("{")
-    end = raw.rfind("}")
-    if start != -1 and end != -1 and end > start:
-        try:
-            return json.loads(raw[start:end + 1])
-        except (json.JSONDecodeError, ValueError):
-            pass
-
-    # Essai 4: { ... } englobant (depth)
-    depth = 0
-    start_idx = None
-    for i, ch in enumerate(raw):
-        if ch == "{":
-            start_idx = i if start_idx is None else start_idx
-            depth += 1
-        elif ch == "}":
-            depth -= 1
-            if depth == 0 and start_idx is not None:
-                try:
-                    return json.loads(raw[start_idx:i + 1])
-                except (json.JSONDecodeError, ValueError):
-                    start_idx = None
-
-    return None
+    Le parsing tolérant (direct → fence → regex → partial) vit désormais dans
+    grading/parser.py avec la stratégie native_json en tête quand le provider
+    a répondu en mode JSON natif.
+    """
+    parsed, _ = parse_correction_response(raw)
+    return parsed
 
 
 def _clamp(value: int, min_val: int, max_val: int) -> int:
@@ -557,10 +527,20 @@ async def evaluate_answer_v2(
     provider = "unknown"
     model = primary_model
     finish_reason = "unknown"
+    json_mode_used = False
+
+    # O7 : JSON natif provider. Le schéma doit correspondre au format demandé
+    # par le prompt (v2 en prod : score 0-100 / errors / feedback / grade —
+    # cf. grading/schemas/correction_output.py pour la divergence documentée).
+    # Kill-switch : config json_mode_enabled=False → aucun response_format.
+    cfg = get_settings()
+    json_schema = (
+        CORRECTION_V2_JSON_SCHEMA if use_v2_prompt else CORRECTION_V1_JSON_SCHEMA
+    ) if cfg.json_mode_enabled else None
 
     def _llm_response_validator(content: str) -> bool:
         """Valide que la réponse LLM contient du JSON exploitable."""
-        return _extract_json_from_response(content) is not None
+        return parse_correction_response(content)[0] is not None
 
     try:
         response = await llm_call(
@@ -571,6 +551,7 @@ async def evaluate_answer_v2(
             max_tokens=LLM_MAX_TOKENS,
             timeout=llm_timeout if llm_timeout is not None else LLM_TIMEOUT_SECONDS,
             response_validator=_llm_response_validator,
+            json_schema=json_schema,
         )
 
         # Extraire le contenu textuel
@@ -580,6 +561,7 @@ async def evaluate_answer_v2(
             provider = getattr(response, "_khawarizmi_provider", provider)
             model = getattr(response, "_khawarizmi_model", model)
             finish_reason = getattr(choice, "finish_reason", None) or "unknown"
+            json_mode_used = bool(getattr(response, "_khawarizmi_json_mode", False))
             logger.warning(
                 f"{log_prefix}llm_response_fr | "
                 f"fr={choice.finish_reason} rl={len(llm_raw)}"
@@ -631,7 +613,12 @@ async def evaluate_answer_v2(
 
     # ── 4. POST-VALIDATION ───────────────────────
 
-    parsed = _extract_json_from_response(llm_raw)
+    # O7 : stratégie native_json en tête quand le provider a répondu en mode
+    # JSON natif ; sinon fallback tolérant (direct → fence → regex → partial).
+    parsed, parse_strategy = parse_correction_response(
+        llm_raw, json_mode_used=json_mode_used
+    )
+    record_parse_strategy(parse_strategy)
 
     if parsed is None:
         logger.warning(
@@ -759,7 +746,9 @@ async def evaluate_answer_v2(
             feedback_ar = str(feedback_ar)
 
         advice_ar = parsed.get("advice_ar", "")
-        if not isinstance(advice_ar, str):
+        if advice_ar is None:  # champ optionnel nullable (O7) — pas de "None"
+            advice_ar = ""
+        elif not isinstance(advice_ar, str):
             advice_ar = str(advice_ar)
 
         # Confiance

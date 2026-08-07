@@ -353,3 +353,96 @@ class TestLocalFallback:
             primary_model="test",
         )
         assert result["source"] == "llm_error"
+
+
+class TestJsonNativeMode:
+    """Audit O7 — intégration du JSON natif provider dans evaluate_answer_v2."""
+
+    @pytest.mark.asyncio
+    async def test_json_schema_passed_to_llm_call_in_v2(self):
+        """Le schéma natif (format v2) est transmis au llm_call en mode v2."""
+        captured: dict = {}
+
+        async def mock_llm(**kwargs):
+            captured.update(kwargs)
+            resp = _make_llm_response(json.dumps({
+                "score": 75,
+                "errors": [{"line": "S1", "type": "erreur scientifique",
+                            "detail": "معلومة خاطئة", "fix": "صححها"}],
+                "feedback": "إجابة متوسطة",
+                "grade": "acquis",
+            }, ensure_ascii=False))
+            resp._khawarizmi_json_mode = True
+            resp._khawarizmi_provider = "primary"
+            resp._khawarizmi_model = "test"
+            return resp
+
+        result = await evaluate_answer_v2(
+            **BASE_KWARGS,
+            student_answer="الاستنساخ يتم في النواة",
+            llm_call=mock_llm,
+            primary_client=MagicMock(),
+            primary_model="test",
+            use_v2_prompt=True,
+        )
+        assert captured.get("json_schema") is not None
+        assert captured["json_schema"]["properties"]["score"]["maximum"] == 100
+
+        # Mapping v2→v1 inchangé : score 0-100 → barème
+        assert result["source"] == "llm_v2"
+        assert result["score"] == round(75 * BASE_KWARGS["score_max"] / 100)
+        assert result["percentage"] == 75
+
+    @pytest.mark.asyncio
+    async def test_native_json_strategy_recorded(self):
+        """json_mode_used=True → stratégie native_json comptée."""
+        from grading.parser import parse_stats
+
+        before = parse_stats().get("native_json", 0)
+
+        async def mock_llm(**kwargs):
+            resp = _make_llm_response(json.dumps({
+                "score": 50, "errors": [], "feedback": "ب", "grade": "retenir",
+            }, ensure_ascii=False))
+            resp._khawarizmi_json_mode = True
+            resp._khawarizmi_provider = "primary"
+            resp._khawarizmi_model = "test"
+            return resp
+
+        await evaluate_answer_v2(
+            **BASE_KWARGS,
+            student_answer="الاستنساخ يتم في النواة",
+            llm_call=mock_llm,
+            primary_client=MagicMock(),
+            primary_model="test",
+            use_v2_prompt=True,
+        )
+        assert parse_stats().get("native_json", 0) == before + 1
+
+    @pytest.mark.asyncio
+    async def test_kill_switch_disables_json_schema(self, monkeypatch):
+        """json_mode_enabled=False → aucun json_schema transmis (pré-O7)."""
+        from config import get_settings
+
+        captured: dict = {}
+
+        async def mock_llm(**kwargs):
+            captured.update(kwargs)
+            resp = _make_llm_response(json.dumps({
+                "score": 50, "errors": [], "feedback": "ب", "grade": "retenir",
+            }, ensure_ascii=False))
+            resp._khawarizmi_json_mode = False
+            resp._khawarizmi_provider = "primary"
+            resp._khawarizmi_model = "test"
+            return resp
+
+        monkeypatch.setattr(get_settings(), "json_mode_enabled", False)
+        await evaluate_answer_v2(
+            **BASE_KWARGS,
+            student_answer="الاستنساخ يتم في النواة",
+            llm_call=mock_llm,
+            primary_client=MagicMock(),
+            primary_model="test",
+            use_v2_prompt=True,
+        )
+        assert captured.get("json_schema") is None

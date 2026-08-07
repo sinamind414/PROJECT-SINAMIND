@@ -38,6 +38,10 @@ class Settings(BaseSettings):
     ia_temperature: float = 0.3
     ia_max_tokens: int = 600
     AI_MODEL_PRIMARY: str = "gemini-2.5-flash"
+    # Audit O7 : sortie JSON native provider (response_format). Kill-switch —
+    # à False, aucun provider ne reçoit response_format et le parser fallback
+    # fait le travail (comportement pré-O7). Par défaut activé.
+    json_mode_enabled: bool = True
 
     VISION_API_KEY: str = ""
     vision_base_url: str = "https://api.openai.com/v1"

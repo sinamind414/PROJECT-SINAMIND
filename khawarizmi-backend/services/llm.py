@@ -25,6 +25,7 @@ from tenacity import retry, stop_after_attempt, wait_exponential
 from config import get_settings
 from prompts.evaluation_prompt import EVALUATION_SYSTEM_PROMPT, build_evaluation_prompt
 from services.llm_parser import parse_llm_json
+from services.llm_providers import apply_json_mode
 
 logger = logging.getLogger("khawarizmi.llm")
 
@@ -57,11 +58,17 @@ def _breaker_record_success(name: str) -> None:
     _breaker_state[name] = (0, 0.0)
 
 
-def _tag_response_provider(response: object, provider: str, model: str) -> object:
+def _tag_response_provider(
+    response: object,
+    provider: str,
+    model: str,
+    json_mode_used: bool = False,
+) -> object:
     """Ajoute des métadonnées non bloquantes pour l'audit."""
     try:
         response._khawarizmi_provider = provider
         response._khawarizmi_model = model
+        response._khawarizmi_json_mode = json_mode_used
     except Exception:
         pass
     return response
@@ -85,6 +92,7 @@ async def _call_with_fallback(
     max_tokens: int = 400,
     timeout: float = 8.0,
     response_validator: Callable[[str], bool] | None = None,
+    json_schema: dict | None = None,
 ) -> object:
     cfg = get_settings()
     providers = []
@@ -138,13 +146,16 @@ async def _call_with_fallback(
     deadline = time.monotonic() + GLOBAL_LLM_DEADLINE_SECONDS
 
     try:
-        primary_response = await primary_client.chat.completions.create(
-            model=primary_model,
-            temperature=temperature,
-            max_tokens=max_tokens,
-            timeout=min(timeout, max(1.0, deadline - time.monotonic())),
-            messages=messages,
-        )
+        primary_kwargs: dict = {
+            "model": primary_model,
+            "temperature": temperature,
+            "max_tokens": max_tokens,
+            "timeout": min(timeout, max(1.0, deadline - time.monotonic())),
+            "messages": messages,
+        }
+        # JSON natif (O7) : dispatch par capacité déclarée du provider
+        primary_json = apply_json_mode(primary_kwargs, "primary", json_schema, cfg)
+        primary_response = await primary_client.chat.completions.create(**primary_kwargs)
         # Si un validateur est fourni et que le contenu du provider primaire
         # est invalide, on bascule vers les fallbacks au lieu de rendre
         # l'erreur silencieusement.
@@ -164,7 +175,9 @@ async def _call_with_fallback(
                 )
                 raise ValueError(f"extract_failed: {ve}")
         _breaker_record_success("primary")
-        return _tag_response_provider(primary_response, "primary", primary_model)
+        return _tag_response_provider(
+            primary_response, "primary", primary_model, primary_json
+        )
     except Exception as e:
         is_rate_limit = "429" in str(e) or "quota" in str(e).lower() or "quota" in str(e)
         is_validator_reject = "response_validator" in str(e) or "extract_failed" in str(e)
@@ -182,13 +195,16 @@ async def _call_with_fallback(
             continue
         try:
             logger.warning(f"⚠️ Fallback vers {name}...")
-            resp = await client.chat.completions.create(
-                model=model,
-                temperature=temperature,
-                max_tokens=max_tokens,
-                timeout=min(timeout, remaining),
-                messages=messages,
-            )
+            fallback_kwargs: dict = {
+                "model": model,
+                "temperature": temperature,
+                "max_tokens": max_tokens,
+                "timeout": min(timeout, remaining),
+                "messages": messages,
+            }
+            # JSON natif (O7) : capacité déclarée du provider fallback
+            fallback_json = apply_json_mode(fallback_kwargs, name, json_schema, cfg)
+            resp = await client.chat.completions.create(**fallback_kwargs)
             if response_validator is not None:
                 try:
                     content = resp.choices[0].message.content or ""
@@ -202,7 +218,7 @@ async def _call_with_fallback(
                     continue
             _breaker_record_success(name)
             logger.info(f"✅ Fallback {name} réussi.")
-            return _tag_response_provider(resp, name, model)
+            return _tag_response_provider(resp, name, model, fallback_json)
         except Exception as fallback_err:
             _breaker_record_failure(name)
             logger.error(f"❌ Échec {name} : {fallback_err}")
