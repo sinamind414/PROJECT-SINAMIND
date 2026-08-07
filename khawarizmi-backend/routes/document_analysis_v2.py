@@ -24,6 +24,7 @@ from rate_limit import evaluate_limit, limiter
 from schemas.document_analysis import EvaluateRequest
 from services.correction_audit import log_correction_audit
 from services.correction_v2_retry import evaluate_answer_v2_with_retry
+from services.hashing import hash_answer
 from services.llm import _call_with_fallback
 from services.rag_service import format_rag_context, rag_search
 from services.socratic_tutor import get_socratic_hint
@@ -229,7 +230,7 @@ async def evaluer_reponses_v2(
                     "verb_slug": q["verb_slug"],
                     "chapter_slug": body.chapter_slug or "",
                     # RGPD (AGENTS.md §1.2) : jamais la copie en clair — hash SHA-256 uniquement
-                    "answer_text": _sha256_text(ans.answer),
+                    "answer_text": hash_answer(ans.answer),
                     "score": result["score"],
                     "score_max": result["score_max"],
                     "percentage": result["percentage"],
@@ -322,12 +323,6 @@ async def evaluer_reponses_v2(
         "evaluations": evaluations,
         "technical_errors": n_errors,
     }
-
-
-def _sha256_text(value: str) -> str:
-    """Hash SHA-256 hexadécimal — utilisé à la place de toute donnée élève en clair."""
-    import hashlib
-    return hashlib.sha256(value.encode("utf-8")).hexdigest()
 
 
 def _compute_score_max_for_verb(verb_slug: str) -> int:

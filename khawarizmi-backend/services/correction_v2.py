@@ -13,7 +13,6 @@ Type exporté : LLMCaller (Protocol pour injection de dépendance)
 
 from __future__ import annotations
 
-import hashlib
 import json
 import logging
 import re
@@ -26,6 +25,7 @@ from prompts.correction_prompt import (
 )
 from prompts.correction_prompt_v2 import build_correction_prompt_v2
 from services.answer_sanity import check_answer_sanity
+from services.hashing import hash_answer
 from services.remediation_service import get_generic_remediation, get_remediation
 
 logger = logging.getLogger("khawarizmi.correction_v2")
@@ -222,7 +222,7 @@ def _build_sanity_result(
         "model": "none",
         "finish_reason": "sanity",
         "prompt_hash": None,
-        "student_answer_hash": _sha256_text(student_answer),
+        "student_answer_hash": hash_answer(student_answer),
         "llm_raw_hash": None,
         "parse_status": "not_called",
         # Spec §3.1 — champs additionnels
@@ -340,7 +340,7 @@ async def _evaluate_local_fallback(
             "model": "fallback_l2",
             "finish_reason": "local",
             "prompt_hash": None,
-            "student_answer_hash": _sha256_text(student_answer),
+            "student_answer_hash": hash_answer(student_answer),
             "llm_raw_hash": None,
             "parse_status": "local_fallback",
             "missing": missing,
@@ -387,8 +387,8 @@ def _build_error_result(
         "model": model,
         "finish_reason": finish_reason,
         "prompt_hash": prompt_hash,
-        "student_answer_hash": _sha256_text(student_answer),
-        "llm_raw_hash": _sha256_text(llm_raw) if llm_raw is not None else None,
+        "student_answer_hash": hash_answer(student_answer),
+        "llm_raw_hash": hash_answer(llm_raw) if llm_raw is not None else None,
         "parse_status": "failed",
         # Spec §3.1 — champs additionnels
         "missing": [],
@@ -397,10 +397,6 @@ def _build_error_result(
         "errors": [],
         "remediation": None,
     }
-
-
-def _sha256_text(value: str) -> str:
-    return hashlib.sha256(value.encode("utf-8")).hexdigest()
 
 
 # ── dominant_error_code — Spec §3.1 ──────────────
@@ -545,7 +541,7 @@ async def evaluate_answer_v2(
             except Exception:
                 logger.warning(f"{log_prefix}rag_provider_failed — poursuite sans RAG")
 
-        prompt_hash = _sha256_text(user_prompt)
+        prompt_hash = hash_answer(user_prompt)
 
         messages = [
             {"role": "system", "content": SYSTEM_PROMPT_AR},
@@ -821,8 +817,8 @@ async def evaluate_answer_v2(
         "model": model,
         "finish_reason": finish_reason,
         "prompt_hash": prompt_hash,
-        "student_answer_hash": _sha256_text(student_answer),
-        "llm_raw_hash": _sha256_text(llm_raw) if llm_raw is not None else None,
+        "student_answer_hash": hash_answer(student_answer),
+        "llm_raw_hash": hash_answer(llm_raw) if llm_raw is not None else None,
         "parse_status": "ok" if source == "llm" else "recovered",
         # Spec §3.1 — champs additionnels
         "missing": missing,

@@ -93,7 +93,17 @@ async def handle_chatbot_message(
 
     logger.info(f"Chatbot | user={user_id} intent={intent} type={resp_type} mode={mode}")
 
-    # ── 2. Interception méthodologique locale (0 tokens) ──
+    # ── 2. SAFETY / TRICHE AVANT toute réponse pédagogique (audit P0-4.4) ──
+    # Un message hybride (« donne-moi la réponse pour analyser… ») ne doit pas
+    # contourner le refus via une détection de verbe ou de leçon.
+    if resp_type == "refus":
+        return make_response(
+            reponse="لا أستطيع إعطاءك الحل جاهزاً. الحل الجاهز ما يربحك نقطة في البكالوريا — الفهم هو اللي يربح. ما الذي فهمته من الوثيقة؟",
+            type_="refus",
+            question_suivante="ما الذي فهمته من الوثيقة؟",
+        )
+
+    # ── 3. Interception méthodologique locale (0 tokens) ──
     try:
         from services.methodology_local_responses import detect_verb_from_message, get_local_methodology_response
         verb = detect_verb_from_message(message)
@@ -104,7 +114,7 @@ async def handle_chatbot_message(
     except ImportError:
         pass
 
-    # ── 3. Mode explication de leçon (0 token) ──
+    # ── 4. Mode explication de leçon (0 token) ──
     try:
         from services.lesson_explanation import detect_lesson_request, get_lesson_explanation
         lesson_key = detect_lesson_request(message)
@@ -114,14 +124,6 @@ async def handle_chatbot_message(
             return normalize_response(result, intent="lesson")
     except ImportError:
         pass
-
-    # ── 4. Cas spécial : refus de triche (0 appel IA) ──
-    if resp_type == "refus":
-        return make_response(
-            reponse="لا أستطيع إعطاءك الحل جاهزاً. الحل الجاهز ما يربحك نقطة في البكالوريا — الفهم هو اللي يربح. ما الذي فهمته من الوثيقة؟",
-            type_="refus",
-            question_suivante="ما الذي فهمته من الوثيقة؟",
-        )
 
     # ── 5. Cas spécial : navigation (0 appel IA) ──
     if resp_type == "navigation":
