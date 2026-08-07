@@ -290,7 +290,7 @@ def _sqlite_extra_ddl() -> list[str]:
         # ── RAG chunks ─────────────────────────────────────
         f"""CREATE TABLE IF NOT EXISTS rag_chunks (
             id {pk}, source TEXT, chapitre TEXT, chapter TEXT, content TEXT NOT NULL,
-            embedding TEXT, tokens INTEGER DEFAULT 0,
+            content_norm TEXT, embedding TEXT, tokens INTEGER DEFAULT 0,
             chunk_index INTEGER DEFAULT 0, importance REAL DEFAULT 1.0,
             nb INTEGER DEFAULT 0, metadata_json TEXT DEFAULT '{{}}',
             created_at {ts}

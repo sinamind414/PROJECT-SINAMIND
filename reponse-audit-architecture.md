@@ -309,6 +309,74 @@ de rédaction (علّل/فسّر — le cas des troncatures sur-notées).
 
 ---
 
+# 2f. Sprint 1 (étape 5) — ar_normalize partagé + index RAG (migration 032) ✅
+
+Livré : `services/arabic.py` (source unique), migration `032_add_rag_content_norm`
+(add_column + backfill Python + index trigram Postgres), branchement
+`rag_service.py` (keywords normalisés + matching `COALESCE(content_norm,
+content)`), ingestion `ingest_livre_manhadjiya.py` (content_norm à
+l'insertion), DDL preview `database.py`, 3 duplications supprimées.
+
+## Réponses aux greps (état réel)
+
+- **Grep 1** : il existait DÉJÀ 3 copies identiques de `normalize_arabic`
+  (même regex `[\u064B-\u0652\u0670\u0640]`) dans action_verbs_service.py,
+  chat_classifier.py, document_analysis_service.py — unifiées vers
+  `services/arabic.normalize_arabic` (alias de `ar_normalize`). Non touchés
+  volontairement : savoir_corrector._normalize et fallback_v2._normalize_ar_fr
+  (comportements spécifiques validés par le golden).
+- **Grep 2** : `keyword_rag_search` requêtait `LOWER(content) ILIKE
+  ANY(:keywords)` sur le contenu BRUT — aucune normalisation.
+
+## Écarts vs plan (documentés)
+
+1. **Test d'acceptation du plan corrigé** : `ar_normalize("الحرارة المثلى") ==
+   ar_normalize("حرارة مثلى")` est INCOHÉRENT avec la fonction proposée —
+   la spec ne retire pas l'article défini ال (et c'est correct : le wildcard
+   `%...%` du SQL le gère ; retirer ال serait une racination risquée,
+   « الله »→« له »). L'équivalence RAG est démontrée par
+   `test_rag_matching_equivalent` + le test d'intégration SQLite réel.
+2. `\u0670` (alef suscrit) ajouté à la classe de diacritiques + `.lower()`
+   conservé : les 3 fonctions existantes les incluaient — les omettre
+   réintroduirait des variantes et casserait le matching latin.
+
+## Bug latent corrigé (découvert par le test d'intégration)
+
+`_ANY_RE` (database.py) était défini mais JAMAIS appliqué → `ILIKE ANY` aurait
+cassé le preview SQLite ("near ANY: syntax error"). Corrigé dans
+rag_service.py : **OR explicites** portables (Postgres + SQLite) au lieu de
+`ANY`. Le hook annales.py (`= ANY(tags)`) reste non appliqué (hors périmètre,
+signalé).
+
+## Migration 032 (validée manuellement)
+
+- `add_column rag_chunks.content_norm` + backfill Python par lots (LIMIT 500,
+  ar_normalize n'est pas exprimable en SQL pur) + index GIN trigram Postgres
+  (`pg_trgm`, skipé silencieusement en SQLite). Down : drop index + colonne.
+- ⚠️ Non testable en pytest : l'import d'une migration échoue dans
+  l'environnement pytest (le fake postgresql de database.py n'expose pas
+  BIGINT requis par alembic.ddl.postgresql) ; migrations Postgres-only
+  (CREATE EXTENSION vector). Validé manuellement : alembic upgrade 032 sur
+  SQLite temporaire → backfill « الحرارة المثلى » → « الحراره المثلي » OK.
+
+## Valeurs mesurées
+
+- RAG intégration SQLite réel : requête avec tashkîl/variantes
+  (« الحَرارةُ المُثْلى ») retrouve le chunk canonique (« ...الحرارة
+  المثلى ») via content_norm ; filtre chapitre conservé ; sans match → [].
+- Tests : +21 (11 arabic dont idempotence/acceptation corrigée, 6 RAG
+  normalisé, 2 migration idempotence, + existants unifiés) → **786 passed,
+  3 skipped, 5 xfailed** · ruff vert.
+
+## Sprint 1 CLÔTURÉ ✅
+
+C2 (cache correction) · O7 (JSON natif) · golden metrics CI · branchement
+savoir_corrector · ar_normalize + index RAG. Restent pour S2 :
+refactor `grading/` (pipeline unifié), observabilité (Prometheus/OTel),
+FSRS unifié (4 systèmes → 1).
+
+---
+
 # 3. Réponses aux 3 questions de l'audit
 
 1. **Quel modèle ONNX ?** → `paraphrase-multilingual-MiniLM-L12-v2` (multilingue, pas anglais-only). C4 reste à mesurer (AUC 50 paires arabes) mais le remplacement d'urgence n'est pas nécessaire.

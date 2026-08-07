@@ -44,6 +44,9 @@ from collections.abc import Iterable
 from dataclasses import dataclass, field
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from services.arabic import ar_normalize  # noqa: E402 — après sys.path
+
 logger = logging.getLogger("ingest_livre_manhadjiya")
 logging.basicConfig(level=logging.INFO, format="%(levelname)s | %(message)s")
 
@@ -304,13 +307,13 @@ async def ingest_chunks_to_db(chunks: list[Chunk], *, db_url: str) -> int:
             await conn.execute(
                 sql_text("""
                     INSERT INTO rag_chunks
-                        (id, content, embedding, source, matiere,
+                        (id, content, content_norm, embedding, source, matiere,
                          chapitre, importance, chunk_index)
                     VALUES
-                        (:id, :content, CAST(:embedding AS vector),
+                        (:id, :content, :content_norm, CAST(:embedding AS vector),
                          :source, :matiere, :chapitre, :importance, :chunk_index)
                 """),
-                row,
+                {**row, "content_norm": ar_normalize(chunk.content)},
             )
             inserted += 1
             if inserted % 20 == 0:

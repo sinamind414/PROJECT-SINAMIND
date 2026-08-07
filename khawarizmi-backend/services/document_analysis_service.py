@@ -7,21 +7,7 @@ la même logique de normalisation arabe que action_verbs_service.
 import re
 
 # ── Normalisation arabe (identique à action_verbs_service) ──
-
-_ARABIC_DIACRITICS = re.compile(r"[\u064B-\u0652\u0670\u0640]")
-_ALEF_VARIANTS = {"أ": "ا", "إ": "ا", "آ": "ا", "ٱ": "ا"}
-_TA_MARBUTA = re.compile(r"ة")
-
-
-def normalize_arabic(text: str) -> str:
-    if not text:
-        return ""
-    t = _ARABIC_DIACRITICS.sub("", text)
-    for variant, canonical in _ALEF_VARIANTS.items():
-        t = t.replace(variant, canonical)
-    t = _TA_MARBUTA.sub("ه", t)
-    t = t.lower().strip()
-    return t
+from services.arabic import normalize_arabic  # audit O4 — source unique
 
 
 def includes_any(text: str, markers: list[str]) -> bool:

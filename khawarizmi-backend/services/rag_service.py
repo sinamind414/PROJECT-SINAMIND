@@ -6,6 +6,8 @@ from collections import OrderedDict
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from services.arabic import ar_normalize
+
 logger = logging.getLogger("khawarizmi.rag")
 
 RAG_CACHE_TTL_SECONDS = 300
@@ -38,6 +40,11 @@ STOP_WORDS_RAG = {
     "the", "is", "what", "how", "why", "where", "explain", "define",
 }
 
+# Stop words NORMALISÉS (audit O4) : les tokens sont normalisés par
+# ar_normalize avant le filtre — "على" → "علي" ne matcherait pas le stop
+# word brut et deviendrait un keyword bruité.
+_STOP_WORDS_RAG_NORM = {ar_normalize(w) for w in STOP_WORDS_RAG}
+
 
 def _extract_keywords(message: str, limit: int = 4) -> list[str]:
     tokens = re.findall(r"[\u0600-\u06FF\u0750-\u077F\w]+", message.lower())
@@ -47,10 +54,14 @@ def _extract_keywords(message: str, limit: int = 4) -> list[str]:
         # retirer la ponctuation arabe/française collée (؟؟!،) : déjà exclue par \w,
         # mais certains caractères passent via les plages arabes — purge simple
         token = token.strip("؟?!،.;:")
-        if len(token) <= 2 or token in STOP_WORDS_RAG or token in seen:
+        if len(token) <= 2:
             continue
-        seen.add(token)
-        keywords.append(token)
+        # Normalisation arabe (audit O4) : les keywords matchent content_norm
+        token_norm = ar_normalize(token)
+        if token_norm in _STOP_WORDS_RAG_NORM or token_norm in seen:
+            continue
+        seen.add(token_norm)
+        keywords.append(token_norm)
         if len(keywords) >= limit:
             break
     return keywords
@@ -126,28 +137,41 @@ async def keyword_rag_search(
         if not keywords:
             return []
 
+        # Audit O4 : matching sur content_norm (normalisé par ar_normalize)
+        # quand dispo, sinon repli sur le brut (COALESCE) — les keywords sont
+        # déjà normalisés par _extract_keywords, donc le matching normalisé
+        # fonctionne (الحرارة المثلى ↔ حرارة مثلى, أ/إ/آ ↔ ا, ة ↔ ه, ى ↔ ي).
+        # OR explicites au lieu de `ILIKE ANY(:keywords)` : portable Postgres
+        # ET SQLite (le hook _ANY_RE de database.py est défini mais jamais
+        # appliqué → ANY cassait le preview SQLite, bug latent).
+        like_clause = " OR ".join(
+            f"LOWER(COALESCE(content_norm, content)) LIKE :kw{i}"
+            for i in range(len(keywords))
+        )
+        params: dict = {f"kw{i}": f"%{k}%" for i, k in enumerate(keywords)}
+        params["lim"] = limit
         if chapter:
             result = await db.execute(
-                text("""
+                text(f"""
                     SELECT content, source, chapitre AS chapter, importance
                     FROM rag_chunks
-                    WHERE LOWER(chapitre) LIKE LOWER(:chapter)
-                      AND LOWER(content) ILIKE ANY(:keywords)
+                    WHERE LOWER(chapitre) LIKE :chapter
+                      AND ({like_clause})
                     ORDER BY chunk_index
                     LIMIT :lim
                 """),
-                {"chapter": f"%{chapter}%", "keywords": [f"%{k}%" for k in keywords], "lim": limit},
+                {**params, "chapter": f"%{chapter}%"},
             )
         else:
             result = await db.execute(
-                text("""
+                text(f"""
                     SELECT content, source, chapitre AS chapter, importance
                     FROM rag_chunks
-                    WHERE LOWER(content) ILIKE ANY(:keywords)
+                    WHERE {like_clause}
                     ORDER BY chunk_index
                     LIMIT :lim
                 """),
-                {"keywords": [f"%{k}%" for k in keywords], "lim": limit},
+                params,
             )
 
         importance_scores = {"critique": 0.95, "haute": 0.80, "moyenne": 0.60}
