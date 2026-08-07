@@ -13,6 +13,9 @@
 
 :root {
   color-scheme: dark;
+  /* Police locale : Cairo si installée sur l'OS, sinon pile système arabe.
+     (plus de téléchargement Google Fonts au build → build 100 % hermétique) */
+  --font-cairo: "Cairo", "Segoe UI", Tahoma, "Noto Kufi Arabic", "Noto Sans Arabic", sans-serif;
 }
 
 html { 

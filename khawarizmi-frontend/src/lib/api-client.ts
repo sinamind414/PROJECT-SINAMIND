@@ -188,6 +188,39 @@ class KhawarizmiApiClient {
     return response.json()
   }
 
+  // ── Méthodes génériques (pages : aujourdhui, dix-minutes, fiche-j1, progress) ──
+  // Retournent la Response brute ; lèvent une erreur si HTTP non-OK (les pages
+  // basculent alors sur leur fallback local). Auth Bearer + credentials inclus.
+
+  private _rawHeaders(extra?: HeadersInit): HeadersInit {
+    const headers: HeadersInit = { "Content-Type": "application/json", ...extra }
+    if (_khawarizmiToken) {
+      (headers as Record<string, string>)["Authorization"] = `Bearer ${_khawarizmiToken}`
+    }
+    return headers
+  }
+
+  async get(endpoint: string): Promise<Response> {
+    const resp = await fetch(`${API_BASE_URL}${endpoint}`, {
+      method: "GET",
+      headers: this._rawHeaders(),
+      credentials: "include",
+    })
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`)
+    return resp
+  }
+
+  async post(endpoint: string, body?: unknown): Promise<Response> {
+    const resp = await fetch(`${API_BASE_URL}${endpoint}`, {
+      method: "POST",
+      headers: this._rawHeaders(),
+      credentials: "include",
+      body: body === undefined ? undefined : JSON.stringify(body),
+    })
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`)
+    return resp
+  }
+
   // ── Auth ───────────────────────────────────────
 
   async login(email: string, password: string) {

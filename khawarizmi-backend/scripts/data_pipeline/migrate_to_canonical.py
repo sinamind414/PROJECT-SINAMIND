@@ -9,7 +9,6 @@ from pathlib import Path
 BASE = Path(__file__).parent.parent.parent
 TARGET_FILES = [
     "services/khawarizmi_engine.py",
-    "routes/chat.py",
     "routes/programme.py",
     "main.py",
 ]

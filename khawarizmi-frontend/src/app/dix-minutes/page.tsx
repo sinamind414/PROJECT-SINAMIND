@@ -106,7 +106,10 @@ function DixContent() {
           phrase_cle: "",
           conseil: "",
         })),
-        progression: session.progression_actuelle,
+        progression: {
+          ...session.progression_actuelle,
+          pourcentage: 0,
+        },
       })
     }
   }

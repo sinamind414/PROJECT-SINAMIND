@@ -265,7 +265,8 @@ function AujourdhuiContent() {
           />
         </div>
         <div className="flex gap-1 mt-2">
-          {(p.unites && p.unites.length > 0 ? p.unites : Array.from({ length: 8 })).map((u: any, i) => {
+          {Array.from({ length: p.unites && p.unites.length > 0 ? p.unites.length : 8 }).map((_, i) => {
+            const u = p.unites && p.unites[i]
             const unitPct =
               u && u.mc_total > 0 ? (u.mc_maitrise / u.mc_total) * 100 : (i / 8) * 100
             const done = p.pourcentage >= ((i + 1) / 8) * 100
