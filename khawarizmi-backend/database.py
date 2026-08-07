@@ -76,6 +76,7 @@ def _sqlite_compat() -> None:
     _CAST_RE = re.compile(r"::[a-zA-Z_]+(?:\[\])?")
     _ILIKE_RE = re.compile(r"\bILIKE\b", re.IGNORECASE)
     _NOW_RE = re.compile(r"\bNOW\s*\(\s*\)", re.IGNORECASE)
+    _UUID_RE = re.compile(r"\bgen_random_uuid\s*\(\s*\)", re.IGNORECASE)
     # ANY(...) n'existe pas en SQLite → remplacer par une série de LIKE OR
     _ANY_RE = re.compile(r"I?LIKE\s+ANY\s*\(\s*:(\w+)\s*\)", re.IGNORECASE)
 
@@ -87,6 +88,8 @@ def _sqlite_compat() -> None:
         rendered = _ILIKE_RE.sub("LIKE", rendered)
         # NOW() → CURRENT_TIMESTAMP (fonction SQLite native)
         rendered = _NOW_RE.sub("CURRENT_TIMESTAMP", rendered)
+        # gen_random_uuid() → hex(randomblob(16)) (SQLite n'a pas de pgcrypto)
+        rendered = _UUID_RE.sub("(lower(hex(randomblob(16))))", rendered)
         return rendered
 
     # ── Désactive TOUTES les clauses REFERENCES / FOREIGN KEY en DDL
@@ -588,14 +591,20 @@ def sqlite_preview_create_all(sync_connection, db_path: str) -> int:
         except Exception:
             pass
 
-    _strip_all_foreign_keys(Base.metadata)
+    # ⚠️ Ne JAMAIS muter Base.metadata : les mappers ORM (relationships) en
+    # dépendent. On strippe une COPIE — les tables SQLite créées n'ont pas de
+    # FK (résilient), et les mappers gardent leurs FK pour les requêtes.
+    import copy as _copy
 
-    # create_all via SQLAlchemy (tables du metadata)
+    meta_copy = _copy.deepcopy(Base.metadata)
+    _strip_all_foreign_keys(meta_copy)
+
+    # create_all via SQLAlchemy (tables du metadata, sans FK)
     sync_connection.exec_driver_sql("PRAGMA foreign_keys=OFF")
-    Base.metadata.create_all(sync_connection)
+    meta_copy.create_all(sync_connection)
 
     # Tables additionnelles via sqlite3 direct
-    created = len(Base.metadata.tables)
+    created = len(meta_copy.tables)
     con = sqlite3.connect(db_path)
     try:
         con.execute("PRAGMA foreign_keys=OFF")

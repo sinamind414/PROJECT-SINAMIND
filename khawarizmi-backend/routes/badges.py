@@ -34,7 +34,7 @@ async def get_my_badges(
     current_user=Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    badges = await get_user_badges(db, str(current_user.id))
+    badges = await get_user_badges(db, str(current_user["id"]))
     unlocked = sum(1 for b in badges if b["unlocked"])
     return {
         "badges": badges,

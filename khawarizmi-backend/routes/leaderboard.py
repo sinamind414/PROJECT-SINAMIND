@@ -30,10 +30,10 @@ async def my_rank(
     current_user=Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    rank = await get_user_rank(db, str(current_user.id), scope=scope, wilaya_code=wilaya)
+    rank = await get_user_rank(db, str(current_user["id"]), scope=scope, wilaya_code=wilaya)
     return {"rank": rank, "scope": scope}
 
 
 @router.post("/refresh")
 async def refresh_my_stats(current_user=Depends(get_current_user), db: AsyncSession = Depends(get_db)):
-    return await update_user_stats(db, str(current_user.id))
+    return await update_user_stats(db, str(current_user["id"]))

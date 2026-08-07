@@ -22,13 +22,13 @@ BADGES = [
 
 
 async def get_user_badges(db: AsyncSession, user_id: str) -> list[dict]:
-    from models.badge import UserBadge
+    from models.gamification import UserBadge
 
     result = await db.execute(
-        select(UserBadge.badge_code, UserBadge.unlocked_at)
+        select(UserBadge.badge_id, UserBadge.unlocked_at)
         .where(UserBadge.user_id == user_id)
     )
-    unlocked = {row.badge_code: row.unlocked_at.isoformat() for row in result.all()}
+    unlocked = {row.badge_id: row.unlocked_at.isoformat() for row in result.all()}
 
     return [
         {
@@ -41,15 +41,15 @@ async def get_user_badges(db: AsyncSession, user_id: str) -> list[dict]:
 
 
 async def check_and_unlock_badges(db: AsyncSession, user_id: str, event_type: str, event_data: dict = None) -> list[str]:
-    from models.badge import UserBadge
+    from models.gamification import UserBadge
 
     event_data = event_data or {}
     newly_unlocked = []
 
     existing = await db.execute(
-        select(UserBadge.badge_code).where(UserBadge.user_id == user_id)
+        select(UserBadge.badge_id).where(UserBadge.user_id == user_id)
     )
-    owned = {row.badge_code for row in existing.all()}
+    owned = {row.badge_id for row in existing.all()}
 
     for badge in BADGES:
         code = badge["code"]
@@ -57,7 +57,7 @@ async def check_and_unlock_badges(db: AsyncSession, user_id: str, event_type: st
             continue
 
         if _check_condition(code, event_data):
-            db.add(UserBadge(user_id=user_id, badge_code=code))
+            db.add(UserBadge(user_id=user_id, badge_id=code))
             newly_unlocked.append(code)
 
     if newly_unlocked:

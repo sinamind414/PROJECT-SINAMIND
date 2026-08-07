@@ -31,7 +31,7 @@ async def get_my_streak(
     current_user=Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    streak = await get_user_streak(db, str(current_user.id))
+    streak = await get_user_streak(db, str(current_user["id"]))
     return streak
 
 
@@ -40,7 +40,7 @@ async def record_my_activity(
     current_user=Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    streak = await record_activity(db, str(current_user.id))
+    streak = await record_activity(db, str(current_user["id"]))
     return {"streak": streak}
 
 
@@ -49,8 +49,8 @@ async def use_my_freeze(
     current_user=Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    success = await use_freeze(db, str(current_user.id))
+    success = await use_freeze(db, str(current_user["id"]))
     if not success:
         raise HTTPException(status_code=400, detail="Aucun freeze disponible ou streak déjà actif")
-    streak = await get_user_streak(db, str(current_user.id))
+    streak = await get_user_streak(db, str(current_user["id"]))
     return streak
