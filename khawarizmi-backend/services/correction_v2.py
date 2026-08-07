@@ -34,7 +34,7 @@ logger = logging.getLogger("khawarizmi.correction_v2")
 # NE PAS modifier sans accord utilisateur (cf. HANDOFF § 8)
 
 LLM_TEMPERATURE = 0.0
-LLM_MAX_TOKENS = 4096
+LLM_MAX_TOKENS = 900  # audit C1.3 : un JSON v2 tient dans ~900 tokens ; 4096 = ~4× le besoin
 LLM_TIMEOUT_SECONDS = 25.0
 
 # ── Type pour injection du client LLM ─────────────

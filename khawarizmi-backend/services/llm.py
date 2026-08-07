@@ -16,6 +16,7 @@ sur réponse HTTP 200 inexploitable (ex. JSON invalide).
 """
 
 import logging
+import time
 from collections.abc import Callable
 
 from openai import AsyncOpenAI
@@ -26,6 +27,34 @@ from prompts.evaluation_prompt import EVALUATION_SYSTEM_PROMPT, build_evaluation
 from services.llm_parser import parse_llm_json
 
 logger = logging.getLogger("khawarizmi.llm")
+
+# ── Budget global + circuit breaker (audit C3) ─────────────────────────
+# Pire cas historique : 7 providers × timeout individuel → 175 s de blocage.
+# Désormais : un DEADLINE global partagé + un breaker par provider.
+GLOBAL_LLM_DEADLINE_SECONDS = 20.0
+_BREAKER_COOLDOWN_SECONDS = 60.0
+_BREAKER_FAIL_THRESHOLD = 3
+
+_breaker_state: dict[str, tuple[int, float]] = {}  # name -> (failures, opened_at)
+
+
+def _breaker_allow(name: str) -> bool:
+    failures, opened_at = _breaker_state.get(name, (0, 0.0))
+    if failures >= _BREAKER_FAIL_THRESHOLD:
+        if time.monotonic() - opened_at > _BREAKER_COOLDOWN_SECONDS:
+            _breaker_state[name] = (0, 0.0)  # half-open : on réessaie
+            return True
+        return False
+    return True
+
+
+def _breaker_record_failure(name: str) -> None:
+    failures, _ = _breaker_state.get(name, (0, 0.0))
+    _breaker_state[name] = (failures + 1, time.monotonic())
+
+
+def _breaker_record_success(name: str) -> None:
+    _breaker_state[name] = (0, 0.0)
 
 
 def _tag_response_provider(response: object, provider: str, model: str) -> object:
@@ -106,12 +135,14 @@ async def _call_with_fallback(
             "gpt-4o-mini",
         ))
 
+    deadline = time.monotonic() + GLOBAL_LLM_DEADLINE_SECONDS
+
     try:
         primary_response = await primary_client.chat.completions.create(
             model=primary_model,
             temperature=temperature,
             max_tokens=max_tokens,
-            timeout=timeout,
+            timeout=min(timeout, max(1.0, deadline - time.monotonic())),
             messages=messages,
         )
         # Si un validateur est fourni et que le contenu du provider primaire
@@ -132,21 +163,30 @@ async def _call_with_fallback(
                     f"validation — fallback. Erreur: {ve}"
                 )
                 raise ValueError(f"extract_failed: {ve}")
+        _breaker_record_success("primary")
         return _tag_response_provider(primary_response, "primary", primary_model)
     except Exception as e:
         is_rate_limit = "429" in str(e) or "quota" in str(e).lower() or "quota" in str(e)
         is_validator_reject = "response_validator" in str(e) or "extract_failed" in str(e)
+        _breaker_record_failure("primary")
         if not is_rate_limit and not is_validator_reject:
             raise
 
     for name, client, model in providers:
+        remaining = deadline - time.monotonic()
+        if remaining < 2.0:
+            logger.warning("⚠️ Deadline global LLM atteint — abandon des fallbacks.")
+            break
+        if not _breaker_allow(name):
+            logger.warning(f"⛔ Circuit breaker OPEN pour {name} — provider sauté.")
+            continue
         try:
             logger.warning(f"⚠️ Fallback vers {name}...")
             resp = await client.chat.completions.create(
                 model=model,
                 temperature=temperature,
                 max_tokens=max_tokens,
-                timeout=timeout,
+                timeout=min(timeout, remaining),
                 messages=messages,
             )
             if response_validator is not None:
@@ -154,13 +194,17 @@ async def _call_with_fallback(
                     content = resp.choices[0].message.content or ""
                     if not response_validator(content):
                         logger.warning(f"⚠️ Réponse fallback {name} invalide — provider suivant...")
+                        _breaker_record_failure(name)
                         continue
                 except (IndexError, AttributeError) as ve:
                     logger.warning(f"⚠️ Extraction réponse fallback {name} impossible — provider suivant. Erreur: {ve}")
+                    _breaker_record_failure(name)
                     continue
+            _breaker_record_success(name)
             logger.info(f"✅ Fallback {name} réussi.")
             return _tag_response_provider(resp, name, model)
         except Exception as fallback_err:
+            _breaker_record_failure(name)
             logger.error(f"❌ Échec {name} : {fallback_err}")
 
     raise RuntimeError("Tous les providers IA ont échoué ou retourné une réponse invalide. Réessaie plus tard.")

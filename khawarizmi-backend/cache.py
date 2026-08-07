@@ -26,6 +26,11 @@ async def set_cache(key: str, value: str, ttl: int = 3600):
         await s.redis.setex(key, ttl, value)
 
 
+# Version du contrat de cache (audit O2) : bump à chaque changement de prompt
+# ou de format qui rendrait les réponses cachées obsolètes.
+CACHE_CONTRACT_VERSION = "v2"
+
+
 def make_cache_key(*parts) -> str:
     raw = ":".join(str(p) for p in parts)
-    return f"khawarizmi:{hashlib.md5(raw.encode()).hexdigest()}"
+    return f"khawarizmi:{CACHE_CONTRACT_VERSION}:{hashlib.md5(raw.encode()).hexdigest()}"

@@ -28,6 +28,16 @@ class KhawarizmiEmbedder:
         return self._fallback_mode
 
     @property
+    def is_semantic(self) -> bool:
+        """Vrai si l'embedder produit de vraies représentations sémantiques.
+
+        False quand le fallback déterministe est actif (vecteurs aléatoires =
+        bruit) — les consommateurs sémantiques (cache sémantique, RAG vectoriel,
+        poids sémantique L2) doivent être désactivés dans ce cas.
+        """
+        return not self._fallback_mode
+
+    @property
     def fallback_reason(self) -> str:
         return self._fallback_reason
 
