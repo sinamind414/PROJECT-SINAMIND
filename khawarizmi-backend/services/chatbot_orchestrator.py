@@ -45,6 +45,7 @@ from services.chatbot_response import (
 from services.llm_helpers import call_llm
 from services.metrics import MetricsCollector, record_request
 from services.orientation_service import calculer_orientation
+from services.pedagogical import pedagogical_bucket
 from services.rag_service import rag_search
 from services.remediation import build_due_concept_question, get_due_concept_for_question
 from services.semantic_cache import get_semantic_cache, set_semantic_cache
@@ -313,8 +314,8 @@ async def handle_chatbot_message(
         return result
 
     # ── 12. Cas par défaut : sos_concept ou explication → RAG + LLM ──
-    stability = context.get("fsrs_stability", 0)
-    is_explication = stability is not None and stability < 3.0
+    # Seuil unique partagé avec la clé de cache chatbot (services/pedagogical.py)
+    is_explication = pedagogical_bucket(context) == "low"
     chapitre = context.get("chapitre", "general")
 
     # Cache sémantique

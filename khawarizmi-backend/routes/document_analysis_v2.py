@@ -24,6 +24,7 @@ from rate_limit import evaluate_limit, limiter
 from schemas.document_analysis import EvaluateRequest
 from services.correction_audit import log_correction_audit
 from services.correction_v2_retry import evaluate_answer_v2_with_retry
+from services.grading_cache import evaluate_with_cache
 from services.hashing import hash_answer
 from services.llm import _call_with_fallback
 from services.rag_service import format_rag_context, rag_search
@@ -183,17 +184,22 @@ async def evaluer_reponses_v2(
             })
             continue
 
-        # 6b. Mode Évaluation : appel du correcteur v2 avec retry
-        result = await evaluate_answer_v2_with_retry(
+        # 6b. Mode Évaluation : appel du correcteur v2 avec retry + cache exact
+        # (audit C2) — la clé couvre (question, verbe, barème, modèle, version
+        # de prompt, copie normalisée) ; un hit = 0 appel LLM, source="cached_evaluation".
+        result = await evaluate_with_cache(
+            question_id=q["id"],
+            verb_slug=q["verb_slug"],
+            score_max=score_max,
+            student_answer=ans.answer,
+            model_id=cfg.openai_model,
+            evaluate_fn=evaluate_answer_v2_with_retry,
             scenario_context=scenario_context,
             documents=documents,
             question_prompt=q["prompt_ar"],
             question_skill=q["skill_ar"],
-            verb_slug=q["verb_slug"],
             model_answer=q["model_answer_ar"],
             learning_focus=q["learning_focus_ar"],
-            score_max=score_max,
-            student_answer=ans.answer,
             llm_call=_call_with_fallback,
             primary_client=openai_client,
             primary_model=cfg.openai_model,

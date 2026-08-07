@@ -21,6 +21,8 @@ from datetime import UTC, datetime
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from services.pedagogical import PEDAGOGICAL_STABILITY_THRESHOLD
+
 logger = logging.getLogger("khawarizmi.remediation")
 
 
@@ -85,7 +87,7 @@ def build_due_concept_question(concept: dict) -> dict:
     if stability < 1.0:
         # Concept très fragile — question de restitution (L1)
         message = f"لديك مفهوم بحاجة لمراجعة عاجلة: {concept_id}. هل تذكر ما هو دوره الأساسي؟"
-    elif stability < 3.0:
+    elif stability < PEDAGOGICAL_STABILITY_THRESHOLD:
         # Concept fragile — question d'application (L2)
         message = f"مفهوم {concept_id} يحتاج لتثبيت. اشرح باختصار كيف يعمل في سياق {chapter}؟"
     else:

@@ -59,6 +59,54 @@ Le modèle est **multilingue** (formé sur 50+ langues dont l'arabe). Le test AU
 
 ---
 
+# 2b. Sprint 1 (étape 1) — C2 : cache de correction exact (corr_full_exact) ✅
+
+Livré dans `services/grading_cache.py` — **wrapper** autour de
+`evaluate_answer_v2_with_retry` (aucune édition des 700 lignes de
+`correction_v2.py` ; le refactor `grading/` de S2.1 se posera dessus sans
+friction). Route `document_analysis_v2.py` branchée.
+
+- **Vérification préalable (bloquante)** : le prompt de correction est PUR —
+  aucun champ élève (prenom/user/attempt/fsrs/stability/niveau) dans
+  `prompts/correction_prompt.py` ni `prompts/correction_prompt_v2.py` ; tous
+  les inputs sont dérivés de (question, verbe, barème, copie) → cache
+  partageable sans `user_id`, ni `attempt_bucket`, ni `level_bucket` à ajouter.
+- **Clé** : `corr:{CACHE_CONTRACT_VERSION}:c1:prompt:p1:variant:{v1|v2}:
+  model:{modèle CONFIGURÉ}:q:{question_id}:verb:{verb_slug}:smax:{score_max}:
+  ans:{hmac_sha256(pepper, canonical)}` — `score_max` dans la clé ⇒ un
+  changement de barème (VERB_RULES) invalide seul ; un déploiement invalide
+  sélectivement (14 j de TTL).
+- **Piège 1 (offsets)** : `key_normalize` — seule normalisation à décalage
+  calculable (`\r\n`→`\n` aussi appliqué au texte envoyé au LLM, lstrip avec
+  `delta` reprojeté, rstrip sans effet). Highlights stockés en espace
+  CANONIQUE, reprojetés de +delta puis clampés sur la copie réelle au retour
+  (hit ET miss → même convention). Interdit : collapse interne, ar_normalize.
+- **Piège 2 (champs par-élève)** : payload = `CACHEABLE_FIELDS` uniquement ;
+  `student_answer_hash`, `prompt_hash`, `llm_raw_hash`, `attempts`,
+  `parse_status`, `source` recalculés à chaque hit — jamais lus du cache.
+  Aucun `llm_raw` dans le payload (vérifié par test).
+- **Piège 3 (note dégradée)** : `is_cacheable` — seules les notes LLM
+  (`llm`/`llm_v2`/`llm_recovered`/`llm_retried`, parse `ok`/`recovered`) sont
+  cachées ; `local_fallback`, `sanity`, `llm_error` jamais (équité : on ne
+  fige pas une panne LLM pour 14 j).
+- **Single-flight** : verrou local + verrou Redis (Lua CAS, libération
+  conditionnée au token, attente bornée) — 30 élèves sur la même question →
+  **1 seul appel LLM**.
+- **Hit** : `source="cached_evaluation"` (déjà présent dans `SourceV2`),
+  `attempts=0`, `parse_status="cached"`, 0 appel LLM.
+- **Observabilité** : `grading_cache_ops_total{result,verb}` par verbe
+  (logs structurés + compteurs in-process exposés par `grading_cache_stats()`).
+- **Réserve B §7** : seuil FSRS `3.0` unifié dans `services/pedagogical.py`
+  (`pedagogical_bucket`, absent ≡ 0.0 ≡ "low") — le namespace "default" de la
+  clé chatbot est supprimé (poids mort) ; aligné sur la route chatbot,
+  l'orchestrateur, chat_service, chat_prompt et remediation.
+- **Tests** : +40 (dont les 7 acceptations C2 : 2e envoi → cache, offsets
+  reprojetés, hash par copie, note dégradée non cachée, bump de version,
+  single-flight 10 concurrents, pas de llm_raw) → **684 passed, 1 skipped,
+  5 xfailed** · ruff vert.
+
+---
+
 # 3. Réponses aux 3 questions de l'audit
 
 1. **Quel modèle ONNX ?** → `paraphrase-multilingual-MiniLM-L12-v2` (multilingue, pas anglais-only). C4 reste à mesurer (AUC 50 paires arabes) mais le remplacement d'urgence n'est pas nécessaire.

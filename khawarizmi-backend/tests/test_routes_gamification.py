@@ -115,8 +115,9 @@ class TestMappersORM:
 
     def test_mappers_configure(self):
         from sqlalchemy.orm import configure_mappers
-        from models.exercise import Exercise  # noqa: F401
-        from models.duel import Duel  # noqa: F401
+
+        from models.duel import Duel  # ruff: ignore[unused-import]
+        from models.exercise import Exercise  # ruff: ignore[unused-import]
 
         configure_mappers()  # ne doit pas lever InvalidRequestError
 

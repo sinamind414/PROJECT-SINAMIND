@@ -25,6 +25,7 @@ from services.lesson_explanation import detect_lesson_request, get_lesson_explan
 from services.methodology_local_responses import detect_verb_from_message, get_local_methodology_response
 from services.metrics import MetricsCollector, record_request
 from services.orientation_service import calculer_orientation
+from services.pedagogical import pedagogical_bucket
 from services.remediation import build_due_concept_question, get_due_concept_for_question
 from services.reranker import rerank
 from services.semantic_cache import get_semantic_cache, set_semantic_cache
@@ -234,8 +235,8 @@ async def handle_tuteur(
         return result
 
     # ── 10. Cas : sos_concept ou explication → RAG + Gemini ──
-    stability = context.get("fsrs_stability", 0)
-    is_explication = stability is not None and stability < 3.0
+    # Seuil unique partagé avec la clé de cache chatbot (services/pedagogical.py)
+    is_explication = pedagogical_bucket(context) == "low"
     chapitre = context.get("chapitre", "general")
 
     # Cache sémantique : vérifier si une question similaire a déjà été posée

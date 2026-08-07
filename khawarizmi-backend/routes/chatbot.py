@@ -24,6 +24,7 @@ from database import get_db
 from deps import get_current_user, get_openai_optional
 from rate_limit import chat_limit, limiter
 from services.chatbot_orchestrator import handle_chatbot_message
+from services.pedagogical import pedagogical_bucket
 
 logger = logging.getLogger("khawarizmi.chatbot")
 router = APIRouter(prefix="/api/chatbot", tags=["Chatbot"])
@@ -112,11 +113,10 @@ async def _resolve_ask(
 
     # Clé fine (audit O2 révisé) : isole prompt_version + modèle + niveau
     # pédagogique (bucket FSRS) pour ne jamais servir une réponse personnalisée
-    # à un autre contexte. Bucket "default" quand la stabilité est absente.
-    level_bucket = "default"
-    stability = context.get("fsrs_stability")
-    if stability is not None:
-        level_bucket = "low" if stability < 3.0 else "high"
+    # à un autre contexte. Source unique du seuil : services/pedagogical.py —
+    # la clé et le sélecteur de prompt ne peuvent pas diverger. Stabilité
+    # absente ≡ "low" (explication) — plus de namespace "default" mort.
+    level_bucket = pedagogical_bucket(context)
 
     cache_key = make_cache_key(
         "chatbot",
