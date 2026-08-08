@@ -42,7 +42,11 @@ jobs:
           assert n > 100
           "
 
-      - name: Full test suite (633 tests, preview SQLite)
+      # S2.4 : les traces OTel sont no-op sans exporter — la suite complète
+      # (935 tests) couvre : grading (pipeline, cache, parser, mapping,
+      # post_validate, prompts, sanity, savoir, l2), chatbot handlers,
+      # observability Prometheus, tracing OTel, fsrs_unified, golden local.
+      - name: Full test suite (935 tests, preview SQLite)
         run: |
           cd khawarizmi-backend
           SECRET_KEY=ci-test-key-for-smoke-tests-only \
@@ -61,7 +65,8 @@ jobs:
           REDIS_URL=redis://localhost:6379/9 \
           python -m pytest tests/golden/test_golden_local.py -v --tb=short
         # Seuils : L2 MAE ≤ 0.85 · severe ≤ 0.10 · κ ≥ 0.45
-        #          savoir MAE ≤ 0.35 · severe == 0.0 (spécialiste, conf ≥ 0.92)
+        #          savoir MAE ≤ 0.35 · severe ≤ 0.10 (copies modèles strict
+        #          MAE == 0.0 via test_perfect_copies_strict)
 
   frontend-tests:
     runs-on: ubuntu-latest
@@ -120,6 +125,31 @@ jobs:
           REDIS_URL=redis://localhost:6379/9 \
           python -m pytest tests/golden/test_json_mode_quality.py -m nightly -v --tb=short
         # Seuils : MAE(json, libre) ≤ 0.15 · std(json) ≥ 0.70×std(libre)
+
+  observability-nightly:
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          cd khawarizmi-backend
+          pip install -r requirements.txt
+
+      - name: Observabilité (Prometheus + OTel, nightly — exporter OTLP)
+        run: |
+          cd khawarizmi-backend
+          SECRET_KEY=ci-test-key-for-smoke-tests-only \
+          ENVIRONMENT=ci \
+          DATABASE_URL=sqlite+aiosqlite:///./ci_test.db \
+          REDIS_URL=redis://localhost:6379/9 \
+          python -m pytest tests/test_observability.py tests/test_tracing.py -v --tb=short
 
   deploy-railway:
     if: github.ref == 'refs/heads/main'

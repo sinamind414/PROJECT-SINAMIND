@@ -1089,6 +1089,24 @@ OpenTelemetry (traces).
 
 ---
 
+# 2x. CI préparé — état réel (935 tests) + job observability nightly ✅
+
+Le fichier `docs/ci/ci.yml.amelioree` (toujours non poussable — permission
+`workflows` absente, vérifié) est mis à jour pour refléter l'état réel :
+- Full test suite : 935 tests (grading, chatbot handlers, observability,
+  tracing, fsrs_unified, golden local — couverts par `pytest tests/`).
+- Golden set : seuils à jour (savoir severe ≤ 0.10 + copies modèles strict
+  MAE == 0.0 via test_perfect_copies_strict).
+- NOUVEAU job `observability-nightly` (schedule) : tests Prometheus + OTel
+  avec exporter OTLP configurable.
+- YAML validé (5 jobs : backend-tests, frontend-tests, golden-llm-nightly,
+  observability-nightly, deploy-railway).
+
+Le CI est prêt à être activé dès que la permission `workflows` est accordée
+au token GitHub — aucune autre modification nécessaire.
+
+---
+
 # 3. Réponses aux 3 questions de l'audit
 
 1. **Quel modèle ONNX ?** → `paraphrase-multilingual-MiniLM-L12-v2` (multilingue, pas anglais-only). C4 reste à mesurer (AUC 50 paires arabes) mais le remplacement d'urgence n'est pas nécessaire.
