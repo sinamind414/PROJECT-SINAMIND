@@ -21,6 +21,7 @@ from collections.abc import Awaitable, Callable
 from typing import Any
 
 from grading.context import PipelineContext
+from grading.sanity import run_sanity, sanity_tuple
 
 # Champs variables exclus de la comparaison de parité (tests) : ils dépendent
 # du run (hashes, horodatage) ou d'étapes pas encore extraites.
@@ -70,15 +71,25 @@ async def evaluate_answer_v2_pipeline(
         local_fallback_db=kwargs.get("local_fallback_db"),
     )
 
-    t0 = time.perf_counter()
+    # S2.1b : Étape 1 — SANITY, extraite du monolithe. Toujours première,
+    # même si le rejet est immédiat (déterministe, ~µs). Le résultat est porté
+    # par le contexte ET transmis au legacy via precomputed_sanity : l'ancien
+    # moteur ne refait pas le calcul, mais reste la source du format (parité).
+    t_sanity = time.perf_counter()
+    sanity = run_sanity(student_answer)
+    ctx.sanity_result = sanity
+    ctx.steps["sanity_ms"] = (time.perf_counter() - t_sanity) * 1000.0
+
+    t_legacy = time.perf_counter()
     result = await evaluate_legacy(
         student_answer=student_answer,
         score_max=score_max,
         verb_slug=verb_slug,
         model_answer=model_answer,
+        precomputed_sanity=sanity_tuple(sanity),
         **kwargs,
     )
-    ctx.steps["legacy_total_ms"] = (time.perf_counter() - t0) * 1000.0
+    ctx.steps["legacy_total_ms"] = (time.perf_counter() - t_legacy) * 1000.0
 
     # Traçabilité du résultat (source réelle de l'ancien moteur)
     ctx.final_result = result

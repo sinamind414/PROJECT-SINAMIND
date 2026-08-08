@@ -460,6 +460,44 @@ observation (parité en prod) avant les extractions.
 
 ---
 
+# 2i. S2.1b — Extraction de la sanity (première brique du pipeline) ✅
+
+L'étape 1 du pipeline sort du monolithe. Vérifications préalables (greps) :
+- `check_answer_sanity(answer) -> SanityResult = tuple[bool, str, str]`
+  (answer_sanity.py:41,129) — codes : empty, too_short, gibberish,
+  not_arabic, repeated_chars ; succès `(True, "ok", "")`.
+- Appel unique dans correction_v2.py (bloc « 1. SANITY CHECK ») — aucune
+  autre dépendance.
+
+Livré :
+- `grading/sanity.py` : `run_sanity(student_answer)` → dict standardisé
+  {"is_valid", "sanity_code", "message_ar"} + `sanity_tuple()` (conversion
+  vers le tuple du legacy). Wrapper PUR, zéro dépendance externe.
+- `correction_v2.py` : nouveau paramètre RÉTROCOMPATIBLE
+  `precomputed_sanity: tuple[bool, str, str] | None = None` — le monolithe
+  reste la SEULE source du format de résultat (parité), mais ne refait pas
+  le calcul quand le pipeline le fournit. Aucun changement d'API existante.
+- `grading/pipeline.py` : appelle `run_sanity(ctx)` AVANT le legacy
+  (chrono sanity_ms séparé), porte le résultat dans `ctx.sanity_result`,
+  transmet `precomputed_sanity` au legacy. `evaluate_answer_v2_with_retry`
+  transmet **kwargs → compatible sans modification.
+- Tests (test_grading_sanity.py, +14) : codes run_sanity (dont le fait
+  vérifié que « ERRETREZR » → gibberish par keyboard-smash avant le ratio
+  arabe) ; **parité RÉELLE** pipeline(vrai moteur) == moteur seul sur les
+  5 cas (vide, court, gibberish, répétitions, copie OK avec LLM mocké) ;
+  precomputed_sanity ne change pas le résultat du legacy (rétrocompat
+  prouvée sur les 5 cas) ; le pipeline transmet bien le tuple au legacy
+  (capturé par spy : (False,"empty",…) et (True,"ok","")).
+
+Chemin route inchangé (wrapper cache → retry → evaluate_answer_v2 utilise
+toujours la sanity interne) : le pipeline shadow est un chemin séparé, non
+branché — cohérent avec le mode observation S2.1a.
+
+Tests : 826 passed (+14), 3 skipped, 5 xfailed · ruff vert.
+Prochaine étape : S2.1c — savoir.py (wrapper autour de savoir_corrector).
+
+---
+
 # 3. Réponses aux 3 questions de l'audit
 
 1. **Quel modèle ONNX ?** → `paraphrase-multilingual-MiniLM-L12-v2` (multilingue, pas anglais-only). C4 reste à mesurer (AUC 50 paires arabes) mais le remplacement d'urgence n'est pas nécessaire.

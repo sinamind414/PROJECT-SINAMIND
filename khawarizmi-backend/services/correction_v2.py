@@ -435,6 +435,9 @@ async def evaluate_answer_v2(
     # Budget LLM restant (audit C3) : partagé entre les retries — la cascade
     # interne (_call_with_fallback) a déjà son propre deadline de 20 s.
     llm_timeout: float | None = None,
+    # S2.1b : sanity pré-calculée par le pipeline (grading/pipeline.py) —
+    # évite de la refaire. Rétrocompatible : None = comportement historique.
+    precomputed_sanity: tuple[bool, str, str] | None = None,
 ) -> dict[str, Any]:
     """Évalue une réponse d'élève avec le pipeline hybride sanity + LLM.
 
@@ -455,7 +458,13 @@ async def evaluate_answer_v2(
 
     # ── 1. SANITY CHECK ──────────────────────────
 
-    is_valid, sanity_code, sanity_message = check_answer_sanity(student_answer)
+    # S2.1b : le pipeline (grading/pipeline.py) peut fournir un résultat
+    # pré-calculé — le monolithe ne refait pas le calcul, mais reste la
+    # SEULE source du format de résultat (parité garantie).
+    if precomputed_sanity is not None:
+        is_valid, sanity_code, sanity_message = precomputed_sanity
+    else:
+        is_valid, sanity_code, sanity_message = check_answer_sanity(student_answer)
 
     if not is_valid:
         logger.info(
