@@ -33,6 +33,7 @@ from . import (
     lessons,
     lexique,
     manhadjiya,
+    memory,
     methodology,
     methodology_flashcards,
     mindmap,
@@ -119,6 +120,7 @@ ALL_ROUTERS = [
     onboarding.router,
     # ── Manhadjiya (LOT8 — Base de connaissance scientifique) ──
     manhadjiya.router,
+    memory.router,
     # ── PULSE Dashboard ──
     pulse.router,
     # ── Aujourd'hui (accueil) · Leçons actives · Bac Blanc v1 (immersif) ──

@@ -793,6 +793,50 @@ S2.3 clôturé — prochaine : S3 (FSRS unifié : 4 systèmes + 1 fichier).
 
 ---
 
+# 2p. S3 (étape 1) — FSRS unifié : service d'accès unique + endpoints ✅
+
+État des lieux réel des « 4 systèmes + 1 fichier » :
+- mastery_micro_concepts (par micro-concept, fsrs_state JSON) — flashcards,
+  drill, interleaving, calendar_context, evaluation_mode ;
+- da_fsrs (par verbe/chapitre) — document_analysis (v1+v2) ;
+- action_verb_progress (par verbe d'action) — action_verbs, leaderboard,
+  city_service ;
+- concept_prerequisites + question_concept_map (le graphe) — déjà en DB ;
+- le « 1 fichier » data/mastery/*.json : DOSSIER VIDE — le graphe a déjà été
+  migré en DB (concept_prerequisites). Il ne reste que 3 tables d'état.
+
+Livré (S3a — la porte d'entrée unifiée, sans fusion physique risquée) :
+- `services/fsrs_unified.py` : MemoryItem (dataclass normalisé, source
+  agnostique) + MemoryKind (concept | verb_chapter | verb_action) +
+  * get_user_memory(db, user_id, kinds) — vue consolidée des 3 sources ;
+  * get_due_items(db, user_id, limit, kinds) — items dus triés par date ;
+  * update_memory(db, user_id, kind, item_id, ...) — upsert dans la bonne
+    table (ON CONFLICT sur les contraintes UNIQUE existantes, attempts
+    incrémenté par appel — conventions SQL des routes conservées) ;
+  * memory_summary(db, user_id) — stats consolidées (total, by_kind, dus,
+    avg_stability).
+  Invariants : tolérance par source (table absente en preview SQLite —
+  mastery_micro_concepts n'est pas dans l'auto-DDL → source vide, jamais
+  d'erreur) ; aucune double-écriture (chaque parcours garde SA table ; la
+  fusion physique, si décidée, sera S3b) ; parsing robuste des types
+  SQLite (fsrs_state string JSON → dict, DATETIME string → datetime).
+- `routes/memory.py` : GET /api/memory/summary + GET /api/memory/due
+  (auth requise) — la vue consolidée pour le dashboard/observabilité.
+- Tests (+13) : round-trip lecture/écriture sur les 3 sources, attempts
+  incrémenté, isolation par user, filtre kinds, due trié + limit, summary,
+  table absente → sources vides + update False, endpoints (401 sans auth,
+  200 avec, validation 422).
+- Découverte de test : le mock naive matchait « users » dans total_users →
+  corrigé (FROM users).
+
+Le service est prêt à devenir la porte d'entrée des parcours (flashcards,
+drill, document_analysis, action_verbs) — migration parcours par parcours
+en S3b, chacun testé individuellement.
+
+Tests : 910 passed (+13), 3 skipped, 5 xfailed · ruff vert.
+
+---
+
 # 3. Réponses aux 3 questions de l'audit
 
 1. **Quel modèle ONNX ?** → `paraphrase-multilingual-MiniLM-L12-v2` (multilingue, pas anglais-only). C4 reste à mesurer (AUC 50 paires arabes) mais le remplacement d'urgence n'est pas nécessaire.
