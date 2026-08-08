@@ -78,3 +78,7 @@ Pipeline complet dans `grading/pipeline.py` : sanity → savoir → prompt → L
    (6 tests, SKIP si Redis absent) — Lua CAS réel (libération par token),
    single-flight 10→1 appel, TTL 7 j vérifié, isolation par clé, zéro verrou
    résiduel ; `benchmark_cache.py --redis-url` : ratios identiques au fake.
+6. **Single-flight multi-workers validé** ✅ :
+   `tests/test_grading_cache_multiprocess.py` (2 processus réels, même
+   Redis, starting-gate) — même copie → 1 appel LLM ; copies différentes →
+   2 appels. SKIP si Redis absent. 959 tests au total.

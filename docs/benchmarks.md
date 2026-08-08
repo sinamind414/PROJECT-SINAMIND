@@ -109,11 +109,27 @@ et le TTL fonctionnent avec la sémantique Redis réelle. Seule la latence
 absolue des hits change (µs in-process → ms réseau), sans impact utilisateur
 perceptible (5 ms ≪ 200 ms d'un appel LLM).
 
+## Single-flight multi-workers (2 processus réels) ✅
+
+`tests/test_grading_cache_multiprocess.py` — orchestre 2 PROCESSUS Python
+réels (scripts/_cache_worker_mp.py) qui corrigent la MÊME copie contre le
+MÊME Redis, avec un starting-gate (clés `ready:*` uniques par PID puis
+départ simultané) :
+
+- même copie, 2 workers → **1 seul appel LLM** (le verrou NX 30 s + attente
+  bornée + double-check fusionnent les workers : un worker corrige, l'autre
+  attend puis lit le cache → `from_cache=True`) ;
+- 2 copies différentes → **2 appels LLM** (pas de fusion abusive) ;
+- SKIP si Redis indisponible (suite verte partout) ; ~6 s avec Redis local.
+
+→ Le single-flight est validé de bout en bout : intra-worker (asyncio.Lock),
+inter-workers (Redis NX + Lua CAS), et jusqu'au multi-process réel.
+
 ## Limites
 
-- Multi-process / multi-nœuds (2 workers sur le même Redis) non mesuré — le
-  lock 30 s + double-check post-verrou sont conçus pour ce cas mais un test
-  multi-workers reste à écrire (nécessite 2 processus).
+- Multi-nœuds (2 machines sur le même Redis) : même mécanisme que
+  multi-process (le Redis est le point de vérité), seule la latence réseau
+  diffère — non mesuré (nécessite 2 hôtes).
 - La latence LLM simulée est fixe ; en prod elle varie selon le provider
   (cf. alerte `LLMDeadline` p99 > 20 s).
 - Le pipeline complet est couvert par un second benchmark

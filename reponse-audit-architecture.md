@@ -1326,11 +1326,22 @@ qu'en production. Validation ajoutée :
   change (162 µs in-process → 5.4 ms round-trip réseau, ≪ 200 ms LLM).
 
 Bilan : le cache C2 est validé sur la sémantique Redis réelle (Lua, NX, TTL).
-Reste non couvert : le partage multi-workers (2 processus sur le même
-Redis) — le lock 30 s + double-check sont conçus pour, mais un test
-multi-process reste à écrire.
 
-Tests : 957 passed (951 + 6 réel redis), 3 skipped, 5 xfailed · ruff vert.
+Multi-process validé en plus (`tests/test_grading_cache_multiprocess.py`,
+2 PROCESSUS Python réels sur le même Redis, starting-gate par clés
+`ready:*` uniques par PID) :
+- même copie → **1 appel LLM** total (un worker corrige, l'autre attend le
+  verrou puis lit le cache → from_cache=True) ;
+- 2 copies différentes → 2 appels (pas de fusion abusive) ;
+- ~6 s avec Redis local, SKIP si indisponible.
+Bug de test corrigé en route : les workers écrivaient la MÊME clé ready →
+KEYS n'en comptait qu'un ; clés `ready:{pid}` uniques.
+
+Reste non couvert : multi-nœuds (2 machines) — même mécanisme Redis, seule
+la latence réseau diffère.
+
+Tests : 959 passed (951 + 6 réel redis + 2 multi-process), 3 skipped,
+5 xfailed · ruff vert.
 
 ---
 
