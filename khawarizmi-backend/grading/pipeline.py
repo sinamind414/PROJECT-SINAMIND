@@ -48,6 +48,7 @@ from grading.schemas.correction_output import (
     CORRECTION_V1_JSON_SCHEMA,
     CORRECTION_V2_JSON_SCHEMA,
 )
+from grading.tracing import record_exception, set_span_attribute, trace_step
 
 logger = logging.getLogger("khawarizmi.grading_pipeline")
 
@@ -128,6 +129,9 @@ async def evaluate_answer_v2_pipeline(
     )
 
     # ── 1. SANITY CHECK (toujours première) ──────
+    # S2.4 : span OTel (no-op si dépendance absente) — durée via sanity_ms
+    with trace_step("grading.sanity", {"verb": verb_slug}):
+        pass
     t_sanity = time.perf_counter()
     if precomputed_sanity is not None:
         is_valid, sanity_code, sanity_message = precomputed_sanity
@@ -162,6 +166,9 @@ async def evaluate_answer_v2_pipeline(
         return result
 
     # ── 2. Étage SAVOIR (0 token, 0 clé — feature flag par verbe) ──
+    # S2.4 : span OTel (no-op si dépendance absente)
+    with trace_step("grading.savoir", {"verb": verb_slug}):
+        pass
     ctx.savoir_result = run_savoir(
         question=question_prompt,
         student_answer=student_answer,
@@ -268,6 +275,8 @@ async def evaluate_answer_v2_pipeline(
 
     t_llm = time.perf_counter()
     try:
+        set_span_attribute("grading.verb", verb_slug)
+        set_span_attribute("grading.provider", provider)
         response = await llm_call(
             messages=messages,
             primary_client=primary_client,
@@ -315,6 +324,7 @@ async def evaluate_answer_v2_pipeline(
 
     except Exception as e:
         logger.error(f"{log_prefix}llm_call_failed | error={e}")
+        record_exception(e)  # S2.4 : exception sur le span courant
         # Correcteur local sans clé API : mieux qu'une erreur technique.
         if local_fallback:
             local_result = await run_l2(

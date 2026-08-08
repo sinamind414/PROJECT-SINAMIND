@@ -1051,6 +1051,44 @@ Tests : 929 passed (+1), 3 skipped, 5 xfailed · ruff vert.
 
 ---
 
+# 2w. S2.4 — Observabilité OpenTelemetry (traces distribuées) ✅
+
+- `grading/tracing.py` : import PAESSEUX d'opentelemetry (no-op si absent —
+  cohérent avec grading/observability.py pour Prometheus) :
+  * `get_tracer()` — provider initialisé une fois (service.name via
+    OTEL_SERVICE_NAME, exporter OTLP si OTEL_EXPORTER_OTLP_ENDPOINT sinon
+    ConsoleSpanExporter) ;
+  * `trace_step(name, attributes)` — contextmanager de span (no-op sans
+    tracer) ;
+  * `set_span_attribute(key, value)` / `record_exception(exc)` — attributs
+    et exceptions sur le span courant (no-op si absent).
+  Instrumentation MANUELLE (pas l'instrumentation auto FastAPI) : plus
+  robuste, testable, sans dépendances lourdes.
+- Branchement :
+  * `grading/pipeline.py` : spans `grading.sanity` et `grading.savoir`
+    (attribut verb), attributs grading.verb/grading.provider sur l'appel
+    LLM, record_exception sur échec LLM ;
+  * `services/chatbot_orchestrator.py` : span `chatbot.handle` autour du
+    dispatcher (attributs user_id/mode) + attributs chatbot.intent/type.
+- requirements.txt : opentelemetry-sdk==1.44.0, opentelemetry-api==1.44.0.
+- Tests (+6) : no-op sans la lib (trace_step/set_span_attribute/
+  record_exception ne lèvent jamais) ; spans réels vérifiés via
+  InMemorySpanExporter — le pipeline émet grading.sanity + grading.savoir,
+  le chatbot émet chatbot.handle.
+- Découvertes (contraintes OTel) :
+  * `set_tracer_provider` est INTERDIT après la première initialisation
+    ("Overriding of current TracerProvider is not allowed") — les tests
+    mockent `grading.tracing.get_tracer` pour retourner un tracer lié à un
+    exporter in_memory (isolation totale, aucun effet de bord inter-tests) ;
+  * `patch()` est un context manager sync (pas async) — le test chatbot
+    wrapper `asyncio.run` dans un `with` sync.
+
+Tests : 935 passed (+6), 3 skipped, 5 xfailed · ruff vert.
+S2.4 clôturé — l'observabilité couvre désormais Prometheus (métriques) +
+OpenTelemetry (traces).
+
+---
+
 # 3. Réponses aux 3 questions de l'audit
 
 1. **Quel modèle ONNX ?** → `paraphrase-multilingual-MiniLM-L12-v2` (multilingue, pas anglais-only). C4 reste à mesurer (AUC 50 paires arabes) mais le remplacement d'urgence n'est pas nécessaire.

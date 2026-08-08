@@ -15,6 +15,7 @@ import logging
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from grading.tracing import set_span_attribute, trace_step
 from services.chat_classifier import classify
 from services.chatbot_handlers import (
     handle_default_explanation,
@@ -55,6 +56,23 @@ async def handle_chatbot_message(
     Returns:
         Dict aligné sur TuteurResponse.
     """
+    # S2.4 : span OTel du traitement chatbot (no-op si dépendance absente)
+    with trace_step("chatbot.handle", {"chatbot.user_id": str(user_id),
+                                       "chatbot.mode": mode}):
+        return await _handle_chatbot_message_inner(
+            message, context, user_id, db, openai_client, mode,
+        )
+
+
+async def _handle_chatbot_message_inner(
+    message: str,
+    context: dict,
+    user_id: str | int,
+    db: AsyncSession,
+    openai_client=None,
+    mode: str = "quick",
+) -> dict:
+    """Corps du dispatcher (dans le span OTel)."""
     mc = MetricsCollector(user_id=str(user_id), endpoint="/api/chatbot")
     mc.start("classification")
 
@@ -78,6 +96,8 @@ async def handle_chatbot_message(
     observe_chatbot_step("classification", mc._durations.get("classification", 0))
 
     logger.info(f"Chatbot | user={user_id} intent={intent} type={resp_type} mode={mode}")
+    set_span_attribute("chatbot.intent", intent)
+    set_span_attribute("chatbot.type", resp_type)
 
     # ── 2. SAFETY / TRICHE AVANT toute réponse pédagogique (audit P0-4.4) ──
     if resp_type == "refus":

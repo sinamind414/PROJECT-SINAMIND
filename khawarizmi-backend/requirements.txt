@@ -30,3 +30,5 @@ pytest==9.0.3
 pytest-asyncio==1.4.0
 pytest-cov==6.1.1
 prometheus-client==0.26.0
+opentelemetry-sdk==1.44.0
+opentelemetry-api==1.44.0
