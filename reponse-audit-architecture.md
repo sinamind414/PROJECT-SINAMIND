@@ -1140,6 +1140,24 @@ Tests : 945 passed (+10), 3 skipped, 5 xfailed · ruff vert.
 
 ---
 
+# 2z. Déploiement progressif — checklist opérationnelle consolidée ✅
+
+`docs/deploiement-progressif.md` rassemble TOUTES les activations
+progressives en une checklist opérationnelle :
+- Configuration (savoir_enabled_verbs, json_mode_providers, ENABLE_EXTERNAL_LLM)
+  — défauts vides = comportement pré-optimisation.
+- Séquence J0→J14 : baseline → savoir (1 verbe) → étendre → JSON natif
+  (1 provider puis +) — avec métriques cibles (grading_source > 20 %,
+  native_json > 95 %), rollback par liste.
+- Endpoints de contrôle, alertes Prometheus (SavoirInactif, JsonModeFaible,
+  LLMDeadline p99 > 20 s).
+- Ordre de la migration 033 (fusion FSRS) + vérifications.
+- Garde-fous intégrés (rappel des invariants C2/savoir/O7/LLM/FSRS).
+
+Aucun changement de code — document d'exploitation.
+
+---
+
 # 3. Réponses aux 3 questions de l'audit
 
 1. **Quel modèle ONNX ?** → `paraphrase-multilingual-MiniLM-L12-v2` (multilingue, pas anglais-only). C4 reste à mesurer (AUC 50 paires arabes) mais le remplacement d'urgence n'est pas nécessaire.
