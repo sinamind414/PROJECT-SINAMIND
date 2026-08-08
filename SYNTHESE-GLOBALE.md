@@ -1,7 +1,7 @@
 # Synthèse Globale — IA Khawarizmi Pro (Bac SVT Algérie)
 
-**Branche** : `arena/019fd78d-project-sinamind` · **Dernier commit** : `981dc96`
-**Suite de tests** : 929 passed · 3 skipped · 5 xfailed · ruff vert
+**Branche** : `arena/019fd78d-project-sinamind` · **Dernier commit** : `d6591c1`
+**Suite de tests** : 945 passed · 3 skipped · 5 xfailed · ruff vert
 
 ---
 
@@ -47,8 +47,24 @@ Pipeline complet dans `grading/pipeline.py` : sanity → savoir → prompt → L
 - **2 routes** ajoutées (`/metrics/prometheus`, `/api/memory/*`)
 - **3 bugs d'infrastructure latents** corrigés (ILIKE ANY SQLite, CAST jsonb → '0', table mastery absente du preview)
 
-## 3. Prochaines étapes possibles
-1. **S2.4** — observabilité OpenTelemetry (traces distribuées)
-2. **CI** — débloquer la permission `workflows` (le fichier `docs/ci/ci.yml.amelioree` est prêt : golden bloquant + nightly LLM)
-3. **Golden humain** — remplacer les annotations synthétiques par un expert SVT (même format, la mécanique est prête)
-4. **Déploiement** — activation progressive documentée (savoir par verbe, JSON mode par provider)
+## 3. Phases suivantes (réalisées)
+1. **S2.4 — OpenTelemetry** ✅ : `grading/tracing.py` (import paresseux,
+   spans `grading.sanity`/`grading.savoir`/`chatbot.handle`, attributs +
+   exceptions) — 945 tests.
+2. **CI préparé** ✅ : `docs/ci/ci.yml.amelioree` à jour (935 tests, job
+   `observability-nightly` Prometheus+OTel) — prêt dès la permission
+   `workflows`.
+3. **Golden humain (processus)** ✅ : `docs/golden-annotation-procedure.md`
+   (procédure expert SVT, format, règles) + `scripts/validate_golden_
+   annotations.py` (validateur de cohérence, 125 items synthétiques OK).
+4. **Déploiement progressif** ✅ : `docs/deploiement-progressif.md`
+   (checklist J0→J14, alertes Prometheus, ordre migration 033, garde-fous).
+
+## 4. Prochaines étapes possibles
+1. **Annotations expert SVT** — exécuter la procédure (2-3 h) → κ savoir
+   ≥ 0.65 → réactiver la remédiation de l'étage savoir.
+2. **Permission `workflows`** — activer le CI préparé (5 jobs, golden
+   bloquant, nightly LLM + observability).
+3. **Suppression des tables FSRS héritées** (da_fsrs, action_verb_progress)
+   après bascule complète des lectures analytics.
+4. **Tests de charge / benchmarks** — hit rate cache, latences LLM p95.
