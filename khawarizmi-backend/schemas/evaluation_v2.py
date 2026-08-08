@@ -12,8 +12,11 @@ from typing import Any, Literal
 from pydantic import BaseModel, Field
 
 SourceV2 = Literal[
-    "local", "llm", "llm_recovered", "llm_v2", "llm_retried",
+    "local", "local_savoir", "local_l2_high_conf",
+    "llm", "llm_recovered", "llm_v2", "llm_retried",
     "sanity", "llm_error", "cached_evaluation",
+    # État transitoire interne du pipeline (jamais exposé en réponse finale)
+    "unknown",
 ]
 
 DominantErrorCode = Literal[

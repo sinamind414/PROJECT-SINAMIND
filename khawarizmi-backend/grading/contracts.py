@@ -4,12 +4,13 @@ Types, Literals et TypedDict du résultat d'évaluation — pour l'autocompléti
 et la lisibilité interne du pipeline. Le schéma Pydantic
 (schemas/evaluation_v2.py, Sprint 0) reste la source de validation runtime.
 
-Alignement avec schemas/evaluation_v2.py (écarts DOCUMENTÉS) :
-- SourceV2 ici inclut "local_savoir" (source réelle de l'étage savoir,
-  branchée en S1 — absente du Literal Pydantic ; à unifier lors du refactor
-  des schémas).
+Alignement avec schemas/evaluation_v2.py :
+- SourceV2 aligné sur le Literal Pydantic (mis à jour en S2.1a : local_savoir,
+  local_l2_high_conf, unknown ajoutés). La provenance n'est JAMAIS convertie
+  en "local" : elle compte pour les métriques, l'audit et le taux de promotion.
 - ParseStatus n'existe pas côté Pydantic (champ str) ; ici il reflète les
-  valeurs réellement produites par le pipeline.
+  valeurs réellement produites par le pipeline, scindé en
+  ParseStatusInternal (avec "not_called" transitoire) / ParseStatusPublic.
 - Le TypedDict est volontairement SUPERSET du modèle Public : il couvre aussi
   les champs internes/additionnels réels (llm_raw pour llm_error, error_message,
   from_cache pour les hits cache, remediation_reason pour local_savoir).
@@ -21,7 +22,8 @@ from typing import Any, Literal, TypedDict
 
 SourceV2 = Literal[
     "local",
-    "local_savoir",  # étage savoir haute confiance (S1) — absent de schemas
+    "local_savoir",       # étage savoir haute confiance (S1) — provenance
+    "local_l2_high_conf",  # futur étage L2 haute confiance (O1)
     "llm",
     "llm_v2",
     "llm_recovered",
@@ -29,10 +31,14 @@ SourceV2 = Literal[
     "sanity",
     "llm_error",
     "cached_evaluation",
+    # État transitoire interne du pipeline (jamais exposé en réponse finale)
+    "unknown",
 ]
 
-ParseStatus = Literal[
-    "not_called",       # rejet sanity (pas d'appel LLM)
+# ParseStatus INTERNE : inclut "not_called" (état transitoire avant l'appel
+# LLM — rejet sanity). Utilisé par le pipeline pour son état courant.
+ParseStatusInternal = Literal[
+    "not_called",       # rejet sanity (pas d'appel LLM) / état initial
     "ok",               # parse direct
     "recovered",        # parse après stratégie de rattrapage (ou v2)
     "failed",           # erreur LLM / parse impossible
@@ -40,6 +46,22 @@ ParseStatus = Literal[
     "local",            # étage savoir
     "cached",           # rehydratation depuis le cache
 ]
+
+# ParseStatus PUBLIC : "not_called" est un état transitoire interne — il n'a
+# pas de sens dans un résultat final exposé (un résultat final est soit noté,
+# soit en erreur). "local" (étage savoir) est conservé : c'est une valeur
+# RÉELLEMENT produite par le pipeline et cacheable (politique C2).
+ParseStatusPublic = Literal[
+    "ok",
+    "recovered",
+    "failed",
+    "local_fallback",
+    "local",
+    "cached",
+]
+
+# Alias rétrocompatible (le pipeline interne utilise l'ensemble complet).
+ParseStatus = ParseStatusInternal
 
 DominantErrorCode = Literal[
     "scientific_error", "methodology_error", "off_topic", "partial_correct",

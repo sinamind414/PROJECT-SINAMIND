@@ -409,6 +409,57 @@ g (prompt + LLM) → h (post-validation/remediation) → i (pipeline.py + façad
 
 ---
 
+# 2h. S2.1a (suite) — Validation des écarts + pipeline shadow + parité ✅
+
+Suite de S2.1a avec les 3 exigences de validation :
+
+1. **`local_savoir` / `local_l2_high_conf` / `unknown` ajoutés au Literal
+   Pydantic** (`schemas/evaluation_v2.py`) — le schéma runtime accepte
+   désormais les sources réelles de l'étage savoir. La provenance n'est
+   JAMAIS convertie en "local" (métriques, audit, taux de promotion).
+   Vérifié : les schémas Pydantic ne sont utilisés que par les tests (aucun
+   usage runtime) → élargissement sans risque. Testé :
+   `EvaluationResultV2Internal(source="local_savoir", parse_status="local",
+   ...)` valide.
+2. **Split ParseStatusInternal / ParseStatusPublic** : `not_called` = état
+   transitoire INTERNE (exclu du public — un résultat final est soit noté,
+   soit en erreur) ; `local` (étage savoir) conservé dans le public (valeur
+   réelle, politique C2). Alias `ParseStatus = ParseStatusInternal`.
+3. **Contexte enrichi** (`grading/context.py`) : champs de traçabilité
+   pipeline (source="unknown" initial, parse_strategy, steps en
+   MILLISECONDES, llm_called, cache_hit) + étapes (sanity_result,
+   savoir_result, l2_result, prompt, llm_response, parsed_llm,
+   final_result) + alias `PipelineContext = GradingContext`. Règles
+   documentées : `student_answer` = copie ORIGINALE (jamais normalisée),
+   jamais de `llm_raw` dans le contexte (il vit dans llm_response, retiré
+   avant exposition).
+4. **Pipeline shadow** (`grading/pipeline.py`) :
+   `evaluate_answer_v2_pipeline(question_id, verb_slug, score_max,
+   student_answer, model_answer, evaluate_legacy, **kwargs)` — délègue à
+   l'ancien moteur, remplit le contexte, retourne EXACTEMENT le résultat
+   legacy. `assert_parity()` ignore VOLATILE_FIELDS (attempts, hashes,
+   latency_ms). AUCUN import FastAPI/SQLAlchemy/Redis (critère S2.1-4).
+   Les modules existants (parser, mapping, cache, cache_key) ne sont PAS
+   déplacés (risque d'imports patchés/monkeypatch) — vérifiés importables
+   depuis leurs chemins actuels.
+5. **Tests de parité** (test_grading_pipeline.py, 12 tests) : sanity,
+   local_savoir, local fallback, LLM mocké, llm_v2, JSON invalide, cache
+   hit, réponse vide — `pipeline(input) == legacy(input)` à chaque fois ;
+   état initial du contexte (acceptation) ; règle copie originale.
+
+Critères de validation : contrats importables ✓ · local_savoir accepté ✓ ·
+not_called géré (interne) ✓ · llm_raw absent du public (testé via
+from_internal) ✓ · PipelineContext initialisable ✓ · aucun changement de
+route ✓ · suite complète ✓ · ruff ✓ · import main OK (193 routes) ✓ ·
+aucun import circulaire ✓.
+
+Tests : 812 passed (+18), 3 skipped, 5 xfailed · ruff vert.
+Prochaine étape : S2.1b/c/d (context utilisé par le constructeur, parser/
+mapping sans duplications) — ou brancher le pipeline shadow en mode
+observation (parité en prod) avant les extractions.
+
+---
+
 # 3. Réponses aux 3 questions de l'audit
 
 1. **Quel modèle ONNX ?** → `paraphrase-multilingual-MiniLM-L12-v2` (multilingue, pas anglais-only). C4 reste à mesurer (AUC 50 paires arabes) mais le remplacement d'urgence n'est pas nécessaire.
