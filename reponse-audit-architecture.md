@@ -879,6 +879,43 @@ Tests : 915 passed (+5), 3 skipped, 5 xfailed · ruff vert.
 
 ---
 
+# 2r. S3b (étape 3) — Deuxième parcours migré : évaluation riche → fsrs_unified ✅
+
+Le chemin FSRS riche (apply_evaluation_to_fsrs — /api/evaluate, drill)
+passe par l'API unifiée.
+
+- `services/fsrs_unified.py` — helpers fidèles au chemin évaluation riche :
+  * `get_concept_states(db, user_id, concept_ids)` — batch par concept_id
+    (IN expanding), retourne dict concept_id → Card FSRS hydratée (vierge si
+    absent) — reproduction exacte de fsrs_persistence.get_concept_states ;
+  * `save_concept_update(db, user_id, concept_id, *, chapter, due,
+    interval_jours, difficulty, stability, fsrs_state, pending_eval)` —
+    upsert avec **ON CONFLICT (user_id, concept_id)** (pas micro_concept_id
+    — les deux contraintes UNIQUE existent dans le schéma réel) +
+    pending_real_evaluation ;
+  * `tag_pending_concept(db, user_id, concept_id, chapter)` — fallback L3/
+    erreur : pending_real_evaluation=TRUE (reproduction du bloc inline
+    d'evaluation_fsrs).
+- `services/fsrs_persistence.py` : get_concept_states → délégation ;
+  save_concept_updates → boucle de délégation par concept (la logique
+  sched_days/pending/forced_reason est conservée dans la façade). 0 SQL
+  mastery restant.
+- `services/evaluation_fsrs.py` : le bloc pending inline → tag_pending_concept.
+  0 SQL mastery restant.
+- Tests (+5) : batch Cards hydratées/vierges, save_concept_update round-trip,
+  conflit sur (user_id, concept_id) écrasé, tag_pending_concept
+  (pending_real_evaluation=TRUE vérifié en DB), table absente → False.
+- Découverte : la Card fsrs n'a pas .reps et stability=None à la création
+  (l'ancien code utilisait hasattr comme garde — reproduit fidèlement).
+
+Parcours migrés : flashcards/drill (S3b-2) + évaluation riche (S3b-3).
+Restent : drill_queue, interleaving, calendar_context, orientation_service,
+evaluation_mode.
+
+Tests : 920 passed (+5), 3 skipped, 5 xfailed · ruff vert.
+
+---
+
 # 3. Réponses aux 3 questions de l'audit
 
 1. **Quel modèle ONNX ?** → `paraphrase-multilingual-MiniLM-L12-v2` (multilingue, pas anglais-only). C4 reste à mesurer (AUC 50 paires arabes) mais le remplacement d'urgence n'est pas nécessaire.

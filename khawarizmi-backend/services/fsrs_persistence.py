@@ -1,8 +1,7 @@
-import json
 import logging
 
 from fsrs import Card
-from sqlalchemy import bindparam, text
+from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 logger = logging.getLogger("khawarizmi.fsrs")
@@ -19,39 +18,10 @@ async def get_concept_mapping(db: AsyncSession, question_id: str) -> dict[str, f
 
 
 async def get_concept_states(db: AsyncSession, user_id: int, concept_ids: list[str]) -> dict[str, Card]:
-    """Charge l'état FSRS de chaque concept pour cet utilisateur."""
-    states: dict[str, Card] = {}
-    if not concept_ids:
-        return states
+    """Charge l'état FSRS de chaque concept — S3b : délègue à fsrs_unified."""
+    from services.fsrs_unified import get_concept_states as _unified
 
-    cids_param = tuple(concept_ids) if len(concept_ids) > 1 else (concept_ids[0],)
-    stmt = text(
-        "SELECT concept_id, fsrs_state FROM mastery_micro_concepts WHERE user_id = :uid AND concept_id IN :cids"
-    ).bindparams(bindparam("cids", expanding=True))
-
-    try:
-        res = await db.execute(stmt, {"uid": user_id, "cids": cids_param})
-        for row in res.fetchall():
-            c_id, fsrs_state_dict = row[0], row[1] or {}
-            card = Card()
-            if fsrs_state_dict:
-                try:
-                    card.stability = fsrs_state_dict.get("stability", card.stability)
-                    card.difficulty = fsrs_state_dict.get("difficulty", card.difficulty)
-                    for attr in ["scheduled_days", "reps", "lapses"]:
-                        if hasattr(card, attr) and attr in fsrs_state_dict:
-                            setattr(card, attr, fsrs_state_dict[attr])
-                except Exception as e:
-                    logger.error(f"Erreur hydratation FSRS: {e}")
-            states[c_id] = card
-    except Exception as e:
-        logger.error(f"get_concept_states: {e}")
-
-    for c_id in concept_ids:
-        if c_id not in states:
-            states[c_id] = Card()
-
-    return states
+    return await _unified(db, user_id, concept_ids)
 
 
 async def save_concept_updates(
@@ -71,7 +41,7 @@ async def save_concept_updates(
         if not sched_days and new_card.due and new_card.last_review:
             sched_days = (new_card.due - new_card.last_review).days
 
-        fsrs_json = json.dumps({
+        fsrs_json = {
             "stability": new_card.stability,
             "difficulty": new_card.difficulty,
             "scheduled_days": sched_days,
@@ -79,50 +49,32 @@ async def save_concept_updates(
             "lapses": getattr(new_card, "lapses", 0),
             "state": str(new_card.state),
             "last_review": new_card.last_review.isoformat() if new_card.last_review else None,
-        })
+        }
 
         is_direct_eval = upd.get("rating_applied") is not None
-        forced_reason = upd.get("forced_review_reason")
-
         if is_direct_eval:
             pending = eval_result.get("needs_l1_review", False)
         else:
             pending = False
+            forced_reason = upd.get("forced_review_reason")
             if forced_reason:
                 logger.debug(
                     f"FSRS_PROPAGATION | user={user_id} | "
                     f"concept={c_id} | reason={forced_reason}"
                 )
 
-        await db.execute(
-            text("""
-                INSERT INTO mastery_micro_concepts
-                    (user_id, micro_concept_id, concept_id, chapter, due_date,
-                     interval_jours, difficulty, stability, fsrs_state, pending_real_evaluation, updated_at)
-                VALUES
-                    (:user_id, :c_id, :c_id, :chapter, :due,
-                     :interval, :difficulty, :stability, CAST(:fsrs_state AS jsonb), :pending_eval, NOW())
-                ON CONFLICT (user_id, concept_id)
-                DO UPDATE SET
-                    due_date           = EXCLUDED.due_date,
-                    interval_jours     = EXCLUDED.interval_jours,
-                    difficulty         = EXCLUDED.difficulty,
-                    stability          = EXCLUDED.stability,
-                    fsrs_state         = EXCLUDED.fsrs_state,
-                    pending_real_evaluation = EXCLUDED.pending_real_evaluation,
-                    updated_at         = NOW()
-            """),
-            {
-                "user_id": user_id,
-                "c_id": c_id,
-                "chapter": chapter,
-                "due": upd["due"],
-                "interval": sched_days,
-                "difficulty": new_card.difficulty,
-                "stability": new_card.stability,
-                "fsrs_state": fsrs_json,
-                "pending_eval": pending,
-            },
+        # S3b : upsert via le service unifié (ON CONFLICT user_id+concept_id)
+        from services.fsrs_unified import save_concept_update
+
+        await save_concept_update(
+            db, user_id, c_id,
+            chapter=question.get("chapitre_id", "ch_inconnu"),
+            due=upd["due"],
+            interval_jours=sched_days,
+            difficulty=new_card.difficulty,
+            stability=new_card.stability,
+            fsrs_state=fsrs_json,
+            pending_eval=pending,
         )
 
         if c_id == question.get("concept_cle") and is_direct_eval:

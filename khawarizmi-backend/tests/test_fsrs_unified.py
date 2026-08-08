@@ -14,11 +14,14 @@ from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
 from services.fsrs_unified import (
     get_concept_state,
+    get_concept_states,
     get_due_items,
     get_user_memory,
     memory_summary,
     save_concept_card,
     save_concept_review,
+    save_concept_update,
+    tag_pending_concept,
     update_memory,
 )
 
@@ -46,7 +49,8 @@ CREATE TABLE mastery_micro_concepts (
     due_date DATETIME,
     pending_real_evaluation BOOLEAN DEFAULT 0,
     updated_at DATETIME,
-    UNIQUE(user_id, micro_concept_id)
+    UNIQUE(user_id, micro_concept_id),
+    UNIQUE(user_id, concept_id)
 );
 CREATE TABLE da_fsrs (
     id INTEGER PRIMARY KEY,
@@ -330,6 +334,112 @@ class TestConceptHelpers:
                     prochaine_revision=datetime.now(UTC),
                 )
                 assert ok is False  # mastery_micro_concepts absente
+        finally:
+            await engine.dispose()
+            os.unlink(path)
+
+
+class TestEvaluationRichHelpers:
+    @pytest.mark.asyncio
+    async def test_get_concept_states_batch(self, db):
+        """Batch par concept_id : retourne des Cards hydratées ou vierges."""
+        from datetime import UTC, datetime, timedelta
+
+        from fsrs import Card
+
+        due = datetime.now(UTC) + timedelta(days=2)
+        await save_concept_update(
+            db, 1, "c1", chapter="ch1",
+            due=due, interval_jours=2.0,
+            difficulty=5.0, stability=2.5,
+            fsrs_state={"stability": 2.5, "difficulty": 5.0, "reps": 3},
+        )
+        states = await get_concept_states(db, 1, ["c1", "absent"])
+        assert set(states) == {"c1", "absent"}
+        assert isinstance(states["c1"], Card)
+        assert states["c1"].stability == 2.5
+        # reps n'existe pas sur la Card fsrs (l'ancien code utilisait
+        # hasattr comme garde) — seuls les champs présents sont hydratés
+        if hasattr(states["c1"], "reps"):
+            assert states["c1"].reps == 3
+        assert isinstance(states["absent"], Card)
+        # Card() vierge : stability None (l'ancien code retournait Card() aussi)
+        assert states["absent"].stability is None
+
+    @pytest.mark.asyncio
+    async def test_save_concept_update_roundtrip(self, db):
+        from datetime import UTC, datetime, timedelta
+
+        due = datetime.now(UTC) + timedelta(days=5)
+        ok = await save_concept_update(
+            db, 1, "c2", chapter="ch2",
+            due=due, interval_jours=5.0,
+            difficulty=4.0, stability=3.0,
+            fsrs_state={"stability": 3.0, "reps": 1},
+            pending_eval=False,
+        )
+        assert ok is True
+        items = await get_user_memory(db, 1, kinds=("concept",))
+        assert len(items) == 1
+        assert items[0].item_id == "c2"
+        assert items[0].stability == 3.0
+        assert items[0].chapter == "ch2"
+
+    @pytest.mark.asyncio
+    async def test_save_concept_update_conflict_on_concept_id(self, db):
+        """Deux concepts partageant le même concept_id → un seul upsert
+        (ON CONFLICT user_id+concept_id — le schéma réel l'exige)."""
+        from datetime import UTC, datetime, timedelta
+
+        due = datetime.now(UTC) + timedelta(days=1)
+        # micro_concept_id différent, concept_id identique (c_id = c3)
+        await save_concept_update(
+            db, 1, "c3", chapter="ch1",
+            due=due, interval_jours=1.0, difficulty=5.0, stability=1.0,
+            fsrs_state={"stability": 1.0},
+        )
+        await save_concept_update(
+            db, 1, "c3", chapter="ch1",
+            due=due, interval_jours=2.0, difficulty=5.0, stability=2.0,
+            fsrs_state={"stability": 2.0},
+        )
+        items = await get_user_memory(db, 1, kinds=("concept",))
+        assert len(items) == 1
+        assert items[0].stability == 2.0  # écrasé par le 2e
+
+    @pytest.mark.asyncio
+    async def test_tag_pending_concept(self, db):
+        ok = await tag_pending_concept(db, 1, "c_pending", "ch3")
+        assert ok is True
+        # Lire l'état : pending_real_evaluation doit être TRUE
+        from sqlalchemy import text
+
+        res = await db.execute(
+            text("SELECT pending_real_evaluation FROM mastery_micro_concepts WHERE concept_id = 'c_pending'")
+        )
+        row = res.fetchone()
+        assert row is not None
+        assert bool(row[0]) is True
+
+    @pytest.mark.asyncio
+    async def test_missing_table_returns_false(self, db):
+        import os
+        import tempfile
+
+        fd, path = tempfile.mkstemp(suffix=".db")
+        os.close(fd)
+        engine = create_async_engine(f"sqlite+aiosqlite:///{path}")
+        async with engine.begin() as conn:
+            await conn.exec_driver_sql("CREATE TABLE users (id INTEGER PRIMARY KEY)")
+        factory = async_sessionmaker(engine, expire_on_commit=False)
+        try:
+            async with factory() as session:
+                assert await save_concept_update(
+                    session, 1, "x", chapter="ch",
+                    due=None, interval_jours=1.0, difficulty=1.0,
+                    stability=1.0, fsrs_state={},
+                ) is False
+                assert await tag_pending_concept(session, 1, "x", "ch") is False
         finally:
             await engine.dispose()
             os.unlink(path)

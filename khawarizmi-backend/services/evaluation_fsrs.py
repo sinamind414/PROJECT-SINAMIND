@@ -104,21 +104,13 @@ async def apply_evaluation_to_fsrs(
         )
         return next_review_date
 
-    # Fallback L3 ou erreur totale : carte en attente ( Tag )
-    await db.execute(
-        text("""
-            INSERT INTO mastery_micro_concepts
-                (user_id, micro_concept_id, concept_id, chapter, pending_real_evaluation, updated_at)
-            VALUES
-                (:user_id, :mc_id, :mc_id, :chapter, TRUE, NOW())
-            ON CONFLICT (user_id, concept_id)
-            DO UPDATE SET pending_real_evaluation = TRUE, updated_at = NOW()
-        """),
-        {
-            "user_id": user_id,
-            "mc_id": question_id,
-            "chapter": question.get("chapitre_id", "ch_inconnu"),
-        },
+    # Fallback L3 ou erreur totale : carte en attente (Tag) — S3b : via le
+    # service unifié (même upsert, ON CONFLICT user_id+concept_id)
+    from services.fsrs_unified import tag_pending_concept
+
+    await tag_pending_concept(
+        db, user_id, question_id,
+        chapter=question.get("chapitre_id", "ch_inconnu"),
     )
     await db.commit()
 

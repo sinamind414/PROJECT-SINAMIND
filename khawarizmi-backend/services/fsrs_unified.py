@@ -28,7 +28,7 @@ from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from typing import Any, Literal
 
-from sqlalchemy import text
+from sqlalchemy import bindparam, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 logger = logging.getLogger("khawarizmi.fsrs_unified")
@@ -618,4 +618,133 @@ async def save_concept_card(
         return True
     except Exception as e:
         logger.warning(f"fsrs_unified: save_concept_card échoué ({e})")
+        return False
+
+
+# ── Helpers parcours ÉVALUATION RICHE (S3b : /api/evaluate, drill) ───
+
+async def get_concept_states(
+    db: AsyncSession,
+    user_id,
+    concept_ids: list[str],
+) -> dict[str, Any]:
+    """Charge l'état FSRS de chaque concept (par concept_id, batch IN).
+
+    Fidèle à fsrs_persistence.get_concept_states : retourne un dict
+    concept_id → Card FSRS hydratée (Card() vierge si absent).
+    """
+    from fsrs import Card
+
+    states: dict[str, Any] = {}
+    if not concept_ids:
+        return states
+
+    cids_param = tuple(concept_ids) if len(concept_ids) > 1 else (concept_ids[0],)
+    stmt = text(
+        "SELECT concept_id, fsrs_state FROM mastery_micro_concepts "
+        "WHERE user_id = :uid AND concept_id IN :cids"
+    ).bindparams(bindparam("cids", expanding=True))
+
+    try:
+        res = await db.execute(stmt, {"uid": user_id, "cids": cids_param})
+        for row in res.fetchall():
+            c_id, fsrs_state_dict = row[0], _parse_state(row[1])
+            card = Card()
+            if fsrs_state_dict:
+                try:
+                    card.stability = fsrs_state_dict.get("stability", card.stability)
+                    card.difficulty = fsrs_state_dict.get("difficulty", card.difficulty)
+                    for attr in ["scheduled_days", "reps", "lapses"]:
+                        if hasattr(card, attr) and attr in fsrs_state_dict:
+                            setattr(card, attr, fsrs_state_dict[attr])
+                except Exception as e:
+                    logger.error(f"Erreur hydratation FSRS: {e}")
+            states[c_id] = card
+    except Exception as e:
+        logger.error(f"get_concept_states: {e}")
+
+    for c_id in concept_ids:
+        if c_id not in states:
+            states[c_id] = Card()
+
+    return states
+
+
+async def save_concept_update(
+    db: AsyncSession,
+    user_id,
+    concept_id: str,
+    *,
+    chapter: str,
+    due,
+    interval_jours: float,
+    difficulty: float,
+    stability: float,
+    fsrs_state: dict[str, Any],
+    pending_eval: bool = False,
+) -> bool:
+    """Upsert d'un concept APRÈS évaluation riche.
+
+    Fidèle à fsrs_persistence.save_concept_updates : ON CONFLICT sur
+    (user_id, concept_id) — pas sur micro_concept_id (les deux contraintes
+    UNIQUE existent dans le schéma réel).
+    """
+    try:
+        await db.execute(
+            text(f"""
+                INSERT INTO mastery_micro_concepts
+                    (user_id, micro_concept_id, concept_id, chapter, due_date,
+                     interval_jours, difficulty, stability, fsrs_state,
+                     pending_real_evaluation, updated_at)
+                VALUES
+                    (:user_id, :c_id, :c_id, :chapter, :due,
+                     :interval, :difficulty, :stability, {_fsrs_cast(db)},
+                     :pending_eval, NOW())
+                ON CONFLICT (user_id, concept_id)
+                DO UPDATE SET
+                    due_date           = EXCLUDED.due_date,
+                    interval_jours     = EXCLUDED.interval_jours,
+                    difficulty         = EXCLUDED.difficulty,
+                    stability          = EXCLUDED.stability,
+                    fsrs_state         = EXCLUDED.fsrs_state,
+                    pending_real_evaluation = EXCLUDED.pending_real_evaluation,
+                    updated_at         = NOW()
+            """),
+            {"user_id": user_id, "c_id": concept_id,
+             "chapter": chapter, "due": due, "interval": interval_jours,
+             "difficulty": difficulty, "stability": stability,
+             "fsrs": json.dumps(fsrs_state or {}), "pending_eval": pending_eval},
+        )
+        return True
+    except Exception as e:
+        logger.warning(f"fsrs_unified: save_concept_update échoué ({e})")
+        return False
+
+
+async def tag_pending_concept(
+    db: AsyncSession,
+    user_id,
+    concept_id: str,
+    chapter: str,
+) -> bool:
+    """Marque un concept en attente d'évaluation réelle (fallback L3/erreur).
+
+    Fidèle au bloc pending d'evaluation_fsrs : pending_real_evaluation=TRUE.
+    """
+    try:
+        await db.execute(
+            text("""
+                INSERT INTO mastery_micro_concepts
+                    (user_id, micro_concept_id, concept_id, chapter,
+                     pending_real_evaluation, updated_at)
+                VALUES
+                    (:user_id, :mc_id, :mc_id, :chapter, TRUE, NOW())
+                ON CONFLICT (user_id, concept_id)
+                DO UPDATE SET pending_real_evaluation = TRUE, updated_at = NOW()
+            """),
+            {"user_id": user_id, "mc_id": concept_id, "chapter": chapter},
+        )
+        return True
+    except Exception as e:
+        logger.warning(f"fsrs_unified: tag_pending_concept échoué ({e})")
         return False
