@@ -13,13 +13,13 @@ Design (audit) :
 import asyncio
 import json
 import time
-from unittest.mock import AsyncMock
+from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
 from app_state import state
 from grading.cache import evaluate_with_cache
-from grading.pipeline import evaluate_answer_v2_pipeline
+from services.correction_v2_retry import evaluate_answer_v2_with_retry
 from services.savoir_corrector import (
     SAVOIR_HIGH_CONFIDENCE_MIN_CONCEPTS,
     deterministic_correct_v2,
@@ -82,22 +82,30 @@ def fake_redis(monkeypatch):
     return fake
 
 
-def _make_evaluate_fn(return_result: dict | None = None):
-    """Mock asynchrone du correcteur LLM : compte les appels."""
-    holder = {"result": return_result or {
-        "source": "llm", "score": 2, "score_max": 2, "percentage": 100,
-        "highlights": [], "matched_criteria": [], "unmatched_criteria": [],
-        "feedback_ar": "f", "advice_ar": "", "confidence": 0.9,
-        "sanity_code": "ok", "parse_status": "ok", "provider": "p",
-        "model": "m", "finish_reason": "stop", "prompt_hash": None,
-        "student_answer_hash": "h", "llm_raw_hash": None, "missing": [],
-        "dominant_error_code": "all_correct", "success": [], "errors": [],
-        "remediation": None,
-    }}
+def _make_llm_mock(content: str | None = None):
+    """Mock du llm_call (réponse avec .choices, JSON v1 par défaut)."""
+    from unittest.mock import MagicMock
+
+    payload = content if content is not None else json.dumps({
+        "score": 2,
+        "matched_criteria": ["a"],
+        "unmatched_criteria": [],
+        "highlights": [],
+        "feedback_ar": "f",
+        "advice_ar": "",
+        "confidence": 0.9,
+    }, ensure_ascii=False)
     mock = AsyncMock()
 
     async def _impl(**kwargs):
-        return json.loads(json.dumps(holder["result"]))
+        resp = MagicMock()
+        resp.choices = [MagicMock()]
+        resp.choices[0].message.content = payload
+        resp.choices[0].finish_reason = "stop"
+        resp._khawarizmi_json_mode = False
+        resp._khawarizmi_provider = "primary"
+        resp._khawarizmi_model = "test"
+        return resp
 
     mock.side_effect = _impl
     return mock
@@ -111,20 +119,22 @@ Q_GS001 = {
 }
 
 
-async def _call(legacy_mock, *, answer: str, verb_slug: str = "analyse",
+async def _call(llm_mock, *, answer: str, verb_slug: str = "analyse",
                 question: str = Q_GS001["question"],
                 model_answer: str = Q_GS001["reponse_attendue"],
                 score_max: int = Q_GS001["bareme"], **overrides) -> dict:
-    """Appelle le wrapper cache avec le PIPELINE réel (S2.1c) et le legacy
-    mocké (evaluate_answer_v2_with_retry simulé)."""
+    """Appelle le wrapper cache avec le RETRY réel (S2.1f) → façade →
+    pipeline complet ; llm_call mocké pour les cas non-savoir."""
     return await evaluate_with_cache(
         question_id=1,
         verb_slug=verb_slug,
         score_max=score_max,
         student_answer=answer,
         model_id="gpt-4o-mini",
-        evaluate_fn=evaluate_answer_v2_pipeline,
-        evaluate_legacy=legacy_mock,
+        evaluate_fn=evaluate_answer_v2_with_retry,
+        llm_call=llm_mock,
+        primary_client=MagicMock(),
+        primary_model="test",
         scenario_context="ctx",
         documents=None,
         question_prompt=question,
@@ -208,9 +218,9 @@ class TestDeterministicCorrectV2:
 class TestSavoirBranching:
     async def test_savoir_applied_when_high_confidence(self, savoir_active, fake_redis):
         """Question couverte + ≥ 3 concepts dans la copie → le PIPELINE
-        promeut savoir (0 appel legacy/LLM), pas de remédiation (κ modéré)."""
-        legacy_mock = _make_evaluate_fn()
-        result = await _call(legacy_mock, answer=Q_GS001["reponse_attendue"])
+        promeut savoir (0 appel LLM), pas de remédiation (κ modéré)."""
+        llm_mock = _make_llm_mock()
+        result = await _call(llm_mock, answer=Q_GS001["reponse_attendue"])
 
         assert result["source"] == "local_savoir"
         assert result["remediation"] is None
@@ -218,73 +228,74 @@ class TestSavoirBranching:
         assert result["attempts"] == 0
         assert result["parse_status"] == "local"
         assert result["finish_reason"] == "savoir_high_confidence"
-        assert legacy_mock.await_count == 0
+        assert llm_mock.await_count == 0
 
     async def test_savoir_skipped_when_low_concepts(self, savoir_active, fake_redis):
-        """Copie avec < 3 concepts → savoir cède, legacy appelé."""
-        legacy_mock = _make_evaluate_fn()
+        """Copie avec < 3 concepts → savoir cède, le LLM est appelé (via
+        retry → façade → pipeline → llm_call)."""
+        llm_mock = _make_llm_mock()
         # "الاستنساخ" (transcription) + "النواة" (noyau) = 2 concepts < 3
-        result = await _call(legacy_mock, answer="الاستنساخ يتم في النواة")
+        result = await _call(llm_mock, answer="الاستنساخ يتم في النواة")
 
         assert result["source"] != "local_savoir"
-        assert legacy_mock.await_count == 1
+        assert llm_mock.await_count == 1
 
     async def test_savoir_disabled_globally_by_default(self, fake_redis):
         """Défaut config : savoir_enabled_verbs=[] → jamais appelé."""
-        legacy_mock = _make_evaluate_fn()
-        result = await _call(legacy_mock, answer=Q_GS001["reponse_attendue"])
+        llm_mock = _make_llm_mock()
+        result = await _call(llm_mock, answer=Q_GS001["reponse_attendue"])
 
         assert result["source"] != "local_savoir"
-        assert legacy_mock.await_count == 1
+        assert llm_mock.await_count == 1
 
     async def test_savoir_disabled_for_verb_not_in_list(self, savoir_active, fake_redis):
         """Verbe absent de la liste → savoir skippé même si haute confiance."""
-        legacy_mock = _make_evaluate_fn()
-        result = await _call(legacy_mock, answer=Q_GS001["reponse_attendue"],
+        llm_mock = _make_llm_mock()
+        result = await _call(llm_mock, answer=Q_GS001["reponse_attendue"],
                              verb_slug="interpret")
 
         assert result["source"] != "local_savoir"
-        assert legacy_mock.await_count == 1
+        assert llm_mock.await_count == 1
 
     async def test_savoir_result_is_cached(self, savoir_active, fake_redis):
         """Le wrapper cache (pur, S2.1c) cache le résultat local_savoir du
         pipeline ; 2e envoi → hit (source préservée, from_cache=True), 0
         appel legacy au total."""
-        legacy_mock = _make_evaluate_fn()
-        r1 = await _call(legacy_mock, answer=Q_GS001["reponse_attendue"])
-        r2 = await _call(legacy_mock, answer=Q_GS001["reponse_attendue"])
+        llm_mock = _make_llm_mock()
+        r1 = await _call(llm_mock, answer=Q_GS001["reponse_attendue"])
+        r2 = await _call(llm_mock, answer=Q_GS001["reponse_attendue"])
 
         assert r1["source"] == "local_savoir"
-        assert legacy_mock.await_count == 0  # jamais appelé (savoir 0 token)
+        assert llm_mock.await_count == 0  # jamais appelé (savoir 0 token)
         assert r2["source"] == "local_savoir"  # source préservée au hit
         assert r2["from_cache"] is True
         assert r2["score"] == r1["score"]
 
     async def test_savoir_survives_single_flight(self, savoir_active, fake_redis):
         """10 concurrents → 1 seul calcul savoir, 9 hits."""
-        legacy_mock = _make_evaluate_fn()
+        llm_mock = _make_llm_mock()
         results = await asyncio.gather(*[
-            _call(legacy_mock, answer=Q_GS001["reponse_attendue"]) for _ in range(10)
+            _call(llm_mock, answer=Q_GS001["reponse_attendue"]) for _ in range(10)
         ])
         assert all(r["score"] == Q_GS001["bareme"] for r in results)
         assert sum(1 for r in results if r.get("from_cache")) == 9
-        assert legacy_mock.await_count == 0
+        assert llm_mock.await_count == 0
 
     async def test_savoir_not_cached_without_redis(self, savoir_active):
         """Sans Redis (CI) : pas de cache, mais l'étage savoir fonctionne."""
-        legacy_mock = _make_evaluate_fn()
-        r = await _call(legacy_mock, answer=Q_GS001["reponse_attendue"])
+        llm_mock = _make_llm_mock()
+        r = await _call(llm_mock, answer=Q_GS001["reponse_attendue"])
         assert r["source"] == "local_savoir"
-        assert legacy_mock.await_count == 0
+        assert llm_mock.await_count == 0
 
     async def test_sanity_still_first(self, savoir_active, fake_redis):
         """Une copie vide est rejetée par sanity — ni savoir ni legacy ne
         sont exécutés (court-circuit S2.1c dans le pipeline)."""
-        legacy_mock = _make_evaluate_fn()
-        r = await _call(legacy_mock, answer="   ")
+        llm_mock = _make_llm_mock()
+        r = await _call(llm_mock, answer="   ")
         assert r["source"] == "sanity"
         assert r["sanity_code"] == "empty"
-        assert legacy_mock.await_count == 0  # court-circuit avant le legacy
+        assert llm_mock.await_count == 0  # court-circuit avant le legacy
 
 
 # ── Étape 4 : non-régression golden (périmètre de branchement) ───────

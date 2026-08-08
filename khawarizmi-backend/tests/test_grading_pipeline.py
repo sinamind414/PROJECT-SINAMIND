@@ -1,242 +1,252 @@
-"""tests/test_grading_pipeline.py — Pipeline shadow (audit S2.1a).
+"""tests/test_grading_pipeline.py — Pipeline complet (audit S2.1f).
 
-Objectif strict : `nouveau pipeline(input) == ancien moteur(input)`.
-
-- Parité sur les cas du plan : sanity, local_savoir, local fallback, LLM
-  mocké, JSON invalide, cache hit, réponse vide.
-- Le pipeline retourne EXACTEMENT le résultat de l'ancien moteur (champs
-  fonctionnels — VOLATILE_FIELDS exclus).
-- Le contexte est rempli correctement (source, parse_strategy, final_result,
-  steps en ms, llm_called).
-- État initial du contexte (acceptation S2.1a).
+Le pipeline appelle TOUTES les étapes directement (sanity → savoir → prompt
+→ LLM → parser → mapping → post-validation) ; la façade correction_v2
+délègue ici. Ces tests vérifient la logique réelle avec des mocks LLM :
+- sanity court-circuit (aucun appel LLM)
+- étage savoir (promotion, feature flag)
+- LLM v1 / v2 (mapping), erreurs, JSON invalide, L2 fallback
+- constances (LLM_MAX_TOKENS, VOLATILE_FIELDS) et assert_parity
 """
 
-from unittest.mock import AsyncMock
+import json
+from unittest.mock import MagicMock
 
 import pytest
 
-from grading.context import GradingContext, PipelineContext
 from grading.pipeline import (
+    LLM_MAX_TOKENS,
+    LLM_TEMPERATURE,
+    LLM_TIMEOUT_SECONDS,
     VOLATILE_FIELDS,
     assert_parity,
     evaluate_answer_v2_pipeline,
 )
+from services.correction_v2 import evaluate_answer_v2
+
+BASE_KWARGS = {
+    "scenario_context": "دراسة تأثير التغذية على نسبة الغلوكوز",
+    "documents": [{"title": "وثيقة 1", "caption": "منحنى", "data": None}],
+    "question_prompt": "حلّل الوثيقة 1",
+    "question_skill": "تحليل وثيقة",
+    "verb_slug": "analyse",
+    "model_answer": "نلاحظ من الوثيقة أن نسبة الغلوكوز تزداد من 0.8 إلى 1.4 غ/ل",
+    "learning_focus": "التنظيم الهرموني",
+    "score_max": 8,
+}
 
 
-def _legacy_factory(result: dict):
-    """Crée un ancien moteur mocké retournant `result` (copie fraîche)."""
-    import json
+def _make_llm_response(content: str) -> MagicMock:
+    resp = MagicMock()
+    resp.choices = [MagicMock()]
+    resp.choices[0].message.content = content
+    resp.choices[0].finish_reason = "stop"
+    resp._khawarizmi_json_mode = False
+    resp._khawarizmi_provider = "primary"
+    resp._khawarizmi_model = "test"
+    return resp
 
-    async def _impl(**kwargs):
-        return json.loads(json.dumps(result))
 
-    return AsyncMock(side_effect=_impl)
-
-
-def _base_result(**overrides) -> dict:
-    r = {
-        "source": "llm",
-        "score": 3,
-        "score_max": 4,
-        "percentage": 75,
-        "highlights": [],
+def _v1_json(score: int = 6) -> str:
+    return json.dumps({
+        "score": score,
         "matched_criteria": ["a"],
         "unmatched_criteria": [],
+        "highlights": [],
         "feedback_ar": "f",
         "advice_ar": "",
         "confidence": 0.8,
-        "sanity_code": "ok",
-        "provider": "p",
-        "model": "m",
-        "finish_reason": "stop",
-        "parse_status": "ok",
-        "attempts": 1,
-        "prompt_hash": "h1",
-        "student_answer_hash": "h2",
-        "llm_raw_hash": None,
-        "missing": [],
-        "dominant_error_code": "partial_correct",
-        "success": [],
+    }, ensure_ascii=False)
+
+
+def _v2_json(score: int = 75) -> str:
+    return json.dumps({
+        "score": score,
         "errors": [],
-        "remediation": None,
-    }
-    r.update(overrides)
-    return r
+        "feedback": "f",
+        "grade": "acquis",
+    }, ensure_ascii=False)
 
 
-async def _run(legacy, answer: str = "الاستنساخ يتم في النواة والترجمة في الهيولى",
-               **kwargs) -> dict:
-    """Copie par défaut VALIDE (arabe) — depuis S2.1c, le pipeline
-    court-circuite sur rejet sanity (une copie latine serait rejetée avant
-    d'atteindre le legacy mocké)."""
+async def _run(llm_mock, *, answer: str = "الاستنساخ يتم في النواة والترجمة في الهيولى",
+               **overrides) -> dict:
+    kwargs = {k: v for k, v in BASE_KWARGS.items()
+              if k not in ("verb_slug", "model_answer", "score_max")}
+    kwargs.update(overrides)
     return await evaluate_answer_v2_pipeline(
         question_id=1,
         verb_slug="analyse",
-        score_max=4,
+        score_max=8,
         student_answer=answer,
-        model_answer="modèle",
-        evaluate_legacy=legacy,
-        scenario_context="ctx",
-        question_prompt="حلل",
-        use_v2_prompt=True,
+        model_answer=BASE_KWARGS["model_answer"],
+        llm_call=llm_mock,
+        primary_client=MagicMock(),
+        primary_model="test",
         **kwargs,
     )
 
 
-# ── État initial du contexte (acceptation) ───────────────────────────
+class TestSanity:
+    @pytest.mark.asyncio
+    async def test_reject_circuit_breaks(self):
+        """Copie invalide → sanity rejetée, AUCUN appel LLM."""
+        llm_mock = MagicMock()
+        result = await _run(llm_mock, answer="ZZZZZ")
+        assert result["source"] == "sanity"
+        assert result["sanity_code"] == "too_short"
+        assert result["score"] == 0
+        llm_mock.assert_not_called()
 
-class TestPipelineContextInitialState:
-    def test_initial_state(self):
-        ctx = PipelineContext(
-            question_id=1, verb_slug="analyse", score_max=4,
-            student_answer="x", model_answer="y",
+    @pytest.mark.asyncio
+    async def test_empty_answer(self):
+        llm_mock = MagicMock()
+        result = await _run(llm_mock, answer="")
+        assert result["source"] == "sanity"
+        assert result["sanity_code"] == "empty"
+        llm_mock.assert_not_called()
+
+    @pytest.mark.asyncio
+    async def test_precomputed_sanity_retrocompat(self):
+        """precomputed_sanity (S2.1b) : résultat identique au calcul interne."""
+        llm_mock = MagicMock()
+        result = await _run(llm_mock, answer="", precomputed_sanity=(False, "empty", "msg"))
+        assert result["source"] == "sanity"
+        assert result["sanity_code"] == "empty"
+        llm_mock.assert_not_called()
+
+
+class TestSavoirIntegrated:
+    # Contexte du golden couvert par le lexique (≥ 3 concepts dans la copie)
+    _Q = "أين يحدث نسخ المعلومة الوراثية في الخلية حقيقية النواة؟"
+    _MA = "يحدث نسخ المعلومة الوراثية في النواة حيث تتواجد جزيئة ADN"
+
+    @pytest.mark.asyncio
+    async def test_savoir_promoted_no_llm_call(self, monkeypatch):
+        from config import get_settings
+        monkeypatch.setattr(get_settings(), "savoir_enabled_verbs", ["analyse"])
+
+        llm_mock = MagicMock()
+        result = await evaluate_answer_v2_pipeline(
+            question_id=1, verb_slug="analyse", score_max=2,
+            student_answer=self._MA, model_answer=self._MA,
+            question_prompt=self._Q, question_skill="restitution",
+            llm_call=llm_mock, primary_client=MagicMock(), primary_model="test",
         )
-        assert ctx.sanity_result is None
-        assert ctx.savoir_result is None
-        assert ctx.l2_result is None
-        assert ctx.llm_response is None
-        assert ctx.parsed_llm is None
-        assert ctx.final_result is None
-        assert ctx.source == "unknown"
-        assert ctx.parse_strategy == "none"
-        assert ctx.steps == {}
-        assert ctx.llm_called is False
-        assert ctx.cache_hit is False
+        assert result["source"] == "local_savoir"
+        assert result["parse_status"] == "local"
+        assert result["remediation"] is None
+        assert result["attempts"] == 0
+        llm_mock.assert_not_called()
 
-    def test_grading_context_alias(self):
-        """GradingContext et PipelineContext sont le même type."""
-        assert GradingContext is PipelineContext
-        ctx = GradingContext(
-            question_id=1, verb_slug="analyse", score_max=4,
-            student_answer="x", model_answer="y",
+    @pytest.mark.asyncio
+    async def test_savoir_disabled_by_default(self):
+        """Défaut config : savoir_enabled_verbs=[] → jamais promu."""
+        async def llm_mock(**kwargs):
+            return _make_llm_response(_v1_json())
+
+        result = await _run(llm_mock)
+        assert result["source"] != "local_savoir"
+        assert result["source"] == "llm"
+
+
+class TestLLM:
+    @pytest.mark.asyncio
+    async def test_v1_success(self):
+        async def llm_mock(**kwargs):
+            return _make_llm_response(_v1_json(score=6))
+
+        result = await _run(llm_mock)
+        assert result["source"] == "llm"
+        assert result["score"] == 6
+        assert result["parse_status"] == "ok"
+        assert result["percentage"] == 75
+
+    @pytest.mark.asyncio
+    async def test_v2_mapping(self):
+        async def llm_mock(**kwargs):
+            resp = _make_llm_response(_v2_json(score=75))
+            resp._khawarizmi_json_mode = True
+            return resp
+
+        result = await _run(llm_mock, use_v2_prompt=True)
+        assert result["source"] == "llm_v2"
+        assert result["score"] == round(75 * 8 / 100)  # 6
+        assert result["parse_status"] == "recovered"
+
+    @pytest.mark.asyncio
+    async def test_llm_error(self):
+        async def llm_mock(**kwargs):
+            raise RuntimeError("boom")
+
+        result = await _run(llm_mock)
+        assert result["source"] == "llm_error"
+        assert result["error_message"] == "boom"
+        assert result["parse_status"] == "failed"
+
+    @pytest.mark.asyncio
+    async def test_llm_error_with_local_fallback(self):
+        async def llm_mock(**kwargs):
+            raise RuntimeError("boom")
+
+        result = await _run(llm_mock, local_fallback=True, local_fallback_db=None)
+        assert result["source"] == "local"
+        assert result["parse_status"] == "local_fallback"
+
+    @pytest.mark.asyncio
+    async def test_json_invalide_error(self):
+        async def llm_mock(**kwargs):
+            return _make_llm_response("pas de json ici {")
+
+        result = await _run(llm_mock)
+        assert result["source"] == "llm_error"
+        assert "parser" in result["error_message"]
+
+    @pytest.mark.asyncio
+    async def test_json_invalide_local_fallback(self):
+        async def llm_mock(**kwargs):
+            return _make_llm_response("pas de json ici {")
+
+        result = await _run(llm_mock, local_fallback=True, local_fallback_db=None)
+        assert result["source"] == "local"
+
+    @pytest.mark.asyncio
+    async def test_llm_call_receives_expected_kwargs(self):
+        captured = {}
+
+        async def llm_mock(**kwargs):
+            captured.update(kwargs)
+            return _make_llm_response(_v1_json())
+
+        await _run(llm_mock)
+        assert captured["temperature"] == LLM_TEMPERATURE
+        assert captured["max_tokens"] == LLM_MAX_TOKENS
+        assert captured["timeout"] == LLM_TIMEOUT_SECONDS
+        assert captured["json_schema"] is None  # json_mode_providers vide par défaut
+        assert captured["response_validator"] is not None
+
+
+class TestFacadeParity:
+    @pytest.mark.asyncio
+    async def test_facade_equals_pipeline(self):
+        """La façade evaluate_answer_v2 délègue au pipeline (même résultat)."""
+        async def llm_mock(**kwargs):
+            return _make_llm_response(_v1_json(score=6))
+
+        via_facade = await evaluate_answer_v2(
+            **BASE_KWARGS,
+            student_answer="الاستنساخ يتم في النواة والترجمة في الهيولى",
+            llm_call=llm_mock, primary_client=MagicMock(), primary_model="test",
         )
-        assert isinstance(ctx, PipelineContext)
-
-    def test_student_answer_is_original(self):
-        """Règle 1 : le contexte garde la copie ORIGINALE (jamais normalisée)."""
-        ctx = PipelineContext(
-            question_id=1, verb_slug="analyse", score_max=4,
-            student_answer="  réponse   élève  \n", model_answer="y",
-        )
-        assert ctx.student_answer == "  réponse   élève  \n"
+        via_pipeline = await _run(llm_mock)
+        assert_parity(via_facade, via_pipeline)
 
 
-# ── Parité pipeline == legacy ────────────────────────────────────────
+class TestConstants:
+    def test_llm_constants(self):
+        assert LLM_TEMPERATURE == 0.0
+        assert LLM_MAX_TOKENS == 900
+        assert LLM_TIMEOUT_SECONDS == 25.0
 
-class TestParity:
-    @pytest.mark.asyncio
-    async def test_parity_sanity(self):
-        """S2.1c : le pipeline court-circuite sur rejet sanity — le legacy
-        n'est PAS appelé, le résultat est construit par le builder legacy
-        (même fonction que le moteur seul → parité structurelle)."""
-        legacy = _legacy_factory(_base_result(source="llm"))
-        out = await _run(legacy, answer="ZZZZZ")
-        assert out["source"] == "sanity"
-        assert out["sanity_code"] == "too_short"  # 5 chars < MIN_LENGTH 8
-        assert out["score"] == 0
-        assert legacy.await_count == 0  # court-circuit avant le legacy
-        # Parité avec le vrai moteur (même builder) — couvert par
-        # test_grading_sanity.test_parity_all_cases
-
-    @pytest.mark.asyncio
-    async def test_parity_local_savoir(self):
-        result = _base_result(source="local_savoir", score=4, percentage=100,
-                              parse_status="local", model="savoir_v1",
-                              remediation=None)
-        legacy = _legacy_factory(result)
-        out = await _run(legacy)
-        assert_parity(out, result)
-
-    @pytest.mark.asyncio
-    async def test_parity_local_fallback(self):
-        result = _base_result(source="local", score=2, percentage=50,
-                              parse_status="local_fallback", model="fallback_l2")
-        legacy = _legacy_factory(result)
-        out = await _run(legacy)
-        assert_parity(out, result)
-
-    @pytest.mark.asyncio
-    async def test_parity_llm_mock(self):
-        result = _base_result(source="llm", score=3, percentage=75,
-                              parse_status="ok")
-        legacy = _legacy_factory(result)
-        out = await _run(legacy)
-        assert_parity(out, result)
-
-    @pytest.mark.asyncio
-    async def test_parity_llm_v2(self):
-        result = _base_result(source="llm_v2", score=3, percentage=75,
-                              parse_status="recovered")
-        legacy = _legacy_factory(result)
-        out = await _run(legacy)
-        assert_parity(out, result)
-
-    @pytest.mark.asyncio
-    async def test_parity_json_invalide(self):
-        """JSON invalide → llm_error (le legacy gère) — parité conservée."""
-        result = _base_result(source="llm_error", score=0, percentage=0,
-                              parse_status="failed",
-                              error_message="Impossible de parser")
-        legacy = _legacy_factory(result)
-        out = await _run(legacy)
-        assert_parity(out, result)
-
-    @pytest.mark.asyncio
-    async def test_parity_cache_hit(self):
-        """Un hit cache (from_cache=True, source d'origine préservée) est
-        transparent pour le pipeline shadow."""
-        result = _base_result(source="llm_v2", score=3, percentage=75,
-                              parse_status="cached", from_cache=True,
-                              attempts=0)
-        legacy = _legacy_factory(result)
-        out = await _run(legacy)
-        assert_parity(out, result, extra_volatile={"from_cache"})
-        assert out["from_cache"] is True
-
-    @pytest.mark.asyncio
-    async def test_parity_empty_answer(self):
-        """Réponse vide → court-circuit sanity (empty), legacy non appelé."""
-        legacy = _legacy_factory(_base_result(source="llm"))
-        out = await _run(legacy, answer="")
-        assert out["source"] == "sanity"
-        assert out["sanity_code"] == "empty"
-        assert legacy.await_count == 0
-
-    @pytest.mark.asyncio
-    async def test_pipeline_returns_exact_legacy_object(self):
-        """Le pipeline ne mute pas le résultat (retour EXACT)."""
-        result = _base_result(source="llm", score=3)
-        legacy = _legacy_factory(result)
-        out = await _run(legacy)
-        # Comparaison structurelle stricte (volatile exclus)
-        for k, v in result.items():
-            if k not in VOLATILE_FIELDS:
-                assert out[k] == v, f"{k}: {out.get(k)} != {v}"
-
-
-# ── Remplissage du contexte ──────────────────────────────────────────
-
-class TestContextFill:
-    @pytest.mark.asyncio
-    async def test_context_filled_from_result(self):
-        result = _base_result(source="llm_v2", score=3, parse_status="recovered",
-                              attempts=1)
-        legacy = _legacy_factory(result)
-        await _run(legacy)
-
-        kwargs = legacy.call_args.kwargs
-        # Le pipeline construit bien l'appel legacy — copie + identité +
-        # sanity pré-calculée
-        assert kwargs["student_answer"] == "الاستنساخ يتم في النواة والترجمة في الهيولى"
-        assert kwargs["score_max"] == 4
-        assert kwargs["verb_slug"] == "analyse"
-        assert kwargs["precomputed_sanity"] == (True, "ok", "")
-
-    @pytest.mark.asyncio
-    async def test_context_steps_recorded(self):
-        result = _base_result(source="llm", score=3)
-        legacy = _legacy_factory(result)
-        await _run(legacy)
-        # steps est rempli (ms) — on ne peut pas vérifier la valeur exacte
-        # (le contexte n'est pas exposé par le wrapper), mais la parité du
-        # résultat est garantie par les autres tests.
+    def test_volatile_fields(self):
+        assert "attempts" in VOLATILE_FIELDS
+        assert "prompt_hash" in VOLATILE_FIELDS

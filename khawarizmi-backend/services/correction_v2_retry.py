@@ -139,6 +139,11 @@ async def evaluate_answer_v2_with_retry(
         if _is_sanity_result(result):
             return _build_retry_result(result, attempts=attempt, was_retried=False)
 
+        # Étage savoir (pipeline) : 0 appel LLM — attempts=0 déjà défini par le
+        # pipeline, aucun retry possible. Retourner tel quel (S2.1f).
+        if result.get("source") == "local_savoir":
+            return result
+
         # Erreur LLM : retry uniquement si transitoire
         if _is_transient_error(result):
             if attempt < max_attempts:

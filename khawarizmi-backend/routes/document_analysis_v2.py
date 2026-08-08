@@ -21,7 +21,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from config import get_settings
 from deps import get_current_user, get_db, get_openai
 from grading.cache import evaluate_with_cache
-from grading.pipeline import evaluate_answer_v2_pipeline
 from rate_limit import evaluate_limit, limiter
 from schemas.document_analysis import EvaluateRequest
 from services.correction_audit import log_correction_audit
@@ -195,8 +194,7 @@ async def evaluer_reponses_v2(
             score_max=score_max,
             student_answer=ans.answer,
             model_id=cfg.openai_model,
-            evaluate_fn=evaluate_answer_v2_pipeline,
-            evaluate_legacy=evaluate_answer_v2_with_retry,
+            evaluate_fn=evaluate_answer_v2_with_retry,
             scenario_context=scenario_context,
             documents=documents,
             question_prompt=q["prompt_ar"],

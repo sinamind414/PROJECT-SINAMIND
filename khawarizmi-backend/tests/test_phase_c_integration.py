@@ -69,7 +69,9 @@ async def test_cost_logger_integration(mock_llm_response):
     """Test que le cost_logger est appelé après un appel LLM réussi."""
     from services.correction_v2 import evaluate_answer_v2
 
-    with patch("services.correction_v2.get_logger") as mock_get_logger:
+    # S2.1f : le cost logging vit dans grading/pipeline (le monolithe est
+    # une façade — get_logger n'y est plus défini).
+    with patch("grading.pipeline.get_logger") as mock_get_logger:
         mock_logger = MagicMock()
         mock_get_logger.return_value = mock_logger
 

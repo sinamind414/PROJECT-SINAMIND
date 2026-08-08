@@ -1,10 +1,10 @@
-"""tests/test_grading_sanity.py — Extraction sanity (audit S2.1b).
+"""tests/test_grading_sanity.py — Extraction sanity (audit S2.1b, S2.1f).
 
 - run_sanity : wrapper pur, codes standardisés.
-- PARITÉ RÉELLE : le pipeline (avec le VRAI evaluate_answer_v2 comme
-  evaluate_legacy) produit le même résultat que l'ancien moteur, sur les cas
-  sanity : vide, court, gibberish, répétitions, copie OK.
-- precomputed_sanity ne change PAS le comportement du legacy (rétrocompat).
+- Le PIPELINE (S2.1f : logique complète) rejette les copies invalides avec
+  le format historique (build_sanity_result) et court-circuite AVANT l'appel
+  LLM ; la copie OK passe au LLM.
+- precomputed_sanity (S2.1b) : rétrocompat — même résultat avec ou sans.
 """
 
 import json
@@ -14,7 +14,6 @@ import pytest
 
 from grading.pipeline import assert_parity, evaluate_answer_v2_pipeline
 from grading.sanity import run_sanity, sanity_tuple
-from services.correction_v2 import evaluate_answer_v2
 
 BASE_KWARGS = {
     "scenario_context": "دراسة تأثير التغذية على نسبة الغلوكوز",
@@ -36,40 +35,38 @@ SANITY_CASES = {
     "copie_ok": "الاستنساخ يتم في النواة والترجمة في الهيولى",
 }
 
-_V1_JSON = {
-    "score": 6,
-    "matched_criteria": ["تقديم الوثيقة"],
-    "unmatched_criteria": [],
-    "highlights": [{"start": 0, "end": 5, "type": "good_element",
-                    "message_ar": "عنصر صحيح"}],
-    "feedback_ar": "إجابة جيدة",
-    "advice_ar": "أضف تفاصيل",
-    "confidence": 0.85,
-}
 
+def _llm_factory(llm_called: dict):
+    """Crée un llm_call mocké (JSON v1) qui compte ses appels."""
 
-def _make_llm_mock():
-    """Mock LLM retournant du JSON v1 valide (pour la copie OK)."""
-
-    async def mock_llm(**kwargs):
+    async def llm_mock(**kwargs):
+        llm_called["n"] += 1
         resp = MagicMock()
         resp.choices = [MagicMock()]
-        resp.choices[0].message.content = json.dumps(_V1_JSON, ensure_ascii=False)
+        resp.choices[0].message.content = json.dumps({
+            "score": 6, "matched_criteria": [], "unmatched_criteria": [],
+            "highlights": [], "feedback_ar": "f", "advice_ar": "",
+            "confidence": 0.8,
+        }, ensure_ascii=False)
         resp.choices[0].finish_reason = "stop"
-        resp._khawarizmi_json_mode = False
         resp._khawarizmi_provider = "primary"
         resp._khawarizmi_model = "test"
         return resp
 
-    return mock_llm
+    return llm_mock
 
 
-def _llm_kwargs():
-    return {"llm_call": _make_llm_mock(), "primary_client": MagicMock(),
-            "primary_model": "test"}
+async def _run(llm_mock, answer: str, **overrides) -> dict:
+    kwargs = {k: v for k, v in BASE_KWARGS.items()
+              if k not in ("verb_slug", "model_answer", "score_max")}
+    kwargs.update(overrides)
+    return await evaluate_answer_v2_pipeline(
+        question_id=1, verb_slug="analyse", score_max=8,
+        student_answer=answer, model_answer=BASE_KWARGS["model_answer"],
+        llm_call=llm_mock, primary_client=MagicMock(), primary_model="test",
+        **kwargs,
+    )
 
-
-# ── run_sanity : wrapper pur ─────────────────────────────────────────
 
 class TestRunSanity:
     @pytest.mark.parametrize("case,expected_code", [
@@ -93,96 +90,49 @@ class TestRunSanity:
         assert sanity_tuple(r) == (False, "empty", r["message_ar"])
 
 
-# ── Parité réelle pipeline == legacy ─────────────────────────────────
-
-class TestParitySanityRealEngine:
+class TestPipelineSanity:
     @pytest.mark.asyncio
     @pytest.mark.parametrize("case_name", list(SANITY_CASES))
-    async def test_parity_all_cases(self, case_name):
-        """Pipeline (vrai moteur en legacy) == moteur seul, pour chaque cas."""
+    async def test_reject_or_pass_like_legacy(self, case_name):
+        """Le pipeline rejette les copies invalides (format build_sanity_result)
+        et laisse passer la copie OK (appel LLM)."""
         answer = SANITY_CASES[case_name]
-        kwargs = {k: v for k, v in BASE_KWARGS.items()
-                  if k not in ("verb_slug", "model_answer", "score_max")}
+        llm_called = {"n": 0}
+        out = await _run(_llm_factory(llm_called), answer)
 
-        # Moteur seul (comportement historique)
-        legacy_result = await evaluate_answer_v2(
-            **BASE_KWARGS, student_answer=answer, **_llm_kwargs()
-        )
-
-        # Pipeline : sanity extraite + legacy avec precomputed_sanity
-        out = await evaluate_answer_v2_pipeline(
-            question_id=1,
-            verb_slug="analyse",
-            score_max=8,
-            student_answer=answer,
-            model_answer=BASE_KWARGS["model_answer"],
-            evaluate_legacy=evaluate_answer_v2,
-            **kwargs, **_llm_kwargs(),
-        )
-
-        assert_parity(out, legacy_result, extra_volatile={"precomputed_sanity"})
-        # La source est la même (sanity pour les rejets, llm pour la copie OK)
-        assert out["source"] == legacy_result["source"]
-        if case_name != "copie_ok":
+        if case_name == "copie_ok":
+            assert out["source"] == "llm"
+            assert llm_called["n"] == 1
+        else:
             assert out["source"] == "sanity"
             assert out["sanity_code"] in {
                 "empty", "too_short", "gibberish", "not_arabic", "repeated_chars",
             }
+            assert out["score"] == 0
+            assert llm_called["n"] == 0  # court-circuit avant l'appel LLM
 
     @pytest.mark.asyncio
-    async def test_precomputed_sanity_does_not_change_legacy(self):
-        """Rétrocompat : le legacy AVEC precomputed_sanity produit le même
-        résultat que SANS (le paramètre est un passe-plat transparent)."""
-        for case_name, answer in SANITY_CASES.items():
-            without = await evaluate_answer_v2(
-                **BASE_KWARGS, student_answer=answer, **_llm_kwargs()
-            )
+    async def test_precomputed_sanity_does_not_change_result(self):
+        """precomputed_sanity (S2.1b) : rétrocompat — même résultat avec ou
+        sans (le paramètre est absorbé par le pipeline)."""
+        for answer in SANITY_CASES.values():
+            llm_called = {"n": 0}
+            without = await _run(_llm_factory(llm_called), answer)
             sanity = run_sanity(answer)
-            with_ = await evaluate_answer_v2(
-                **BASE_KWARGS, student_answer=answer,
-                precomputed_sanity=sanity_tuple(sanity), **_llm_kwargs(),
-            )
+            with_ = await _run(_llm_factory(llm_called), answer,
+                               precomputed_sanity=sanity_tuple(sanity))
             assert_parity(with_, without, extra_volatile={"precomputed_sanity"})
 
     @pytest.mark.asyncio
-    async def test_pipeline_circuit_breaks_on_reject(self):
-        """S2.1c : sur rejet sanity, le pipeline retourne directement le
-        rejet SANS appeler le legacy (court-circuit)."""
-        captured = {"called": False}
-
-        async def legacy_spy(**kwargs):
-            captured["called"] = True
-            return await evaluate_answer_v2(**kwargs)
-
-        out = await evaluate_answer_v2_pipeline(
-            question_id=1, verb_slug="analyse", score_max=8,
-            student_answer="", model_answer=BASE_KWARGS["model_answer"],
-            evaluate_legacy=legacy_spy,
-            **{k: v for k, v in BASE_KWARGS.items()
-               if k not in ("verb_slug", "model_answer", "score_max")},
-            **_llm_kwargs(),
-        )
-        assert out["source"] == "sanity"
-        assert out["sanity_code"] == "empty"
-        assert captured["called"] is False
+    async def test_reject_never_calls_llm(self):
+        """Preuve du court-circuit : 3 rejets successifs → 0 appel LLM."""
+        llm_called = {"n": 0}
+        for answer in ("", "abc", "ERRETREZR"):
+            await _run(_llm_factory(llm_called), answer)
+        assert llm_called["n"] == 0
 
     @pytest.mark.asyncio
-    async def test_pipeline_passes_precomputed_sanity_ok(self):
-        """Copie valide → le pipeline transmet precomputed=(True,'ok','') au
-        legacy (le legacy ne refait pas le calcul)."""
-        captured = {}
-
-        async def legacy_spy(**kwargs):
-            captured["precomputed_sanity"] = kwargs.get("precomputed_sanity")
-            return await evaluate_answer_v2(**kwargs)
-
-        await evaluate_answer_v2_pipeline(
-            question_id=1, verb_slug="analyse", score_max=8,
-            student_answer="الاستنساخ يتم في النواة",
-            model_answer=BASE_KWARGS["model_answer"],
-            evaluate_legacy=legacy_spy,
-            **{k: v for k, v in BASE_KWARGS.items()
-               if k not in ("verb_slug", "model_answer", "score_max")},
-            **_llm_kwargs(),
-        )
-        assert captured["precomputed_sanity"] == (True, "ok", "")
+    async def test_valid_copy_calls_llm_once(self):
+        llm_called = {"n": 0}
+        await _run(_llm_factory(llm_called), "الاستنساخ يتم في النواة والترجمة في الهيولى")
+        assert llm_called["n"] == 1

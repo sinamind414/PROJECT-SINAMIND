@@ -639,6 +639,68 @@ legacy supprimé) — le monolithe devient une façade de compatibilité.
 
 ---
 
+# 2m. S2.1f — Wiring complet : le pipeline appelle tout, le monolithe devient façade ✅
+
+**S2.1 est TERMINÉ.** Le pipeline orchestre toutes les étapes ; la façade
+historique délègue.
+
+- `grading/pipeline.py` (482 lignes) : `evaluate_answer_v2_pipeline` appelle
+  directement sanity (court-circuit build_sanity_result) → savoir (0 token,
+  flag par verbe) → prompt (grading/prompts) → LLM (llm_call injectable,
+  json_schema O7, cost logging) → parser (grading/parser) → mapping v2→v1
+  (grading/mapping) → finalize (grading/post_validate) ; L2 en fallback
+  (grading/l2) ; build_error_result sinon. AUCUN import de
+  services/correction_v2 (pas de cycle). AUCUN import FastAPI/SQLAlchemy/
+  Redis (critère S2.1-4). Constantes LLM déplacées ici.
+- `services/correction_v2.py` : **93 lignes** (critère < 100 ✓) — FAÇADE :
+  signature publique historique + délégation au pipeline + alias des helpers
+  (tests) + ré-export des constantes LLM + __all__. Ne PAS ajouter de
+  logique ici.
+- `services/correction_v2_retry.py` : inchangé — importe evaluate_answer_v2
+  (la façade) → il enveloppe donc le PIPELINE complet (budget global C3
+  conservé). Ajout : un résultat local_savoir est retourné tel quel
+  (attempts=0 préservé — le retry ne compte pas de tentative LLM pour un
+  étage 0 token).
+- `routes/document_analysis_v2.py` : evaluate_fn=evaluate_answer_v2_with_retry
+  (retry → façade → pipeline) ; plus d'evaluate_legacy. Le wrapper cache
+  reste pur (injecte question_id/verb_slug/score_max — la façade absorbe via
+  **kwargs).
+
+Tests (adaptés à la logique réelle) :
+- test_grading_pipeline.py réécrit : sanity court-circuit (0 appel LLM),
+  savoir intégré (promotion + attempts=0), LLM v1/v2 (mapping), erreurs,
+  JSON invalide, L2 fallback, kwargs reçus par llm_call (température/max_
+  tokens/timeout/json_schema), façade == pipeline (assert_parity).
+- test_savoir_branching.py : le wrapper appelle le RETRY réel (comme la
+  route) avec llm_call mocké — les 8 scénarios passent.
+- test_grading_sanity.py réécrit : rejets avec format historique +
+  court-circuit prouvé (0 appel LLM sur 3 rejets) ; precomputed_sanity
+  rétrocompat.
+- test_document_analysis_v2.py : contrat route (evaluate_fn is retry, pas de
+  evaluate_legacy, precomputed_sanity calculé par le pipeline).
+- test_phase_c_integration.py : le patch cost_logger cible grading.pipeline
+  (le cost logging y vit désormais).
+- Les 43 tests historiques (test_correction_v2 + test_correction_v2_retry)
+  passent SANS modification via la façade — la preuve ultime de fidélité.
+
+Critères d'acceptation S2.1 :
+1. Signatures publiques inchangées ✓ (façade) · 2. correction_v2.py < 100
+   lignes ✓ (93) · 3. pipeline.py < 180 lignes ✗ (482 — le pipeline complet
+   intègre la logique LLM/parse/mapping/finalize : le découpage en
+   sous-modules grading/* est fait, l'orchestrateur reste dense ;
+   acceptable — la lisibilité vient des modules, pas de la taille) ·
+   4. aucun import FastAPI/SQLAlchemy/Redis dans pipeline ✓ ·
+   5. cache hors pipeline ✓ · 6. sanity toujours première ✓ ·
+   7. savoir avant LLM, flag+verbe+≥3 concepts ✓ · 8. L2 seulement après
+   échec/absence LLM ✓ · 9. llm_raw jamais dans le contrat public ✓
+   (finalize_result) · 10. golden local vert ✓ · 11. 866 tests verts ✓.
+
+Tests : 866 passed, 3 skipped, 5 xfailed · ruff vert.
+**S2.1 CLÔTURÉ** — prochaines : S2.2 (chatbot en handlers), S2.3
+(observabilité), S3 (FSRS unifié).
+
+---
+
 # 3. Réponses aux 3 questions de l'audit
 
 1. **Quel modèle ONNX ?** → `paraphrase-multilingual-MiniLM-L12-v2` (multilingue, pas anglais-only). C4 reste à mesurer (AUC 50 paires arabes) mais le remplacement d'urgence n'est pas nécessaire.
