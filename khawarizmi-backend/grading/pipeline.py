@@ -85,9 +85,9 @@ async def evaluate_answer_v2_pipeline(
     ctx.steps["sanity_ms"] = (time.perf_counter() - t_sanity) * 1000.0
 
     if not sanity["is_valid"]:
-        from services.correction_v2 import _build_sanity_result
+        from grading.post_validate import build_sanity_result
 
-        result = _build_sanity_result(
+        result = build_sanity_result(
             sanity_code=sanity["sanity_code"],
             message_ar=sanity["message_ar"],
             score_max=score_max,

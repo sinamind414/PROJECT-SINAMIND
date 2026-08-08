@@ -20,18 +20,31 @@ from config import get_settings
 from cost_logger import get_logger
 from grading.mapping import map_v2_to_v1
 from grading.parser import parse_correction_response, record_parse_strategy
+from grading.post_validate import (
+    build_error_result,
+    build_sanity_result,
+    clamp,
+    compute_dominant_error_code,
+    finalize_result,
+    normalize_unmatched,
+    validate_highlights,
+)
+from grading.prompts import build_prompt
 from grading.schemas.correction_output import (
     CORRECTION_V1_JSON_SCHEMA,
     CORRECTION_V2_JSON_SCHEMA,
 )
-from prompts.correction_prompt import (
-    SYSTEM_PROMPT_AR,
-    build_correction_prompt,
-)
-from prompts.correction_prompt_v2 import build_correction_prompt_v2
 from services.answer_sanity import check_answer_sanity
-from services.hashing import hash_answer
-from services.remediation_service import get_generic_remediation, get_remediation
+
+# ── Alias de compatibilité (S2.1e) ────────────────
+# Les helpers vivent dans grading/post_validate.py ; les noms _* sont
+# conservés pour les tests existants et le code interne du monolithe.
+_clamp = clamp
+_validate_highlights = validate_highlights
+_normalize_unmatched = normalize_unmatched
+_compute_dominant_error_code = compute_dominant_error_code
+_build_sanity_result = build_sanity_result
+_build_error_result = build_error_result
 
 logger = logging.getLogger("khawarizmi.correction_v2")
 
@@ -75,136 +88,6 @@ def _extract_json_from_response(raw: str) -> dict | None:
     return parsed
 
 
-def _clamp(value: int, min_val: int, max_val: int) -> int:
-    """Clampe une valeur entre min et max."""
-    return max(min_val, min(value, max_val))
-
-
-def _validate_highlights(
-    highlights: list[dict],
-    student_answer: str,
-) -> list[dict]:
-    """Valide et corrige les highlights retournés par le LLM.
-
-    - Filtre les highlights avec start/end invalides
-    - Clampe start/end dans les bornes du texte
-    - S'assure que type est un type valide
-    """
-    valid_types = {
-        "gibberish",
-        "off_topic",
-        "missing_link",
-        "wrong_formulation",
-        "irrelevant",
-        "good_element",
-    }
-    text_len = len(student_answer)
-    validated = []
-
-    for h in highlights:
-        if not isinstance(h, dict):
-            continue
-
-        start = h.get("start")
-        end = h.get("end")
-        h_type = h.get("type", "")
-        message = h.get("message_ar", "")
-
-        # Vérifier que start/end sont des entiers
-        if not isinstance(start, int) or not isinstance(end, int):
-            continue
-
-        # Clamper dans les bornes
-        start = _clamp(start, 0, text_len)
-        end = _clamp(end, 0, text_len)
-
-        # start doit être < end
-        if start >= end:
-            continue
-
-        # Normaliser le type
-        if h_type not in valid_types:
-            h_type = "irrelevant"  # type par défaut
-
-        validated.append({
-            "start": start,
-            "end": end,
-            "type": h_type,
-            "message_ar": str(message),
-        })
-
-    return validated
-
-
-def _normalize_unmatched(unmatched: list) -> list[dict]:
-    """Normalise les critères non matchés retournés par le LLM."""
-    result = []
-    for item in unmatched:
-        if isinstance(item, str):
-            result.append({
-                "criterion": item,
-                "why_ar": "",
-                "from_model_answer": "",
-            })
-        elif isinstance(item, dict):
-            result.append({
-                "criterion": item.get("criterion", str(item)),
-                "why_ar": item.get("why_ar", ""),
-                "from_model_answer": item.get("from_model_answer", ""),
-            })
-    return result
-
-
-# ── Résultat sanity (score = 0, pas d'appel LLM) ─
-
-
-def _build_sanity_result(
-    *,
-    sanity_code: str,
-    message_ar: str,
-    score_max: int,
-    student_answer: str,
-) -> dict[str, Any]:
-    """Construit le résultat quand le sanity check rejette la réponse."""
-    highlights = []
-    if student_answer.strip():
-        # Surligner tout le texte en rouge (charabia)
-        highlights = [{
-            "start": 0,
-            "end": len(student_answer),
-            "type": "gibberish",
-            "message_ar": message_ar,
-        }]
-
-    return {
-        "source": "sanity",
-        "score": 0,
-        "score_max": score_max,
-        "percentage": 0,
-        "highlights": highlights,
-        "matched_criteria": [],
-        "unmatched_criteria": [],
-        "feedback_ar": message_ar,
-        "advice_ar": "أعد كتابة إجابتك بشكل واضح ومنظم باللغة العربية.",
-        "confidence": 1.0,
-        "sanity_code": sanity_code,
-        "provider": "none",
-        "model": "none",
-        "finish_reason": "sanity",
-        "prompt_hash": None,
-        "student_answer_hash": hash_answer(student_answer),
-        "llm_raw_hash": None,
-        "parse_status": "not_called",
-        # Spec §3.1 — champs additionnels
-        "missing": [],
-        "dominant_error_code": sanity_code,
-        "success": [],
-        "errors": [],
-        # Guide p.2 — remédiation automatique
-        "remediation": None,
-    }
-
-
 async def _evaluate_local_fallback(
     *,
     student_answer: str,
@@ -230,84 +113,6 @@ async def _evaluate_local_fallback(
         db=db,
         log_prefix=log_prefix,
     )
-
-
-# ── Résultat erreur LLM ──────────────────────────
-
-
-def _build_error_result(
-    *,
-    score_max: int,
-    error_message: str,
-    llm_raw: str | None = None,
-    prompt_hash: str | None = None,
-    student_answer: str = "",
-    provider: str = "unknown",
-    model: str = "unknown",
-    finish_reason: str = "unknown",
-) -> dict[str, Any]:
-    """Construit le résultat quand l'appel LLM échoue."""
-    return {
-        "source": "llm_error",
-        "score": 0,
-        "score_max": score_max,
-        "percentage": 0,
-        "highlights": [],
-        "matched_criteria": [],
-        "unmatched_criteria": [],
-        "feedback_ar": "حدث خطأ تقني أثناء التصحيح. يرجى المحاولة لاحقاً.",
-        "advice_ar": "",
-        "confidence": 0.0,
-        "sanity_code": "ok",
-        "llm_raw": llm_raw,
-        "error_message": error_message,
-        "provider": provider,
-        "model": model,
-        "finish_reason": finish_reason,
-        "prompt_hash": prompt_hash,
-        "student_answer_hash": hash_answer(student_answer),
-        "llm_raw_hash": hash_answer(llm_raw) if llm_raw is not None else None,
-        "parse_status": "failed",
-        # Spec §3.1 — champs additionnels
-        "missing": [],
-        "dominant_error_code": "server_error",
-        "success": [],
-        "errors": [],
-        "remediation": None,
-    }
-
-
-# ── dominant_error_code — Spec §3.1 ──────────────
-
-
-def _compute_dominant_error_code(
-    highlights: list[dict],
-    unmatched: list[dict],
-    sanity_code: str,
-    score: int,
-    score_max: int,
-) -> str:
-    """Détermine le code d'erreur dominant pour le retour API (Spec §3.1)."""
-    if sanity_code != "ok":
-        return sanity_code  # gibberish, too_short, empty, etc.
-
-    if score == score_max:
-        return "all_correct"
-
-    highlight_types = {h.get("type") for h in highlights if isinstance(h, dict)}
-
-    if "scientific_error" in highlight_types:
-        return "scientific_error"
-    if "off_topic" in highlight_types:
-        return "off_topic"
-    if "missing_link" in highlight_types:
-        return "methodology_error"
-    if unmatched:
-        return "methodology_error"
-    if score < score_max:
-        return "partial_correct"
-
-    return "unknown"
 
 
 # ── Fonction principale ──────────────────────────
@@ -386,35 +191,28 @@ async def evaluate_answer_v2(
         )
 
     # ── 2. BUILD PROMPT ──────────────────────────
+    # S2.1e : construction extraite dans grading/prompts.py (fonction pure) —
+    # le plumbing async du RAG (v1) reste ici jusqu'à S2.1f.
 
     if use_v2_prompt:
-        # Phase C — prompt v2 optimisé (~918 tokens vs ~3742)
-        user_prompt, prompt_hash = build_correction_prompt_v2(
-            scenario_context=scenario_context,
-            model_answer=student_answer,
-            verb_methodology=question_skill,
-            documents=documents,
-            learning_focus=learning_focus or "",
-            verb_slug=verb_slug,
-        )
-        # Note: v2 inclut déjà le system prompt dans le user_prompt
-        messages = [{"role": "user", "content": user_prompt}]
-        logger.info(f"{log_prefix}using_v2_prompt | hash={prompt_hash}")
-    else:
-        # Prompt v1 original
-        user_prompt = build_correction_prompt(
+        messages, prompt_hash = build_prompt(
+            use_v2_prompt=True,
             scenario_context=scenario_context,
             documents=documents,
             question_prompt=question_prompt,
             question_skill=question_skill,
             verb_slug=verb_slug,
             model_answer=model_answer,
+            student_answer=student_answer,
             learning_focus=learning_focus,
             score_max=score_max,
-            student_answer=student_answer,
         )
-
-        # RAG enrichment : injecter les extraits du LIVRE MANHADJIYA si disponible
+        # Note: v2 inclut déjà le system prompt dans le user_prompt
+        logger.info(f"{log_prefix}using_v2_prompt | hash={prompt_hash}")
+    else:
+        # RAG enrichment : injecter les extraits du LIVRE MANHADJIYA si
+        # disponible (v1 uniquement)
+        rag_context = None
         if rag_context_provider is not None:
             try:
                 rag_context = await rag_context_provider(
@@ -422,21 +220,23 @@ async def evaluate_answer_v2(
                     question_prompt=question_prompt,
                     student_answer=student_answer,
                 )
-                if rag_context:
-                    user_prompt = (
-                        f"{user_prompt}\n\n"
-                        "═══ مقتطفات من الكتاب المنهجي (RAG) ═══\n"
-                        f"{rag_context}"
-                    )
             except Exception:
                 logger.warning(f"{log_prefix}rag_provider_failed — poursuite sans RAG")
 
-        prompt_hash = hash_answer(user_prompt)
-
-        messages = [
-            {"role": "system", "content": SYSTEM_PROMPT_AR},
-            {"role": "user", "content": user_prompt},
-        ]
+        # Prompt v1 original (+ RAG)
+        messages, prompt_hash = build_prompt(
+            use_v2_prompt=False,
+            scenario_context=scenario_context,
+            documents=documents,
+            question_prompt=question_prompt,
+            question_skill=question_skill,
+            verb_slug=verb_slug,
+            model_answer=model_answer,
+            student_answer=student_answer,
+            learning_focus=learning_focus,
+            score_max=score_max,
+            rag_context=rag_context,
+        )
 
     # ── 3. APPEL LLM ────────────────────────────
 
@@ -642,66 +442,26 @@ async def evaluate_answer_v2(
             confidence = 0.5
             source = "llm_recovered"
 
-    percentage = round((score / score_max) * 100) if score_max > 0 else 0
-
-    logger.info(
-        f"{log_prefix}eval_v2_done | verb={verb_slug} source={source} "
-        f"score={score}/{score_max} ({percentage}%) highlights={len(highlights)}"
+    # S2.1e : finalisation extraite dans grading/post_validate.py (finalize_result)
+    return finalize_result(
+        source=source,
+        score=score,
+        score_max=score_max,
+        highlights=highlights,
+        matched=matched,
+        unmatched=unmatched,
+        feedback_ar=feedback_ar,
+        advice_ar=advice_ar,
+        confidence=confidence,
+        provider=provider,
+        model=model,
+        finish_reason=finish_reason,
+        prompt_hash=prompt_hash,
+        student_answer=student_answer,
+        llm_raw=llm_raw,
+        verb_slug=verb_slug,
+        dominant_error_code=(
+            v2_mapped["dominant_error_code"] if v2_mapped is not None else None
+        ),
+        log_prefix=log_prefix,
     )
-
-    # Spec §3.1 — mapping des champs
-    success = [str(m) for m in matched]
-    missing = [
-        {
-            "expected": u["criterion"],
-            "why_ar": u.get("why_ar", ""),
-            "from_model_answer": u.get("from_model_answer", ""),
-        }
-        for u in unmatched if isinstance(u, dict)
-    ]
-    errors = list(unmatched)  # alias spec-compatible
-    dominant_error_code = (
-        v2_mapped["dominant_error_code"]
-        if v2_mapped is not None
-        else _compute_dominant_error_code(
-            highlights=highlights,
-            unmatched=unmatched,
-            sanity_code="ok",
-            score=score,
-            score_max=score_max,
-        )
-    )
-
-    # Guide p.2 — remédiation automatique
-    remediation = get_remediation(verb_slug, dominant_error_code)
-    if remediation is None:
-        remediation = get_generic_remediation(dominant_error_code)
-
-    return {
-        "source": source,
-        "score": score,
-        "score_max": score_max,
-        "percentage": percentage,
-        "highlights": highlights,
-        "matched_criteria": success,
-        "unmatched_criteria": unmatched,
-        "feedback_ar": feedback_ar,
-        "advice_ar": advice_ar,
-        "confidence": confidence,
-        "sanity_code": "ok",
-        # NOTE : llm_raw volontairement absent du contrat public (fuite potentielle).
-        # Conservé uniquement dans le résultat llm_error (debug interne, jamais exposé).
-        "provider": provider,
-        "model": model,
-        "finish_reason": finish_reason,
-        "prompt_hash": prompt_hash,
-        "student_answer_hash": hash_answer(student_answer),
-        "llm_raw_hash": hash_answer(llm_raw) if llm_raw is not None else None,
-        "parse_status": "ok" if source == "llm" else "recovered",
-        # Spec §3.1 — champs additionnels
-        "missing": missing,
-        "dominant_error_code": dominant_error_code,
-        "success": success,
-        "errors": errors,
-        "remediation": remediation,
-    }

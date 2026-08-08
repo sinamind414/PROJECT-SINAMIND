@@ -592,6 +592,53 @@ Prochaine étape : S2.1e — prompts.py + post_validate.py.
 
 ---
 
+# 2l. S2.1e — Extraction prompt + post-validation ✅
+
+La construction du prompt et la post-validation sortent du monolithe.
+`correction_v2.py` : 707 → **467 lignes**.
+
+- `grading/prompts.py` : `build_prompt(use_v2_prompt, scenario_context,
+  documents, question_prompt, question_skill, verb_slug, model_answer,
+  student_answer, learning_focus, score_max, rag_context=None)` →
+  (messages, prompt_hash). Fonction PURE et synchrone (le plumbing async du
+  rag_context_provider reste chez l'appelant jusqu'à S2.1f). Fidélité : v2 =
+  un seul message user + prompt_hash du builder v2 ; v1 = system+user +
+  hash_answer(user_prompt) + enrichment RAG au format exact d'origine.
+- `grading/post_validate.py` : clamp, validate_highlights (types autorisés,
+  clamp, type inconnu → "irrelevant"), normalize_unmatched (strings/dicts),
+  build_sanity_result, build_error_result (llm_raw présent — debug interne),
+  compute_dominant_error_code, finalize_result (percentage, success/missing/
+  errors, dominant auto ou passé, remédiation, hashes RGPD, parse_status
+  ok/recovered, llm_raw JAMAIS exposé). Fidélité stricte à l'original.
+- `correction_v2.py` : les définitions sont remplacées par des imports +
+  alias _* (compat tests existants) ; le bloc « 2. BUILD PROMPT » appelle
+  build_prompt (le plumbing RAG async est conservé) ; le bloc final appelle
+  finalize_result (log eval_v2_done inclus, log_prefix transmis).
+- `grading/pipeline.py` : le court-circuit sanity importe désormais
+  build_sanity_result depuis grading.post_validate (sens unique pipeline →
+  grading, plus de dépendance vers services.correction_v2).
+
+Tests (+31) :
+- test_grading_prompts.py : v2 (1 message user, hash 12, RAG ignoré en v2),
+  v1 (system+user, hash == hash_answer(user)), RAG (inclus, hash différent),
+  PARITÉ avec les builders legacy (même contenu, même hash) ;
+- test_grading_post_validate.py : validate_highlights (clamp, type inconnu,
+  start>=end filtré, non-dict filtrés), normalize_unmatched, dominant codes,
+  build_sanity_result (vide vs gibberish), build_error_result (llm_raw
+  interne), finalize_result (percentage, parse_status ok/recovered, dominant
+  auto/passé, missing/errors, hashes, llm_raw absent du public), clamp ;
+- les 834 tests existants restent verts (parité de l'extraction garantie).
+
+Vérifié : App OK (193 routes) ; modules grading importables ; alias
+_validate_highlights/_build_sanity_result/_build_error_result pointent vers
+grading.post_validate.
+
+Tests : 865 passed (+31), 3 skipped, 5 xfailed · ruff vert.
+Prochaine étape : S2.1f — wiring complet (pipeline appelle tout directement,
+legacy supprimé) — le monolithe devient une façade de compatibilité.
+
+---
+
 # 3. Réponses aux 3 questions de l'audit
 
 1. **Quel modèle ONNX ?** → `paraphrase-multilingual-MiniLM-L12-v2` (multilingue, pas anglais-only). C4 reste à mesurer (AUC 50 paires arabes) mais le remplacement d'urgence n'est pas nécessaire.
