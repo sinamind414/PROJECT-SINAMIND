@@ -556,6 +556,42 @@ Prochaine étape : S2.1d — l2.py (wrapper autour de fallback_v2).
 
 ---
 
+# 2k. S2.1d — Extraction de L2 (évaluation locale) ✅
+
+L'évaluation locale L2 sort du monolithe : la logique vit dans
+`grading/l2.py`, `correction_v2._evaluate_local_fallback` devient une
+délégation (conservée pour ses 2 appels internes).
+
+- `grading/l2.py` : `run_l2(student_answer, model_answer, question_skill,
+  score_max, db, log_prefix="")` — extraction FIDÈLE de l'original :
+  concepts requis = skill + mots significatifs du modèle (stop words arabes
+  filtrés, ≤ 10) ; redistribution des poids quand l'embedder est en fallback
+  (final = (0.25·coverage + 0.35·structural)/0.6) ; résultat au contrat v2
+  (source="local", parse_status="local_fallback", model="fallback_l2",
+  confidence=0.6, dominant dérivé du score, hash RGPD) ; None sur échec.
+  Aucun import de correction_v2 (sens unique : correction_v2 → grading.l2).
+- `correction_v2.py` : `_evaluate_local_fallback` = délégation à run_l2 —
+  comportement identique (les 2 call sites : échec LLM + parse irrécupérable).
+  L'import `re` mort retiré par ruff.
+- Tests (test_grading_l2.py, +8) :
+  * unitaires run_l2 (mock evaluate_l2 + embedder) : format complet du
+    résultat, score via score_final quand embedder réel (0.625·8 → 5),
+    redistribution quand fallback (0.7333·8 → 6), dominant_error_code
+    (all_correct/partial_correct/insufficient), None sur exception,
+    concepts depuis skill+modèle (≤ 10, stop words filtrés) ;
+  * PARITÉ délégation : `evaluate_answer_v2(local_fallback=True, LLM en
+    panne)` == `run_l2(...)` direct (les deux passent par le même code) ;
+  * llm_error conservé quand local_fallback=False.
+
+Le pipeline (S2.1c) délègue toujours au legacy qui utilise run_l2 — le
+branchement direct de l'étage L2 dans le pipeline viendra à S2.1f (quand le
+legacy meurt).
+
+Tests : 834 passed (+8), 3 skipped, 5 xfailed · ruff vert.
+Prochaine étape : S2.1e — prompts.py + post_validate.py.
+
+---
+
 # 3. Réponses aux 3 questions de l'audit
 
 1. **Quel modèle ONNX ?** → `paraphrase-multilingual-MiniLM-L12-v2` (multilingue, pas anglais-only). C4 reste à mesurer (AUC 50 paires arabes) mais le remplacement d'urgence n'est pas nécessaire.

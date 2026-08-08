@@ -14,7 +14,6 @@ Type exporté : LLMCaller (Protocol pour injection de dépendance)
 from __future__ import annotations
 
 import logging
-import re
 from typing import Any, Protocol, runtime_checkable
 
 from config import get_settings
@@ -217,112 +216,20 @@ async def _evaluate_local_fallback(
 ) -> dict[str, Any] | None:
     """Évaluation 100 % locale (0 token, 0 clé API) via fallback_v2 (L2).
 
-    Moteur : TF-IDF + regex structurelle + embeddings locaux. Utilisé quand
-    le LLM est indisponible (aucune clé API configurée, panne, quota).
+    S2.1d : la logique vit dans grading/l2.py (run_l2) — cette fonction est
+    une délégation conservée pour les 2 appels internes du monolithe.
     Retourne un résultat au format v2 (source="local"), ou None si l'échec.
     """
-    try:
-        from services.fallback_v2 import evaluate_l2
+    from grading.l2 import run_l2
 
-        # Concepts requis : termes significatifs de la réponse modèle (arabe/Français)
-        # + le skill du verbe. Améliore le score structurel local.
-        concepts_requis: list[str] = []
-        if question_skill:
-            concepts_requis.append(question_skill)
-        if model_answer:
-            _STOP = {
-                "التي", "الذي", "حيث", "على", "الى", "إلى", "من", "في", "عن", "مع",
-                "هذا", "هذه", "ذلك", "بعد", "قبل", "عند", "خلال", "أن", "ان", "ثم",
-                "كل", "بين", "كان", "هو", "هي", "لا", "ما", "لأن", "حسب", "وقد",
-                "يتم", "تم", "يكون", "تكون", "عبارة",
-            }
-            words = re.findall(r"[\w\u0600-\u06FF]{4,}", model_answer)
-            for w in words:
-                if w not in _STOP and w not in concepts_requis:
-                    concepts_requis.append(w)
-            concepts_requis = concepts_requis[:10]
-
-        question_data = {
-            "reponse_attendue": model_answer or "",
-            "concepts_requis": concepts_requis,
-            "points_cles": [model_answer] if model_answer else [],
-            "question_id": None,
-        }
-        res = await evaluate_l2(
-            reponse_eleve=student_answer,
-            question_data=question_data,
-            db=db,
-        )
-
-        # Si l'embedder sémantique est en fallback (modèle ONNX absent), le signal
-        # sémantique s1 est du bruit : on redistribue son poids sur TF-IDF + structurel.
-        final_score = res.score_final
-        try:
-            from services.embedder import get_embedder
-            if bool(getattr(get_embedder(), "is_fallback", False)):
-                w_s, w_t, w_r = 0.40, 0.25, 0.35
-                denom = w_t + w_r
-                final_score = (w_t * res.coverage_score + w_r * res.structural_score) / denom
-                final_score = max(0.0, min(1.0, final_score))
-        except Exception:
-            pass
-
-        score = _clamp(int(round(final_score * score_max)), 0, score_max)
-        percentage = round((score / score_max) * 100) if score_max > 0 else 0
-        missing = [
-            {"expected": c, "why_ar": "مفهوم غير موجود في الإجابة", "from_model_answer": ""}
-            for c in res.concepts_manquants
-        ]
-        unmatched = [{"criterion": c, "why_ar": "مفهوم غير موجود في الإجابة", "from_model_answer": ""}
-                     for c in res.concepts_manquants]
-
-        if score == score_max:
-            dominant = "all_correct"
-        elif score > 0:
-            dominant = "partial_correct"
-        else:
-            dominant = "insufficient"
-
-        advice = (
-            "أحسنت! راجع التفاصيل الدقيقة لتكتمل الإجابة."
-            if score > 0 else
-            "أعد كتابة إجابتك بالاعتماد على المفاهيم الأساسية للدرس."
-        )
-
-        logger.info(
-            f"{log_prefix}local_fallback_done | score={score}/{score_max} "
-            f"({percentage}%) concepts_trouves={res.concepts_trouves} "
-            f"manquants={res.concepts_manquants}"
-        )
-
-        return {
-            "source": "local",
-            "score": score,
-            "score_max": score_max,
-            "percentage": percentage,
-            "highlights": [],
-            "matched_criteria": list(res.concepts_trouves),
-            "unmatched_criteria": unmatched,
-            "feedback_ar": res.feedback_fallback,
-            "advice_ar": advice,
-            "confidence": 0.6,
-            "sanity_code": "ok",
-            "provider": "local",
-            "model": "fallback_l2",
-            "finish_reason": "local",
-            "prompt_hash": None,
-            "student_answer_hash": hash_answer(student_answer),
-            "llm_raw_hash": None,
-            "parse_status": "local_fallback",
-            "missing": missing,
-            "dominant_error_code": dominant,
-            "success": list(res.concepts_trouves),
-            "errors": list(res.concepts_manquants),
-            "remediation": None,
-        }
-    except Exception as exc:
-        logger.warning(f"{log_prefix}local_fallback_failed | {exc}")
-        return None
+    return await run_l2(
+        student_answer=student_answer,
+        model_answer=model_answer,
+        question_skill=question_skill,
+        score_max=score_max,
+        db=db,
+        log_prefix=log_prefix,
+    )
 
 
 # ── Résultat erreur LLM ──────────────────────────
