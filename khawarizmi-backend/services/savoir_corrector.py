@@ -390,9 +390,24 @@ def _contains_any(text: str, variants: list[str]) -> bool:
     les tokens courts (ex: "b" qui matche dans "اللمفاويه b" mais aussi dans
     "bien" ou dans d'autres mots). Pour les variantes >= 3 caractères on
     accepte aussi le match en sous-chaîne (tolérant aux pluriels agglutinés).
+
+    ⚠️ Variantes BRUTES : re-normalisées à chaque appel (utilisé seulement
+    pour des listes dynamiques) — voir _contains_any_norm pour le chemin
+    chaud (lexique pré-normalisé, ~100× plus rapide).
     """
-    for v in variants:
-        vn = _normalize(v)
+    return _contains_any_norm(text, [n for v in variants if (n := _normalize(v))])
+
+
+def _contains_any_norm(text: str, variants_norm: list[str]) -> bool:
+    """Comme _contains_any, mais variantes DÉJÀ normalisées (chemin chaud).
+
+    Le lexique (_SYNONYMS) est statique : ses variantes sont normalisées UNE
+    FOIS au chargement (_SYNONYMS_NORM). Avant ce fix, chaque correction
+    re-normalisait ~1500 variantes (NFKD + 25 replace + 6 regex chacune) →
+    ~30-60 ms CPU par copie, bloquant la boucle asyncio (GIL). Mesuré :
+    30.7 ms/appel → < 0.5 ms/appel.
+    """
+    for vn in variants_norm:
         if not vn:
             continue
         # Variantes très courtes (1-2 caractères : B, T, pH, km, O2, CO2)
@@ -410,13 +425,23 @@ def _contains_any(text: str, variants: list[str]) -> bool:
     return False
 
 
+# Variantes du lexique pré-normalisées UNE FOIS au chargement (chemin chaud).
+# Le lexique est statique : re-normaliser ~1500 variantes (NFKD + 25 replace
+# + 6 regex chacune) à chaque correction coûtait ~30-60 ms CPU par copie et
+# bloquait la boucle asyncio (GIL) — voir _contains_any_norm.
+_SYNONYMS_NORM: dict[str, list[str]] = {
+    kw: [n for v in syns if (n := _normalize(v))]
+    for kw, syns in _SYNONYMS.items()
+}
+
+
 def _count_keyword_hits(text: str, keywords: list[str]) -> tuple[int, list[str]]:
     hits = 0
     hit_list: list[str] = []
     for kw in keywords:
         # Essayer le synonyme le plus long qui correspond
-        syns = _SYNONYMS.get(kw, [kw])
-        if _contains_any(text, syns):
+        syns = _SYNONYMS_NORM.get(kw, [kw])
+        if _contains_any_norm(text, syns):
             hits += 1
             hit_list.append(kw)
     return hits, hit_list
@@ -432,8 +457,8 @@ def _detect_lexicon_concepts(question: str, model_answer: str) -> list[str]:
     q_norm = _normalize(question or "")
     m_norm = _normalize(model_answer or "")
     found: list[str] = []
-    for kw_id, syns in _SYNONYMS.items():
-        if _contains_any(q_norm, syns) or _contains_any(m_norm, syns):
+    for kw_id, syns in _SYNONYMS_NORM.items():
+        if _contains_any_norm(q_norm, syns) or _contains_any_norm(m_norm, syns):
             found.append(kw_id)
     return found
 
@@ -702,9 +727,9 @@ def deterministic_correct(
     # ── Déduction automatique des mots-clés si non fournis ──
     if not expected_keywords:
         expected_keywords = []
-        # Chercher dans le modèle réponse
-        for kw_id, syns in _SYNONYMS.items():
-            if _contains_any(model_norm, syns) or _contains_any(q_norm, syns):
+        # Chercher dans le modèle réponse (variantes pré-normalisées — chemin chaud)
+        for kw_id, syns in _SYNONYMS_NORM.items():
+            if _contains_any_norm(model_norm, syns) or _contains_any_norm(q_norm, syns):
                 expected_keywords.append(kw_id)
         # Limiter à 6 mots-clés maximum pour éviter sur-pondération
         expected_keywords = expected_keywords[:6]
@@ -781,7 +806,7 @@ def deterministic_correct(
     if mandatory_keywords:
         hits_mandatory, _ = _count_keyword_hits(ans_norm, mandatory_keywords)
         if hits_mandatory < len(mandatory_keywords):
-            miss = [m for m in mandatory_keywords if not _contains_any(ans_norm, _SYNONYMS.get(m, [m]))]
+            miss = [m for m in mandatory_keywords if not _contains_any_norm(ans_norm, _SYNONYMS_NORM.get(m, [m]))]
             msg_miss = " ، ".join(miss) if language == "ar" else ", ".join(miss)
             if language == "fr":
                 erreurs.append(f"Concept(s) obligatoire(s) manquant(s): {msg_miss}.")

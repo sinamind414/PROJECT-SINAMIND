@@ -1276,6 +1276,33 @@ Tests : 948+ passed, 3 skipped, 5 xfailed · ruff vert · App OK (195 routes).
 
 ---
 
+# 2dd. Perf — benchmark pipeline + bug CPU du moteur savoir corrigé ✅
+
+Le benchmark pipeline (`scripts/benchmark_pipeline.py`, chemin prod complet :
+cache → retry → façade → pipeline, corpus golden 48 questions, LLM simulé)
+a révélé un bug de performance latent du moteur savoir :
+
+- **Symptôme** : copies savoir ~62 ms, appels LLM étalés par paliers de
+  ~500 ms (blocage GIL), mur 7.6 s pour 96 corrections.
+- **Cause** : `_contains_any` re-normalisait chaque variante du lexique à
+  chaque appel — ~1500 variantes × (NFKD + 25 replace + 6 regex) ≈ 30.7 ms,
+  et le moteur l'appelait 2× par correction (can_handle + détection).
+- **Fix** (`services/savoir_corrector.py`) : `_SYNONYMS_NORM` construit une
+  fois au chargement + `_contains_any_norm` sur le chemin chaud (4 call
+  sites basculés : _count_keyword_hits, _detect_lexicon_concepts,
+  deterministic_correct déduction, mandatory_keywords).
+- **Résultats** : _detect 30.7 ms → 0.61 ms (×50) ; correction savoir
+  ~60 ms → 1.65 ms (×36) ; scénario A 96 corr. : mur 7.6 s → 1.6 s, savoir
+  p50 2.9 ms, LLM p50 259 ms ; 67.7 % des corrections sans token LLM.
+  Comportement identique (951 tests passed, golden inclus).
+- **Bilan perf** : avec le flag savoir activé, 2/3 des corrections coûtent
+  ~3 ms CPU local ; le LLM n'est appelé que sur les copies non couvertes.
+  Le flag reste le kill-switch par verbe (défaut config : []).
+
+Docs : docs/benchmarks.md (chiffres avant/après, méthodologie, limites).
+
+---
+
 # 3. Réponses aux 3 questions de l'audit
 
 1. **Quel modèle ONNX ?** → `paraphrase-multilingual-MiniLM-L12-v2` (multilingue, pas anglais-only). C4 reste à mesurer (AUC 50 paires arabes) mais le remplacement d'urgence n'est pas nécessaire.

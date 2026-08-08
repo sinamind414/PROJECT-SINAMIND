@@ -67,5 +67,10 @@ Pipeline complet dans `grading/pipeline.py` : sanity → savoir → prompt → L
 2. **Permission `workflows`** — activer le CI préparé (5 jobs, golden
    bloquant, nightly LLM + observability).
 3. **Tests de charge / benchmarks** ✅ : `scripts/benchmark_cache.py` +
-   `docs/benchmarks.md` — single-flight 30 élèves → 1 appel LLM (96.7 %
-   d'économie), hit ~162 µs vs miss ~182 ms, concurrence 10×10 → 10 appels.
+   `scripts/benchmark_pipeline.py` + `docs/benchmarks.md` — single-flight
+   30 élèves → 1 appel LLM (96.7 %), hit ~162 µs vs miss ~182 ms, pipeline :
+   savoir 2.9 ms vs LLM 259 ms, 67.7 % de copies sans token LLM.
+4. **Bug de perf savoir corrigé** ✅ : `_SYNONYMS_NORM` (variantes
+   pré-normalisées) — `_detect_lexicon_concepts` 30.7 ms → 0.61 ms (×50),
+   correction savoir ~60 ms → 1.65 ms (×36) ; le GIL bloquait la boucle
+   asyncio (100 corrections simultanées = secondes de gel).
