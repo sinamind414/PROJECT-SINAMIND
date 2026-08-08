@@ -60,6 +60,15 @@ def _now() -> datetime:
     return datetime.now(UTC)
 
 
+def _row_len(row: Any) -> int:
+    """Longueur d'une ligne SQL (liste/tuple SQLAlchemy) — robuste aux
+    objets de test sans __len__ (FakeRow)."""
+    try:
+        return len(row)
+    except TypeError:
+        return 0
+
+
 def _parse_dt(value: Any) -> datetime | None:
     """Parse une date (datetime en Postgres, string ISO en SQLite)."""
     if value is None:
@@ -120,7 +129,7 @@ async def _read_concepts(db: AsyncSession, user_id) -> list[MemoryItem]:
                        fsrs_state, prochaine_revision, interval_jours,
                        last_score, attempts, last_review, total_reviews,
                        avg_score, streak, pending_real_evaluation, due_date,
-                       state
+                       state, source, item_key
                 FROM mastery_micro_concepts
                 WHERE user_id = :uid
             """),
@@ -151,6 +160,8 @@ async def _read_concepts(db: AsyncSession, user_id) -> list[MemoryItem]:
                 "pending_real_evaluation": bool(row[13]),
                 "due_date": row[14],
                 "state": row[15],
+                "source": row[16] if _row_len(row) > 16 else "concept",
+                "item_key": row[17] if _row_len(row) > 17 else None,
             },
         ))
     return items

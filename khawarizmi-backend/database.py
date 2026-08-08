@@ -264,6 +264,25 @@ def _sqlite_extra_ddl() -> list[str]:
     ts = "DATETIME DEFAULT CURRENT_TIMESTAMP"
     pk = "TEXT PRIMARY KEY DEFAULT (lower(hex(randomblob(16))))"
     return [
+        # ── FSRS unifié (S3c) : table mémoire unique (migrations 001/033) ─
+        """CREATE TABLE IF NOT EXISTS mastery_micro_concepts (
+            id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL,
+            micro_concept_id TEXT NOT NULL, concept_id TEXT,
+            chapter TEXT, stability REAL DEFAULT 0,
+            difficulty REAL DEFAULT 0, fsrs_state TEXT DEFAULT '{}',
+            prochaine_revision DATETIME, interval_jours REAL DEFAULT 0,
+            last_score INTEGER, attempts INTEGER DEFAULT 0,
+            last_review DATETIME, total_reviews INTEGER DEFAULT 0,
+            avg_score REAL DEFAULT 0, streak INTEGER DEFAULT 0,
+            reps INTEGER DEFAULT 0, lapses INTEGER DEFAULT 0,
+            state INTEGER DEFAULT 0, due_date DATETIME,
+            pending_real_evaluation INTEGER DEFAULT 0,
+            source TEXT DEFAULT 'concept', item_key TEXT,
+            avg_pct REAL, total_users INTEGER,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE(user_id, micro_concept_id), UNIQUE(user_id, concept_id)
+        )""",
         # ── Mindmaps ────────────────────────────────────────
         f"""CREATE TABLE IF NOT EXISTS mindmaps (
             id {pk}, titre TEXT, title TEXT, subject TEXT, chapitre TEXT,

@@ -1012,6 +1012,45 @@ Tests : 928 passed, 3 skipped, 5 xfailed · ruff vert.
 
 ---
 
+# 2v. S3c (étape 7) — Fusion physique : migration 033 + table mastery au preview ✅
+
+- `migrations/versions/033_fsrs_unified_memory.py` : la table
+  mastery_micro_concepts devient la table mémoire UNIQUE en ajoutant les
+  colonnes de fusion (source DEFAULT 'concept', item_key, avg_pct,
+  total_users) + backfill depuis da_fsrs (source='verb_chapter', item_key=
+  verb::chapter) et action_verb_progress (source='verb_action',
+  item_key=verb) via INSERT...SELECT WHERE NOT EXISTS (portable) +
+  CURRENT_TIMESTAMP (portable) + index ix_mastery_source_item.
+  Les tables da_fsrs et action_verb_progress sont CONSERVÉES (lectures
+  analytics) mais ne sont plus la source d'écriture.
+  ⚠️ Postgres-only comme toutes les migrations du projet (CREATE EXTENSION
+  vector en 001) ; le preview SQLite utilise l'auto-DDL.
+- `database.py` : `mastery_micro_concepts` (schéma complet avec colonnes de
+  fusion) AJOUTÉE à `_sqlite_extra_ddl()` — le preview SQLite crée
+  désormais la table (vérifié : 81 tables, mastery présente). Avant, la
+  table n'était PAS dans l'auto-DDL → les parcours migrés (flashcards,
+  drill, mindmap) qui écrivent via fsrs_unified ne persistaient RIEN en
+  preview SQLite (tolérance silencieuse). Bug d'infrastructure corrigé.
+- `services/fsrs_unified.py` : `_read_concepts` expose `source`/`item_key`
+  dans extra (provenance des lignes fusionnées) ; helper `_row_len`
+  robuste aux FakeRow de test.
+- Tests : +1 (provenance source/item_key dans la vue consolidée — les
+  lignes fusionnées verb_chapter/verb_action sont visibles via
+  get_user_memory) ; test de la migration validé manuellement (backfill
+  da_fsrs + action_verb_progress, avg_pct/total_users préservés).
+- Découvertes : '::' dans un text() SQLAlchemy = bind param → échappé ;
+  len(row) sur FakeRow → _row_len robuste.
+
+**S3 COMPLET (fusion physique incluse)** : une table mémoire unique
+(mastery_micro_concepts avec source/item_key), l'API unifiée
+(fsrs_unified.py) couvre toutes les écritures + lectures consolidées, les
+lectures analytics restantes sont documentées. Le « 4 systèmes + 1 fichier »
+de l'audit initial est réduit à 1 table + 2 tables de lecture héritées.
+
+Tests : 929 passed (+1), 3 skipped, 5 xfailed · ruff vert.
+
+---
+
 # 3. Réponses aux 3 questions de l'audit
 
 1. **Quel modèle ONNX ?** → `paraphrase-multilingual-MiniLM-L12-v2` (multilingue, pas anglais-only). C4 reste à mesurer (AUC 50 paires arabes) mais le remplacement d'urgence n'est pas nécessaire.

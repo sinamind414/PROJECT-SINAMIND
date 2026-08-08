@@ -52,6 +52,10 @@ CREATE TABLE mastery_micro_concepts (
     state INTEGER DEFAULT 0,
     due_date DATETIME,
     pending_real_evaluation BOOLEAN DEFAULT 0,
+    source TEXT DEFAULT 'concept',
+    item_key TEXT,
+    avg_pct REAL,
+    total_users INTEGER,
     updated_at DATETIME,
     UNIQUE(user_id, micro_concept_id),
     UNIQUE(user_id, concept_id)
@@ -579,3 +583,36 @@ class TestReconciliationHelpers:
         finally:
             await engine.dispose()
             os.unlink(path)
+
+
+class TestUnifiedProvenance:
+    @pytest.mark.asyncio
+    async def test_source_and_item_key_exposed(self, db):
+        """La vue consolidée expose la provenance (source/item_key) —
+        la fusion physique (migration 033) rend les lignes verb_chapter /
+        verb_action visibles via get_user_memory."""
+        from sqlalchemy import text
+
+        # Simuler des lignes fusionnées (migration 033)
+        async with db.begin():
+            # NB : '::' dans un text() SQLAlchemy est un bind param → échappé
+            # avec text("...") + bindparams explicites (ou concaténation)
+            await db.execute(text("""
+                INSERT INTO mastery_micro_concepts
+                    (user_id, micro_concept_id, concept_id, chapter,
+                     stability, source, item_key)
+                VALUES
+                    (1, 'vc_analyse_ch1', 'vc_analyse_ch1', 'ch1', 2.5,
+                     'verb_chapter', :key_vc),
+                    (1, 'va_interpret', 'va_interpret', NULL, 3.0,
+                     'verb_action', 'interpret')
+            """), {"key_vc": "analyse::ch1"})
+
+        items = await get_user_memory(db, 1, kinds=("concept",))
+        assert len(items) == 2
+        by_key = {i.extra.get("item_key"): i for i in items}
+        assert "analyse::ch1" in by_key
+        assert by_key["analyse::ch1"].extra["source"] == "verb_chapter"
+        assert by_key["analyse::ch1"].stability == 2.5
+        assert by_key["interpret"].extra["source"] == "verb_action"
+        assert by_key["interpret"].extra["item_key"] == "interpret"
