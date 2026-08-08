@@ -43,6 +43,29 @@ class FakeResult:
                     False, None, 0,
                 ])
             return lines
+        if isinstance(r, dict) and "verb_slug" in r:
+            # Anciens formats action_verb_progress / da_fsrs → lignes mastery
+            # fusionnées (SELECT _read_mastery_by_source : 12 colonnes :
+            # item_key, chapter, stability, difficulty, fsrs_state,
+            # prochaine_revision, interval_jours, last_score, attempts,
+            # last_review, avg_pct, total_users)
+            verb = r["verb_slug"]
+            if r.get("chapter_slug"):
+                # da_fsrs → source='verb_chapter'
+                return [[
+                    f"{verb}::{r['chapter_slug']}", r["chapter_slug"],
+                    r.get("stability", 0.0) or 0.0, r.get("difficulty", 0.0) or 0.0,
+                    "{}", r.get("prochaine_revision"), r.get("interval_jours", 1.0),
+                    r.get("last_score", 0), r.get("attempts", 0), None, None, None,
+                ]]
+            # action_verb_progress → source='verb_action'
+            return [[
+                verb, None, r.get("stability", 0.0) or 0.0,
+                r.get("difficulty", 0.0) or 0.0, "{}",
+                r.get("prochaine_revision"), r.get("interval_jours", 1.0),
+                r.get("last_score", 0), r.get("attempts", 0), None,
+                r.get("avg_pct"), r.get("total_users"),
+            ]]
         return r
 
     def fetchall(self):

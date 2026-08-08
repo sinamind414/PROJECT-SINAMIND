@@ -132,6 +132,7 @@ async def _read_concepts(db: AsyncSession, user_id) -> list[MemoryItem]:
                        state, source, item_key
                 FROM mastery_micro_concepts
                 WHERE user_id = :uid
+                  AND (source IS NULL OR source = 'concept')
             """),
             {"uid": user_id},
         )
@@ -167,12 +168,14 @@ async def _read_concepts(db: AsyncSession, user_id) -> list[MemoryItem]:
     return items
 
 
-async def _read_mastery_by_source(db: AsyncSession, user_id, source: str) -> list[tuple]:
+async def _read_mastery_by_source(db: AsyncSession, user_id, source: str) -> tuple[list[tuple], bool]:
     """Lit les lignes FUSIONNÉES depuis mastery_micro_concepts (migration 033).
 
-    Retourne les lignes brutes (item_key, chapter, stability, difficulty,
-    fsrs_state, prochaine_revision, interval_jours, last_score, attempts,
-    last_review, avg_pct, total_users) ou [] si indisponible/vide.
+    Retourne (rows, exists) : rows = lignes brutes (item_key, chapter,
+    stability, difficulty, fsrs_state, prochaine_revision, interval_jours,
+    last_score, attempts, last_review, avg_pct, total_users) ; exists = la
+    table mastery existe (si False → fallback table héritée ; si True et
+    vide → mastery est la source de vérité, pas de fallback).
     """
     try:
         res = await db.execute(
@@ -185,17 +188,16 @@ async def _read_mastery_by_source(db: AsyncSession, user_id, source: str) -> lis
             """),
             {"uid": user_id, "src": source},
         )
-        rows = res.fetchall()
-        return rows if rows else []
+        return list(res.fetchall()), True
     except Exception as e:
         logger.warning(f"fsrs_unified: mastery source={source} indisponible ({e})")
-        return []
+        return [], False
 
 
 async def _read_verb_chapters(db: AsyncSession, user_id) -> list[MemoryItem]:
     """État par (verbe, chapitre) — MASTERY d'abord (fusion 033), fallback da_fsrs."""
     items: list[MemoryItem] = []
-    rows = await _read_mastery_by_source(db, user_id, "verb_chapter")
+    rows, mastery_exists = await _read_mastery_by_source(db, user_id, "verb_chapter")
 
     if rows:
         for row in rows:
@@ -217,44 +219,45 @@ async def _read_verb_chapters(db: AsyncSession, user_id) -> list[MemoryItem]:
             ))
         return items
 
-    # Fallback : table héritée (prod avant 033 / preview sans backfill)
-    try:
-        res = await db.execute(
-            text("""
-                SELECT verb_slug, chapter_slug, stability, difficulty,
-                       fsrs_state, prochaine_revision, interval_jours,
-                       last_score, attempts, last_review
-                FROM da_fsrs
-                WHERE user_id = :uid
-            """),
-            {"uid": user_id},
-        )
-    except Exception as e:
-        logger.warning(f"fsrs_unified: da_fsrs indisponible ({e})")
-        return []
+    # Fallback : table héritée UNIQUEMENT si mastery absente (prod avant 033)
+    if not mastery_exists:
+        try:
+            res = await db.execute(
+                text("""
+                    SELECT verb_slug, chapter_slug, stability, difficulty,
+                           fsrs_state, prochaine_revision, interval_jours,
+                           last_score, attempts, last_review
+                    FROM da_fsrs
+                    WHERE user_id = :uid
+                """),
+                {"uid": user_id},
+            )
+        except Exception as e:
+            logger.warning(f"fsrs_unified: da_fsrs indisponible ({e})")
+            return []
 
-    for row in res.fetchall():
-        items.append(MemoryItem(
-            kind="verb_chapter",
-            item_id=f"{row[0]}::{row[1]}",
-            stability=float(row[2] or 0.0),
-            difficulty=float(row[3] or 0.0),
-            fsrs_state=_parse_state(row[4]),
-            due=_parse_dt(row[5]),
-            interval_jours=float(row[6] or 0.0),
-            last_score=row[7],
-            attempts=int(row[8] or 0),
-            last_review=_parse_dt(row[9]),
-            chapter=row[1],
-            extra={"verb_slug": row[0]},
-        ))
+        for row in res.fetchall():
+            items.append(MemoryItem(
+                kind="verb_chapter",
+                item_id=f"{row[0]}::{row[1]}",
+                stability=float(row[2] or 0.0),
+                difficulty=float(row[3] or 0.0),
+                fsrs_state=_parse_state(row[4]),
+                due=_parse_dt(row[5]),
+                interval_jours=float(row[6] or 0.0),
+                last_score=row[7],
+                attempts=int(row[8] or 0),
+                last_review=_parse_dt(row[9]),
+                chapter=row[1],
+                extra={"verb_slug": row[0]},
+            ))
     return items
 
 
 async def _read_verb_actions(db: AsyncSession, user_id) -> list[MemoryItem]:
     """État par verbe d'action — MASTERY d'abord (fusion 033), fallback avp."""
     items: list[MemoryItem] = []
-    rows = await _read_mastery_by_source(db, user_id, "verb_action")
+    rows, mastery_exists = await _read_mastery_by_source(db, user_id, "verb_action")
 
     if rows:
         for row in rows:
@@ -272,35 +275,36 @@ async def _read_verb_actions(db: AsyncSession, user_id) -> list[MemoryItem]:
             ))
         return items
 
-    # Fallback : table héritée
-    try:
-        res = await db.execute(
-            text("""
-                SELECT verb_slug, stability, difficulty, fsrs_state,
-                       prochaine_revision, interval_jours, last_score,
-                       attempts, avg_pct, total_users
-                FROM action_verb_progress
-                WHERE user_id = :uid
-            """),
-            {"uid": user_id},
-        )
-    except Exception as e:
-        logger.warning(f"fsrs_unified: action_verb_progress indisponible ({e})")
-        return []
+    # Fallback : table héritée UNIQUEMENT si mastery absente (prod avant 033)
+    if not mastery_exists:
+        try:
+            res = await db.execute(
+                text("""
+                    SELECT verb_slug, stability, difficulty, fsrs_state,
+                           prochaine_revision, interval_jours, last_score,
+                           attempts, avg_pct, total_users
+                    FROM action_verb_progress
+                    WHERE user_id = :uid
+                """),
+                {"uid": user_id},
+            )
+        except Exception as e:
+            logger.warning(f"fsrs_unified: action_verb_progress indisponible ({e})")
+            return []
 
-    for row in res.fetchall():
-        items.append(MemoryItem(
-            kind="verb_action",
-            item_id=str(row[0]),
-            stability=float(row[1] or 0.0),
-            difficulty=float(row[2] or 0.0),
-            fsrs_state=_parse_state(row[3]),
-            due=_parse_dt(row[4]),
-            interval_jours=float(row[5] or 0.0),
-            last_score=row[6],
-            attempts=int(row[7] or 0),
-            extra={"avg_pct": row[8], "total_users": row[9]},
-        ))
+        for row in res.fetchall():
+            items.append(MemoryItem(
+                kind="verb_action",
+                item_id=str(row[0]),
+                stability=float(row[1] or 0.0),
+                difficulty=float(row[2] or 0.0),
+                fsrs_state=_parse_state(row[3]),
+                due=_parse_dt(row[4]),
+                interval_jours=float(row[5] or 0.0),
+                last_score=row[6],
+                attempts=int(row[7] or 0),
+                extra={"avg_pct": row[8], "total_users": row[9]},
+            ))
     return items
 
 
@@ -425,76 +429,156 @@ async def _upsert_concept(db: AsyncSession, user_id, *, item_id, chapter,
 async def _upsert_verb_chapter(db: AsyncSession, user_id, *, verb_slug, chapter_slug,
                                stability, difficulty, fsrs_state, due,
                                interval_jours, last_score, attempts_delta) -> bool:
+    """Écrit dans MASTERY (fusion 033) ; fallback da_fsrs si mastery absente."""
+    item_key = f"{verb_slug}::{chapter_slug}"
+    cid = f"vc_{verb_slug}_{chapter_slug}"
+    payload = {
+        "uid": user_id, "cid": cid, "alias": cid, "chapter": chapter_slug,
+        "item_key": item_key,
+        "stability": stability if stability is not None else 0.0,
+        "difficulty": difficulty if difficulty is not None else 0.0,
+        "fsrs": json.dumps(fsrs_state or {}),
+        "due": due, "interval": interval_jours if interval_jours is not None else 0.0,
+        "score": last_score, "attempts": max(attempts_delta, 1),
+        "attempts_delta": max(attempts_delta, 0),
+    }
     try:
         await db.execute(
             text("""
-                INSERT INTO da_fsrs
-                    (user_id, verb_slug, chapter_slug, stability, difficulty,
-                     fsrs_state, prochaine_revision, interval_jours,
-                     last_score, attempts, last_review, updated_at)
+                INSERT INTO mastery_micro_concepts
+                    (user_id, micro_concept_id, concept_id, chapter,
+                     stability, difficulty, fsrs_state, prochaine_revision,
+                     interval_jours, last_score, attempts, last_review,
+                     source, item_key, updated_at)
                 VALUES
-                    (:uid, :verb, :chapter, :stability, :difficulty,
-                     :fsrs, :due, :interval, :score, :attempts, NOW(), NOW())
-                ON CONFLICT (user_id, verb_slug, chapter_slug) DO UPDATE SET
+                    (:uid, :cid, :alias, :chapter, :stability, :difficulty,
+                     :fsrs, :due, :interval, :score, :attempts, NOW(),
+                     'verb_chapter', :item_key, NOW())
+                ON CONFLICT (user_id, concept_id) DO UPDATE SET
+                    chapter = EXCLUDED.chapter,
                     stability = EXCLUDED.stability,
                     difficulty = EXCLUDED.difficulty,
                     fsrs_state = EXCLUDED.fsrs_state,
                     prochaine_revision = EXCLUDED.prochaine_revision,
                     interval_jours = EXCLUDED.interval_jours,
                     last_score = EXCLUDED.last_score,
-                    attempts = da_fsrs.attempts + :attempts_delta,
+                    attempts = mastery_micro_concepts.attempts + :attempts_delta,
                     last_review = NOW(),
                     updated_at = NOW()
             """),
-            {"uid": user_id, "verb": verb_slug, "chapter": chapter_slug,
-             "stability": stability if stability is not None else 0.0,
-             "difficulty": difficulty if difficulty is not None else 0.0,
-             "fsrs": json.dumps(fsrs_state or {}),
-             "due": due, "interval": interval_jours if interval_jours is not None else 0.0,
-             "score": last_score, "attempts": max(attempts_delta, 1),
-             "attempts_delta": max(attempts_delta, 0)},
+            payload,
         )
         return True
     except Exception as e:
-        logger.warning(f"fsrs_unified: upsert da_fsrs échoué ({e})")
-        return False
+        logger.warning(f"fsrs_unified: upsert mastery verb_chapter échoué ({e})")
+        # Fallback : table héritée (prod avant 033)
+        try:
+            await db.execute(
+                text("""
+                    INSERT INTO da_fsrs
+                        (user_id, verb_slug, chapter_slug, stability, difficulty,
+                         fsrs_state, prochaine_revision, interval_jours,
+                         last_score, attempts, last_review, updated_at)
+                    VALUES
+                        (:uid, :verb, :chapter, :stability, :difficulty,
+                         :fsrs, :due, :interval, :score, :attempts, NOW(), NOW())
+                    ON CONFLICT (user_id, verb_slug, chapter_slug) DO UPDATE SET
+                        stability = EXCLUDED.stability,
+                        difficulty = EXCLUDED.difficulty,
+                        fsrs_state = EXCLUDED.fsrs_state,
+                        prochaine_revision = EXCLUDED.prochaine_revision,
+                        interval_jours = EXCLUDED.interval_jours,
+                        last_score = EXCLUDED.last_score,
+                        attempts = da_fsrs.attempts + :attempts_delta,
+                        last_review = NOW(),
+                        updated_at = NOW()
+                """),
+                {"uid": user_id, "verb": verb_slug, "chapter": chapter_slug,
+                 "stability": payload["stability"], "difficulty": payload["difficulty"],
+                 "fsrs": payload["fsrs"], "due": due,
+                 "interval": payload["interval"], "score": last_score,
+                 "attempts": payload["attempts"],
+                 "attempts_delta": payload["attempts_delta"]},
+            )
+            return True
+        except Exception as e2:
+            logger.warning(f"fsrs_unified: upsert da_fsrs échoué ({e2})")
+            return False
 
 
 async def _upsert_verb_action(db: AsyncSession, user_id, *, verb_slug,
                               stability, difficulty, fsrs_state, due,
                               interval_jours, last_score, attempts_delta) -> bool:
+    """Écrit dans MASTERY (fusion 033) ; fallback avp si mastery absente."""
+    cid = f"va_{verb_slug}"
+    payload = {
+        "uid": user_id, "cid": cid, "alias": cid, "item_key": verb_slug,
+        "stability": stability if stability is not None else 0.0,
+        "difficulty": difficulty if difficulty is not None else 0.0,
+        "fsrs": json.dumps(fsrs_state or {}),
+        "due": due, "interval": interval_jours if interval_jours is not None else 0.0,
+        "score": last_score, "attempts": max(attempts_delta, 1),
+        "attempts_delta": max(attempts_delta, 0),
+    }
     try:
         await db.execute(
             text("""
-                INSERT INTO action_verb_progress
-                    (user_id, verb_slug, stability, difficulty, fsrs_state,
-                     prochaine_revision, interval_jours, last_score,
-                     attempts, updated_at)
+                INSERT INTO mastery_micro_concepts
+                    (user_id, micro_concept_id, concept_id, stability,
+                     difficulty, fsrs_state, prochaine_revision,
+                     interval_jours, last_score, attempts,
+                     source, item_key, updated_at)
                 VALUES
-                    (:uid, :verb, :stability, :difficulty, :fsrs,
-                     :due, :interval, :score, :attempts, NOW())
-                ON CONFLICT (user_id, verb_slug) DO UPDATE SET
+                    (:uid, :cid, :alias, :stability, :difficulty, :fsrs,
+                     :due, :interval, :score, :attempts,
+                     'verb_action', :item_key, NOW())
+                ON CONFLICT (user_id, concept_id) DO UPDATE SET
                     stability = EXCLUDED.stability,
                     difficulty = EXCLUDED.difficulty,
                     fsrs_state = EXCLUDED.fsrs_state,
                     prochaine_revision = EXCLUDED.prochaine_revision,
                     interval_jours = EXCLUDED.interval_jours,
                     last_score = EXCLUDED.last_score,
-                    attempts = action_verb_progress.attempts + :attempts_delta,
+                    attempts = mastery_micro_concepts.attempts + :attempts_delta,
                     updated_at = NOW()
             """),
-            {"uid": user_id, "verb": verb_slug,
-             "stability": stability if stability is not None else 0.0,
-             "difficulty": difficulty if difficulty is not None else 0.0,
-             "fsrs": json.dumps(fsrs_state or {}),
-             "due": due, "interval": interval_jours if interval_jours is not None else 0.0,
-             "score": last_score, "attempts": max(attempts_delta, 1),
-             "attempts_delta": max(attempts_delta, 0)},
+            payload,
         )
         return True
     except Exception as e:
-        logger.warning(f"fsrs_unified: upsert action_verb_progress échoué ({e})")
-        return False
+        logger.warning(f"fsrs_unified: upsert mastery verb_action échoué ({e})")
+        # Fallback : table héritée (prod avant 033)
+        try:
+            await db.execute(
+                text("""
+                    INSERT INTO action_verb_progress
+                        (user_id, verb_slug, stability, difficulty, fsrs_state,
+                         prochaine_revision, interval_jours, last_score,
+                         attempts, updated_at)
+                    VALUES
+                        (:uid, :verb, :stability, :difficulty, :fsrs,
+                         :due, :interval, :score, :attempts, NOW())
+                    ON CONFLICT (user_id, verb_slug) DO UPDATE SET
+                        stability = EXCLUDED.stability,
+                        difficulty = EXCLUDED.difficulty,
+                        fsrs_state = EXCLUDED.fsrs_state,
+                        prochaine_revision = EXCLUDED.prochaine_revision,
+                        interval_jours = EXCLUDED.interval_jours,
+                        last_score = EXCLUDED.last_score,
+                        attempts = action_verb_progress.attempts + :attempts_delta,
+                        updated_at = NOW()
+                """),
+                {"uid": user_id, "verb": verb_slug,
+                 "stability": payload["stability"], "difficulty": payload["difficulty"],
+                 "fsrs": payload["fsrs"], "due": due,
+                 "interval": payload["interval"], "score": last_score,
+                 "attempts": payload["attempts"],
+                 "attempts_delta": payload["attempts_delta"]},
+            )
+            return True
+        except Exception as e2:
+            logger.warning(f"fsrs_unified: upsert action_verb_progress échoué ({e2})")
+            return False
 
 
 # ── Résumé consolidé (dashboard / observabilité) ─────────────────────

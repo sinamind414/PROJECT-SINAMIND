@@ -154,25 +154,26 @@ async def progression_verbes(
     db: AsyncSession = Depends(get_db),
 ):
     """Retourne la progression FSRS de l'élève sur tous les verbes."""
-    result = await db.execute(
-        text("""
-            SELECT avp.verb_slug, avp.stability, avp.difficulty,
-                   avp.last_score, avp.attempts,
-                   avp.prochaine_revision, avp.interval_jours
-            FROM action_verb_progress avp
-            WHERE avp.user_id = :user_id
-            ORDER BY avp.prochaine_revision ASC
-        """),
-        {"user_id": current_user["id"]},
-    )
-    rows = result.fetchall()
+    # S3 finale : lecture via la vue consolidée (mastery-first, fallback avp)
+    from services.fsrs_unified import get_user_memory
+
+    memory = await get_user_memory(db, current_user["id"], kinds=("verb_action",))
+    memory.sort(key=lambda i: i.due or datetime.max.replace(tzinfo=UTC))
 
     now = datetime.now(UTC)
     verbs: list[VerbProgressItem] = []
     dues = 0
 
-    for r in rows:
-        m = r._mapping
+    for item in memory:
+        m = {
+            "verb_slug": item.item_id,
+            "stability": item.stability,
+            "difficulty": item.difficulty,
+            "last_score": item.last_score,
+            "attempts": item.attempts,
+            "prochaine_revision": item.due,
+            "interval_jours": item.interval_jours,
+        }
         est_due = (m["prochaine_revision"] is not None and m["prochaine_revision"] <= now) or m[
             "prochaine_revision"
         ] is None
@@ -212,22 +213,15 @@ async def reviser_verbe(
     """Marque une révision FSRS pour un verbe et programme la prochaine."""
     scheduler = get_scheduler()
 
-    # Récupérer l'état FSRS existant
-    result = await db.execute(
-        text("""
-            SELECT stability, difficulty, fsrs_state
-            FROM action_verb_progress
-            WHERE user_id = :user_id AND verb_slug = :slug
-        """),
-        {"user_id": current_user["id"], "slug": slug},
-    )
-    row = result.fetchone()
+    # S3 finale : lecture via la vue consolidée (mastery-first, fallback avp)
+    from services.fsrs_unified import get_user_memory, update_memory
+
+    memory = await get_user_memory(db, current_user["id"], kinds=("verb_action",))
+    av_item = next((i for i in memory if i.item_id == slug), None)
 
     card = Card()
-    if row and row._mapping["fsrs_state"]:
-        state = row._mapping["fsrs_state"]
-        if isinstance(state, str):
-            state = json.loads(state)
+    if av_item and av_item.fsrs_state:
+        state = av_item.fsrs_state
         card.stability = state.get("stability", 0.0)
         card.difficulty = state.get("difficulty", 0.0)
         card.reps = state.get("reps", 0)
@@ -256,35 +250,24 @@ async def reviser_verbe(
         }
     )
 
-    await db.execute(
-        text("""
-            INSERT INTO action_verb_progress
-                (user_id, verb_slug, stability, difficulty, fsrs_state,
-                 prochaine_revision, interval_jours, last_score, attempts,
-                 updated_at)
-            VALUES
-                (:user_id, :slug, :stability, :difficulty, :fsrs_state,
-                 :next_review, :interval, :score, 1, NOW())
-            ON CONFLICT (user_id, verb_slug) DO UPDATE SET
-                stability = EXCLUDED.stability,
-                difficulty = EXCLUDED.difficulty,
-                fsrs_state = EXCLUDED.fsrs_state,
-                prochaine_revision = EXCLUDED.prochaine_revision,
-                interval_jours = EXCLUDED.interval_jours,
-                last_score = EXCLUDED.last_score,
-                attempts = action_verb_progress.attempts + 1,
-                updated_at = NOW()
-        """),
-        {
-            "user_id": current_user["id"],
-            "slug": slug,
+    await update_memory(
+        db, current_user["id"], "verb_action",
+        item_id=slug,
+        stability=new_card.stability,
+        difficulty=new_card.difficulty,
+        fsrs_state={
             "stability": new_card.stability,
             "difficulty": new_card.difficulty,
-            "fsrs_state": fsrs_json,
-            "next_review": next_review,
-            "interval": float(new_card.scheduled_days),
-            "score": body.score_percentage or 0,
+            "scheduled_days": new_card.scheduled_days,
+            "reps": new_card.reps,
+            "lapses": new_card.lapses,
+            "state": str(new_card.state),
+            "last_review": now.isoformat(),
         },
+        due=next_review,
+        interval_jours=float(new_card.scheduled_days),
+        last_score=body.score_percentage or 0,
+        attempts_delta=1,
     )
     await db.commit()
 
@@ -312,17 +295,13 @@ async def _enregistrer_tentative(
     percentage: int,
 ):
     """Enregistre une tentative (sans programmer FSRS — juste le score)."""
-    await db.execute(
-        text("""
-            INSERT INTO action_verb_progress
-                (user_id, verb_slug, last_score, attempts, updated_at)
-            VALUES
-                (:user_id, :slug, :score, 1, NOW())
-            ON CONFLICT (user_id, verb_slug) DO UPDATE SET
-                last_score = EXCLUDED.last_score,
-                attempts = action_verb_progress.attempts + 1,
-                updated_at = NOW()
-        """),
-        {"user_id": user_id, "slug": verb_slug, "score": percentage},
+    # S3 finale : écriture via le service unifié
+    from services.fsrs_unified import update_memory
+
+    await update_memory(
+        db, user_id, "verb_action",
+        item_id=verb_slug,
+        last_score=percentage,
+        attempts_delta=1,
     )
     await db.commit()

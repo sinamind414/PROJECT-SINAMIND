@@ -1194,6 +1194,47 @@ puis migration 034 (suppression des tables héritées) si tout est vert.
 
 ---
 
+# 2bb. S3 finale (suite) — écritures mastery-first + action_verbs/leaderboard/orientation migrés ✅
+
+MASTERY devient LA table d'écriture (fusion 033) ; les tables héritées ne
+servent qu'en fallback si mastery est ABSENTE (prod avant 033).
+
+- `fsrs_unified.py` :
+  * `_upsert_verb_chapter` / `_upsert_verb_action` écrivent désormais dans
+    mastery_micro_concepts (source='verb_chapter'/'verb_action',
+    item_key=verb::chapter / verb) avec fallback da_fsrs/avp si mastery
+    absente ;
+  * `_read_mastery_by_source` retourne (rows, exists) — le fallback ne se
+    déclenche que si mastery ABSENTE (pas si vide : mastery est la source
+    de vérité) ;
+  * `_read_concepts` filtre `source IS NULL OR source='concept'` (les
+    lignes fusionnées ne polluent plus la vue concept) ;
+  * `_upsert_verb_action` : item_key = verb_slug (pas le cid préfixé).
+- `routes/action_verbs.py` : progression_verbes (SELECT avp → vue
+  consolidée), reviser_verbe (SELECT état + INSERT riche → get_user_memory
+  + update_memory), _enregistrer_tentative (INSERT → update_memory).
+  0 INSERT action_verb_progress restant.
+- `services/leaderboard_service.py` : update_user_stats (SELECT avp → vue
+  consolidée par-user). 0 référence restante.
+- `services/orientation_service.py` : §2 action verbs faibles + §3 da dues
+  → vue consolidée (get_user_memory kinds verb_action/verb_chapter).
+  0 référence restante.
+- `services/city_service.py` : get_national_stats CONSERVÉE (agrégation
+  GLOBALE GROUP BY tous users — l'API unifiée est par-user, non migrable) —
+  documenté comme lecture analytics héritée.
+- Tests adaptés : test_verb_chapter_falls_back_to_legacy réécrit (DB sans
+  mastery → fallback réel), test_source_and_item_key_exposed (vérifie
+  item_id = item_key), FakeResult._convert gère les entrées avp/da
+  (12 colonnes mastery avec item_key).
+
+Bilan : toutes les écritures ET lectures par-user passent par
+mastery_micro_concepts (fusion 033). Les tables héritées ne servent qu'en
+fallback (mastery absente) + 1 lecture globale documentée (city_service).
+
+Tests : 948 passed, 3 skipped, 5 xfailed · ruff vert · App OK (195 routes).
+
+---
+
 # 3. Réponses aux 3 questions de l'audit
 
 1. **Quel modèle ONNX ?** → `paraphrase-multilingual-MiniLM-L12-v2` (multilingue, pas anglais-only). C4 reste à mesurer (AUC 50 paires arabes) mais le remplacement d'urgence n'est pas nécessaire.

@@ -134,30 +134,24 @@ async def calculer_orientation(
     fc_by_chapter: dict[str, int] = await get_due_by_chapter(db, user_id)
     total_fc_dues = sum(fc_by_chapter.values())
 
-    # ── 2. Action verbs faibles ──
-    av_result = await db.execute(
-        text("""
-            SELECT verb_slug, last_score, attempts, prochaine_revision
-            FROM action_verb_progress
-            WHERE user_id = :uid
-        """),
-        {"uid": user_id},
-    )
+    # ── 2. Action verbs faibles — S3 finale : vue consolidée ──
+    from services.fsrs_unified import get_user_memory
+
+    av_memory = await get_user_memory(db, user_id, kinds=("verb_action",))
     weak_verbs: list[dict] = []
     total_av_dues = 0
     now = datetime.now(UTC)
-    for r in av_result.fetchall():
-        m = r._mapping
-        next_rev = m.get("prochaine_revision")
+    for item in av_memory:
+        next_rev = item.due
         is_due = next_rev is not None and next_rev <= now
         if is_due:
             total_av_dues += 1
-        last_score = m["last_score"] or 0
-        attempts = m["attempts"] or 0
+        last_score = item.last_score or 0
+        attempts = item.attempts
         if last_score < WEAK_SCORE_THRESHOLD:
             weak_verbs.append(
                 {
-                    "verb_slug": m["verb_slug"],
+                    "verb_slug": item.item_id,
                     "last_score": last_score,
                     "attempts": attempts,
                     "is_due": is_due,
@@ -185,22 +179,13 @@ async def calculer_orientation(
                 }
             )
 
-    # ── 3. Document analysis dues ──
-    da_result = await db.execute(
-        text("""
-            SELECT verb_slug, chapter_slug, last_score, attempts,
-                   prochaine_revision
-            FROM da_fsrs
-            WHERE user_id = :uid
-        """),
-        {"uid": user_id},
-    )
+    # ── 3. Document analysis dues — S3 finale : vue consolidée ──
+    da_memory = await get_user_memory(db, user_id, kinds=("verb_chapter",))
     da_by_chapter: dict[str, int] = {}
     total_da_dues = 0
-    for r in da_result.fetchall():
-        m = r._mapping
-        ch = m["chapter_slug"]
-        is_due = m["prochaine_revision"] is None or m["prochaine_revision"] <= now
+    for item in da_memory:
+        ch = item.chapter or item.item_id.partition("::")[2]
+        is_due = item.due is None or item.due <= now
         if is_due:
             total_da_dues += 1
             da_by_chapter[ch] = da_by_chapter.get(ch, 0) + 1

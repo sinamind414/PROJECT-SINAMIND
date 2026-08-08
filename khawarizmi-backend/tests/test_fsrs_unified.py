@@ -608,14 +608,15 @@ class TestUnifiedProvenance:
                      'verb_action', 'interpret')
             """), {"key_vc": "analyse::ch1"})
 
-        items = await get_user_memory(db, 1, kinds=("concept",))
+        items = await get_user_memory(db, 1)  # tous les kinds (provenance)
         assert len(items) == 2
-        by_key = {i.extra.get("item_key"): i for i in items}
-        assert "analyse::ch1" in by_key
-        assert by_key["analyse::ch1"].extra["source"] == "verb_chapter"
-        assert by_key["analyse::ch1"].stability == 2.5
-        assert by_key["interpret"].extra["source"] == "verb_action"
-        assert by_key["interpret"].extra["item_key"] == "interpret"
+        # item_id = item_key (le lecteur mastery-first l'utilise directement)
+        by_id = {i.item_id: i for i in items}
+        assert "analyse::ch1" in by_id
+        assert by_id["analyse::ch1"].stability == 2.5
+        assert by_id["analyse::ch1"].kind == "verb_chapter"
+        assert by_id["interpret"].kind == "verb_action"
+        assert by_id["interpret"].item_id == "interpret"
 
 
 class TestMasteryFirstBascule:
@@ -647,21 +648,42 @@ class TestMasteryFirstBascule:
         assert items[0].extra["verb_slug"] == "analyse"
 
     @pytest.mark.asyncio
-    async def test_verb_chapter_falls_back_to_legacy(self, db):
-        from sqlalchemy import text
+    async def test_verb_chapter_falls_back_to_legacy(self):
+        """Fallback UNIQUEMENT si la table mastery est ABSENTE (prod avant
+        033) : da_fsrs est alors la source."""
+        import os
+        import tempfile
 
-        # Aucune ligne fusionnée → lecture depuis da_fsrs (fallback)
-        async with db.begin():
-            await db.execute(text("""
-                INSERT INTO da_fsrs (user_id, verb_slug, chapter_slug,
-                                     stability, last_score)
-                VALUES ('1', 'analyse', 'ch1', 2.5, 75)
-            """))
-        items = await get_user_memory(db, 1, kinds=("verb_chapter",))
-        assert len(items) == 1
-        assert items[0].item_id == "analyse::ch1"
-        assert items[0].stability == 2.5
-        assert items[0].last_score == 75
+        fd, path = tempfile.mkstemp(suffix=".db")
+        os.close(fd)
+        engine = create_async_engine(f"sqlite+aiosqlite:///{path}")
+        async with engine.begin() as conn:
+            # da_fsrs seulement (PAS mastery — fallback requis)
+            await conn.exec_driver_sql("""
+                CREATE TABLE da_fsrs (
+                    id INTEGER PRIMARY KEY, user_id TEXT, verb_slug TEXT,
+                    chapter_slug TEXT, stability REAL, difficulty REAL,
+                    fsrs_state TEXT DEFAULT '{}', prochaine_revision DATETIME,
+                    interval_jours REAL, last_score INTEGER,
+                    attempts INTEGER, last_review DATETIME,
+                    UNIQUE(user_id, verb_slug, chapter_slug)
+                )
+            """)
+            await conn.exec_driver_sql(
+                "INSERT INTO da_fsrs (user_id, verb_slug, chapter_slug, "
+                "stability, last_score) VALUES ('1', 'analyse', 'ch1', 2.5, 75)"
+            )
+        factory = async_sessionmaker(engine, expire_on_commit=False)
+        try:
+            async with factory() as session:
+                items = await get_user_memory(session, 1, kinds=("verb_chapter",))
+                assert len(items) == 1
+                assert items[0].item_id == "analyse::ch1"
+                assert items[0].stability == 2.5
+                assert items[0].last_score == 75
+        finally:
+            await engine.dispose()
+            os.unlink(path)
 
     @pytest.mark.asyncio
     async def test_verb_action_reads_fused_rows(self, db):
