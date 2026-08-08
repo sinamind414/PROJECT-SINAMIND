@@ -616,3 +616,69 @@ class TestUnifiedProvenance:
         assert by_key["analyse::ch1"].stability == 2.5
         assert by_key["interpret"].extra["source"] == "verb_action"
         assert by_key["interpret"].extra["item_key"] == "interpret"
+
+
+class TestMasteryFirstBascule:
+    """S3 finale : les lectures verb_chapter/verb_action lisent d'abord les
+    lignes FUSIONNÉES (source dans mastery), avec fallback sur les tables
+    héritées si aucune ligne fusionnée."""
+
+    @pytest.mark.asyncio
+    async def test_verb_chapter_reads_fused_rows(self, db):
+        from sqlalchemy import text
+
+        # Ligne fusionnée (migration 033) — source='verb_chapter'
+        async with db.begin():
+            await db.execute(text("""
+                INSERT INTO mastery_micro_concepts
+                    (user_id, micro_concept_id, concept_id, chapter,
+                     stability, source, item_key)
+                VALUES
+                    (1, 'vc_analyse_ch1', 'vc_analyse_ch1', 'ch1', 4.5,
+                     'verb_chapter', :key)
+            """), {"key": "analyse::ch1"})
+        # Table da_fsrs absente du fixture → fallback impossible → la
+        # lecture doit venir de mastery
+        items = await get_user_memory(db, 1, kinds=("verb_chapter",))
+        assert len(items) == 1
+        assert items[0].item_id == "analyse::ch1"
+        assert items[0].stability == 4.5
+        assert items[0].chapter == "ch1"
+        assert items[0].extra["verb_slug"] == "analyse"
+
+    @pytest.mark.asyncio
+    async def test_verb_chapter_falls_back_to_legacy(self, db):
+        from sqlalchemy import text
+
+        # Aucune ligne fusionnée → lecture depuis da_fsrs (fallback)
+        async with db.begin():
+            await db.execute(text("""
+                INSERT INTO da_fsrs (user_id, verb_slug, chapter_slug,
+                                     stability, last_score)
+                VALUES ('1', 'analyse', 'ch1', 2.5, 75)
+            """))
+        items = await get_user_memory(db, 1, kinds=("verb_chapter",))
+        assert len(items) == 1
+        assert items[0].item_id == "analyse::ch1"
+        assert items[0].stability == 2.5
+        assert items[0].last_score == 75
+
+    @pytest.mark.asyncio
+    async def test_verb_action_reads_fused_rows(self, db):
+        from sqlalchemy import text
+
+        async with db.begin():
+            await db.execute(text("""
+                INSERT INTO mastery_micro_concepts
+                    (user_id, micro_concept_id, concept_id, stability,
+                     avg_pct, total_users, source, item_key)
+                VALUES
+                    (1, 'va_interpret', 'va_interpret', 3.5, 60, 10,
+                     'verb_action', 'interpret')
+            """))
+        items = await get_user_memory(db, 1, kinds=("verb_action",))
+        assert len(items) == 1
+        assert items[0].item_id == "interpret"
+        assert items[0].stability == 3.5
+        assert items[0].extra["avg_pct"] == 60
+        assert items[0].extra["total_users"] == 10

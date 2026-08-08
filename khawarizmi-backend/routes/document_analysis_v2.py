@@ -359,17 +359,19 @@ async def _update_fsrs_v2(
     chapter_slug: str,
     percentage: int,
 ):
-    """Met à jour le score et le compteur FSRS (identique à document_analysis.py)."""
-    await db.execute(
-        text("""
-            INSERT INTO da_fsrs
-                (user_id, verb_slug, chapter_slug, last_score, attempts, updated_at)
-            VALUES
-                (:user_id, :verb, :chapter, :score, 1, NOW())
-            ON CONFLICT (user_id, verb_slug, chapter_slug) DO UPDATE SET
-                last_score = EXCLUDED.last_score,
-                attempts = da_fsrs.attempts + 1,
-                updated_at = NOW()
-        """),
-        {"user_id": user_id, "verb": verb_slug, "chapter": chapter_slug, "score": percentage},
+    """Met à jour le score et le compteur FSRS (identique à document_analysis.py).
+
+    S3 finale : écriture via le service unifié (update_memory verb_chapter) —
+    la table da_fsrs n'est plus écrite directement. En prod (migration 033),
+    l'upsert MASTERY alimente la vue consolidée ; en preview, update_memory
+    retombe sur da_fsrs (tolérance).
+    """
+    from services.fsrs_unified import update_memory
+
+    await update_memory(
+        db, user_id, "verb_chapter",
+        item_id=f"{verb_slug}::{chapter_slug}",
+        chapter=chapter_slug,
+        last_score=percentage,
+        attempts_delta=1,
     )

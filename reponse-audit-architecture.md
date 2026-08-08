@@ -1158,6 +1158,42 @@ Aucun changement de code — document d'exploitation.
 
 ---
 
+# 2aa. S3 finale — bascule lectures mastery-first + écritures document_analysis migrées ✅
+
+Objectif : rendre les tables FSRS héritées (da_fsrs, action_verb_progress)
+OBSOLÈTES — d'abord en lecture, puis en écriture — pour permettre leur
+suppression (migration 034) si décidée.
+
+Phase 1 — Bascule des lectures dans `fsrs_unified` :
+- `_read_verb_chapters` / `_read_verb_actions` lisent désormais depuis
+  `mastery_micro_concepts` (source='verb_chapter'/'verb_action' — les lignes
+  FUSIONNÉES par la migration 033) avec FALLBACK sur les tables héritées
+  (prod avant 033 / preview sans backfill). Nouveau helper
+  `_read_mastery_by_source`.
+- Tests (+3) : verb_chapter lit les lignes fusionnées (item_id verb::chapter,
+  stability), fallback da_fsrs quand aucune ligne fusionnée, verb_action lit
+  les lignes fusionnées (avg_pct/total_users).
+- Régression évitée : get_user_memory/get_due_items écrasées par un
+  remplacement trop large → restaurées immédiatement (détecté par ruff).
+
+Phase 2 — Écritures document_analysis migrées :
+- `routes/document_analysis_v2.py` `_update_fsrs_v2` : INSERT da_fsrs →
+  `update_memory("verb_chapter", last_score, attempts_delta=1)`.
+- `routes/document_analysis.py` : progression_da (SELECT → get_user_memory +
+  tri Python), reviser_da (SELECT état → vue consolidée ; INSERT riche →
+  update_memory avec stability/difficulty/fsrs_state/due/interval),
+  faiblesses_da (SELECT → vue consolidée + filtre last_score<75/due),
+  _update_fsrs (INSERT → update_memory). **0 INSERT da_fsrs restant.**
+- Incident réparé : un remplacement par index a englouti la fin de
+  reviser_da ET la fonction faiblesses_da (weak_spots indéfini) — restauré
+  depuis git (97e969c) avec la migration intégrée + import WeakSpot ajouté.
+
+Tests : 948 passed, 3 skipped, 5 xfailed · ruff vert. App OK (195 routes).
+Prochaine : action_verbs.py + city_service + leaderboard + orientation §2/§3,
+puis migration 034 (suppression des tables héritées) si tout est vert.
+
+---
+
 # 3. Réponses aux 3 questions de l'audit
 
 1. **Quel modèle ONNX ?** → `paraphrase-multilingual-MiniLM-L12-v2` (multilingue, pas anglais-only). C4 reste à mesurer (AUC 50 paires arabes) mais le remplacement d'urgence n'est pas nécessaire.

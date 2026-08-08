@@ -318,40 +318,33 @@ async def progression_da(
     db: AsyncSession = Depends(get_db),
 ):
     """Retourne la progression FSRS de l'élève sur l'analyse de documents."""
-    result = await db.execute(
-        text("""
-            SELECT verb_slug, chapter_slug, stability, difficulty,
-                   last_score, attempts, prochaine_revision, interval_jours
-            FROM da_fsrs
-            WHERE user_id = :user_id
-            ORDER BY prochaine_revision ASC
-        """),
-        {"user_id": current_user["id"]},
-    )
-    rows = result.fetchall()
+    # S3 finale : lecture via la vue consolidée (mastery-first, fallback
+    # da_fsrs) — la table da_fsrs n'est plus lue directement ici.
+    from services.fsrs_unified import get_user_memory
+
+    memory = await get_user_memory(db, current_user["id"], kinds=("verb_chapter",))
+    memory.sort(key=lambda i: i.due or datetime.max.replace(tzinfo=UTC))
 
     now = datetime.now(UTC)
     skills: list[DaFsrsItem] = []
     dues = 0
 
-    for r in rows:
-        m = r._mapping
-        est_due = (m["prochaine_revision"] is not None and m["prochaine_revision"] <= now) or m[
-            "prochaine_revision"
-        ] is None
+    for item in memory:
+        verb, _, chapter = item.item_id.partition("::")
+        est_due = item.due is None or item.due <= now
         if est_due:
             dues += 1
         skills.append(
             DaFsrsItem(
-                verb_slug=m["verb_slug"],
-                chapter_slug=m["chapter_slug"],
-                stability=m["stability"] or 0.0,
-                difficulty=m["difficulty"] or 0.0,
-                last_score=m["last_score"] or 0,
-                attempts=m["attempts"] or 0,
+                verb_slug=verb or item.extra.get("verb_slug", ""),
+                chapter_slug=item.chapter or chapter,
+                stability=item.stability,
+                difficulty=item.difficulty,
+                last_score=item.last_score or 0,
+                attempts=item.attempts,
                 est_due=est_due,
-                prochaine_revision=m["prochaine_revision"].isoformat() if m["prochaine_revision"] else None,
-                interval_jours=m["interval_jours"] or 0.0,
+                prochaine_revision=item.due.isoformat() if item.due else None,
+                interval_jours=item.interval_jours,
             )
         )
 
@@ -375,25 +368,17 @@ async def reviser_da(
     """Marque une révision FSRS pour un verbe×chapitre et programme la prochaine."""
     scheduler = get_scheduler()
 
-    result = await db.execute(
-        text("""
-            SELECT stability, difficulty, fsrs_state
-            FROM da_fsrs
-            WHERE user_id = :user_id AND verb_slug = :verb AND chapter_slug = :chapter
-        """),
-        {
-            "user_id": current_user["id"],
-            "verb": body.verb_slug,
-            "chapter": body.chapter_slug,
-        },
-    )
-    row = result.fetchone()
+    # S3 finale : lecture via la vue consolidée (mastery-first, fallback
+    # da_fsrs) — plus de SELECT direct sur da_fsrs.
+    from services.fsrs_unified import get_user_memory, update_memory
+
+    vc_id = f"{body.verb_slug}::{body.chapter_slug}"
+    memory = await get_user_memory(db, current_user["id"], kinds=("verb_chapter",))
+    vc_item = next((i for i in memory if i.item_id == vc_id), None)
 
     card = Card()
-    if row and row._mapping["fsrs_state"]:
-        state = row._mapping["fsrs_state"]
-        if isinstance(state, str):
-            state = json.loads(state)
+    if vc_item and vc_item.fsrs_state:
+        state = vc_item.fsrs_state
         card.stability = state.get("stability", 0.0)
         card.difficulty = state.get("difficulty", 0.0)
         card.reps = state.get("reps", 0)
@@ -421,36 +406,25 @@ async def reviser_da(
         }
     )
 
-    await db.execute(
-        text("""
-            INSERT INTO da_fsrs
-                (user_id, verb_slug, chapter_slug, stability, difficulty,
-                 fsrs_state, prochaine_revision, interval_jours, last_score,
-                 attempts, updated_at)
-            VALUES
-                (:user_id, :verb, :chapter, :stability, :difficulty,
-                 :fsrs_state, :next_review, :interval, :score, 1, NOW())
-            ON CONFLICT (user_id, verb_slug, chapter_slug) DO UPDATE SET
-                stability = EXCLUDED.stability,
-                difficulty = EXCLUDED.difficulty,
-                fsrs_state = EXCLUDED.fsrs_state,
-                prochaine_revision = EXCLUDED.prochaine_revision,
-                interval_jours = EXCLUDED.interval_jours,
-                last_score = EXCLUDED.last_score,
-                attempts = da_fsrs.attempts + 1,
-                updated_at = NOW()
-        """),
-        {
-            "user_id": current_user["id"],
-            "verb": body.verb_slug,
-            "chapter": body.chapter_slug,
+    await update_memory(
+        db, current_user["id"], "verb_chapter",
+        item_id=vc_id,
+        chapter=body.chapter_slug,
+        stability=new_card.stability,
+        difficulty=new_card.difficulty,
+        fsrs_state={
             "stability": new_card.stability,
             "difficulty": new_card.difficulty,
-            "fsrs_state": fsrs_json,
-            "next_review": next_review,
-            "interval": float(new_card.scheduled_days),
-            "score": body.score_percentage or 0,
+            "scheduled_days": new_card.scheduled_days,
+            "reps": new_card.reps,
+            "lapses": new_card.lapses,
+            "state": str(new_card.state),
+            "last_review": now.isoformat(),
         },
+        due=next_review,
+        interval_jours=float(new_card.scheduled_days),
+        last_score=body.score_percentage or 0,
+        attempts_delta=1,
     )
     await db.commit()
 
@@ -478,34 +452,35 @@ async def faiblesses_da(
     current_user: dict = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    """Retourne les faiblesses de l'élève (compétences dues + scores faibles)."""
+    """Retourne les faiblesses de l'élève (compétences dues + scores faibles).
+
+    S3 finale : lecture via la vue consolidée (mastery-first, fallback
+    da_fsrs) — plus de SELECT direct sur da_fsrs.
+    """
+    from services.fsrs_unified import get_user_memory
+
     now = datetime.now(UTC)
-    result = await db.execute(
-        text("""
-            SELECT verb_slug, chapter_slug, last_score, attempts,
-                   prochaine_revision
-            FROM da_fsrs
-            WHERE user_id = :user_id
-              AND (last_score < 75 OR prochaine_revision IS NULL OR prochaine_revision <= :now)
-            ORDER BY last_score ASC, prochaine_revision ASC
-            LIMIT 20
-        """),
-        {"user_id": current_user["id"], "now": now},
-    )
-    rows = result.fetchall()
+    memory = await get_user_memory(db, current_user["id"], kinds=("verb_chapter",))
+
+    # Filtre : score < 75 OU due (prochaine_revision NULL ou passée)
+    candidates = [
+        i for i in memory
+        if (i.last_score is None or i.last_score < 75)
+        or i.due is None or i.due <= now
+    ]
+    candidates.sort(key=lambda i: (i.last_score if i.last_score is not None else 0,
+                                   i.due or datetime.max.replace(tzinfo=UTC)))
 
     weak_spots = []
-    for r in rows:
-        m = r._mapping
-        est_due = (m["prochaine_revision"] is not None and m["prochaine_revision"] <= now) or m[
-            "prochaine_revision"
-        ] is None
+    for item in candidates[:20]:
+        verb, _, chapter = item.item_id.partition("::")
+        est_due = item.due is None or item.due <= now
         weak_spots.append(
             WeakSpot(
-                verb_slug=m["verb_slug"],
-                chapter_slug=m["chapter_slug"],
-                last_score=m["last_score"] or 0,
-                attempts=m["attempts"] or 0,
+                verb_slug=verb or item.extra.get("verb_slug", ""),
+                chapter_slug=item.chapter or chapter,
+                last_score=item.last_score or 0,
+                attempts=item.attempts,
                 est_due=est_due,
             )
         )
@@ -527,17 +502,17 @@ async def _update_fsrs(
     chapter_slug: str,
     percentage: int,
 ):
-    """Met à jour le score et le compteur FSRS (sans programmer la prochaine révision)."""
-    await db.execute(
-        text("""
-            INSERT INTO da_fsrs
-                (user_id, verb_slug, chapter_slug, last_score, attempts, updated_at)
-            VALUES
-                (:user_id, :verb, :chapter, :score, 1, NOW())
-            ON CONFLICT (user_id, verb_slug, chapter_slug) DO UPDATE SET
-                last_score = EXCLUDED.last_score,
-                attempts = da_fsrs.attempts + 1,
-                updated_at = NOW()
-        """),
-        {"user_id": user_id, "verb": verb_slug, "chapter": chapter_slug, "score": percentage},
+    """Met à jour le score et le compteur FSRS (sans programmer la prochaine révision).
+
+    S3 finale : écriture via le service unifié — la table da_fsrs n'est plus
+    écrite directement.
+    """
+    from services.fsrs_unified import update_memory
+
+    await update_memory(
+        db, user_id, "verb_chapter",
+        item_id=f"{verb_slug}::{chapter_slug}",
+        chapter=chapter_slug,
+        last_score=percentage,
+        attempts_delta=1,
     )

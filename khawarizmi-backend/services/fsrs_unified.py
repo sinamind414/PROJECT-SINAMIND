@@ -167,8 +167,57 @@ async def _read_concepts(db: AsyncSession, user_id) -> list[MemoryItem]:
     return items
 
 
+async def _read_mastery_by_source(db: AsyncSession, user_id, source: str) -> list[tuple]:
+    """Lit les lignes FUSIONNÉES depuis mastery_micro_concepts (migration 033).
+
+    Retourne les lignes brutes (item_key, chapter, stability, difficulty,
+    fsrs_state, prochaine_revision, interval_jours, last_score, attempts,
+    last_review, avg_pct, total_users) ou [] si indisponible/vide.
+    """
+    try:
+        res = await db.execute(
+            text("""
+                SELECT item_key, chapter, stability, difficulty,
+                       fsrs_state, prochaine_revision, interval_jours,
+                       last_score, attempts, last_review, avg_pct, total_users
+                FROM mastery_micro_concepts
+                WHERE user_id = :uid AND source = :src
+            """),
+            {"uid": user_id, "src": source},
+        )
+        rows = res.fetchall()
+        return rows if rows else []
+    except Exception as e:
+        logger.warning(f"fsrs_unified: mastery source={source} indisponible ({e})")
+        return []
+
+
 async def _read_verb_chapters(db: AsyncSession, user_id) -> list[MemoryItem]:
-    """État par (verbe, chapitre) — da_fsrs."""
+    """État par (verbe, chapitre) — MASTERY d'abord (fusion 033), fallback da_fsrs."""
+    items: list[MemoryItem] = []
+    rows = await _read_mastery_by_source(db, user_id, "verb_chapter")
+
+    if rows:
+        for row in rows:
+            item_key = row[0] or ""
+            verb, _, chapter = item_key.partition("::")
+            items.append(MemoryItem(
+                kind="verb_chapter",
+                item_id=item_key or f"{verb}::{row[1]}",
+                stability=float(row[2] or 0.0),
+                difficulty=float(row[3] or 0.0),
+                fsrs_state=_parse_state(row[4]),
+                due=_parse_dt(row[5]),
+                interval_jours=float(row[6] or 0.0),
+                last_score=row[7],
+                attempts=int(row[8] or 0),
+                last_review=_parse_dt(row[9]),
+                chapter=row[1],
+                extra={"verb_slug": verb},
+            ))
+        return items
+
+    # Fallback : table héritée (prod avant 033 / preview sans backfill)
     try:
         res = await db.execute(
             text("""
@@ -184,7 +233,6 @@ async def _read_verb_chapters(db: AsyncSession, user_id) -> list[MemoryItem]:
         logger.warning(f"fsrs_unified: da_fsrs indisponible ({e})")
         return []
 
-    items = []
     for row in res.fetchall():
         items.append(MemoryItem(
             kind="verb_chapter",
@@ -204,7 +252,27 @@ async def _read_verb_chapters(db: AsyncSession, user_id) -> list[MemoryItem]:
 
 
 async def _read_verb_actions(db: AsyncSession, user_id) -> list[MemoryItem]:
-    """État par verbe d'action — action_verb_progress."""
+    """État par verbe d'action — MASTERY d'abord (fusion 033), fallback avp."""
+    items: list[MemoryItem] = []
+    rows = await _read_mastery_by_source(db, user_id, "verb_action")
+
+    if rows:
+        for row in rows:
+            items.append(MemoryItem(
+                kind="verb_action",
+                item_id=row[0] or "",
+                stability=float(row[2] or 0.0),
+                difficulty=float(row[3] or 0.0),
+                fsrs_state=_parse_state(row[4]),
+                due=_parse_dt(row[5]),
+                interval_jours=float(row[6] or 0.0),
+                last_score=row[7],
+                attempts=int(row[8] or 0),
+                extra={"avg_pct": row[10], "total_users": row[11]},
+            ))
+        return items
+
+    # Fallback : table héritée
     try:
         res = await db.execute(
             text("""
@@ -220,7 +288,6 @@ async def _read_verb_actions(db: AsyncSession, user_id) -> list[MemoryItem]:
         logger.warning(f"fsrs_unified: action_verb_progress indisponible ({e})")
         return []
 
-    items = []
     for row in res.fetchall():
         items.append(MemoryItem(
             kind="verb_action",
