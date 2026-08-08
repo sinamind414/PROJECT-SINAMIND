@@ -74,3 +74,7 @@ Pipeline complet dans `grading/pipeline.py` : sanity → savoir → prompt → L
    pré-normalisées) — `_detect_lexicon_concepts` 30.7 ms → 0.61 ms (×50),
    correction savoir ~60 ms → 1.65 ms (×36) ; le GIL bloquait la boucle
    asyncio (100 corrections simultanées = secondes de gel).
+5. **Cache C2 validé sur VRAI Redis** ✅ : `tests/test_grading_cache_real_redis.py`
+   (6 tests, SKIP si Redis absent) — Lua CAS réel (libération par token),
+   single-flight 10→1 appel, TTL 7 j vérifié, isolation par clé, zéro verrou
+   résiduel ; `benchmark_cache.py --redis-url` : ratios identiques au fake.

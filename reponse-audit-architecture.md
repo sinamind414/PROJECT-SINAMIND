@@ -1303,6 +1303,37 @@ Docs : docs/benchmarks.md (chiffres avant/après, méthodologie, limites).
 
 ---
 
+# 2ee. Cache C2 validé sur VRAI Redis (Lua CAS réel) ✅
+
+Le FakeRedis des tests/benchmarks ne parse jamais le script Lua de
+libération du verrou (le fake se contente d'un comparaison dict). Une
+erreur de syntaxe Lua ou une sémantique NX/TTL incorrecte ne serait apparue
+qu'en production. Validation ajoutée :
+
+- `tests/test_grading_cache_real_redis.py` (6 tests d'intégration, SKIP si
+  Redis indisponible — suite verte partout) :
+  * le Lua `_RELEASE_LUA` se parse et ne supprime le verrou QUE si le token
+    correspond (CAS) — 2 scénarios (bon/mauvais token) ;
+  * single-flight 10 corrections concurrentes identiques → 1 appel LLM
+    (verrou NX + Lua réels) ;
+  * TTL réel du payload : 6 j < ttl ≤ 7 j ;
+  * isolation par clé (2 réponses → 2 misses puis 2 hits, 0 appel LLM
+    supplémentaire) ;
+  * aucun verrou résiduel après correction (le CAS a libéré).
+- `scripts/benchmark_cache.py --redis-url ...` (Redis 6.2.14 local, LLM
+  simulé 200 ms) : ratios identiques au fake redis — single-flight 30→1
+  appel (96.7 %), hit rate 50 %/90 % ; seule la latence absolue des hits
+  change (162 µs in-process → 5.4 ms round-trip réseau, ≪ 200 ms LLM).
+
+Bilan : le cache C2 est validé sur la sémantique Redis réelle (Lua, NX, TTL).
+Reste non couvert : le partage multi-workers (2 processus sur le même
+Redis) — le lock 30 s + double-check sont conçus pour, mais un test
+multi-process reste à écrire.
+
+Tests : 957 passed (951 + 6 réel redis), 3 skipped, 5 xfailed · ruff vert.
+
+---
+
 # 3. Réponses aux 3 questions de l'audit
 
 1. **Quel modèle ONNX ?** → `paraphrase-multilingual-MiniLM-L12-v2` (multilingue, pas anglais-only). C4 reste à mesurer (AUC 50 paires arabes) mais le remplacement d'urgence n'est pas nécessaire.

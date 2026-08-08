@@ -205,13 +205,24 @@ async def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--llm-ms", type=float, default=200.0, help="latence LLM simulée (ms)")
     parser.add_argument("--quick", action="store_true", help="variante réduite")
+    parser.add_argument("--redis-url", default="", metavar="URL",
+                        help="vrai Redis (ex redis://127.0.0.1:6390) — sinon fake redis in-process")
     args = parser.parse_args()
 
     from app_state import state
 
-    state.redis = FakeRedis()
+    if args.redis_url:
+        import redis.asyncio as aioredis
+
+        state.redis = aioredis.from_url(args.redis_url, decode_responses=True)
+        await state.redis.ping()
+        await state.redis.flushdb()
+        redis_label = f"VRAI Redis ({args.redis_url})"
+    else:
+        state.redis = FakeRedis()
+        redis_label = "fake redis in-process"
     llm = SimulatedLLM(llm_ms=args.llm_ms)
-    print(f"Latence LLM simulée : {args.llm_ms:.0f} ms ± 80 ms (single process, fake redis)\n")
+    print(f"Latence LLM simulée : {args.llm_ms:.0f} ms ± 80 ms · {redis_label}\n")
 
     N = 5 if args.quick else 30          # élèves concurrents (bench 1)
     NQ = 5 if args.quick else 50         # questions uniques (bench 2)
@@ -287,6 +298,13 @@ async def main() -> None:
     dest.parent.mkdir(exist_ok=True)
     dest.write_text(json.dumps(results, indent=2, ensure_ascii=False))
     print(f"\nDétails → {dest}")
+
+    if args.redis_url:
+        try:
+            await state.redis.flushdb()
+            await state.redis.aclose()
+        except Exception:
+            pass
 
 
 if __name__ == "__main__":

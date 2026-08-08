@@ -83,11 +83,37 @@ pareil en même temps.
    dégradé (source hors whitelist, sanity ≠ ok) est refusé au store
    (`skip_uncacheable`) — l'équité prime sur la perf.
 
+## Validation sur VRAI Redis (Lua CAS réel)
+
+Le FakeRedis des benchmarks ne parse jamais le script Lua de libération du
+verrou. Validation réelle ajoutée (run du 2026-08-08, Redis 6.2.14 local) :
+
+- `tests/test_grading_cache_real_redis.py` : 6 tests d'intégration contre un
+  vrai serveur Redis (SKIP si indisponible — la suite reste verte partout) :
+  * le Lua CAS ne libère le verrou QUE si le token correspond (2 scénarios) ;
+  * single-flight 10 concurrents identiques → 1 appel LLM (NX + Lua réels) ;
+  * TTL réel du payload = 7 jours ± (bornes 6-7 j) ;
+  * isolation par clé (2 réponses → 2 clés, re-soumission → 2 hits) ;
+  * aucun verrou résiduel après correction (CAS réel).
+- `python scripts/benchmark_cache.py --redis-url redis://127.0.0.1:6390`
+  (même machine, latence LLM 200 ms) :
+
+| Scénario | Fake redis | Vrai Redis |
+|---|---|---|
+| Single-flight 30 → appels LLM | 1 (96.7 %) | **1 (96.7 %)** |
+| Hit p50 | 162 µs | 5.4 ms (round-trip réseau) |
+| Hit rate global | 50 % / 90 % | 50 % / 90 % (identiques) |
+
+→ Les RATIOS (économie d'appels, hit rate) sont identiques : le single-flight
+et le TTL fonctionnent avec la sémantique Redis réelle. Seule la latence
+absolue des hits change (µs in-process → ms réseau), sans impact utilisateur
+perceptible (5 ms ≪ 200 ms d'un appel LLM).
+
 ## Limites
 
-- Mono-process : le partage inter-nœuds (vrai Redis réseau) n'est pas
-  mesuré ici — le comportement du single-flight multi-workers dépend de la
-  latence réseau Redis (lock 30 s, double-check après attente).
+- Multi-process / multi-nœuds (2 workers sur le même Redis) non mesuré — le
+  lock 30 s + double-check post-verrou sont conçus pour ce cas mais un test
+  multi-workers reste à écrire (nécessite 2 processus).
 - La latence LLM simulée est fixe ; en prod elle varie selon le provider
   (cf. alerte `LLMDeadline` p99 > 20 s).
 - Le pipeline complet est couvert par un second benchmark
