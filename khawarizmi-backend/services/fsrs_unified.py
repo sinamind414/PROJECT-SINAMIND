@@ -750,3 +750,107 @@ async def tag_pending_concept(
     except Exception as e:
         logger.warning(f"fsrs_unified: tag_pending_concept échoué ({e})")
         return False
+
+
+# ── Stats agrégées (S3b : calendar_context, orientation_service) ─────
+
+async def get_concept_stats(
+    db: AsyncSession,
+    user_id,
+) -> dict[str, Any]:
+    """Stats agrégées de la mémoire concepts (calendar_context).
+
+    Fidèle à calendar_context.get_user_stats : total, mastered
+    (stability > 10.0), avg_stability. Calculé depuis la vue consolidée —
+    équivalent aux requêtes agrégées, sans SQL éparpillé.
+    """
+    items = await get_user_memory(db, user_id, kinds=("concept",))
+    total = len(items)
+    mastered = sum(1 for i in items if i.stability > 10.0)
+    avg = round(sum(i.stability for i in items) / total, 1) if total else 0.0
+    return {"total": total, "mastered": mastered, "avg_stability": avg}
+
+
+async def get_concept_stats_by_chapter(
+    db: AsyncSession,
+    user_id,
+) -> dict[str, Any]:
+    """Stats par chapitre (orientation_service — prediction BAC).
+
+    Fidèle à la requête GROUP BY chapter : {chapter: {avg_stability,
+    nb_concepts}}. Calculé depuis la vue consolidée.
+    """
+    items = await get_user_memory(db, user_id, kinds=("concept",))
+    by_chapter: dict[str, dict[str, Any]] = {}
+    for i in items:
+        ch = i.chapter
+        if not ch:
+            continue
+        entry = by_chapter.setdefault(ch, {"avg_stability": 0.0, "nb_concepts": 0})
+        entry["nb_concepts"] += 1
+        entry["avg_stability"] += i.stability
+    for entry in by_chapter.values():
+        entry["avg_stability"] = round(
+            entry["avg_stability"] / entry["nb_concepts"], 3
+        ) if entry["nb_concepts"] else 0.0
+    return by_chapter
+
+
+async def save_concept_update_existing(
+    db: AsyncSession,
+    user_id,
+    concept_id: str,
+    *,
+    due,
+    interval_jours: float,
+    difficulty: float,
+    stability: float,
+    fsrs_state: dict[str, Any],
+) -> bool:
+    """UPDATE d'un concept EXISTANT (reconciliation_queue — ne crée pas).
+
+    Fidèle au bloc UPDATE de reconciliation_queue : pending_real_evaluation
+    repassé à FALSE (la réconciliation fournit une vraie évaluation).
+    """
+    try:
+        await db.execute(
+            text(f"""
+                UPDATE mastery_micro_concepts
+                SET due_date = :due, interval_jours = :interval,
+                    difficulty = :difficulty, stability = :stability,
+                    fsrs_state = {_fsrs_cast(db)},
+                    pending_real_evaluation = FALSE, updated_at = NOW()
+                WHERE user_id = :uid AND concept_id = :cid
+            """),
+            {"uid": user_id, "cid": concept_id, "due": due,
+             "interval": interval_jours, "difficulty": difficulty,
+             "stability": stability, "fsrs": json.dumps(fsrs_state or {})},
+        )
+        return True
+    except Exception as e:
+        logger.warning(f"fsrs_unified: save_concept_update_existing échoué ({e})")
+        return False
+
+
+async def clear_pending_concept(
+    db: AsyncSession,
+    user_id,
+    concept_id: str,
+) -> bool:
+    """Repasse pending_real_evaluation à FALSE (L1 confirmé).
+
+    Fidèle au bloc UPDATE de reconciliation_queue (score L2 confirmé).
+    """
+    try:
+        await db.execute(
+            text("""
+                UPDATE mastery_micro_concepts
+                SET pending_real_evaluation = FALSE, updated_at = NOW()
+                WHERE user_id = :uid AND concept_id = :cid
+            """),
+            {"uid": user_id, "cid": concept_id},
+        )
+        return True
+    except Exception as e:
+        logger.warning(f"fsrs_unified: clear_pending_concept échoué ({e})")
+        return False

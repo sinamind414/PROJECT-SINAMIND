@@ -13,14 +13,18 @@ import pytest
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
 from services.fsrs_unified import (
+    clear_pending_concept,
     get_concept_state,
     get_concept_states,
+    get_concept_stats,
+    get_concept_stats_by_chapter,
     get_due_items,
     get_user_memory,
     memory_summary,
     save_concept_card,
     save_concept_review,
     save_concept_update,
+    save_concept_update_existing,
     tag_pending_concept,
     update_memory,
 )
@@ -470,3 +474,108 @@ class TestDrillQueueSupport:
         # NB : le due principal (normalisé) vient de prochaine_revision, qui
         # est NULL ici — le due_date réel est exposé dans extra (drill_queue
         # lit cette colonne). Les deux cohabitent comme dans le schéma réel.
+
+
+class TestAnalyticsHelpers:
+    @pytest.mark.asyncio
+    async def test_get_concept_stats(self, db):
+        from datetime import UTC, datetime, timedelta
+
+        due = datetime.now(UTC) + timedelta(days=1)
+        await save_concept_update(
+            db, 1, "c1", chapter="ch1", due=due, interval_jours=1.0,
+            difficulty=5.0, stability=2.0, fsrs_state={"stability": 2.0},
+        )
+        await save_concept_update(
+            db, 1, "c2", chapter="ch1", due=due, interval_jours=1.0,
+            difficulty=5.0, stability=12.0, fsrs_state={"stability": 12.0},
+        )
+        await save_concept_update(
+            db, 1, "c3", chapter="ch2", due=due, interval_jours=1.0,
+            difficulty=5.0, stability=4.0, fsrs_state={"stability": 4.0},
+        )
+        stats = await get_concept_stats(db, 1)
+        assert stats["total"] == 3
+        assert stats["mastered"] == 1  # stability > 10
+        assert stats["avg_stability"] == 6.0  # (2+12+4)/3 = 6
+
+    @pytest.mark.asyncio
+    async def test_get_concept_stats_by_chapter(self, db):
+        from datetime import UTC, datetime, timedelta
+
+        due = datetime.now(UTC) + timedelta(days=1)
+        await save_concept_update(
+            db, 1, "c1", chapter="ch1", due=due, interval_jours=1.0,
+            difficulty=5.0, stability=2.0, fsrs_state={"stability": 2.0},
+        )
+        await save_concept_update(
+            db, 1, "c2", chapter="ch1", due=due, interval_jours=1.0,
+            difficulty=5.0, stability=4.0, fsrs_state={"stability": 4.0},
+        )
+        await save_concept_update(
+            db, 1, "c3", chapter="ch2", due=due, interval_jours=1.0,
+            difficulty=5.0, stability=6.0, fsrs_state={"stability": 6.0},
+        )
+        by_chapter = await get_concept_stats_by_chapter(db, 1)
+        assert set(by_chapter) == {"ch1", "ch2"}
+        assert by_chapter["ch1"]["nb_concepts"] == 2
+        assert by_chapter["ch1"]["avg_stability"] == 3.0  # (2+4)/2
+        assert by_chapter["ch2"]["avg_stability"] == 6.0
+
+
+class TestReconciliationHelpers:
+    @pytest.mark.asyncio
+    async def test_save_concept_update_existing_updates_only(self, db):
+        """UPDATE sans création : un concept absent n'est pas créé."""
+        from datetime import UTC, datetime, timedelta
+
+        due = datetime.now(UTC) + timedelta(days=3)
+        # UPDATE sur un concept inexistant → aucune ligne affectée
+        ok = await save_concept_update_existing(
+            db, 1, "absent", due=due, interval_jours=3.0,
+            difficulty=5.0, stability=2.0, fsrs_state={"stability": 2.0},
+        )
+        assert ok is True  # pas d'erreur
+        items = await get_user_memory(db, 1, kinds=("concept",))
+        assert len(items) == 0  # rien créé
+
+    @pytest.mark.asyncio
+    async def test_save_concept_update_existing_updates_pending(self, db):
+        """Un concept pending → UPDATE le réconcilie (pending=FALSE)."""
+        from datetime import UTC, datetime, timedelta
+
+        await tag_pending_concept(db, 1, "c_rec", "ch1")
+        due = datetime.now(UTC) + timedelta(days=3)
+        await save_concept_update_existing(
+            db, 1, "c_rec", due=due, interval_jours=3.0,
+            difficulty=5.0, stability=2.0, fsrs_state={"stability": 2.0},
+        )
+        items = await get_user_memory(db, 1, kinds=("concept",))
+        assert len(items) == 1
+        assert items[0].extra["pending_real_evaluation"] is False  # réconcilié
+        assert items[0].stability == 2.0
+
+    @pytest.mark.asyncio
+    async def test_clear_pending_concept(self, db):
+        await tag_pending_concept(db, 1, "c_clr", "ch1")
+        assert await clear_pending_concept(db, 1, "c_clr") is True
+        items = await get_user_memory(db, 1, kinds=("concept",))
+        assert items[0].extra["pending_real_evaluation"] is False
+
+    @pytest.mark.asyncio
+    async def test_clear_pending_missing_table(self, db):
+        import os
+        import tempfile
+
+        fd, path = tempfile.mkstemp(suffix=".db")
+        os.close(fd)
+        engine = create_async_engine(f"sqlite+aiosqlite:///{path}")
+        async with engine.begin() as conn:
+            await conn.exec_driver_sql("CREATE TABLE users (id INTEGER PRIMARY KEY)")
+        factory = async_sessionmaker(engine, expire_on_commit=False)
+        try:
+            async with factory() as session:
+                assert await clear_pending_concept(session, 1, "x") is False
+        finally:
+            await engine.dispose()
+            os.unlink(path)

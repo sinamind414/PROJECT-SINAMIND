@@ -943,6 +943,40 @@ Tests : 922 passed (+2), 3 skipped, 5 xfailed · ruff vert.
 
 ---
 
+# 2t. S3b (étape 5) — Derniers parcours migrés, S3 consolidé ✅
+
+- `services/ai_modes/evaluation_mode.py` : le INSERT pending inline →
+  `tag_pending_concept` (0 SQL mastery restant).
+- `services/reconciliation_queue.py` : le SELECT ANY (état concepts) →
+  `get_concept_states` (batch IN expanding, asyncpg-safe) ; l'UPDATE FSRS →
+  `save_concept_update_existing` (UPDATE seul, ne crée pas — reconduit
+  pending→FALSE) ; le UPDATE clear pending → `clear_pending_concept`.
+  0 SQL mastery restant.
+- `services/mindmap_service.py` : SELECT fsrs_state → `get_concept_state`
+  (le parse JSON inline supprimé — le service retourne déjà le dict) ; le
+  INSERT review → `save_concept_review`. Le INSERT de CRÉATION (avec
+  RETURNING id — le seul usage de RETURNING sur cette table, nécessaire
+  pour fsrs_id) est conservé mais DOCUMENTÉ comme bloc spécifique.
+- `services/fsrs_unified.py` — helpers ajoutés : `get_concept_stats`
+  (total/mastered/avg — équivalent calendar_context), `get_concept_stats_by_chapter`
+  (GROUP BY chapter — équivalent orientation_service prediction BAC),
+  `save_concept_update_existing` (UPDATE seul), `clear_pending_concept`.
+- Lectures analytics NON migrées (documentées) : calendar_context (AVG/
+  COUNT FILTER), interleaving (JOIN+EXTRACT), orientation_service (GROUP BY),
+  progress_snapshots, scheduler, remediation — aucune écriture → aucun
+  risque de divergence ; elles restent du SQL validé.
+
+**Bilan S3 consolidé** : TOUTES les écritures mastery_micro_concepts passent
+par fsrs_unified (flashcards/drill, évaluation riche, drill_queue,
+evaluation_mode, reconciliation_queue, mindmap reviews). Les lectures sont
+soit via l'API unifiée (get_user_memory, get_concept_state, stats), soit des
+analytics documentés. La fusion physique des tables (S3c, migration 033)
+reste possible si décidée — l'API est prête.
+
+Tests : 928 passed (+6), 3 skipped, 5 xfailed · ruff vert.
+
+---
+
 # 3. Réponses aux 3 questions de l'audit
 
 1. **Quel modèle ONNX ?** → `paraphrase-multilingual-MiniLM-L12-v2` (multilingue, pas anglais-only). C4 reste à mesurer (AUC 50 paires arabes) mais le remplacement d'urgence n'est pas nécessaire.
