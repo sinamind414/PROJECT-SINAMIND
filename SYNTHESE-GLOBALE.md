@@ -66,4 +66,6 @@ Pipeline complet dans `grading/pipeline.py` : sanity → savoir → prompt → L
    ≥ 0.65 → réactiver la remédiation de l'étage savoir.
 2. **Permission `workflows`** — activer le CI préparé (5 jobs, golden
    bloquant, nightly LLM + observability).
-3. **Tests de charge / benchmarks** — hit rate cache, latences LLM p95.
+3. **Tests de charge / benchmarks** ✅ : `scripts/benchmark_cache.py` +
+   `docs/benchmarks.md` — single-flight 30 élèves → 1 appel LLM (96.7 %
+   d'économie), hit ~162 µs vs miss ~182 ms, concurrence 10×10 → 10 appels.
