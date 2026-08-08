@@ -1107,6 +1107,39 @@ au token GitHub — aucune autre modification nécessaire.
 
 ---
 
+# 2y. Golden humain — processus d'annotation expert préparé ✅
+
+L'approche A du plan (annotation humaine par un expert SVT) est prête à être
+exécutée — la mécanique de mesure existe déjà, il manquait le PROCESSUS.
+
+- `docs/golden-annotation-procedure.md` : procédure complète pour l'expert —
+  fichiers concernés, format exact d'un item annoté, 5 règles d'annotation,
+  codes valides, cohérence vérifiée automatiquement, étapes après livraison,
+  stratégie progressive (30/50 questions d'abord). Rappel : remplacer
+  `annotator: "synthetic_keyword_v1"` par `"expert_svt"` + date ISO, sans
+  toucher aux champs sources.
+- `scripts/validate_golden_annotations.py` : validateur de cohérence (exit 1
+  si problèmes) — champs requis (13), human_score entier ∈ [0, bareme], code
+  valide, partition des mots-clés (copies partielles, tolérance ال),
+  copie vide → empty + 0, copie == modèle → bareme (sans vérification de
+  partition littérale — le concept peut être exprimé autrement).
+- Tests (+10) : valid_item, champ manquant, score hors bornes, code invalide,
+  partition présent/absent, copie vide, copie modèle, skip partition pour
+  copie modèle, et le fichier d'annotations ACTUEL (125 synthétiques) passe
+  le validateur.
+- Découvertes : la copie modèle a tous les mots-clés dans matched PAR
+  DÉFINITION (le modèle exprime les concepts autrement) → exemption de la
+  partition littérale ; le validateur doit normaliser ال sur TOUT le texte
+  (même logique que build_golden_annotated).
+
+Une fois l'expert livré : remplacer golden_annotated.json, lancer
+test_golden_local.py (seuils inchangés), et le κ savoir ≥ 0.65 permettra de
+réactiver la remédiation de l'étage savoir (désactivée à κ synthétique 0.449).
+
+Tests : 945 passed (+10), 3 skipped, 5 xfailed · ruff vert.
+
+---
+
 # 3. Réponses aux 3 questions de l'audit
 
 1. **Quel modèle ONNX ?** → `paraphrase-multilingual-MiniLM-L12-v2` (multilingue, pas anglais-only). C4 reste à mesurer (AUC 50 paires arabes) mais le remplacement d'urgence n'est pas nécessaire.
