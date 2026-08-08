@@ -93,15 +93,24 @@ THEN "latence LLM p99 > 20 s — deadline global C3 approché"
 
 ---
 
-## 5. Migration 033 (fusion FSRS) — ordre
+## 5. Migrations FSRS (033 fusion + 034 suppression) — ordre
 
-1. `alembic upgrade head` (Postgres) — ajoute les colonnes de fusion +
-   backfill da_fsrs/action_verb_progress (idempotent, WHERE NOT EXISTS).
+1. `alembic upgrade head` (Postgres) — 033 : colonnes de fusion + backfill
+   da_fsrs/action_verb_progress (idempotent, WHERE NOT EXISTS).
 2. Vérifier : `SELECT source, COUNT(*) FROM mastery_micro_concepts GROUP BY
    source;` → concept/verb_chapter/verb_action.
-3. Les écritures passent déjà par fsrs_unified (aucun changement de code
-   nécessaire). Les tables da_fsrs/action_verb_progress restent en lecture
-   (analytics) — suppression possible plus tard si décidée.
+3. **034 (après un cycle de prod stable)** : re-backfill de rattrapage puis
+   `DROP TABLE da_fsrs` + `DROP TABLE action_verb_progress`.
+   - Sécurité : tables vides → drop sans risque ; tables non vides avec
+     backfill en échec → **ABORT explicite** (jamais de perte silencieuse).
+   - Le code ne dépend plus des tables : toutes les lectures/écritures
+     passent par fsrs_unified (mastery-first) ; `get_national_stats` lit
+     mastery `source='verb_action'` (fallback legacy conservé pour les
+     environnements pré-033).
+   - Rollback : `alembic downgrade 033` recrée les tables (user_id en
+     INTEGER, aligné sur users.id) et re-backfille DEPUIS mastery.
+4. Alertes : si `SavoirInactif` ou `JsonModeFaible` se déclenchent après le
+   cycle, reporter la 034 d'un cycle (métriques indépendantes de la 034).
 
 ---
 

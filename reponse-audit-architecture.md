@@ -1235,6 +1235,47 @@ Tests : 948 passed, 3 skipped, 5 xfailed · ruff vert · App OK (195 routes).
 
 ---
 
+# 2cc. S3 finale (fin) — migration 034 : suppression des tables héritées ✅
+
+La dernière lecture analytics directe (city_service.get_national_stats) est
+migrée vers mastery, puis les tables da_fsrs / action_verb_progress sont
+supprimées.
+
+- `services/city_service.py` — `get_national_stats` lit désormais
+  `mastery_micro_concepts WHERE source='verb_action'` :
+  `AVG(stability)*100` par `item_key` (COALESCE anti-NULL) +
+  `COUNT(DISTINCT user_id)` ; fallback action_verb_progress conservé UNIQUEMENT
+  si la table mastery est absente (environnement pré-033). 0 lecture directe
+  restante sur les tables héritées hors fsrs_unified.
+- `migrations/versions/034_drop_legacy_fsrs_tables.py` :
+  * upgrade = re-backfill de rattrapage (idempotent, WHERE NOT EXISTS) puis
+    `DROP TABLE IF EXISTS da_fsrs` / `action_verb_progress` ;
+  * **sécurité** : tables vides → drop sans risque ; tables non vides avec
+    backfill en échec (ex. Postgres : user_id UUID non convertible en
+    INTEGER — les écritures legacy ont historiquement échoué sur ce cast) →
+    **RuntimeError ABORT**, jamais de perte silencieuse ;
+  * backfill avp en 2 variantes : avec avg_pct/total_users (SQLite auto-DDL)
+    puis retry sans (schéma Postgres 008, colonnes absentes) ;
+  * downgrade = recréation des tables (user_id en INTEGER, aligné sur
+    users.id — les schémas d'origine déclaraient UUID, incompatible avec les
+    ids entiers de l'app ; fsrs_state en sa.JSON, lu via text() par les
+    fallbacks) + re-backfill DEPUIS mastery (boucle Python portable,
+    ids générés côté client) ;
+  * validée sur SQLite réel (5 scénarios : upgrade avec données, downgrade
+    inverse, re-upgrade idempotent, tables absentes, backfill sans colonnes).
+- `fsrs_unified.py` : docstring mise à jour — les fallbacks legacy ne
+  s'exécutent QUE si mastery_micro_concepts est absente (pré-033) ; en prod
+  post-034 ils sont morts (mastery toujours présente). Aucune logique modifiée.
+- Commentaires routes document_analysis/action_verbs mis à jour (034).
+
+Bilan : il ne reste AUCUNE table FSRS hors mastery_micro_concepts. Les
+fallbacks legacy subsistent dans le code comme tolérance pour les
+environnements pré-033 (preview SQLite auto-DDL, DB non migrées).
+
+Tests : 948+ passed, 3 skipped, 5 xfailed · ruff vert · App OK (195 routes).
+
+---
+
 # 3. Réponses aux 3 questions de l'audit
 
 1. **Quel modèle ONNX ?** → `paraphrase-multilingual-MiniLM-L12-v2` (multilingue, pas anglais-only). C4 reste à mesurer (AUC 50 paires arabes) mais le remplacement d'urgence n'est pas nécessaire.

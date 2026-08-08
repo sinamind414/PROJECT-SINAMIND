@@ -132,7 +132,7 @@ async def evaluer_reponse(
     verb = dict(row._mapping)
     evaluation = evaluate_answer(verb, body.answer)
 
-    # Enregistrer la tentative dans action_verb_progress
+    # Enregistrer la tentative (mastery verb_action — migration 034)
     await _enregistrer_tentative(
         db=db,
         user_id=current_user["id"],

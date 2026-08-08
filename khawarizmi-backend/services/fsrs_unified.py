@@ -1,20 +1,23 @@
 """services/fsrs_unified.py — Accès unifié à la mémoire FSRS (audit S3).
 
-Consolide les 3 tables d'état mémoire sous UNE API :
-  - mastery_micro_concepts  : par micro-concept (flashcards, drill, FSRS riche)
-  - da_fsrs                 : par (verbe, chapitre) — analyse de documents
-  - action_verb_progress    : par verbe d'action — exercices méthodologie
+mastery_micro_concepts est la table mémoire UNIQUE (migrations 033/034) :
+  - source='concept'        : flashcards, drill, FSRS riche
+  - source='verb_chapter'   : analyse de documents (ex-da_fsrs, supprimée en 034)
+  - source='verb_action'    : exercices méthodologie (ex-action_verb_progress,
+                              supprimée en 034)
 (+ le graphe concept_prerequisites / question_concept_map, déjà en DB).
 
 Invariants :
-  - Lecture consolidée : get_user_memory / get_due_items — une seule vue.
-  - Écriture par type : update_memory(kind, ...) — upsert dans la bonne table
+  - Lecture consolidée : get_user_memory / get_due_items — une seule vue
+    (mastery-first ; les fallbacks vers da_fsrs / action_verb_progress ne
+    s'exécutent QUE si mastery_micro_concepts est absente — environnement
+    pré-033 uniquement).
+  - Écriture par type : update_memory(kind, ...) — upsert dans MASTERY
     (conventions SQL existantes : ON CONFLICT sur les contraintes UNIQUE).
-  - Tolérance : une table absente (preview SQLite — mastery_micro_concepts
-    n'est pas dans l'auto-DDL) → source vide, jamais d'erreur.
-  - Aucune double-écriture : chaque parcours garde SA table ; l'API unifiée
-    est la porte d'entrée (la fusion physique des tables, si décidée, sera
-    une migration séparée S3b).
+  - Tolérance : une table absente (environnement pré-033) → source vide,
+    jamais d'erreur.
+  - Aucune double-écriture : chaque parcours garde SA source dans mastery ;
+    l'API unifiée est la porte d'entrée.
 
 Le graphe (concept_prerequisites) n'est pas dupliqué : load_concept_graph
 (fsrs_graph.py) reste la source.

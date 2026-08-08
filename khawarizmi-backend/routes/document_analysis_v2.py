@@ -362,9 +362,9 @@ async def _update_fsrs_v2(
     """Met à jour le score et le compteur FSRS (identique à document_analysis.py).
 
     S3 finale : écriture via le service unifié (update_memory verb_chapter) —
-    la table da_fsrs n'est plus écrite directement. En prod (migration 033),
-    l'upsert MASTERY alimente la vue consolidée ; en preview, update_memory
-    retombe sur da_fsrs (tolérance).
+    la table da_fsrs n'est plus écrite directement. Depuis la migration 034,
+    l'upsert MASTERY alimente la vue consolidée (tables héritées supprimées
+    en prod ; tolérance conservée pour les environnements pré-033).
     """
     from services.fsrs_unified import update_memory
 

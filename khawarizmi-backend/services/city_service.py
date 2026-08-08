@@ -91,14 +91,33 @@ async def unlock_city(db: AsyncSession, user_id: str, city_id: str, level: int) 
 
 
 async def get_national_stats(db: AsyncSession) -> list[dict]:
-    result = await db.execute(
-        text("""
-            SELECT avp.verb_slug, AVG(avp.stability) * 100 as avg_pct, COUNT(avp.user_id) as total_users
-            FROM action_verb_progress avp
-            GROUP BY avp.verb_slug
-            ORDER BY avg_pct ASC
-        """)
-    )
+    """Stats nationales par verbe d'action — MASTERY d'abord (fusion 033,
+    migration 034 : les tables héritées sont supprimées), fallback
+    action_verb_progress uniquement si mastery_micro_concepts est absente
+    (environnement pré-033)."""
+    try:
+        result = await db.execute(
+            text("""
+                SELECT item_key AS verb_slug,
+                       COALESCE(AVG(stability), 0) * 100 AS avg_pct,
+                       COUNT(DISTINCT user_id) AS total_users
+                FROM mastery_micro_concepts
+                WHERE source = 'verb_action'
+                GROUP BY item_key
+                ORDER BY avg_pct ASC
+            """)
+        )
+    except Exception:
+        # Fallback pré-033 : table héritée (avant la fusion FSRS)
+        result = await db.execute(
+            text("""
+                SELECT avp.verb_slug, AVG(avp.stability) * 100 as avg_pct,
+                       COUNT(avp.user_id) as total_users
+                FROM action_verb_progress avp
+                GROUP BY avp.verb_slug
+                ORDER BY avg_pct ASC
+            """)
+        )
     rows = result.all()
     return [{"verb_slug": r.verb_slug, "avg_pct": round(float(r.avg_pct), 1), "total_users": r.total_users} for r in rows]
 

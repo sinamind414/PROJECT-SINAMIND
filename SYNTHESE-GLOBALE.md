@@ -36,6 +36,7 @@ Pipeline complet dans `grading/pipeline.py` : sanity → savoir → prompt → L
 ### S3 — FSRS unifié (4 systèmes → 1)
 - **API** : `services/fsrs_unified.py` — `get_user_memory`, `get_due_items`, `update_memory`, `save_concept_review/update/card`, `tag_pending_concept`, `clear_pending_concept`, `get_concept_states`, stats par chapitre
 - **Fusion physique** : migration `033_fsrs_unified_memory` — colonnes `source`/`item_key`/`avg_pct`/`total_users` + backfill depuis da_fsrs et action_verb_progress
+- **Suppression des tables héritées** : migration `034_drop_legacy_fsrs_tables` — re-backfill de rattrapage (ABORT si données non fusionnables) + `DROP TABLE da_fsrs` / `action_verb_progress` ; downgrade recrée + re-backfill inverse (user_id aligné INTEGER)
 - **100 % des écritures** mastery passent par l'API unifiée (flashcards, drill, évaluation riche, drill_queue, evaluation_mode, reconciliation_queue, mindmap)
 - Table mastery ajoutée à l'auto-DDL SQLite (bug d'infrastructure corrigé — avant, le preview ne persistait rien)
 
@@ -43,7 +44,7 @@ Pipeline complet dans `grading/pipeline.py` : sanity → savoir → prompt → L
 - **51 commits** poussés sur la branche de session
 - **929 tests verts** (+~290 depuis le début de la session), ruff 0 erreur
 - **correction_v2.py** : 707 → 93 lignes · **chatbot_orchestrator.py** : 442 → 74 lignes
-- **3 migrations** créées (032 ar_normalize, 033 fusion FSRS)
+- **4 migrations** créées (032 ar_normalize, 033 fusion FSRS, 034 suppression tables héritées)
 - **2 routes** ajoutées (`/metrics/prometheus`, `/api/memory/*`)
 - **3 bugs d'infrastructure latents** corrigés (ILIKE ANY SQLite, CAST jsonb → '0', table mastery absente du preview)
 
@@ -65,6 +66,4 @@ Pipeline complet dans `grading/pipeline.py` : sanity → savoir → prompt → L
    ≥ 0.65 → réactiver la remédiation de l'étage savoir.
 2. **Permission `workflows`** — activer le CI préparé (5 jobs, golden
    bloquant, nightly LLM + observability).
-3. **Suppression des tables FSRS héritées** (da_fsrs, action_verb_progress)
-   après bascule complète des lectures analytics.
-4. **Tests de charge / benchmarks** — hit rate cache, latences LLM p95.
+3. **Tests de charge / benchmarks** — hit rate cache, latences LLM p95.

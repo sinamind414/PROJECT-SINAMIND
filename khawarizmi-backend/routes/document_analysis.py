@@ -318,8 +318,8 @@ async def progression_da(
     db: AsyncSession = Depends(get_db),
 ):
     """Retourne la progression FSRS de l'élève sur l'analyse de documents."""
-    # S3 finale : lecture via la vue consolidée (mastery-first, fallback
-    # da_fsrs) — la table da_fsrs n'est plus lue directement ici.
+    # S3 finale : lecture via la vue consolidée (mastery-first) — les tables
+    # héritées da_fsrs / action_verb_progress sont supprimées (migration 034).
     from services.fsrs_unified import get_user_memory
 
     memory = await get_user_memory(db, current_user["id"], kinds=("verb_chapter",))
@@ -368,8 +368,8 @@ async def reviser_da(
     """Marque une révision FSRS pour un verbe×chapitre et programme la prochaine."""
     scheduler = get_scheduler()
 
-    # S3 finale : lecture via la vue consolidée (mastery-first, fallback
-    # da_fsrs) — plus de SELECT direct sur da_fsrs.
+    # S3 finale : lecture via la vue consolidée (mastery-first) — plus de
+    # SELECT direct sur da_fsrs (table supprimée en 034).
     from services.fsrs_unified import get_user_memory, update_memory
 
     vc_id = f"{body.verb_slug}::{body.chapter_slug}"
@@ -454,8 +454,8 @@ async def faiblesses_da(
 ):
     """Retourne les faiblesses de l'élève (compétences dues + scores faibles).
 
-    S3 finale : lecture via la vue consolidée (mastery-first, fallback
-    da_fsrs) — plus de SELECT direct sur da_fsrs.
+    S3 finale : lecture via la vue consolidée (mastery-first) — plus de
+    SELECT direct sur da_fsrs (table supprimée en 034).
     """
     from services.fsrs_unified import get_user_memory
 
@@ -505,7 +505,7 @@ async def _update_fsrs(
     """Met à jour le score et le compteur FSRS (sans programmer la prochaine révision).
 
     S3 finale : écriture via le service unifié — la table da_fsrs n'est plus
-    écrite directement.
+    écrite directement (table supprimée en 034).
     """
     from services.fsrs_unified import update_memory
 
