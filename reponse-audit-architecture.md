@@ -701,6 +701,47 @@ Tests : 866 passed, 3 skipped, 5 xfailed · ruff vert.
 
 ---
 
+# 2n. S2.2 — Refactor chatbot : handlers testables ✅
+
+Le chatbot unifié est découpé en handlers purs, le dispatcher devient mince.
+
+- `services/chatbot_handlers.py` (nouveau) : 11 handlers ASYNC purs, chacun
+  reçoit ses dépendances (db, openai_client, message, context, mode, mc) en
+  paramètres et retourne le dict TuteurResponse — AUCUN état global, AUCUN
+  import de chatbot_orchestrator (pas de cycle) :
+  handle_refus (triche — statique), handle_methodology (verbe, 0 token),
+  handle_lesson (leçon, 0 token), handle_navigation (statique),
+  handle_orientation (orientation + FSRS push si init), handle_procrastination
+  (cache → LLM → fallback), handle_illusion (due concept / chapitre / cartes),
+  handle_smart_goal, handle_motivation, handle_feedback (cache → LLM →
+  fallback), handle_default_explanation (RAG + LLM + fallback + cache +
+  engagement + métriques). Les 6 helpers `_safe_*` y sont déplacés
+  (safe_rag_search, safe_orientation, safe_get_due_concept,
+  safe_semantic_cache_get/set, safe_record_engagement) — utilisés uniquement
+  ici (vérifié : aucun import externe).
+- `services/chatbot_orchestrator.py` : 442 → 74 lignes — DISPATCHER pur :
+  classify → refus AVANT méthodologie/leçon (audit P0-4.4 conservé) →
+  dispatch par resp_type → défaut. Point d'entrée public inchangé
+  (handle_chatbot_message — importé par routes/chatbot.py et
+  ai_modes/free_mode.py).
+- Tests (test_chatbot_handlers.py, +21) : chaque handler isolé avec mocks
+  (db AsyncMock, openai_client, semantic_cache, call_llm) — refus statique
+  + dispatcher qui refuse AVANT méthodologie (mocké, non appelé) ;
+  méthodologie/leçon (type réel methodology_local) ; navigation (avec/sans
+  chapitre) ; orientation (dict réel + FSRS push) ; procrastination/feedback
+  (LLM + fallback) ; motivation (cache hit) ; smart_goal ; illusion ; défaut
+  (RAG+LLM+sources, fallback quand LLM None, cache hit skip LLM, mode tutor
+  injecté dans le prompt).
+- Découverte de test : le champ réel est `fallback_active` (make_response
+  mappe fallback → fallback_active) — les tests le reflètent.
+- Les 49 tests chatbot existants passent SANS modification (le dispatcher
+  est une extraction à comportement identique).
+
+Tests : 887 passed (+21), 3 skipped, 5 xfailed · ruff vert.
+S2.2 clôturé — prochaine : S2.3 (observabilité) ou S3 (FSRS unifié).
+
+---
+
 # 3. Réponses aux 3 questions de l'audit
 
 1. **Quel modèle ONNX ?** → `paraphrase-multilingual-MiniLM-L12-v2` (multilingue, pas anglais-only). C4 reste à mesurer (AUC 50 paires arabes) mais le remplacement d'urgence n'est pas nécessaire.
