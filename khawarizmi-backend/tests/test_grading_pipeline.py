@@ -64,7 +64,11 @@ def _base_result(**overrides) -> dict:
     return r
 
 
-async def _run(legacy, answer: str = "réponse élève", **kwargs) -> dict:
+async def _run(legacy, answer: str = "الاستنساخ يتم في النواة والترجمة في الهيولى",
+               **kwargs) -> dict:
+    """Copie par défaut VALIDE (arabe) — depuis S2.1c, le pipeline
+    court-circuite sur rejet sanity (une copie latine serait rejetée avant
+    d'atteindre le legacy mocké)."""
     return await evaluate_answer_v2_pipeline(
         question_id=1,
         verb_slug="analyse",
@@ -122,11 +126,17 @@ class TestPipelineContextInitialState:
 class TestParity:
     @pytest.mark.asyncio
     async def test_parity_sanity(self):
-        result = _base_result(source="sanity", score=0, percentage=0,
-                              sanity_code="gibberish", parse_status="not_called")
-        legacy = _legacy_factory(result)
+        """S2.1c : le pipeline court-circuite sur rejet sanity — le legacy
+        n'est PAS appelé, le résultat est construit par le builder legacy
+        (même fonction que le moteur seul → parité structurelle)."""
+        legacy = _legacy_factory(_base_result(source="llm"))
         out = await _run(legacy, answer="ZZZZZ")
-        assert_parity(out, result)
+        assert out["source"] == "sanity"
+        assert out["sanity_code"] == "too_short"  # 5 chars < MIN_LENGTH 8
+        assert out["score"] == 0
+        assert legacy.await_count == 0  # court-circuit avant le legacy
+        # Parité avec le vrai moteur (même builder) — couvert par
+        # test_grading_sanity.test_parity_all_cases
 
     @pytest.mark.asyncio
     async def test_parity_local_savoir(self):
@@ -185,11 +195,12 @@ class TestParity:
 
     @pytest.mark.asyncio
     async def test_parity_empty_answer(self):
-        result = _base_result(source="sanity", score=0, percentage=0,
-                              sanity_code="empty", parse_status="not_called")
-        legacy = _legacy_factory(result)
+        """Réponse vide → court-circuit sanity (empty), legacy non appelé."""
+        legacy = _legacy_factory(_base_result(source="llm"))
         out = await _run(legacy, answer="")
-        assert_parity(out, result)
+        assert out["source"] == "sanity"
+        assert out["sanity_code"] == "empty"
+        assert legacy.await_count == 0
 
     @pytest.mark.asyncio
     async def test_pipeline_returns_exact_legacy_object(self):
@@ -214,11 +225,12 @@ class TestContextFill:
         await _run(legacy)
 
         kwargs = legacy.call_args.kwargs
-        # Le pipeline construit bien le contexte — source/parse_strategy
-        # viennent du résultat legacy, pas d'une valeur codée en dur
-        assert kwargs["student_answer"] == "réponse élève"
+        # Le pipeline construit bien l'appel legacy — copie + identité +
+        # sanity pré-calculée
+        assert kwargs["student_answer"] == "الاستنساخ يتم في النواة والترجمة في الهيولى"
         assert kwargs["score_max"] == 4
         assert kwargs["verb_slug"] == "analyse"
+        assert kwargs["precomputed_sanity"] == (True, "ok", "")
 
     @pytest.mark.asyncio
     async def test_context_steps_recorded(self):

@@ -139,16 +139,16 @@ async def test_evaluate_v2_success(client, auth_headers):
         assert eval1["feedback_ar"] == "تعليق ممتاز"
 
         # Le correcteur v2 a bien été appelé avec les bons arguments.
-        # Nouveau contrat (audit C2) : le wrapper grading_cache consomme
-        # verb_slug/student_answer/score_max pour la clé de cache — le
-        # correcteur ne les reçoit plus en kwargs (il reçoit la copie
-        # canonique, identique ici car aucune normalisation à appliquer).
+        # Contrat S2.1c : le PIPELINE (evaluate_answer_v2_pipeline) appelle le
+        # legacy (evaluate_answer_v2_with_retry) en construisant l'appel
+        # complet : verb_slug/score_max/model_answer + precomputed_sanity.
         mock_eval.assert_called_once()
         kwargs_called = mock_eval.call_args.kwargs
         assert kwargs_called["scenario_context"] == "السياق العام للتحليل"
         assert kwargs_called["student_answer"] == "نلاحظ من خلال الوثيقة أن التغيرات واضحة"
-        assert "verb_slug" not in kwargs_called
-        assert "score_max" not in kwargs_called
+        assert kwargs_called["verb_slug"] == "analyse"
+        assert kwargs_called["score_max"] == 7
+        assert kwargs_called["precomputed_sanity"] == (True, "ok", "")
 
 
 async def test_evaluate_v2_cache_contract(client, auth_headers):
@@ -236,8 +236,14 @@ async def test_evaluate_v2_cache_contract(client, auth_headers):
         assert call_kwargs["score_max"] == 7  # VERB_RULES analyse (2+2+2+1)
         assert call_kwargs["student_answer"] == "نلاحظ من خلال الوثيقة أن التغيرات واضحة"
         assert call_kwargs["model_id"] == get_settings().openai_model
-        # Le correcteur réel (avec retry) est bien l'evaluate_fn injecté
-        from routes.document_analysis_v2 import evaluate_answer_v2_with_retry
-        assert call_kwargs["evaluate_fn"] is evaluate_answer_v2_with_retry
-        # La copie normalisée + la version de prompt v2 partent au correcteur
+        # S2.1c : le wrapper reçoit le PIPELINE comme evaluate_fn et le
+        # legacy (retry) comme evaluate_legacy — le wrapper ne fait que
+        # cacher, le pipeline orchestre (sanity → savoir → legacy).
+        from routes.document_analysis_v2 import (
+            evaluate_answer_v2_pipeline,
+            evaluate_answer_v2_with_retry,
+        )
+        assert call_kwargs["evaluate_fn"] is evaluate_answer_v2_pipeline
+        assert call_kwargs["evaluate_legacy"] is evaluate_answer_v2_with_retry
+        # La copie normalisée + la version de prompt v2 partent au pipeline
         assert call_kwargs["use_v2_prompt"] is True

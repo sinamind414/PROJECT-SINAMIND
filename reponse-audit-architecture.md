@@ -498,6 +498,64 @@ Prochaine étape : S2.1c — savoir.py (wrapper autour de savoir_corrector).
 
 ---
 
+# 2j. S2.1c — Extraction de savoir : du wrapper cache vers le pipeline ✅
+
+L'étage savoir quitte le wrapper cache (qui redevient un PUR cache) pour sa
+vraie place : l'orchestration dans le pipeline.
+
+Vérifications préalables (greps) :
+- étage savoir dans grading/cache.py : bloc « 2. Étage savoir_corrector »
+  (is_savoir_enabled + deterministic_correct_v2 + promotion),
+- imports : grading/cache.py → services.savoir_corrector (is_savoir_enabled,
+  deterministic_correct_v2) ; correction_v2.py n'importe pas savoir,
+- feature flag : config.savoir_enabled_verbs (défaut []) + is_savoir_enabled
+  dans services/savoir_corrector.py.
+
+Livré :
+- `grading/savoir.py` : `run_savoir(question, student_answer, verb_slug,
+  score_max, model_answer)` — wrapper pur : flag par verbe → deterministic_
+  correct_v2 → promotion UNIQUEMENT si can_handle ET ≥ 3 concepts DANS LA
+  COPIE (périmètre validé par le golden) ; promotion au contrat v2 (attempts=0,
+  parse_status="local", finish_reason, remediation=None + reason — κ 0.449).
+- `grading/metrics.py` : record_grading_source / grading_source_stats
+  déplacés du cache (le pipeline les appelle) ; grading/cache.py les
+  ré-exporte (compat imports).
+- `grading/pipeline.py` : court-circuit SANITY (rejet retourné directement via
+  le builder du legacy — pas d'appel legacy) + étage SAVOIR entre sanity et
+  legacy (record_grading_source("local_savoir") + ctx.savoir_result +
+  ctx.source) + `pop("model_answer")` des kwargs avant l'appel legacy (sinon
+  TypeError — le wrapper transmet tout en **kwargs).
+- `grading/cache.py` : bloc savoir RETIRÉ — le wrapper ne fait que cacher ;
+  injecte question_id/verb_slug/score_max dans l'appel à evaluate_fn (le
+  pipeline les exige — sinon TypeError).
+- ROUTE : evaluate_fn=evaluate_answer_v2_pipeline + evaluate_legacy=
+  evaluate_answer_v2_with_retry — le pipeline (sanity → savoir → legacy/LLM)
+  est ACTIF en prod, le cache reste pur. Un résultat local_savoir renvoyé par
+  le pipeline est caché automatiquement (source ∈ politique C2).
+
+Tests :
+- test_savoir_branching.py réécrit : le wrapper appelle le PIPELINE réel avec
+  legacy mocké — les 8 scénarios (appliqué/skippé/désactivé/caché/single-
+  flight/sans redis/sanity d'abord) passent au nouveau callstack.
+- test_grading_pipeline.py : copie par défaut VALIDE (arabe) — le pipeline
+  court-circuitant sur rejet, une copie latine n'atteint plus le legacy
+  mocké ; test_parity_sanity vérifie le court-circuit (legacy non appelé).
+- test_grading_sanity.py : test_pipeline_circuit_breaks_on_reject (legacy
+  jamais appelé sur rejet) + transmission precomputed=(True,'ok','') sur
+  copie valide.
+- test_document_analysis_v2.py : contrat mis à jour (evaluate_fn is pipeline,
+  evaluate_legacy is retry ; le pipeline passe verb_slug/score_max/
+  precomputed_sanity au legacy).
+
+Vérifié : aucun import circulaire (metrics ← cache/pipeline ; savoir ←
+pipeline ; pipeline ne dépend pas de cache) ; App OK (193 routes) ; modules
+grading importables.
+
+Tests : 826 passed, 3 skipped, 5 xfailed · ruff vert.
+Prochaine étape : S2.1d — l2.py (wrapper autour de fallback_v2).
+
+---
+
 # 3. Réponses aux 3 questions de l'audit
 
 1. **Quel modèle ONNX ?** → `paraphrase-multilingual-MiniLM-L12-v2` (multilingue, pas anglais-only). C4 reste à mesurer (AUC 50 paires arabes) mais le remplacement d'urgence n'est pas nécessaire.

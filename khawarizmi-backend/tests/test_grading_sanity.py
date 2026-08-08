@@ -145,16 +145,16 @@ class TestParitySanityRealEngine:
             assert_parity(with_, without, extra_volatile={"precomputed_sanity"})
 
     @pytest.mark.asyncio
-    async def test_pipeline_passes_precomputed_sanity(self):
-        """Le pipeline transmet bien le résultat sanity au legacy (le legacy
-        ne refait pas le calcul)."""
-        captured = {}
+    async def test_pipeline_circuit_breaks_on_reject(self):
+        """S2.1c : sur rejet sanity, le pipeline retourne directement le
+        rejet SANS appeler le legacy (court-circuit)."""
+        captured = {"called": False}
 
         async def legacy_spy(**kwargs):
-            captured["precomputed_sanity"] = kwargs.get("precomputed_sanity")
+            captured["called"] = True
             return await evaluate_answer_v2(**kwargs)
 
-        await evaluate_answer_v2_pipeline(
+        out = await evaluate_answer_v2_pipeline(
             question_id=1, verb_slug="analyse", score_max=8,
             student_answer="", model_answer=BASE_KWARGS["model_answer"],
             evaluate_legacy=legacy_spy,
@@ -162,12 +162,14 @@ class TestParitySanityRealEngine:
                if k not in ("verb_slug", "model_answer", "score_max")},
             **_llm_kwargs(),
         )
-        assert captured["precomputed_sanity"] is not None
-        assert captured["precomputed_sanity"][0] is False
-        assert captured["precomputed_sanity"][1] == "empty"
+        assert out["source"] == "sanity"
+        assert out["sanity_code"] == "empty"
+        assert captured["called"] is False
 
     @pytest.mark.asyncio
     async def test_pipeline_passes_precomputed_sanity_ok(self):
+        """Copie valide → le pipeline transmet precomputed=(True,'ok','') au
+        legacy (le legacy ne refait pas le calcul)."""
         captured = {}
 
         async def legacy_spy(**kwargs):

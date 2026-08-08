@@ -21,7 +21,9 @@ from collections.abc import Awaitable, Callable
 from typing import Any
 
 from grading.context import PipelineContext
+from grading.metrics import record_grading_source
 from grading.sanity import run_sanity, sanity_tuple
+from grading.savoir import run_savoir
 
 # Champs variables exclus de la comparaison de parité (tests) : ils dépendent
 # du run (hashes, horodatage) ou d'étapes pas encore extraites.
@@ -75,19 +77,57 @@ async def evaluate_answer_v2_pipeline(
     # même si le rejet est immédiat (déterministe, ~µs). Le résultat est porté
     # par le contexte ET transmis au legacy via precomputed_sanity : l'ancien
     # moteur ne refait pas le calcul, mais reste la source du format (parité).
+    # S2.1c : court-circuit — un rejet est retourné DIRECTEMENT (le builder
+    # vient encore du legacy : _build_sanity_result, extrait en S2.1e).
     t_sanity = time.perf_counter()
     sanity = run_sanity(student_answer)
     ctx.sanity_result = sanity
     ctx.steps["sanity_ms"] = (time.perf_counter() - t_sanity) * 1000.0
 
+    if not sanity["is_valid"]:
+        from services.correction_v2 import _build_sanity_result
+
+        result = _build_sanity_result(
+            sanity_code=sanity["sanity_code"],
+            message_ar=sanity["message_ar"],
+            score_max=score_max,
+            student_answer=student_answer,
+        )
+        ctx.final_result = result
+        ctx.source = "sanity"
+        ctx.llm_called = False
+        return result
+
+    # S2.1c : Étape 2 — SAVOIR, extrait du wrapper cache. 0 token, 0 clé.
+    # Feature flag par verbe + can_handle + ≥ 3 concepts dans la copie
+    # (périmètre validé par le golden). Le résultat promu est ensuite caché
+    # automatiquement par le wrapper cache (source local_savoir ∈ politique C2).
+    ctx.savoir_result = run_savoir(
+        question=ctx.question_text,
+        student_answer=student_answer,
+        verb_slug=verb_slug,
+        score_max=score_max,
+        model_answer=model_answer,
+    )
+    if ctx.savoir_result is not None:
+        record_grading_source("local_savoir", verb_slug)
+        ctx.final_result = ctx.savoir_result
+        ctx.source = "local_savoir"
+        ctx.llm_called = False
+        return ctx.savoir_result
+
     t_legacy = time.perf_counter()
+    # model_answer est un paramètre nommé du pipeline : l'exclure des kwargs
+    # transmis au legacy (sinon TypeError — le wrapper passe tout en **kwargs).
+    legacy_kwargs = dict(kwargs)
+    legacy_kwargs.pop("model_answer", None)
     result = await evaluate_legacy(
         student_answer=student_answer,
         score_max=score_max,
         verb_slug=verb_slug,
         model_answer=model_answer,
         precomputed_sanity=sanity_tuple(sanity),
-        **kwargs,
+        **legacy_kwargs,
     )
     ctx.steps["legacy_total_ms"] = (time.perf_counter() - t_legacy) * 1000.0
 

@@ -19,6 +19,7 @@ import pytest
 
 from app_state import state
 from grading.cache import evaluate_with_cache
+from grading.pipeline import evaluate_answer_v2_pipeline
 from services.savoir_corrector import (
     SAVOIR_HIGH_CONFIDENCE_MIN_CONCEPTS,
     deterministic_correct_v2,
@@ -110,17 +111,20 @@ Q_GS001 = {
 }
 
 
-async def _call(evaluate_fn, *, answer: str, verb_slug: str = "analyse",
+async def _call(legacy_mock, *, answer: str, verb_slug: str = "analyse",
                 question: str = Q_GS001["question"],
                 model_answer: str = Q_GS001["reponse_attendue"],
                 score_max: int = Q_GS001["bareme"], **overrides) -> dict:
+    """Appelle le wrapper cache avec le PIPELINE réel (S2.1c) et le legacy
+    mocké (evaluate_answer_v2_with_retry simulé)."""
     return await evaluate_with_cache(
         question_id=1,
         verb_slug=verb_slug,
         score_max=score_max,
         student_answer=answer,
         model_id="gpt-4o-mini",
-        evaluate_fn=evaluate_fn,
+        evaluate_fn=evaluate_answer_v2_pipeline,
+        evaluate_legacy=legacy_mock,
         scenario_context="ctx",
         documents=None,
         question_prompt=question,
@@ -203,10 +207,10 @@ class TestDeterministicCorrectV2:
 
 class TestSavoirBranching:
     async def test_savoir_applied_when_high_confidence(self, savoir_active, fake_redis):
-        """Question couverte + ≥ 3 concepts dans la copie → savoir prend la
-        main, 0 appel LLM, pas de remédiation (κ modéré)."""
-        evaluate_fn = _make_evaluate_fn()
-        result = await _call(evaluate_fn, answer=Q_GS001["reponse_attendue"])
+        """Question couverte + ≥ 3 concepts dans la copie → le PIPELINE
+        promeut savoir (0 appel legacy/LLM), pas de remédiation (κ modéré)."""
+        legacy_mock = _make_evaluate_fn()
+        result = await _call(legacy_mock, answer=Q_GS001["reponse_attendue"])
 
         assert result["source"] == "local_savoir"
         assert result["remediation"] is None
@@ -214,84 +218,73 @@ class TestSavoirBranching:
         assert result["attempts"] == 0
         assert result["parse_status"] == "local"
         assert result["finish_reason"] == "savoir_high_confidence"
-        assert evaluate_fn.await_count == 0
+        assert legacy_mock.await_count == 0
 
     async def test_savoir_skipped_when_low_concepts(self, savoir_active, fake_redis):
-        """Copie avec < 3 concepts → savoir cède, LLM appelé."""
-        evaluate_fn = _make_evaluate_fn()
+        """Copie avec < 3 concepts → savoir cède, legacy appelé."""
+        legacy_mock = _make_evaluate_fn()
         # "الاستنساخ" (transcription) + "النواة" (noyau) = 2 concepts < 3
-        result = await _call(evaluate_fn, answer="الاستنساخ يتم في النواة")
+        result = await _call(legacy_mock, answer="الاستنساخ يتم في النواة")
 
         assert result["source"] != "local_savoir"
-        assert evaluate_fn.await_count == 1
+        assert legacy_mock.await_count == 1
 
     async def test_savoir_disabled_globally_by_default(self, fake_redis):
         """Défaut config : savoir_enabled_verbs=[] → jamais appelé."""
-        evaluate_fn = _make_evaluate_fn()
-        result = await _call(evaluate_fn, answer=Q_GS001["reponse_attendue"])
+        legacy_mock = _make_evaluate_fn()
+        result = await _call(legacy_mock, answer=Q_GS001["reponse_attendue"])
 
         assert result["source"] != "local_savoir"
-        assert evaluate_fn.await_count == 1
+        assert legacy_mock.await_count == 1
 
     async def test_savoir_disabled_for_verb_not_in_list(self, savoir_active, fake_redis):
         """Verbe absent de la liste → savoir skippé même si haute confiance."""
-        evaluate_fn = _make_evaluate_fn()
-        result = await _call(evaluate_fn, answer=Q_GS001["reponse_attendue"],
+        legacy_mock = _make_evaluate_fn()
+        result = await _call(legacy_mock, answer=Q_GS001["reponse_attendue"],
                              verb_slug="interpret")
 
         assert result["source"] != "local_savoir"
-        assert evaluate_fn.await_count == 1
+        assert legacy_mock.await_count == 1
 
     async def test_savoir_result_is_cached(self, savoir_active, fake_redis):
-        """Résultat savoir mis en cache ; 2e envoi → hit (source préservée,
-        from_cache=True), 0 appel LLM au total."""
-        evaluate_fn = _make_evaluate_fn()
-        r1 = await _call(evaluate_fn, answer=Q_GS001["reponse_attendue"])
-        r2 = await _call(evaluate_fn, answer=Q_GS001["reponse_attendue"])
+        """Le wrapper cache (pur, S2.1c) cache le résultat local_savoir du
+        pipeline ; 2e envoi → hit (source préservée, from_cache=True), 0
+        appel legacy au total."""
+        legacy_mock = _make_evaluate_fn()
+        r1 = await _call(legacy_mock, answer=Q_GS001["reponse_attendue"])
+        r2 = await _call(legacy_mock, answer=Q_GS001["reponse_attendue"])
 
         assert r1["source"] == "local_savoir"
-        assert evaluate_fn.await_count == 0  # jamais appelé (savoir 0 token)
+        assert legacy_mock.await_count == 0  # jamais appelé (savoir 0 token)
         assert r2["source"] == "local_savoir"  # source préservée au hit
         assert r2["from_cache"] is True
         assert r2["score"] == r1["score"]
 
     async def test_savoir_survives_single_flight(self, savoir_active, fake_redis):
         """10 concurrents → 1 seul calcul savoir, 9 hits."""
-        evaluate_fn = _make_evaluate_fn()
+        legacy_mock = _make_evaluate_fn()
         results = await asyncio.gather(*[
-            _call(evaluate_fn, answer=Q_GS001["reponse_attendue"]) for _ in range(10)
+            _call(legacy_mock, answer=Q_GS001["reponse_attendue"]) for _ in range(10)
         ])
         assert all(r["score"] == Q_GS001["bareme"] for r in results)
         assert sum(1 for r in results if r.get("from_cache")) == 9
-        assert evaluate_fn.await_count == 0
+        assert legacy_mock.await_count == 0
 
     async def test_savoir_not_cached_without_redis(self, savoir_active):
         """Sans Redis (CI) : pas de cache, mais l'étage savoir fonctionne."""
-        evaluate_fn = _make_evaluate_fn()
-        r = await _call(evaluate_fn, answer=Q_GS001["reponse_attendue"])
+        legacy_mock = _make_evaluate_fn()
+        r = await _call(legacy_mock, answer=Q_GS001["reponse_attendue"])
         assert r["source"] == "local_savoir"
-        assert evaluate_fn.await_count == 0
+        assert legacy_mock.await_count == 0
 
     async def test_sanity_still_first(self, savoir_active, fake_redis):
-        """Une copie vide est rejetée par sanity — l'étage savoir n'est pas
-        exécuté (le wrapper délègue directement au pipeline qui rejette)."""
-        async def fake_sanity_pipeline(**kwargs):
-            return {
-                "source": "sanity", "score": 0, "score_max": 2, "percentage": 0,
-                "highlights": [], "matched_criteria": [], "unmatched_criteria": [],
-                "feedback_ar": "", "advice_ar": "", "confidence": 1.0,
-                "sanity_code": "empty", "provider": "none", "model": "none",
-                "finish_reason": "sanity", "prompt_hash": None,
-                "student_answer_hash": "h", "llm_raw_hash": None,
-                "parse_status": "not_called", "missing": [],
-                "dominant_error_code": "empty", "success": [], "errors": [],
-                "remediation": None,
-            }
-        evaluate_fn = AsyncMock(side_effect=fake_sanity_pipeline)
-        r = await _call(evaluate_fn, answer="   ")
+        """Une copie vide est rejetée par sanity — ni savoir ni legacy ne
+        sont exécutés (court-circuit S2.1c dans le pipeline)."""
+        legacy_mock = _make_evaluate_fn()
+        r = await _call(legacy_mock, answer="   ")
         assert r["source"] == "sanity"
         assert r["sanity_code"] == "empty"
-        assert evaluate_fn.await_count == 1  # délégation directe, pas d'étage savoir
+        assert legacy_mock.await_count == 0  # court-circuit avant le legacy
 
 
 # ── Étape 4 : non-régression golden (périmètre de branchement) ───────
