@@ -146,6 +146,10 @@ async def evaluate_answer_v2_pipeline(
             f"{log_prefix}sanity_reject | code={sanity_code} "
             f"verb={verb_slug} len={len(student_answer)}"
         )
+        # S2.3 : événement Prometheus (no-op si dépendance absente)
+        from grading.observability import record_pipeline_event as _prom_event
+
+        _prom_event("sanity_reject")
         result = build_sanity_result(
             sanity_code=sanity_code,
             message_ar=sanity_message,
@@ -167,6 +171,9 @@ async def evaluate_answer_v2_pipeline(
     )
     if ctx.savoir_result is not None:
         record_grading_source("local_savoir", verb_slug)
+        from grading.observability import record_pipeline_event as _prom_event
+
+        _prom_event("savoir_promoted")
         ctx.final_result = ctx.savoir_result
         ctx.source = "local_savoir"
         ctx.llm_called = False
@@ -245,7 +252,11 @@ async def evaluate_answer_v2_pipeline(
                 log_prefix=log_prefix,
             )
             if local_result is not None:
+                from grading.observability import record_pipeline_event as _prom_event
+                _prom_event("l2_fallback")
                 return local_result
+        from grading.observability import record_pipeline_event as _prom_event
+        _prom_event("llm_error")
         return build_error_result(
             score_max=score_max,
             error_message="llm_call non fourni (pipeline)",
@@ -315,7 +326,11 @@ async def evaluate_answer_v2_pipeline(
                 log_prefix=log_prefix,
             )
             if local_result is not None:
+                from grading.observability import record_pipeline_event as _prom_event
+                _prom_event("l2_fallback")
                 return local_result
+        from grading.observability import record_pipeline_event as _prom_event
+        _prom_event("llm_error")
         return build_error_result(
             score_max=score_max,
             error_message=str(e),
@@ -326,6 +341,10 @@ async def evaluate_answer_v2_pipeline(
         )
     finally:
         ctx.steps["llm_ms"] = (time.perf_counter() - t_llm) * 1000.0
+        # S2.3 : histogramme latence LLM (no-op si dépendance absente)
+        from grading.observability import observe_llm_latency as _prom_latency
+
+        _prom_latency(ctx.steps["llm_ms"] / 1000.0)
 
     # ── 5. POST-VALIDATION — parsing ─────────────
     # O7 : stratégie native_json en tête quand le provider a répondu en mode
@@ -352,7 +371,11 @@ async def evaluate_answer_v2_pipeline(
                 log_prefix=log_prefix,
             )
             if local_result is not None:
+                from grading.observability import record_pipeline_event as _prom_event
+                _prom_event("l2_fallback")
                 return local_result
+        from grading.observability import record_pipeline_event as _prom_event
+        _prom_event("llm_error")
         return build_error_result(
             score_max=score_max,
             error_message="Impossible de parser la réponse JSON du LLM.",
@@ -432,6 +455,10 @@ async def evaluate_answer_v2_pipeline(
         except (ValueError, TypeError):
             confidence = 0.5
             source = "llm_recovered"
+
+    from grading.observability import record_pipeline_event as _prom_event
+
+    _prom_event("llm_ok")
 
     # ── 7. Finalisation (post_validate.finalize_result) ──
     result = finalize_result(

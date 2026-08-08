@@ -128,6 +128,10 @@ def _record(result: str, verb_slug: str) -> None:
         f"correction_cache_ops_total{{result={result},verb={verb_slug}}} "
         f"| total={_stats[result]}"
     )
+    # S2.3 : alimente aussi Prometheus (no-op si dépendance absente)
+    from grading.observability import record_cache_op as _prom_record
+
+    _prom_record(result, verb_slug)
 
 
 # ── grading_source_total{source, verb_slug} — vit dans grading/metrics.py ──

@@ -68,6 +68,15 @@ async def handle_chatbot_message(
     mc.set("intent", intent)
     mc.set("resp_type", resp_type)
 
+    # S2.3 : compteur Prometheus des messages classés (no-op si absent)
+    from grading.observability import (
+        observe_chatbot_step,
+        record_chatbot_message,
+    )
+
+    record_chatbot_message(intent, resp_type)
+    observe_chatbot_step("classification", mc._durations.get("classification", 0))
+
     logger.info(f"Chatbot | user={user_id} intent={intent} type={resp_type} mode={mode}")
 
     # ── 2. SAFETY / TRICHE AVANT toute réponse pédagogique (audit P0-4.4) ──

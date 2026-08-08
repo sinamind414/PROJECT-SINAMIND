@@ -43,6 +43,10 @@ def record_parse_strategy(strategy: str, provider: str = "unknown") -> None:
         f"parse_strategy_total{{strategy={strategy},provider={provider}}} "
         f"| total={_PARSE_STATS[strategy]}"
     )
+    # S2.3 : alimente aussi Prometheus (no-op si dépendance absente)
+    from grading.observability import record_parse_strategy as _prom_record
+
+    _prom_record(strategy, provider)
 
 
 def parse_stats() -> dict[str, int]:

@@ -742,6 +742,57 @@ S2.2 clôturé — prochaine : S2.3 (observabilité) ou S3 (FSRS unifié).
 
 ---
 
+# 2o. S2.3 — Observabilité Prometheus ✅
+
+Le pipeline et le chatbot exposent leurs métriques au format Prometheus.
+
+- `grading/observability.py` : compteurs + histogrammes prometheus-client
+  avec import PAESSEUX (no-op si la dépendance est absente — le système ne
+  casse pas) :
+  * Counter grading_source_total{source, verb}
+  * Counter parse_strategy_total{strategy, provider} (O7)
+  * Counter correction_cache_ops_total{result, verb} (C2)
+  * Counter grading_pipeline_events_total{event} — sanity_reject /
+    savoir_promoted / l2_fallback / llm_error / llm_ok
+  * Histogram grading_llm_latency_seconds (buckets 0.1→30 s)
+  * Counter chatbot_messages_total{intent, type}
+  * Histogram chatbot_step_duration_ms{step} (classification, rag, llm,
+    cache_lookup, total_ms)
+  Labels à cardinalité bornée (verb ~15, provider ~7, strategy ~6…).
+  metrics_text() (exposition) + metrics_summary() (JSON interne/tests) —
+  les samples *_created (timestamp) sont ignorés du summary.
+- Branchement (hooks no-op si absent) :
+  * grading/metrics.py → record_grading_source
+  * grading/parser.py → record_parse_strategy
+  * grading/cache.py → record_cache_op
+  * grading/pipeline.py → événements (sanity_reject, savoir_promoted,
+    l2_fallback ×3, llm_error ×3, llm_ok) + observe_llm_latency (steps
+    llm_ms déjà mesurés)
+  * services/chatbot_orchestrator.py → record_chatbot_message +
+    observe_chatbot_step(classification)
+  * services/metrics.py (MetricsCollector.flush) → observe_chatbot_step
+    (total_ms + chaque étape)
+- `routes/observability.py` : GET /metrics/prometheus → PlainTextResponse
+  (format exposition) — monté dans routes/__init__.py. ⚠️ /metrics (JSON
+  gamification, phase6) est déjà pris : le path /metrics/prometheus évite
+  le conflit (testé).
+- requirements.txt : prometheus-client==0.26.0.
+
+Bugs réels attrapés par les tests :
+1. Histogram chatbot_step_duration_ms utilisé avec .labels(step=…) mais
+   déclaré SANS labelnames → ValueError "No label names" (crash route
+   chatbot en prod !) — corrigé (["step"]).
+2. metrics_summary lisait le sample *_created (timestamp) au lieu du count
+   → valeurs absurdes — corrigé (filtre _created).
+3. Tests hooks : comparaison par count() du texte instable quand d'autres
+   tests créent déjà les séries → comparaison de VALEUR par label via
+   metrics_summary.
+
+Tests : 897 passed (+10), 3 skipped, 5 xfailed · ruff vert.
+S2.3 clôturé — prochaine : S3 (FSRS unifié : 4 systèmes + 1 fichier).
+
+---
+
 # 3. Réponses aux 3 questions de l'audit
 
 1. **Quel modèle ONNX ?** → `paraphrase-multilingual-MiniLM-L12-v2` (multilingue, pas anglais-only). C4 reste à mesurer (AUC 50 paires arabes) mais le remplacement d'urgence n'est pas nécessaire.

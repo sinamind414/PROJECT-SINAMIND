@@ -95,6 +95,17 @@ class MetricsCollector:
 
         # Log JSON structuré (une ligne = une entrée parsable)
         logger.info(f"METRICS|{json.dumps(report, ensure_ascii=False)}")
+
+        # S2.3 : histogrammes Prometheus des étapes (no-op si dépendance absente)
+        try:
+            from grading.observability import observe_chatbot_step
+
+            observe_chatbot_step("total_ms", total_ms)
+            for step, duration in self._durations.items():
+                observe_chatbot_step(step, duration)
+        except Exception:
+            pass
+
         return report
 
 

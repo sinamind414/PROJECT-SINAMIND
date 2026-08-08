@@ -30,6 +30,10 @@ def record_grading_source(source: str, verb_slug: str) -> None:
         f"grading_source_total{{source={source},verb={verb_slug}}} "
         f"| total={_grading_sources[source]}"
     )
+    # S2.3 : alimente aussi Prometheus (no-op si dépendance absente)
+    from grading.observability import record_grading_source as _prom_record
+
+    _prom_record(source, verb_slug)
 
 
 def grading_source_stats() -> dict[str, Any]:
