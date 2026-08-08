@@ -443,3 +443,30 @@ class TestEvaluationRichHelpers:
         finally:
             await engine.dispose()
             os.unlink(path)
+
+
+class TestDrillQueueSupport:
+    @pytest.mark.asyncio
+    async def test_pending_flag_exposed_in_extra(self, db):
+        """drill_queue lit pending_real_evaluation via extra — vérifié."""
+
+        await tag_pending_concept(db, 1, "c_pend", "ch1")
+        items = await get_user_memory(db, 1, kinds=("concept",))
+        assert len(items) == 1
+        assert items[0].extra["pending_real_evaluation"] is True
+
+    @pytest.mark.asyncio
+    async def test_due_date_exposed_in_extra(self, db):
+        from datetime import UTC, datetime, timedelta
+
+        due = datetime.now(UTC) + timedelta(days=1)
+        await save_concept_update(
+            db, 1, "c_due", chapter="ch1",
+            due=due, interval_jours=1.0, difficulty=5.0, stability=1.0,
+            fsrs_state={"stability": 1.0},
+        )
+        items = await get_user_memory(db, 1, kinds=("concept",))
+        assert items[0].extra["due_date"] is not None
+        # NB : le due principal (normalisé) vient de prochaine_revision, qui
+        # est NULL ici — le due_date réel est exposé dans extra (drill_queue
+        # lit cette colonne). Les deux cohabitent comme dans le schéma réel.

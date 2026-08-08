@@ -119,7 +119,7 @@ async def _read_concepts(db: AsyncSession, user_id) -> list[MemoryItem]:
                 SELECT micro_concept_id, chapter, stability, difficulty,
                        fsrs_state, prochaine_revision, interval_jours,
                        last_score, attempts, last_review, total_reviews,
-                       avg_score, streak
+                       avg_score, streak, pending_real_evaluation, due_date
                 FROM mastery_micro_concepts
                 WHERE user_id = :uid
             """),
@@ -147,6 +147,8 @@ async def _read_concepts(db: AsyncSession, user_id) -> list[MemoryItem]:
                 "total_reviews": row[10],
                 "avg_score": row[11],
                 "streak": row[12],
+                "pending_real_evaluation": bool(row[13]),
+                "due_date": row[14],
             },
         ))
     return items

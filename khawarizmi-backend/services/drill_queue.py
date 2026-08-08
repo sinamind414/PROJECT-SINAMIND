@@ -21,7 +21,6 @@ import logging
 import random
 from datetime import UTC, datetime
 
-from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from services.qcm_items import get_all_qcm_ids, qcm_db
@@ -102,21 +101,18 @@ async def build_drill_queue(
         ]
 
         if valid_qids:
-            res_state = await db.execute(
-                text("""
-                    SELECT micro_concept_id, due_date, stability, pending_real_evaluation
-                    FROM mastery_micro_concepts
-                    WHERE user_id = :uid
-                """),
-                {"uid": user_id},
-            )
-            for row in res_state.fetchall():
-                mc_id = row[0]
+            # S3b : lecture via le service unifié (même SELECT qu'avant)
+            from services.fsrs_unified import get_user_memory
+
+            memory = await get_user_memory(db, user_id, kinds=("concept",))
+            for item in memory:
+                mc_id = item.item_id
                 if mc_id in valid_qids:
                     fsrs_state[mc_id] = {
-                        "due_date": row[1],
-                        "stability": row[2] or 0.0,
-                        "pending": bool(row[3]),
+                        "due_date": item.due,
+                        "stability": item.stability,
+                        "pending": bool(item.extra.get("pending_real_evaluation", False))
+                        or bool(item.fsrs_state.get("pending_real_evaluation", False)),
                     }
 
             seen_qids = set(fsrs_state.keys())

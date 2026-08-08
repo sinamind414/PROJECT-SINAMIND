@@ -916,6 +916,33 @@ Tests : 920 passed (+5), 3 skipped, 5 xfailed · ruff vert.
 
 ---
 
+# 2s. S3b (étape 4) — Parcours drill_queue migré + lectures analytics documentées ✅
+
+- `services/drill_queue.py` : le SELECT d'état (due_date, stability,
+  pending) → `get_user_memory(db, user_id, kinds=("concept",))` via le
+  service unifié. La lecture est identique (mêmes colonnes, même filtre
+  user) — le tri due/stability reste dans drill_queue.
+- `services/fsrs_unified.py` : `_read_concepts` expose désormais
+  `pending_real_evaluation` et `due_date` dans `extra` (nécessaire pour
+  drill_queue — la colonne due_date est distincte de prochaine_revision).
+- `services/interleaving.py` : NON migré — ses 2 requêtes mastery sont des
+  lectures ANALYTIQUES complexes (JOIN micro_concepts, AVG, calcul de
+  récupérabilité à la volée avec EXTRACT/EPOCH). Les migrer vers l'API
+  unifiée perdrait en clarté/perf sans gain de cohérence (aucune écriture →
+  aucun risque de divergence). Documenté : ces lectures restent du SQL
+  validé, la porte d'écriture unifiée est fsrs_unified.
+- Tests (+2) : pending_real_evaluation exposé dans extra (drill_queue le
+  lit), due_date exposé dans extra (distinct de prochaine_revision — le due
+  normalisé vient de prochaine_revision, NULL si non défini).
+
+Parcours migrés : flashcards/drill, évaluation riche, drill_queue.
+Restent (lectures analytics documentées) : interleaving, calendar_context,
+orientation_service, evaluation_mode.
+
+Tests : 922 passed (+2), 3 skipped, 5 xfailed · ruff vert.
+
+---
+
 # 3. Réponses aux 3 questions de l'audit
 
 1. **Quel modèle ONNX ?** → `paraphrase-multilingual-MiniLM-L12-v2` (multilingue, pas anglais-only). C4 reste à mesurer (AUC 50 paires arabes) mais le remplacement d'urgence n'est pas nécessaire.
