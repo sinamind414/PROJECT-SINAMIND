@@ -75,6 +75,25 @@ def _parse_dt(value: Any) -> datetime | None:
     return None
 
 
+def _is_postgres(db: AsyncSession) -> bool:
+    """Détecte Postgres (le CAST jsonb est Postgres-only — SQLite le
+    convertirait en '0' : type inconnu → numérique)."""
+    try:
+        dialect = getattr(db, "bind", None)
+        if dialect is None:
+            dialect = getattr(db, "get_bind", lambda: None)()
+        return getattr(dialect, "dialect", None) is not None and (
+            dialect.dialect.name == "postgresql"
+        )
+    except Exception:
+        return False
+
+
+def _fsrs_cast(db: AsyncSession) -> str:
+    """CAST jsonb en Postgres ; string brute ailleurs (SQLite/preview)."""
+    return "{_fsrs_cast(db)}" if _is_postgres(db) else ":fsrs"
+
+
 def _parse_state(value: Any) -> dict[str, Any]:
     """Parse fsrs_state (dict JSONB en Postgres, string JSON en SQLite)."""
     if value is None:
@@ -418,3 +437,185 @@ async def memory_summary(db: AsyncSession, user_id) -> dict[str, Any]:
         "due_count": due_count,
         "avg_stability": round(total_stability / len(items), 3) if items else 0.0,
     }
+
+
+# ── Helpers parcours CONCEPT (S3b : flashcards / drill) ──────────────
+
+async def get_concept_state(
+    db: AsyncSession,
+    user_id,
+    concept_id: str,
+) -> dict[str, Any] | None:
+    """Lit le fsrs_state d'un concept précis (remplace le SELECT inline).
+
+    Retourne le dict fsrs_state (parsé), ou None si absent/indisponible.
+    """
+    try:
+        res = await db.execute(
+            text("""
+                SELECT fsrs_state FROM mastery_micro_concepts
+                WHERE user_id = :uid AND micro_concept_id = :cid
+                LIMIT 1
+            """),
+            {"uid": user_id, "cid": concept_id},
+        )
+        row = res.fetchone()
+    except Exception as e:
+        logger.warning(f"fsrs_unified: get_concept_state indisponible ({e})")
+        return None
+    return _parse_state(row[0]) if row else None
+
+
+async def save_concept_review(
+    db: AsyncSession,
+    user_id,
+    concept_id: str,
+    *,
+    concept_id_alias: str | None = None,
+    chapter: str | None = None,
+    prochaine_revision: datetime,
+    interval_jours: float,
+    difficulty: float,
+    stability: float,
+    fsrs_state: dict[str, Any],
+    due_date: datetime | None = None,
+    last_review: datetime | None = None,
+    reps: int = 0,
+    lapses: int = 0,
+    state: int = 0,
+    avg_score: float | None = None,
+) -> bool:
+    """Upsert RICHE d'une révision concept (flashcards review / drill result).
+
+    Fidèle aux upserts existants de routes/flashcards.py :
+    - avg_score fourni → total_reviews += 1 et avg_score = moyenne pondérée ;
+    - sinon → upsert simple (review flashcards).
+    """
+    try:
+        if avg_score is not None:
+            # Cas drill/result : moyenne pondérée + total_reviews +1
+            await db.execute(
+                text(f"""
+                    INSERT INTO mastery_micro_concepts
+                        (user_id, micro_concept_id, concept_id, chapter,
+                         prochaine_revision, interval_jours, difficulty,
+                         stability, fsrs_state, due_date, last_review,
+                         reps, lapses, state, total_reviews, avg_score,
+                         updated_at)
+                    VALUES
+                        (:uid, :cid, :alias, :chapter, :next_rev, :interval,
+                         :difficulty, :stability, {_fsrs_cast(db)},
+                         :due, :last_review, :reps, :lapses, :state,
+                         1, :avg, NOW())
+                    ON CONFLICT (user_id, micro_concept_id) DO UPDATE SET
+                        concept_id = COALESCE(mastery_micro_concepts.concept_id, EXCLUDED.concept_id),
+                        prochaine_revision = EXCLUDED.prochaine_revision,
+                        interval_jours = EXCLUDED.interval_jours,
+                        difficulty = EXCLUDED.difficulty,
+                        stability = EXCLUDED.stability,
+                        fsrs_state = EXCLUDED.fsrs_state,
+                        due_date = EXCLUDED.due_date,
+                        last_review = EXCLUDED.last_review,
+                        reps = EXCLUDED.reps,
+                        lapses = EXCLUDED.lapses,
+                        state = EXCLUDED.state,
+                        total_reviews = COALESCE(mastery_micro_concepts.total_reviews, 0) + 1,
+                        avg_score = (
+                            (COALESCE(mastery_micro_concepts.avg_score, 0)
+                             * COALESCE(mastery_micro_concepts.total_reviews, 0))
+                            + :avg
+                        ) / NULLIF(COALESCE(mastery_micro_concepts.total_reviews, 0) + 1, 0),
+                        updated_at = NOW()
+                """),
+                {"uid": user_id, "cid": concept_id,
+                 "alias": concept_id_alias or concept_id,
+                 "chapter": chapter, "next_rev": prochaine_revision,
+                 "interval": interval_jours, "difficulty": difficulty,
+                 "stability": stability, "fsrs": json.dumps(fsrs_state or {}),
+                 "due": due_date, "last_review": last_review,
+                 "reps": reps, "lapses": lapses, "state": state,
+                 "avg": avg_score},
+            )
+        else:
+            # Cas review : upsert simple
+            await db.execute(
+                text(f"""
+                    INSERT INTO mastery_micro_concepts
+                        (user_id, micro_concept_id, concept_id, chapter,
+                         prochaine_revision, interval_jours, difficulty,
+                         stability, fsrs_state, due_date, last_review,
+                         reps, lapses, state, updated_at)
+                    VALUES
+                        (:uid, :cid, :alias, :chapter, :next_rev, :interval,
+                         :difficulty, :stability, {_fsrs_cast(db)},
+                         :due, :last_review, :reps, :lapses, :state, NOW())
+                    ON CONFLICT (user_id, micro_concept_id) DO UPDATE SET
+                        concept_id = COALESCE(mastery_micro_concepts.concept_id, EXCLUDED.concept_id),
+                        prochaine_revision = EXCLUDED.prochaine_revision,
+                        interval_jours = EXCLUDED.interval_jours,
+                        difficulty = EXCLUDED.difficulty,
+                        stability = EXCLUDED.stability,
+                        fsrs_state = EXCLUDED.fsrs_state,
+                        due_date = EXCLUDED.due_date,
+                        last_review = EXCLUDED.last_review,
+                        reps = EXCLUDED.reps,
+                        lapses = EXCLUDED.lapses,
+                        state = EXCLUDED.state,
+                        updated_at = NOW()
+                """),
+                {"uid": user_id, "cid": concept_id,
+                 "alias": concept_id_alias or concept_id,
+                 "chapter": chapter, "next_rev": prochaine_revision,
+                 "interval": interval_jours, "difficulty": difficulty,
+                 "stability": stability, "fsrs": json.dumps(fsrs_state or {}),
+                 "due": due_date, "last_review": last_review,
+                 "reps": reps, "lapses": lapses, "state": state},
+            )
+        return True
+    except Exception as e:
+        logger.warning(f"fsrs_unified: save_concept_review échoué ({e})")
+        return False
+
+
+async def save_concept_card(
+    db: AsyncSession,
+    user_id,
+    concept_id: str,
+    *,
+    concept_id_alias: str | None = None,
+    chapter: str | None = None,
+    difficulty: float = 0.0,
+    stability: float = 0.0,
+    state: int = 0,
+    due_date: datetime | None = None,
+    prochaine_revision: datetime | None = None,
+    interval_jours: float = 1.0,
+) -> bool:
+    """Crée une carte concept (create_flashcard) — upsert simple."""
+    try:
+        await db.execute(
+            text("""
+                INSERT INTO mastery_micro_concepts
+                    (user_id, micro_concept_id, concept_id, chapter,
+                     difficulty, stability, state, due_date,
+                     prochaine_revision, interval_jours, updated_at)
+                VALUES
+                    (:uid, :cid, :alias, :chapter,
+                     :difficulty, :stability, :state, :due,
+                     :next_rev, :interval, NOW())
+                ON CONFLICT (user_id, micro_concept_id) DO UPDATE SET
+                    chapter = EXCLUDED.chapter,
+                    difficulty = EXCLUDED.difficulty,
+                    updated_at = NOW()
+            """),
+            {"uid": user_id, "cid": concept_id,
+             "alias": concept_id_alias or concept_id,
+             "chapter": chapter, "difficulty": difficulty,
+             "stability": stability, "state": state,
+             "due": due_date, "next_rev": prochaine_revision,
+             "interval": interval_jours},
+        )
+        return True
+    except Exception as e:
+        logger.warning(f"fsrs_unified: save_concept_card échoué ({e})")
+        return False

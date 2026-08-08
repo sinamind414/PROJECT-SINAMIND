@@ -13,9 +13,12 @@ import pytest
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
 from services.fsrs_unified import (
+    get_concept_state,
     get_due_items,
     get_user_memory,
     memory_summary,
+    save_concept_card,
+    save_concept_review,
     update_memory,
 )
 
@@ -24,6 +27,7 @@ CREATE TABLE mastery_micro_concepts (
     id INTEGER PRIMARY KEY,
     user_id INTEGER NOT NULL,
     micro_concept_id TEXT NOT NULL,
+    concept_id TEXT,
     chapter TEXT,
     stability REAL DEFAULT 0,
     difficulty REAL DEFAULT 0,
@@ -36,6 +40,11 @@ CREATE TABLE mastery_micro_concepts (
     total_reviews INTEGER DEFAULT 0,
     avg_score REAL DEFAULT 0,
     streak INTEGER DEFAULT 0,
+    reps INTEGER DEFAULT 0,
+    lapses INTEGER DEFAULT 0,
+    state INTEGER DEFAULT 0,
+    due_date DATETIME,
+    pending_real_evaluation BOOLEAN DEFAULT 0,
     updated_at DATETIME,
     UNIQUE(user_id, micro_concept_id)
 );
@@ -226,6 +235,101 @@ class TestMissingTableTolerance:
                 assert await update_memory(
                     session, 1, "verb_chapter", item_id="analyse::ch1",
                 ) is True
+        finally:
+            await engine.dispose()
+            os.unlink(path)
+
+
+class TestConceptHelpers:
+    @pytest.mark.asyncio
+    async def test_get_concept_state_none_when_absent(self, db):
+        state = await get_concept_state(db, 1, "absent")
+        assert state is None
+
+    @pytest.mark.asyncio
+    async def test_save_and_get_concept_state_roundtrip(self, db):
+        from datetime import UTC, datetime, timedelta
+
+        due = datetime.now(UTC) + timedelta(days=3)
+        assert await save_concept_card(
+            db, 1, "fc_1", concept_id_alias="fc_1", chapter="ch1",
+            difficulty=5.0, state=0, due_date=due,
+            prochaine_revision=due, interval_jours=1,
+        )
+        state = await get_concept_state(db, 1, "fc_1")
+        assert state == {}  # pas de fsrs_state encore (création simple)
+
+    @pytest.mark.asyncio
+    async def test_save_concept_review_simple(self, db):
+        from datetime import UTC, datetime, timedelta
+
+        due = datetime.now(UTC) + timedelta(days=2)
+        ok = await save_concept_review(
+            db, 1, "fc_x", concept_id_alias="fc_x", chapter="ch1",
+            prochaine_revision=due, interval_jours=2.0,
+            difficulty=6.0, stability=3.5,
+            fsrs_state={"stability": 3.5, "reps": 1},
+            due_date=due, last_review=datetime.now(UTC),
+            reps=1, lapses=0, state=1,
+        )
+        assert ok is True
+        items = await get_user_memory(db, 1, kinds=("concept",))
+        assert len(items) == 1
+        assert items[0].stability == 3.5
+        assert items[0].fsrs_state["reps"] == 1
+        assert items[0].attempts == 0  # review simple : pas d'incrément attempts
+
+    @pytest.mark.asyncio
+    async def test_save_concept_review_with_avg_score(self, db):
+        """Cas drill/result : total_reviews +1 et avg_score pondéré."""
+        from datetime import UTC, datetime, timedelta
+
+        due = datetime.now(UTC) + timedelta(days=2)
+        # 1re révision à 60
+        await save_concept_review(
+            db, 1, "fc_y", concept_id_alias="fc_y",
+            prochaine_revision=due, interval_jours=2.0,
+            difficulty=5.0, stability=2.0,
+            fsrs_state={"stability": 2.0},
+            due_date=due, last_review=datetime.now(UTC),
+            reps=1, lapses=0, state=1, avg_score=60.0,
+        )
+        # 2e révision à 80 → avg = (60*1 + 80)/2 = 70, total_reviews = 2
+        await save_concept_review(
+            db, 1, "fc_y", concept_id_alias="fc_y",
+            prochaine_revision=due, interval_jours=3.0,
+            difficulty=5.0, stability=3.0,
+            fsrs_state={"stability": 3.0},
+            due_date=due, last_review=datetime.now(UTC),
+            reps=2, lapses=0, state=1, avg_score=80.0,
+        )
+        items = await get_user_memory(db, 1, kinds=("concept",))
+        assert len(items) == 1
+        assert items[0].extra["total_reviews"] == 2
+        assert items[0].extra["avg_score"] == pytest.approx(70.0)
+
+    @pytest.mark.asyncio
+    async def test_save_concept_missing_table_returns_false(self, db):
+        """Table mastery absente → False, pas d'erreur."""
+        import os
+        import tempfile
+        from datetime import UTC, datetime
+
+        fd, path = tempfile.mkstemp(suffix=".db")
+        os.close(fd)
+        engine = create_async_engine(f"sqlite+aiosqlite:///{path}")
+        async with engine.begin() as conn:
+            await conn.exec_driver_sql(
+                "CREATE TABLE users (id INTEGER PRIMARY KEY)"
+            )
+        factory = async_sessionmaker(engine, expire_on_commit=False)
+        try:
+            async with factory() as session:
+                ok = await save_concept_card(
+                    session, 1, "x", due_date=datetime.now(UTC),
+                    prochaine_revision=datetime.now(UTC),
+                )
+                assert ok is False  # mastery_micro_concepts absente
         finally:
             await engine.dispose()
             os.unlink(path)

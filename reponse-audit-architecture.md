@@ -837,6 +837,48 @@ Tests : 910 passed (+13), 3 skipped, 5 xfailed · ruff vert.
 
 ---
 
+# 2q. S3b (étape 2) — Premier parcours migré : flashcards → fsrs_unified ✅
+
+Le parcours flashcards/drill passe par l'API unifiée — 0 référence directe à
+mastery_micro_concepts dans routes/flashcards.py.
+
+- `services/fsrs_unified.py` — helpers dédiés au parcours concept (reproduction
+  FIDÈLE des upserts existants) :
+  * `get_concept_state(db, user_id, concept_id)` — lit le fsrs_state d'un
+    concept (remplace les 2 SELECT inline de flashcards) ;
+  * `save_concept_review(db, user_id, concept_id, *, concept_id_alias,
+    chapter, prochaine_revision, interval_jours, difficulty, stability,
+    fsrs_state, due_date, last_review, reps, lapses, state, avg_score=None)` —
+    upsert RICHE : avg_score fourni → total_reviews +1 + moyenne pondérée
+    (cas drill/result) ; sinon upsert simple (cas review flashcards) ;
+  * `save_concept_card(db, user_id, concept_id, *, concept_id_alias, chapter,
+    difficulty, stability, state, due_date, prochaine_revision,
+    interval_jours)` — création de carte (create_flashcard).
+- `routes/flashcards.py` migré : create_flashcard → save_concept_card ;
+  soumettre_resultat_drill → get_concept_state + save_concept_review(avg) ;
+  review_flashcard → get_concept_state + save_concept_review(simple).
+  Comportement identique (mêmes upserts, mêmes conventions) ; table absente
+  → warning + retour normal (tolérance preview).
+- **Bug latent corrigé (découvert par les tests)** : `CAST(:fsrs AS jsonb)`
+  exécuté tel quel en SQLite convertit le JSON en `'0'` (type inconnu →
+  numérique) — le hook database.py ne traduit que `::type`, pas
+  `CAST(x AS type)`. Les helpers utilisent désormais `_fsrs_cast(db)` :
+  CAST jsonb en Postgres, string brute ailleurs. (Bug préexistant dans les
+  routes originales en preview — corrigé par la migration.)
+- Tests (+4) : round-trip get_concept_state/save_concept_review,
+  review simple (stability, fsrs_state, attempts), drill/result (total_
+  reviews +1, avg_score pondéré 60→80 = 70), création de carte, table
+  absente → False.
+
+Le parcours flashcards est le PREMIER migré ; les autres (evaluation_fsrs,
+fsrs_persistence, drill_queue, interleaving, calendar_context,
+orientation_service) gardent leurs chemins — migration parcours par parcours
+en S3b, chacun testé.
+
+Tests : 915 passed (+5), 3 skipped, 5 xfailed · ruff vert.
+
+---
+
 # 3. Réponses aux 3 questions de l'audit
 
 1. **Quel modèle ONNX ?** → `paraphrase-multilingual-MiniLM-L12-v2` (multilingue, pas anglais-only). C4 reste à mesurer (AUC 50 paires arabes) mais le remplacement d'urgence n'est pas nécessaire.
