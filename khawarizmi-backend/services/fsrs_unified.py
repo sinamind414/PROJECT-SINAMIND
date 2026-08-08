@@ -119,7 +119,8 @@ async def _read_concepts(db: AsyncSession, user_id) -> list[MemoryItem]:
                 SELECT micro_concept_id, chapter, stability, difficulty,
                        fsrs_state, prochaine_revision, interval_jours,
                        last_score, attempts, last_review, total_reviews,
-                       avg_score, streak, pending_real_evaluation, due_date
+                       avg_score, streak, pending_real_evaluation, due_date,
+                       state
                 FROM mastery_micro_concepts
                 WHERE user_id = :uid
             """),
@@ -149,6 +150,7 @@ async def _read_concepts(db: AsyncSession, user_id) -> list[MemoryItem]:
                 "streak": row[12],
                 "pending_real_evaluation": bool(row[13]),
                 "due_date": row[14],
+                "state": row[15],
             },
         ))
     return items
@@ -854,3 +856,28 @@ async def clear_pending_concept(
     except Exception as e:
         logger.warning(f"fsrs_unified: clear_pending_concept échoué ({e})")
         return False
+
+
+async def get_due_by_chapter(
+    db: AsyncSession,
+    user_id,
+) -> dict[str, int]:
+    """Flashcards dues par chapitre (orientation_service §1).
+
+    Fidèle à la requête GROUP BY chapter : due_date <= now, state NULL ou
+    IN (0,1), chapter non NULL. Calculé depuis la vue consolidée.
+    """
+    now = _now()
+    items = await get_user_memory(db, user_id, kinds=("concept",))
+    by_chapter: dict[str, int] = {}
+    for i in items:
+        if not i.chapter:
+            continue
+        state = i.extra.get("state")
+        if state is not None and int(state) not in (0, 1):
+            continue
+        due_date = _parse_dt(i.extra.get("due_date"))
+        if due_date is None or due_date > now:
+            continue
+        by_chapter[i.chapter] = by_chapter.get(i.chapter, 0) + 1
+    return by_chapter

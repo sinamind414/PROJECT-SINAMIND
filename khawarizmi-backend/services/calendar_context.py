@@ -1,7 +1,6 @@
 import logging
 from datetime import date
 
-from sqlalchemy import text as sa_text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 logger = logging.getLogger("khawarizmi.calendar")
@@ -28,25 +27,12 @@ def compute_days_to_bac(today: date | None = None) -> tuple[date, int, str]:
 
 
 async def get_user_stats(db: AsyncSession, user_id: int) -> dict:
+    # S3c : stats via le service unifié (même calcul : total, mastered
+    # stability > 10, avg_stability) — plus de SQL mastery ici.
     try:
-        result = await db.execute(
-            sa_text("""
-                SELECT
-                    COUNT(*) as total,
-                    COUNT(*) FILTER (WHERE stability > 10.0) as mastered,
-                    COALESCE(AVG(stability), 0.0) as avg_stability
-                FROM mastery_micro_concepts
-                WHERE user_id = :uid
-            """),
-            {"uid": user_id},
-        )
-        row = result.fetchone()
-        if row:
-            return {
-                "total": row[0],
-                "mastered": row[1],
-                "avg_stability": round(row[2] or 0.0, 1),
-            }
+        from services.fsrs_unified import get_concept_stats
+
+        return await get_concept_stats(db, user_id)
     except Exception as e:
         logger.error(f"Erreur stats FSRS: {e}")
     return {"total": 0, "mastered": 0, "avg_stability": 0.0}

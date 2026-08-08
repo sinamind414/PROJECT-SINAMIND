@@ -977,6 +977,41 @@ Tests : 928 passed (+6), 3 skipped, 5 xfailed · ruff vert.
 
 ---
 
+# 2u. S3c (étape 6) — Lectures analytics migrées, S3 complet ✅
+
+- `services/calendar_context.py` : `get_user_stats` (COUNT, COUNT FILTER
+  stability>10, AVG) → `get_concept_stats` (équivalent exact, déjà testé).
+  0 SQL mastery restant.
+- `services/orientation_service.py` : §1 flashcards dues par chapitre →
+  `get_due_by_chapter` (filtre due_date<=now + state IN (0,1) + chapter
+  non NULL reproduit en Python) ; §6 prédiction BAC (GROUP BY chapter) →
+  `get_concept_stats_by_chapter` (moyenne pondérée identique). 0 SQL
+  mastery restant.
+- `services/fsrs_unified.py` : `_read_concepts` expose `state` dans extra
+  (nécessaire au filtre dues) ; nouveau helper `get_due_by_chapter(db,
+  user_id)` → {chapter: nb_dues}.
+- `tests/test_orientation_service.py` : FakeRow devient subscriptable
+  (accès positionnel row[0] pour les lignes mastery) + FakeResult convertit
+  automatiquement l'ancien format mastery (dicts nb_dues / avg_stability)
+  en lignes individuelles 16 colonnes — les 12 tests passent SANS changer
+  leurs assertions (les valeurs attendues : dues 4, prediction 33, etc.
+  sont préservées).
+- Usages mastery restants (documentés, aucune écriture) : drill_queue
+  (commentaire), mindmap_service (INSERT RETURNING id spécifique),
+  interleaving (JOIN+EXTRACT analytics), progress_snapshots, scheduler,
+  remediation (lectures analytics).
+
+**Bilan S3 COMPLET** : 100 % des écritures mastery_micro_concepts passent
+par fsrs_unified ; les lectures sont soit via l'API unifiée (get_user_memory,
+get_concept_state, stats, due_by_chapter), soit des analytics SQL validés
+documentés. L'objectif « un seul système mémoire » est atteint à l'API —
+la fusion physique (migration 033) reste possible si décidée, l'API est
+prête et testée.
+
+Tests : 928 passed, 3 skipped, 5 xfailed · ruff vert.
+
+---
+
 # 3. Réponses aux 3 questions de l'audit
 
 1. **Quel modèle ONNX ?** → `paraphrase-multilingual-MiniLM-L12-v2` (multilingue, pas anglais-only). C4 reste à mesurer (AUC 50 paires arabes) mais le remplacement d'urgence n'est pas nécessaire.

@@ -9,13 +9,51 @@ class FakeRow:
     def __init__(self, mapping):
         self._mapping = mapping
 
+    def __getitem__(self, key):
+        # S3c : les lignes mastery sont des listes (accès positionnel row[0])
+        # ; les autres requêtes utilisent _mapping["clé"].
+        return self._mapping[key]
+
 
 class FakeResult:
     def __init__(self, rows):
-        self._rows = [FakeRow(r) for r in rows]
+        self._rows = [FakeRow(self._convert(r)) for r in rows]
+
+    @staticmethod
+    def _convert(r) -> object:
+        """S3c : convertit l'ancien format mastery (dicts agrégés) en lignes
+        individuelles compatibles fsrs_unified (16 colonnes)."""
+        if isinstance(r, dict) and "nb_dues" in r and "chapter" in r:
+            # ancien format dues → nb_dues lignes dues
+            lines = []
+            due = datetime.now(UTC) - timedelta(hours=1)
+            for i in range(int(r["nb_dues"])):
+                lines.append([
+                    f"{r['chapter']}_{i}", r["chapter"], 2.0, 5.0, "{}",
+                    None, 1.0, None, 0, None, 1, 50.0, 0, False, due, 0,
+                ])
+            return lines
+        if isinstance(r, dict) and "avg_stability" in r and "nb_concepts" in r:
+            # ancien format prediction → nb_concepts lignes
+            lines = []
+            for i in range(int(r["nb_concepts"])):
+                lines.append([
+                    f"{r['chapter']}_{i}", r["chapter"], float(r["avg_stability"]),
+                    5.0, "{}", None, 1.0, None, 0, None, 1, 50.0, 0,
+                    False, None, 0,
+                ])
+            return lines
+        return r
 
     def fetchall(self):
-        return self._rows
+        # une conversion peut produire PLUSIEURS lignes (liste de listes)
+        out = []
+        for row in self._rows:
+            if isinstance(row._mapping, list) and row._mapping and isinstance(row._mapping[0], list):
+                out.extend(FakeRow(sub) for sub in row._mapping)
+            else:
+                out.append(row)
+        return out
 
 
 class SequencedDb:
