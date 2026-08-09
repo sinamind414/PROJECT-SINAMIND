@@ -17,7 +17,18 @@ def make_response(
     fallback: bool = False,
     due_concept: str | None = None,
     due_chapter: str | None = None,
+    cache_scope: str = "public",
 ) -> dict:
+    """Construit une réponse chatbot.
+
+    cache_scope (audit P0-4.3) : détermine si la réponse peut être mise en cache
+    et avec quelle clé.
+      - "public"           : méthodologie, leçon, navigation → cache partagé
+      - "chapter_public"   : explication RAG générale → clé inclut chapitre
+      - "personalized"     : orientation, motivation FSRS, socratique → jamais
+                             de cache partagé (clé user) ou no_cache
+      - "no_cache"         : refus de triche, erreurs → jamais de cache
+    """
     return {
         "reponse": reponse,
         "type": type_,
@@ -33,10 +44,15 @@ def make_response(
         "from_cache": False,
         "due_concept": due_concept,
         "due_chapter": due_chapter,
+        "cache_scope": cache_scope,
     }
 
 
 def normalize_response(result: dict, intent: str = "unknown") -> dict:
+    if "cache_scope" not in result:
+        # défaut sûr : public pour les réponses pédagogiques stables,
+        # personnalisé pour tout le reste (orientation, motivation, socratique).
+        result["cache_scope"] = "public" if intent in ("methodology", "lesson", "navigation") else "personalized"
     return {
         "reponse": result.get("reponse", ""),
         "type": result.get("type", intent),

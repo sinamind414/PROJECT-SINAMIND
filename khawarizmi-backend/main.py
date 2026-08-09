@@ -12,7 +12,7 @@ from rate_limit import limiter
 from routes import ALL_ROUTERS
 from routes.admin_ingest import router as admin_router
 from routes.errors import generic_exception_handler, http_exception_handler, validation_exception_handler
-from routes.lifespan import lifespan, state  # noqa: F401 — re-exported for deps.py
+from routes.lifespan import lifespan, state  # ruff: ignore[unused-import] — re-exported for deps.py
 from routes.openapi_config import openapi_metadata
 
 setup_monitoring()

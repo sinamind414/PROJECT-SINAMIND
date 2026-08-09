@@ -279,3 +279,25 @@ class TestChatbotAdvanced:
         assert "reward_type" in data
         assert data["rarity"] in ("common", "rare", "epic", "legendary")
         assert data["reward_type"] in ("points", "mission_boost", "boss_hint", "badge")
+
+
+class TestAskStreamSSE:
+    """Route /api/chatbot/ask/stream — contrat SSE du frontend."""
+
+    async def test_stream_events_contract(self):
+        """Les événements SSE suivent le contrat : meta → token* → cartes/sources → done."""
+        from routes.chatbot import _sse, _tokenize_stream
+
+        chunks = _tokenize_stream("phrase une deux trois quatre cinq six sept huit", chunk_size=10)
+        assert len(chunks) >= 2
+        assert "".join(chunks).replace(" ", "") == "phraseunedeuxtroisquatrecinqsixsepthuit".replace(" ", "")
+
+        evt = _sse("done", {"text": "ok", "fallback": True})
+        assert evt.startswith("event: done\n")
+        assert "\ndata: " in evt
+        assert evt.endswith("\n\n")
+
+    async def test_sse_empty_text(self):
+        from routes.chatbot import _tokenize_stream
+        assert _tokenize_stream("") == []
+        assert _tokenize_stream(None) == []

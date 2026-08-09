@@ -1,8 +1,10 @@
 import asyncio
-from sqlalchemy.ext.asyncio import create_async_engine
+
 from sqlalchemy import text
+from sqlalchemy.ext.asyncio import create_async_engine
 
 DATABASE_URL = "postgresql+asyncpg://khawarizmi_user:khawarizmi_dev_pass_2024@localhost:5432/khawarizmi"
+
 
 async def main():
     engine = create_async_engine(DATABASE_URL)
@@ -30,5 +32,6 @@ async def main():
 
     await engine.dispose()
     print("Done.")
+
 
 asyncio.run(main())

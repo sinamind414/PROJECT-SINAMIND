@@ -3,7 +3,6 @@ services/reconciliation_queue.py - File de réconciliation asynchrone L1/L2
 """
 
 import asyncio
-import json
 import logging
 from dataclasses import dataclass
 from datetime import UTC, datetime
@@ -68,33 +67,14 @@ async def correct_fsrs_scores(student_id: str, question_id: str, corrected_score
             chapter = question.get("chapitre_id", "ch_inconnu")
             concept_ids = list(corrected_scores.keys())
 
-            # 2. Charger l'état FSRS des concepts
-            from fsrs import Card
+            # 2. Charger l'état FSRS des concepts — S3b : via le service unifié
+            # (get_concept_states gère le batch IN expanding — asyncpg OK)
+            from services.fsrs_unified import get_concept_states
 
-            concept_states = {}
-            if concept_ids:
-                # ANY(:array) obligatoire — IN :tuple bug asyncpg (AGENTS.md §1.5)
-                res_states = await db.execute(
-                    text(
-                        "SELECT concept_id, fsrs_state FROM mastery_micro_concepts WHERE user_id = :uid AND concept_id = ANY(:cids)"
-                    ),
-                    {"uid": int(student_id), "cids": list(concept_ids)},
-                )
-                for row in res_states.fetchall():
-                    c_id = row[0]
-                    fsrs_state_dict = row[1] if row[1] else {}
-                    card = Card()
-                    if fsrs_state_dict:
-                        card.stability = fsrs_state_dict.get("stability", card.stability)
-                        card.difficulty = fsrs_state_dict.get("difficulty", card.difficulty)
-                        for attr in ["scheduled_days", "reps", "lapses"]:
-                            if hasattr(card, attr) and attr in fsrs_state_dict:
-                                setattr(card, attr, fsrs_state_dict[attr])
-                    concept_states[c_id] = card
-
-            for c_id in concept_ids:
-                if c_id not in concept_states:
-                    concept_states[c_id] = Card()
+            concept_states = (
+                await get_concept_states(db, int(student_id), list(concept_ids))
+                if concept_ids else {}
+            )
 
             # 3. Recalculer FSRS
             from services.fsrs_graph import QuestionConceptMapping, update_concept_graph
@@ -152,23 +132,16 @@ async def correct_fsrs_scores(student_id: str, question_id: str, corrected_score
                     "last_review": new_card.last_review.isoformat() if new_card.last_review else None,
                 }
 
-                await db.execute(
-                    text("""
-                        UPDATE mastery_micro_concepts
-                        SET due_date = :due, interval_jours = :interval, difficulty = :difficulty,
-                            stability = :stability, fsrs_state = CAST(:fsrs_state AS jsonb),
-                            pending_real_evaluation = FALSE, updated_at = NOW()
-                        WHERE user_id = :uid AND concept_id = :cid
-                    """),
-                    {
-                        "due": upd["due"],
-                        "interval": sched_days,
-                        "difficulty": new_card.difficulty,
-                        "stability": new_card.stability,
-                        "fsrs_state": json.dumps(fsrs_json),
-                        "uid": int(student_id),
-                        "cid": c_id,
-                    },
+                # S3b : UPDATE via le service unifié (même SQL qu'avant)
+                from services.fsrs_unified import save_concept_update_existing
+
+                await save_concept_update_existing(
+                    db, int(student_id), c_id,
+                    due=upd["due"],
+                    interval_jours=sched_days,
+                    difficulty=new_card.difficulty,
+                    stability=new_card.stability,
+                    fsrs_state=fsrs_json,
                 )
             await db.commit()
             logger.info(
@@ -244,13 +217,11 @@ async def process_review_queue():
                 else:
                     # Le score L2 est validé, on désactive simplement le flag pending_real_evaluation
                     async with state.db_session() as db:
-                        await db.execute(
-                            text("""
-                                UPDATE mastery_micro_concepts
-                                SET pending_real_evaluation = FALSE, updated_at = NOW()
-                                WHERE user_id = :uid AND concept_id = :cid
-                            """),
-                            {"uid": int(review.student_id), "cid": review.question_id},
+                        # S3b : clear pending via le service unifié
+                        from services.fsrs_unified import clear_pending_concept
+
+                        await clear_pending_concept(
+                            db, int(review.student_id), review.question_id,
                         )
                         await db.commit()
                         logger.info(

@@ -7,10 +7,12 @@ from . import (
     ai_chat,
     ai_evaluate,
     annales,
+    aujourdhui,
     auth,
     avatar,
-    badges,
+    bac_blanc,
     bac_blanc_intelligent,
+    badges,
     chapitres,
     chatbot,
     chatbot_engagement,
@@ -18,6 +20,7 @@ from . import (
     cours,
     dashboard,
     diagnostic,
+    document_analysis,
     document_analysis_v2,
     dual_coding,
     duels,
@@ -27,32 +30,32 @@ from . import (
     gems,
     health,
     leaderboard,
+    lessons,
     lexique,
+    manhadjiya,
+    memory,
     methodology,
     methodology_flashcards,
     mindmap,
     mindmap_methodology,
     mystery_box,
+    observability,
     onboarding,
     orientation,
     payment,
-    pulse,
     phase1,
     phase3,
     phase5,
     phase6,
     programme,
     progress,
+    pulse,
     session,
     social,
     streaks,
     tutor,
     videos,
 )
-from . import (
-    document_analysis as document_analysis,
-)
-from . import manhadjiya
 
 ALL_ROUTERS = [
     # ── Core ──
@@ -69,6 +72,7 @@ ALL_ROUTERS = [
     programme.router,
     progress.router,
     dashboard.router,
+    observability.router,
     orientation.router,
     lexique.router,
     videos.router,
@@ -99,8 +103,8 @@ ALL_ROUTERS = [
     social.router,
     # ── Admin Analytics (Dashboard Professeur) ──
     admin_analytics.router,
-    # ── Document Analysis (v2 uniquement — v1 désactivée) ──
-    # document_analysis.router,  # DÉSACTIVÉ : v1 utilisait evaluate_answer (regex) qui notait 75% le charabia
+    # ── Document Analysis (v1 : scenarios/progress/weak-spots + v2 : evaluate) ──
+    document_analysis.router,
     document_analysis_v2.router,
     # ── Action Verbs ──
     action_verbs.router,
@@ -116,6 +120,11 @@ ALL_ROUTERS = [
     onboarding.router,
     # ── Manhadjiya (LOT8 — Base de connaissance scientifique) ──
     manhadjiya.router,
+    memory.router,
     # ── PULSE Dashboard ──
     pulse.router,
+    # ── Aujourd'hui (accueil) · Leçons actives · Bac Blanc v1 (immersif) ──
+    aujourdhui.router,
+    lessons.router,
+    bac_blanc.router,
 ]

@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from deps import get_current_user
 from database import get_db
+from deps import get_current_user
 from services.pulse_service import (
     complete_card,
     get_or_create_today_cards,

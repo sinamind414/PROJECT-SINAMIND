@@ -303,7 +303,7 @@ export function useChatbot(): UseChatbotReturn {
     } finally {
       setLoading(false)
     }
-  }, [input, loading, addAssistantMessage])
+  }, [input, loading, addAssistantMessage, isTutorMode])
 
   const handleFeedback = useCallback(async (msgId: number, type: FeedbackType) => {
     setMessages((prev) =>
@@ -350,7 +350,7 @@ export function useChatbot(): UseChatbotReturn {
     } finally {
       setLoading(false)
     }
-  }, [addAssistantMessage])
+  }, [addAssistantMessage, isTutorMode])
 
   const toggleTutorMode = useCallback(() => {
     const newMode = !isTutorMode

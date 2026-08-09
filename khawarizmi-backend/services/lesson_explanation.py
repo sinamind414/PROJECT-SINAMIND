@@ -51,7 +51,48 @@ LESSON_EXPLANATIONS: dict[str, dict[str, Any]] = {
         ],
         "methodological_advice": "Pour une question sur la mitose, structure ta reponse en decrivant les phases dans l ordre chronologique avec les evenements cles de chaque phase.",
         "next_question": "Veux-tu que je t explique les differences entre mitose et meiose ?"
-    }
+    },
+
+    "respiration": {
+        "title": "La Respiration Cellulaire",
+        "introduction": "La respiration cellulaire degrade le glucose en presence de dioxygene pour produire de l'ATP : glycolyse, cycle de Krebs et phosphorylation oxydative.",
+        "key_points": [
+            "Glycolyse dans le cytoplasme : 2 ATP nets",
+            "Cycle de Krebs dans la matrice mitochondriale",
+            "Phosphorylation oxydative sur les cretes",
+            "Bilan : environ 38 ATP par glucose"
+        ],
+        "bac_verbs": ["expliquer", "comparer", "schematiser", "calculer"],
+        "methodological_advice": "Distingue bien le lieu de chaque etape (cytoplasme / matrice / cretes).",
+        "next_question": "Ou se deroule la phosphorylation oxydative ?"
+    },
+    "photosynthese": {
+        "title": "La Photosynthese",
+        "introduction": "La photosynthese convertit l'energie lumineuse en energie chimique : phase photochimique (thylacoides) et phase chimique ou cycle de Calvin (stroma).",
+        "key_points": [
+            "Phase photochimique : photolyse de l'eau, liberation d'O2",
+            "Phase chimique : fixation du CO2 (cycle de Calvin)",
+            "Lieu : chloroplaste (thylacoides et stroma)",
+            "Bilan : 6CO2 + 12H2O -> glucose + 6O2 + 6H2O"
+        ],
+        "bac_verbs": ["expliquer", "schematiser", "comparer", "deduire"],
+        "methodological_advice": "Relie chaque produit (O2, ATP, NADPH) a sa phase precise.",
+        "next_question": "Quel gaz est libere lors de la phase photochimique ?"
+    },
+    "tectonique": {
+        "title": "La Tectonique des Plaques",
+        "introduction": "La tectonique des plaques etudie la dynamique de la lithosphere : dorsales, subduction, collision et formation des chaines de montagnes.",
+        "key_points": [
+            "Dorsales medio-oceaniques : creation de croute oceanique",
+            "Subduction : disparition de croute dans le manteau",
+            "Collision : formation des chaines de montagnes",
+            "Phenomenes associes : seismes, volcanisme, ophiolites"
+        ],
+        "bac_verbs": ["expliquer", "comparer", "schematiser", "identifier"],
+        "methodological_advice": "Relie chaque structure geologique a son contexte tectonique (dorsale, subduction, collision).",
+        "next_question": "Quelle structure resulte de la collision continentale ?"
+    },
+
 }
 
 
@@ -94,10 +135,32 @@ def detect_lesson_request(message: str) -> str | None:
         "respiration": "respiration",
         "adn": "adn",
         "cellule": "cellule",
+        # Arabe — mots-clés des leçons du programme
+        "مناعة": "proteines",
+        "المناعة": "proteines",
+        "استنساخ": "proteines",
+        "ترجمة": "proteines",
+        "الترجمة": "proteines",
+        "بروتين": "proteines",
+        "انزيم": "proteines",
+        "إنزيم": "proteines",
+        "تنفس": "respiration",
+        "التنفس": "respiration",
+        "تركيب ضوئي": "photosynthese",
+        "التركيب الضوئي": "photosynthese",
+        "تكتونية": "tectonique",
+        "زلازل": "tectonique",
+        "تخمر": "respiration",
+        "ميتوكندري": "respiration",
+        "ميتوكوندري": "respiration",
     }
 
+    # Déclencheurs (latin + arabe)
+    triggers = ["explique", "cours", "lecon", "chapitre", "resume",
+                "درس", "اشرح", "اشرحي", "ملخص", "راجع", "مراجعة", "افهم"]
+
     for keyword, lesson in lesson_keywords.items():
-        if keyword in message_lower and any(word in message_lower for word in ["explique", "cours", "lecon", "chapitre", "resume"]):
+        if keyword in message_lower and any(word in message_lower for word in triggers):
             return lesson
 
     return None

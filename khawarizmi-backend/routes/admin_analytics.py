@@ -10,21 +10,37 @@ from __future__ import annotations
 
 import logging
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Header, HTTPException
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from config import get_settings
 from deps import get_current_user, get_db
 
 logger = logging.getLogger("khawarizmi.admin_analytics")
 router = APIRouter(prefix="/api/admin/analytics", tags=["Admin Analytics"])
 
 
+def _require_admin(x_admin_token: str) -> None:
+    """Garde-fou : ces endpoints exposent des données élèves (notes, erreurs).
+
+    Accessibles uniquement avec le header X-Admin-Token égal à ADMIN_SECRET
+    (même mécanisme que routes/admin_ingest.py). Par défaut (secret absent) :
+    refus 404 — jamais d'exposition par simple authentification élève.
+    """
+    cfg = get_settings()
+    secret = cfg.ADMIN_SECRET or ""
+    if not secret or x_admin_token != secret:
+        raise HTTPException(status_code=404, detail="Not found")
+
+
 @router.get("/global")
 async def analytics_global(
     current_user: dict = Depends(get_current_user),
+    x_admin_token: str = Header(""),
     db: AsyncSession = Depends(get_db),
 ):
+    _require_admin(x_admin_token)
     rows = await db.execute(
         text("""
             SELECT
@@ -63,8 +79,10 @@ async def analytics_global(
 @router.get("/methodology-gaps")
 async def analytics_methodology_gaps(
     current_user: dict = Depends(get_current_user),
+    x_admin_token: str = Header(""),
     db: AsyncSession = Depends(get_db),
 ):
+    _require_admin(x_admin_token)
     rows = await db.execute(
         text("""
             SELECT
@@ -99,8 +117,10 @@ async def analytics_methodology_gaps(
 @router.get("/students-at-risk")
 async def analytics_students_at_risk(
     current_user: dict = Depends(get_current_user),
+    x_admin_token: str = Header(""),
     db: AsyncSession = Depends(get_db),
 ):
+    _require_admin(x_admin_token)
     rows = await db.execute(
         text("""
             SELECT

@@ -64,7 +64,7 @@ export const CHAPITRES_TRADUCTION: Record<string, string> = {
   "L'energie interne du globe terrestre": "الطاقة الداخلية للكرة الأرضية",
   "Les ondes sismiques": "الموجات الزلزالية",
   "Composition chimique des roches de la croute terrestre et du manteau":
-    "التركيب الكيميائي لصخور القشرة والوشاح",
+    "التركيب الكيميائي لصخور القشرة والبرنس",
   "Modelisation de la structure interne du globe terrestre":
     "نمذجة البنية الداخلية للكرة الأرضية",
   "Caracteristiques des dorsales medio-oceaniques":

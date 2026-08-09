@@ -26,6 +26,7 @@ export function MessengerView() {
 
   useEffect(() => {
     if (activeConvId) fetchMessages(activeConvId)
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- fetchMessages recréée à chaque render
   }, [activeConvId])
 
   useEffect(() => {
@@ -36,7 +37,7 @@ export function MessengerView() {
     apiClient.request<{ partners: SuggestedPartner[] }>("/api/social/suggested-partners")
       .then(res => setSuggestedPartners(res.partners || []))
       .catch(() => {})
-  }, [])
+  }, [apiClient])
 
   const handleSend = async () => {
     if (!input.trim() || !activeConvId) return

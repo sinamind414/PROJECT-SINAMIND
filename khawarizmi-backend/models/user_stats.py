@@ -2,7 +2,6 @@
 Modèle UserStats — statistiques pour le classement.
 """
 
-import uuid
 from sqlalchemy import Column, DateTime, Float, ForeignKey, Integer, String, func, text
 from sqlalchemy.dialects.postgresql import UUID
 

@@ -138,9 +138,111 @@ async def test_evaluate_v2_success(client, auth_headers):
         assert eval1["highlights"][0]["type"] == "good_element"
         assert eval1["feedback_ar"] == "تعليق ممتاز"
 
-        # Le correcteur v2 a bien été appelé avec les bons arguments
+        # S2.1f : la route passe le RETRY (evaluate_answer_v2_with_retry) comme
+        # evaluate_fn — le retry enveloppe la façade → le pipeline complet
+        # (sanity → savoir → prompt → LLM → parser → mapping → finalize).
+        # Le wrapper cache injecte question_id/verb_slug/score_max.
         mock_eval.assert_called_once()
         kwargs_called = mock_eval.call_args.kwargs
         assert kwargs_called["scenario_context"] == "السياق العام للتحليل"
-        assert kwargs_called["verb_slug"] == "analyse"
         assert kwargs_called["student_answer"] == "نلاحظ من خلال الوثيقة أن التغيرات واضحة"
+        assert kwargs_called["verb_slug"] == "analyse"
+        assert kwargs_called["score_max"] == 7
+        assert kwargs_called["question_id"] == "q1"
+        # La sanity est calculée par le PIPELINE, pas par le retry
+        assert "precomputed_sanity" not in kwargs_called
+
+
+async def test_evaluate_v2_cache_contract(client, auth_headers):
+    """Audit C2 — la route passe au wrapper grading_cache les composants
+    de la clé (question_id, verb_slug, score_max, student_answer, model_id)
+    et le correcteur en tant qu'evaluate_fn. Le wrapper est mocké ici :
+    on vérifie le CONTRAT d'appel de la route, pas le cache (testé ailleurs)."""
+    from unittest.mock import AsyncMock
+
+    from config import get_settings
+
+    scenario_row = {"id": 101, "context_ar": "السياق العام للتحليل"}
+    document_row = {"title_ar": "وثيقة 1", "caption_ar": "منحنى تغيرات", "data": {}, "sort_order": 1}
+    session_row = {"id": 999}
+    question_row = {
+        "id": "q1",
+        "verb_slug": "analyse",
+        "prompt_ar": "حلل الوثيقة",
+        "skill_ar": "تحليل وثيقة",
+        "model_answer_ar": "الإجابة النموذجية الصحيحة",
+        "learning_focus_ar": "التحليل المنهجي",
+    }
+
+    from tests.conftest import MockAsyncSession
+
+    original_execute = MockAsyncSession.execute
+
+    async def mock_execute(self, statement, *args, **kwargs):
+        sql = str(statement)
+        if "da_scenarios" in sql:
+            return MockAsyncExecResult([scenario_row])
+        elif "da_documents" in sql:
+            return MockAsyncExecResult([document_row])
+        elif "da_sessions" in sql:
+            return MockAsyncExecResult([session_row])
+        elif "da_questions" in sql:
+            return MockAsyncExecResult([question_row])
+        elif "da_answers" in sql or "da_fsrs" in sql or "correction_audit" in sql:
+            return MockAsyncExecResult([])
+        # users (auth), etc. → comportement par défaut de la session mockée
+        return await original_execute(self, statement, *args, **kwargs)
+
+    mock_eval_res = {
+        "source": "llm",
+        "score": 6,
+        "score_max": 8,
+        "percentage": 75,
+        "highlights": [],
+        "matched_criteria": [],
+        "unmatched_criteria": [],
+        "feedback_ar": "تعليق",
+        "advice_ar": "",
+        "confidence": 0.9,
+    }
+
+    with (
+        patch("tests.conftest.MockAsyncSession.execute", new=mock_execute),
+        patch(
+            "routes.document_analysis_v2.evaluate_with_cache",
+            new=AsyncMock(return_value=mock_eval_res),
+        ) as mock_cache,
+    ):
+        resp = await client.post(
+            "/api/document-analysis/evaluate-v2",
+            json={
+                "scenario_id": "ch1-scenario1",
+                "chapter_slug": "ch1_les_relations",
+                "answers": [
+                    {
+                        "verb_slug": "analyse",
+                        "answer": "نلاحظ من خلال الوثيقة أن التغيرات واضحة",
+                        "question_id": "q1",
+                    }
+                ],
+            },
+            headers=auth_headers,
+        )
+
+        assert resp.status_code == 200
+        mock_cache.assert_called_once()
+        call_kwargs = mock_cache.call_args.kwargs
+        # Composants de la clé C2 — présents à l'appel du wrapper
+        assert call_kwargs["question_id"] == "q1"
+        assert call_kwargs["verb_slug"] == "analyse"
+        assert call_kwargs["score_max"] == 7  # VERB_RULES analyse (2+2+2+1)
+        assert call_kwargs["student_answer"] == "نلاحظ من خلال الوثيقة أن التغيرات واضحة"
+        assert call_kwargs["model_id"] == get_settings().openai_model
+        # S2.1f : le wrapper reçoit le RETRY comme evaluate_fn — le wrapper
+        # ne fait que cacher ; le retry → façade → pipeline orchestre tout
+        # (sanity → savoir → prompt → LLM → parser → mapping → finalize).
+        from routes.document_analysis_v2 import evaluate_answer_v2_with_retry
+        assert call_kwargs["evaluate_fn"] is evaluate_answer_v2_with_retry
+        assert "evaluate_legacy" not in call_kwargs
+        # La copie normalisée + la version de prompt v2 partent au retry
+        assert call_kwargs["use_v2_prompt"] is True

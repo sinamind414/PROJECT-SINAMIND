@@ -26,7 +26,7 @@ from prompts.scientific_knowledge import (
     get_relevant_knowledge_raw,
 )
 
-# ruff: noqa: RUF012 — mutable class defaults in tests are acceptable
+# ruff: file-ignore[mutable-class-default] — mutable class defaults in tests are acceptable
 
 # ── Prompt systeme ───────────────────────────────
 

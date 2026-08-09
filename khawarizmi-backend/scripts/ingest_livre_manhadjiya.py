@@ -35,15 +35,17 @@ from __future__ import annotations
 
 import argparse
 import asyncio
-import json
 import logging
 import os
 import re
 import sys
 import uuid
+from collections.abc import Iterable
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Iterable
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from services.arabic import ar_normalize  # noqa: E402 — après sys.path
 
 logger = logging.getLogger("ingest_livre_manhadjiya")
 logging.basicConfig(level=logging.INFO, format="%(levelname)s | %(message)s")
@@ -81,7 +83,7 @@ IMPORTANCE_HAUTE_KEYWORDS = [
     "الفعل الأدائي",     # section principale d'un verbe
     "المسعى العلمي",     # démarche scientifique
     "الاستدلال العلمي",  # raisonnement
-    "الكلمات المفتاحية", # mots-clés
+    "الكلمات المفتاحية",  # mots-clés
     "المنهجية الجديدة",  # méthodo 2022
 ]
 
@@ -305,13 +307,13 @@ async def ingest_chunks_to_db(chunks: list[Chunk], *, db_url: str) -> int:
             await conn.execute(
                 sql_text("""
                     INSERT INTO rag_chunks
-                        (id, content, embedding, source, matiere,
+                        (id, content, content_norm, embedding, source, matiere,
                          chapitre, importance, chunk_index)
                     VALUES
-                        (:id, :content, CAST(:embedding AS vector),
+                        (:id, :content, :content_norm, CAST(:embedding AS vector),
                          :source, :matiere, :chapitre, :importance, :chunk_index)
                 """),
-                row,
+                {**row, "content_norm": ar_normalize(chunk.content)},
             )
             inserted += 1
             if inserted % 20 == 0:

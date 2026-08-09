@@ -49,9 +49,9 @@ from services.savoir_corrector import (
     _GRAVE_ERRORS,
     _NUMERIC_RULES,
     _SYNONYMS,
-    deterministic_correct,
-    _normalize,
     _contains_any,
+    _normalize,
+    deterministic_correct,
 )
 
 
@@ -361,10 +361,9 @@ def run_audit() -> dict:
         score_pct = corr["score"] / max(0.001, corr["max_score"])
         passed = True
         failures = []
-        if q.get("expect_error"):
-            if not corr.get("erreurs") and corr["score"] > 0:
-                passed = False
-                failures.append("erreur attendue mais aucune détectée")
+        if q.get("expect_error") and not corr.get("erreurs") and corr["score"] > 0:
+            passed = False
+            failures.append("erreur attendue mais aucune détectée")
         if "expected_score_max_pct" in q and score_pct > q["expected_score_max_pct"]:
             passed = False
             failures.append(f"score {score_pct:.0%} > max attendu {q['expected_score_max_pct']:.0%}")
@@ -467,7 +466,7 @@ def build_recommendations(report: dict) -> list[str]:
                     + ", ".join(d["id"] for d in failed[:5]))
     chap_faibles = [c for c, v in report["per_chapter"].items() if v["score_moyen_pct"] < 0.5]
     if chap_faibles:
-        recs.append(f"Ajouter des règles et mots-clés spécifiques aux chapitres les plus faibles: "
+        recs.append("Ajouter des règles et mots-clés spécifiques aux chapitres les plus faibles: "
                     + ", ".join(chap_faibles))
     if g["latence_ms_moyenne"] > 50:
         recs.append("Optimiser la normalisation pour descendre sous 20 ms par question.")
@@ -483,63 +482,63 @@ def render_markdown(report: dict) -> str:
     m = report["meta"]
     lines: list[str] = []
     a_ = lines.append
-    a_(f"# Rapport d'Audit — Correcteur Local Khawarizmi")
-    a_(f"")
+    a_("# Rapport d'Audit — Correcteur Local Khawarizmi")
+    a_("")
     a_(f"- **Date** : {m['timestamp']}")
     a_(f"- **Moteur** : `{m['correcteur']}` (0 LLM, 0 clé API, 0 réseau)")
-    a_(f"- **Mode forcé** : DISABLE_LLM=1  |  **LLM externe** : ❌ désactivé")
+    a_("- **Mode forcé** : DISABLE_LLM=1  |  **LLM externe** : ❌ désactivé")
     a_(f"- **Concepts détectables** : {m['nb_concepts']}  ({m['nb_synonymes']} variantes FR/AR)")
     a_(f"- **Règles erreurs graves** : {m['nb_grave_error_rules']}")
     a_(f"- **Règles numériques DZ** : {m['nb_numeric_rules']} (38 ATP, P/O NADH=3, FADH2=2…)")
-    a_(f"")
-    a_(f"## 🎯 Score de robustesse : **{s['robustesse_score']*100:.0f}/100** — {s['verdict']}")
-    a_(f"")
-    a_(f"| Critère | Valeur |")
-    a_(f"|---|---|")
+    a_("")
+    a_(f"## 🎯 Score de robustesse : **{s['robustesse_score'] * 100:.0f}/100** — {s['verdict']}")
+    a_("")
+    a_("| Critère | Valeur |")
+    a_("|---|---|")
     a_(f"| Latence moyenne / question | {s['latence_ms_moyenne_totale']:.1f} ms |")
-    a_(f"| Bonnes réponses Golden Set bien notées (≥ 70%) | {g['haute_qualite']}/{g['total']} ({g['haute_qualite']/max(1,g['total'])*100:.0f}%) |")
+    a_(f"| Bonnes réponses Golden Set bien notées (≥ 70%) | {g['haute_qualite']}/{g['total']} ({g['haute_qualite'] / max(1, g['total']) * 100:.0f}%) |")
     a_(f"| Réponses faibles (< 40%) | {g['faible']}/{g['total']} |")
-    a_(f"| Score moyen Golden Set | {g['score_moyen_pct']*100:.0f}% |")
-    a_(f"| Adversariaux réussis | {a['passed']}/{a['total']} ({a['taux_reussite_pct']*100:.0f}%) |")
-    a_(f"| Appels LLM pendant l'audit | **0** (guaranti) |")
-    a_(f"")
-    a_(f"## 📚 Performance par chapitre")
-    a_(f"")
-    a_(f"| Chapitre | Nb questions | Score moyen | Couverture mots-clés |")
-    a_(f"|---|---|---|---|")
+    a_(f"| Score moyen Golden Set | {g['score_moyen_pct'] * 100:.0f}% |")
+    a_(f"| Adversariaux réussis | {a['passed']}/{a['total']} ({a['taux_reussite_pct'] * 100:.0f}%) |")
+    a_("| Appels LLM pendant l'audit | **0** (guaranti) |")
+    a_("")
+    a_("## 📚 Performance par chapitre")
+    a_("")
+    a_("| Chapitre | Nb questions | Score moyen | Couverture mots-clés |")
+    a_("|---|---|---|---|")
     for chap, v in sorted(report["per_chapter"].items(), key=lambda x: x[1]["score_moyen_pct"], reverse=True):
-        a_(f"| {chap} | {v['nb_questions']} | {v['score_moyen_pct']*100:.0f}% | {v['taux_couverture_mc']*100:.0f}% |")
-    a_(f"")
-    a_(f"## 🧪 Tests adversariaux")
-    a_(f"")
-    a_(f"| ID | Cas | Score | Statut | Échecs |")
-    a_(f"|---|---|---|---|---|")
+        a_(f"| {chap} | {v['nb_questions']} | {v['score_moyen_pct'] * 100:.0f}% | {v['taux_couverture_mc'] * 100:.0f}% |")
+    a_("")
+    a_("## 🧪 Tests adversariaux")
+    a_("")
+    a_("| ID | Cas | Score | Statut | Échecs |")
+    a_("|---|---|---|---|---|")
     for d in a["details"]:
         icon = "✅" if d["passed"] else "❌"
-        a_(f"| {d['id']} | {d['description'][:50]} | {d['score_pct']*100:.0f}% | {icon} | {'; '.join(d['failures']) or '—'} |")
-    a_(f"")
-    a_(f"## 💡 Recommandations d'amélioration")
-    a_(f"")
+        a_(f"| {d['id']} | {d['description'][:50]} | {d['score_pct'] * 100:.0f}% | {icon} | {'; '.join(d['failures']) or '—'} |")
+    a_("")
+    a_("## 💡 Recommandations d'amélioration")
+    a_("")
     for i, r in enumerate(s["recommandations"], 1):
         a_(f"{i}. {r}")
-    a_(f"")
-    a_(f"## 🔒 Garanties 0 LLM")
-    a_(f"")
-    a_(f"- ✅ `is_llm_enabled()` retourne `False` par défaut")
-    a_(f"- ✅ Variables d'environnement de clés API VIDÉES au démarrage")
-    a_(f"- ✅ `AsyncOpenAI(...)` monkey-patché → retourne `GuardedOpenAIClient`")
-    a_(f"- ✅ Blocage HTTP au niveau httpx vers 16 domaines de providers")
-    a_(f"- ✅ `GuardedOpenAIClient.chat.completions.create()` lève LLMDisabledError")
-    a_(f"- ✅ `tokens_utilises = 0` sur toutes les réponses de correction déterministe")
-    a_(f"")
-    a_(f"## 📊 Détail Golden Set")
-    a_(f"")
-    a_(f"| Chapitre | Score | Mots-clés trouvés | Erreurs |")
-    a_(f"|---|---|---|---|")
+    a_("")
+    a_("## 🔒 Garanties 0 LLM")
+    a_("")
+    a_("- ✅ `is_llm_enabled()` retourne `False` par défaut")
+    a_("- ✅ Variables d'environnement de clés API VIDÉES au démarrage")
+    a_("- ✅ `AsyncOpenAI(...)` monkey-patché → retourne `GuardedOpenAIClient`")
+    a_("- ✅ Blocage HTTP au niveau httpx vers 16 domaines de providers")
+    a_("- ✅ `GuardedOpenAIClient.chat.completions.create()` lève LLMDisabledError")
+    a_("- ✅ `tokens_utilises = 0` sur toutes les réponses de correction déterministe")
+    a_("")
+    a_("## 📊 Détail Golden Set")
+    a_("")
+    a_("| Chapitre | Score | Mots-clés trouvés | Erreurs |")
+    a_("|---|---|---|---|")
     for r in report["results_golden"]:
         err = "; ".join(r["erreurs"][:2]) if r["erreurs"] else "—"
-        a_(f"| {r['chapitre']} | {r['score_pct']*100:.0f}% | {len(r['mots_cles_trouves'] or [])}/{len(r['expected_keywords'])} | {err[:60]} |")
-    a_(f"")
+        a_(f"| {r['chapitre']} | {r['score_pct'] * 100:.0f}% | {len(r['mots_cles_trouves'] or [])}/{len(r['expected_keywords'])} | {err[:60]} |")
+    a_("")
     return "\n".join(lines)
 
 

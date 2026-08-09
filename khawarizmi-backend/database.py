@@ -18,7 +18,6 @@ import types
 from contextlib import asynccontextmanager
 
 from fastapi import HTTPException
-from sqlalchemy import JSON
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import declarative_base
 
@@ -29,27 +28,35 @@ def _sqlite_compat() -> None:
     """Patche les types PostgreSQL (JSONB/ARRAY/UUID) et le constructeur
     ARRAY générique, et remplace les casts `::jsonb`/`::text` etc. pour
     permettre aux modèles de compiler sous SQLite (preview/dev)."""
-    from sqlalchemy import JSON as _JSON, String as _String, TypeDecorator as _TD
+    import re
+
+    import sqlalchemy as _sa
+    from sqlalchemy import JSON as _JSON
+    from sqlalchemy import String as _String
+    from sqlalchemy import TypeDecorator as _TD
     from sqlalchemy.ext.compiler import compiles
     from sqlalchemy.sql.elements import TextClause
-    import sqlalchemy as _sa
-    import re
 
     class _CompatUUID(_TD):
         impl = _String(36)
         cache_ok = True
+
         def process_bind_param(self, value, dialect):
             return str(value) if value else None
+
         def process_result_value(self, value, dialect):
             return value
 
     class _CompatARRAY(_TD):
         impl = _JSON
         cache_ok = True
+
         def __init__(self, item_type=None, as_tuple=False, dimensions=None, zero_indexes=False, **kw):
             super().__init__(**kw)
+
         def process_bind_param(self, value, dialect):
             return value if value is not None else []
+
         def process_result_value(self, value, dialect):
             return value or []
 
@@ -69,6 +76,7 @@ def _sqlite_compat() -> None:
     _CAST_RE = re.compile(r"::[a-zA-Z_]+(?:\[\])?")
     _ILIKE_RE = re.compile(r"\bILIKE\b", re.IGNORECASE)
     _NOW_RE = re.compile(r"\bNOW\s*\(\s*\)", re.IGNORECASE)
+    _UUID_RE = re.compile(r"\bgen_random_uuid\s*\(\s*\)", re.IGNORECASE)
     # ANY(...) n'existe pas en SQLite → remplacer par une série de LIKE OR
     _ANY_RE = re.compile(r"I?LIKE\s+ANY\s*\(\s*:(\w+)\s*\)", re.IGNORECASE)
 
@@ -80,6 +88,8 @@ def _sqlite_compat() -> None:
         rendered = _ILIKE_RE.sub("LIKE", rendered)
         # NOW() → CURRENT_TIMESTAMP (fonction SQLite native)
         rendered = _NOW_RE.sub("CURRENT_TIMESTAMP", rendered)
+        # gen_random_uuid() → hex(randomblob(16)) (SQLite n'a pas de pgcrypto)
+        rendered = _UUID_RE.sub("(lower(hex(randomblob(16))))", rendered)
         return rendered
 
     # ── Désactive TOUTES les clauses REFERENCES / FOREIGN KEY en DDL
@@ -88,13 +98,12 @@ def _sqlite_compat() -> None:
     from sqlalchemy import ForeignKeyConstraint as _FKC
 
     @compiles(_FKC, "sqlite")
-    def _noop_fk_sqlite(element, compiler, **kw):  # noqa: ARG001
+    def _noop_fk_sqlite(element, compiler, **kw):
         return ""
 
     # Intercepte gen_random_uuid() → text('(lower(hex(randomblob(16))))')
     # Intercepte NOW() → CURRENT_TIMESTAMP pour compatibilité SQLite preview
-    from sqlalchemy.sql.functions import GenericFunction as _GF, Function as _F
-    import sqlalchemy.sql.functions as _sqlfunc
+    from sqlalchemy.sql.functions import GenericFunction as _GF
 
     @compiles(_GF, "sqlite")
     def _generic_func_sqlite(element, compiler, **kw):
@@ -126,17 +135,17 @@ Base = declarative_base()
 # retente la requête (une seule fois). Ça rend le preview 100% local,
 # 100% résilient aux oublis de schéma dans le DDL statique.
 import re as _re
+
 _NO_SUCH_COL = _re.compile(r"no such column:\s*([a-zA-Z_][a-zA-Z_0-9]*)", _re.IGNORECASE)
 _NO_SUCH_TBL = _re.compile(r"no such table:\s*([a-zA-Z_][a-zA-Z_0-9]*)", _re.IGNORECASE)
 
 
 def _install_sqlite_auto_alter(engine) -> None:
     """Installe un écouteur sur le moteur qui auto-Ajoute colonnes/tables."""
-    from sqlalchemy import event
-    from sqlalchemy.engine import Engine
-
     # Il faut un flag thread-local pour éviter les boucles infinies.
     import threading
+
+    from sqlalchemy import event
     _in_retry = threading.local()
 
     @event.listens_for(engine, "handle_error")
@@ -255,6 +264,25 @@ def _sqlite_extra_ddl() -> list[str]:
     ts = "DATETIME DEFAULT CURRENT_TIMESTAMP"
     pk = "TEXT PRIMARY KEY DEFAULT (lower(hex(randomblob(16))))"
     return [
+        # ── FSRS unifié (S3c) : table mémoire unique (migrations 001/033) ─
+        """CREATE TABLE IF NOT EXISTS mastery_micro_concepts (
+            id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL,
+            micro_concept_id TEXT NOT NULL, concept_id TEXT,
+            chapter TEXT, stability REAL DEFAULT 0,
+            difficulty REAL DEFAULT 0, fsrs_state TEXT DEFAULT '{}',
+            prochaine_revision DATETIME, interval_jours REAL DEFAULT 0,
+            last_score INTEGER, attempts INTEGER DEFAULT 0,
+            last_review DATETIME, total_reviews INTEGER DEFAULT 0,
+            avg_score REAL DEFAULT 0, streak INTEGER DEFAULT 0,
+            reps INTEGER DEFAULT 0, lapses INTEGER DEFAULT 0,
+            state INTEGER DEFAULT 0, due_date DATETIME,
+            pending_real_evaluation INTEGER DEFAULT 0,
+            source TEXT DEFAULT 'concept', item_key TEXT,
+            avg_pct REAL, total_users INTEGER,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE(user_id, micro_concept_id), UNIQUE(user_id, concept_id)
+        )""",
         # ── Mindmaps ────────────────────────────────────────
         f"""CREATE TABLE IF NOT EXISTS mindmaps (
             id {pk}, titre TEXT, title TEXT, subject TEXT, chapitre TEXT,
@@ -281,7 +309,7 @@ def _sqlite_extra_ddl() -> list[str]:
         # ── RAG chunks ─────────────────────────────────────
         f"""CREATE TABLE IF NOT EXISTS rag_chunks (
             id {pk}, source TEXT, chapitre TEXT, chapter TEXT, content TEXT NOT NULL,
-            embedding TEXT, tokens INTEGER DEFAULT 0,
+            content_norm TEXT, embedding TEXT, tokens INTEGER DEFAULT 0,
             chunk_index INTEGER DEFAULT 0, importance REAL DEFAULT 1.0,
             nb INTEGER DEFAULT 0, metadata_json TEXT DEFAULT '{{}}',
             created_at {ts}
@@ -335,7 +363,7 @@ def _sqlite_extra_ddl() -> list[str]:
             feedback_global TEXT, created_at {ts}
         )""",
         f"""CREATE TABLE IF NOT EXISTS da_documents (
-            id {pk}, session_id TEXT, title_ar TEXT, caption_ar TEXT,
+            id {pk}, session_id TEXT, scenario_id TEXT, title_ar TEXT, caption_ar TEXT,
             data TEXT, doc_type TEXT, contenu TEXT, sort_order INTEGER DEFAULT 0,
             type_document TEXT, created_at {ts}
         )""",
@@ -404,7 +432,8 @@ def _sqlite_extra_ddl() -> list[str]:
             titre_fr TEXT, titre_ar TEXT, position_index INTEGER DEFAULT 0
         )""",
         f"""CREATE TABLE IF NOT EXISTS lesson_blocks (
-            id {pk}, chapter_id TEXT, block_type TEXT DEFAULT 'markdown',
+            id {pk}, chapter_id TEXT, chapter_slug TEXT,
+            block_type TEXT DEFAULT 'markdown',
             type_block TEXT DEFAULT 'markdown', title_ar TEXT, body_ar TEXT,
             contenu TEXT, visual_hint TEXT, quick_check TEXT,
             ordre INTEGER DEFAULT 0, sort_order INTEGER DEFAULT 0,
@@ -425,7 +454,7 @@ def _sqlite_extra_ddl() -> list[str]:
             status TEXT DEFAULT 'started', score REAL DEFAULT 0
         )""",
         f"""CREATE TABLE IF NOT EXISTS bac_subjects (
-            id {pk}, session_id TEXT, subject_number INTEGER DEFAULT 1,
+            id {pk}, session_id TEXT, annale_slug TEXT, subject_number INTEGER DEFAULT 1,
             title_ar TEXT, themes_ar TEXT DEFAULT '[]', exercises TEXT DEFAULT '[]',
             estimated_minutes INTEGER DEFAULT 0, enonce TEXT, matiere TEXT,
             points INTEGER DEFAULT 10
@@ -565,7 +594,7 @@ def sqlite_preview_create_all(sync_connection, db_path: str) -> int:
     # Importer TOUS les modules modèles pour enregistrer leurs tables
     # dans Base.metadata (certains ne sont pas dans __init__.py).
     try:
-        import models  # noqa: F401
+        import models  # ruff: ignore[unused-import]
     except Exception:
         pass
     for _, mod, _ in pkgutil.iter_modules([__import__("models").__path__[0]]):
@@ -582,14 +611,20 @@ def sqlite_preview_create_all(sync_connection, db_path: str) -> int:
         except Exception:
             pass
 
-    _strip_all_foreign_keys(Base.metadata)
+    # ⚠️ Ne JAMAIS muter Base.metadata : les mappers ORM (relationships) en
+    # dépendent. On strippe une COPIE — les tables SQLite créées n'ont pas de
+    # FK (résilient), et les mappers gardent leurs FK pour les requêtes.
+    import copy as _copy
 
-    # create_all via SQLAlchemy (tables du metadata)
+    meta_copy = _copy.deepcopy(Base.metadata)
+    _strip_all_foreign_keys(meta_copy)
+
+    # create_all via SQLAlchemy (tables du metadata, sans FK)
     sync_connection.exec_driver_sql("PRAGMA foreign_keys=OFF")
-    Base.metadata.create_all(sync_connection)
+    meta_copy.create_all(sync_connection)
 
     # Tables additionnelles via sqlite3 direct
-    created = len(Base.metadata.tables)
+    created = len(meta_copy.tables)
     con = sqlite3.connect(db_path)
     try:
         con.execute("PRAGMA foreign_keys=OFF")

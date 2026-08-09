@@ -8,7 +8,7 @@ pulse_service.py — Logique métier pour le dashboard PULSE.
 """
 
 import uuid
-from datetime import date, datetime, timedelta
+from datetime import date, datetime
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession

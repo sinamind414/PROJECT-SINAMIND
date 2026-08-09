@@ -17,7 +17,6 @@ import re
 import unicodedata
 from typing import Any
 
-
 # ──────────────────────────────────────────────────────────────────────
 # Lexique de synonymes scientifiques FR/AR/arabe dialectal
 # ──────────────────────────────────────────────────────────────────────
@@ -30,8 +29,8 @@ _SYNONYMS: dict[str, list[str]] = {
     "ribose":         ["ribose", "سكر ريبوز", "الريبوز", "ريبوز"],
     "thymine":        ["thymine", "الثايمين", "ثايمين", "القاعدة الثايمين", "t"],
     "uracile":        ["uracile", "اليوراسيل", "يوراسيل", "قاعدة يوراسيل", "u"],
-    "adn_double_brin":["double brin", "double hélice", "ثنائي السلاسل", "ثنايي السلسله", "مزدوج", "سلسلتان", "حلزون مزدوج"],
-    "arn_simple_brin":["simple brin", "brin simple", "أحادي السلسلة", "احادي السلسله", "سلسلة واحدة"],
+    "adn_double_brin": ["double brin", "double hélice", "ثنائي السلاسل", "ثنايي السلسله", "مزدوج", "سلسلتان", "حلزون مزدوج"],
+    "arn_simple_brin": ["simple brin", "brin simple", "أحادي السلسلة", "احادي السلسله", "سلسلة واحدة"],
     "bases_azotees":  ["bases azotées", "القواعد الآزوتية", "قواعد آزوتية", "القواعد النيتروجينية", "تسلسل القواعد", "تسلسل القواعد الآزوتية", "تسلسل القواعد الازوتيه"],
     "arm":            ["arnm", "mrna", "arn messager", "الرنا الرسول", "الرنا الرسول", "رنا رسول"],
     "trn":            ["arnt", "trna", "arn de transfert", "arn transférable", "الرنا الناقل", "رنا ناقل", "arn الناقل", "الرنا الناقل", "ينقل arnt", "arn ناقل"],
@@ -49,16 +48,16 @@ _SYNONYMS: dict[str, list[str]] = {
 
     # ── Structure des protéines ──
     "prot_primaire":  ["structure primaire", "البنية الأولية", "البنية الاوليه", "التركيب الأولي", "التركيب الاولي", "تسلسل الأحماض الأمينية", "تسلسل الاحماض الامينيه", "sequence des acides amines", "سلسلة ببتيدية ببتيدية", "تتابع الأحماض الأمينية"],
-    "prot_secondaire":["structure secondaire", "بنية ثانوية", "البنية الثانوية", "التركيب الثانوي", "حلزون ألفا", "حلزون الفا", "hélice alpha", "helice α", "الصحيفة بيتا", "الصفيحة بيتا", "صحيفة مطوية", "الوريقات المطوية", "الورقة المطوية", "وريقات مطوية", "feuillet bêta", "feuillet beta", "رابطة هيدروجينية", "روابط هيدروجينية", "liaisons hydrogène", "لولبي", "حلزوني", "الشكل الحلزوني", "البنية الحلزونية", "بنية حلزونية", "شكل حلزوني", "أشكال حلزونية", "التفاف السلسلة الببتيدية", "انطواء السلسلة", "الانطواء"],
+    "prot_secondaire": ["structure secondaire", "بنية ثانوية", "البنية الثانوية", "التركيب الثانوي", "حلزون ألفا", "حلزون الفا", "hélice alpha", "helice α", "الصحيفة بيتا", "الصفيحة بيتا", "صحيفة مطوية", "الوريقات المطوية", "الورقة المطوية", "وريقات مطوية", "feuillet bêta", "feuillet beta", "رابطة هيدروجينية", "روابط هيدروجينية", "liaisons hydrogène", "لولبي", "حلزوني", "الشكل الحلزوني", "البنية الحلزونية", "بنية حلزونية", "شكل حلزوني", "أشكال حلزونية", "التفاف السلسلة الببتيدية", "انطواء السلسلة", "الانطواء"],
     "prot_tertiaire": ["structure tertiaire", "بنية ثالثية", "بنية ثلاثية", "البنية الثالثية", "البنيه الثالثيه", "التركيب الثالثي", "التركيب الثالثى", "التفاف", "التلاف", "الانطواء", "انطواء", "انطواء السلسلة", "تلتف", "شكل كروي", "شكلا كرويا", "كروي", "كروية", "repliement", "repliement tridimensionnel", "بنية ثلاثية الأبعاد", "الشكل ثلاثي الأبعاد", "بنيات ثانوية حلزونية ووريقات"],
-    "prot_quaternaire":["structure quaternaire", "بنية رباعية", "البنية الرباعية", "التركيب الرباعي", "عدة سلاسل ببتيدية", "plusieurs chaînes peptidiques", "وحدات فرعية", "تحت الوحدات", "تحت الوحدة", "تحت وحدات", "لسلسلتين ببتيديتين أو أكثر", "تجمع تحت وحدات"],
+    "prot_quaternaire": ["structure quaternaire", "بنية رباعية", "البنية الرباعية", "التركيب الرباعي", "عدة سلاسل ببتيدية", "plusieurs chaînes peptidiques", "وحدات فرعية", "تحت الوحدات", "تحت الوحدة", "تحت وحدات", "لسلسلتين ببتيديتين أو أكثر", "تجمع تحت وحدات"],
     "pont_disulfure": ["pont disulfure", "ponts disulfures", "جسور ثنائية الكبريت", "جسور كبريتية", "الجسور الكبريتية", "رابطة ثنائية الكبريت", "liaison disulfure", "جسر كبريتي"],
     "liaison_h":      ["liaison hydrogène", "liaisons hydrogène", "رابطة هيدروجينية", "روابط هيدروجينية"],
-    "liaison_ionique":["liaison ionique", "pont salin", "ponts salins", "رابطة أيونية", "روابط أيونية", "روابط شاردية", "رابطة شاردية", "الروابط الملحية", "رابطة ملحية", "تفاعلات كهربائية", "تفاعلات الشحنات"],
-    "liaison_hydrophobe":["interaction hydrophobe", "interactions hydrophobes", "تفاعلات كارهة للماء", "تداخل الجذور الكارهة للماء", "تجاذب كاره للماء", "تداخل كاره للماء", "تأثير كاره للماء"],
+    "liaison_ionique": ["liaison ionique", "pont salin", "ponts salins", "رابطة أيونية", "روابط أيونية", "روابط شاردية", "رابطة شاردية", "الروابط الملحية", "رابطة ملحية", "تفاعلات كهربائية", "تفاعلات الشحنات"],
+    "liaison_hydrophobe": ["interaction hydrophobe", "interactions hydrophobes", "تفاعلات كارهة للماء", "تداخل الجذور الكارهة للماء", "تجاذب كاره للماء", "تداخل كاره للماء", "تأثير كاره للماء"],
     "groupe_r":       ["groupes latéraux", "groupe r", "المجموعات الجانبية", "مجموعات جانبية", "السلاسل الجانبية r", "chaînes latérales", "chaîne latérale", "مجموعات R", "مجموعات الجانب", "المجموعات الجانبيه", "المجموعة الجانبية", "الجذور r", "جذر r", "جذور الأحماض الأمينية", "الجذور الكيميائية"],
-    "chaine_peptidique":["chaîne peptidique", "سلسلة ببتيدية", "السلسلة الببتيدية", "سلسلة بيبتيدية", "السلسلة البيبتيدية", "سلسل بيبتيدي"],
-    "liaison_peptidique":["liaison peptidique", "روابط ببتيدية", "رابطة ببتيدية", "الرابطة الببتيدية", "الروابط الببتيدية"],
+    "chaine_peptidique": ["chaîne peptidique", "سلسلة ببتيدية", "السلسلة الببتيدية", "سلسلة بيبتيدية", "السلسلة البيبتيدية", "سلسل بيبتيدي"],
+    "liaison_peptidique": ["liaison peptidique", "روابط ببتيدية", "رابطة ببتيدية", "الرابطة الببتيدية", "الروابط الببتيدية"],
     "sequence_aa":    ["séquence des acides aminés", "تسلسل الأحماض الأمينية", "ترتيب الأحماض الأمينية", "تسلسل", "متسلسل", "الترتيب المتسلسل"],
     "ordre_aa":       ["ترتيب", "الترتيب", "ترتيب الأحماض", "ترتيب متسلسل"],
     "feuillet_beta_nom": ["صفائح", "الصفائح", "الصفائحية", "الشكل الصفائحي", "بنية صفائحية", "مناطق صفائحية"],
@@ -69,7 +68,6 @@ _SYNONYMS: dict[str, list[str]] = {
     "complementarite_nom": ["تمامة", "التمامة", "متمم", "متممة", "تكامل", "التكامل"],
     "globules_rouges": ["كرات الدم الحمراء", "كريات حمراء"],
     "codon_stop":     ["codon stop", "codon de terminaison", "كودون التوقف", "كودون توقف", "توقف الترجمة"],
-    "acide_amine":    ["acide aminé", "acides amines", "aminoacide", "حمض أميني", "أحماض أمينية", "الاحماض الامينيه"],
 
     # ── Enzymologie ──
     "enzyme":         ["enzyme", "إنزيم", "أنزيم", "إنظيم", "الإنزيم", "الانزيم", "الإنزميم", "الانزيمات"],
@@ -102,7 +100,7 @@ _SYNONYMS: dict[str, list[str]] = {
     # ── Conformation / structure-fonction ──
     "conformation":   ["conformation", "بنية مكانية", "البنية المكانية", "بنيه مكانيه", "البنية ثلاثية الأبعاد", "الشكل ثلاثي الأبعاد", "البنية الفراغية", "التخصص البنيوي", "البنية ثلاثية الابعاد"],
     "relation_struct_fonction": ["relation structure-fonction", "علاقة بين البنية والوظيفة", "البنية تحدد الوظيفة", "تغير البنية", "تغير البنية يؤدي", "تغير الوظيفة", "تفقد الانزيم وظيفته", "فقدان الوظيفة", "perte de fonction"],
-    "complementarite":["complémentarité", "تكامل", "التكامل", "التكامل البنيوي", "تمام", "التمامة", "متمم", "متممة", "تتطابق", "تطابق", "تطابق شكلي", "التكامل الشكلي", "complémentarité de forme", "التعرف النوعي", "يتعرف"],
+    "complementarite": ["complémentarité", "تكامل", "التكامل", "التكامل البنيوي", "تمام", "التمامة", "متمم", "متممة", "تتطابق", "تطابق", "تطابق شكلي", "التكامل الشكلي", "complémentarité de forme", "التعرف النوعي", "يتعرف"],
     "globuline":      ["globuline", "الغلوبولينات", "غلوبولينات", "الغلوبولين", "غلوبولين", "الجلوبيولينات", "بروتينات الدم"],
     "reconnaissance": ["reconnaissance", "التعرف", "يتعرف على", "تتعرف على", "التعرف النوعي", "التعرف على المستضد"],
     # ── Traduction/transcription plus ──
@@ -120,7 +118,7 @@ _SYNONYMS: dict[str, list[str]] = {
     "chaine_resp":    ["chaîne respiratoire", "chaîne de transport d'électrons", "السلسلة التنفسية", "سلسلة التنفس"],
     "phosphorylation_oxydative": ["phosphorylation oxydative", "الفسفرة التأكسدية", "الفسفرة المؤكسدة", "فسفرة تأكسدية"],
     "oxygene":        ["o2", "dioxygène", "oxygène", "الأكسجين", "أكسجين", "الاوكسجين", "اكسجين"],
-    "38_atp":         ["38 atp", "38atp", "38 جزيئة atp", "38 جزيء atp", "38atp", "38 أتب", "38 جزيء atp" ],
+    "38_atp":         ["38 atp", "38atp", "38 جزيئة atp", "38 جزيء atp", "38atp", "38 أتب", "38 جزيء atp"],
     "pyruvate":       ["pyruvate", "acide pyruvique", "البيروفات", "بيروفات", "حمض البيروفيك", "الحمض البيروفي", "البيروفيك", "مركب ثلاثي الكربون"],
     "acetyl_coa":     ["acétyl-coa", "acetyl-coa", "acétyl coenzyme a", "أستيل كوآ", "أستيل مرافق أ", "أسيتيل كوآ", "الأسيتيل كوآ", "أستيل كو إنزيم أ", "استيل كو"],
     "chloroplaste":   ["chloroplaste", "البلاستيدات الخضراء", "بلاستيدات خضراء", "الكلوروبلاست", "الصانعات الخضراء", "الصانعة الخضراء", "صانعات يخضورية", "صانعة خضراء"],
@@ -133,7 +131,7 @@ _SYNONYMS: dict[str, list[str]] = {
     "glucose":        ["glucose", "جلوكوز", "الغلوكوز", "الغلوكوز", "مادة عضوية", "المادة العضوية", "ماده عضويه", "مواد عضوية", "سكر", "الجلوكوز"],
     "o2_degage":      ["dégagement d'o2", "libération d'oxygène", "انطلاق الأكسجين", "إطلاق الأكسجين", "ينطلق الأكسجين"],
     "eau":            ["eau", "الماء", "ماء", "h2o"],
-    "energie_lumineuse":["énergie lumineuse", "طاقة ضوئية", "الطاقة الضوئية", "طاقه ضوييه", "الطاقه الضوييه", "طاقة الشمس", "ضوء", "lumière"],
+    "energie_lumineuse": ["énergie lumineuse", "طاقة ضوئية", "الطاقة الضوئية", "طاقه ضوييه", "الطاقه الضوييه", "طاقة الشمس", "ضوء", "lumière"],
     "mat_organique":  ["matière organique", "المادة العضوية", "ماده عضويه", "مواد عضوية", "matieres organiques", "glucides", "sucres"],
     "mat_minerale":   ["matière minérale", "المادة المعدنية", "ماده معدنيه", "مواد معدنية", "sels minéraux", "املاح معدنية", "co2 et eau"],
 
@@ -180,15 +178,15 @@ _SYNONYMS: dict[str, list[str]] = {
     "ach":            ["acétylcholine", "ach", "الأستيل كولين", "أستيل كولين", "استيل كولين", "أسيتيل كولين", "الاستيل كولين", "الأستيل كولين", "الاستل كولين", "الأستيلكولين"],
     "canal_na":       ["canaux na+", "canaux sodium", "قنوات الصوديوم", "قنوات صوديوم", "قنوات na+", "قنوات شوارد الصوديوم"],
     "canal_k":        ["canaux k+", "canaux potassium", "قنوات البوتاسيوم", "قنوات بوتاسيوم", "قنوات k+"],
-    "canaux_ioniques":["canaux ioniques", "قنوات أيونية", "قنوات شاردية", "القنوات الغشائية", "قنوات الغشاء"],
+    "canaux_ioniques": ["canaux ioniques", "قنوات أيونية", "قنوات شاردية", "القنوات الغشائية", "قنوات الغشاء"],
     "canaux_voltage": ["canaux voltage-dépendants", "قنوات فولطية", "قنوات الفولطية", "القنوات الفولطية", "canaux tensiodépendants"],
     "pompe_na_k":     ["pompe na/k", "pompe sodium potassium", "مضخة الصوديوم والبوتاسيوم", "مضخة na+ k", "مضخة صوديوم بوتاسيوم", "atpase", "مضخة na k", "مضخة na/k atpase"],
     "myeline":        ["myéline", "غمد المايلين", "النخاعين", "غمد نخاعيني", "غمد الميالين", "غمد النخاعين"],
     "ppm":            ["ppm", "plaque motrice", "الصفيحة المحركة", "المشبك العصبي العضلي", "اللوحة المحركة", "الصفيحة المحركة العضلية"],
     "contraction":    ["contraction musculaire", "تقلص عضلي", "انقباض عضلي", "التقلص العضلي"],
     "ca":             ["ca2+", "calcium", "أيونات الكالسيوم", "الكالسيوم", "شوارد الكالسيوم", "كالسيوم", "ايونات الكالسيوم", "ca2+", "شوارد ca"],
-    "synapse_chimique":["synapse chimique", "المشبك الكيميائي", "مشبك كيميائي", "مشبك كيميايي", "الناقل الكيميائي", "ناقل كيميائي", "المشابك الكيميائية", "وسيط كيميائي", "بواسطة مادة كيميائية", "المرسل الكيميائي", "مبلغ كيميائي"],
-    "fente_synaptique":["fente synaptique", "الشق المشبكي", "شق مشبكي", "الفراغ المشبكي", "الفراغ بين المشبكي"],
+    "synapse_chimique": ["synapse chimique", "المشبك الكيميائي", "مشبك كيميائي", "مشبك كيميايي", "الناقل الكيميائي", "ناقل كيميائي", "المشابك الكيميائية", "وسيط كيميائي", "بواسطة مادة كيميائية", "المرسل الكيميائي", "مبلغ كيميائي"],
+    "fente_synaptique": ["fente synaptique", "الشق المشبكي", "شق مشبكي", "الفراغ المشبكي", "الفراغ بين المشبكي"],
     "terminaison":    ["terminaison présynaptique", "الطرف قبل المشبكي", "نهاية قبل مشبكية", "الطرف المشبكي", "الحويصلات المشبكية", "النهاية قبل المشبكية", "النهاية العصبية", "النهاية قبل المشبكية"],
     "postsynaptique": ["postsynaptique", "بعد المشبكي", "الغشاء بعد المشبكي", "الخلية بعد المشبكية", "البعد مشبكي", "الخلية البعد مشبكية"],
     "presynaptique":  ["présynaptique", "قبل المشبكي", "قبل مشبكي", "الطرف قبل المشبكي", "القبل مشبكي", "الخلية قبل المشبكية"],
@@ -196,7 +194,7 @@ _SYNONYMS: dict[str, list[str]] = {
     "vesicule":       ["vésicule", "vésicules synaptiques", "حويصلات", "حويصلات مشبكية", "الحويصلات", "حويصلات المبلغ", "حويصلات الأستيل كولين"],
     "depolarisation": ["dépolarisation", "زوال الاستقطاب", "إزالة الاستقطاب", "زوال استقطاب", "اندفاع الصوديوم", "دخول الصوديوم", "انفتاح قنوات الصوديوم", "انعكاس قطبية الغشاء", "انعكاس قطبية", "انقلاب الاستقطاب", "انعكاس سريع لقطبية", "يصبح داخل الليف موجبا"],
     "polarisation":   ["قطبية الغشاء", "الاستقطاب الغشائي", "قطبية", "استقطاب الغشاء", "الشحنة السالبة", "داخل سالب خارج موجب", "سالبة داخل"],
-    "potentiel_actif":["تنبيه فعال", "التنبيه الفعال", "المنبه الفعال", "تنبيه كاف"],
+    "potentiel_actif": ["تنبيه فعال", "التنبيه الفعال", "المنبه الفعال", "تنبيه كاف"],
     "repolarisation": ["repolarisation", "عودة الاستقطاب", "إعادة استقطاب", "عودة استقطاب", "خروج البوتاسيوم", "انفتاح قنوات البوتاسيوم", "العودة لكمون الراحة", "يعود لكمون الراحة"],
     "seuil":          ["seuil", "العتبة", "عتبة", "عتبة كمون العمل", "-50mv", "عتبة التنبيه"],
     "conduction_saltatoire": ["conduction saltatoire", "التوصيل القفزي", "النقل القفزي", "التوصيل القفزي على طول ليف النخاعين", "انتشار قفزي"],
@@ -237,7 +235,7 @@ _SYNONYMS: dict[str, list[str]] = {
     "expansion_fond_oceanique": ["expansion des fonds océaniques", "توسع قيعان المحيطات", "توسع قاع المحيط", "اتساع قاع المحيط", "تمدد قاع المحيط"],
     "inversions_mag":  ["inversions magnétiques", "الانعكاسات المغناطيسية", "انعكاسات المغناطيسية", "الانعكاس المغناطيسي", "تعاكس المغناطيسية", "الشذوذ المغناطيسي المتماثل"],
     "anomalie_mag":   ["anomalie magnétique", "الشذوذ المغناطيسي", "الانعكاسات المغناطيسية", "السجل المغناطيسي", "الشذوذ المغناطيسي المتماثل", "الانعكاس المغناطيسي"],
-    "ophiolite":      ["ophiolite", "أوفيوليت", "الأوفيوليت", "الانيوليت", "أفيوليت", "الافيوليت"],
+    "ophiolite":      ["ophiolite", "أوفيوليت", "الأوفيوليت", "الانيوليت", "أفيوليت", "الافيوليت", "الأفيوليت"],
     "magma":          ["magma", "صهارة", "الصهارة", "ماغما", "الماغما", "مغماتية", "الصهارة الصاعدة", "ماغما بازلتية", "الحمم البركانية"],
     "volcan":         ["volcan", "بركان", "البركان", "بركانية", "براكين"],
     "seisme":         ["séisme", "زلزال", "زلازل"],
@@ -268,14 +266,14 @@ _GRAVE_ERRORS = [
     (r"36\s+\w+\s+atp|36\s+atp",
      "عدد جزيئات ATP هو 38 وليس 36 (البرنامج الرسمي ONEC)", 1.0),
     (r"32\s+\w*\s*atp|32\s+atp",
-     "عدد جزيئات ATP هو 38 وليس 32",                        1.0),
+     "عدد جزيئات ATP هو 38 وليس 32", 1.0),
     (r"(?:2\s+atp.*(?:التنفس|تنفس|respir)|38\s+atp.*(?:تخم|ferment|تخمر))",
      "التنفس الهوائي ينتج 38 ATP والتخمر ينتج 2 ATP — خلط بينهما", 1.0),
     # ── Localisation erronée de la traduction / ADN ──
     (r"الترجم?ه\s+في\s+النوا|ribosome[^.]*noyau",
      "تتم الترجمة في الريبوزومات (الهيولى) وليس في النواة", 1.0),
     (r"الريبوزوم\s+في\s+النوا",
-     "الريبوزوم يوجد في الهيولى وليس في النواة",             1.0),
+     "الريبوزوم يوجد في الهيولى وليس في النواة", 1.0),
     # ADN localisé explicitement DANS le hyaloplasme/cytoplasme (ERREUR).
     # Règle stricte : "ADN ... في hyaloplasme" SANS mention de النواة/noyau entre les deux.
     (r"adn\b(?!(?:(?!adn\b)[^.]){0,80}(?:النواة|النواه|noyau))(?:(?!adn\b)[^.]){0,30}(?:في|est|se trouve|se situe|localis|present|يوجد|يتواجد|موجود|يحتوي)(?:(?!adn\b)[^.]){0,20}(?:الهيول|هيول|hyaloplasme|cytoplasme|السايتوبلازم|السيتوبلازم)",
@@ -299,10 +297,10 @@ _GRAVE_ERRORS = [
 
 # Règles numériques DZ à vérifier dans les réponses quantitatives
 _NUMERIC_RULES = {
-    "atp_resp":  {"patterns": [r"bilan.{0,20}atp", r"atp.{0,20}respir", r"atp.{0,20}تنفس"],  "expected": 38},
-    "atp_ferm":  {"patterns": [r"atp.{0,20}ferment", r"atp.{0,20}تخم"],                      "expected": 2},
-    "po_nadh":   {"patterns": [r"p/o.{0,15}nadh", r"nadh.{0,20}atp", r"p/o"],                "expected": 3},
-    "po_fadh":   {"patterns": [r"p/o.{0,15}fadh", r"fadh.{0,20}atp"],                        "expected": 2},
+    "atp_resp":  {"patterns": [r"bilan.{0,20}atp", r"atp.{0,20}respir", r"atp.{0,20}تنفس"], "expected": 38},
+    "atp_ferm":  {"patterns": [r"atp.{0,20}ferment", r"atp.{0,20}تخم"], "expected": 2},
+    "po_nadh":   {"patterns": [r"p/o.{0,15}nadh", r"nadh.{0,20}atp", r"p/o"], "expected": 3},
+    "po_fadh":   {"patterns": [r"p/o.{0,15}fadh", r"fadh.{0,20}atp"], "expected": 2},
 }
 
 
@@ -331,6 +329,7 @@ def _normalize(text: str) -> str:
     # ـك (ton/masculin), ـكم (votre).
     # On les retire seulement si le mot d'origine contient au moins 3
     # caractères arabes avant le suffixe.
+
     def _strip_possessive(m: re.Match) -> str:
         prefix = m.group(1)
         # Conserver ة de féminin (devient ه en dernier ressort) : si le
@@ -359,13 +358,14 @@ def _normalize(text: str) -> str:
     t = re.sub(r"(\S{2,})ها\b", _poss_replacer, t)
     t = re.sub(r"(\S{2,})هم\b", _poss_replacer, t)
     t = re.sub(r"(\S{2,})كم\b", _poss_replacer, t)
-    t = re.sub(r"(\S{2,})ك\b",  _poss_replacer, t)
+    t = re.sub(r"(\S{2,})ك\b", _poss_replacer, t)
     # Pour ه final : retirer seulement si ce n'est pas une ة/ت précédente,
     # ni un mot se terminant par ئ/ي/ى long (adjectifs : هوائي, ثنائي, عالي…),
     # et si le mot est suffisamment long pour être un nom+possessif.
     # Après normalisation ة est toujours U+0629 à ce stade, et ئ a été
     # décomposé par NFKD → ي + Hamza suscrite (puis le combining est enlevé)
     # → ئ devient ي. Donc il suffit de protéger le ي final aussi.
+
     def _h_final(m: re.Match) -> str:
         prefix = m.group(1)
         last = prefix[-1] if prefix else ""
@@ -390,9 +390,24 @@ def _contains_any(text: str, variants: list[str]) -> bool:
     les tokens courts (ex: "b" qui matche dans "اللمفاويه b" mais aussi dans
     "bien" ou dans d'autres mots). Pour les variantes >= 3 caractères on
     accepte aussi le match en sous-chaîne (tolérant aux pluriels agglutinés).
+
+    ⚠️ Variantes BRUTES : re-normalisées à chaque appel (utilisé seulement
+    pour des listes dynamiques) — voir _contains_any_norm pour le chemin
+    chaud (lexique pré-normalisé, ~100× plus rapide).
     """
-    for v in variants:
-        vn = _normalize(v)
+    return _contains_any_norm(text, [n for v in variants if (n := _normalize(v))])
+
+
+def _contains_any_norm(text: str, variants_norm: list[str]) -> bool:
+    """Comme _contains_any, mais variantes DÉJÀ normalisées (chemin chaud).
+
+    Le lexique (_SYNONYMS) est statique : ses variantes sont normalisées UNE
+    FOIS au chargement (_SYNONYMS_NORM). Avant ce fix, chaque correction
+    re-normalisait ~1500 variantes (NFKD + 25 replace + 6 regex chacune) →
+    ~30-60 ms CPU par copie, bloquant la boucle asyncio (GIL). Mesuré :
+    30.7 ms/appel → < 0.5 ms/appel.
+    """
+    for vn in variants_norm:
         if not vn:
             continue
         # Variantes très courtes (1-2 caractères : B, T, pH, km, O2, CO2)
@@ -410,17 +425,239 @@ def _contains_any(text: str, variants: list[str]) -> bool:
     return False
 
 
+# Variantes du lexique pré-normalisées UNE FOIS au chargement (chemin chaud).
+# Le lexique est statique : re-normaliser ~1500 variantes (NFKD + 25 replace
+# + 6 regex chacune) à chaque correction coûtait ~30-60 ms CPU par copie et
+# bloquait la boucle asyncio (GIL) — voir _contains_any_norm.
+_SYNONYMS_NORM: dict[str, list[str]] = {
+    kw: [n for v in syns if (n := _normalize(v))]
+    for kw, syns in _SYNONYMS.items()
+}
+
+
 def _count_keyword_hits(text: str, keywords: list[str]) -> tuple[int, list[str]]:
     hits = 0
     hit_list: list[str] = []
     for kw in keywords:
         # Essayer le synonyme le plus long qui correspond
-        syns = _SYNONYMS.get(kw, [kw])
-        best = max(syns, key=len) if syns else kw
-        if _contains_any(text, syns):
+        syns = _SYNONYMS_NORM.get(kw, [kw])
+        if _contains_any_norm(text, syns):
             hits += 1
             hit_list.append(kw)
     return hits, hit_list
+
+
+def _detect_lexicon_concepts(question: str, model_answer: str) -> list[str]:
+    """Concepts du lexique présents dans (question + réponse modèle).
+
+    Même logique que la déduction automatique des mots-clés de
+    deterministic_correct : pour chaque entrée du lexique, on regarde si
+    l'un de ses synonymes apparaît dans l'énoncé ou la réponse modèle.
+    """
+    q_norm = _normalize(question or "")
+    m_norm = _normalize(model_answer or "")
+    found: list[str] = []
+    for kw_id, syns in _SYNONYMS_NORM.items():
+        if _contains_any_norm(q_norm, syns) or _contains_any_norm(m_norm, syns):
+            found.append(kw_id)
+    return found
+
+
+def can_handle(question: str, model_answer: str = "") -> bool:
+    """Le moteur SAVOIR couvre-t-il cette question ?
+
+    Filtre d'applicabilité (audit — le moteur ne doit JAMAIS être utilisé
+    comme correcteur généraliste) : au moins 2 concepts du lexique détectés
+    dans (énoncé + réponse modèle). En dessous, le moteur tomberait dans son
+    fallback générique bienveillant (0.3-0.5×barème) — inacceptable.
+    """
+    return len(_detect_lexicon_concepts(question, model_answer)) >= 2
+
+
+def confidence_for(question: str, model_answer: str = "") -> float:
+    """Confiance = couverture du lexique sur la question (0..1).
+
+    min(1.0, concepts_détectés / 3) : ≥ 0.92 ⟺ ≥ 3 concepts couverts par le
+    lexique — seuil de promotion « local_savoir » (étage haute confiance).
+    """
+    return min(1.0, len(_detect_lexicon_concepts(question, model_answer)) / 3.0)
+
+
+# ── Seuil de promotion (audit A1) ────────────────────────────────────
+# Un item est "haute confiance" ssi ≥ 3 concepts détectés DANS LA COPIE.
+# 0.92 est un seuil DÉRIVÉ (3/3) — informatif, à NE PAS ajuster
+# dynamiquement : c'est la formule confidence_for qui devrait évoluer.
+SAVOIR_HIGH_CONFIDENCE_MIN_CONCEPTS = 3
+SAVOIR_HIGH_CONFIDENCE_THRESHOLD = 0.92  # dérivé = 3 / 3 — informatif
+
+
+def is_high_confidence(n_concepts_matched: int) -> bool:
+    """Un résultat savoir est promu ssi ≥ MIN_CONCEPTS concepts trouvés
+    dans la copie de l'élève (périmètre validé par le golden set :
+    MAE=0.308, severe=0.0 sur ce sous-groupe)."""
+    return n_concepts_matched >= SAVOIR_HIGH_CONFIDENCE_MIN_CONCEPTS
+
+
+def is_savoir_enabled(verb_slug: str) -> bool:
+    """Feature flag PAR VERBE (activation progressive en prod).
+
+    Défaut vide = savoir jamais activé. La liste contient les verb_slug de
+    la route (ex. 'analyse', 'extract', 'interpret' — la route reçoit des
+    slugs, pas les noms arabes).
+    """
+    from config import get_settings
+    return verb_slug in (get_settings().savoir_enabled_verbs or [])
+
+
+# ── Highlights sur la copie élève (offsets BRUTS) ────────────────────
+
+def find_keyword_occurrences(text: str, keyword_id: str) -> list[tuple[int, int]]:
+    """Occurrences d'un concept dans le texte BRUT (start, end).
+
+    Cherche chaque variante du lexique dans le texte non normalisé
+    (case-insensitive) — le texte normalisé (_normalize) retire ponctuation
+    et diacritiques : les positions y seraient fausses vs la copie affichée.
+    Variantes < 3 caractères ignorées (faux positifs : 'b', 't'...).
+    """
+    occs: list[tuple[int, int]] = []
+    text_lower = text.lower()
+    for variant in _SYNONYMS.get(keyword_id, [keyword_id]):
+        v = variant.strip().lower()
+        if len(v) < 3:
+            continue
+        start = 0
+        while True:
+            idx = text_lower.find(v, start)
+            if idx == -1:
+                break
+            occs.append((idx, idx + len(v)))
+            start = idx + max(1, len(v))
+    # Trier par position puis dédupliquer les occurrences IMBRIQUÉES
+    # (ex. 'نواة' ⊂ 'النواة' — deux spans pour le même mot) : garder le
+    # premier span (le plus long à la position de début), ignorer ceux qui
+    # chevauchent un span déjà retenu.
+    occs.sort()
+    dedup: list[tuple[int, int]] = []
+    for occ in occs:
+        if dedup and occ[0] < dedup[-1][1]:
+            continue  # chevauche le span précédent → imbriqué
+        dedup.append(occ)
+    return dedup
+
+
+def build_savoir_highlights(
+    student_answer: str,
+    matched_keywords: list[str],
+) -> list[dict]:
+    """Surligne (good_element) les concepts trouvés DANS la copie.
+
+    Uniquement les matches — on ne surligne jamais ce qui est absent
+    (les `missing` sont un champ missing[], pas un highlight[]). Les offsets
+    pointent dans le texte brut de l'élève, pas dans la réponse modèle.
+    """
+    highlights: list[dict] = []
+    for kw in matched_keywords:
+        for start, end in find_keyword_occurrences(student_answer, kw):
+            if start >= end:
+                continue
+            highlights.append({
+                "start": start,
+                "end": end,
+                "type": "good_element",
+                "message_ar": f"جيد: {kw}",
+            })
+    return highlights
+
+
+def _savoir_dominant_error(raw: dict, score: int, score_max: int) -> str:
+    """Code d'erreur dominant pour un résultat savoir.
+
+    κ modéré (0.449) : le code est une heuristique, la remédiation est
+    désactivée (remediation=None) tant que κ < 0.65 sur golden humain.
+    """
+    if any("خطأ مفاهيمي" in e for e in raw.get("erreurs", [])):
+        return "scientific_error"
+    if score >= score_max:
+        return "all_correct"
+    if score > 0:
+        return "partial_correct"
+    return "insufficient"
+
+
+def deterministic_correct_v2(
+    *,
+    question: str,
+    student_answer: str,
+    score_max: int,
+    language: str = "ar",
+    expected_keywords: list[str] | None = None,
+    mandatory_keywords: list[str] | None = None,
+    expected_numeric: dict[str, float] | None = None,
+    model_answer: str = "",
+) -> dict:
+    """Version de deterministic_correct compatible contrat v2 (CACHEABLE).
+
+    Retourne un dict au format du contrat v2 (score, score_max, percentage,
+    confidence, matched_criteria, missing, success, errors, highlights,
+    feedback_ar, advice_ar, dominant_error_code, sanity_code, provider,
+    model) + métadonnées internes _savoir_* (retirées avant mise en cache).
+
+    ⚠️ Concepts attendus : déduits de la RÉPONSE MODÈLE UNIQUEMENT (pas de
+    l'énoncé). Déduire depuis la question piégerait la copie parfaite : un
+    concept présent dans l'énoncé mais absent du modèle (ex. gs_022
+    'immunite'/'rep_humorale') deviendrait un manquant inévitable → la copie
+    modèle n'obtiendrait pas le barème. Mesuré sur le golden : MAE copies
+    parfaites 0.104 → 0.000 ; MAE globale 0.361 → 0.279.
+    """
+    if expected_keywords is None:
+        expected_keywords = _detect_lexicon_concepts("", model_answer)
+
+    raw = deterministic_correct(
+        question=question,
+        student_answer=student_answer,
+        points=score_max,
+        language=language,
+        expected_keywords=expected_keywords,
+        mandatory_keywords=mandatory_keywords,
+        expected_numeric=expected_numeric,
+        model_answer=model_answer,
+    )
+
+    matched = list(raw.get("mots_cles_trouves", []) or [])
+    missing = list(raw.get("mots_cles_manquants", []) or [])
+    n_concepts = len(matched)
+    confidence = min(1.0, n_concepts / SAVOIR_HIGH_CONFIDENCE_MIN_CONCEPTS)
+
+    score = int(round(float(raw.get("score", 0.0))))
+    score = max(0, min(score_max, score))
+    percentage = round(100 * score / max(score_max, 1))
+
+    return {
+        "source": "local_savoir",
+        "score": score,
+        "score_max": score_max,
+        "percentage": percentage,
+        "confidence": confidence,
+        "highlights": build_savoir_highlights(student_answer, matched),
+        "matched_criteria": matched,
+        "unmatched_criteria": [],
+        "missing": [
+            {"expected": k, "why_ar": f"مطلوب: {k}", "from_model_answer": ""}
+            for k in missing
+        ],
+        "success": [f"تم اكتشاف: {k}" for k in matched],
+        "errors": [f"مفقود: {k}" for k in missing],
+        "feedback_ar": raw.get("explication", ""),
+        "advice_ar": " ".join(raw.get("conseils", "").split()),
+        "dominant_error_code": _savoir_dominant_error(raw, score, score_max),
+        "sanity_code": "ok",
+        "provider": "local",
+        "model": "savoir_v1",
+        # Métadonnées internes (observabilité, retirées avant cache)
+        "_savoir_can_handle": can_handle(question, model_answer),
+        "_savoir_confidence": confidence,
+        "_savoir_n_concepts": n_concepts,
+    }
 
 
 # ──────────────────────────────────────────────────────────────────────
@@ -490,9 +727,9 @@ def deterministic_correct(
     # ── Déduction automatique des mots-clés si non fournis ──
     if not expected_keywords:
         expected_keywords = []
-        # Chercher dans le modèle réponse
-        for kw_id, syns in _SYNONYMS.items():
-            if _contains_any(model_norm, syns) or _contains_any(q_norm, syns):
+        # Chercher dans le modèle réponse (variantes pré-normalisées — chemin chaud)
+        for kw_id, syns in _SYNONYMS_NORM.items():
+            if _contains_any_norm(model_norm, syns) or _contains_any_norm(q_norm, syns):
                 expected_keywords.append(kw_id)
         # Limiter à 6 mots-clés maximum pour éviter sur-pondération
         expected_keywords = expected_keywords[:6]
@@ -569,7 +806,7 @@ def deterministic_correct(
     if mandatory_keywords:
         hits_mandatory, _ = _count_keyword_hits(ans_norm, mandatory_keywords)
         if hits_mandatory < len(mandatory_keywords):
-            miss = [m for m in mandatory_keywords if not _contains_any(ans_norm, _SYNONYMS.get(m, [m]))]
+            miss = [m for m in mandatory_keywords if not _contains_any_norm(ans_norm, _SYNONYMS_NORM.get(m, [m]))]
             msg_miss = " ، ".join(miss) if language == "ar" else ", ".join(miss)
             if language == "fr":
                 erreurs.append(f"Concept(s) obligatoire(s) manquant(s): {msg_miss}.")

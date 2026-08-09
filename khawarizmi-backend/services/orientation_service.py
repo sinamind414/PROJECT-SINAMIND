@@ -128,51 +128,30 @@ async def calculer_orientation(
     """
     now = datetime.now(UTC)
 
-    # ── 1. Flashcards dues par chapitre ──
-    fc_result = await db.execute(
-        text("""
-            SELECT mmc.chapter, COUNT(*) as nb_dues
-            FROM mastery_micro_concepts mmc
-            WHERE mmc.user_id = :uid
-              AND mmc.due_date <= :now
-              AND (mmc.state IS NULL OR mmc.state IN (0, 1))
-              AND mmc.chapter IS NOT NULL
-            GROUP BY mmc.chapter
-        """),
-        {"uid": user_id, "now": now},
-    )
-    fc_by_chapter: dict[str, int] = {}
-    total_fc_dues = 0
-    for r in fc_result.fetchall():
-        ch = r._mapping["chapter"]
-        nb = r._mapping["nb_dues"]
-        fc_by_chapter[ch] = nb
-        total_fc_dues += nb
+    # ── 1. Flashcards dues par chapitre — S3c : via le service unifié ──
+    from services.fsrs_unified import get_due_by_chapter
 
-    # ── 2. Action verbs faibles ──
-    av_result = await db.execute(
-        text("""
-            SELECT verb_slug, last_score, attempts, prochaine_revision
-            FROM action_verb_progress
-            WHERE user_id = :uid
-        """),
-        {"uid": user_id},
-    )
+    fc_by_chapter: dict[str, int] = await get_due_by_chapter(db, user_id)
+    total_fc_dues = sum(fc_by_chapter.values())
+
+    # ── 2. Action verbs faibles — S3 finale : vue consolidée ──
+    from services.fsrs_unified import get_user_memory
+
+    av_memory = await get_user_memory(db, user_id, kinds=("verb_action",))
     weak_verbs: list[dict] = []
     total_av_dues = 0
     now = datetime.now(UTC)
-    for r in av_result.fetchall():
-        m = r._mapping
-        next_rev = m.get("prochaine_revision")
+    for item in av_memory:
+        next_rev = item.due
         is_due = next_rev is not None and next_rev <= now
         if is_due:
             total_av_dues += 1
-        last_score = m["last_score"] or 0
-        attempts = m["attempts"] or 0
+        last_score = item.last_score or 0
+        attempts = item.attempts
         if last_score < WEAK_SCORE_THRESHOLD:
             weak_verbs.append(
                 {
-                    "verb_slug": m["verb_slug"],
+                    "verb_slug": item.item_id,
                     "last_score": last_score,
                     "attempts": attempts,
                     "is_due": is_due,
@@ -200,22 +179,13 @@ async def calculer_orientation(
                 }
             )
 
-    # ── 3. Document analysis dues ──
-    da_result = await db.execute(
-        text("""
-            SELECT verb_slug, chapter_slug, last_score, attempts,
-                   prochaine_revision
-            FROM da_fsrs
-            WHERE user_id = :uid
-        """),
-        {"uid": user_id},
-    )
+    # ── 3. Document analysis dues — S3 finale : vue consolidée ──
+    da_memory = await get_user_memory(db, user_id, kinds=("verb_chapter",))
     da_by_chapter: dict[str, int] = {}
     total_da_dues = 0
-    for r in da_result.fetchall():
-        m = r._mapping
-        ch = m["chapter_slug"]
-        is_due = m["prochaine_revision"] is None or m["prochaine_revision"] <= now
+    for item in da_memory:
+        ch = item.chapter or item.item_id.partition("::")[2]
+        is_due = item.due is None or item.due <= now
         if is_due:
             total_da_dues += 1
             da_by_chapter[ch] = da_by_chapter.get(ch, 0) + 1
@@ -257,26 +227,15 @@ async def calculer_orientation(
             "bac_frequent": m["bac_frequent"],
         }
 
-    # ── 6. Prédiction BAC ──
-    pred_result = await db.execute(
-        text("""
-            SELECT mmc.chapter,
-                   AVG(mmc.stability) as avg_stability,
-                   COUNT(*) as nb_concepts
-            FROM mastery_micro_concepts mmc
-            WHERE mmc.user_id = :uid
-              AND mmc.chapter IS NOT NULL
-            GROUP BY mmc.chapter
-        """),
-        {"uid": user_id},
-    )
+    # ── 6. Prédiction BAC — S3c : via le service unifié (GROUP BY chapter) ──
+    from services.fsrs_unified import get_concept_stats_by_chapter
+
     chapter_stability: dict[str, float] = {}
     total_stability = 0.0
     total_concepts = 0
-    for r in pred_result.fetchall():
-        ch = r._mapping["chapter"]
-        avg_s = r._mapping["avg_stability"] or 0.0
-        nb = r._mapping["nb_concepts"]
+    for ch, stats in (await get_concept_stats_by_chapter(db, user_id)).items():
+        avg_s = stats["avg_stability"] or 0.0
+        nb = stats["nb_concepts"]
         chapter_stability[ch] = avg_s
         total_stability += avg_s * nb
         total_concepts += nb

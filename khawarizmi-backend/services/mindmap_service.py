@@ -256,9 +256,8 @@ GÉNÉRATION PROGRESSIVE (LAZY LOADING) :
                 node["expanded"] = False
 
                 for idx, child in enumerate(node["enfants"]):
-                    if level == 0:
-                        if "couleur_branche" not in child or not child["couleur_branche"]:
-                            child["couleur_branche"] = BRANCH_COLORS[idx % len(BRANCH_COLORS)]
+                    if level == 0 and ("couleur_branche" not in child or not child["couleur_branche"]):
+                        child["couleur_branche"] = BRANCH_COLORS[idx % len(BRANCH_COLORS)]
                     format_node_lazy(child, level + 1, parent_branch_color=node.get("couleur_branche"))
 
             format_node_lazy(generated_data["racine"], level=0)
@@ -392,8 +391,7 @@ async def expand_node(
     return {"node_id": node_id, "enfants": enfants}
 
 
-
-from services.mindmap_prompt_v2 import MINDMAP_SYSTEM_PROMPT_V2, EXPAND_PROMPT_V2, BRANCH_COLORS
+from services.mindmap_prompt_v2 import BRANCH_COLORS, EXPAND_PROMPT_V2, MINDMAP_SYSTEM_PROMPT_V2
 
 MINDMAP_SYSTEM_PROMPT = MINDMAP_SYSTEM_PROMPT_V2
 
@@ -547,9 +545,8 @@ async def generate_mindmap(
 
         node["enfants"] = node.get("enfants", [])
         for idx, child in enumerate(node["enfants"]):
-            if level == 0:
-                if "couleur_branche" not in child or not child["couleur_branche"]:
-                    child["couleur_branche"] = BRANCH_COLORS[idx % len(BRANCH_COLORS)]
+            if level == 0 and ("couleur_branche" not in child or not child["couleur_branche"]):
+                child["couleur_branche"] = BRANCH_COLORS[idx % len(BRANCH_COLORS)]
             format_node_recursive(child, level + 1, parent_branch_color=node.get("couleur_branche"))
 
     format_node_recursive(generated_data["racine"], level=0)
@@ -748,6 +745,9 @@ async def persist_flashcards_to_fsrs(
 
         result = await db.execute(
             text("""
+                -- S3b : création initiale mindmap — RETURNING id requis
+                -- (le seul usage de RETURNING sur cette table ; les reviews
+                --  passent par fsrs_unified.save_concept_review)
                 INSERT INTO mastery_micro_concepts
                     (user_id, micro_concept_id, concept_id, chapter,
                      difficulty, stability, state, due_date,
@@ -902,26 +902,22 @@ async def update_node_maitrise(node_id: str, maitrise: int, user_id: str, db: As
 
     fsrs_card_id = f"mm_{node_id}"
 
-    # Charger l'état actuel de la carte si elle existe
-    mc_result = await db.execute(
-        text("SELECT fsrs_state FROM mastery_micro_concepts WHERE micro_concept_id = :mc_id AND user_id = :uid"),
-        {"mc_id": fsrs_card_id, "uid": u_id},
-    )
-    mc_row = mc_result.fetchone()
+    # Charger l'état actuel de la carte si elle existe — S3b : via le service
+    # unifié (get_concept_state retourne le fsrs_state parsé ou None)
+    from services.fsrs_unified import get_concept_state
+
+    mc_state = await get_concept_state(db, u_id, fsrs_card_id)
 
     card = Card()
     review_history = []
-    if mc_row and mc_row[0]:
+    if mc_state:
         try:
-            state_data = mc_row[0]
-            if isinstance(state_data, str):
-                state_data = json.loads(state_data)
-            card.stability = state_data.get("stability", card.stability)
-            card.difficulty = state_data.get("difficulty", card.difficulty)
-            card.reps = state_data.get("reps", card.reps)
-            card.lapses = state_data.get("lapses", card.lapses)
-            card.scheduled_days = state_data.get("scheduled_days", card.scheduled_days)
-            review_history = state_data.get("review_history", [])
+            card.stability = mc_state.get("stability", card.stability)
+            card.difficulty = mc_state.get("difficulty", card.difficulty)
+            card.reps = mc_state.get("reps", card.reps)
+            card.lapses = mc_state.get("lapses", card.lapses)
+            card.scheduled_days = mc_state.get("scheduled_days", card.scheduled_days)
+            review_history = mc_state.get("review_history", [])
         except Exception as e:
             logger.warning(f"Impossible de parser fsrs_state pour {fsrs_card_id}: {e}")
 
@@ -971,45 +967,32 @@ async def update_node_maitrise(node_id: str, maitrise: int, user_id: str, db: As
         }
     )
 
-    await db.execute(
-        text("""
-            INSERT INTO mastery_micro_concepts
-                (user_id, micro_concept_id, concept_id, chapter,
-                 difficulty, stability, fsrs_state, due_date,
-                 prochaine_revision, interval_jours, state, last_review, updated_at)
-            VALUES
-                (:user_id, :mc_id, :concept_id, :chapter,
-                 :difficulty, :stability, CAST(:fsrs_state AS jsonb), :due_date,
-                 :next_rev, :interval, :state, :last_review, :updated_at)
-            ON CONFLICT (user_id, micro_concept_id)
-            DO UPDATE SET
-                difficulty = EXCLUDED.difficulty,
-                stability = EXCLUDED.stability,
-                fsrs_state = EXCLUDED.fsrs_state,
-                due_date = EXCLUDED.due_date,
-                prochaine_revision = EXCLUDED.prochaine_revision,
-                interval_jours = EXCLUDED.interval_jours,
-                state = EXCLUDED.state,
-                last_review = EXCLUDED.last_review,
-                updated_at = EXCLUDED.updated_at
-        """),
-        {
-            "user_id": u_id,
-            "mc_id": fsrs_card_id,
-            "concept_id": node_id,
-            "chapter": node_row[2] if node_row else "",
-            "difficulty": updated_card.difficulty,
-            "stability": updated_card.stability,
-            "fsrs_state": fsrs_json,
-            "due_date": due_date_naive,
-            "next_rev": due_date_naive,
-            "interval": interval,
-            "state": updated_card.state.value if hasattr(updated_card.state, "value") else int(updated_card.state),
-            "last_review": now_naive_sql,
-            "updated_at": now_naive_sql,
-        },
-    )
+    # S3b : review via le service unifié (même upsert qu'avant)
+    from services.fsrs_unified import save_concept_review
 
+    await save_concept_review(
+        db, u_id, fsrs_card_id,
+        concept_id_alias=fsrs_card_id,
+        prochaine_revision=due_date,
+        interval_jours=interval,
+        difficulty=updated_card.difficulty,
+        stability=updated_card.stability,
+        fsrs_state={
+            "stability": updated_card.stability,
+            "difficulty": updated_card.difficulty,
+            "scheduled_days": interval,
+            "reps": getattr(updated_card, "reps", 0),
+            "lapses": getattr(updated_card, "lapses", 0),
+            "state": str(updated_card.state),
+            "last_review": now_utc.isoformat(),
+            "review_history": review_history,
+        },
+        due_date=due_date,
+        last_review=now_utc,
+        reps=getattr(updated_card, "reps", 0),
+        lapses=getattr(updated_card, "lapses", 0),
+        state=int(getattr(updated_card.state, "value", 0)) if hasattr(updated_card.state, "value") else 0,
+    )
     await db.commit()
 
     # Synchroniser la maîtrise dans le JSON data de la table mindmaps

@@ -9,13 +9,74 @@ class FakeRow:
     def __init__(self, mapping):
         self._mapping = mapping
 
+    def __getitem__(self, key):
+        # S3c : les lignes mastery sont des listes (accès positionnel row[0])
+        # ; les autres requêtes utilisent _mapping["clé"].
+        return self._mapping[key]
+
 
 class FakeResult:
     def __init__(self, rows):
-        self._rows = [FakeRow(r) for r in rows]
+        self._rows = [FakeRow(self._convert(r)) for r in rows]
+
+    @staticmethod
+    def _convert(r) -> object:
+        """S3c : convertit l'ancien format mastery (dicts agrégés) en lignes
+        individuelles compatibles fsrs_unified (16 colonnes)."""
+        if isinstance(r, dict) and "nb_dues" in r and "chapter" in r:
+            # ancien format dues → nb_dues lignes dues
+            lines = []
+            due = datetime.now(UTC) - timedelta(hours=1)
+            for i in range(int(r["nb_dues"])):
+                lines.append([
+                    f"{r['chapter']}_{i}", r["chapter"], 2.0, 5.0, "{}",
+                    None, 1.0, None, 0, None, 1, 50.0, 0, False, due, 0,
+                ])
+            return lines
+        if isinstance(r, dict) and "avg_stability" in r and "nb_concepts" in r:
+            # ancien format prediction → nb_concepts lignes
+            lines = []
+            for i in range(int(r["nb_concepts"])):
+                lines.append([
+                    f"{r['chapter']}_{i}", r["chapter"], float(r["avg_stability"]),
+                    5.0, "{}", None, 1.0, None, 0, None, 1, 50.0, 0,
+                    False, None, 0,
+                ])
+            return lines
+        if isinstance(r, dict) and "verb_slug" in r:
+            # Anciens formats action_verb_progress / da_fsrs → lignes mastery
+            # fusionnées (SELECT _read_mastery_by_source : 12 colonnes :
+            # item_key, chapter, stability, difficulty, fsrs_state,
+            # prochaine_revision, interval_jours, last_score, attempts,
+            # last_review, avg_pct, total_users)
+            verb = r["verb_slug"]
+            if r.get("chapter_slug"):
+                # da_fsrs → source='verb_chapter'
+                return [[
+                    f"{verb}::{r['chapter_slug']}", r["chapter_slug"],
+                    r.get("stability", 0.0) or 0.0, r.get("difficulty", 0.0) or 0.0,
+                    "{}", r.get("prochaine_revision"), r.get("interval_jours", 1.0),
+                    r.get("last_score", 0), r.get("attempts", 0), None, None, None,
+                ]]
+            # action_verb_progress → source='verb_action'
+            return [[
+                verb, None, r.get("stability", 0.0) or 0.0,
+                r.get("difficulty", 0.0) or 0.0, "{}",
+                r.get("prochaine_revision"), r.get("interval_jours", 1.0),
+                r.get("last_score", 0), r.get("attempts", 0), None,
+                r.get("avg_pct"), r.get("total_users"),
+            ]]
+        return r
 
     def fetchall(self):
-        return self._rows
+        # une conversion peut produire PLUSIEURS lignes (liste de listes)
+        out = []
+        for row in self._rows:
+            if isinstance(row._mapping, list) and row._mapping and isinstance(row._mapping[0], list):
+                out.extend(FakeRow(sub) for sub in row._mapping)
+            else:
+                out.append(row)
+        return out
 
 
 class SequencedDb:

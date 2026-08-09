@@ -44,6 +44,7 @@ export default function ChatbotPage() {
       initSent.current = true
       sendInit()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- init unique volontaire (guard initSent)
   }, [])
 
   async function sendInit() {

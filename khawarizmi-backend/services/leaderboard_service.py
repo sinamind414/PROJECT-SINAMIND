@@ -2,7 +2,7 @@
 Leaderboard Service — classements nationaux, wilaya, lycée, amis.
 """
 
-from sqlalchemy import select, func, text
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from models.user_stats import UserStats
@@ -40,22 +40,21 @@ def calc_weighted_score(verb_slug: str, percentage: float) -> float:
 
 
 async def update_user_stats(db: AsyncSession, user_id: str) -> dict:
-    result = await db.execute(
-        text("""
-            SELECT verb_slug, stability, attempts
-            FROM action_verb_progress
-            WHERE user_id = :uid AND attempts > 0
-        """),
-        {"uid": user_id},
-    )
-    rows = result.all()
+    # S3 finale : lecture via la vue consolidée (par-user, mastery-first)
+    from services.fsrs_unified import get_user_memory
 
-    total_eval = sum(r.attempts for r in rows)
-    total_correct = sum(int(r.stability * r.attempts) for r in rows)
+    memory = await get_user_memory(db, user_id, kinds=("verb_action",))
+    rows = [
+        {"verb_slug": i.item_id, "stability": i.stability, "attempts": i.attempts}
+        for i in memory if i.attempts > 0
+    ]
+
+    total_eval = sum(r["attempts"] for r in rows)
+    total_correct = sum(int(r["stability"] * r["attempts"]) for r in rows)
     precision = (total_correct / total_eval * 100) if total_eval > 0 else 0.0
 
     weighted = sum(
-        calc_weighted_score(r.verb_slug, r.stability * 100)
+        calc_weighted_score(r["verb_slug"], r["stability"] * 100)
         for r in rows
     )
 

@@ -1,0 +1,740 @@
+{
+ "generated_from": [
+  "programme_svt_3as_canonical.json",
+  "services/units.py",
+  "الكتاب_المصحح_v1.0.md",
+  "lexique_svt_terminale_complet.json"
+ ],
+ "micro_concepts": [
+  {
+   "id": "mc_prot_01",
+   "titre": "نسخ المعلومة الوراثية",
+   "phrase_cle": "نسخ المعلومة الوراثية",
+   "erreur_frequente": "خلط نسخ المعلومة الوراثية بمفهوم مشابه أو نسيان الشروط — خطأ شائع في البكالوريا",
+   "mnemo": "راجع: Transcription de l'ADN",
+   "points_bac": 1.0,
+   "niveau": "critique",
+   "unit_id": "u1",
+   "bac_frequent": true
+  },
+  {
+   "id": "mc_prot_02",
+   "titre": "ترجمة الرنا الرسول",
+   "phrase_cle": "ترجمة الرنا الرسول",
+   "erreur_frequente": "خلط ترجمة الرنا الرسول بمفهوم مشابه أو نسيان الشروط — خطأ شائع في البكالوريا",
+   "mnemo": "راجع: Traduction de l'ARNm",
+   "points_bac": 1.0,
+   "niveau": "critique",
+   "unit_id": "u1",
+   "bac_frequent": true
+  },
+  {
+   "id": "mc_prot_03",
+   "titre": "الشفرة الوراثية",
+   "phrase_cle": "نظام تطابق بين الرامزات في ARNm والأحماض الأمينية أثناء الترجمة",
+   "erreur_frequente": "خلط الشفرة الوراثية بمفهوم مشابه أو نسيان الشروط — خطأ شائع في البكالوريا",
+   "mnemo": "راجع: Code génétique",
+   "points_bac": 1.0,
+   "niveau": "critique",
+   "unit_id": "u1",
+   "bac_frequent": true
+  },
+  {
+   "id": "mc_prot_04",
+   "titre": "الرنا الرسول",
+   "phrase_cle": "الرنا الرسول",
+   "erreur_frequente": "خلط الرنا الرسول بمفهوم مشابه أو نسيان الشروط — خطأ شائع في البكالوريا",
+   "mnemo": "راجع: ARN messager (ARNm)",
+   "points_bac": 1.0,
+   "niveau": "critique",
+   "unit_id": "u1",
+   "bac_frequent": true
+  },
+  {
+   "id": "mc_prot_05",
+   "titre": "الرنا الناقل",
+   "phrase_cle": "الرنا الناقل",
+   "erreur_frequente": "خلط الرنا الناقل بمفهوم مشابه أو نسيان الشروط — خطأ شائع في البكالوريا",
+   "mnemo": "راجع: ARN de transfert (ARNt)",
+   "points_bac": 0.5,
+   "niveau": "moyen",
+   "unit_id": "u1",
+   "bac_frequent": true
+  },
+  {
+   "id": "mc_prot_06",
+   "titre": "الريبوزوم",
+   "phrase_cle": "معقد ريبونوكليوتيدي بروتيني يتكون من تحت وحدتين، موقع تركيب البروتينات بترجمة ARNm",
+   "erreur_frequente": "خلط الريبوزوم بمفهوم مشابه أو نسيان الشروط — خطأ شائع في البكالوريا",
+   "mnemo": "راجع: Ribosome",
+   "points_bac": 1.0,
+   "niveau": "critique",
+   "unit_id": "u1",
+   "bac_frequent": true
+  },
+  {
+   "id": "mc_prot_07",
+   "titre": "بدء الترجمة",
+   "phrase_cle": "عملية تركيب سلسلة بولي ببتيدية انطلاقاً من ARNm على مستوى الريبوزومات بقراءة الرامزات",
+   "erreur_frequente": "خلط بدء الترجمة بمفهوم مشابه أو نسيان الشروط — خطأ شائع في البكالوريا",
+   "mnemo": "راجع: Initiation de la traduction",
+   "points_bac": 0.5,
+   "niveau": "moyen",
+   "unit_id": "u1",
+   "bac_frequent": true
+  },
+  {
+   "id": "mc_prot_08",
+   "titre": "الاستطالة والإنهاء",
+   "phrase_cle": "الاستطالة والإنهاء",
+   "erreur_frequente": "خلط الاستطالة والإنهاء بمفهوم مشابه أو نسيان الشروط — خطأ شائع في البكالوريا",
+   "mnemo": "راجع: Élongation et terminaison",
+   "points_bac": 0.5,
+   "niveau": "moyen",
+   "unit_id": "u1",
+   "bac_frequent": false
+  },
+  {
+   "id": "mc_struc_01",
+   "titre": "البنية الأولية",
+   "phrase_cle": "التسلسل الخطي للأحماض الأمينية في سلسلة بولي ببتيدية، يحدده التسلسل النوكليوتيدي للمورثة",
+   "erreur_frequente": "خلط البنية الأولية بمفهوم مشابه أو نسيان الشروط — خطأ شائع في البكالوريا",
+   "mnemo": "راجع: Structure primaire",
+   "points_bac": 0.5,
+   "niveau": "moyen",
+   "unit_id": "u2",
+   "bac_frequent": true
+  },
+  {
+   "id": "mc_struc_02",
+   "titre": "البنية الثانوية",
+   "phrase_cle": "البنية الثانوية",
+   "erreur_frequente": "خلط البنية الثانوية بمفهوم مشابه أو نسيان الشروط — خطأ شائع في البكالوريا",
+   "mnemo": "راجع: Structure secondaire (α-hélice, feuillet β)",
+   "points_bac": 0.5,
+   "niveau": "moyen",
+   "unit_id": "u2",
+   "bac_frequent": true
+  },
+  {
+   "id": "mc_struc_03",
+   "titre": "البنية الثالثية",
+   "phrase_cle": "الطي ثلاثي الأبعاد لسلسلة بولي ببتيدية يثبت بواسطة روابط هيدروجينية وأيونية وكارهة للماء وجسور كبريتية",
+   "erreur_frequente": "خلط البنية الثالثية بمفهوم مشابه أو نسيان الشروط — خطأ شائع في البكالوريا",
+   "mnemo": "راجع: Structure tertiaire",
+   "points_bac": 1.0,
+   "niveau": "critique",
+   "unit_id": "u2",
+   "bac_frequent": true
+  },
+  {
+   "id": "mc_struc_04",
+   "titre": "البنية الرباعية",
+   "phrase_cle": "البنية الرباعية",
+   "erreur_frequente": "خلط البنية الرباعية بمفهوم مشابه أو نسيان الشروط — خطأ شائع في البكالوريا",
+   "mnemo": "راجع: Structure quaternaire",
+   "points_bac": 0.5,
+   "niveau": "moyen",
+   "unit_id": "u2",
+   "bac_frequent": false
+  },
+  {
+   "id": "mc_struc_05",
+   "titre": "العلاقة بين البنية والوظيفة",
+   "phrase_cle": "العلاقة بين البنية والوظيفة",
+   "erreur_frequente": "خلط العلاقة بين البنية والوظيفة بمفهوم مشابه أو نسيان الشروط — خطأ شائع في البكالوريا",
+   "mnemo": "راجع: Relation structure-fonction",
+   "points_bac": 1.0,
+   "niveau": "critique",
+   "unit_id": "u2",
+   "bac_frequent": true
+  },
+  {
+   "id": "mc_enz_01",
+   "titre": "الموقع الفعال للإنزيم",
+   "phrase_cle": "منطقة نوعية في الإنزيم تتكون من أحماض أمينية محددة مسؤولة عن تثبيت الركيزة وتحفيز التفاعل",
+   "erreur_frequente": "خلط الموقع الفعال للإنزيم بمفهوم مشابه أو نسيان الشروط — خطأ شائع في البكالوريا",
+   "mnemo": "راجع: Site actif de l'enzyme",
+   "points_bac": 1.0,
+   "niveau": "critique",
+   "unit_id": "u3",
+   "bac_frequent": true
+  },
+  {
+   "id": "mc_enz_02",
+   "titre": "النوعية الإنزيمية",
+   "phrase_cle": "بروتين محفز يسرع تفاعل كيميائي حيوي نوعي دون أن يُستهلك بخفض طاقة التنشيط",
+   "erreur_frequente": "خلط النوعية الإنزيمية بمفهوم مشابه أو نسيان الشروط — خطأ شائع في البكالوريا",
+   "mnemo": "راجع: Spécificité enzymatique",
+   "points_bac": 1.0,
+   "niveau": "critique",
+   "unit_id": "u3",
+   "bac_frequent": true
+  },
+  {
+   "id": "mc_enz_03",
+   "titre": "سرعة التفاعل الإنزيمي",
+   "phrase_cle": "بروتين محفز يسرع تفاعل كيميائي حيوي نوعي دون أن يُستهلك بخفض طاقة التنشيط",
+   "erreur_frequente": "خلط سرعة التفاعل الإنزيمي بمفهوم مشابه أو نسيان الشروط — خطأ شائع في البكالوريا",
+   "mnemo": "راجع: Vitesse de réaction enzymatique",
+   "points_bac": 0.5,
+   "niveau": "moyen",
+   "unit_id": "u3",
+   "bac_frequent": true
+  },
+  {
+   "id": "mc_enz_04",
+   "titre": "العوامل المؤثرة على النشاط الإنزيمي",
+   "phrase_cle": "بروتين محفز يسرع تفاعل كيميائي حيوي نوعي دون أن يُستهلك بخفض طاقة التنشيط",
+   "erreur_frequente": "خلط العوامل المؤثرة على النشاط الإنزيمي بمفهوم مشابه أو نسيان الشروط — خطأ شائع في البكالوريا",
+   "mnemo": "راجع: Facteurs influençant l'activité (température, pH)",
+   "points_bac": 1.0,
+   "niveau": "critique",
+   "unit_id": "u3",
+   "bac_frequent": true
+  },
+  {
+   "id": "mc_enz_05",
+   "titre": "تثبيط الإنزيم",
+   "phrase_cle": "بروتين محفز يسرع تفاعل كيميائي حيوي نوعي دون أن يُستهلك بخفض طاقة التنشيط",
+   "erreur_frequente": "خلط تثبيط الإنزيم بمفهوم مشابه أو نسيان الشروط — خطأ شائع في البكالوريا",
+   "mnemo": "راجع: Inhibition enzymatique",
+   "points_bac": 0.5,
+   "niveau": "moyen",
+   "unit_id": "u3",
+   "bac_frequent": false
+  },
+  {
+   "id": "mc_imm_01",
+   "titre": "الخلايا الليمفاوية B",
+   "phrase_cle": "الخلايا الليمفاوية B",
+   "erreur_frequente": "خلط الخلايا الليمفاوية B بمفهوم مشابه أو نسيان الشروط — خطأ شائع في البكالوريا",
+   "mnemo": "راجع: Lymphocytes B",
+   "points_bac": 1.0,
+   "niveau": "critique",
+   "unit_id": "u4",
+   "bac_frequent": true
+  },
+  {
+   "id": "mc_imm_02",
+   "titre": "الخلايا الليمفاوية T",
+   "phrase_cle": "الخلايا الليمفاوية T",
+   "erreur_frequente": "خلط الخلايا الليمفاوية T بمفهوم مشابه أو نسيان الشروط — خطأ شائع في البكالوريا",
+   "mnemo": "راجع: Lymphocytes T",
+   "points_bac": 1.0,
+   "niveau": "critique",
+   "unit_id": "u4",
+   "bac_frequent": true
+  },
+  {
+   "id": "mc_imm_03",
+   "titre": "الأجسام المضادة والمستضدات",
+   "phrase_cle": "كل مادة غريبة عن الجسم قادرة على إثارة استجابة مناعية بالارتباط النوعي مع جسم مضاد أو مستقبل لمفاوي",
+   "erreur_frequente": "خلط الأجسام المضادة والمستضدات بمفهوم مشابه أو نسيان الشروط — خطأ شائع في البكالوريا",
+   "mnemo": "راجع: Anticorps et antigènes",
+   "points_bac": 1.0,
+   "niveau": "critique",
+   "unit_id": "u4",
+   "bac_frequent": true
+  },
+  {
+   "id": "mc_imm_04",
+   "titre": "الاستجابة المناعية الخلطية",
+   "phrase_cle": "الاستجابة المناعية الخلطية",
+   "erreur_frequente": "خلط الاستجابة المناعية الخلطية بمفهوم مشابه أو نسيان الشروط — خطأ شائع في البكالوريا",
+   "mnemo": "راجع: Réponse immunitaire humorale",
+   "points_bac": 0.5,
+   "niveau": "moyen",
+   "unit_id": "u4",
+   "bac_frequent": true
+  },
+  {
+   "id": "mc_imm_05",
+   "titre": "الاستجابة المناعية الخلوية",
+   "phrase_cle": "الاستجابة المناعية الخلوية",
+   "erreur_frequente": "خلط الاستجابة المناعية الخلوية بمفهوم مشابه أو نسيان الشروط — خطأ شائع في البكالوريا",
+   "mnemo": "راجع: Réponse immunitaire cellulaire",
+   "points_bac": 0.5,
+   "niveau": "moyen",
+   "unit_id": "u4",
+   "bac_frequent": true
+  },
+  {
+   "id": "mc_imm_06",
+   "titre": "الذاكرة المناعية",
+   "phrase_cle": "الذاكرة المناعية",
+   "erreur_frequente": "خلط الذاكرة المناعية بمفهوم مشابه أو نسيان الشروط — خطأ شائع في البكالوريا",
+   "mnemo": "راجع: Mémoire immunitaire",
+   "points_bac": 0.5,
+   "niveau": "moyen",
+   "unit_id": "u4",
+   "bac_frequent": true
+  },
+  {
+   "id": "mc_nerv_01",
+   "titre": "كمون الراحة",
+   "phrase_cle": "فرق كمون الغشاء حوالي -70 ملڤولت لعصبون غير منبه، يثبت بمضخات Na+/K+ والقنوات الأيونية",
+   "erreur_frequente": "خلط كمون الراحة بمفهوم مشابه أو نسيان الشروط — خطأ شائع في البكالوريا",
+   "mnemo": "راجع: Potentiel de repos",
+   "points_bac": 1.0,
+   "niveau": "critique",
+   "unit_id": "u5",
+   "bac_frequent": true
+  },
+  {
+   "id": "mc_nerv_02",
+   "titre": "كمون العمل",
+   "phrase_cle": "زوال استقطاب سريع وقصير للغشاء العصبي ناتج عن دخول جماعي لـ Na+ يتبعه خروج K+، مما يسمح بانتشار الرسالة العصبية",
+   "erreur_frequente": "خلط كمون العمل بمفهوم مشابه أو نسيان الشروط — خطأ شائع في البكالوريا",
+   "mnemo": "راجع: Potentiel d'action",
+   "points_bac": 1.0,
+   "niveau": "critique",
+   "unit_id": "u5",
+   "bac_frequent": true
+  },
+  {
+   "id": "mc_nerv_03",
+   "titre": "المشبك الكيميائي",
+   "phrase_cle": "منطقة التماس الوظيفي بين عصبونين أو بين عصبون وخلية منفذة تسمح بنقل الرسالة العصبية",
+   "erreur_frequente": "خلط المشبك الكيميائي بمفهوم مشابه أو نسيان الشروط — خطأ شائع في البكالوريا",
+   "mnemo": "راجع: Synapse chimique",
+   "points_bac": 1.0,
+   "niveau": "critique",
+   "unit_id": "u5",
+   "bac_frequent": true
+  },
+  {
+   "id": "mc_nerv_04",
+   "titre": "النواقل العصبية",
+   "phrase_cle": "النواقل العصبية",
+   "erreur_frequente": "خلط النواقل العصبية بمفهوم مشابه أو نسيان الشروط — خطأ شائع في البكالوريا",
+   "mnemo": "راجع: Neurotransmetteurs",
+   "points_bac": 0.5,
+   "niveau": "moyen",
+   "unit_id": "u5",
+   "bac_frequent": true
+  },
+  {
+   "id": "mc_photo_01",
+   "titre": "البلاستيدات الخضراء والثايلاكويدات",
+   "phrase_cle": "البلاستيدات الخضراء والثايلاكويدات",
+   "erreur_frequente": "خلط البلاستيدات الخضراء والثايلاكويدات بمفهوم مشابه أو نسيان الشروط — خطأ شائع في البكالوريا",
+   "mnemo": "راجع: Chloroplaste et thylakoïdes",
+   "points_bac": 1.0,
+   "niveau": "critique",
+   "unit_id": "u6",
+   "bac_frequent": true
+  },
+  {
+   "id": "mc_photo_02",
+   "titre": "المرحلة الضوئية",
+   "phrase_cle": "المرحلة الضوئية",
+   "erreur_frequente": "خلط المرحلة الضوئية بمفهوم مشابه أو نسيان الشروط — خطأ شائع في البكالوريا",
+   "mnemo": "راجع: Phase photochimique (lumineuse)",
+   "points_bac": 1.0,
+   "niveau": "critique",
+   "unit_id": "u6",
+   "bac_frequent": true
+  },
+  {
+   "id": "mc_photo_03",
+   "titre": "دورة كالفن",
+   "phrase_cle": "تفاعلات كيميائية حيوية في حشوة الصانعة الخضراء تثبت CO2 على RuBP لتخليق سكريات، تستخدم ATP و NADPH من الطور الضوئي",
+   "erreur_frequente": "خلط دورة كالفن بمفهوم مشابه أو نسيان الشروط — خطأ شائع في البكالوريا",
+   "mnemo": "راجع: Cycle de Calvin (phase obscure)",
+   "points_bac": 1.0,
+   "niveau": "critique",
+   "unit_id": "u6",
+   "bac_frequent": true
+  },
+  {
+   "id": "mc_photo_04",
+   "titre": "العوامل المؤثرة على التركيب الضوئي",
+   "phrase_cle": "العوامل المؤثرة على التركيب الضوئي",
+   "erreur_frequente": "خلط العوامل المؤثرة على التركيب الضوئي بمفهوم مشابه أو نسيان الشروط — خطأ شائع في البكالوريا",
+   "mnemo": "راجع: Facteurs influençant la photosynthèse",
+   "points_bac": 0.5,
+   "niveau": "moyen",
+   "unit_id": "u6",
+   "bac_frequent": true
+  },
+  {
+   "id": "mc_resp_01",
+   "titre": "الميتوكوندريا",
+   "phrase_cle": "الميتوكوندريا",
+   "erreur_frequente": "خلط الميتوكوندريا بمفهوم مشابه أو نسيان الشروط — خطأ شائع في البكالوريا",
+   "mnemo": "راجع: Mitochondrie",
+   "points_bac": 1.0,
+   "niveau": "critique",
+   "unit_id": "u7",
+   "bac_frequent": true
+  },
+  {
+   "id": "mc_resp_02",
+   "titre": "الجليكوليز",
+   "phrase_cle": "الجليكوليز",
+   "erreur_frequente": "خلط الجليكوليز بمفهوم مشابه أو نسيان الشروط — خطأ شائع في البكالوريا",
+   "mnemo": "راجع: Glycolyse",
+   "points_bac": 0.5,
+   "niveau": "moyen",
+   "unit_id": "u7",
+   "bac_frequent": true
+  },
+  {
+   "id": "mc_resp_03",
+   "titre": "دورة كربس",
+   "phrase_cle": "دورة كربس",
+   "erreur_frequente": "خلط دورة كربس بمفهوم مشابه أو نسيان الشروط — خطأ شائع في البكالوريا",
+   "mnemo": "راجع: Cycle de Krebs",
+   "points_bac": 1.0,
+   "niveau": "critique",
+   "unit_id": "u7",
+   "bac_frequent": true
+  },
+  {
+   "id": "mc_resp_04",
+   "titre": "سلسلة التنفس والفسفرة التأكسدية",
+   "phrase_cle": "تركيب ATP المقترن بالسلسلة التنفسية حيث تؤكسدة NADH و FADH2 تولد تدرجاً بروتونياً يستخدمه ATP سنتاز",
+   "erreur_frequente": "خلط سلسلة التنفس والفسفرة التأكسدية بمفهوم مشابه أو نسيان الشروط — خطأ شائع في البكالوريا",
+   "mnemo": "راجع: Chaîne respiratoire et phosphorylation oxydative",
+   "points_bac": 1.0,
+   "niveau": "critique",
+   "unit_id": "u7",
+   "bac_frequent": true
+  },
+  {
+   "id": "mc_resp_05",
+   "titre": "التخمر",
+   "phrase_cle": "عملية لاهوائية للهدم الجزئي للغلوكوز بواسطة الخمائر تنتج الإيثانول و CO2 و 2 ATP لكل غلوكوز",
+   "erreur_frequente": "خلط التخمر بمفهوم مشابه أو نسيان الشروط — خطأ شائع في البكالوريا",
+   "mnemo": "راجع: Fermentation (lactique et alcoolique)",
+   "points_bac": 0.5,
+   "niveau": "moyen",
+   "unit_id": "u7",
+   "bac_frequent": true
+  },
+  {
+   "id": "mc_resp_06",
+   "titre": "ناقلات الإلكترونات NAD⁺/NADH و FAD/FADH₂",
+   "phrase_cle": "نيكوتيناميد أدنين ثنائي النوكليوتيد المرجع، مرافق ناقل للإلكترونات ينتج في التحلل السكري ونزع الكربوكسيل ودورة كريبس",
+   "erreur_frequente": "خلط ناقلات الإلكترونات NAD⁺/NADH و FAD/FADH₂ بمفهوم مشابه أو نسيان الشروط — خطأ شائع في البكالوريا",
+   "mnemo": "راجع: NAD⁺/NADH et FAD/FADH₂ (transporteurs d'électrons)",
+   "points_bac": 0.5,
+   "niveau": "moyen",
+   "unit_id": "u7",
+   "bac_frequent": true
+  },
+  {
+   "id": "mc_resp_07",
+   "titre": "حصيلة ATP لدورة كربس",
+   "phrase_cle": "أدينوزين ثلاثي الفوسفات، جزيء الطاقة العام للكائنات الحية، يحرر الطاقة بالتحلل المائي إلى ADP + Pi",
+   "erreur_frequente": "خلط حصيلة ATP لدورة كربس بمفهوم مشابه أو نسيان الشروط — خطأ شائع في البكالوريا",
+   "mnemo": "راجع: Bilan ATP du cycle de Krebs",
+   "points_bac": 0.5,
+   "niveau": "moyen",
+   "unit_id": "u7",
+   "bac_frequent": true
+  },
+  {
+   "id": "mc_bilan_01",
+   "titre": "العلاقة بين التركيب الضوئي والتنفس الخلوي",
+   "phrase_cle": "عملية هوائية للهدم الكامل للغلوكوز إلى CO2 و H2O تنتج 36-38 ATP لكل غلوكوز",
+   "erreur_frequente": "خلط العلاقة بين التركيب الضوئي والتنفس الخلوي بمفهوم مشابه أو نسيان الشروط — خطأ شائع في البكالوريا",
+   "mnemo": "راجع: Relation entre photosynthèse et respiration",
+   "points_bac": 1.0,
+   "niveau": "critique",
+   "unit_id": "u8",
+   "bac_frequent": true
+  },
+  {
+   "id": "mc_bilan_02",
+   "titre": "الحصيلة الطاقوية المقارنة الشاملة",
+   "phrase_cle": "الكمية الإجمالية لـ ATP المنتجة من الهدم الكامل لجزيء غلوكوز، تختلف حسب المسار الأيضي",
+   "erreur_frequente": "خلط الحصيلة الطاقوية المقارنة الشاملة بمفهوم مشابه أو نسيان الشروط — خطأ شائع في البكالوريا",
+   "mnemo": "راجع: Bilan énergétique global comparé",
+   "points_bac": 1.0,
+   "niveau": "critique",
+   "unit_id": "u8",
+   "bac_frequent": true
+  },
+  {
+   "id": "mc_bilan_03",
+   "titre": "تدفق الطاقة في النظام البيئي",
+   "phrase_cle": "تدفق الطاقة في النظام البيئي",
+   "erreur_frequente": "خلط تدفق الطاقة في النظام البيئي بمفهوم مشابه أو نسيان الشروط — خطأ شائع في البكالوريا",
+   "mnemo": "راجع: Flux de l'énergie dans l'écosystème",
+   "points_bac": 0.5,
+   "niveau": "moyen",
+   "unit_id": "u8",
+   "bac_frequent": true
+  },
+  {
+   "id": "mc_bilan_04",
+   "titre": "التوازن الطاقوي الخلوي",
+   "phrase_cle": "التوازن الطاقوي الخلوي",
+   "erreur_frequente": "خلط التوازن الطاقوي الخلوي بمفهوم مشابه أو نسيان الشروط — خطأ شائع في البكالوريا",
+   "mnemo": "راجع: Équilibre énergétique cellulaire (production vs consommation",
+   "points_bac": 0.5,
+   "niveau": "moyen",
+   "unit_id": "u8",
+   "bac_frequent": true
+  },
+  {
+   "id": "mc_tec_01",
+   "titre": "تحديد الصفائح التكتونية",
+   "phrase_cle": "تحديد الصفائح التكتونية",
+   "erreur_frequente": "خلط تحديد الصفائح التكتونية بمفهوم مشابه أو نسيان الشروط — خطأ شائع في البكالوريا",
+   "mnemo": "راجع: Identification des plaques tectoniques",
+   "points_bac": 1.0,
+   "niveau": "critique",
+   "unit_id": "u9",
+   "bac_frequent": true
+  },
+  {
+   "id": "mc_tec_02",
+   "titre": "أنواع حركات الصفائح",
+   "phrase_cle": "أنواع حركات الصفائح",
+   "erreur_frequente": "خلط أنواع حركات الصفائح بمفهوم مشابه أو نسيان الشروط — خطأ شائع في البكالوريا",
+   "mnemo": "راجع: Types de mouvements de plaques (divergence, convergence, cou",
+   "points_bac": 1.0,
+   "niveau": "critique",
+   "unit_id": "u9",
+   "bac_frequent": true
+  },
+  {
+   "id": "mc_tec_03",
+   "titre": "الأدلة على حركة الصفائح",
+   "phrase_cle": "الأدلة على حركة الصفائح",
+   "erreur_frequente": "خلط الأدلة على حركة الصفائح بمفهوم مشابه أو نسيان الشروط — خطأ شائع في البكالوريا",
+   "mnemo": "راجع: Preuves de la dérive des continents",
+   "points_bac": 0.5,
+   "niveau": "moyen",
+   "unit_id": "u9",
+   "bac_frequent": true
+  },
+  {
+   "id": "mc_tec_04",
+   "titre": "الطاقة الداخلية للكرة الأرضية",
+   "phrase_cle": "الطاقة الداخلية للكرة الأرضية",
+   "erreur_frequente": "خلط الطاقة الداخلية للكرة الأرضية بمفهوم مشابه أو نسيان الشروط — خطأ شائع في البكالوريا",
+   "mnemo": "راجع: Énergie interne de la Terre",
+   "points_bac": 0.5,
+   "niveau": "moyen",
+   "unit_id": "u9",
+   "bac_frequent": true
+  },
+  {
+   "id": "mc_tec_05",
+   "titre": "محركات حركة الصفائح",
+   "phrase_cle": "محركات حركة الصفائح",
+   "erreur_frequente": "خلط محركات حركة الصفائح بمفهوم مشابه أو نسيان الشروط — خطأ شائع في البكالوريا",
+   "mnemo": "راجع: Moteurs des mouvements tectoniques",
+   "points_bac": 0.5,
+   "niveau": "moyen",
+   "unit_id": "u9",
+   "bac_frequent": true
+  },
+  {
+   "id": "mc_struc_terre_01",
+   "titre": "الموجات الزلزالية وأنواعها",
+   "phrase_cle": "اهتزاز أرضي ناتج عن تحرر مفاجئ للطاقة المتراكمة على طول الصدوع، خاصة عند حدود الصفائح",
+   "erreur_frequente": "خلط الموجات الزلزالية وأنواعها بمفهوم مشابه أو نسيان الشروط — خطأ شائع في البكالوريا",
+   "mnemo": "راجع: Ondes sismiques (P, S, L) et leurs propriétés",
+   "points_bac": 1.0,
+   "niveau": "critique",
+   "unit_id": "u10",
+   "bac_frequent": true
+  },
+  {
+   "id": "mc_struc_terre_02",
+   "titre": "انتشار الموجات الزلزالية في باطن الأرض",
+   "phrase_cle": "اهتزاز أرضي ناتج عن تحرر مفاجئ للطاقة المتراكمة على طول الصدوع، خاصة عند حدود الصفائح",
+   "erreur_frequente": "خلط انتشار الموجات الزلزالية في باطن الأرض بمفهوم مشابه أو نسيان الشروط — خطأ شائع في البكالوريا",
+   "mnemo": "راجع: Propagation des ondes sismiques dans les couches terrestres",
+   "points_bac": 1.0,
+   "niveau": "critique",
+   "unit_id": "u10",
+   "bac_frequent": true
+  },
+  {
+   "id": "mc_struc_terre_03",
+   "titre": "نمذجة البنية الداخلية للكرة الأرضية",
+   "phrase_cle": "نمذجة البنية الداخلية للكرة الأرضية",
+   "erreur_frequente": "خلط نمذجة البنية الداخلية للكرة الأرضية بمفهوم مشابه أو نسيان الشروط — خطأ شائع في البكالوريا",
+   "mnemo": "راجع: Modélisation de la structure interne (discontinuités)",
+   "points_bac": 0.5,
+   "niveau": "moyen",
+   "unit_id": "u10",
+   "bac_frequent": true
+  },
+  {
+   "id": "mc_struc_terre_04",
+   "titre": "التركيب الكيميائي والمعدني للطبقات",
+   "phrase_cle": "التركيب الكيميائي والمعدني للطبقات",
+   "erreur_frequente": "خلط التركيب الكيميائي والمعدني للطبقات بمفهوم مشابه أو نسيان الشروط — خطأ شائع في البكالوريا",
+   "mnemo": "راجع: Composition chimique et minérale des couches",
+   "points_bac": 0.5,
+   "niveau": "moyen",
+   "unit_id": "u10",
+   "bac_frequent": true
+  },
+  {
+   "id": "mc_geo_01",
+   "titre": "الظهرات وسط المحيطية وبناء اللوح المحيطي",
+   "phrase_cle": "الظهرات وسط المحيطية وبناء اللوح المحيطي",
+   "erreur_frequente": "خلط الظهرات وسط المحيطية وبناء اللوح المحيطي بمفهوم مشابه أو نسيان الشروط — خطأ شائع في البكالوريا",
+   "mnemo": "راجع: Dorsales océaniques et formation de la croûte",
+   "points_bac": 1.0,
+   "niveau": "critique",
+   "unit_id": "u11",
+   "bac_frequent": true
+  },
+  {
+   "id": "mc_geo_02",
+   "titre": "الغوص واختفاء اللوح المحيطي",
+   "phrase_cle": "عملية تغوص بموجبها صفيحة محيطية تحت صفيحة أخرى في منطقة تقارب، مكونة خندقاً محيطياً",
+   "erreur_frequente": "خلط الغوص واختفاء اللوح المحيطي بمفهوم مشابه أو نسيان الشروط — خطأ شائع في البكالوريا",
+   "mnemo": "راجع: Subduction et disparition de la croûte océanique",
+   "points_bac": 1.0,
+   "niveau": "critique",
+   "unit_id": "u11",
+   "bac_frequent": true
+  },
+  {
+   "id": "mc_geo_03",
+   "titre": "التصادم القاري وبناء السلاسل الجبلية",
+   "phrase_cle": "لقاء غلافين صخريين قاريين بعد غوص الغلاف الصخري المحيطي، مشكلاً سلسلة جبلية",
+   "erreur_frequente": "خلط التصادم القاري وبناء السلاسل الجبلية بمفهوم مشابه أو نسيان الشروط — خطأ شائع في البكالوريا",
+   "mnemo": "راجع: Collision continentale et chaînes alpines",
+   "points_bac": 1.0,
+   "niveau": "critique",
+   "unit_id": "u11",
+   "bac_frequent": true
+  },
+  {
+   "id": "mc_geo_04",
+   "titre": "الأوفيوليت — شواهد محيط قديم",
+   "phrase_cle": "الأوفيوليت — شواهد محيط قديم",
+   "erreur_frequente": "خلط الأوفيوليت — شواهد محيط قديم بمفهوم مشابه أو نسيان الشروط — خطأ شائع في البكالوريا",
+   "mnemo": "راجع: Ophiolites — témoins d'un ancien océan",
+   "points_bac": 0.5,
+   "niveau": "moyen",
+   "unit_id": "u11",
+   "bac_frequent": true
+  },
+  {
+   "id": "mc_geo_05",
+   "titre": "دورة ويلسون الكاملة",
+   "phrase_cle": "دورة ويلسون الكاملة",
+   "erreur_frequente": "خلط دورة ويلسون الكاملة بمفهوم مشابه أو نسيان الشروط — خطأ شائع في البكالوريا",
+   "mnemo": "راجع: Cycle de Wilson complet",
+   "points_bac": 0.5,
+   "niveau": "moyen",
+   "unit_id": "u11",
+   "bac_frequent": true
+  }
+ ],
+ "unites": [
+  {
+   "unit_id": "u1",
+   "titre_fr": "تركيب البروتين",
+   "titre_ar": "تركيب البروتين",
+   "position": 1,
+   "mc_count": 8
+  },
+  {
+   "unit_id": "u2",
+   "titre_fr": "العلاقة بين بنية ووظيفة البروتين",
+   "titre_ar": "العلاقة بين بنية ووظيفة البروتين",
+   "position": 2,
+   "mc_count": 5
+  },
+  {
+   "unit_id": "u3",
+   "titre_fr": "النشاط الإنزيمي للبروتينات",
+   "titre_ar": "النشاط الإنزيمي للبروتينات",
+   "position": 3,
+   "mc_count": 5
+  },
+  {
+   "unit_id": "u4",
+   "titre_fr": "دور البروتينات في الدفاع عن الذات",
+   "titre_ar": "دور البروتينات في الدفاع عن الذات",
+   "position": 4,
+   "mc_count": 6
+  },
+  {
+   "unit_id": "u5",
+   "titre_fr": "دور البروتينات في الاتصال العصبي",
+   "titre_ar": "دور البروتينات في الاتصال العصبي",
+   "position": 5,
+   "mc_count": 4
+  },
+  {
+   "unit_id": "u6",
+   "titre_fr": "آليات تحويل الطاقة الضوئية إلى طاقة كيميائية كامنة",
+   "titre_ar": "آليات تحويل الطاقة الضوئية إلى طاقة كيميائية كامنة",
+   "position": 6,
+   "mc_count": 4
+  },
+  {
+   "unit_id": "u7",
+   "titre_fr": "آليات تحويل الطاقة الكيميائية الكامنة في الجزيئات العضوية إلى ATP",
+   "titre_ar": "آليات تحويل الطاقة الكيميائية الكامنة في الجزيئات العضوية إلى ATP",
+   "position": 7,
+   "mc_count": 7
+  },
+  {
+   "unit_id": "u8",
+   "titre_fr": "تحويل الطاقة على المستوى ما فوق البنية الخلوية",
+   "titre_ar": "تحويل الطاقة على المستوى ما فوق البنية الخلوية",
+   "position": 8,
+   "mc_count": 4
+  },
+  {
+   "unit_id": "u9",
+   "titre_fr": "النشاط التكتوني للصفائح",
+   "titre_ar": "النشاط التكتوني للصفائح",
+   "position": 9,
+   "mc_count": 5
+  },
+  {
+   "unit_id": "u10",
+   "titre_fr": "بنية الكرة الأرضية",
+   "titre_ar": "بنية الكرة الأرضية",
+   "position": 10,
+   "mc_count": 4
+  },
+  {
+   "unit_id": "u11",
+   "titre_fr": "النشاط التكتوني والبنيات الجيولوجية المرتبطة به",
+   "titre_ar": "النشاط التكتوني والبنيات الجيولوجية المرتبطة به",
+   "position": 11,
+   "mc_count": 5
+  }
+ ],
+ "phrases_bac_clefs": [
+  "القاعدة الذهبية: **المحيطية تغوص دائماً تحت القارية** (كثافة أعلى).",
+  "**زلازل عميقة (>100 كم) = دليل أكيد على الغوص** (مستوى بينيوف).",
+  "الأشرطة المغناطيسية المتناظرة = الأدلة الأقوى على حركة الصفائح وتوسع قاع المحيط.",
+  "في المقطع التخطيطي: ضع دائماً أسهم الاتجاه + مقياس الأعماق + تسمية البنيات (ظهرة/خندق/فالق).",
+  "اربط كل حدّ بظواهره: ظهرة⇒بازلت هادئ؛ خندق⇒أنديزيت انفجاري؛ فالق⇒زلازل فقط؛ تصادم⇒جبال فقط.",
+  "تذكّر: قعر المحيط حديث (≤ ~180 م.س) بينما القارات يتجاوز عمرها 3 مليارات سنة.",
+  "احفظ سلسلة الانقطاعات بأعماقها: **موهو (القشرة) → غوتنبرغ 2900 ← ليمان 5100**.",
+  "**S تتوقف = سائل**: أي انعدام لـ S دليل سيولة — أهم استنتاج في الوحدة.",
+  "فارق (S − P) ∝ المسافة عن المركز السطحي — جاهز دائماً في تمارين السيزموغرامات.",
+  "ميّز بدقة: سيال **غرانيت**(قاري) / سيما **بازلت-غابرو**(محيطي) / **بيريدوتيت**(برنس).",
+  "عند «فسّر + استنتج»: اربط دوماً سلوكاً زلزالياً بخاصية فيزيائية (حالة الوسط، كثافة).",
+  "لا تنسَ النيازك الحديدية كنموذج مرجعي لتركيب النواة (Fe–Ni).",
+  "ثلاثية يجب حفظها تلقائياً: **ظهرة⇒(بازلت/غابرو) | غوص⇒(أنديزيت/غرانوديوريت) | تصادم⇒(طيات+انجرافات، بلا ماغما)**.",
+  "**الأوفيوليت = شاهد محيط قديم** — سؤال متكرر في كل الدورات تقريباً.",
+  "الماء المُفلَت من اللوح الغائص ⇒ خفض درجة انصهار البيريدوتيت ⇒ مفتاح كل مغماتية الغوص.",
+  "في تمرين «رتّب المراحل»: دائماً تباعد ← غوص ← تصادم.",
+  "نسيج الصخر يُشخّص موضعه: ميكروليتي=سطحي سريع / حبيبي=عميق بطيء.",
+  "لا تنس أن السلسلة المغاربية/الألبية من نتائج **غلق تيثيس** — اربط تمرين الرحلة دوماً بالخرائط."
+ ],
+ "erreurs_graves": [
+  "لا تنسَ النيازك الحديدية كنموذج مرجعي لتركيب النواة (Fe–Ni).",
+  "لا تنس أن السلسلة المغاربية/الألبية من نتائج **غلق تيثيس** — اربط تمرين الرحلة دوماً بالخرائط."
+ ]
+}

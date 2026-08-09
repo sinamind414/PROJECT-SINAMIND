@@ -54,6 +54,16 @@ async def get_semantic_cache(message: str, chapitre: str) -> dict | None:
     if not s.redis:
         return None
 
+    # C4-gate (audit) : si l'embedder est en fallback (vecteurs = bruit),
+    # la similarité cosinus servirait de mauvaises réponses → cache désactivé.
+    try:
+        from services.embedder import get_embedder
+
+        if not bool(getattr(get_embedder(), "is_semantic", False)):
+            return None
+    except Exception:
+        return None
+
     try:
         embedder = _get_embedder()
         query_emb = embedder.encode([message])[0]

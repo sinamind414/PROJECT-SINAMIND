@@ -2,8 +2,7 @@
 Modèle UserGems — solde de gemmes de l'utilisateur.
 """
 
-import uuid
-from sqlalchemy import Column, DateTime, Integer, ForeignKey, String, func, text
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, func, text
 from sqlalchemy.dialects.postgresql import UUID
 
 from database import Base

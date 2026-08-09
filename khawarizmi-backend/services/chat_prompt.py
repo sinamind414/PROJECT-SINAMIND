@@ -14,6 +14,7 @@ Règles globales :
 """
 
 from services.chat_classifier import detect_language
+from services.pedagogical import PEDAGOGICAL_STABILITY_THRESHOLD
 
 # ═══════════════════════════════════════════════════════════════
 # IDENTITÉ CORE — الأستاذ خوارزمي
@@ -153,7 +154,8 @@ def _format_fsrs_context(context: dict) -> str:
 
     lines = []
     if stability is not None:
-        if stability < 3.0:
+        # Seuil partagé avec la clé de cache chatbot (services/pedagogical.py)
+        if stability < PEDAGOGICAL_STABILITY_THRESHOLD:
             lines.append(f"⚠️ stability = {stability:.1f} → مفهوم ضعيف جداً، يحتاج شرح مبسّط + تشبيه")
         elif stability < 5.0:
             lines.append(f"📉 stability = {stability:.1f} → يحتاج تعزيز")

@@ -74,11 +74,17 @@ async def get_current_user(
         raise credentials_exception
 
     try:
+        # verify_sub=False : les tokens existants portent sub en int (python-jose
+        # exigerait une chaîne). La validation de sub est faite manuellement ci-dessous.
         payload = jwt.decode(token, cfg.SECRET_KEY, algorithms=[cfg.JWT_ALGORITHM], options={"verify_sub": False})
-        user_id: int = int(payload.get("sub"))
+        raw_sub = payload.get("sub")
+        # sub absent, non-numérique ou nul → 401 propre (pas de 500 TypeError)
+        if raw_sub is None:
+            raise credentials_exception
+        user_id = int(raw_sub)
         if not user_id:
             raise credentials_exception
-    except JWTError:
+    except (JWTError, TypeError, ValueError):
         raise credentials_exception
 
     result = await db.execute(

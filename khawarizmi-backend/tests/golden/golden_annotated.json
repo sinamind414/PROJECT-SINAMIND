@@ -1,0 +1,3662 @@
+{
+  "metadata": {
+    "source": "golden_set_onec.json (ONEC Bac SVT)",
+    "annotation_type": "synthetic_keyword_based",
+    "annotator": "synthetic_keyword_v1",
+    "date": "2026-08-07",
+    "note": "Approche B — remplacer par annotations expert_svt (même format) quand disponible"
+  },
+  "items": [
+    {
+      "question_id": "gs_001",
+      "verb_slug": "restitution",
+      "chapitre": "Synthèse des protéines",
+      "question": "أين يحدث نسخ المعلومة الوراثية في الخلية حقيقية النواة؟",
+      "student_answer": "يحدث نسخ المعلومة الوراثية في النواة حيث تتواجد جزيئة ADN",
+      "bareme": 2,
+      "reponse_attendue": "يحدث نسخ المعلومة الوراثية في النواة حيث تتواجد جزيئة ADN",
+      "mots_cles_attendus": [
+        "النواة",
+        "ADN",
+        "نسخ"
+      ],
+      "human_score": 2,
+      "human_score_max": 2,
+      "human_dominant_error": "all_correct",
+      "human_matched_criteria": [
+        "النواة",
+        "ADN",
+        "نسخ"
+      ],
+      "human_unmatched_criteria": [],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_001",
+      "verb_slug": "restitution",
+      "chapitre": "Synthèse des protéines",
+      "question": "أين يحدث نسخ المعلومة الوراثية في الخلية حقيقية النواة؟",
+      "student_answer": "يحدث نسخ المعلومة الوراثية في",
+      "bareme": 2,
+      "reponse_attendue": "يحدث نسخ المعلومة الوراثية في النواة حيث تتواجد جزيئة ADN",
+      "mots_cles_attendus": [
+        "النواة",
+        "ADN",
+        "نسخ"
+      ],
+      "human_score": 1,
+      "human_score_max": 2,
+      "human_dominant_error": "partial_correct",
+      "human_matched_criteria": [
+        "نسخ"
+      ],
+      "human_unmatched_criteria": [
+        "النواة",
+        "ADN"
+      ],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_001",
+      "verb_slug": "restitution",
+      "chapitre": "Synthèse des protéines",
+      "question": "أين يحدث نسخ المعلومة الوراثية في الخلية حقيقية النواة؟",
+      "student_answer": "",
+      "bareme": 2,
+      "reponse_attendue": "يحدث نسخ المعلومة الوراثية في النواة حيث تتواجد جزيئة ADN",
+      "mots_cles_attendus": [
+        "النواة",
+        "ADN",
+        "نسخ"
+      ],
+      "human_score": 0,
+      "human_score_max": 2,
+      "human_dominant_error": "empty",
+      "human_matched_criteria": [],
+      "human_unmatched_criteria": [
+        "النواة",
+        "ADN",
+        "نسخ"
+      ],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_002",
+      "verb_slug": "restitution",
+      "chapitre": "Synthèse des protéines",
+      "question": "ما هو دور الرنا الرسول (ARNm) في تركيب البروتينات؟",
+      "student_answer": "ينقل الرنا الرسول نسخة من المعلومة الوراثية من ADN الموجود في النواة إلى الريبوزوم في الهيولى حيث تتم ترجمة هذه المعلومة لتركيب البروتين",
+      "bareme": 3,
+      "reponse_attendue": "ينقل الرنا الرسول نسخة من المعلومة الوراثية من ADN الموجود في النواة إلى الريبوزوم في الهيولى حيث تتم ترجمة هذه المعلومة لتركيب البروتين",
+      "mots_cles_attendus": [
+        "نقل",
+        "معلومة",
+        "الريبوزوم",
+        "الهيولى"
+      ],
+      "human_score": 3,
+      "human_score_max": 3,
+      "human_dominant_error": "all_correct",
+      "human_matched_criteria": [
+        "نقل",
+        "معلومة",
+        "الريبوزوم",
+        "الهيولى"
+      ],
+      "human_unmatched_criteria": [],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_002",
+      "verb_slug": "restitution",
+      "chapitre": "Synthèse des protéines",
+      "question": "ما هو دور الرنا الرسول (ARNm) في تركيب البروتينات؟",
+      "student_answer": "ينقل الرنا الرسول نسخة من المعلومة الوراثية من ADN الموجود في النواة إلى",
+      "bareme": 3,
+      "reponse_attendue": "ينقل الرنا الرسول نسخة من المعلومة الوراثية من ADN الموجود في النواة إلى الريبوزوم في الهيولى حيث تتم ترجمة هذه المعلومة لتركيب البروتين",
+      "mots_cles_attendus": [
+        "نقل",
+        "معلومة",
+        "الريبوزوم",
+        "الهيولى"
+      ],
+      "human_score": 2,
+      "human_score_max": 3,
+      "human_dominant_error": "partial_correct",
+      "human_matched_criteria": [
+        "نقل",
+        "معلومة"
+      ],
+      "human_unmatched_criteria": [
+        "الريبوزوم",
+        "الهيولى"
+      ],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_003",
+      "verb_slug": "restitution",
+      "chapitre": "Synthèse des protéines",
+      "question": "ما هي الشفرة الوراثية؟",
+      "student_answer": "الشفرة الوراثية هي مجموعة القواعد الثلاثية المتتالية (الكودونات) في جزيئة ARNm التي تحدد نوع الأحماض الأمينية في البروتين المراد تركيبه",
+      "bareme": 3,
+      "reponse_attendue": "الشفرة الوراثية هي مجموعة القواعد الثلاثية المتتالية (الكودونات) في جزيئة ARNm التي تحدد نوع الأحماض الأمينية في البروتين المراد تركيبه",
+      "mots_cles_attendus": [
+        "كودونات",
+        "قواعد",
+        "ثلاثية",
+        "أحماض أمينية"
+      ],
+      "human_score": 3,
+      "human_score_max": 3,
+      "human_dominant_error": "all_correct",
+      "human_matched_criteria": [
+        "كودونات",
+        "قواعد",
+        "ثلاثية",
+        "أحماض أمينية"
+      ],
+      "human_unmatched_criteria": [],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_003",
+      "verb_slug": "restitution",
+      "chapitre": "Synthèse des protéines",
+      "question": "ما هي الشفرة الوراثية؟",
+      "student_answer": "الشفرة الوراثية هي مجموعة القواعد الثلاثية المتتالية (الكودونات) في جزيئة",
+      "bareme": 3,
+      "reponse_attendue": "الشفرة الوراثية هي مجموعة القواعد الثلاثية المتتالية (الكودونات) في جزيئة ARNm التي تحدد نوع الأحماض الأمينية في البروتين المراد تركيبه",
+      "mots_cles_attendus": [
+        "كودونات",
+        "قواعد",
+        "ثلاثية",
+        "أحماض أمينية"
+      ],
+      "human_score": 2,
+      "human_score_max": 3,
+      "human_dominant_error": "partial_correct",
+      "human_matched_criteria": [
+        "كودونات",
+        "قواعد",
+        "ثلاثية"
+      ],
+      "human_unmatched_criteria": [
+        "أحماض أمينية"
+      ],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_003",
+      "verb_slug": "restitution",
+      "chapitre": "Synthèse des protéines",
+      "question": "ما هي الشفرة الوراثية؟",
+      "student_answer": "",
+      "bareme": 3,
+      "reponse_attendue": "الشفرة الوراثية هي مجموعة القواعد الثلاثية المتتالية (الكودونات) في جزيئة ARNm التي تحدد نوع الأحماض الأمينية في البروتين المراد تركيبه",
+      "mots_cles_attendus": [
+        "كودونات",
+        "قواعد",
+        "ثلاثية",
+        "أحماض أمينية"
+      ],
+      "human_score": 0,
+      "human_score_max": 3,
+      "human_dominant_error": "empty",
+      "human_matched_criteria": [],
+      "human_unmatched_criteria": [
+        "كودونات",
+        "قواعد",
+        "ثلاثية",
+        "أحماض أمينية"
+      ],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_004",
+      "verb_slug": "application",
+      "chapitre": "Synthèse des protéines",
+      "question": "اشرح مراحل ترجمة ARNm إلى بروتين",
+      "student_answer": "ترجمة ARNm تمر بثلاث مراحل: 1- بدء الترجمة: ارتباط الوحدة الصغيرة للريبوزوم مع ARNm ثم ارتباط ARNt البادئ، 2- الاستطالة: إضافة الأحماض الأمينية المتتالية بواسطة ARNt حسب كودونات ARNm، 3- الإنهاء: عند الوصول لكودون التوقف ينفصل البروتين المركب",
+      "bareme": 5,
+      "reponse_attendue": "ترجمة ARNm تمر بثلاث مراحل: 1- بدء الترجمة: ارتباط الوحدة الصغيرة للريبوزوم مع ARNm ثم ارتباط ARNt البادئ، 2- الاستطالة: إضافة الأحماض الأمينية المتتالية بواسطة ARNt حسب كودونات ARNm، 3- الإنهاء: عند الوصول لكودون التوقف ينفصل البروتين المركب",
+      "mots_cles_attendus": [
+        "بدء",
+        "استطالة",
+        "إنهاء",
+        "ريبوزوم",
+        "ARNt",
+        "كودون"
+      ],
+      "human_score": 5,
+      "human_score_max": 5,
+      "human_dominant_error": "all_correct",
+      "human_matched_criteria": [
+        "بدء",
+        "استطالة",
+        "إنهاء",
+        "ريبوزوم",
+        "ARNt",
+        "كودون"
+      ],
+      "human_unmatched_criteria": [],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_004",
+      "verb_slug": "application",
+      "chapitre": "Synthèse des protéines",
+      "question": "اشرح مراحل ترجمة ARNm إلى بروتين",
+      "student_answer": "ترجمة ARNm تمر بثلاث مراحل: 1- بدء الترجمة: ارتباط الوحدة الصغيرة للريبوزوم مع ARNm ثم ارتباط ARNt البادئ، 2- الاستطالة: إضافة",
+      "bareme": 5,
+      "reponse_attendue": "ترجمة ARNm تمر بثلاث مراحل: 1- بدء الترجمة: ارتباط الوحدة الصغيرة للريبوزوم مع ARNm ثم ارتباط ARNt البادئ، 2- الاستطالة: إضافة الأحماض الأمينية المتتالية بواسطة ARNt حسب كودونات ARNm، 3- الإنهاء: عند الوصول لكودون التوقف ينفصل البروتين المركب",
+      "mots_cles_attendus": [
+        "بدء",
+        "استطالة",
+        "إنهاء",
+        "ريبوزوم",
+        "ARNt",
+        "كودون"
+      ],
+      "human_score": 3,
+      "human_score_max": 5,
+      "human_dominant_error": "partial_correct",
+      "human_matched_criteria": [
+        "بدء",
+        "استطالة",
+        "ريبوزوم",
+        "ARNt"
+      ],
+      "human_unmatched_criteria": [
+        "إنهاء",
+        "كودون"
+      ],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_005",
+      "verb_slug": "restitution",
+      "chapitre": "Synthèse des protéines",
+      "question": "ما هو دور ARN الناقل (ARNt)؟",
+      "student_answer": "ينقل ARNt الأحماض الأمينية المناسبة إلى الريبوزوم حسب الترميز الذي يحمله كل كودون في ARNm، وكل ARNt يحمل كودونا مضادا (anticodon) يطابق الكودون",
+      "bareme": 3,
+      "reponse_attendue": "ينقل ARNt الأحماض الأمينية المناسبة إلى الريبوزوم حسب الترميز الذي يحمله كل كودون في ARNm، وكل ARNt يحمل كودونا مضادا (anticodon) يطابق الكودون",
+      "mots_cles_attendus": [
+        "نقل",
+        "أحماض أمينية",
+        "كودون مضاد",
+        "anticodon"
+      ],
+      "human_score": 3,
+      "human_score_max": 3,
+      "human_dominant_error": "all_correct",
+      "human_matched_criteria": [
+        "نقل",
+        "أحماض أمينية",
+        "كودون مضاد",
+        "anticodon"
+      ],
+      "human_unmatched_criteria": [],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_005",
+      "verb_slug": "restitution",
+      "chapitre": "Synthèse des protéines",
+      "question": "ما هو دور ARN الناقل (ARNt)؟",
+      "student_answer": "ينقل ARNt الأحماض الأمينية المناسبة إلى الريبوزوم حسب الترميز الذي يحمله كل",
+      "bareme": 3,
+      "reponse_attendue": "ينقل ARNt الأحماض الأمينية المناسبة إلى الريبوزوم حسب الترميز الذي يحمله كل كودون في ARNm، وكل ARNt يحمل كودونا مضادا (anticodon) يطابق الكودون",
+      "mots_cles_attendus": [
+        "نقل",
+        "أحماض أمينية",
+        "كودون مضاد",
+        "anticodon"
+      ],
+      "human_score": 2,
+      "human_score_max": 3,
+      "human_dominant_error": "partial_correct",
+      "human_matched_criteria": [
+        "نقل",
+        "أحماض أمينية"
+      ],
+      "human_unmatched_criteria": [
+        "كودون مضاد",
+        "anticodon"
+      ],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_005",
+      "verb_slug": "restitution",
+      "chapitre": "Synthèse des protéines",
+      "question": "ما هو دور ARN الناقل (ARNt)؟",
+      "student_answer": "",
+      "bareme": 3,
+      "reponse_attendue": "ينقل ARNt الأحماض الأمينية المناسبة إلى الريبوزوم حسب الترميز الذي يحمله كل كودون في ARNm، وكل ARNt يحمل كودونا مضادا (anticodon) يطابق الكودون",
+      "mots_cles_attendus": [
+        "نقل",
+        "أحماض أمينية",
+        "كودون مضاد",
+        "anticodon"
+      ],
+      "human_score": 0,
+      "human_score_max": 3,
+      "human_dominant_error": "empty",
+      "human_matched_criteria": [],
+      "human_unmatched_criteria": [
+        "نقل",
+        "أحماض أمينية",
+        "كودون مضاد",
+        "anticodon"
+      ],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_006",
+      "verb_slug": "application",
+      "chapitre": "Synthèse des protéines",
+      "question": "حدد الشروط الضرورية لترجمة ARNm",
+      "student_answer": "الشروط الضرورية لترجمة ARNm هي: 1- وجود ARNm، 2- وجود الأحماض الأمينية، 3- وجود إنزيم خاص بكل حمض أميني، 4- وجود الطاقة (ATP)، 5- وجود ARNt، 6- وجود الريبوزومات",
+      "bareme": 4,
+      "reponse_attendue": "الشروط الضرورية لترجمة ARNm هي: 1- وجود ARNm، 2- وجود الأحماض الأمينية، 3- وجود إنزيم خاص بكل حمض أميني، 4- وجود الطاقة (ATP)، 5- وجود ARNt، 6- وجود الريبوزومات",
+      "mots_cles_attendus": [
+        "ARNm",
+        "أحماض أمينية",
+        "إنزيم",
+        "ATP",
+        "ARNt",
+        "ريبوزوم"
+      ],
+      "human_score": 4,
+      "human_score_max": 4,
+      "human_dominant_error": "all_correct",
+      "human_matched_criteria": [
+        "ARNm",
+        "أحماض أمينية",
+        "إنزيم",
+        "ATP",
+        "ARNt",
+        "ريبوزوم"
+      ],
+      "human_unmatched_criteria": [],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_006",
+      "verb_slug": "application",
+      "chapitre": "Synthèse des protéines",
+      "question": "حدد الشروط الضرورية لترجمة ARNm",
+      "student_answer": "الشروط الضرورية لترجمة ARNm هي: 1- وجود ARNm، 2- وجود الأحماض الأمينية، 3- وجود إنزيم",
+      "bareme": 4,
+      "reponse_attendue": "الشروط الضرورية لترجمة ARNm هي: 1- وجود ARNm، 2- وجود الأحماض الأمينية، 3- وجود إنزيم خاص بكل حمض أميني، 4- وجود الطاقة (ATP)، 5- وجود ARNt، 6- وجود الريبوزومات",
+      "mots_cles_attendus": [
+        "ARNm",
+        "أحماض أمينية",
+        "إنزيم",
+        "ATP",
+        "ARNt",
+        "ريبوزوم"
+      ],
+      "human_score": 2,
+      "human_score_max": 4,
+      "human_dominant_error": "partial_correct",
+      "human_matched_criteria": [
+        "ARNm",
+        "أحماض أمينية",
+        "إنزيم"
+      ],
+      "human_unmatched_criteria": [
+        "ATP",
+        "ARNt",
+        "ريبوزوم"
+      ],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_007",
+      "verb_slug": "type_bac",
+      "chapitre": "Synthèse des protéines",
+      "question": "صف مراحل تركيب البروتين انطلاقا من نسخ ADN إلى ترجمة ARNm",
+      "student_answer": "1- النسخ: في النواة، تنفتح جزيئة ADN وتنسخ إحدى سلسلتيها إلى ARNm بواسطة إنزيم ARN بوليميراز، 2- خروج ARNm من النواة إلى الهيولى، 3- الترجمة: يرتبط ARNm بالريبوزوم، يأتي ARNt حاملا الأحماض الأمينية حسب الكودونات، تتشكل الروابط الببتيدية، 4- ينفصل البروتين المركب عند كودون التوقف",
+      "bareme": 6,
+      "reponse_attendue": "1- النسخ: في النواة، تنفتح جزيئة ADN وتنسخ إحدى سلسلتيها إلى ARNm بواسطة إنزيم ARN بوليميراز، 2- خروج ARNm من النواة إلى الهيولى، 3- الترجمة: يرتبط ARNm بالريبوزوم، يأتي ARNt حاملا الأحماض الأمينية حسب الكودونات، تتشكل الروابط الببتيدية، 4- ينفصل البروتين المركب عند كودون التوقف",
+      "mots_cles_attendus": [
+        "نسخ",
+        "ADN",
+        "ARNm",
+        "ريبوزوم",
+        "ARNt",
+        "روابط ببتيدية",
+        "كودون توقف"
+      ],
+      "human_score": 6,
+      "human_score_max": 6,
+      "human_dominant_error": "all_correct",
+      "human_matched_criteria": [
+        "نسخ",
+        "ADN",
+        "ARNm",
+        "ريبوزوم",
+        "ARNt",
+        "روابط ببتيدية",
+        "كودون توقف"
+      ],
+      "human_unmatched_criteria": [],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_007",
+      "verb_slug": "type_bac",
+      "chapitre": "Synthèse des protéines",
+      "question": "صف مراحل تركيب البروتين انطلاقا من نسخ ADN إلى ترجمة ARNm",
+      "student_answer": "1- النسخ: في النواة، تنفتح جزيئة ADN وتنسخ إحدى سلسلتيها إلى ARNm بواسطة إنزيم ARN بوليميراز، 2- خروج ARNm من النواة إلى الهيولى، 3- الترجمة: يرتبط ARNm",
+      "bareme": 6,
+      "reponse_attendue": "1- النسخ: في النواة، تنفتح جزيئة ADN وتنسخ إحدى سلسلتيها إلى ARNm بواسطة إنزيم ARN بوليميراز، 2- خروج ARNm من النواة إلى الهيولى، 3- الترجمة: يرتبط ARNm بالريبوزوم، يأتي ARNt حاملا الأحماض الأمينية حسب الكودونات، تتشكل الروابط الببتيدية، 4- ينفصل البروتين المركب عند كودون التوقف",
+      "mots_cles_attendus": [
+        "نسخ",
+        "ADN",
+        "ARNm",
+        "ريبوزوم",
+        "ARNt",
+        "روابط ببتيدية",
+        "كودون توقف"
+      ],
+      "human_score": 3,
+      "human_score_max": 6,
+      "human_dominant_error": "partial_correct",
+      "human_matched_criteria": [
+        "نسخ",
+        "ADN",
+        "ARNm"
+      ],
+      "human_unmatched_criteria": [
+        "ريبوزوم",
+        "ARNt",
+        "روابط ببتيدية",
+        "كودون توقف"
+      ],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_007",
+      "verb_slug": "type_bac",
+      "chapitre": "Synthèse des protéines",
+      "question": "صف مراحل تركيب البروتين انطلاقا من نسخ ADN إلى ترجمة ARNm",
+      "student_answer": "",
+      "bareme": 6,
+      "reponse_attendue": "1- النسخ: في النواة، تنفتح جزيئة ADN وتنسخ إحدى سلسلتيها إلى ARNm بواسطة إنزيم ARN بوليميراز، 2- خروج ARNm من النواة إلى الهيولى، 3- الترجمة: يرتبط ARNm بالريبوزوم، يأتي ARNt حاملا الأحماض الأمينية حسب الكودونات، تتشكل الروابط الببتيدية، 4- ينفصل البروتين المركب عند كودون التوقف",
+      "mots_cles_attendus": [
+        "نسخ",
+        "ADN",
+        "ARNm",
+        "ريبوزوم",
+        "ARNt",
+        "روابط ببتيدية",
+        "كودون توقف"
+      ],
+      "human_score": 0,
+      "human_score_max": 6,
+      "human_dominant_error": "empty",
+      "human_matched_criteria": [],
+      "human_unmatched_criteria": [
+        "نسخ",
+        "ADN",
+        "ARNm",
+        "ريبوزوم",
+        "ARNt",
+        "روابط ببتيدية",
+        "كودون توقف"
+      ],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_008",
+      "verb_slug": "restitution",
+      "chapitre": "Synthèse des protéines",
+      "question": "ما هو دور الريبوزوم في تركيب البروتين؟",
+      "student_answer": "الريبوزوم هو عضية تتوضع في الهيولى، دوره هو قراءة ARNm وربط الأحماض الأمينية فيما بينها بروابط ببتيدية لتشكيل البروتين، يتكون من وحدتين صغيرة وكبيرة",
+      "bareme": 3,
+      "reponse_attendue": "الريبوزوم هو عضية تتوضع في الهيولى، دوره هو قراءة ARNm وربط الأحماض الأمينية فيما بينها بروابط ببتيدية لتشكيل البروتين، يتكون من وحدتين صغيرة وكبيرة",
+      "mots_cles_attendus": [
+        "الهيولى",
+        "قراءة",
+        "ARNm",
+        "روابط ببتيدية",
+        "وحدتين"
+      ],
+      "human_score": 3,
+      "human_score_max": 3,
+      "human_dominant_error": "all_correct",
+      "human_matched_criteria": [
+        "الهيولى",
+        "قراءة",
+        "ARNm",
+        "روابط ببتيدية",
+        "وحدتين"
+      ],
+      "human_unmatched_criteria": [],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_008",
+      "verb_slug": "restitution",
+      "chapitre": "Synthèse des protéines",
+      "question": "ما هو دور الريبوزوم في تركيب البروتين؟",
+      "student_answer": "الريبوزوم هو عضية تتوضع في الهيولى، دوره هو قراءة ARNm وربط الأحماض الأمينية",
+      "bareme": 3,
+      "reponse_attendue": "الريبوزوم هو عضية تتوضع في الهيولى، دوره هو قراءة ARNm وربط الأحماض الأمينية فيما بينها بروابط ببتيدية لتشكيل البروتين، يتكون من وحدتين صغيرة وكبيرة",
+      "mots_cles_attendus": [
+        "الهيولى",
+        "قراءة",
+        "ARNm",
+        "روابط ببتيدية",
+        "وحدتين"
+      ],
+      "human_score": 2,
+      "human_score_max": 3,
+      "human_dominant_error": "partial_correct",
+      "human_matched_criteria": [
+        "الهيولى",
+        "قراءة",
+        "ARNm"
+      ],
+      "human_unmatched_criteria": [
+        "روابط ببتيدية",
+        "وحدتين"
+      ],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_009",
+      "verb_slug": "restitution",
+      "chapitre": "Structure des protéines",
+      "question": "ما هي البنية الأولية للبروتين؟",
+      "student_answer": "البنية الأولية للبروتين هي الترتيب المتسلسل للأحماض الأمينية المرتبطة فيما بينها بروابط ببتيدية لتشكيل سلسلة ببتيدية",
+      "bareme": 2,
+      "reponse_attendue": "البنية الأولية للبروتين هي الترتيب المتسلسل للأحماض الأمينية المرتبطة فيما بينها بروابط ببتيدية لتشكيل سلسلة ببتيدية",
+      "mots_cles_attendus": [
+        "ترتيب",
+        "أحماض أمينية",
+        "روابط ببتيدية",
+        "سلسلة"
+      ],
+      "human_score": 2,
+      "human_score_max": 2,
+      "human_dominant_error": "all_correct",
+      "human_matched_criteria": [
+        "ترتيب",
+        "أحماض أمينية",
+        "روابط ببتيدية",
+        "سلسلة"
+      ],
+      "human_unmatched_criteria": [],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_009",
+      "verb_slug": "restitution",
+      "chapitre": "Structure des protéines",
+      "question": "ما هي البنية الأولية للبروتين؟",
+      "student_answer": "البنية الأولية للبروتين هي الترتيب المتسلسل للأحماض الأمينية",
+      "bareme": 2,
+      "reponse_attendue": "البنية الأولية للبروتين هي الترتيب المتسلسل للأحماض الأمينية المرتبطة فيما بينها بروابط ببتيدية لتشكيل سلسلة ببتيدية",
+      "mots_cles_attendus": [
+        "ترتيب",
+        "أحماض أمينية",
+        "روابط ببتيدية",
+        "سلسلة"
+      ],
+      "human_score": 1,
+      "human_score_max": 2,
+      "human_dominant_error": "partial_correct",
+      "human_matched_criteria": [
+        "ترتيب",
+        "أحماض أمينية"
+      ],
+      "human_unmatched_criteria": [
+        "روابط ببتيدية",
+        "سلسلة"
+      ],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_009",
+      "verb_slug": "restitution",
+      "chapitre": "Structure des protéines",
+      "question": "ما هي البنية الأولية للبروتين؟",
+      "student_answer": "",
+      "bareme": 2,
+      "reponse_attendue": "البنية الأولية للبروتين هي الترتيب المتسلسل للأحماض الأمينية المرتبطة فيما بينها بروابط ببتيدية لتشكيل سلسلة ببتيدية",
+      "mots_cles_attendus": [
+        "ترتيب",
+        "أحماض أمينية",
+        "روابط ببتيدية",
+        "سلسلة"
+      ],
+      "human_score": 0,
+      "human_score_max": 2,
+      "human_dominant_error": "empty",
+      "human_matched_criteria": [],
+      "human_unmatched_criteria": [
+        "ترتيب",
+        "أحماض أمينية",
+        "روابط ببتيدية",
+        "سلسلة"
+      ],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_010",
+      "verb_slug": "restitution",
+      "chapitre": "Structure des protéines",
+      "question": "كيف تتشكل البنية الثالثية للبروتين؟",
+      "student_answer": "تتشكل البنية الثالثية للبروتين نتيجة التفاف السلسلة الببتيدية ذات البنية الثانوية في الفضاء لتأخذ شكلا كرويا، وتنتج عن روابط بين المجموعات الجانبية (R) للأحماض الأمينية",
+      "bareme": 3,
+      "reponse_attendue": "تتشكل البنية الثالثية للبروتين نتيجة التفاف السلسلة الببتيدية ذات البنية الثانوية في الفضاء لتأخذ شكلا كرويا، وتنتج عن روابط بين المجموعات الجانبية (R) للأحماض الأمينية",
+      "mots_cles_attendus": [
+        "التلاف",
+        "كروي",
+        "مجموعات جانبية",
+        "روابط"
+      ],
+      "human_score": 3,
+      "human_score_max": 3,
+      "human_dominant_error": "all_correct",
+      "human_matched_criteria": [
+        "التلاف",
+        "كروي",
+        "مجموعات جانبية",
+        "روابط"
+      ],
+      "human_unmatched_criteria": [],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_010",
+      "verb_slug": "restitution",
+      "chapitre": "Structure des protéines",
+      "question": "كيف تتشكل البنية الثالثية للبروتين؟",
+      "student_answer": "تتشكل البنية الثالثية للبروتين نتيجة التفاف السلسلة الببتيدية ذات البنية الثانوية في الفضاء",
+      "bareme": 3,
+      "reponse_attendue": "تتشكل البنية الثالثية للبروتين نتيجة التفاف السلسلة الببتيدية ذات البنية الثانوية في الفضاء لتأخذ شكلا كرويا، وتنتج عن روابط بين المجموعات الجانبية (R) للأحماض الأمينية",
+      "mots_cles_attendus": [
+        "التلاف",
+        "كروي",
+        "مجموعات جانبية",
+        "روابط"
+      ],
+      "human_score": 0,
+      "human_score_max": 3,
+      "human_dominant_error": "insufficient",
+      "human_matched_criteria": [],
+      "human_unmatched_criteria": [
+        "التلاف",
+        "كروي",
+        "مجموعات جانبية",
+        "روابط"
+      ],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_011",
+      "verb_slug": "application",
+      "chapitre": "Structure des protéines",
+      "question": "اشرح العلاقة بين بنية البروتين ووظيفته",
+      "student_answer": "هناك علاقة طردية بين بنية البروتين ووظيفته: فالبنية المكانية للبروتين تحدد موقعه الفعال الذي يرتبط بالركيزة، وأي تغير في البنية يؤدي إلى تغير الوظيفة. مثال: إنزيم الأميلاز له بنية تسمح له بالارتباط بالنشا وتفكيكه",
+      "bareme": 4,
+      "reponse_attendue": "هناك علاقة طردية بين بنية البروتين ووظيفته: فالبنية المكانية للبروتين تحدد موقعه الفعال الذي يرتبط بالركيزة، وأي تغير في البنية يؤدي إلى تغير الوظيفة. مثال: إنزيم الأميلاز له بنية تسمح له بالارتباط بالنشا وتفكيكه",
+      "mots_cles_attendus": [
+        "بنية",
+        "وظيفة",
+        "موقع فعال",
+        "ركيزة"
+      ],
+      "human_score": 4,
+      "human_score_max": 4,
+      "human_dominant_error": "all_correct",
+      "human_matched_criteria": [
+        "بنية",
+        "وظيفة",
+        "موقع فعال",
+        "ركيزة"
+      ],
+      "human_unmatched_criteria": [],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_011",
+      "verb_slug": "application",
+      "chapitre": "Structure des protéines",
+      "question": "اشرح العلاقة بين بنية البروتين ووظيفته",
+      "student_answer": "هناك علاقة طردية بين بنية البروتين ووظيفته: فالبنية المكانية للبروتين تحدد موقعه الفعال الذي يرتبط بالركيزة، وأي",
+      "bareme": 4,
+      "reponse_attendue": "هناك علاقة طردية بين بنية البروتين ووظيفته: فالبنية المكانية للبروتين تحدد موقعه الفعال الذي يرتبط بالركيزة، وأي تغير في البنية يؤدي إلى تغير الوظيفة. مثال: إنزيم الأميلاز له بنية تسمح له بالارتباط بالنشا وتفكيكه",
+      "mots_cles_attendus": [
+        "بنية",
+        "وظيفة",
+        "موقع فعال",
+        "ركيزة"
+      ],
+      "human_score": 2,
+      "human_score_max": 4,
+      "human_dominant_error": "partial_correct",
+      "human_matched_criteria": [
+        "بنية",
+        "ركيزة"
+      ],
+      "human_unmatched_criteria": [
+        "وظيفة",
+        "موقع فعال"
+      ],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_011",
+      "verb_slug": "application",
+      "chapitre": "Structure des protéines",
+      "question": "اشرح العلاقة بين بنية البروتين ووظيفته",
+      "student_answer": "",
+      "bareme": 4,
+      "reponse_attendue": "هناك علاقة طردية بين بنية البروتين ووظيفته: فالبنية المكانية للبروتين تحدد موقعه الفعال الذي يرتبط بالركيزة، وأي تغير في البنية يؤدي إلى تغير الوظيفة. مثال: إنزيم الأميلاز له بنية تسمح له بالارتباط بالنشا وتفكيكه",
+      "mots_cles_attendus": [
+        "بنية",
+        "وظيفة",
+        "موقع فعال",
+        "ركيزة"
+      ],
+      "human_score": 0,
+      "human_score_max": 4,
+      "human_dominant_error": "empty",
+      "human_matched_criteria": [],
+      "human_unmatched_criteria": [
+        "بنية",
+        "وظيفة",
+        "موقع فعال",
+        "ركيزة"
+      ],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_012",
+      "verb_slug": "restitution",
+      "chapitre": "Structure des protéines",
+      "question": "ما الفرق بين البنية الثانوية الحلزونية والصفائحية؟",
+      "student_answer": "البنية الثانوية الحلزونية تأخذ شكل لولبي نتيجة الروابط الهيدروجينية بين مجموعات CO و NH المتجاورة، بينما الصفائحية تأخذ شكل صفائح مطوية نتيجة الروابط الهيدروجينية بين سلاسل ببتيدية متجاورة",
+      "bareme": 3,
+      "reponse_attendue": "البنية الثانوية الحلزونية تأخذ شكل لولبي نتيجة الروابط الهيدروجينية بين مجموعات CO و NH المتجاورة، بينما الصفائحية تأخذ شكل صفائح مطوية نتيجة الروابط الهيدروجينية بين سلاسل ببتيدية متجاورة",
+      "mots_cles_attendus": [
+        "لولبي",
+        "صفائح",
+        "روابط هيدروجينية"
+      ],
+      "human_score": 3,
+      "human_score_max": 3,
+      "human_dominant_error": "all_correct",
+      "human_matched_criteria": [
+        "لولبي",
+        "صفائح",
+        "روابط هيدروجينية"
+      ],
+      "human_unmatched_criteria": [],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_012",
+      "verb_slug": "restitution",
+      "chapitre": "Structure des protéines",
+      "question": "ما الفرق بين البنية الثانوية الحلزونية والصفائحية؟",
+      "student_answer": "البنية الثانوية الحلزونية تأخذ شكل لولبي نتيجة الروابط الهيدروجينية بين مجموعات CO و NH المتجاورة،",
+      "bareme": 3,
+      "reponse_attendue": "البنية الثانوية الحلزونية تأخذ شكل لولبي نتيجة الروابط الهيدروجينية بين مجموعات CO و NH المتجاورة، بينما الصفائحية تأخذ شكل صفائح مطوية نتيجة الروابط الهيدروجينية بين سلاسل ببتيدية متجاورة",
+      "mots_cles_attendus": [
+        "لولبي",
+        "صفائح",
+        "روابط هيدروجينية"
+      ],
+      "human_score": 2,
+      "human_score_max": 3,
+      "human_dominant_error": "partial_correct",
+      "human_matched_criteria": [
+        "لولبي",
+        "روابط هيدروجينية"
+      ],
+      "human_unmatched_criteria": [
+        "صفائح"
+      ],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_013",
+      "verb_slug": "type_bac",
+      "chapitre": "Structure des protéines",
+      "question": "بين انطلاقا من دراسة بروتينات الدم (الغلوبولينات) العلاقة بين البنية والوظيفة",
+      "student_answer": "الغلوبولينات (الأجسام المضادة) بروتينات ذات بنية ثالثية ورباعية تسمح لها بالتعرف النوعي على المستضدات، فالموقع الفعال لكل غلوبولين متمم لبنية مستضد محدد، مما يثبت أن البنية المكانية تحدد الوظيفة",
+      "bareme": 5,
+      "reponse_attendue": "الغلوبولينات (الأجسام المضادة) بروتينات ذات بنية ثالثية ورباعية تسمح لها بالتعرف النوعي على المستضدات، فالموقع الفعال لكل غلوبولين متمم لبنية مستضد محدد، مما يثبت أن البنية المكانية تحدد الوظيفة",
+      "mots_cles_attendus": [
+        "غلوبولينات",
+        "بنية",
+        "موقع فعال",
+        "مستضد",
+        "تمامة",
+        "وظيفة"
+      ],
+      "human_score": 5,
+      "human_score_max": 5,
+      "human_dominant_error": "all_correct",
+      "human_matched_criteria": [
+        "غلوبولينات",
+        "بنية",
+        "موقع فعال",
+        "مستضد",
+        "تمامة",
+        "وظيفة"
+      ],
+      "human_unmatched_criteria": [],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_013",
+      "verb_slug": "type_bac",
+      "chapitre": "Structure des protéines",
+      "question": "بين انطلاقا من دراسة بروتينات الدم (الغلوبولينات) العلاقة بين البنية والوظيفة",
+      "student_answer": "الغلوبولينات (الأجسام المضادة) بروتينات ذات بنية ثالثية ورباعية تسمح لها بالتعرف النوعي على المستضدات،",
+      "bareme": 5,
+      "reponse_attendue": "الغلوبولينات (الأجسام المضادة) بروتينات ذات بنية ثالثية ورباعية تسمح لها بالتعرف النوعي على المستضدات، فالموقع الفعال لكل غلوبولين متمم لبنية مستضد محدد، مما يثبت أن البنية المكانية تحدد الوظيفة",
+      "mots_cles_attendus": [
+        "غلوبولينات",
+        "بنية",
+        "موقع فعال",
+        "مستضد",
+        "تمامة",
+        "وظيفة"
+      ],
+      "human_score": 2,
+      "human_score_max": 5,
+      "human_dominant_error": "partial_correct",
+      "human_matched_criteria": [
+        "غلوبولينات",
+        "بنية",
+        "مستضد"
+      ],
+      "human_unmatched_criteria": [
+        "موقع فعال",
+        "تمامة",
+        "وظيفة"
+      ],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_013",
+      "verb_slug": "type_bac",
+      "chapitre": "Structure des protéines",
+      "question": "بين انطلاقا من دراسة بروتينات الدم (الغلوبولينات) العلاقة بين البنية والوظيفة",
+      "student_answer": "",
+      "bareme": 5,
+      "reponse_attendue": "الغلوبولينات (الأجسام المضادة) بروتينات ذات بنية ثالثية ورباعية تسمح لها بالتعرف النوعي على المستضدات، فالموقع الفعال لكل غلوبولين متمم لبنية مستضد محدد، مما يثبت أن البنية المكانية تحدد الوظيفة",
+      "mots_cles_attendus": [
+        "غلوبولينات",
+        "بنية",
+        "موقع فعال",
+        "مستضد",
+        "تمامة",
+        "وظيفة"
+      ],
+      "human_score": 0,
+      "human_score_max": 5,
+      "human_dominant_error": "empty",
+      "human_matched_criteria": [],
+      "human_unmatched_criteria": [
+        "غلوبولينات",
+        "بنية",
+        "موقع فعال",
+        "مستضد",
+        "تمامة",
+        "وظيفة"
+      ],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_014",
+      "verb_slug": "restitution",
+      "chapitre": "Activité enzymatique",
+      "question": "ما هو الموقع الفعال للإنزيم؟",
+      "student_answer": "الموقع الفعال للإنزيم هو المنطقة التي يرتبط فيها الركيزة ويتفاعل معها، وهو ذو بنية مكانية متممة لبنية الركيزة",
+      "bareme": 2,
+      "reponse_attendue": "الموقع الفعال للإنزيم هو المنطقة التي يرتبط فيها الركيزة ويتفاعل معها، وهو ذو بنية مكانية متممة لبنية الركيزة",
+      "mots_cles_attendus": [
+        "موقع",
+        "ركيزة",
+        "متممة",
+        "بنية"
+      ],
+      "human_score": 2,
+      "human_score_max": 2,
+      "human_dominant_error": "all_correct",
+      "human_matched_criteria": [
+        "موقع",
+        "ركيزة",
+        "متممة",
+        "بنية"
+      ],
+      "human_unmatched_criteria": [],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_014",
+      "verb_slug": "restitution",
+      "chapitre": "Activité enzymatique",
+      "question": "ما هو الموقع الفعال للإنزيم؟",
+      "student_answer": "الموقع الفعال للإنزيم هو المنطقة التي يرتبط فيها الركيزة",
+      "bareme": 2,
+      "reponse_attendue": "الموقع الفعال للإنزيم هو المنطقة التي يرتبط فيها الركيزة ويتفاعل معها، وهو ذو بنية مكانية متممة لبنية الركيزة",
+      "mots_cles_attendus": [
+        "موقع",
+        "ركيزة",
+        "متممة",
+        "بنية"
+      ],
+      "human_score": 1,
+      "human_score_max": 2,
+      "human_dominant_error": "partial_correct",
+      "human_matched_criteria": [
+        "موقع",
+        "ركيزة"
+      ],
+      "human_unmatched_criteria": [
+        "متممة",
+        "بنية"
+      ],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_015",
+      "verb_slug": "restitution",
+      "chapitre": "Activité enzymatique",
+      "question": "ماذا نقصد بالنوعية الإنزيمية؟",
+      "student_answer": "النوعية الإنزيمية هي خاصية الإنزيم التي تجعله يتعرف على ركيزة محددة فقط ويفككها أو يركبها، وذلك بسبب التمامة بين الموقع الفعال والركيزة",
+      "bareme": 3,
+      "reponse_attendue": "النوعية الإنزيمية هي خاصية الإنزيم التي تجعله يتعرف على ركيزة محددة فقط ويفككها أو يركبها، وذلك بسبب التمامة بين الموقع الفعال والركيزة",
+      "mots_cles_attendus": [
+        "نوعية",
+        "ركيزة",
+        "موقع فعال",
+        "تمامة"
+      ],
+      "human_score": 3,
+      "human_score_max": 3,
+      "human_dominant_error": "all_correct",
+      "human_matched_criteria": [
+        "نوعية",
+        "ركيزة",
+        "موقع فعال",
+        "تمامة"
+      ],
+      "human_unmatched_criteria": [],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_015",
+      "verb_slug": "restitution",
+      "chapitre": "Activité enzymatique",
+      "question": "ماذا نقصد بالنوعية الإنزيمية؟",
+      "student_answer": "النوعية الإنزيمية هي خاصية الإنزيم التي تجعله يتعرف على ركيزة محددة فقط",
+      "bareme": 3,
+      "reponse_attendue": "النوعية الإنزيمية هي خاصية الإنزيم التي تجعله يتعرف على ركيزة محددة فقط ويفككها أو يركبها، وذلك بسبب التمامة بين الموقع الفعال والركيزة",
+      "mots_cles_attendus": [
+        "نوعية",
+        "ركيزة",
+        "موقع فعال",
+        "تمامة"
+      ],
+      "human_score": 2,
+      "human_score_max": 3,
+      "human_dominant_error": "partial_correct",
+      "human_matched_criteria": [
+        "نوعية",
+        "ركيزة"
+      ],
+      "human_unmatched_criteria": [
+        "موقع فعال",
+        "تمامة"
+      ],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_015",
+      "verb_slug": "restitution",
+      "chapitre": "Activité enzymatique",
+      "question": "ماذا نقصد بالنوعية الإنزيمية؟",
+      "student_answer": "",
+      "bareme": 3,
+      "reponse_attendue": "النوعية الإنزيمية هي خاصية الإنزيم التي تجعله يتعرف على ركيزة محددة فقط ويفككها أو يركبها، وذلك بسبب التمامة بين الموقع الفعال والركيزة",
+      "mots_cles_attendus": [
+        "نوعية",
+        "ركيزة",
+        "موقع فعال",
+        "تمامة"
+      ],
+      "human_score": 0,
+      "human_score_max": 3,
+      "human_dominant_error": "empty",
+      "human_matched_criteria": [],
+      "human_unmatched_criteria": [
+        "نوعية",
+        "ركيزة",
+        "موقع فعال",
+        "تمامة"
+      ],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_016",
+      "verb_slug": "application",
+      "chapitre": "Activité enzymatique",
+      "question": "كيف تؤثر درجة الحرارة على نشاط الإنزيم؟",
+      "student_answer": "تزداد سرعة التفاعل الإنزيمي مع ارتفاع درجة الحرارة حتى تصل إلى درجة الحرارة المثلى (حوالي 37 درجة في الإنسان) حيث تكون السرعة قصوى، ثم تنخفض السرعة عند درجات حرارة أعلى بسبب تمسخ الإنزيم وتغير بنيته المكانية",
+      "bareme": 4,
+      "reponse_attendue": "تزداد سرعة التفاعل الإنزيمي مع ارتفاع درجة الحرارة حتى تصل إلى درجة الحرارة المثلى (حوالي 37 درجة في الإنسان) حيث تكون السرعة قصوى، ثم تنخفض السرعة عند درجات حرارة أعلى بسبب تمسخ الإنزيم وتغير بنيته المكانية",
+      "mots_cles_attendus": [
+        "حرارة مثلى",
+        "تمسخ",
+        "بنية",
+        "سرعة"
+      ],
+      "human_score": 4,
+      "human_score_max": 4,
+      "human_dominant_error": "all_correct",
+      "human_matched_criteria": [
+        "حرارة مثلى",
+        "تمسخ",
+        "بنية",
+        "سرعة"
+      ],
+      "human_unmatched_criteria": [],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_016",
+      "verb_slug": "application",
+      "chapitre": "Activité enzymatique",
+      "question": "كيف تؤثر درجة الحرارة على نشاط الإنزيم؟",
+      "student_answer": "تزداد سرعة التفاعل الإنزيمي مع ارتفاع درجة الحرارة حتى تصل إلى درجة الحرارة المثلى (حوالي 37 درجة في الإنسان)",
+      "bareme": 4,
+      "reponse_attendue": "تزداد سرعة التفاعل الإنزيمي مع ارتفاع درجة الحرارة حتى تصل إلى درجة الحرارة المثلى (حوالي 37 درجة في الإنسان) حيث تكون السرعة قصوى، ثم تنخفض السرعة عند درجات حرارة أعلى بسبب تمسخ الإنزيم وتغير بنيته المكانية",
+      "mots_cles_attendus": [
+        "حرارة مثلى",
+        "تمسخ",
+        "بنية",
+        "سرعة"
+      ],
+      "human_score": 2,
+      "human_score_max": 4,
+      "human_dominant_error": "partial_correct",
+      "human_matched_criteria": [
+        "حرارة مثلى",
+        "سرعة"
+      ],
+      "human_unmatched_criteria": [
+        "تمسخ",
+        "بنية"
+      ],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_017",
+      "verb_slug": "application",
+      "chapitre": "Activité enzymatique",
+      "question": "اشرح آلية تثبيط الإنزيم التنافسي",
+      "student_answer": "التثبيط التنافسي يحدث عندما يشبه المثبط بنية الركيزة فيرتبط بالموقع الفعال للإنزيم بدلا من الركيزة، مما يمنع الركيزة من الارتباط. يمكن التغلب على هذا التثبيط بزيادة تركيز الركيزة",
+      "bareme": 4,
+      "reponse_attendue": "التثبيط التنافسي يحدث عندما يشبه المثبط بنية الركيزة فيرتبط بالموقع الفعال للإنزيم بدلا من الركيزة، مما يمنع الركيزة من الارتباط. يمكن التغلب على هذا التثبيط بزيادة تركيز الركيزة",
+      "mots_cles_attendus": [
+        "مثبط",
+        "موقع فعال",
+        "ركيزة",
+        "تركيز"
+      ],
+      "human_score": 4,
+      "human_score_max": 4,
+      "human_dominant_error": "all_correct",
+      "human_matched_criteria": [
+        "مثبط",
+        "موقع فعال",
+        "ركيزة",
+        "تركيز"
+      ],
+      "human_unmatched_criteria": [],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_017",
+      "verb_slug": "application",
+      "chapitre": "Activité enzymatique",
+      "question": "اشرح آلية تثبيط الإنزيم التنافسي",
+      "student_answer": "التثبيط التنافسي يحدث عندما يشبه المثبط بنية الركيزة فيرتبط بالموقع الفعال للإنزيم بدلا من",
+      "bareme": 4,
+      "reponse_attendue": "التثبيط التنافسي يحدث عندما يشبه المثبط بنية الركيزة فيرتبط بالموقع الفعال للإنزيم بدلا من الركيزة، مما يمنع الركيزة من الارتباط. يمكن التغلب على هذا التثبيط بزيادة تركيز الركيزة",
+      "mots_cles_attendus": [
+        "مثبط",
+        "موقع فعال",
+        "ركيزة",
+        "تركيز"
+      ],
+      "human_score": 3,
+      "human_score_max": 4,
+      "human_dominant_error": "partial_correct",
+      "human_matched_criteria": [
+        "مثبط",
+        "موقع فعال",
+        "ركيزة"
+      ],
+      "human_unmatched_criteria": [
+        "تركيز"
+      ],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_017",
+      "verb_slug": "application",
+      "chapitre": "Activité enzymatique",
+      "question": "اشرح آلية تثبيط الإنزيم التنافسي",
+      "student_answer": "",
+      "bareme": 4,
+      "reponse_attendue": "التثبيط التنافسي يحدث عندما يشبه المثبط بنية الركيزة فيرتبط بالموقع الفعال للإنزيم بدلا من الركيزة، مما يمنع الركيزة من الارتباط. يمكن التغلب على هذا التثبيط بزيادة تركيز الركيزة",
+      "mots_cles_attendus": [
+        "مثبط",
+        "موقع فعال",
+        "ركيزة",
+        "تركيز"
+      ],
+      "human_score": 0,
+      "human_score_max": 4,
+      "human_dominant_error": "empty",
+      "human_matched_criteria": [],
+      "human_unmatched_criteria": [
+        "مثبط",
+        "موقع فعال",
+        "ركيزة",
+        "تركيز"
+      ],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_018",
+      "verb_slug": "type_bac",
+      "chapitre": "Activité enzymatique",
+      "question": "بين انطلاقا من تجربة أن نشاط الإنزيم يتأثر بدرجة الـ pH",
+      "student_answer": "نأخذ عدة أنابيب اختبار نضع في كل منها نفس كمية الإنزيم ونفس كمية الركيزة ولكن نغير درجة الـ pH من 2 إلى 10، نقيس سرعة التفاعل في كل أنبوب. النتائج: تكون السرعة قصوى عند pH محدد (الـ pH الأمثل) وتنخفض عند باقي قيم الـ pH. الاستنتاج: نشاط الإنزيم يتأثر بدرجة الـ pH وكل إنزيم له pH أمثل",
+      "bareme": 5,
+      "reponse_attendue": "نأخذ عدة أنابيب اختبار نضع في كل منها نفس كمية الإنزيم ونفس كمية الركيزة ولكن نغير درجة الـ pH من 2 إلى 10، نقيس سرعة التفاعل في كل أنبوب. النتائج: تكون السرعة قصوى عند pH محدد (الـ pH الأمثل) وتنخفض عند باقي قيم الـ pH. الاستنتاج: نشاط الإنزيم يتأثر بدرجة الـ pH وكل إنزيم له pH أمثل",
+      "mots_cles_attendus": [
+        "تجربة",
+        "pH",
+        "سرعة",
+        "pH أمثل",
+        "استنتاج"
+      ],
+      "human_score": 5,
+      "human_score_max": 5,
+      "human_dominant_error": "all_correct",
+      "human_matched_criteria": [
+        "تجربة",
+        "pH",
+        "سرعة",
+        "pH أمثل",
+        "استنتاج"
+      ],
+      "human_unmatched_criteria": [],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_018",
+      "verb_slug": "type_bac",
+      "chapitre": "Activité enzymatique",
+      "question": "بين انطلاقا من تجربة أن نشاط الإنزيم يتأثر بدرجة الـ pH",
+      "student_answer": "نأخذ عدة أنابيب اختبار نضع في كل منها نفس كمية الإنزيم ونفس كمية الركيزة ولكن نغير درجة الـ pH من 2 إلى 10، نقيس سرعة التفاعل في كل أنبوب. النتائج: تكون",
+      "bareme": 5,
+      "reponse_attendue": "نأخذ عدة أنابيب اختبار نضع في كل منها نفس كمية الإنزيم ونفس كمية الركيزة ولكن نغير درجة الـ pH من 2 إلى 10، نقيس سرعة التفاعل في كل أنبوب. النتائج: تكون السرعة قصوى عند pH محدد (الـ pH الأمثل) وتنخفض عند باقي قيم الـ pH. الاستنتاج: نشاط الإنزيم يتأثر بدرجة الـ pH وكل إنزيم له pH أمثل",
+      "mots_cles_attendus": [
+        "تجربة",
+        "pH",
+        "سرعة",
+        "pH أمثل",
+        "استنتاج"
+      ],
+      "human_score": 2,
+      "human_score_max": 5,
+      "human_dominant_error": "partial_correct",
+      "human_matched_criteria": [
+        "pH",
+        "سرعة"
+      ],
+      "human_unmatched_criteria": [
+        "تجربة",
+        "pH أمثل",
+        "استنتاج"
+      ],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_019",
+      "verb_slug": "restitution",
+      "chapitre": "Immunologie",
+      "question": "ما الفرق بين الخلايا الليمفاوية B و T؟",
+      "student_answer": "الخلايا الليمفاوية B مسؤولة عن الاستجابة المناعية الخلطية (إنتاج الأجسام المضادة)، بينما الخلايا الليمفاوية T مسؤولة عن الاستجابة المناعية الخلوية (التدمير المباشر للخلايا المصابة)",
+      "bareme": 3,
+      "reponse_attendue": "الخلايا الليمفاوية B مسؤولة عن الاستجابة المناعية الخلطية (إنتاج الأجسام المضادة)، بينما الخلايا الليمفاوية T مسؤولة عن الاستجابة المناعية الخلوية (التدمير المباشر للخلايا المصابة)",
+      "mots_cles_attendus": [
+        "B",
+        "T",
+        "خلطية",
+        "خلوية",
+        "أجسام مضادة"
+      ],
+      "human_score": 3,
+      "human_score_max": 3,
+      "human_dominant_error": "all_correct",
+      "human_matched_criteria": [
+        "B",
+        "T",
+        "خلطية",
+        "خلوية",
+        "أجسام مضادة"
+      ],
+      "human_unmatched_criteria": [],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_019",
+      "verb_slug": "restitution",
+      "chapitre": "Immunologie",
+      "question": "ما الفرق بين الخلايا الليمفاوية B و T؟",
+      "student_answer": "الخلايا الليمفاوية B مسؤولة عن الاستجابة المناعية الخلطية (إنتاج الأجسام المضادة)، بينما الخلايا",
+      "bareme": 3,
+      "reponse_attendue": "الخلايا الليمفاوية B مسؤولة عن الاستجابة المناعية الخلطية (إنتاج الأجسام المضادة)، بينما الخلايا الليمفاوية T مسؤولة عن الاستجابة المناعية الخلوية (التدمير المباشر للخلايا المصابة)",
+      "mots_cles_attendus": [
+        "B",
+        "T",
+        "خلطية",
+        "خلوية",
+        "أجسام مضادة"
+      ],
+      "human_score": 2,
+      "human_score_max": 3,
+      "human_dominant_error": "partial_correct",
+      "human_matched_criteria": [
+        "B",
+        "خلطية",
+        "أجسام مضادة"
+      ],
+      "human_unmatched_criteria": [
+        "T",
+        "خلوية"
+      ],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_019",
+      "verb_slug": "restitution",
+      "chapitre": "Immunologie",
+      "question": "ما الفرق بين الخلايا الليمفاوية B و T؟",
+      "student_answer": "",
+      "bareme": 3,
+      "reponse_attendue": "الخلايا الليمفاوية B مسؤولة عن الاستجابة المناعية الخلطية (إنتاج الأجسام المضادة)، بينما الخلايا الليمفاوية T مسؤولة عن الاستجابة المناعية الخلوية (التدمير المباشر للخلايا المصابة)",
+      "mots_cles_attendus": [
+        "B",
+        "T",
+        "خلطية",
+        "خلوية",
+        "أجسام مضادة"
+      ],
+      "human_score": 0,
+      "human_score_max": 3,
+      "human_dominant_error": "empty",
+      "human_matched_criteria": [],
+      "human_unmatched_criteria": [
+        "B",
+        "T",
+        "خلطية",
+        "خلوية",
+        "أجسام مضادة"
+      ],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_020",
+      "verb_slug": "restitution",
+      "chapitre": "Immunologie",
+      "question": "ما هو المستضد؟",
+      "student_answer": "المستضد هو كل جسم غريب يدخل الجسم ويثير استجابة مناعية، فيتعرف عليه الجهاز المناعي ويحفز إنتاج الأجسام المضادة النوعية ضده",
+      "bareme": 2,
+      "reponse_attendue": "المستضد هو كل جسم غريب يدخل الجسم ويثير استجابة مناعية، فيتعرف عليه الجهاز المناعي ويحفز إنتاج الأجسام المضادة النوعية ضده",
+      "mots_cles_attendus": [
+        "جسم غريب",
+        "استجابة",
+        "أجسام مضادة"
+      ],
+      "human_score": 2,
+      "human_score_max": 2,
+      "human_dominant_error": "all_correct",
+      "human_matched_criteria": [
+        "جسم غريب",
+        "استجابة",
+        "أجسام مضادة"
+      ],
+      "human_unmatched_criteria": [],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_020",
+      "verb_slug": "restitution",
+      "chapitre": "Immunologie",
+      "question": "ما هو المستضد؟",
+      "student_answer": "المستضد هو كل جسم غريب يدخل الجسم ويثير استجابة مناعية، فيتعرف",
+      "bareme": 2,
+      "reponse_attendue": "المستضد هو كل جسم غريب يدخل الجسم ويثير استجابة مناعية، فيتعرف عليه الجهاز المناعي ويحفز إنتاج الأجسام المضادة النوعية ضده",
+      "mots_cles_attendus": [
+        "جسم غريب",
+        "استجابة",
+        "أجسام مضادة"
+      ],
+      "human_score": 1,
+      "human_score_max": 2,
+      "human_dominant_error": "partial_correct",
+      "human_matched_criteria": [
+        "جسم غريب",
+        "استجابة"
+      ],
+      "human_unmatched_criteria": [
+        "أجسام مضادة"
+      ],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_021",
+      "verb_slug": "restitution",
+      "chapitre": "Immunologie",
+      "question": "ما هي الأجسام المضادة؟",
+      "student_answer": "الأجسام المضادة هي بروتينات (غلوبولينات مناعية) تنتجها الخلايا الليمفاوية B المتمايزة إلى خلايا بلازمية، ترتبط نوعيا مع المستضد لتحيده وتمنع تأثيره",
+      "bareme": 3,
+      "reponse_attendue": "الأجسام المضادة هي بروتينات (غلوبولينات مناعية) تنتجها الخلايا الليمفاوية B المتمايزة إلى خلايا بلازمية، ترتبط نوعيا مع المستضد لتحيده وتمنع تأثيره",
+      "mots_cles_attendus": [
+        "بروتينات",
+        "غلوبولينات",
+        "B",
+        "خلايا بلازمية",
+        "نوعيا"
+      ],
+      "human_score": 3,
+      "human_score_max": 3,
+      "human_dominant_error": "all_correct",
+      "human_matched_criteria": [
+        "بروتينات",
+        "غلوبولينات",
+        "B",
+        "خلايا بلازمية",
+        "نوعيا"
+      ],
+      "human_unmatched_criteria": [],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_021",
+      "verb_slug": "restitution",
+      "chapitre": "Immunologie",
+      "question": "ما هي الأجسام المضادة؟",
+      "student_answer": "الأجسام المضادة هي بروتينات (غلوبولينات مناعية) تنتجها الخلايا الليمفاوية B",
+      "bareme": 3,
+      "reponse_attendue": "الأجسام المضادة هي بروتينات (غلوبولينات مناعية) تنتجها الخلايا الليمفاوية B المتمايزة إلى خلايا بلازمية، ترتبط نوعيا مع المستضد لتحيده وتمنع تأثيره",
+      "mots_cles_attendus": [
+        "بروتينات",
+        "غلوبولينات",
+        "B",
+        "خلايا بلازمية",
+        "نوعيا"
+      ],
+      "human_score": 2,
+      "human_score_max": 3,
+      "human_dominant_error": "partial_correct",
+      "human_matched_criteria": [
+        "بروتينات",
+        "غلوبولينات",
+        "B"
+      ],
+      "human_unmatched_criteria": [
+        "خلايا بلازمية",
+        "نوعيا"
+      ],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_021",
+      "verb_slug": "restitution",
+      "chapitre": "Immunologie",
+      "question": "ما هي الأجسام المضادة؟",
+      "student_answer": "",
+      "bareme": 3,
+      "reponse_attendue": "الأجسام المضادة هي بروتينات (غلوبولينات مناعية) تنتجها الخلايا الليمفاوية B المتمايزة إلى خلايا بلازمية، ترتبط نوعيا مع المستضد لتحيده وتمنع تأثيره",
+      "mots_cles_attendus": [
+        "بروتينات",
+        "غلوبولينات",
+        "B",
+        "خلايا بلازمية",
+        "نوعيا"
+      ],
+      "human_score": 0,
+      "human_score_max": 3,
+      "human_dominant_error": "empty",
+      "human_matched_criteria": [],
+      "human_unmatched_criteria": [
+        "بروتينات",
+        "غلوبولينات",
+        "B",
+        "خلايا بلازمية",
+        "نوعيا"
+      ],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_022",
+      "verb_slug": "application",
+      "chapitre": "Immunologie",
+      "question": "اشرح مراحل الاستجابة المناعية الخلطية",
+      "student_answer": "1- التعرف: تتعرف الخلايا الليمفاوية B على المستضد، 2- التنشيط: تنشط الخلايا B وتتكاثر، 3- التمايز: تتمايز إلى خلايا بلازمية (تنتج الأجسام المضادة) وخلايا ذاكرة، 4- الإنتاج: تنتج الخلايا البلازمية الأجسام المضادة النوعية التي ترتبط بالمستضد وحيده",
+      "bareme": 5,
+      "reponse_attendue": "1- التعرف: تتعرف الخلايا الليمفاوية B على المستضد، 2- التنشيط: تنشط الخلايا B وتتكاثر، 3- التمايز: تتمايز إلى خلايا بلازمية (تنتج الأجسام المضادة) وخلايا ذاكرة، 4- الإنتاج: تنتج الخلايا البلازمية الأجسام المضادة النوعية التي ترتبط بالمستضد وحيده",
+      "mots_cles_attendus": [
+        "تعرف",
+        "تنشيط",
+        "تمايز",
+        "خلايا بلازمية",
+        "أجسام مضادة",
+        "ذاكرة"
+      ],
+      "human_score": 5,
+      "human_score_max": 5,
+      "human_dominant_error": "all_correct",
+      "human_matched_criteria": [
+        "تعرف",
+        "تنشيط",
+        "تمايز",
+        "خلايا بلازمية",
+        "أجسام مضادة",
+        "ذاكرة"
+      ],
+      "human_unmatched_criteria": [],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_022",
+      "verb_slug": "application",
+      "chapitre": "Immunologie",
+      "question": "اشرح مراحل الاستجابة المناعية الخلطية",
+      "student_answer": "1- التعرف: تتعرف الخلايا الليمفاوية B على المستضد، 2- التنشيط: تنشط الخلايا B وتتكاثر، 3- التمايز: تتمايز إلى خلايا بلازمية (تنتج",
+      "bareme": 5,
+      "reponse_attendue": "1- التعرف: تتعرف الخلايا الليمفاوية B على المستضد، 2- التنشيط: تنشط الخلايا B وتتكاثر، 3- التمايز: تتمايز إلى خلايا بلازمية (تنتج الأجسام المضادة) وخلايا ذاكرة، 4- الإنتاج: تنتج الخلايا البلازمية الأجسام المضادة النوعية التي ترتبط بالمستضد وحيده",
+      "mots_cles_attendus": [
+        "تعرف",
+        "تنشيط",
+        "تمايز",
+        "خلايا بلازمية",
+        "أجسام مضادة",
+        "ذاكرة"
+      ],
+      "human_score": 3,
+      "human_score_max": 5,
+      "human_dominant_error": "partial_correct",
+      "human_matched_criteria": [
+        "تعرف",
+        "تنشيط",
+        "تمايز",
+        "خلايا بلازمية"
+      ],
+      "human_unmatched_criteria": [
+        "أجسام مضادة",
+        "ذاكرة"
+      ],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_023",
+      "verb_slug": "application",
+      "chapitre": "Immunologie",
+      "question": "ما المقصود بالذاكرة المناعية؟",
+      "student_answer": "الذاكرة المناعية هي قدرة الجهاز المناعي على الاحتفاظ بخلايا ذاكرة بعد الاستجابة المناعية الأولى، فعند دخول نفس المستضد مرة ثانية تكون الاستجابة أسرع وأقوى لأن خلايا الذاكرة تتذكر المستضد",
+      "bareme": 3,
+      "reponse_attendue": "الذاكرة المناعية هي قدرة الجهاز المناعي على الاحتفاظ بخلايا ذاكرة بعد الاستجابة المناعية الأولى، فعند دخول نفس المستضد مرة ثانية تكون الاستجابة أسرع وأقوى لأن خلايا الذاكرة تتذكر المستضد",
+      "mots_cles_attendus": [
+        "خلايا ذاكرة",
+        "أسرع",
+        "أقوى",
+        "نفس المستضد"
+      ],
+      "human_score": 3,
+      "human_score_max": 3,
+      "human_dominant_error": "all_correct",
+      "human_matched_criteria": [
+        "خلايا ذاكرة",
+        "أسرع",
+        "أقوى",
+        "نفس المستضد"
+      ],
+      "human_unmatched_criteria": [],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_023",
+      "verb_slug": "application",
+      "chapitre": "Immunologie",
+      "question": "ما المقصود بالذاكرة المناعية؟",
+      "student_answer": "الذاكرة المناعية هي قدرة الجهاز المناعي على الاحتفاظ بخلايا ذاكرة بعد الاستجابة المناعية الأولى، فعند",
+      "bareme": 3,
+      "reponse_attendue": "الذاكرة المناعية هي قدرة الجهاز المناعي على الاحتفاظ بخلايا ذاكرة بعد الاستجابة المناعية الأولى، فعند دخول نفس المستضد مرة ثانية تكون الاستجابة أسرع وأقوى لأن خلايا الذاكرة تتذكر المستضد",
+      "mots_cles_attendus": [
+        "خلايا ذاكرة",
+        "أسرع",
+        "أقوى",
+        "نفس المستضد"
+      ],
+      "human_score": 1,
+      "human_score_max": 3,
+      "human_dominant_error": "partial_correct",
+      "human_matched_criteria": [
+        "خلايا ذاكرة"
+      ],
+      "human_unmatched_criteria": [
+        "أسرع",
+        "أقوى",
+        "نفس المستضد"
+      ],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_023",
+      "verb_slug": "application",
+      "chapitre": "Immunologie",
+      "question": "ما المقصود بالذاكرة المناعية؟",
+      "student_answer": "",
+      "bareme": 3,
+      "reponse_attendue": "الذاكرة المناعية هي قدرة الجهاز المناعي على الاحتفاظ بخلايا ذاكرة بعد الاستجابة المناعية الأولى، فعند دخول نفس المستضد مرة ثانية تكون الاستجابة أسرع وأقوى لأن خلايا الذاكرة تتذكر المستضد",
+      "mots_cles_attendus": [
+        "خلايا ذاكرة",
+        "أسرع",
+        "أقوى",
+        "نفس المستضد"
+      ],
+      "human_score": 0,
+      "human_score_max": 3,
+      "human_dominant_error": "empty",
+      "human_matched_criteria": [],
+      "human_unmatched_criteria": [
+        "خلايا ذاكرة",
+        "أسرع",
+        "أقوى",
+        "نفس المستضد"
+      ],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_024",
+      "verb_slug": "type_bac",
+      "chapitre": "Immunologie",
+      "question": "حلل تجربة تثبت دور الخلايا الليمفاوية T في الاستجابة المناعية الخلوية",
+      "student_answer": "نأخذ فأرين: الفأر الأول سليم والفأر الثاني مستأصل منه الغدة التيموسية. نحقن كلاهما بنفس المستضد. النتائج: الفأر السليم يظهر استجابة خلوية طبيعية، الفأر المستأصل التيموس لا يظهر استجابة خلوية. الاستنتاج: الخلايا الليمفاوية T مسؤولة عن الاستجابة المناعية الخلوية وتتطور في الغدة التيموسية",
+      "bareme": 5,
+      "reponse_attendue": "نأخذ فأرين: الفأر الأول سليم والفأر الثاني مستأصل منه الغدة التيموسية. نحقن كلاهما بنفس المستضد. النتائج: الفأر السليم يظهر استجابة خلوية طبيعية، الفأر المستأصل التيموس لا يظهر استجابة خلوية. الاستنتاج: الخلايا الليمفاوية T مسؤولة عن الاستجابة المناعية الخلوية وتتطور في الغدة التيموسية",
+      "mots_cles_attendus": [
+        "تيموس",
+        "T",
+        "خلوية",
+        "استجابة",
+        "استنتاج"
+      ],
+      "human_score": 5,
+      "human_score_max": 5,
+      "human_dominant_error": "all_correct",
+      "human_matched_criteria": [
+        "تيموس",
+        "T",
+        "خلوية",
+        "استجابة",
+        "استنتاج"
+      ],
+      "human_unmatched_criteria": [],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_024",
+      "verb_slug": "type_bac",
+      "chapitre": "Immunologie",
+      "question": "حلل تجربة تثبت دور الخلايا الليمفاوية T في الاستجابة المناعية الخلوية",
+      "student_answer": "نأخذ فأرين: الفأر الأول سليم والفأر الثاني مستأصل منه الغدة التيموسية. نحقن كلاهما بنفس المستضد. النتائج: الفأر السليم يظهر استجابة خلوية طبيعية، الفأر",
+      "bareme": 5,
+      "reponse_attendue": "نأخذ فأرين: الفأر الأول سليم والفأر الثاني مستأصل منه الغدة التيموسية. نحقن كلاهما بنفس المستضد. النتائج: الفأر السليم يظهر استجابة خلوية طبيعية، الفأر المستأصل التيموس لا يظهر استجابة خلوية. الاستنتاج: الخلايا الليمفاوية T مسؤولة عن الاستجابة المناعية الخلوية وتتطور في الغدة التيموسية",
+      "mots_cles_attendus": [
+        "تيموس",
+        "T",
+        "خلوية",
+        "استجابة",
+        "استنتاج"
+      ],
+      "human_score": 3,
+      "human_score_max": 5,
+      "human_dominant_error": "partial_correct",
+      "human_matched_criteria": [
+        "تيموس",
+        "خلوية",
+        "استجابة"
+      ],
+      "human_unmatched_criteria": [
+        "T",
+        "استنتاج"
+      ],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_025",
+      "verb_slug": "restitution",
+      "chapitre": "Transmission nerveuse",
+      "question": "ما هو كمون الراحة؟",
+      "student_answer": "كمون الراحة هو الفرق في الشحنات الكهربائية بين وجهي الغشاء الخلوي في حالة الراحة، يكون داخل الخلية سالبا بالنسبة للخارج (حوالي -70 ميليفولت)",
+      "bareme": 3,
+      "reponse_attendue": "كمون الراحة هو الفرق في الشحنات الكهربائية بين وجهي الغشاء الخلوي في حالة الراحة، يكون داخل الخلية سالبا بالنسبة للخارج (حوالي -70 ميليفولت)",
+      "mots_cles_attendus": [
+        "الراحة",
+        "الغشاء",
+        "سالبا",
+        "-70",
+        "فرق"
+      ],
+      "human_score": 3,
+      "human_score_max": 3,
+      "human_dominant_error": "all_correct",
+      "human_matched_criteria": [
+        "الراحة",
+        "الغشاء",
+        "سالبا",
+        "-70",
+        "فرق"
+      ],
+      "human_unmatched_criteria": [],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_025",
+      "verb_slug": "restitution",
+      "chapitre": "Transmission nerveuse",
+      "question": "ما هو كمون الراحة؟",
+      "student_answer": "كمون الراحة هو الفرق في الشحنات الكهربائية بين وجهي الغشاء الخلوي في حالة",
+      "bareme": 3,
+      "reponse_attendue": "كمون الراحة هو الفرق في الشحنات الكهربائية بين وجهي الغشاء الخلوي في حالة الراحة، يكون داخل الخلية سالبا بالنسبة للخارج (حوالي -70 ميليفولت)",
+      "mots_cles_attendus": [
+        "الراحة",
+        "الغشاء",
+        "سالبا",
+        "-70",
+        "فرق"
+      ],
+      "human_score": 2,
+      "human_score_max": 3,
+      "human_dominant_error": "partial_correct",
+      "human_matched_criteria": [
+        "الراحة",
+        "الغشاء",
+        "فرق"
+      ],
+      "human_unmatched_criteria": [
+        "سالبا",
+        "-70"
+      ],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_025",
+      "verb_slug": "restitution",
+      "chapitre": "Transmission nerveuse",
+      "question": "ما هو كمون الراحة؟",
+      "student_answer": "",
+      "bareme": 3,
+      "reponse_attendue": "كمون الراحة هو الفرق في الشحنات الكهربائية بين وجهي الغشاء الخلوي في حالة الراحة، يكون داخل الخلية سالبا بالنسبة للخارج (حوالي -70 ميليفولت)",
+      "mots_cles_attendus": [
+        "الراحة",
+        "الغشاء",
+        "سالبا",
+        "-70",
+        "فرق"
+      ],
+      "human_score": 0,
+      "human_score_max": 3,
+      "human_dominant_error": "empty",
+      "human_matched_criteria": [],
+      "human_unmatched_criteria": [
+        "الراحة",
+        "الغشاء",
+        "سالبا",
+        "-70",
+        "فرق"
+      ],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_026",
+      "verb_slug": "restitution",
+      "chapitre": "Transmission nerveuse",
+      "question": "ما هو كمون العمل؟",
+      "student_answer": "كمون العمل هو انعكاس سريع ومؤقت في قطبية الغشاء العصبي عند التنبيه الفعال، يصبح داخل الليف موجبا بالنسبة للخارج ثم يعود لكمون الراحة",
+      "bareme": 3,
+      "reponse_attendue": "كمون العمل هو انعكاس سريع ومؤقت في قطبية الغشاء العصبي عند التنبيه الفعال، يصبح داخل الليف موجبا بالنسبة للخارج ثم يعود لكمون الراحة",
+      "mots_cles_attendus": [
+        "انعكاس",
+        "قطبية",
+        "موجبا",
+        "تنبيه",
+        "فعال"
+      ],
+      "human_score": 3,
+      "human_score_max": 3,
+      "human_dominant_error": "all_correct",
+      "human_matched_criteria": [
+        "انعكاس",
+        "قطبية",
+        "موجبا",
+        "تنبيه",
+        "فعال"
+      ],
+      "human_unmatched_criteria": [],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_026",
+      "verb_slug": "restitution",
+      "chapitre": "Transmission nerveuse",
+      "question": "ما هو كمون العمل؟",
+      "student_answer": "كمون العمل هو انعكاس سريع ومؤقت في قطبية الغشاء العصبي عند التنبيه",
+      "bareme": 3,
+      "reponse_attendue": "كمون العمل هو انعكاس سريع ومؤقت في قطبية الغشاء العصبي عند التنبيه الفعال، يصبح داخل الليف موجبا بالنسبة للخارج ثم يعود لكمون الراحة",
+      "mots_cles_attendus": [
+        "انعكاس",
+        "قطبية",
+        "موجبا",
+        "تنبيه",
+        "فعال"
+      ],
+      "human_score": 2,
+      "human_score_max": 3,
+      "human_dominant_error": "partial_correct",
+      "human_matched_criteria": [
+        "انعكاس",
+        "قطبية",
+        "تنبيه"
+      ],
+      "human_unmatched_criteria": [
+        "موجبا",
+        "فعال"
+      ],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_027",
+      "verb_slug": "restitution",
+      "chapitre": "Transmission nerveuse",
+      "question": "ما هو المشبك الكيميائي؟",
+      "student_answer": "المشبك الكيميائي هو منطقة الاتصال بين عصبونين أو بين عصبون وخلية مستجيبة، يتم فيه نقل الرسالة العصبية بواسطة نواقل كيميائية تنتشر من الطرف قبل المشبكي إلى الطرف بعد المشبكي",
+      "bareme": 3,
+      "reponse_attendue": "المشبك الكيميائي هو منطقة الاتصال بين عصبونين أو بين عصبون وخلية مستجيبة، يتم فيه نقل الرسالة العصبية بواسطة نواقل كيميائية تنتشر من الطرف قبل المشبكي إلى الطرف بعد المشبكي",
+      "mots_cles_attendus": [
+        "اتصال",
+        "نواقل كيميائية",
+        "قبل مشبكي",
+        "بعد مشبكي"
+      ],
+      "human_score": 3,
+      "human_score_max": 3,
+      "human_dominant_error": "all_correct",
+      "human_matched_criteria": [
+        "اتصال",
+        "نواقل كيميائية",
+        "قبل مشبكي",
+        "بعد مشبكي"
+      ],
+      "human_unmatched_criteria": [],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_027",
+      "verb_slug": "restitution",
+      "chapitre": "Transmission nerveuse",
+      "question": "ما هو المشبك الكيميائي؟",
+      "student_answer": "المشبك الكيميائي هو منطقة الاتصال بين عصبونين أو بين عصبون وخلية مستجيبة، يتم فيه نقل الرسالة",
+      "bareme": 3,
+      "reponse_attendue": "المشبك الكيميائي هو منطقة الاتصال بين عصبونين أو بين عصبون وخلية مستجيبة، يتم فيه نقل الرسالة العصبية بواسطة نواقل كيميائية تنتشر من الطرف قبل المشبكي إلى الطرف بعد المشبكي",
+      "mots_cles_attendus": [
+        "اتصال",
+        "نواقل كيميائية",
+        "قبل مشبكي",
+        "بعد مشبكي"
+      ],
+      "human_score": 1,
+      "human_score_max": 3,
+      "human_dominant_error": "partial_correct",
+      "human_matched_criteria": [
+        "اتصال"
+      ],
+      "human_unmatched_criteria": [
+        "نواقل كيميائية",
+        "قبل مشبكي",
+        "بعد مشبكي"
+      ],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_027",
+      "verb_slug": "restitution",
+      "chapitre": "Transmission nerveuse",
+      "question": "ما هو المشبك الكيميائي؟",
+      "student_answer": "",
+      "bareme": 3,
+      "reponse_attendue": "المشبك الكيميائي هو منطقة الاتصال بين عصبونين أو بين عصبون وخلية مستجيبة، يتم فيه نقل الرسالة العصبية بواسطة نواقل كيميائية تنتشر من الطرف قبل المشبكي إلى الطرف بعد المشبكي",
+      "mots_cles_attendus": [
+        "اتصال",
+        "نواقل كيميائية",
+        "قبل مشبكي",
+        "بعد مشبكي"
+      ],
+      "human_score": 0,
+      "human_score_max": 3,
+      "human_dominant_error": "empty",
+      "human_matched_criteria": [],
+      "human_unmatched_criteria": [
+        "اتصال",
+        "نواقل كيميائية",
+        "قبل مشبكي",
+        "بعد مشبكي"
+      ],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_028",
+      "verb_slug": "application",
+      "chapitre": "Transmission nerveuse",
+      "question": "اشرح آلية انتقال الرسالة العصبية عبر المشبك الكيميائي",
+      "student_answer": "1- وصول كمون العمل للطرف قبل المشبكي، 2- دخول شوارد الكالسيوم، 3- إفراز الحويصلات للنواقل العصبية في الشق المشبكي، 4- ارتباط النواقل بالمستقبلات على الغشاء بعد المشبكي، 5- توليد كمون عمل جديد في الخلية بعد المشبكية",
+      "bareme": 5,
+      "reponse_attendue": "1- وصول كمون العمل للطرف قبل المشبكي، 2- دخول شوارد الكالسيوم، 3- إفراز الحويصلات للنواقل العصبية في الشق المشبكي، 4- ارتباط النواقل بالمستقبلات على الغشاء بعد المشبكي، 5- توليد كمون عمل جديد في الخلية بعد المشبكية",
+      "mots_cles_attendus": [
+        "كمون عمل",
+        "كالسيوم",
+        "حويصلات",
+        "نواقل",
+        "مستقبلات",
+        "شق مشبكي"
+      ],
+      "human_score": 5,
+      "human_score_max": 5,
+      "human_dominant_error": "all_correct",
+      "human_matched_criteria": [
+        "كمون عمل",
+        "كالسيوم",
+        "حويصلات",
+        "نواقل",
+        "مستقبلات",
+        "شق مشبكي"
+      ],
+      "human_unmatched_criteria": [],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_028",
+      "verb_slug": "application",
+      "chapitre": "Transmission nerveuse",
+      "question": "اشرح آلية انتقال الرسالة العصبية عبر المشبك الكيميائي",
+      "student_answer": "1- وصول كمون العمل للطرف قبل المشبكي، 2- دخول شوارد الكالسيوم، 3- إفراز الحويصلات للنواقل العصبية في الشق المشبكي،",
+      "bareme": 5,
+      "reponse_attendue": "1- وصول كمون العمل للطرف قبل المشبكي، 2- دخول شوارد الكالسيوم، 3- إفراز الحويصلات للنواقل العصبية في الشق المشبكي، 4- ارتباط النواقل بالمستقبلات على الغشاء بعد المشبكي، 5- توليد كمون عمل جديد في الخلية بعد المشبكية",
+      "mots_cles_attendus": [
+        "كمون عمل",
+        "كالسيوم",
+        "حويصلات",
+        "نواقل",
+        "مستقبلات",
+        "شق مشبكي"
+      ],
+      "human_score": 4,
+      "human_score_max": 5,
+      "human_dominant_error": "partial_correct",
+      "human_matched_criteria": [
+        "كمون عمل",
+        "كالسيوم",
+        "حويصلات",
+        "نواقل",
+        "شق مشبكي"
+      ],
+      "human_unmatched_criteria": [
+        "مستقبلات"
+      ],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_029",
+      "verb_slug": "application",
+      "chapitre": "Transmission nerveuse",
+      "question": "ما هي النواقل العصبية؟ أعط أمثلة",
+      "student_answer": "النواقل العصبية هي جزيئات كيميائية تنتقل من العصبون قبل المشبكي إلى العصبون بعد المشبكي لنقل الرسالة العصبية. أمثلة: الأستيل كولين، الدوبامين، السيروتونين، GABA",
+      "bareme": 3,
+      "reponse_attendue": "النواقل العصبية هي جزيئات كيميائية تنتقل من العصبون قبل المشبكي إلى العصبون بعد المشبكي لنقل الرسالة العصبية. أمثلة: الأستيل كولين، الدوبامين، السيروتونين، GABA",
+      "mots_cles_attendus": [
+        "جزيئات",
+        "كيميائية",
+        "أستيل كولين",
+        "دوبامين",
+        "GABA"
+      ],
+      "human_score": 3,
+      "human_score_max": 3,
+      "human_dominant_error": "all_correct",
+      "human_matched_criteria": [
+        "جزيئات",
+        "كيميائية",
+        "أستيل كولين",
+        "دوبامين",
+        "GABA"
+      ],
+      "human_unmatched_criteria": [],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_029",
+      "verb_slug": "application",
+      "chapitre": "Transmission nerveuse",
+      "question": "ما هي النواقل العصبية؟ أعط أمثلة",
+      "student_answer": "النواقل العصبية هي جزيئات كيميائية تنتقل من العصبون قبل المشبكي إلى العصبون بعد المشبكي",
+      "bareme": 3,
+      "reponse_attendue": "النواقل العصبية هي جزيئات كيميائية تنتقل من العصبون قبل المشبكي إلى العصبون بعد المشبكي لنقل الرسالة العصبية. أمثلة: الأستيل كولين، الدوبامين، السيروتونين، GABA",
+      "mots_cles_attendus": [
+        "جزيئات",
+        "كيميائية",
+        "أستيل كولين",
+        "دوبامين",
+        "GABA"
+      ],
+      "human_score": 1,
+      "human_score_max": 3,
+      "human_dominant_error": "partial_correct",
+      "human_matched_criteria": [
+        "جزيئات",
+        "كيميائية"
+      ],
+      "human_unmatched_criteria": [
+        "أستيل كولين",
+        "دوبامين",
+        "GABA"
+      ],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_029",
+      "verb_slug": "application",
+      "chapitre": "Transmission nerveuse",
+      "question": "ما هي النواقل العصبية؟ أعط أمثلة",
+      "student_answer": "",
+      "bareme": 3,
+      "reponse_attendue": "النواقل العصبية هي جزيئات كيميائية تنتقل من العصبون قبل المشبكي إلى العصبون بعد المشبكي لنقل الرسالة العصبية. أمثلة: الأستيل كولين، الدوبامين، السيروتونين، GABA",
+      "mots_cles_attendus": [
+        "جزيئات",
+        "كيميائية",
+        "أستيل كولين",
+        "دوبامين",
+        "GABA"
+      ],
+      "human_score": 0,
+      "human_score_max": 3,
+      "human_dominant_error": "empty",
+      "human_matched_criteria": [],
+      "human_unmatched_criteria": [
+        "جزيئات",
+        "كيميائية",
+        "أستيل كولين",
+        "دوبامين",
+        "GABA"
+      ],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_030",
+      "verb_slug": "type_bac",
+      "chapitre": "Transmission nerveuse",
+      "question": "حلل تجربة تثبت أن الناقل العصبي الأستيل كولين مسؤول عن نقل الرسالة في المشبك",
+      "student_answer": "نضع إلكترودين قبل وبعد المشبكي، ننبه العصبون قبل المشبكي فنسجل كمون عمل في الجهتين. ثم نحقن مادة تثبط إنزيم أستيل كولين إستراز (الذي يفكك الأستيل كولين) فنلاحظ استمرار الاستجابة بعد المشبكية. نستنتج أن الأستيل كولين هو الناقل العصبي وأن إنزيم أستيل كولين إستراز يوقف تأثيره",
+      "bareme": 6,
+      "reponse_attendue": "نضع إلكترودين قبل وبعد المشبكي، ننبه العصبون قبل المشبكي فنسجل كمون عمل في الجهتين. ثم نحقن مادة تثبط إنزيم أستيل كولين إستراز (الذي يفكك الأستيل كولين) فنلاحظ استمرار الاستجابة بعد المشبكية. نستنتج أن الأستيل كولين هو الناقل العصبي وأن إنزيم أستيل كولين إستراز يوقف تأثيره",
+      "mots_cles_attendus": [
+        "أستيل كولين",
+        "إلكترود",
+        "إنزيم",
+        "أستيل كولين إستراز",
+        "استنتاج"
+      ],
+      "human_score": 6,
+      "human_score_max": 6,
+      "human_dominant_error": "all_correct",
+      "human_matched_criteria": [
+        "أستيل كولين",
+        "إلكترود",
+        "إنزيم",
+        "أستيل كولين إستراز",
+        "استنتاج"
+      ],
+      "human_unmatched_criteria": [],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_030",
+      "verb_slug": "type_bac",
+      "chapitre": "Transmission nerveuse",
+      "question": "حلل تجربة تثبت أن الناقل العصبي الأستيل كولين مسؤول عن نقل الرسالة في المشبك",
+      "student_answer": "نضع إلكترودين قبل وبعد المشبكي، ننبه العصبون قبل المشبكي فنسجل كمون عمل في الجهتين. ثم نحقن مادة تثبط إنزيم أستيل كولين إستراز (الذي يفكك الأستيل",
+      "bareme": 6,
+      "reponse_attendue": "نضع إلكترودين قبل وبعد المشبكي، ننبه العصبون قبل المشبكي فنسجل كمون عمل في الجهتين. ثم نحقن مادة تثبط إنزيم أستيل كولين إستراز (الذي يفكك الأستيل كولين) فنلاحظ استمرار الاستجابة بعد المشبكية. نستنتج أن الأستيل كولين هو الناقل العصبي وأن إنزيم أستيل كولين إستراز يوقف تأثيره",
+      "mots_cles_attendus": [
+        "أستيل كولين",
+        "إلكترود",
+        "إنزيم",
+        "أستيل كولين إستراز",
+        "استنتاج"
+      ],
+      "human_score": 5,
+      "human_score_max": 6,
+      "human_dominant_error": "partial_correct",
+      "human_matched_criteria": [
+        "أستيل كولين",
+        "إلكترود",
+        "إنزيم",
+        "أستيل كولين إستراز"
+      ],
+      "human_unmatched_criteria": [
+        "استنتاج"
+      ],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_031",
+      "verb_slug": "restitution",
+      "chapitre": "Photosynthèse",
+      "question": "ما هي Photosynthèse (البناء الضوئي)؟",
+      "student_answer": "البناء الضوئي هو عملية حيوية تحدث في البلاستيدات الخضراء حيث تصنع المادة العضوية (الغلوكوز) انطلاقا من المادة المعدنية (CO2 والماء) باستخدام الطاقة الضوئية",
+      "bareme": 3,
+      "reponse_attendue": "البناء الضوئي هو عملية حيوية تحدث في البلاستيدات الخضراء حيث تصنع المادة العضوية (الغلوكوز) انطلاقا من المادة المعدنية (CO2 والماء) باستخدام الطاقة الضوئية",
+      "mots_cles_attendus": [
+        "بلاستيدات خضراء",
+        "مادة عضوية",
+        "CO2",
+        "ماء",
+        "طاقة ضوئية"
+      ],
+      "human_score": 3,
+      "human_score_max": 3,
+      "human_dominant_error": "all_correct",
+      "human_matched_criteria": [
+        "بلاستيدات خضراء",
+        "مادة عضوية",
+        "CO2",
+        "ماء",
+        "طاقة ضوئية"
+      ],
+      "human_unmatched_criteria": [],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_031",
+      "verb_slug": "restitution",
+      "chapitre": "Photosynthèse",
+      "question": "ما هي Photosynthèse (البناء الضوئي)؟",
+      "student_answer": "البناء الضوئي هو عملية حيوية تحدث في البلاستيدات الخضراء حيث تصنع المادة العضوية",
+      "bareme": 3,
+      "reponse_attendue": "البناء الضوئي هو عملية حيوية تحدث في البلاستيدات الخضراء حيث تصنع المادة العضوية (الغلوكوز) انطلاقا من المادة المعدنية (CO2 والماء) باستخدام الطاقة الضوئية",
+      "mots_cles_attendus": [
+        "بلاستيدات خضراء",
+        "مادة عضوية",
+        "CO2",
+        "ماء",
+        "طاقة ضوئية"
+      ],
+      "human_score": 1,
+      "human_score_max": 3,
+      "human_dominant_error": "partial_correct",
+      "human_matched_criteria": [
+        "بلاستيدات خضراء",
+        "مادة عضوية"
+      ],
+      "human_unmatched_criteria": [
+        "CO2",
+        "ماء",
+        "طاقة ضوئية"
+      ],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_031",
+      "verb_slug": "restitution",
+      "chapitre": "Photosynthèse",
+      "question": "ما هي Photosynthèse (البناء الضوئي)؟",
+      "student_answer": "",
+      "bareme": 3,
+      "reponse_attendue": "البناء الضوئي هو عملية حيوية تحدث في البلاستيدات الخضراء حيث تصنع المادة العضوية (الغلوكوز) انطلاقا من المادة المعدنية (CO2 والماء) باستخدام الطاقة الضوئية",
+      "mots_cles_attendus": [
+        "بلاستيدات خضراء",
+        "مادة عضوية",
+        "CO2",
+        "ماء",
+        "طاقة ضوئية"
+      ],
+      "human_score": 0,
+      "human_score_max": 3,
+      "human_dominant_error": "empty",
+      "human_matched_criteria": [],
+      "human_unmatched_criteria": [
+        "بلاستيدات خضراء",
+        "مادة عضوية",
+        "CO2",
+        "ماء",
+        "طاقة ضوئية"
+      ],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_032",
+      "verb_slug": "restitution",
+      "chapitre": "Photosynthèse",
+      "question": "أين تحدث عملية البناء الضوئي؟",
+      "student_answer": "تحدث عملية البناء الضوئي في البلاستيدات الخضراء الموجودة في خلايا الأوراق، وتحديدا في الثايلاكويدات التي تحتوي على صبغة الكلوروفيل",
+      "bareme": 2,
+      "reponse_attendue": "تحدث عملية البناء الضوئي في البلاستيدات الخضراء الموجودة في خلايا الأوراق، وتحديدا في الثايلاكويدات التي تحتوي على صبغة الكلوروفيل",
+      "mots_cles_attendus": [
+        "بلاستيدات خضراء",
+        "الأوراق",
+        "ثايلاكويدات",
+        "كلوروفيل"
+      ],
+      "human_score": 2,
+      "human_score_max": 2,
+      "human_dominant_error": "all_correct",
+      "human_matched_criteria": [
+        "بلاستيدات خضراء",
+        "الأوراق",
+        "ثايلاكويدات",
+        "كلوروفيل"
+      ],
+      "human_unmatched_criteria": [],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_032",
+      "verb_slug": "restitution",
+      "chapitre": "Photosynthèse",
+      "question": "أين تحدث عملية البناء الضوئي؟",
+      "student_answer": "تحدث عملية البناء الضوئي في البلاستيدات الخضراء الموجودة في خلايا",
+      "bareme": 2,
+      "reponse_attendue": "تحدث عملية البناء الضوئي في البلاستيدات الخضراء الموجودة في خلايا الأوراق، وتحديدا في الثايلاكويدات التي تحتوي على صبغة الكلوروفيل",
+      "mots_cles_attendus": [
+        "بلاستيدات خضراء",
+        "الأوراق",
+        "ثايلاكويدات",
+        "كلوروفيل"
+      ],
+      "human_score": 0,
+      "human_score_max": 2,
+      "human_dominant_error": "insufficient",
+      "human_matched_criteria": [
+        "بلاستيدات خضراء"
+      ],
+      "human_unmatched_criteria": [
+        "الأوراق",
+        "ثايلاكويدات",
+        "كلوروفيل"
+      ],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_033",
+      "verb_slug": "application",
+      "chapitre": "Photosynthèse",
+      "question": "ما هي مراحل البناء الضوئي؟",
+      "student_answer": "البناء الضوئي يمر بمرحلتين: 1- المرحلة الضوئية: تحدث في الثايلاكويدات، يتم امتصاص الطاقة الضوئية وتفكك الماء وإنتاج ATP و NADPH وتحرر الأكسجين، 2- المرحلة الكيميائية (دورة كالفن): تحدث في الستروما، يتم تثبيت CO2 وتركيب الغلوكوز باستخدام ATP و NADPH",
+      "bareme": 5,
+      "reponse_attendue": "البناء الضوئي يمر بمرحلتين: 1- المرحلة الضوئية: تحدث في الثايلاكويدات، يتم امتصاص الطاقة الضوئية وتفكك الماء وإنتاج ATP و NADPH وتحرر الأكسجين، 2- المرحلة الكيميائية (دورة كالفن): تحدث في الستروما، يتم تثبيت CO2 وتركيب الغلوكوز باستخدام ATP و NADPH",
+      "mots_cles_attendus": [
+        "ضوئية",
+        "كيميائية",
+        "ثايلاكويدات",
+        "ستروما",
+        "ATP",
+        "كالفن"
+      ],
+      "human_score": 5,
+      "human_score_max": 5,
+      "human_dominant_error": "all_correct",
+      "human_matched_criteria": [
+        "ضوئية",
+        "كيميائية",
+        "ثايلاكويدات",
+        "ستروما",
+        "ATP",
+        "كالفن"
+      ],
+      "human_unmatched_criteria": [],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_033",
+      "verb_slug": "application",
+      "chapitre": "Photosynthèse",
+      "question": "ما هي مراحل البناء الضوئي؟",
+      "student_answer": "البناء الضوئي يمر بمرحلتين: 1- المرحلة الضوئية: تحدث في الثايلاكويدات، يتم امتصاص الطاقة الضوئية وتفكك الماء وإنتاج ATP و NADPH وتحرر",
+      "bareme": 5,
+      "reponse_attendue": "البناء الضوئي يمر بمرحلتين: 1- المرحلة الضوئية: تحدث في الثايلاكويدات، يتم امتصاص الطاقة الضوئية وتفكك الماء وإنتاج ATP و NADPH وتحرر الأكسجين، 2- المرحلة الكيميائية (دورة كالفن): تحدث في الستروما، يتم تثبيت CO2 وتركيب الغلوكوز باستخدام ATP و NADPH",
+      "mots_cles_attendus": [
+        "ضوئية",
+        "كيميائية",
+        "ثايلاكويدات",
+        "ستروما",
+        "ATP",
+        "كالفن"
+      ],
+      "human_score": 2,
+      "human_score_max": 5,
+      "human_dominant_error": "partial_correct",
+      "human_matched_criteria": [
+        "ضوئية",
+        "ثايلاكويدات",
+        "ATP"
+      ],
+      "human_unmatched_criteria": [
+        "كيميائية",
+        "ستروما",
+        "كالفن"
+      ],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_033",
+      "verb_slug": "application",
+      "chapitre": "Photosynthèse",
+      "question": "ما هي مراحل البناء الضوئي؟",
+      "student_answer": "",
+      "bareme": 5,
+      "reponse_attendue": "البناء الضوئي يمر بمرحلتين: 1- المرحلة الضوئية: تحدث في الثايلاكويدات، يتم امتصاص الطاقة الضوئية وتفكك الماء وإنتاج ATP و NADPH وتحرر الأكسجين، 2- المرحلة الكيميائية (دورة كالفن): تحدث في الستروما، يتم تثبيت CO2 وتركيب الغلوكوز باستخدام ATP و NADPH",
+      "mots_cles_attendus": [
+        "ضوئية",
+        "كيميائية",
+        "ثايلاكويدات",
+        "ستروما",
+        "ATP",
+        "كالفن"
+      ],
+      "human_score": 0,
+      "human_score_max": 5,
+      "human_dominant_error": "empty",
+      "human_matched_criteria": [],
+      "human_unmatched_criteria": [
+        "ضوئية",
+        "كيميائية",
+        "ثايلاكويدات",
+        "ستروما",
+        "ATP",
+        "كالفن"
+      ],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_034",
+      "verb_slug": "application",
+      "chapitre": "Photosynthèse",
+      "question": "ما هو دور الكلوروفيل في البناء الضوئي؟",
+      "student_answer": "الكلوروفيل صبغة خضراء موجودة في الثايلاكويدات، دوره هو امتصاص الطاقة الضوئية وتحويلها إلى طاقة كيميائية (ATP) تستخدم في تفاعلات البناء الضوئي",
+      "bareme": 3,
+      "reponse_attendue": "الكلوروفيل صبغة خضراء موجودة في الثايلاكويدات، دوره هو امتصاص الطاقة الضوئية وتحويلها إلى طاقة كيميائية (ATP) تستخدم في تفاعلات البناء الضوئي",
+      "mots_cles_attendus": [
+        "صبغة",
+        "خضراء",
+        "امتصاص",
+        "طاقة ضوئية",
+        "ATP"
+      ],
+      "human_score": 3,
+      "human_score_max": 3,
+      "human_dominant_error": "all_correct",
+      "human_matched_criteria": [
+        "صبغة",
+        "خضراء",
+        "امتصاص",
+        "طاقة ضوئية",
+        "ATP"
+      ],
+      "human_unmatched_criteria": [],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_034",
+      "verb_slug": "application",
+      "chapitre": "Photosynthèse",
+      "question": "ما هو دور الكلوروفيل في البناء الضوئي؟",
+      "student_answer": "الكلوروفيل صبغة خضراء موجودة في الثايلاكويدات، دوره هو امتصاص الطاقة الضوئية",
+      "bareme": 3,
+      "reponse_attendue": "الكلوروفيل صبغة خضراء موجودة في الثايلاكويدات، دوره هو امتصاص الطاقة الضوئية وتحويلها إلى طاقة كيميائية (ATP) تستخدم في تفاعلات البناء الضوئي",
+      "mots_cles_attendus": [
+        "صبغة",
+        "خضراء",
+        "امتصاص",
+        "طاقة ضوئية",
+        "ATP"
+      ],
+      "human_score": 2,
+      "human_score_max": 3,
+      "human_dominant_error": "partial_correct",
+      "human_matched_criteria": [
+        "صبغة",
+        "خضراء",
+        "امتصاص",
+        "طاقة ضوئية"
+      ],
+      "human_unmatched_criteria": [
+        "ATP"
+      ],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_035",
+      "verb_slug": "type_bac",
+      "chapitre": "Photosynthèse",
+      "question": "صمم تجربة تثبت أن البناء الضوئي ينتج الأكسجين",
+      "student_answer": "نأخذ نبتة مائية (إلوديا) ونضعها في قمع مقلوب في أنبوب اختبار مملوء بالماء. نضع الجهاز في الضوء. النتائج: نلاحظ تصاعد فقاعات الغاز نحو الأنبوب. نجمع الغاز وندخل شعلة مشتعلة فتزداد توهجا. الاستنتاج: الغاز المتصاعد هو الأكسجين الناتج عن البناء الضوئي",
+      "bareme": 5,
+      "reponse_attendue": "نأخذ نبتة مائية (إلوديا) ونضعها في قمع مقلوب في أنبوب اختبار مملوء بالماء. نضع الجهاز في الضوء. النتائج: نلاحظ تصاعد فقاعات الغاز نحو الأنبوب. نجمع الغاز وندخل شعلة مشتعلة فتزداد توهجا. الاستنتاج: الغاز المتصاعد هو الأكسجين الناتج عن البناء الضوئي",
+      "mots_cles_attendus": [
+        "إلوديا",
+        "قمع",
+        "ضوء",
+        "فقاعات",
+        "أكسجين",
+        "شعلة",
+        "استنتاج"
+      ],
+      "human_score": 5,
+      "human_score_max": 5,
+      "human_dominant_error": "all_correct",
+      "human_matched_criteria": [
+        "إلوديا",
+        "قمع",
+        "ضوء",
+        "فقاعات",
+        "أكسجين",
+        "شعلة",
+        "استنتاج"
+      ],
+      "human_unmatched_criteria": [],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_035",
+      "verb_slug": "type_bac",
+      "chapitre": "Photosynthèse",
+      "question": "صمم تجربة تثبت أن البناء الضوئي ينتج الأكسجين",
+      "student_answer": "نأخذ نبتة مائية (إلوديا) ونضعها في قمع مقلوب في أنبوب اختبار مملوء بالماء. نضع الجهاز في الضوء. النتائج: نلاحظ تصاعد فقاعات الغاز نحو",
+      "bareme": 5,
+      "reponse_attendue": "نأخذ نبتة مائية (إلوديا) ونضعها في قمع مقلوب في أنبوب اختبار مملوء بالماء. نضع الجهاز في الضوء. النتائج: نلاحظ تصاعد فقاعات الغاز نحو الأنبوب. نجمع الغاز وندخل شعلة مشتعلة فتزداد توهجا. الاستنتاج: الغاز المتصاعد هو الأكسجين الناتج عن البناء الضوئي",
+      "mots_cles_attendus": [
+        "إلوديا",
+        "قمع",
+        "ضوء",
+        "فقاعات",
+        "أكسجين",
+        "شعلة",
+        "استنتاج"
+      ],
+      "human_score": 3,
+      "human_score_max": 5,
+      "human_dominant_error": "partial_correct",
+      "human_matched_criteria": [
+        "إلوديا",
+        "قمع",
+        "ضوء",
+        "فقاعات"
+      ],
+      "human_unmatched_criteria": [
+        "أكسجين",
+        "شعلة",
+        "استنتاج"
+      ],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_035",
+      "verb_slug": "type_bac",
+      "chapitre": "Photosynthèse",
+      "question": "صمم تجربة تثبت أن البناء الضوئي ينتج الأكسجين",
+      "student_answer": "",
+      "bareme": 5,
+      "reponse_attendue": "نأخذ نبتة مائية (إلوديا) ونضعها في قمع مقلوب في أنبوب اختبار مملوء بالماء. نضع الجهاز في الضوء. النتائج: نلاحظ تصاعد فقاعات الغاز نحو الأنبوب. نجمع الغاز وندخل شعلة مشتعلة فتزداد توهجا. الاستنتاج: الغاز المتصاعد هو الأكسجين الناتج عن البناء الضوئي",
+      "mots_cles_attendus": [
+        "إلوديا",
+        "قمع",
+        "ضوء",
+        "فقاعات",
+        "أكسجين",
+        "شعلة",
+        "استنتاج"
+      ],
+      "human_score": 0,
+      "human_score_max": 5,
+      "human_dominant_error": "empty",
+      "human_matched_criteria": [],
+      "human_unmatched_criteria": [
+        "إلوديا",
+        "قمع",
+        "ضوء",
+        "فقاعات",
+        "أكسجين",
+        "شعلة",
+        "استنتاج"
+      ],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_036",
+      "verb_slug": "restitution",
+      "chapitre": "Génétique",
+      "question": "ما هو ADN؟",
+      "student_answer": "ADN (الحمض النووي الريبي منقوص الأكسجين) هو جزيئة تحمل المعلومة الوراثية، يتكون من سلسلتين ملتفين على شكل لولب مزدوج، ويتكون من وحدات تسمى النيوكليوتيدات",
+      "bareme": 3,
+      "reponse_attendue": "ADN (الحمض النووي الريبي منقوص الأكسجين) هو جزيئة تحمل المعلومة الوراثية، يتكون من سلسلتين ملتفين على شكل لولب مزدوج، ويتكون من وحدات تسمى النيوكليوتيدات",
+      "mots_cles_attendus": [
+        "معلومة وراثية",
+        "لولب مزدوج",
+        "نيوكليوتيدات",
+        "سلسلتين"
+      ],
+      "human_score": 3,
+      "human_score_max": 3,
+      "human_dominant_error": "all_correct",
+      "human_matched_criteria": [
+        "معلومة وراثية",
+        "لولب مزدوج",
+        "نيوكليوتيدات",
+        "سلسلتين"
+      ],
+      "human_unmatched_criteria": [],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_036",
+      "verb_slug": "restitution",
+      "chapitre": "Génétique",
+      "question": "ما هو ADN؟",
+      "student_answer": "ADN (الحمض النووي الريبي منقوص الأكسجين) هو جزيئة تحمل المعلومة الوراثية، يتكون من",
+      "bareme": 3,
+      "reponse_attendue": "ADN (الحمض النووي الريبي منقوص الأكسجين) هو جزيئة تحمل المعلومة الوراثية، يتكون من سلسلتين ملتفين على شكل لولب مزدوج، ويتكون من وحدات تسمى النيوكليوتيدات",
+      "mots_cles_attendus": [
+        "معلومة وراثية",
+        "لولب مزدوج",
+        "نيوكليوتيدات",
+        "سلسلتين"
+      ],
+      "human_score": 1,
+      "human_score_max": 3,
+      "human_dominant_error": "partial_correct",
+      "human_matched_criteria": [
+        "معلومة وراثية"
+      ],
+      "human_unmatched_criteria": [
+        "لولب مزدوج",
+        "نيوكليوتيدات",
+        "سلسلتين"
+      ],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_037",
+      "verb_slug": "restitution",
+      "chapitre": "Génétique",
+      "question": "ما هي مكونات النيوكليوتيد؟",
+      "student_answer": "النيوكليوتيد يتكون من ثلاثة مكونات: 1- حمض فوسفوري، 2- سكر خماسي (ديوكسي ريبوز)، 3- قاعدة آزوتية (أدنين، غوانين، سيتوزين، ثايمين)",
+      "bareme": 3,
+      "reponse_attendue": "النيوكليوتيد يتكون من ثلاثة مكونات: 1- حمض فوسفوري، 2- سكر خماسي (ديوكسي ريبوز)، 3- قاعدة آزوتية (أدنين، غوانين، سيتوزين، ثايمين)",
+      "mots_cles_attendus": [
+        "حمض فوسفوري",
+        "سكر خماسي",
+        "ديوكسي ريبوز",
+        "قاعدة آزوتية"
+      ],
+      "human_score": 3,
+      "human_score_max": 3,
+      "human_dominant_error": "all_correct",
+      "human_matched_criteria": [
+        "حمض فوسفوري",
+        "سكر خماسي",
+        "ديوكسي ريبوز",
+        "قاعدة آزوتية"
+      ],
+      "human_unmatched_criteria": [],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_037",
+      "verb_slug": "restitution",
+      "chapitre": "Génétique",
+      "question": "ما هي مكونات النيوكليوتيد؟",
+      "student_answer": "النيوكليوتيد يتكون من ثلاثة مكونات: 1- حمض فوسفوري، 2- سكر خماسي",
+      "bareme": 3,
+      "reponse_attendue": "النيوكليوتيد يتكون من ثلاثة مكونات: 1- حمض فوسفوري، 2- سكر خماسي (ديوكسي ريبوز)، 3- قاعدة آزوتية (أدنين، غوانين، سيتوزين، ثايمين)",
+      "mots_cles_attendus": [
+        "حمض فوسفوري",
+        "سكر خماسي",
+        "ديوكسي ريبوز",
+        "قاعدة آزوتية"
+      ],
+      "human_score": 2,
+      "human_score_max": 3,
+      "human_dominant_error": "partial_correct",
+      "human_matched_criteria": [
+        "حمض فوسفوري",
+        "سكر خماسي"
+      ],
+      "human_unmatched_criteria": [
+        "ديوكسي ريبوز",
+        "قاعدة آزوتية"
+      ],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_037",
+      "verb_slug": "restitution",
+      "chapitre": "Génétique",
+      "question": "ما هي مكونات النيوكليوتيد؟",
+      "student_answer": "",
+      "bareme": 3,
+      "reponse_attendue": "النيوكليوتيد يتكون من ثلاثة مكونات: 1- حمض فوسفوري، 2- سكر خماسي (ديوكسي ريبوز)، 3- قاعدة آزوتية (أدنين، غوانين، سيتوزين، ثايمين)",
+      "mots_cles_attendus": [
+        "حمض فوسفوري",
+        "سكر خماسي",
+        "ديوكسي ريبوز",
+        "قاعدة آزوتية"
+      ],
+      "human_score": 0,
+      "human_score_max": 3,
+      "human_dominant_error": "empty",
+      "human_matched_criteria": [],
+      "human_unmatched_criteria": [
+        "حمض فوسفوري",
+        "سكر خماسي",
+        "ديوكسي ريبوز",
+        "قاعدة آزوتية"
+      ],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_038",
+      "verb_slug": "restitution",
+      "chapitre": "Génétique",
+      "question": "ما هي القواعد الآزوتية في ADN وكيف تترابط؟",
+      "student_answer": "القواعد الآزوتية أربعة: أدنين (A)، غوانين (G)، سيتوزين (C)، ثايمين (T). تترابط بشكل نوعي: A مع T بروابط هيدروجينية مزدوجة، G مع C بروابط هيدروجينية ثلاثية",
+      "bareme": 3,
+      "reponse_attendue": "القواعد الآزوتية أربعة: أدنين (A)، غوانين (G)، سيتوزين (C)، ثايمين (T). تترابط بشكل نوعي: A مع T بروابط هيدروجينية مزدوجة، G مع C بروابط هيدروجينية ثلاثية",
+      "mots_cles_attendus": [
+        "أدنين",
+        "غوانين",
+        "سيتوزين",
+        "ثايمين",
+        "روابط هيدروجينية",
+        "نوعي"
+      ],
+      "human_score": 3,
+      "human_score_max": 3,
+      "human_dominant_error": "all_correct",
+      "human_matched_criteria": [
+        "أدنين",
+        "غوانين",
+        "سيتوزين",
+        "ثايمين",
+        "روابط هيدروجينية",
+        "نوعي"
+      ],
+      "human_unmatched_criteria": [],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_038",
+      "verb_slug": "restitution",
+      "chapitre": "Génétique",
+      "question": "ما هي القواعد الآزوتية في ADN وكيف تترابط؟",
+      "student_answer": "القواعد الآزوتية أربعة: أدنين (A)، غوانين (G)، سيتوزين (C)، ثايمين (T). تترابط بشكل",
+      "bareme": 3,
+      "reponse_attendue": "القواعد الآزوتية أربعة: أدنين (A)، غوانين (G)، سيتوزين (C)، ثايمين (T). تترابط بشكل نوعي: A مع T بروابط هيدروجينية مزدوجة، G مع C بروابط هيدروجينية ثلاثية",
+      "mots_cles_attendus": [
+        "أدنين",
+        "غوانين",
+        "سيتوزين",
+        "ثايمين",
+        "روابط هيدروجينية",
+        "نوعي"
+      ],
+      "human_score": 2,
+      "human_score_max": 3,
+      "human_dominant_error": "partial_correct",
+      "human_matched_criteria": [
+        "أدنين",
+        "غوانين",
+        "سيتوزين",
+        "ثايمين"
+      ],
+      "human_unmatched_criteria": [
+        "روابط هيدروجينية",
+        "نوعي"
+      ],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_039",
+      "verb_slug": "application",
+      "chapitre": "Génétique",
+      "question": "اشرح آلية تضاعف ADN",
+      "student_answer": "تضاعف ADN شبه محافظ: 1- تنفتح السلسلتان بواسطة إنزيم، 2- كل سلسلة تعمل كقالب، 3- ترتبط النيوكليوتيدات الحرة حسب الترابط النوعي (A-T, G-C)، 4- تتشكل سلسلتان جديدتان متطابقتان، كل واحدة تحتوي على سلسلة قديمة وأخرى جديدة",
+      "bareme": 5,
+      "reponse_attendue": "تضاعف ADN شبه محافظ: 1- تنفتح السلسلتان بواسطة إنزيم، 2- كل سلسلة تعمل كقالب، 3- ترتبط النيوكليوتيدات الحرة حسب الترابط النوعي (A-T, G-C)، 4- تتشكل سلسلتان جديدتان متطابقتان، كل واحدة تحتوي على سلسلة قديمة وأخرى جديدة",
+      "mots_cles_attendus": [
+        "شبه محافظ",
+        "قالب",
+        "ترابط نوعي",
+        "نيوكليوتيدات",
+        "إنزيم"
+      ],
+      "human_score": 5,
+      "human_score_max": 5,
+      "human_dominant_error": "all_correct",
+      "human_matched_criteria": [
+        "شبه محافظ",
+        "قالب",
+        "ترابط نوعي",
+        "نيوكليوتيدات",
+        "إنزيم"
+      ],
+      "human_unmatched_criteria": [],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_039",
+      "verb_slug": "application",
+      "chapitre": "Génétique",
+      "question": "اشرح آلية تضاعف ADN",
+      "student_answer": "تضاعف ADN شبه محافظ: 1- تنفتح السلسلتان بواسطة إنزيم، 2- كل سلسلة تعمل كقالب، 3- ترتبط النيوكليوتيدات الحرة حسب",
+      "bareme": 5,
+      "reponse_attendue": "تضاعف ADN شبه محافظ: 1- تنفتح السلسلتان بواسطة إنزيم، 2- كل سلسلة تعمل كقالب، 3- ترتبط النيوكليوتيدات الحرة حسب الترابط النوعي (A-T, G-C)، 4- تتشكل سلسلتان جديدتان متطابقتان، كل واحدة تحتوي على سلسلة قديمة وأخرى جديدة",
+      "mots_cles_attendus": [
+        "شبه محافظ",
+        "قالب",
+        "ترابط نوعي",
+        "نيوكليوتيدات",
+        "إنزيم"
+      ],
+      "human_score": 4,
+      "human_score_max": 5,
+      "human_dominant_error": "partial_correct",
+      "human_matched_criteria": [
+        "شبه محافظ",
+        "قالب",
+        "نيوكليوتيدات",
+        "إنزيم"
+      ],
+      "human_unmatched_criteria": [
+        "ترابط نوعي"
+      ],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_039",
+      "verb_slug": "application",
+      "chapitre": "Génétique",
+      "question": "اشرح آلية تضاعف ADN",
+      "student_answer": "",
+      "bareme": 5,
+      "reponse_attendue": "تضاعف ADN شبه محافظ: 1- تنفتح السلسلتان بواسطة إنزيم، 2- كل سلسلة تعمل كقالب، 3- ترتبط النيوكليوتيدات الحرة حسب الترابط النوعي (A-T, G-C)، 4- تتشكل سلسلتان جديدتان متطابقتان، كل واحدة تحتوي على سلسلة قديمة وأخرى جديدة",
+      "mots_cles_attendus": [
+        "شبه محافظ",
+        "قالب",
+        "ترابط نوعي",
+        "نيوكليوتيدات",
+        "إنزيم"
+      ],
+      "human_score": 0,
+      "human_score_max": 5,
+      "human_dominant_error": "empty",
+      "human_matched_criteria": [],
+      "human_unmatched_criteria": [
+        "شبه محافظ",
+        "قالب",
+        "ترابط نوعي",
+        "نيوكليوتيدات",
+        "إنزيم"
+      ],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_040",
+      "verb_slug": "application",
+      "chapitre": "Génétique",
+      "question": "ما الفرق بين ADN و ARN؟",
+      "student_answer": "ADN يحتوي على سكر ديوكسي ريبوز وقاعدة ثايمين وهو ثنائي السلسلة، بينما ARN يحتوي على سكر ريبوز وقاعدة يوراسيل بدل ثايمين وهو أحادي السلسلة",
+      "bareme": 3,
+      "reponse_attendue": "ADN يحتوي على سكر ديوكسي ريبوز وقاعدة ثايمين وهو ثنائي السلسلة، بينما ARN يحتوي على سكر ريبوز وقاعدة يوراسيل بدل ثايمين وهو أحادي السلسلة",
+      "mots_cles_attendus": [
+        "ديوكسي ريبوز",
+        "ريبوز",
+        "ثايمين",
+        "يوراسيل",
+        "ثنائي",
+        "أحادي"
+      ],
+      "human_score": 3,
+      "human_score_max": 3,
+      "human_dominant_error": "all_correct",
+      "human_matched_criteria": [
+        "ديوكسي ريبوز",
+        "ريبوز",
+        "ثايمين",
+        "يوراسيل",
+        "ثنائي",
+        "أحادي"
+      ],
+      "human_unmatched_criteria": [],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_040",
+      "verb_slug": "application",
+      "chapitre": "Génétique",
+      "question": "ما الفرق بين ADN و ARN؟",
+      "student_answer": "ADN يحتوي على سكر ديوكسي ريبوز وقاعدة ثايمين وهو ثنائي السلسلة، بينما ARN",
+      "bareme": 3,
+      "reponse_attendue": "ADN يحتوي على سكر ديوكسي ريبوز وقاعدة ثايمين وهو ثنائي السلسلة، بينما ARN يحتوي على سكر ريبوز وقاعدة يوراسيل بدل ثايمين وهو أحادي السلسلة",
+      "mots_cles_attendus": [
+        "ديوكسي ريبوز",
+        "ريبوز",
+        "ثايمين",
+        "يوراسيل",
+        "ثنائي",
+        "أحادي"
+      ],
+      "human_score": 2,
+      "human_score_max": 3,
+      "human_dominant_error": "partial_correct",
+      "human_matched_criteria": [
+        "ديوكسي ريبوز",
+        "ريبوز",
+        "ثايمين",
+        "ثنائي"
+      ],
+      "human_unmatched_criteria": [
+        "يوراسيل",
+        "أحادي"
+      ],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_041",
+      "verb_slug": "type_bac",
+      "chapitre": "Génétique",
+      "question": "حلل تجربة تثبت أن ADN هو المادة الوراثية",
+      "student_answer": "تجربة أفري: نأخذ سلالتين من البكتيريا، سلالة ممرضة (S) وسلالة غير ممرضة (R). نقتل السلالة S بالحرارة ونستخلص ADN منها، نحقنه في السلالة R. النتائج: تتحول السلالة R إلى سلالة ممرضة S. الاستنتاج: ADN هو المادة الوراثية المسؤولة عن نقل الصفات الوراثية",
+      "bareme": 6,
+      "reponse_attendue": "تجربة أفري: نأخذ سلالتين من البكتيريا، سلالة ممرضة (S) وسلالة غير ممرضة (R). نقتل السلالة S بالحرارة ونستخلص ADN منها، نحقنه في السلالة R. النتائج: تتحول السلالة R إلى سلالة ممرضة S. الاستنتاج: ADN هو المادة الوراثية المسؤولة عن نقل الصفات الوراثية",
+      "mots_cles_attendus": [
+        "أفري",
+        "بكتيريا",
+        "ممرضة",
+        "S",
+        "R",
+        "تحول",
+        "استنتاج"
+      ],
+      "human_score": 6,
+      "human_score_max": 6,
+      "human_dominant_error": "all_correct",
+      "human_matched_criteria": [
+        "أفري",
+        "بكتيريا",
+        "ممرضة",
+        "S",
+        "R",
+        "تحول",
+        "استنتاج"
+      ],
+      "human_unmatched_criteria": [],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_041",
+      "verb_slug": "type_bac",
+      "chapitre": "Génétique",
+      "question": "حلل تجربة تثبت أن ADN هو المادة الوراثية",
+      "student_answer": "تجربة أفري: نأخذ سلالتين من البكتيريا، سلالة ممرضة (S) وسلالة غير ممرضة (R). نقتل السلالة S بالحرارة ونستخلص ADN منها، نحقنه في السلالة",
+      "bareme": 6,
+      "reponse_attendue": "تجربة أفري: نأخذ سلالتين من البكتيريا، سلالة ممرضة (S) وسلالة غير ممرضة (R). نقتل السلالة S بالحرارة ونستخلص ADN منها، نحقنه في السلالة R. النتائج: تتحول السلالة R إلى سلالة ممرضة S. الاستنتاج: ADN هو المادة الوراثية المسؤولة عن نقل الصفات الوراثية",
+      "mots_cles_attendus": [
+        "أفري",
+        "بكتيريا",
+        "ممرضة",
+        "S",
+        "R",
+        "تحول",
+        "استنتاج"
+      ],
+      "human_score": 4,
+      "human_score_max": 6,
+      "human_dominant_error": "partial_correct",
+      "human_matched_criteria": [
+        "أفري",
+        "بكتيريا",
+        "ممرضة",
+        "S",
+        "R"
+      ],
+      "human_unmatched_criteria": [
+        "تحول",
+        "استنتاج"
+      ],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_041",
+      "verb_slug": "type_bac",
+      "chapitre": "Génétique",
+      "question": "حلل تجربة تثبت أن ADN هو المادة الوراثية",
+      "student_answer": "",
+      "bareme": 6,
+      "reponse_attendue": "تجربة أفري: نأخذ سلالتين من البكتيريا، سلالة ممرضة (S) وسلالة غير ممرضة (R). نقتل السلالة S بالحرارة ونستخلص ADN منها، نحقنه في السلالة R. النتائج: تتحول السلالة R إلى سلالة ممرضة S. الاستنتاج: ADN هو المادة الوراثية المسؤولة عن نقل الصفات الوراثية",
+      "mots_cles_attendus": [
+        "أفري",
+        "بكتيريا",
+        "ممرضة",
+        "S",
+        "R",
+        "تحول",
+        "استنتاج"
+      ],
+      "human_score": 0,
+      "human_score_max": 6,
+      "human_dominant_error": "empty",
+      "human_matched_criteria": [],
+      "human_unmatched_criteria": [
+        "أفري",
+        "بكتيريا",
+        "ممرضة",
+        "S",
+        "R",
+        "تحول",
+        "استنتاج"
+      ],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_042",
+      "verb_slug": "type_bac",
+      "chapitre": "Génétique",
+      "question": "اشرح كيف يحدد ADN الصفات الوراثية",
+      "student_answer": "ADN يحمل المعلومة الوراثية على شكل تسلسل القواعد الآزوتية، هذه المعلومة تُنسخ إلى ARNm ثم تُترجم إلى بروتين في الريبوزوم. البروتينات هي التي تحدد الصفات الوراثية. العلاقة: تسلسل القواعد في ADN يحدد تسلسل الأحماض الأمينية في البروتين",
+      "bareme": 5,
+      "reponse_attendue": "ADN يحمل المعلومة الوراثية على شكل تسلسل القواعد الآزوتية، هذه المعلومة تُنسخ إلى ARNm ثم تُترجم إلى بروتين في الريبوزوم. البروتينات هي التي تحدد الصفات الوراثية. العلاقة: تسلسل القواعد في ADN يحدد تسلسل الأحماض الأمينية في البروتين",
+      "mots_cles_attendus": [
+        "تسلسل",
+        "قواعد",
+        "نسخ",
+        "ARNm",
+        "ترجمة",
+        "بروتين",
+        "صفات"
+      ],
+      "human_score": 5,
+      "human_score_max": 5,
+      "human_dominant_error": "all_correct",
+      "human_matched_criteria": [
+        "تسلسل",
+        "قواعد",
+        "نسخ",
+        "ARNm",
+        "ترجمة",
+        "بروتين",
+        "صفات"
+      ],
+      "human_unmatched_criteria": [],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_042",
+      "verb_slug": "type_bac",
+      "chapitre": "Génétique",
+      "question": "اشرح كيف يحدد ADN الصفات الوراثية",
+      "student_answer": "ADN يحمل المعلومة الوراثية على شكل تسلسل القواعد الآزوتية، هذه المعلومة تُنسخ إلى ARNm ثم تُترجم إلى بروتين في الريبوزوم.",
+      "bareme": 5,
+      "reponse_attendue": "ADN يحمل المعلومة الوراثية على شكل تسلسل القواعد الآزوتية، هذه المعلومة تُنسخ إلى ARNm ثم تُترجم إلى بروتين في الريبوزوم. البروتينات هي التي تحدد الصفات الوراثية. العلاقة: تسلسل القواعد في ADN يحدد تسلسل الأحماض الأمينية في البروتين",
+      "mots_cles_attendus": [
+        "تسلسل",
+        "قواعد",
+        "نسخ",
+        "ARNm",
+        "ترجمة",
+        "بروتين",
+        "صفات"
+      ],
+      "human_score": 4,
+      "human_score_max": 5,
+      "human_dominant_error": "partial_correct",
+      "human_matched_criteria": [
+        "تسلسل",
+        "قواعد",
+        "نسخ",
+        "ARNm",
+        "بروتين"
+      ],
+      "human_unmatched_criteria": [
+        "ترجمة",
+        "صفات"
+      ],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_043",
+      "verb_slug": "restitution",
+      "chapitre": "Géologie",
+      "question": "ما هي البنية الداخلية للأرض؟",
+      "student_answer": "تتكون الأرض من ثلاث طبقات: 1- القشرة الأرضية (الصلبة الخارجية)، 2- الوشاح (الطبقة الوسطى)، 3- النواة (اللب الداخلي والخارجي)",
+      "bareme": 2,
+      "reponse_attendue": "تتكون الأرض من ثلاث طبقات: 1- القشرة الأرضية (الصلبة الخارجية)، 2- الوشاح (الطبقة الوسطى)، 3- النواة (اللب الداخلي والخارجي)",
+      "mots_cles_attendus": [
+        "قشرة",
+        "وشاح",
+        "نواة",
+        "ثلاث"
+      ],
+      "human_score": 2,
+      "human_score_max": 2,
+      "human_dominant_error": "all_correct",
+      "human_matched_criteria": [
+        "قشرة",
+        "وشاح",
+        "نواة",
+        "ثلاث"
+      ],
+      "human_unmatched_criteria": [],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_043",
+      "verb_slug": "restitution",
+      "chapitre": "Géologie",
+      "question": "ما هي البنية الداخلية للأرض؟",
+      "student_answer": "تتكون الأرض من ثلاث طبقات: 1- القشرة الأرضية (الصلبة الخارجية)، 2-",
+      "bareme": 2,
+      "reponse_attendue": "تتكون الأرض من ثلاث طبقات: 1- القشرة الأرضية (الصلبة الخارجية)، 2- الوشاح (الطبقة الوسطى)، 3- النواة (اللب الداخلي والخارجي)",
+      "mots_cles_attendus": [
+        "قشرة",
+        "وشاح",
+        "نواة",
+        "ثلاث"
+      ],
+      "human_score": 1,
+      "human_score_max": 2,
+      "human_dominant_error": "partial_correct",
+      "human_matched_criteria": [
+        "قشرة",
+        "ثلاث"
+      ],
+      "human_unmatched_criteria": [
+        "وشاح",
+        "نواة"
+      ],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_043",
+      "verb_slug": "restitution",
+      "chapitre": "Géologie",
+      "question": "ما هي البنية الداخلية للأرض؟",
+      "student_answer": "",
+      "bareme": 2,
+      "reponse_attendue": "تتكون الأرض من ثلاث طبقات: 1- القشرة الأرضية (الصلبة الخارجية)، 2- الوشاح (الطبقة الوسطى)، 3- النواة (اللب الداخلي والخارجي)",
+      "mots_cles_attendus": [
+        "قشرة",
+        "وشاح",
+        "نواة",
+        "ثلاث"
+      ],
+      "human_score": 0,
+      "human_score_max": 2,
+      "human_dominant_error": "empty",
+      "human_matched_criteria": [],
+      "human_unmatched_criteria": [
+        "قشرة",
+        "وشاح",
+        "نواة",
+        "ثلاث"
+      ],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_044",
+      "verb_slug": "restitution",
+      "chapitre": "Géologie",
+      "question": "ما هي الصفائح التكتونية؟",
+      "student_answer": "الصفائح التكتونية هي أجزاء صلبة من القشرة الأرضية والوشاح العلوي (الليثوسفير) تتحرك فوق الطبقة اللدنة (الأسثينوسفير)",
+      "bareme": 3,
+      "reponse_attendue": "الصفائح التكتونية هي أجزاء صلبة من القشرة الأرضية والوشاح العلوي (الليثوسفير) تتحرك فوق الطبقة اللدنة (الأسثينوسفير)",
+      "mots_cles_attendus": [
+        "قشرة",
+        "ليثوسفير",
+        "أسثينوسفير",
+        "تحرك",
+        "صلبة"
+      ],
+      "human_score": 3,
+      "human_score_max": 3,
+      "human_dominant_error": "all_correct",
+      "human_matched_criteria": [
+        "قشرة",
+        "ليثوسفير",
+        "أسثينوسفير",
+        "تحرك",
+        "صلبة"
+      ],
+      "human_unmatched_criteria": [],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_044",
+      "verb_slug": "restitution",
+      "chapitre": "Géologie",
+      "question": "ما هي الصفائح التكتونية؟",
+      "student_answer": "الصفائح التكتونية هي أجزاء صلبة من القشرة الأرضية والوشاح",
+      "bareme": 3,
+      "reponse_attendue": "الصفائح التكتونية هي أجزاء صلبة من القشرة الأرضية والوشاح العلوي (الليثوسفير) تتحرك فوق الطبقة اللدنة (الأسثينوسفير)",
+      "mots_cles_attendus": [
+        "قشرة",
+        "ليثوسفير",
+        "أسثينوسفير",
+        "تحرك",
+        "صلبة"
+      ],
+      "human_score": 1,
+      "human_score_max": 3,
+      "human_dominant_error": "partial_correct",
+      "human_matched_criteria": [
+        "قشرة",
+        "صلبة"
+      ],
+      "human_unmatched_criteria": [
+        "ليثوسفير",
+        "أسثينوسفير",
+        "تحرك"
+      ],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_045",
+      "verb_slug": "application",
+      "chapitre": "Géologie",
+      "question": "ما هي أنواع حدود الصفائح التكتونية؟",
+      "student_answer": "ثلاثة أنواع: 1- حدود متقاربة (تصادمية): تنتج جبال وخنادق، 2- حدود متباعدة (انفصالية): تنتج قيعان محيطات جديدة، 3- حدود متزاحة (تحويلية): تنتج زلازل",
+      "bareme": 4,
+      "reponse_attendue": "ثلاثة أنواع: 1- حدود متقاربة (تصادمية): تنتج جبال وخنادق، 2- حدود متباعدة (انفصالية): تنتج قيعان محيطات جديدة، 3- حدود متزاحة (تحويلية): تنتج زلازل",
+      "mots_cles_attendus": [
+        "متقاربة",
+        "متباعدة",
+        "متزاحة",
+        "تصادم",
+        "انفصال"
+      ],
+      "human_score": 4,
+      "human_score_max": 4,
+      "human_dominant_error": "all_correct",
+      "human_matched_criteria": [
+        "متقاربة",
+        "متباعدة",
+        "متزاحة",
+        "تصادم",
+        "انفصال"
+      ],
+      "human_unmatched_criteria": [],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_045",
+      "verb_slug": "application",
+      "chapitre": "Géologie",
+      "question": "ما هي أنواع حدود الصفائح التكتونية؟",
+      "student_answer": "ثلاثة أنواع: 1- حدود متقاربة (تصادمية): تنتج جبال وخنادق، 2- حدود متباعدة",
+      "bareme": 4,
+      "reponse_attendue": "ثلاثة أنواع: 1- حدود متقاربة (تصادمية): تنتج جبال وخنادق، 2- حدود متباعدة (انفصالية): تنتج قيعان محيطات جديدة، 3- حدود متزاحة (تحويلية): تنتج زلازل",
+      "mots_cles_attendus": [
+        "متقاربة",
+        "متباعدة",
+        "متزاحة",
+        "تصادم",
+        "انفصال"
+      ],
+      "human_score": 2,
+      "human_score_max": 4,
+      "human_dominant_error": "partial_correct",
+      "human_matched_criteria": [
+        "متقاربة",
+        "متباعدة",
+        "تصادم"
+      ],
+      "human_unmatched_criteria": [
+        "متزاحة",
+        "انفصال"
+      ],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_045",
+      "verb_slug": "application",
+      "chapitre": "Géologie",
+      "question": "ما هي أنواع حدود الصفائح التكتونية؟",
+      "student_answer": "",
+      "bareme": 4,
+      "reponse_attendue": "ثلاثة أنواع: 1- حدود متقاربة (تصادمية): تنتج جبال وخنادق، 2- حدود متباعدة (انفصالية): تنتج قيعان محيطات جديدة، 3- حدود متزاحة (تحويلية): تنتج زلازل",
+      "mots_cles_attendus": [
+        "متقاربة",
+        "متباعدة",
+        "متزاحة",
+        "تصادم",
+        "انفصال"
+      ],
+      "human_score": 0,
+      "human_score_max": 4,
+      "human_dominant_error": "empty",
+      "human_matched_criteria": [],
+      "human_unmatched_criteria": [
+        "متقاربة",
+        "متباعدة",
+        "متزاحة",
+        "تصادم",
+        "انفصال"
+      ],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_046",
+      "verb_slug": "application",
+      "chapitre": "Géologie",
+      "question": "اشرح آلية تحرك الصفائح التكتونية",
+      "student_answer": "تتحرك الصفائح بسبب تيارات الحمل الحراري في الوشاح: المادة الساخنة ترتفع وتبرد ثم تغوص، مما يسبب حركة الصفائح فوقها. أيضا دفع القشرة عند الحدود المتباعدة وسحبها عند الحدود المتقاربة",
+      "bareme": 4,
+      "reponse_attendue": "تتحرك الصفائح بسبب تيارات الحمل الحراري في الوشاح: المادة الساخنة ترتفع وتبرد ثم تغوص، مما يسبب حركة الصفائح فوقها. أيضا دفع القشرة عند الحدود المتباعدة وسحبها عند الحدود المتقاربة",
+      "mots_cles_attendus": [
+        "تيارات الحمل",
+        "حراري",
+        "وشاح",
+        "ترتفع",
+        "تغوص"
+      ],
+      "human_score": 4,
+      "human_score_max": 4,
+      "human_dominant_error": "all_correct",
+      "human_matched_criteria": [
+        "تيارات الحمل",
+        "حراري",
+        "وشاح",
+        "ترتفع",
+        "تغوص"
+      ],
+      "human_unmatched_criteria": [],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_046",
+      "verb_slug": "application",
+      "chapitre": "Géologie",
+      "question": "اشرح آلية تحرك الصفائح التكتونية",
+      "student_answer": "تتحرك الصفائح بسبب تيارات الحمل الحراري في الوشاح: المادة الساخنة ترتفع وتبرد ثم تغوص، مما يسبب",
+      "bareme": 4,
+      "reponse_attendue": "تتحرك الصفائح بسبب تيارات الحمل الحراري في الوشاح: المادة الساخنة ترتفع وتبرد ثم تغوص، مما يسبب حركة الصفائح فوقها. أيضا دفع القشرة عند الحدود المتباعدة وسحبها عند الحدود المتقاربة",
+      "mots_cles_attendus": [
+        "تيارات الحمل",
+        "حراري",
+        "وشاح",
+        "ترتفع",
+        "تغوص"
+      ],
+      "human_score": 4,
+      "human_score_max": 4,
+      "human_dominant_error": "all_correct",
+      "human_matched_criteria": [
+        "تيارات الحمل",
+        "حراري",
+        "وشاح",
+        "ترتفع",
+        "تغوص"
+      ],
+      "human_unmatched_criteria": [],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_047",
+      "verb_slug": "type_bac",
+      "chapitre": "Géologie",
+      "question": "حلل وثائق تثبت ظاهرة الانجراف القاري",
+      "student_answer": "أدلة الانجراف القاري: 1- التطابق الجيولوجي بين سواحل إفريقيا وأمريكا الجنوبية، 2- وجود نفس المستحثات (الميزوصور) في قارتين منفصلتين، 3- تطابق الصخور والأعمار الجيولوجية. الاستنتاج: القارات كانت متصلة (بانجيا) ثم انجرفت",
+      "bareme": 5,
+      "reponse_attendue": "أدلة الانجراف القاري: 1- التطابق الجيولوجي بين سواحل إفريقيا وأمريكا الجنوبية، 2- وجود نفس المستحثات (الميزوصور) في قارتين منفصلتين، 3- تطابق الصخور والأعمار الجيولوجية. الاستنتاج: القارات كانت متصلة (بانجيا) ثم انجرفت",
+      "mots_cles_attendus": [
+        "إفريقيا",
+        "أمريكا",
+        "مستحثات",
+        "ميزوصور",
+        "بانجيا",
+        "انجراف"
+      ],
+      "human_score": 5,
+      "human_score_max": 5,
+      "human_dominant_error": "all_correct",
+      "human_matched_criteria": [
+        "إفريقيا",
+        "أمريكا",
+        "مستحثات",
+        "ميزوصور",
+        "بانجيا",
+        "انجراف"
+      ],
+      "human_unmatched_criteria": [],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_047",
+      "verb_slug": "type_bac",
+      "chapitre": "Géologie",
+      "question": "حلل وثائق تثبت ظاهرة الانجراف القاري",
+      "student_answer": "أدلة الانجراف القاري: 1- التطابق الجيولوجي بين سواحل إفريقيا وأمريكا الجنوبية، 2- وجود نفس المستحثات (الميزوصور) في",
+      "bareme": 5,
+      "reponse_attendue": "أدلة الانجراف القاري: 1- التطابق الجيولوجي بين سواحل إفريقيا وأمريكا الجنوبية، 2- وجود نفس المستحثات (الميزوصور) في قارتين منفصلتين، 3- تطابق الصخور والأعمار الجيولوجية. الاستنتاج: القارات كانت متصلة (بانجيا) ثم انجرفت",
+      "mots_cles_attendus": [
+        "إفريقيا",
+        "أمريكا",
+        "مستحثات",
+        "ميزوصور",
+        "بانجيا",
+        "انجراف"
+      ],
+      "human_score": 4,
+      "human_score_max": 5,
+      "human_dominant_error": "partial_correct",
+      "human_matched_criteria": [
+        "إفريقيا",
+        "أمريكا",
+        "مستحثات",
+        "ميزوصور",
+        "انجراف"
+      ],
+      "human_unmatched_criteria": [
+        "بانجيا"
+      ],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_047",
+      "verb_slug": "type_bac",
+      "chapitre": "Géologie",
+      "question": "حلل وثائق تثبت ظاهرة الانجراف القاري",
+      "student_answer": "",
+      "bareme": 5,
+      "reponse_attendue": "أدلة الانجراف القاري: 1- التطابق الجيولوجي بين سواحل إفريقيا وأمريكا الجنوبية، 2- وجود نفس المستحثات (الميزوصور) في قارتين منفصلتين، 3- تطابق الصخور والأعمار الجيولوجية. الاستنتاج: القارات كانت متصلة (بانجيا) ثم انجرفت",
+      "mots_cles_attendus": [
+        "إفريقيا",
+        "أمريكا",
+        "مستحثات",
+        "ميزوصور",
+        "بانجيا",
+        "انجراف"
+      ],
+      "human_score": 0,
+      "human_score_max": 5,
+      "human_dominant_error": "empty",
+      "human_matched_criteria": [],
+      "human_unmatched_criteria": [
+        "إفريقيا",
+        "أمريكا",
+        "مستحثات",
+        "ميزوصور",
+        "بانجيا",
+        "انجراف"
+      ],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_048",
+      "verb_slug": "restitution",
+      "chapitre": "Géologie",
+      "question": "ما هي الزلازل وكيف تحدث؟",
+      "student_answer": "الزلازل هي اهتزازات أرضية تحدث عند تحرك الصفائح التكتونية فجأة عند الحدود، تتراكم الطاقة ثم تتحرر على شكل أمواج زلزالية",
+      "bareme": 3,
+      "reponse_attendue": "الزلازل هي اهتزازات أرضية تحدث عند تحرك الصفائح التكتونية فجأة عند الحدود، تتراكم الطاقة ثم تتحرر على شكل أمواج زلزالية",
+      "mots_cles_attendus": [
+        "اهتزازات",
+        "صفائح",
+        "طاقة",
+        "أمواج",
+        "تحرر"
+      ],
+      "human_score": 3,
+      "human_score_max": 3,
+      "human_dominant_error": "all_correct",
+      "human_matched_criteria": [
+        "اهتزازات",
+        "صفائح",
+        "طاقة",
+        "أمواج",
+        "تحرر"
+      ],
+      "human_unmatched_criteria": [],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_048",
+      "verb_slug": "restitution",
+      "chapitre": "Géologie",
+      "question": "ما هي الزلازل وكيف تحدث؟",
+      "student_answer": "الزلازل هي اهتزازات أرضية تحدث عند تحرك الصفائح التكتونية فجأة",
+      "bareme": 3,
+      "reponse_attendue": "الزلازل هي اهتزازات أرضية تحدث عند تحرك الصفائح التكتونية فجأة عند الحدود، تتراكم الطاقة ثم تتحرر على شكل أمواج زلزالية",
+      "mots_cles_attendus": [
+        "اهتزازات",
+        "صفائح",
+        "طاقة",
+        "أمواج",
+        "تحرر"
+      ],
+      "human_score": 1,
+      "human_score_max": 3,
+      "human_dominant_error": "partial_correct",
+      "human_matched_criteria": [
+        "اهتزازات",
+        "صفائح"
+      ],
+      "human_unmatched_criteria": [
+        "طاقة",
+        "أمواج",
+        "تحرر"
+      ],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_049",
+      "verb_slug": "application",
+      "chapitre": "Géologie",
+      "question": "ما الفرق بين المركز السطحي والمركز العميق للزلزال؟",
+      "student_answer": "المركز العميق (البؤرة) هو نقطة انطلاق الزلزال في الأعماق، بينما المركز السطحي (المركز الظاهري) هو النقطة على سطح الأرض فوق المركز العميق مباشرة، حيث تكون شدة الزلزال قصوى",
+      "bareme": 3,
+      "reponse_attendue": "المركز العميق (البؤرة) هو نقطة انطلاق الزلزال في الأعماق، بينما المركز السطحي (المركز الظاهري) هو النقطة على سطح الأرض فوق المركز العميق مباشرة، حيث تكون شدة الزلزال قصوى",
+      "mots_cles_attendus": [
+        "سطحي",
+        "عميق",
+        "بؤرة",
+        "شد",
+        "قصوى"
+      ],
+      "human_score": 3,
+      "human_score_max": 3,
+      "human_dominant_error": "all_correct",
+      "human_matched_criteria": [
+        "سطحي",
+        "عميق",
+        "بؤرة",
+        "شد",
+        "قصوى"
+      ],
+      "human_unmatched_criteria": [],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_049",
+      "verb_slug": "application",
+      "chapitre": "Géologie",
+      "question": "ما الفرق بين المركز السطحي والمركز العميق للزلزال؟",
+      "student_answer": "المركز العميق (البؤرة) هو نقطة انطلاق الزلزال في الأعماق، بينما المركز السطحي (المركز",
+      "bareme": 3,
+      "reponse_attendue": "المركز العميق (البؤرة) هو نقطة انطلاق الزلزال في الأعماق، بينما المركز السطحي (المركز الظاهري) هو النقطة على سطح الأرض فوق المركز العميق مباشرة، حيث تكون شدة الزلزال قصوى",
+      "mots_cles_attendus": [
+        "سطحي",
+        "عميق",
+        "بؤرة",
+        "شد",
+        "قصوى"
+      ],
+      "human_score": 2,
+      "human_score_max": 3,
+      "human_dominant_error": "partial_correct",
+      "human_matched_criteria": [
+        "سطحي",
+        "عميق",
+        "بؤرة"
+      ],
+      "human_unmatched_criteria": [
+        "شد",
+        "قصوى"
+      ],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_049",
+      "verb_slug": "application",
+      "chapitre": "Géologie",
+      "question": "ما الفرق بين المركز السطحي والمركز العميق للزلزال؟",
+      "student_answer": "",
+      "bareme": 3,
+      "reponse_attendue": "المركز العميق (البؤرة) هو نقطة انطلاق الزلزال في الأعماق، بينما المركز السطحي (المركز الظاهري) هو النقطة على سطح الأرض فوق المركز العميق مباشرة، حيث تكون شدة الزلزال قصوى",
+      "mots_cles_attendus": [
+        "سطحي",
+        "عميق",
+        "بؤرة",
+        "شد",
+        "قصوى"
+      ],
+      "human_score": 0,
+      "human_score_max": 3,
+      "human_dominant_error": "empty",
+      "human_matched_criteria": [],
+      "human_unmatched_criteria": [
+        "سطحي",
+        "عميق",
+        "بؤرة",
+        "شد",
+        "قصوى"
+      ],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_050",
+      "verb_slug": "type_bac",
+      "chapitre": "Géologie",
+      "question": "حلل وثائق تثبت ظاهرة توسع قاع المحيط",
+      "student_answer": "أدلة توسع قاع المحيط: 1- وجود سلسلة جبال وسط المحيط (ظهر المحيط)، 2- تزداد عمر الصخور كلما ابتعدنا عن الظهر، 3- الانعكاسات المغناطيسية المتناظرة على جانبي الظهر. الاستنتاج: قاع المحيط يتوسع بانفصال الصفائح عند الحدود المتباعدة وتكوين قشرة محيطية جديدة",
+      "bareme": 6,
+      "reponse_attendue": "أدلة توسع قاع المحيط: 1- وجود سلسلة جبال وسط المحيط (ظهر المحيط)، 2- تزداد عمر الصخور كلما ابتعدنا عن الظهر، 3- الانعكاسات المغناطيسية المتناظرة على جانبي الظهر. الاستنتاج: قاع المحيط يتوسع بانفصال الصفائح عند الحدود المتباعدة وتكوين قشرة محيطية جديدة",
+      "mots_cles_attendus": [
+        "ظهر المحيط",
+        "عمر الصخور",
+        "انعكاسات مغناطيسية",
+        "توسع",
+        "انفصال",
+        "استنتاج"
+      ],
+      "human_score": 6,
+      "human_score_max": 6,
+      "human_dominant_error": "all_correct",
+      "human_matched_criteria": [
+        "ظهر المحيط",
+        "عمر الصخور",
+        "انعكاسات مغناطيسية",
+        "توسع",
+        "انفصال",
+        "استنتاج"
+      ],
+      "human_unmatched_criteria": [],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    },
+    {
+      "question_id": "gs_050",
+      "verb_slug": "type_bac",
+      "chapitre": "Géologie",
+      "question": "حلل وثائق تثبت ظاهرة توسع قاع المحيط",
+      "student_answer": "أدلة توسع قاع المحيط: 1- وجود سلسلة جبال وسط المحيط (ظهر المحيط)، 2- تزداد عمر الصخور كلما ابتعدنا عن الظهر، 3- الانعكاسات المغناطيسية",
+      "bareme": 6,
+      "reponse_attendue": "أدلة توسع قاع المحيط: 1- وجود سلسلة جبال وسط المحيط (ظهر المحيط)، 2- تزداد عمر الصخور كلما ابتعدنا عن الظهر، 3- الانعكاسات المغناطيسية المتناظرة على جانبي الظهر. الاستنتاج: قاع المحيط يتوسع بانفصال الصفائح عند الحدود المتباعدة وتكوين قشرة محيطية جديدة",
+      "mots_cles_attendus": [
+        "ظهر المحيط",
+        "عمر الصخور",
+        "انعكاسات مغناطيسية",
+        "توسع",
+        "انفصال",
+        "استنتاج"
+      ],
+      "human_score": 4,
+      "human_score_max": 6,
+      "human_dominant_error": "partial_correct",
+      "human_matched_criteria": [
+        "ظهر المحيط",
+        "عمر الصخور",
+        "انعكاسات مغناطيسية",
+        "توسع"
+      ],
+      "human_unmatched_criteria": [
+        "انفصال",
+        "استنتاج"
+      ],
+      "annotator": "synthetic_keyword_v1",
+      "annotation_date": "2026-08-07"
+    }
+  ]
+}

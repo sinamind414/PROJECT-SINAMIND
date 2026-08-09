@@ -34,7 +34,7 @@ export function VideosWidget({ chapitre }: { chapitre: string }) {
         setVideos(() => data.slice(0, 3))
       }
     } catch (err) {
-      console.error("Erreur vidÃ©os:", err)
+      console.error("Erreur vidéos:", err)
     } finally {
        
       setLoading(false)
@@ -53,17 +53,17 @@ export function VideosWidget({ chapitre }: { chapitre: string }) {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h2 className="text-2xl font-bold text-white mb-1">
-            ðŸŽ¥ ÙÙŠØ¯ÙŠÙˆÙ‡Ø§Øª Ù…ÙˆØµÙ‰ Ø¨Ù‡Ø§
+            🎥 فيديوهات موصى بها
           </h2>
           <p className="text-gray-400 text-sm">
-            ØªØ¹Ù„Ù… Ø¨ØµØ±ÙŠØ§Ù‹ Ù…Ø¹ Ø£ÙØ¶Ù„ Ø§Ù„Ù‚Ù†ÙˆØ§Øª Ø§Ù„Ø¬Ø²Ø§Ø¦Ø±ÙŠØ©
+            تعلم بصرياً مع أفضل القنوات الجزائرية
           </p>
         </div>
         <Link
           href="/videos"
           className="text-mint-soft text-sm hover:underline"
         >
-          Ø¹Ø±Ø¶ Ø§Ù„ÙƒÙ„ â†
+          عرض الكل ←
         </Link>
       </div>
 

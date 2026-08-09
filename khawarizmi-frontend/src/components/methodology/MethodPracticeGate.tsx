@@ -17,8 +17,8 @@ type Props = {
 }
 
 /**
- * Gate mÃ©thodologique avant rÃ©daction (Ã©tape practice).
- * L'Ã©lÃ¨ve doit cocher la checklist du mode liÃ© au verbe.
+ * Gate méthodologique avant rédaction (étape practice).
+ * L'élève doit cocher la checklist du mode lié au verbe.
  */
 export function MethodPracticeGate({ verbSlug, onGateChange, compact = false }: Props) {
   const mode: MethodMode = useMemo(() => getModeForVerbSlug(verbSlug), [verbSlug])
@@ -62,14 +62,14 @@ export function MethodPracticeGate({ verbSlug, onGateChange, compact = false }: 
         </span>
         <span className="flex-1 min-w-0">
           <span className="block text-sm font-black text-white">
-            Ù‚Ø¨Ù„ Ø§Ù„ÙƒØªØ§Ø¨Ø© â€” Ù‚Ø§Ø¦Ù…Ø© Ø§Ù„ØªØ­Ù‚Ù‚ Â· Checklist
+            قبل الكتابة — قائمة التحقق · Checklist
           </span>
           <span className="block text-xs text-white/55 mt-0.5">
             {mode.mantraAr}{" "}
             <span dir="ltr" className="text-white/40">
-              Â· {mode.mantraFr}
+              · {mode.mantraFr}
             </span>
-            {" Â· "}
+            {" · "}
             {doneCount}/{mode.steps.length}
           </span>
         </span>
@@ -139,13 +139,13 @@ export function MethodPracticeGate({ verbSlug, onGateChange, compact = false }: 
 
           {!ready && (
             <p className="text-[11px] text-amber-200/80 bg-amber-500/10 border border-amber-500/20 rounded-lg px-3 py-2">
-              Ø¹Ù„Ù‘Ù… ÙƒÙ„ Ø®Ø·ÙˆØ§Øª Ø§Ù„Ù‚Ø§Ø¦Ù…Ø© Ù‚Ø¨Ù„ Ø¥Ø±Ø³Ø§Ù„ Ø§Ù„Ø¥Ø¬Ø§Ø¨Ø© â€” Ù‡ÙƒØ°Ø§ ØªÙØ¨Ù†Ù‰ Ø¹Ø§Ø¯Ø© Ø§Ù„Ù…Ù†Ù‡Ø¬ÙŠØ©.
+              علّم كل خطوات القائمة قبل إرسال الإجابة — هكذا تُبنى عادة المنهجية.
             </p>
           )}
 
           {ready && (
             <p className="text-[11px] text-mint bg-mint/10 border border-mint/25 rounded-lg px-3 py-2 font-bold">
-              Ø§Ù„Ù…Ù†Ù‡Ø¬ÙŠØ© Ø¬Ø§Ù‡Ø²Ø© â€” Ø§ÙƒØªØ¨ Ø¥Ø¬Ø§Ø¨ØªÙƒ Ø§Ù„Ø¢Ù†.
+              المنهجية جاهزة — اكتب إجابتك الآن.
             </p>
           )}
 
@@ -153,7 +153,7 @@ export function MethodPracticeGate({ verbSlug, onGateChange, compact = false }: 
             href="/methodology#lab"
             className="inline-block text-[11px] text-white/40 hover:text-mint transition"
           >
-            ØªØ¹Ù„Ù‘Ù… Ø§Ù„Ø³ØªÙ‘Ø© Ø£ÙˆØ¶Ø§Ø¹ ÙƒØ§Ù…Ù„Ø© â†
+            تعلّم الستّة أوضاع كاملة ←
           </Link>
         </div>
       )}

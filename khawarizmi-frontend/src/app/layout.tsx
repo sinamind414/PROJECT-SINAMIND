@@ -1,14 +1,7 @@
 import type { Metadata } from "next";
-import { Cairo } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/providers";
 import { OnboardingOverlay } from "@/components/gamification/OnboardingOverlay";
-
-const cairo = Cairo({
-  subsets: ["arabic", "latin"],
-  variable: "--font-cairo",
-  display: "swap",
-});
 
 export const metadata: Metadata = {
   title: "الخوارزمي برو — بكالوريا جزائرية",
@@ -25,7 +18,7 @@ export default function RootLayout({
     <html
       lang="ar"
       dir="rtl"
-      className={`${cairo.variable} h-full antialiased`}
+      className="h-full antialiased"
       suppressHydrationWarning
     >
       <head>

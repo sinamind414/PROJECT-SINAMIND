@@ -284,7 +284,7 @@ export const methodologyChapterLinks: MethodologyChapterLink[] = [
   // Unité 1: آليات تحويل الطاقة الضوئية / Photosynthese
   {
     slug: "d2-u1-c1-structure-du-chloroplaste",
-    domainNumero: 2, domainAr: "تحويل الطاقة", domainFr: "Conversion de l'energie",
+    domainNumero: 2, domainAr: "التحولات الطاقوية", domainFr: "Les transformations energetiques",
     unitNumero: 1, unitAr: "آليات تحويل الطاقة الضوئية إلى طاقة كيميائية كامنة", unitFr: "Mecanismes de conversion de l'energie lumineuse en energie chimique potentielle",
     chapterNumero: 1, chapterAr: "بنية الصانعة اليخضورية", chapterFr: "Structure du chloroplaste",
     chapterType: "rappel", chapterImportance: "haute",
@@ -294,7 +294,7 @@ export const methodologyChapterLinks: MethodologyChapterLink[] = [
   },
   {
     slug: "d2-u1-c2-reactions-photochimiques-phase-claire",
-    domainNumero: 2, domainAr: "تحويل الطاقة", domainFr: "Conversion de l'energie",
+    domainNumero: 2, domainAr: "التحولات الطاقوية", domainFr: "Les transformations energetiques",
     unitNumero: 1, unitAr: "آليات تحويل الطاقة الضوئية إلى طاقة كيميائية كامنة", unitFr: "Mecanismes de conversion de l'energie lumineuse en energie chimique potentielle",
     chapterNumero: 2, chapterAr: "التفاعلات الضوئية (الطور الضوئي)", chapterFr: "Reactions photochimiques (phase claire)",
     chapterType: "processus", chapterImportance: "critique",
@@ -304,17 +304,17 @@ export const methodologyChapterLinks: MethodologyChapterLink[] = [
   },
   {
     slug: "d2-u1-c3-reactions-non-photochimiques-phase-sombre",
-    domainNumero: 2, domainAr: "تحويل الطاقة", domainFr: "Conversion de l'energie",
+    domainNumero: 2, domainAr: "التحولات الطاقوية", domainFr: "Les transformations energetiques",
     unitNumero: 1, unitAr: "آليات تحويل الطاقة الضوئية إلى طاقة كيميائية كامنة", unitFr: "Mecanismes de conversion de l'energie lumineuse en energie chimique potentielle",
     chapterNumero: 3, chapterAr: "التفاعلات اللاضوئية (طور التثبيت)", chapterFr: "Reactions non photochimiques (phase sombre)",
     chapterType: "processus", chapterImportance: "critique",
     scenarioId: "photosynthesis-v1",
-    focusAr: "التركيز المنهجي: تحليل دورة كالفن وتثبيت CO2 ودور ATP وNADPH+H+ في تركيب الجلوكوز.",
+    focusAr: "التركيز المنهجي: تحليل دورة كالفن وتثبيت CO2 ودور ATP وNADPH+H+ في تركيب الغلوكوز.",
     recommendedVerbs: ["analyse", "interpret", "deduce", "scientific-text"],
   },
   {
     slug: "d2-u1-c4-facteurs-influencant-la-photosynthese",
-    domainNumero: 2, domainAr: "تحويل الطاقة", domainFr: "Conversion de l'energie",
+    domainNumero: 2, domainAr: "التحولات الطاقوية", domainFr: "Les transformations energetiques",
     unitNumero: 1, unitAr: "آليات تحويل الطاقة الضوئية إلى طاقة كيميائية كامنة", unitFr: "Mecanismes de conversion de l'energie lumineuse en energie chimique potentielle",
     chapterNumero: 4, chapterAr: "العوامل المؤثرة في التركيب الضوئي", chapterFr: "Facteurs influencant la photosynthese",
     chapterType: "experience", chapterImportance: "haute",
@@ -324,7 +324,7 @@ export const methodologyChapterLinks: MethodologyChapterLink[] = [
   },
   {
     slug: "d2-u1-c5-synthese-photosynthese",
-    domainNumero: 2, domainAr: "تحويل الطاقة", domainFr: "Conversion de l'energie",
+    domainNumero: 2, domainAr: "التحولات الطاقوية", domainFr: "Les transformations energetiques",
     unitNumero: 1, unitAr: "آليات تحويل الطاقة الضوئية إلى طاقة كيميائية كامنة", unitFr: "Mecanismes de conversion de l'energie lumineuse en energie chimique potentielle",
     chapterNumero: 5, chapterAr: "تمرين شامل: التركيب الضوئي", chapterFr: "Synthese: photosynthese",
     chapterType: "synthese", chapterImportance: "haute",
@@ -336,7 +336,7 @@ export const methodologyChapterLinks: MethodologyChapterLink[] = [
   // Unité 2: آليات تحويل الطاقة الكيميائية / Respiration cellulaire
   {
     slug: "d2-u2-c1-respiration-cellulaire-concept-general",
-    domainNumero: 2, domainAr: "تحويل الطاقة", domainFr: "Conversion de l'energie",
+    domainNumero: 2, domainAr: "التحولات الطاقوية", domainFr: "Les transformations energetiques",
     unitNumero: 2, unitAr: "آليات تحويل الطاقة الكيميائية الكامنة في الجزيئات العضوية إلى ATP", unitFr: "Mecanismes de conversion de l'energie chimique potentielle des molecules organiques en ATP",
     chapterNumero: 1, chapterAr: "التنفس الخلوي: مفهوم عام", chapterFr: "Respiration cellulaire: concept general",
     chapterType: "concept", chapterImportance: "critique",
@@ -346,7 +346,7 @@ export const methodologyChapterLinks: MethodologyChapterLink[] = [
   },
   {
     slug: "d2-u2-c2-glycolyse",
-    domainNumero: 2, domainAr: "تحويل الطاقة", domainFr: "Conversion de l'energie",
+    domainNumero: 2, domainAr: "التحولات الطاقوية", domainFr: "Les transformations energetiques",
     unitNumero: 2, unitAr: "آليات تحويل الطاقة الكيميائية الكامنة في الجزيئات العضوية إلى ATP", unitFr: "Mecanismes de conversion de l'energie chimique potentielle des molecules organiques en ATP",
     chapterNumero: 2, chapterAr: "التحلل السكري", chapterFr: "Glycolyse",
     chapterType: "processus", chapterImportance: "haute",
@@ -356,7 +356,7 @@ export const methodologyChapterLinks: MethodologyChapterLink[] = [
   },
   {
     slug: "d2-u2-c3-cycle-de-krebs-et-chaine-respiratoire",
-    domainNumero: 2, domainAr: "تحويل الطاقة", domainFr: "Conversion de l'energie",
+    domainNumero: 2, domainAr: "التحولات الطاقوية", domainFr: "Les transformations energetiques",
     unitNumero: 2, unitAr: "آليات تحويل الطاقة الكيميائية الكامنة في الجزيئات العضوية إلى ATP", unitFr: "Mecanismes de conversion de l'energie chimique potentielle des molecules organiques en ATP",
     chapterNumero: 3, chapterAr: "دورة كريبس وسلسلة التنفس", chapterFr: "Cycle de Krebs et chaine respiratoire",
     chapterType: "processus", chapterImportance: "critique",
@@ -366,7 +366,7 @@ export const methodologyChapterLinks: MethodologyChapterLink[] = [
   },
   {
     slug: "d2-u2-c4-fermentation",
-    domainNumero: 2, domainAr: "تحويل الطاقة", domainFr: "Conversion de l'energie",
+    domainNumero: 2, domainAr: "التحولات الطاقوية", domainFr: "Les transformations energetiques",
     unitNumero: 2, unitAr: "آليات تحويل الطاقة الكيميائية الكامنة في الجزيئات العضوية إلى ATP", unitFr: "Mecanismes de conversion de l'energie chimique potentielle des molecules organiques en ATP",
     chapterNumero: 4, chapterAr: "التخمر", chapterFr: "Fermentation",
     chapterType: "processus", chapterImportance: "haute",
@@ -376,7 +376,7 @@ export const methodologyChapterLinks: MethodologyChapterLink[] = [
   },
   {
     slug: "d2-u2-c5-synthese-conversion-energie-mitochondriale",
-    domainNumero: 2, domainAr: "تحويل الطاقة", domainFr: "Conversion de l'energie",
+    domainNumero: 2, domainAr: "التحولات الطاقوية", domainFr: "Les transformations energetiques",
     unitNumero: 2, unitAr: "آليات تحويل الطاقة الكيميائية الكامنة في الجزيئات العضوية إلى ATP", unitFr: "Mecanismes de conversion de l'energie chimique potentielle des molecules organiques en ATP",
     chapterNumero: 5, chapterAr: "تمرين شامل: تحويل الطاقة في الميتوكندري", chapterFr: "Synthese: conversion d'energie dans la mitochondrie",
     chapterType: "synthese", chapterImportance: "haute",
@@ -388,7 +388,7 @@ export const methodologyChapterLinks: MethodologyChapterLink[] = [
   // Unité 3: تحويل الطاقة على المستوى ما فوق البنية الخلوية / Ultrastructural
   {
     slug: "d2-u3-c1-echanges-gazeux-pulmonaires",
-    domainNumero: 2, domainAr: "تحويل الطاقة", domainFr: "Conversion de l'energie",
+    domainNumero: 2, domainAr: "التحولات الطاقوية", domainFr: "Les transformations energetiques",
     unitNumero: 3, unitAr: "تحويل الطاقة على المستوى ما فوق البنية الخلوية", unitFr: "Conversion de l'energie au niveau ultrastructural cellulaire",
     chapterNumero: 1, chapterAr: "تبادل الغازات على مستوى الرئة", chapterFr: "Echanges gazeux au niveau pulmonaire",
     chapterType: "processus", chapterImportance: "haute",
@@ -398,7 +398,7 @@ export const methodologyChapterLinks: MethodologyChapterLink[] = [
   },
   {
     slug: "d2-u3-c2-transport-des-gaz-dans-le-sang",
-    domainNumero: 2, domainAr: "تحويل الطاقة", domainFr: "Conversion de l'energie",
+    domainNumero: 2, domainAr: "التحولات الطاقوية", domainFr: "Les transformations energetiques",
     unitNumero: 3, unitAr: "تحويل الطاقة على المستوى ما فوق البنية الخلوية", unitFr: "Conversion de l'energie au niveau ultrastructural cellulaire",
     chapterNumero: 2, chapterAr: "نقل الغازات في الدم", chapterFr: "Transport des gaz dans le sang",
     chapterType: "processus", chapterImportance: "haute",
@@ -408,7 +408,7 @@ export const methodologyChapterLinks: MethodologyChapterLink[] = [
   },
   {
     slug: "d2-u3-c3-integration-fonctionnelle-des-organites",
-    domainNumero: 2, domainAr: "تحويل الطاقة", domainFr: "Conversion de l'energie",
+    domainNumero: 2, domainAr: "التحولات الطاقوية", domainFr: "Les transformations energetiques",
     unitNumero: 3, unitAr: "تحويل الطاقة على المستوى ما فوق البنية الخلوية", unitFr: "Conversion de l'energie au niveau ultrastructural cellulaire",
     chapterNumero: 3, chapterAr: "التكامل الوظيفي بين العضيات", chapterFr: "Integration fonctionnelle des organites",
     chapterType: "concept", chapterImportance: "critique",
@@ -418,7 +418,7 @@ export const methodologyChapterLinks: MethodologyChapterLink[] = [
   },
   {
     slug: "d2-u3-c4-comparaison-chloroplaste-mitochondrie",
-    domainNumero: 2, domainAr: "تحويل الطاقة", domainFr: "Conversion de l'energie",
+    domainNumero: 2, domainAr: "التحولات الطاقوية", domainFr: "Les transformations energetiques",
     unitNumero: 3, unitAr: "تحويل الطاقة على المستوى ما فوق البنية الخلوية", unitFr: "Conversion de l'energie au niveau ultrastructural cellulaire",
     chapterNumero: 4, chapterAr: "مقارنة بين اليخضور والميتوكندري", chapterFr: "Comparaison chloroplaste et mitochondrie",
     chapterType: "rappel", chapterImportance: "moyenne",
@@ -428,7 +428,7 @@ export const methodologyChapterLinks: MethodologyChapterLink[] = [
   },
   {
     slug: "d2-u3-c5-synthese-conversion-energie-cellulaire",
-    domainNumero: 2, domainAr: "تحويل الطاقة", domainFr: "Conversion de l'energie",
+    domainNumero: 2, domainAr: "التحولات الطاقوية", domainFr: "Les transformations energetiques",
     unitNumero: 3, unitAr: "تحويل الطاقة على المستوى ما فوق البنية الخلوية", unitFr: "Conversion de l'energie au niveau ultrastructural cellulaire",
     chapterNumero: 5, chapterAr: "تمرين شامل: تحويل الطاقة على المستوى الخلوي", chapterFr: "Synthese: conversion de l'energie au niveau cellulaire",
     chapterType: "synthese", chapterImportance: "haute",
@@ -441,7 +441,7 @@ export const methodologyChapterLinks: MethodologyChapterLink[] = [
   // Unité 1: النشاط التكتوني للصفائح / Tectonique des plaques
   {
     slug: "d3-u1-c1-structure-de-la-lithosphere",
-    domainNumero: 3, domainAr: "ديناميكية الكرة الأرضية", domainFr: "Dynamique du globe terrestre",
+    domainNumero: 3, domainAr: "التكتونية العامة", domainFr: "La tectonique generale",
     unitNumero: 1, unitAr: "النشاط التكتوني للصفائح", unitFr: "L'activite tectonique des plaques",
     chapterNumero: 1, chapterAr: "بنية الغلاف الصخري", chapterFr: "Structure de la lithosphere",
     chapterType: "concept", chapterImportance: "critique",
@@ -451,7 +451,7 @@ export const methodologyChapterLinks: MethodologyChapterLink[] = [
   },
   {
     slug: "d3-u1-c2-seismes-et-leur-distribution",
-    domainNumero: 3, domainAr: "ديناميكية الكرة الأرضية", domainFr: "Dynamique du globe terrestre",
+    domainNumero: 3, domainAr: "التكتونية العامة", domainFr: "La tectonique generale",
     unitNumero: 1, unitAr: "النشاط التكتوني للصفائح", unitFr: "L'activite tectonique des plaques",
     chapterNumero: 2, chapterAr: "الزلازل وتوزيعها", chapterFr: "Seismes et leur distribution",
     chapterType: "experience", chapterImportance: "critique",
@@ -461,7 +461,7 @@ export const methodologyChapterLinks: MethodologyChapterLink[] = [
   },
   {
     slug: "d3-u1-c3-volcans-et-leur-distribution",
-    domainNumero: 3, domainAr: "ديناميكية الكرة الأرضية", domainFr: "Dynamique du globe terrestre",
+    domainNumero: 3, domainAr: "التكتونية العامة", domainFr: "La tectonique generale",
     unitNumero: 1, unitAr: "النشاط التكتوني للصفائح", unitFr: "L'activite tectonique des plaques",
     chapterNumero: 3, chapterAr: "البراكين وتوزيعها", chapterFr: "Volcans et leur distribution",
     chapterType: "experience", chapterImportance: "critique",
@@ -471,7 +471,7 @@ export const methodologyChapterLinks: MethodologyChapterLink[] = [
   },
   {
     slug: "d3-u1-c4-limites-des-plaques-tectoniques",
-    domainNumero: 3, domainAr: "ديناميكية الكرة الأرضية", domainFr: "Dynamique du globe terrestre",
+    domainNumero: 3, domainAr: "التكتونية العامة", domainFr: "La tectonique generale",
     unitNumero: 1, unitAr: "النشاط التكتوني للصفائح", unitFr: "L'activite tectonique des plaques",
     chapterNumero: 4, chapterAr: "الحدود بين الصفائح التكتونية", chapterFr: "Limites des plaques tectoniques",
     chapterType: "concept", chapterImportance: "critique",
@@ -481,7 +481,7 @@ export const methodologyChapterLinks: MethodologyChapterLink[] = [
   },
   {
     slug: "d3-u1-c5-synthese-mouvement-des-plaques",
-    domainNumero: 3, domainAr: "ديناميكية الكرة الأرضية", domainFr: "Dynamique du globe terrestre",
+    domainNumero: 3, domainAr: "التكتونية العامة", domainFr: "La tectonique generale",
     unitNumero: 1, unitAr: "النشاط التكتوني للصفائح", unitFr: "L'activite tectonique des plaques",
     chapterNumero: 5, chapterAr: "تمرين شامل: حركة الصفائح التكتونية", chapterFr: "Synthese: mouvement des plaques tectoniques",
     chapterType: "synthese", chapterImportance: "haute",
@@ -493,7 +493,7 @@ export const methodologyChapterLinks: MethodologyChapterLink[] = [
   // Unité 2: بنية الكرة الأرضية / Structure du globe terrestre
   {
     slug: "d3-u2-c1-ondes-sismiques-et-structure-de-la-terre",
-    domainNumero: 3, domainAr: "ديناميكية الكرة الأرضية", domainFr: "Dynamique du globe terrestre",
+    domainNumero: 3, domainAr: "التكتونية العامة", domainFr: "La tectonique generale",
     unitNumero: 2, unitAr: "بنية الكرة الأرضية", unitFr: "Structure du globe terrestre",
     chapterNumero: 1, chapterAr: "الموجات الزلزالية وبنية الأرض", chapterFr: "Ondes sismiques et structure de la Terre",
     chapterType: "concept", chapterImportance: "critique",
@@ -503,7 +503,7 @@ export const methodologyChapterLinks: MethodologyChapterLink[] = [
   },
   {
     slug: "d3-u2-c2-structure-de-la-croute-terrestre",
-    domainNumero: 3, domainAr: "ديناميكية الكرة الأرضية", domainFr: "Dynamique du globe terrestre",
+    domainNumero: 3, domainAr: "التكتونية العامة", domainFr: "La tectonique generale",
     unitNumero: 2, unitAr: "بنية الكرة الأرضية", unitFr: "Structure du globe terrestre",
     chapterNumero: 2, chapterAr: "بنية القشرة الأرضية", chapterFr: "Structure de la croute terrestre",
     chapterType: "rappel", chapterImportance: "haute",
@@ -513,7 +513,7 @@ export const methodologyChapterLinks: MethodologyChapterLink[] = [
   },
   {
     slug: "d3-u2-c3-lithosphere-et-asthenosphere",
-    domainNumero: 3, domainAr: "ديناميكية الكرة الأرضية", domainFr: "Dynamique du globe terrestre",
+    domainNumero: 3, domainAr: "التكتونية العامة", domainFr: "La tectonique generale",
     unitNumero: 2, unitAr: "بنية الكرة الأرضية", unitFr: "Structure du globe terrestre",
     chapterNumero: 3, chapterAr: "الغلاف الصخري والغلاف الموري", chapterFr: "Lithosphere et asthenosphere",
     chapterType: "concept", chapterImportance: "haute",
@@ -523,7 +523,7 @@ export const methodologyChapterLinks: MethodologyChapterLink[] = [
   },
   {
     slug: "d3-u2-c4-atmosphere-et-hydrosphere",
-    domainNumero: 3, domainAr: "ديناميكية الكرة الأرضية", domainFr: "Dynamique du globe terrestre",
+    domainNumero: 3, domainAr: "التكتونية العامة", domainFr: "La tectonique generale",
     unitNumero: 2, unitAr: "بنية الكرة الأرضية", unitFr: "Structure du globe terrestre",
     chapterNumero: 4, chapterAr: "الغلاف الجوي والغلاف المائي", chapterFr: "Atmosphere et hydrosphere",
     chapterType: "rappel", chapterImportance: "moyenne",
@@ -533,7 +533,7 @@ export const methodologyChapterLinks: MethodologyChapterLink[] = [
   },
   {
     slug: "d3-u2-c5-synthese-structure-du-globe",
-    domainNumero: 3, domainAr: "ديناميكية الكرة الأرضية", domainFr: "Dynamique du globe terrestre",
+    domainNumero: 3, domainAr: "التكتونية العامة", domainFr: "La tectonique generale",
     unitNumero: 2, unitAr: "بنية الكرة الأرضية", unitFr: "Structure du globe terrestre",
     chapterNumero: 5, chapterAr: "تمرين شامل: بنية الكرة الأرضية", chapterFr: "Synthese: structure du globe terrestre",
     chapterType: "synthese", chapterImportance: "haute",
@@ -545,7 +545,7 @@ export const methodologyChapterLinks: MethodologyChapterLink[] = [
   // Unité 3: النشاط التكتوني والبنيات الجيولوجية / Subduction, collision, dorsale
   {
     slug: "d3-u3-c1-expansion-oceanique-et-magnetisme",
-    domainNumero: 3, domainAr: "ديناميكية الكرة الأرضية", domainFr: "Dynamique du globe terrestre",
+    domainNumero: 3, domainAr: "التكتونية العامة", domainFr: "La tectonique generale",
     unitNumero: 3, unitAr: "النشاط التكتوني والبنيات الجيولوجية المرتبطة به", unitFr: "L'activite tectonique et les structures geologiques associees",
     chapterNumero: 1, chapterAr: "توسع قاع المحيط والحرية المغناطيسية", chapterFr: "Expansion oceanique et magnetisme",
     chapterType: "processus", chapterImportance: "critique",
@@ -555,17 +555,17 @@ export const methodologyChapterLinks: MethodologyChapterLink[] = [
   },
   {
     slug: "d3-u3-c2-subduction",
-    domainNumero: 3, domainAr: "ديناميكية الكرة الأرضية", domainFr: "Dynamique du globe terrestre",
+    domainNumero: 3, domainAr: "التكتونية العامة", domainFr: "La tectonique generale",
     unitNumero: 3, unitAr: "النشاط التكتوني والبنيات الجيولوجية المرتبطة به", unitFr: "L'activite tectonique et les structures geologiques associees",
-    chapterNumero: 2, chapterAr: "الاندساس", chapterFr: "Subduction",
+    chapterNumero: 2, chapterAr: "الغوص", chapterFr: "Subduction",
     chapterType: "processus", chapterImportance: "critique",
     scenarioId: "subduction-collision-ridge-v1",
-    focusAr: "التركيز المنهجي في هذا الفصل هو تحليل آلية اندساس الصفيحة المحيطية والظواهر المرافقة (زلازل، براكين، تشكل السلاسل).",
+    focusAr: "التركيز المنهجي في هذا الفصل هو تحليل آلية غوص الصفيحة المحيطية والظواهر المرافقة (زلازل، براكين، تشكل السلاسل).",
     recommendedVerbs: ["analyse", "interpret", "deduce", "scientific-text"],
   },
   {
     slug: "d3-u3-c3-collision-continentale",
-    domainNumero: 3, domainAr: "ديناميكية الكرة الأرضية", domainFr: "Dynamique du globe terrestre",
+    domainNumero: 3, domainAr: "التكتونية العامة", domainFr: "La tectonique generale",
     unitNumero: 3, unitAr: "النشاط التكتوني والبنيات الجيولوجية المرتبطة به", unitFr: "L'activite tectonique et les structures geologiques associees",
     chapterNumero: 3, chapterAr: "التصادم القاري", chapterFr: "Collision continentale",
     chapterType: "processus", chapterImportance: "critique",
@@ -575,22 +575,22 @@ export const methodologyChapterLinks: MethodologyChapterLink[] = [
   },
   {
     slug: "d3-u3-c4-formation-des-chaines-de-montagnes",
-    domainNumero: 3, domainAr: "ديناميكية الكرة الأرضية", domainFr: "Dynamique du globe terrestre",
+    domainNumero: 3, domainAr: "التكتونية العامة", domainFr: "La tectonique generale",
     unitNumero: 3, unitAr: "النشاط التكتوني والبنيات الجيولوجية المرتبطة به", unitFr: "L'activite tectonique et les structures geologiques associees",
     chapterNumero: 4, chapterAr: "تشكل السلاسل الجبلية", chapterFr: "Formation des chaines de montagnes",
     chapterType: "concept", chapterImportance: "haute",
     scenarioId: "subduction-collision-ridge-v1",
-    focusAr: "التركيز المنهجي: تحليل البنيات الجيولوجية المميزة للسلاسل الجبلية (الطيور، الفوالق، الأفيوليت).",
+    focusAr: "التركيز المنهجي: تحليل البنيات الجيولوجية المميزة للسلاسل الجبلية (الطيور، الفوالق، الأوفيوليت).",
     recommendedVerbs: ["analyse", "interpret", "compare", "relationship"],
   },
   {
     slug: "d3-u3-c5-disparition-de-la-plaque-oceanique-et-phenomenes-lies-a-la-subduction",
-    domainNumero: 3, domainAr: "ديناميكية الكرة الأرضية", domainFr: "Dynamique du globe terrestre",
+    domainNumero: 3, domainAr: "التكتونية العامة", domainFr: "La tectonique generale",
     unitNumero: 3, unitAr: "النشاط التكتوني والبنيات الجيولوجية المرتبطة به", unitFr: "L'activite tectonique et les structures geologiques associees",
-    chapterNumero: 5, chapterAr: "اختفاء الصفيحة المحيطية والظواهر المرتبطة بالاندساس", chapterFr: "Disparition de la plaque oceanique et phenomenes lies a la subduction",
+    chapterNumero: 5, chapterAr: "اختفاء الصفيحة المحيطية والظواهر المرتبطة بالغوص", chapterFr: "Disparition de la plaque oceanique et phenomenes lies a la subduction",
     chapterType: "synthese", chapterImportance: "critique",
     scenarioId: "subduction-collision-ridge-v1",
-    focusAr: "التركيز المنهجي: ربط جميع العناصر (توسع، اندساس، تصادم) في نص علمي متكامل حول ديناميكية الأرض.",
+    focusAr: "التركيز المنهجي: ربط جميع العناصر (توسع، غوص، تصادم) في نص علمي متكامل حول ديناميكية الأرض.",
     recommendedVerbs: ["scientific-text", "compare", "relationship", "deduce"],
   },
 ]
@@ -674,7 +674,7 @@ export const UNITS_CONFIG: UnitConfig[] = [
     unitAr: "آليات تحويل الطاقة الضوئية إلى طاقة كيميائية كامنة",
     unitFr: "Mecanismes de conversion de l'energie lumineuse en energie chimique potentielle",
     domainNumero: 2,
-    domainAr: "تحويل الطاقة",
+    domainAr: "التحولات الطاقوية",
     scenarioId: "photosynthesis-v1",
     emoji: "☀️",
     chapters: [],
@@ -684,7 +684,7 @@ export const UNITS_CONFIG: UnitConfig[] = [
     unitAr: "آليات تحويل الطاقة الكيميائية الكامنة في الجزيئات العضوية إلى ATP",
     unitFr: "Mecanismes de conversion de l'energie chimique potentielle des molecules organiques en ATP",
     domainNumero: 2,
-    domainAr: "تحويل الطاقة",
+    domainAr: "التحولات الطاقوية",
     scenarioId: "cellular-respiration-v1",
     emoji: "⚡",
     chapters: [],
@@ -694,7 +694,7 @@ export const UNITS_CONFIG: UnitConfig[] = [
     unitAr: "تحويل الطاقة على المستوى ما فوق البنية الخلوية",
     unitFr: "Conversion de l'energie au niveau ultrastructural cellulaire",
     domainNumero: 2,
-    domainAr: "تحويل الطاقة",
+    domainAr: "التحولات الطاقوية",
     scenarioId: "ultrastructural-energy-v1",
     emoji: "🔋",
     chapters: [],
@@ -704,7 +704,7 @@ export const UNITS_CONFIG: UnitConfig[] = [
     unitAr: "النشاط التكتوني للصفائح",
     unitFr: "L'activite tectonique des plaques",
     domainNumero: 3,
-    domainAr: "ديناميكية الكرة الأرضية",
+    domainAr: "التكتونية العامة",
     scenarioId: "tectonics-general-v1",
     emoji: "🌋",
     chapters: [],
@@ -714,7 +714,7 @@ export const UNITS_CONFIG: UnitConfig[] = [
     unitAr: "بنية الكرة الأرضية",
     unitFr: "Structure du globe terrestre",
     domainNumero: 3,
-    domainAr: "ديناميكية الكرة الأرضية",
+    domainAr: "التكتونية العامة",
     scenarioId: "earth-structure-v1",
     emoji: "🌍",
     chapters: [],
@@ -724,7 +724,7 @@ export const UNITS_CONFIG: UnitConfig[] = [
     unitAr: "النشاط التكتوني والبنيات الجيولوجية المرتبطة به",
     unitFr: "L'activite tectonique et les structures geologiques associees",
     domainNumero: 3,
-    domainAr: "ديناميكية الكرة الأرضية",
+    domainAr: "التكتونية العامة",
     scenarioId: "subduction-collision-ridge-v1",
     emoji: "🏔️",
     chapters: [],

@@ -9,10 +9,10 @@ function computeO2(light: number, co2: number): number {
 }
 
 const QUIZ = [
-  { id: "q1", question: "أين تحدث المرحلة الضوئية؟", options: ["الستروما", "الثايلاكويد", "الميتوكوندري", "السيتوبلازم"], correct: 1, explanation: "المرحلة الضوئية تحدث في الثايلاكويد." },
-  { id: "q2", question: "ماذا تنتج المرحلة الضوئية؟", options: ["جلوكوز فقط", "ATP + NADPH + O2", "CO2 + H2O", "جلوكوز + O2"], correct: 1, explanation: "تنتج ATP و NADPH و O2." },
+  { id: "q1", question: "أين تحدث المرحلة الضوئية؟", options: ["الستروما", "الثايلاكويد", "الميتوكندري", "السيتوبلازم"], correct: 1, explanation: "المرحلة الضوئية تحدث في الثايلاكويد." },
+  { id: "q2", question: "ماذا تنتج المرحلة الضوئية؟", options: ["غلوكوز فقط", "ATP + NADPH + O2", "CO2 + H2O", "غلوكوز + O2"], correct: 1, explanation: "تنتج ATP و NADPH و O2." },
   { id: "q3", question: "ماذا يحدث عند زيادة الإضاءة فوق حد معين؟", options: ["يزداد O2", "إشباع ضوئي", "يتوقف", "ينخفض"], correct: 1, explanation: "يحدث إشباع ضوئي." },
-  { id: "q4", question: "أين تحدث دورة كالفن؟", options: ["الثايلاكويد", "الستروما", "الميتوكوندري", "النواة"], correct: 1, explanation: "دورة كالفن في الستروما." },
+  { id: "q4", question: "أين تحدث دورة كالفن؟", options: ["الثايلاكويد", "الستروما", "الميتوكندري", "النواة"], correct: 1, explanation: "دورة كالفن في الستروما." },
 ]
 
 export function PhotosynthesisSimulation() {
@@ -42,7 +42,7 @@ export function PhotosynthesisSimulation() {
       <div className="rounded-3xl p-6" style={{ background: "linear-gradient(135deg, #10B981, #059669, #F59E0B)" }}>
         <p className="text-white/70 text-sm mb-1">محاكاة تفاعلية · التركيب الضوئي</p>
         <h1 className="text-3xl font-bold text-white mb-2">☀️ محاكاة التركيب الضوئي</h1>
-        <p className="text-white/80 max-w-3xl">تحكم في شدة الإضاءة وتركيز CO2 ولاحظ إنتاج O2 والجلوكوز.</p>
+        <p className="text-white/80 max-w-3xl">تحكم في شدة الإضاءة وتركيز CO2 ولاحظ إنتاج O2 والغلوكوز.</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -76,9 +76,9 @@ export function PhotosynthesisSimulation() {
                 <g key={`co2-${i}`}><circle cx={120 + i * 20} cy={160 + Math.sin(tick / 10 + i) * 10} r="7" fill="rgba(148,163,184,0.3)" stroke="#94A3B8" strokeWidth="1.5" /><text x={120 + i * 20} y={163 + Math.sin(tick / 10 + i) * 10} textAnchor="middle" fill="#94A3B8" fontSize="7" fontWeight="bold">CO2</text></g>
               ))}
               {running && glucose > 10 && (
-                <g transform="translate(450, 160)"><circle cx="0" cy="0" r="10" fill="rgba(251,191,36,0.3)" stroke="#FBBF24" strokeWidth="1.5" /><text x="0" y="3" textAnchor="middle" fill="#FBBF24" fontSize="8" fontWeight="bold">C6</text><text x="0" y="25" textAnchor="middle" fill="#FBBF24" fontSize="9">جلوكوز</text></g>
+                <g transform="translate(450, 160)"><circle cx="0" cy="0" r="10" fill="rgba(251,191,36,0.3)" stroke="#FBBF24" strokeWidth="1.5" /><text x="0" y="3" textAnchor="middle" fill="#FBBF24" fontSize="8" fontWeight="bold">C6</text><text x="0" y="25" textAnchor="middle" fill="#FBBF24" fontSize="9">غلوكوز</text></g>
               )}
-              <text x="300" y="270" textAnchor="middle" fill="#94A3B8" fontSize="11">O2: {o2}% · جلوكوز: {glucose}%</text>
+              <text x="300" y="270" textAnchor="middle" fill="#94A3B8" fontSize="11">O2: {o2}% · غلوكوز: {glucose}%</text>
             </svg>
           </div>
 
@@ -102,7 +102,7 @@ export function PhotosynthesisSimulation() {
 
           <div className="space-y-3">
             <div><div className="flex justify-between mb-1"><span className="text-white text-sm font-bold">O2</span><span className="text-white font-bold">{o2}%</span></div><div className="h-3 rounded-full bg-white/[0.05] overflow-hidden"><div className="h-full rounded-full transition-all" style={{ width: `${o2}%`, background: "linear-gradient(90deg, #60A5FA, #3B82F6)" }} /></div></div>
-            <div><div className="flex justify-between mb-1"><span className="text-white text-sm font-bold">جلوكوز</span><span className="text-white font-bold">{glucose}%</span></div><div className="h-3 rounded-full bg-white/[0.05] overflow-hidden"><div className="h-full rounded-full transition-all" style={{ width: `${glucose}%`, background: "linear-gradient(90deg, #FBBF24, #F59E0B)" }} /></div></div>
+            <div><div className="flex justify-between mb-1"><span className="text-white text-sm font-bold">غلوكوز</span><span className="text-white font-bold">{glucose}%</span></div><div className="h-3 rounded-full bg-white/[0.05] overflow-hidden"><div className="h-full rounded-full transition-all" style={{ width: `${glucose}%`, background: "linear-gradient(90deg, #FBBF24, #F59E0B)" }} /></div></div>
           </div>
         </div>
 

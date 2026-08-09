@@ -12,7 +12,7 @@ export default function ExperimentalLessonView({ slug }: Props) {
   const lesson: ExperimentalLesson = getExperimentalLesson(slug)
   const phases = lesson.phases
   const [currentFrame, setCurrentFrame] = useState(0)
-  const [qcmScore, setQcmScore] = useState(0)
+  const [, setQcmScore] = useState(0)
   const scrollRef = useRef<HTMLDivElement>(null)
 
   useLayoutEffect(() => {

@@ -2,22 +2,23 @@
 tests/test_pulse_service.py — Tests unitaires pour pulse_service.
 """
 
-import pytest
 from datetime import date, datetime, timedelta
 from unittest.mock import AsyncMock, MagicMock
+
+import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from models.pulse import DailyPulseCard
 from services.pulse_service import (
     SEED_CARDS,
     _select_3_cards_for_date,
-    get_or_create_today_cards,
     complete_card,
+    get_or_create_today_cards,
     get_streak_summary,
 )
 
-
 # ── Tests SEED ─────────────────────────────────────────────
+
 
 def test_seed_cards_count():
     assert len(SEED_CARDS) == 7
@@ -154,12 +155,21 @@ async def test_complete_card_idempotent():
 
     result_mock = MagicMock()
     result_mock.scalar_one_or_none.return_value = card
-    db.execute.return_value = result_mock
+
+    streak = MagicMock()
+    streak.current_streak = 5
+    streak.longest_streak = 8
+    streak.last_activity = date.today()
+    streak_result_mock = MagicMock()
+    streak_result_mock.scalar_one_or_none.return_value = streak
+
+    db.execute.side_effect = [result_mock, streak_result_mock]
 
     result = await complete_card(user_id=42, card_id="card-1", db=db)
 
     assert result["already_completed"] is True
     assert result["xp_awarded"] == 0
+    assert result["streak"]["current_streak"] == 5
 
 
 @pytest.mark.asyncio
@@ -195,8 +205,9 @@ async def test_streak_in_danger_when_no_recent_activity():
     streak.longest_streak = 10
     streak.last_activity = date.today() - timedelta(days=3)
 
-    from services import pulse_service
-    pulse_service.get_or_create_streak = AsyncMock(return_value=streak)
+    result_mock = MagicMock()
+    result_mock.scalar_one_or_none.return_value = streak
+    db.execute.return_value = result_mock
 
     result = await get_streak_summary(user_id=42, db=db)
 
@@ -215,8 +226,9 @@ async def test_streak_safe_when_active_today():
     streak.longest_streak = 10
     streak.last_activity = date.today()
 
-    from services import pulse_service
-    pulse_service.get_or_create_streak = AsyncMock(return_value=streak)
+    result_mock = MagicMock()
+    result_mock.scalar_one_or_none.return_value = streak
+    db.execute.return_value = result_mock
 
     result = await get_streak_summary(user_id=42, db=db)
 

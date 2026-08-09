@@ -28,8 +28,8 @@ const SIMULATIONS = [
     emoji: "☀️",
     titleAr: "التركيب الضوئي",
     titleFr: "تحويل الطاقة الضوئية",
-    descAr: "تحكم في الإضاءة وCO2 ولاحظ إنتاج O2 والجلوكوز",
-    chapter: "تحويل الطاقة",
+    descAr: "تحكم في الإضاءة وCO2 ولاحظ إنتاج O2 والغلوكوز",
+    chapter: "التحولات الطاقوية",
     color: "linear-gradient(135deg, #10B981, #059669, #F59E0B)",
   },
   {

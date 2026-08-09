@@ -12,6 +12,9 @@ logger = logging.getLogger("khawarizmi.evaluation_mode")
 
 
 async def handle_evaluation(req, user: dict, db: AsyncSession, openai_client):
+    # NOTE : route /api/ai/evaluate — moteur LEGACY (score/10, seuils 0.85/0.35).
+    # Le correcteur actif est evaluate_answer_v2 (via /api/document-analysis/evaluate-v2).
+    # Route non appelée par le frontend actuel ; conservée pour compatibilité API.
     from routes.evaluate import evaluate_with_fallback, normalize_result
 
     user_id = user["id"]
@@ -89,19 +92,12 @@ async def handle_evaluation(req, user: dict, db: AsyncSession, openai_client):
             ))
 
     else:
-        await db.execute(
-            sa_text("""
-                INSERT INTO mastery_micro_concepts
-                    (user_id, micro_concept_id, concept_id, chapter, pending_real_evaluation, updated_at)
-                VALUES (:uid, :mc_id, :mc_id, :chapter, TRUE, NOW())
-                ON CONFLICT (user_id, concept_id)
-                DO UPDATE SET pending_real_evaluation = TRUE, updated_at = NOW()
-            """),
-            {
-                "uid": user_id,
-                "mc_id": req.question_id,
-                "chapter": question.get("chapitre_id", "ch_inconnu"),
-            },
+        # S3b : pending tag via le service FSRS unifié (même upsert qu'avant)
+        from services.fsrs_unified import tag_pending_concept
+
+        await tag_pending_concept(
+            db, user_id, req.question_id,
+            chapter=question.get("chapitre_id", "ch_inconnu"),
         )
         await db.commit()
 

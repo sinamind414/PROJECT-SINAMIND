@@ -7,6 +7,8 @@ export interface User {
   id: string
   email: string
   nom: string
+  /** Prénom (champ réel de l'API /api/auth/me — utilisé par les pages). */
+  prenom?: string
   filiere: string
   plan: "free" | "premium"
   is_active: boolean

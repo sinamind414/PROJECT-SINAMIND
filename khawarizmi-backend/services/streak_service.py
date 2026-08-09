@@ -3,10 +3,9 @@ Streak Service — gestion de la série quotidienne d'entraînement.
 """
 
 from datetime import date, timedelta
-from sqlalchemy import select, update
-from sqlalchemy.ext.asyncio import AsyncSession
 
-from models.user import User
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 
 async def get_user_streak(db: AsyncSession, user_id: str) -> dict:
@@ -37,9 +36,7 @@ async def get_user_streak(db: AsyncSession, user_id: str) -> dict:
     status = "active"
     if streak.last_active_date is None:
         status = "inactive"
-    elif streak.last_active_date == today:
-        status = "active"
-    elif streak.last_active_date == today - timedelta(days=1):
+    elif streak.last_active_date == today or streak.last_active_date == today - timedelta(days=1):
         status = "active"
     else:
         status = "broken"
@@ -118,7 +115,7 @@ async def use_freeze(db: AsyncSession, user_id: str) -> bool:
 
     streak.freezes_remaining -= 1
     streak.freezes_used_this_week += 1
-    streak.last_active_date = yesterday
+    streak.last_active_date = today - timedelta(days=1)
     streak.current_streak += 1
     streak.longest_streak = max(streak.longest_streak, streak.current_streak)
 

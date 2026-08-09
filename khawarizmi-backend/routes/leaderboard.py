@@ -5,8 +5,8 @@ Routes Leaderboard — classements.
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from deps import get_current_user
 from database import get_db
+from deps import get_current_user
 from services.leaderboard_service import get_leaderboard, get_user_rank, update_user_stats
 
 router = APIRouter(prefix="/api/leaderboard", tags=["leaderboard"])
@@ -30,10 +30,10 @@ async def my_rank(
     current_user=Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    rank = await get_user_rank(db, str(current_user.id), scope=scope, wilaya_code=wilaya)
+    rank = await get_user_rank(db, str(current_user["id"]), scope=scope, wilaya_code=wilaya)
     return {"rank": rank, "scope": scope}
 
 
 @router.post("/refresh")
 async def refresh_my_stats(current_user=Depends(get_current_user), db: AsyncSession = Depends(get_db)):
-    return await update_user_stats(db, str(current_user.id))
+    return await update_user_stats(db, str(current_user["id"]))

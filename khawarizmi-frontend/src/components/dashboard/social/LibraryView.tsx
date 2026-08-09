@@ -1,7 +1,7 @@
 "use client"
 import React, { useEffect, useState } from "react"
 import { useSocial } from "@/hooks/useSocial"
-import { FileText, Image, File, Download } from "lucide-react"
+import { FileText, Image as ImageIcon, File, Download } from "lucide-react"
 
 interface SocialFile {
   id: number
@@ -17,10 +17,10 @@ export function LibraryView() {
 
   useEffect(() => {
     apiClient.request<SocialFile[]>("/api/social/files").then(setFiles).catch(() => {})
-  }, [])
+  }, [apiClient])
 
   const fileIcon = (type?: string) => {
-    if (type?.startsWith("image")) return <Image className="w-5 h-5 text-mint" />
+    if (type?.startsWith("image")) return <ImageIcon className="w-5 h-5 text-mint" />
     if (type?.startsWith("text") || type?.includes("pdf")) return <FileText className="w-5 h-5 text-amber-400" />
     return <File className="w-5 h-5 text-slate-400" />
   }

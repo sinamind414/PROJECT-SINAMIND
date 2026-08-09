@@ -95,7 +95,7 @@ async def seed():
     print("\n🔑 Identifiants de démo :")
     print(f"   Email    : {DEMO_EMAIL}")
     print(f"   Mot de passe : {DEMO_PASSWORD}")
-    print(f"   URL      : http://localhost:3000/auth/login")
+    print("   URL      : http://localhost:3000/auth/login")
 
 
 if __name__ == "__main__":

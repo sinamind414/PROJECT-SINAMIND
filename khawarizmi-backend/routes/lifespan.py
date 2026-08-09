@@ -125,7 +125,7 @@ async def lifespan(app: FastAPI):
     if cfg.DATABASE_URL:
         try:
             db_url = cfg.DATABASE_URL
-            is_sqlite = db_url.startswith("sqlite://")
+            is_sqlite = db_url.startswith("sqlite://") or db_url.startswith("sqlite+aiosqlite://")
             if db_url.startswith("postgresql://") or db_url.startswith("postgres://"):
                 db_url = db_url.replace("postgresql://", "postgresql+asyncpg://", 1).replace(
                     "postgres://", "postgresql+asyncpg://", 1
@@ -156,11 +156,12 @@ async def lifespan(app: FastAPI):
                 from sqlalchemy import event as _sa_event
 
                 @_sa_event.listens_for(state.db_engine.sync_engine, "connect")
-                def _sqlite_now_patch(dbapi_conn, rec):  # noqa: ARG001
+                def _sqlite_now_patch(dbapi_conn, rec):
                     try:
                         dbapi_conn.create_function("NOW", 0, lambda: None)
                         # NOW() en SQLite : utiliser strftime
                         import datetime as _dt
+
                         def _now():
                             return _dt.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
                         dbapi_conn.create_function("NOW", 0, _now)
@@ -272,16 +273,6 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         logger.warning(f"STATIC_CONTENT_PRELOAD_FAILED | {e}")
 
-    # ── Worker pool arq (met des jobs en queue si Redis dispo) ────────
-    try:
-        if state.redis is not None:
-            from worker.worker import get_worker_pool
-
-            await get_worker_pool()
-            logger.info("✅ Worker pool arq initialisé (file d'attente prête)")
-    except Exception as e:
-        logger.warning(f"WORKER_POOL_FAILED | {e}")
-
     logger.info(f"Khawarizmi API prête [{cfg.ENVIRONMENT}]")
     yield
 
@@ -292,11 +283,6 @@ async def lifespan(app: FastAPI):
             await state.reconciliation_task
         except asyncio.CancelledError:
             pass
-    try:
-        from worker.worker import close_worker_pool
-        await close_worker_pool()
-    except Exception:
-        pass
     if state.redis:
         try:
             close = getattr(state.redis, "aclose", None) or getattr(state.redis, "close", None)

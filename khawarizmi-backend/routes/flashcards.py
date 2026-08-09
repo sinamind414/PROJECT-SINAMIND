@@ -6,7 +6,6 @@ from fastapi import APIRouter, Depends, HTTPException
 from fsrs import Card
 from fsrs import Rating as FsrsRating
 from fsrs import Scheduler as CardScheduler
-from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from deps import get_current_user, get_db, get_openai, get_scheduler
@@ -106,16 +105,10 @@ async def soumettre_resultat_drill(
     scheduler = get_scheduler()
     user_id = current_user["id"]
 
-    existing = await db.execute(
-        text("""
-            SELECT fsrs_state FROM mastery_micro_concepts
-            WHERE user_id = :user_id AND micro_concept_id = :mc_id
-            LIMIT 1
-        """),
-        {"user_id": user_id, "mc_id": body.micro_concept_id},
-    )
-    row = existing.fetchone()
-    existing_state = row[0] if row else None
+    # S3b : lecture via le service FSRS unifié (même SELECT qu'avant)
+    from services.fsrs_unified import get_concept_state, save_concept_review
+
+    existing_state = await get_concept_state(db, user_id, body.micro_concept_id)
 
     card = _rehydrate_fsrs_card(existing_state)
     result = scheduler.calculer_prochain_intervalle(card, body.score_percent)
@@ -132,57 +125,26 @@ async def soumettre_resultat_drill(
         "last_review": now.isoformat(),
     }
     fsrs_json = json.dumps(fsrs_payload)
-
-    await db.execute(
-        text("""
-            INSERT INTO mastery_micro_concepts
-                (user_id, micro_concept_id, concept_id, prochaine_revision,
-                 interval_jours, difficulty, stability, fsrs_state,
-                 due_date, last_review, reps, lapses, state,
-                 total_reviews, avg_score, updated_at)
-            VALUES
-                (:user_id, :mc_id, :concept_id, :next_rev,
-                 :interval, :difficulty, :stability, CAST(:fsrs_state AS jsonb),
-                 :due_date, :last_review, :reps, :lapses, :state,
-                 1, :avg_score, NOW())
-            ON CONFLICT (user_id, micro_concept_id)
-            DO UPDATE SET
-                concept_id = COALESCE(mastery_micro_concepts.concept_id, EXCLUDED.concept_id),
-                prochaine_revision = EXCLUDED.prochaine_revision,
-                interval_jours = EXCLUDED.interval_jours,
-                difficulty = EXCLUDED.difficulty,
-                stability = EXCLUDED.stability,
-                fsrs_state = EXCLUDED.fsrs_state,
-                due_date = EXCLUDED.due_date,
-                last_review = EXCLUDED.last_review,
-                reps = EXCLUDED.reps,
-                lapses = EXCLUDED.lapses,
-                state = EXCLUDED.state,
-                total_reviews = COALESCE(mastery_micro_concepts.total_reviews, 0) + 1,
-                avg_score = (
-                    (COALESCE(mastery_micro_concepts.avg_score, 0)
-                     * COALESCE(mastery_micro_concepts.total_reviews, 0))
-                    + :avg_score
-                ) / NULLIF(COALESCE(mastery_micro_concepts.total_reviews, 0) + 1, 0),
-                updated_at = NOW()
-        """),
-        {
-            "user_id": user_id,
-            "mc_id": body.micro_concept_id,
-            "concept_id": body.micro_concept_id,
-            "next_rev": result["prochaine_revision"],
-            "interval": result["interval_jours"],
-            "difficulty": result["difficulty"],
-            "stability": result["stability"],
-            "fsrs_state": fsrs_json,
-            "due_date": result["prochaine_revision"],
-            "last_review": now,
-            "reps": new_card.reps,
-            "lapses": new_card.lapses,
-            "state": int(getattr(new_card.state, "value", 0)) if hasattr(new_card.state, "value") else 0,
-            "avg_score": body.score_percent,
-        },
+    # S3b : upsert riche via le service unifié (total_reviews/avg_score)
+    ok = await save_concept_review(
+        db, user_id, body.micro_concept_id,
+        concept_id_alias=body.micro_concept_id,
+        prochaine_revision=result["prochaine_revision"],
+        interval_jours=result["interval_jours"],
+        difficulty=result["difficulty"],
+        stability=result["stability"],
+        fsrs_state=fsrs_payload,
+        due_date=result["prochaine_revision"],
+        last_review=now,
+        reps=new_card.reps,
+        lapses=new_card.lapses,
+        state=int(getattr(new_card.state, "value", 0)) if hasattr(new_card.state, "value") else 0,
+        avg_score=body.score_percent,
     )
+    await db.commit()
+    if not ok:
+        logger.warning(f"FSRS drill update non persisté (table indisponible): {body.micro_concept_id}")
+
     await db.commit()
 
     logger.info(
@@ -365,36 +327,22 @@ async def create_flashcard(
     card_id = f"fc_{current_user['id']}_{datetime.now(UTC).timestamp()}"
     mc_id = card_id
 
-    await db.execute(
-        text("""
-            INSERT INTO mastery_micro_concepts
-                (user_id, micro_concept_id, concept_id, chapter,
-                 difficulty, stability, state, due_date,
-                 prochaine_revision, interval_jours)
-            VALUES
-                (:uid, :mc_id, :concept_id, :chapter,
-                 :difficulty, :stability, :state, :now,
-                 :next_rev, :interval)
-            ON CONFLICT (user_id, micro_concept_id)
-            DO UPDATE SET
-                chapter = EXCLUDED.chapter,
-                difficulty = EXCLUDED.difficulty,
-                updated_at = NOW()
-        """),
-        {
-            "uid": current_user["id"],
-            "mc_id": mc_id,
-            "concept_id": card_id,
-            "chapter": body.chapitre or "",
-            "difficulty": {"critique": 7.0, "haute": 5.0, "moyenne": 3.0}[body.importance],
-            "stability": 0.0,
-            "state": 0,
-            "now": datetime.now(UTC),
-            "next_rev": datetime.now(UTC),
-            "interval": 1,
-        },
+    # S3b : création via le service FSRS unifié (même upsert qu'avant)
+    from services.fsrs_unified import save_concept_card
+
+    ok = await save_concept_card(
+        db, current_user["id"], mc_id,
+        concept_id_alias=card_id,
+        chapter=body.chapitre or "",
+        difficulty={"critique": 7.0, "haute": 5.0, "moyenne": 3.0}[body.importance],
+        stability=0.0, state=0,
+        due_date=datetime.now(UTC),
+        prochaine_revision=datetime.now(UTC),
+        interval_jours=1,
     )
     await db.commit()
+    if not ok:
+        logger.warning(f"Flashcard non persistée (table indisponible): {mc_id}")
 
     logger.info(f"Flashcard creee: {mc_id} user={current_user['id']}")
 
@@ -420,16 +368,11 @@ async def review_flashcard(
     rating_map = {1: FsrsRating.Again, 2: FsrsRating.Hard, 3: FsrsRating.Good, 4: FsrsRating.Easy}
     fsrs_rating = rating_map[body.rating]
 
-    existing = await db.execute(
-        text("""
-            SELECT fsrs_state FROM mastery_micro_concepts
-            WHERE user_id = :uid AND micro_concept_id = :mc_id
-            LIMIT 1
-        """),
-        {"uid": current_user["id"], "mc_id": card_id},
-    )
-    row = existing.fetchone()
-    card = _rehydrate_fsrs_card(row[0] if row else None)
+    # S3b : lecture via le service FSRS unifié
+    from services.fsrs_unified import get_concept_state, save_concept_review
+
+    existing_state = await get_concept_state(db, current_user["id"], card_id)
+    card = _rehydrate_fsrs_card(existing_state)
 
     now = datetime.now(UTC)
     scheduler = CardScheduler()
@@ -450,40 +393,30 @@ async def review_flashcard(
             "last_review": now.isoformat(),
         }
     )
-
-    await db.execute(
-        text("""
-            INSERT INTO mastery_micro_concepts
-                (user_id, micro_concept_id, prochaine_revision,
-                 interval_jours, difficulty, stability, fsrs_state,
-                 due_date, last_review)
-            VALUES
-                (:uid, :mc_id, :next_rev,
-                 :interval, :difficulty, :stability, CAST(:fsrs_state AS jsonb),
-                 :due_date, :last_review)
-            ON CONFLICT (user_id, micro_concept_id)
-            DO UPDATE SET
-                prochaine_revision = EXCLUDED.prochaine_revision,
-                interval_jours = EXCLUDED.interval_jours,
-                difficulty = EXCLUDED.difficulty,
-                stability = EXCLUDED.stability,
-                fsrs_state = EXCLUDED.fsrs_state,
-                due_date = EXCLUDED.due_date,
-                last_review = EXCLUDED.last_review,
-                updated_at = NOW()
-        """),
-        {
-            "uid": current_user["id"],
-            "mc_id": card_id,
-            "next_rev": due_date,
-            "interval": interval,
-            "difficulty": new_card.difficulty,
+    # S3b : upsert via le service unifié (review simple)
+    ok = await save_concept_review(
+        db, current_user["id"], card_id,
+        concept_id_alias=card_id,
+        prochaine_revision=due_date,
+        interval_jours=interval,
+        difficulty=new_card.difficulty,
+        stability=new_card.stability,
+        fsrs_state={
             "stability": new_card.stability,
-            "fsrs_state": fsrs_json,
-            "due_date": due_date,
-            "last_review": now,
+            "difficulty": new_card.difficulty,
+            "scheduled_days": new_card.scheduled_days,
+            "reps": new_card.reps,
+            "lapses": new_card.lapses,
+            "state": str(new_card.state),
+            "last_review": now.isoformat(),
         },
+        due_date=due_date,
+        last_review=now,
     )
+    await db.commit()
+    if not ok:
+        logger.warning(f"Review non persistée (table indisponible): {card_id}")
+
     await db.commit()
 
     return {

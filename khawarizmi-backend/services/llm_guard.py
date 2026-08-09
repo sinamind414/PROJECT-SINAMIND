@@ -92,6 +92,7 @@ _SCRUB_KEYS = [
 # Logique d'activation — double opt-in STRICT
 # ──────────────────────────────────────────────────────────────────────
 
+
 def is_llm_enabled() -> bool:
     """Retourne True SI ET SEULEMENT SI ENABLE_EXTERNAL_LLM=1 explicite.
 
@@ -166,6 +167,7 @@ class LLMDisabledError(RuntimeError):
 class _GuardedCompletions:
     async def create(self, *args: Any, **kwargs: Any) -> Any:
         raise LLMDisabledError("chat.completions.create")
+
     def __call__(self, *a, **kw):
         raise LLMDisabledError("chat.completions.create")
 
@@ -179,6 +181,7 @@ class _GuardedChat:
 class _GuardedEmbeddings:
     async def create(self, *args: Any, **kwargs: Any) -> Any:
         raise LLMDisabledError("embeddings.create")
+
     def __call__(self, *a, **kw):
         raise LLMDisabledError("embeddings.create")
 

@@ -2,10 +2,10 @@
 Gems Service — monnaie interne (gemmes).
 """
 
-from sqlalchemy import select, update
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from models.gems import UserGems, GemTransaction
+from models.gems import GemTransaction, UserGems
 
 
 async def get_user_gems(db: AsyncSession, user_id: str) -> dict:

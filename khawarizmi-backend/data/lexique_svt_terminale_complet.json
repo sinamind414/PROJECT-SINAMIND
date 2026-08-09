@@ -236,7 +236,7 @@
               "synonymes_fr": [],
               "synonymes_ar": [
                 "الرامزة",
-                "الكودون"
+                "الرامزة"
               ],
               "importance": "haute",
               "bac_frequent": true,
@@ -397,7 +397,7 @@
               "abreviation": null,
               "type": "molecule",
               "definition_fr": "Composé organique cyclique contenant de l'azote : adénine (A), guanine (G), cytosine (C), thymine (T) ou uracile (U)",
-              "definition_ar": "مركب عضوي حلقي يحتوي على النيتروجين: الأدينين (A) والغوانين (G) والسيتوزين (C) والثيمين (T) أو اليوراسيل (U)",
+              "definition_ar": "مركب عضوي حلقي يحتوي على النيتروجين: الأدنين (A) والغوانين (G) والسيتوزين (C) والثيمين (T) أو اليوراسيل (U)",
               "synonymes_fr": [],
               "synonymes_ar": [
                 "القاعدة النيتروجينية"
@@ -3465,7 +3465,7 @@
                 "pigment vert"
               ],
               "synonymes_ar": [
-                "الكلوروفيل"
+                "اليخضور"
               ],
               "importance": "critique",
               "bac_frequent": true,
@@ -3631,7 +3631,7 @@
               "abreviation": null,
               "type": "molecule",
               "definition_fr": "Nicotinamide adénine dinucléotide phosphate réduit, transporteur d'électrons produit lors de la phase claire et utilisé dans le cycle de Calvin",
-              "definition_ar": "فوسفات نيكوتيناميد أدينين ثنائي النوكليوتيد المرجع، ناقل إلكترونات ينتج في الطور الضوئي ويستخدم في دورة كالفن",
+              "definition_ar": "فوسفات نيكوتيناميد أدنين ثنائي النوكليوتيد المرجع، ناقل إلكترونات ينتج في الطور الضوئي ويستخدم في دورة كالفن",
               "synonymes_fr": [],
               "synonymes_ar": [
                 "NADPH"
@@ -3939,7 +3939,7 @@
             {
               "id": "term-085",
               "terme_fr": "Mitochondrie",
-              "terme_ar": "الميتوكوندري",
+              "terme_ar": "الميتوكندري",
               "abreviation": null,
               "type": "organite",
               "definition_fr": "Organite à double membrane, siège de la respiration cellulaire où se déroulent le cycle de Krebs et la phosphorylation oxydative",
@@ -3950,7 +3950,7 @@
               ],
               "synonymes_ar": [
                 "متقدرة",
-                "ميتوكوندريون"
+                "ميتوكندريون"
               ],
               "importance": "critique",
               "bac_frequent": true,
@@ -3974,7 +3974,7 @@
               "abreviation": null,
               "type": "processus",
               "definition_fr": "Série de réactions enzymatiques dans la matrice mitochondriale oxydant l'acétyl-CoA en CO2, produisant NADH, FADH2 et GTP",
-              "definition_ar": "سلسلة من التفاعلات الإنزيمية في المادة الأساسية للميتوكوندري تؤكسد أسيتيل CoA إلى CO2، منتجة NADH و FADH2 و GTP",
+              "definition_ar": "سلسلة من التفاعلات الإنزيمية في المادة الأساسية للميتوكندري تؤكسد أسيتيل CoA إلى CO2، منتجة NADH و FADH2 و GTP",
               "synonymes_fr": [
                 "cycle de l'acide citrique",
                 "cycle tricarboxylique"
@@ -4035,7 +4035,7 @@
               "abreviation": null,
               "type": "processus",
               "definition_fr": "Série de complexes protéiques membranaires (I, II, III, IV) dans la membrane interne mitochondriale transférant des électrons du NADH/FADH2 à O2",
-              "definition_ar": "سلسلة من معقدات بروتينية غشائية (I, II, III, IV) في الغشاء الداخلي للميتوكوندري تنقل الإلكترونات من NADH/FADH2 إلى O2",
+              "definition_ar": "سلسلة من معقدات بروتينية غشائية (I, II, III, IV) في الغشاء الداخلي للميتوكندري تنقل الإلكترونات من NADH/FADH2 إلى O2",
               "synonymes_fr": [
                 "chaîne de transport d'électrons"
               ],
@@ -4121,7 +4121,7 @@
               "abreviation": null,
               "type": "molecule",
               "definition_fr": "Nicotinamide adénine dinucléotide réduit, coenzyme transporteur d'électrons produit lors de la glycolyse, décarboxylation et cycle de Krebs",
-              "definition_ar": "نيكوتيناميد أدينين ثنائي النوكليوتيد المرجع، مرافق ناقل للإلكترونات ينتج في التحلل السكري ونزع الكربوكسيل ودورة كريبس",
+              "definition_ar": "نيكوتيناميد أدنين ثنائي النوكليوتيد المرجع، مرافق ناقل للإلكترونات ينتج في التحلل السكري ونزع الكربوكسيل ودورة كريبس",
               "synonymes_fr": [],
               "synonymes_ar": [
                 "NADH"
@@ -4149,7 +4149,7 @@
               "abreviation": null,
               "type": "molecule",
               "definition_fr": "Flavine adénine dinucléotide réduit, coenzyme transporteur d'électrons produit dans le cycle de Krebs, donnant ses électrons au complexe II",
-              "definition_ar": "فلافين أدينين ثنائي النوكليوتيد المرجع، مرافق ناقل للإلكترونات ينتج في دورة كريبس، يعطي إلكتروناته للمعقد II",
+              "definition_ar": "فلافين أدنين ثنائي النوكليوتيد المرجع، مرافق ناقل للإلكترونات ينتج في دورة كريبس، يعطي إلكتروناته للمعقد II",
               "synonymes_fr": [],
               "synonymes_ar": [
                 "FADH2"
@@ -4173,7 +4173,7 @@
             {
               "id": "term-184",
               "terme_fr": "Membrane interne mitochondriale",
-              "terme_ar": "الغشاء الداخلي للميتوكوندري",
+              "terme_ar": "الغشاء الداخلي للميتوكندري",
               "abreviation": null,
               "type": "structure",
               "definition_fr": "Membrane sélectivement perméable repliée en crêtes où sont localisés les complexes de la chaîne respiratoire et l'ATP synthase",
@@ -4202,7 +4202,7 @@
               "abreviation": null,
               "type": "structure",
               "definition_fr": "Compartiment entre les membranes externe et interne de la mitochondrie où les protons sont pompés pour créer le gradient électrochimique",
-              "definition_ar": "حيز بين الغشاءين الخارجي والداخلي للميتوكوندري حيث تضخ البروتونات لإحداث التدرج الكهروكيميائي",
+              "definition_ar": "حيز بين الغشاءين الخارجي والداخلي للميتوكندري حيث تضخ البروتونات لإحداث التدرج الكهروكيميائي",
               "synonymes_fr": [],
               "synonymes_ar": [],
               "importance": "moyenne",
@@ -4223,11 +4223,11 @@
             {
               "id": "term-186",
               "terme_fr": "Matrice mitochondriale",
-              "terme_ar": "المادة الأساسية للميتوكوندري",
+              "terme_ar": "المادة الأساسية للميتوكندري",
               "abreviation": null,
               "type": "structure",
               "definition_fr": "Compartiment interne de la mitochondrie contenant les enzymes du cycle de Krebs, l'ADN mitochondrial et les ribosomes",
-              "definition_ar": "الحيز الداخلي للميتوكوندري يحتوي على إنزيمات دورة كريبس و ADN الميتوكوندري والريبوزومات",
+              "definition_ar": "الحيز الداخلي للميتوكندري يحتوي على إنزيمات دورة كريبس و ADN الميتوكندري والريبوزومات",
               "synonymes_fr": [],
               "synonymes_ar": [],
               "importance": "moyenne",
@@ -4327,7 +4327,7 @@
               "abreviation": null,
               "type": "concept",
               "definition_fr": "Énergie potentielle électrochimique du gradient de protons à travers la membrane interne mitochondriale utilisée par l'ATP synthase",
-              "definition_ar": "الطاقة الكامنة الكهروكيميائية لتدرج البروتونات عبر الغشاء الداخلي للميتوكوندري يستخدمها ATP سنتاز",
+              "definition_ar": "الطاقة الكامنة الكهروكيميائية لتدرج البروتونات عبر الغشاء الداخلي للميتوكندري يستخدمها ATP سنتاز",
               "synonymes_fr": [],
               "synonymes_ar": [],
               "importance": "haute",
@@ -4801,7 +4801,7 @@
               "abreviation": null,
               "type": "concept",
               "definition_fr": "Enveloppe rigide externe de la Terre composée de la croûte et du manteau supérieur, fragmentée en plaques tectoniques",
-              "definition_ar": "الغلاف الصلب الخارجي للأرض المكون من القشرة والستار العلوي، مقسم إلى صفائح تكتونية",
+              "definition_ar": "الغلاف الصلب الخارجي للأرض المكون من القشرة والبرنس العلوي، مقسم إلى صفائح تكتونية",
               "synonymes_fr": [
                 "croûte lithosphérique"
               ],
@@ -4865,7 +4865,7 @@
                 "zone de subduction"
               ],
               "synonymes_ar": [
-                "الاندساس",
+                "الغوص",
                 "منطقة الغوص"
               ],
               "importance": "critique",
@@ -4973,7 +4973,7 @@
               "abreviation": null,
               "type": "processus",
               "definition_fr": "Processus de formation de nouvelle croûte océanique au niveau des dorsales par remontée de magma mantellique",
-              "definition_ar": "عملية تشكل قشرة محيطية جديدة على مستوى الأظهرة بصعود الماغما الستارية",
+              "definition_ar": "عملية تشكل قشرة محيطية جديدة على مستوى الأظهرة بصعود الماغما البرنسية",
               "synonymes_fr": [
                 "expansion océanique"
               ],
@@ -5354,7 +5354,7 @@
               "abreviation": "Moho",
               "type": "concept",
               "definition_fr": "Surface de séparation entre la croûte et le manteau où la vitesse des ondes sismiques augmente brusquement, située à 5-70 km de profondeur",
-              "definition_ar": "سطح فاصل بين القشرة والستار حيث تزداد سرعة الموجات الزلزالية فجأة، يوجد على عمق 5-70 كم",
+              "definition_ar": "سطح فاصل بين القشرة والبرنس حيث تزداد سرعة الموجات الزلزالية فجأة، يوجد على عمق 5-70 كم",
               "synonymes_fr": [
                 "Moho"
               ],
@@ -5408,14 +5408,14 @@
             {
               "id": "term-113",
               "terme_fr": "Manteau terrestre",
-              "terme_ar": "الستار الأرضي",
+              "terme_ar": "البرنس الأرضي",
               "abreviation": null,
               "type": "concept",
               "definition_fr": "Couche terrestre entre la croûte et le noyau, représentant 84% du volume terrestre, constituée de péridotite riche en olivine",
               "definition_ar": "الطبقة الأرضية بين القشرة والنواة، تمثل 84% من حجم الأرض، مكونة من البيريدوتيت الغني بالأوليفين",
               "synonymes_fr": [],
               "synonymes_ar": [
-                "الستار"
+                "البرنس"
               ],
               "importance": "haute",
               "bac_frequent": true,
@@ -5466,7 +5466,7 @@
               "abreviation": null,
               "type": "concept",
               "definition_fr": "Couche du manteau supérieur située sous la lithosphère (100-700 km), moins rigide et partiellement fondue, permettant les mouvements des plaques",
-              "definition_ar": "طبقة من الستار العلوي تحت الغلاف الصخري (100-700 كم)، أقل صلابة ومنصهرة جزئياً، تسمح بحركة الصفائح",
+              "definition_ar": "طبقة من البرنس العلوي تحت الغلاف الصخري (100-700 كم)، أقل صلابة ومنصهرة جزئياً، تسمح بحركة الصفائح",
               "synonymes_fr": [
                 "zone à faible vitesse"
               ],
@@ -5568,11 +5568,11 @@
             {
               "id": "term-211",
               "terme_fr": "Manteau supérieur",
-              "terme_ar": "الستار العلوي",
+              "terme_ar": "البرنس العلوي",
               "abreviation": null,
               "type": "concept",
               "definition_fr": "Partie supérieure du manteau terrestre (jusqu'à 670 km) incluant la zone de faible vitesse (asthénosphère) et la lithosphère mantellique",
-              "definition_ar": "الجزء العلوي من الستار الأرضي (حتى 670 كم) يشمل منطقة السرعة المنخفضة (الغلاف الموري) والغلاف الصخري الستاري",
+              "definition_ar": "الجزء العلوي من البرنس الأرضي (حتى 670 كم) يشمل منطقة السرعة المنخفضة (الغلاف الموري) والغلاف الصخري البرنسي",
               "synonymes_fr": [],
               "synonymes_ar": [],
               "importance": "moyenne",
@@ -5593,11 +5593,11 @@
             {
               "id": "term-212",
               "terme_fr": "Manteau inférieur",
-              "terme_ar": "الستار السفلي",
+              "terme_ar": "البرنس السفلي",
               "abreviation": null,
               "type": "concept",
               "definition_fr": "Partie inférieure du manteau entre 670 km et 2900 km, solide mais soumise à de très hautes pressions et températures",
-              "definition_ar": "الجزء السفلي من الستار بين 670 كم و 2900 كم، صلب لكن تحت ضغوط وحرارة عالية جداً",
+              "definition_ar": "الجزء السفلي من البرنس بين 670 كم و 2900 كم، صلب لكن تحت ضغوط وحرارة عالية جداً",
               "synonymes_fr": [],
               "synonymes_ar": [],
               "importance": "moyenne",
@@ -6006,11 +6006,11 @@
             {
               "id": "term-219",
               "terme_fr": "Fusion mantellique",
-              "terme_ar": "الانصهار الستاري",
+              "terme_ar": "الانصهار البرنسي",
               "abreviation": null,
               "type": "processus",
               "definition_fr": "Fusion partielle des roches du manteau (péridotite) produisant un magma basaltique, déclenchée par décompression (dorsales) ou hydratation (subduction)",
-              "definition_ar": "انصهار جزئي لصخور الستار (بيريدوتيت) ينتج ماغما بازلتية، يحدث بفعل خفض الضغط (أظهرة) أو الإماهة (غوص)",
+              "definition_ar": "انصهار جزئي لصخور البرنس (بيريدوتيت) ينتج ماغما بازلتية، يحدث بفعل خفض الضغط (أظهرة) أو الإماهة (غوص)",
               "synonymes_fr": [],
               "synonymes_ar": [],
               "importance": "haute",

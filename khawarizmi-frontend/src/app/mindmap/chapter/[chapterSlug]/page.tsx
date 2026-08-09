@@ -28,18 +28,18 @@ import CustomMindMapNode from "@/components/mindmap/CustomMindMapNode"
 import { getChapterBySlug } from "@/lib/cours-data"
 
 const PROGRESS_LABELS: Record<string, string> = {
-  init: "Ø¬Ø§Ø±ÙŠ Ø§Ù„ØªÙ‡ÙŠØ¦Ø©...",
-  rag: "Ø§Ù„Ø¨Ø­Ø« ÙÙŠ Ø§Ù„Ø¯Ø±ÙˆØ³...",
-  llm: "Ø§Ù„ØªÙˆÙ„ÙŠØ¯ Ø¨Ø§Ù„Ø°ÙƒØ§Ø¡ Ø§Ù„Ø§ØµØ·Ù†Ø§Ø¹ÙŠ...",
-  save: "Ø¬Ø§Ø±ÙŠ Ø§Ù„Ø­ÙØ¸...",
-  flashcards: "Ø¥Ù†Ø´Ø§Ø¡ Ø§Ù„Ø¨Ø·Ø§Ù‚Ø§Øª...",
-  done: "ØªÙ… !"
+  init: "جاري التهيئة...",
+  rag: "البحث في الدروس...",
+  llm: "التوليد بالذكاء الاصطناعي...",
+  save: "جاري الحفظ...",
+  flashcards: "إنشاء البطاقات...",
+  done: "تم !"
 }
 
 const MAITRISE_BUTTONS = [
-  { value: 0 as const, label: "ðŸ”´ ØºÙŠØ± Ù…ÙÙ‡ÙˆÙ…", color: "border-red-500/40 bg-red-500/10 text-red-400" },
-  { value: 1 as const, label: "ðŸŸ¡ Ù‚ÙŠØ¯ Ø§Ù„ØªØ¹Ù„Ù…", color: "border-amber-500/40 bg-amber-500/10 text-amber-400" },
-  { value: 2 as const, label: "ðŸŸ¢ Ù…ÙØªÙ‚Ù†", color: "border-green-500/40 bg-green-500/10 text-green-400" },
+  { value: 0 as const, label: "🔴 غير مفهوم", color: "border-red-500/40 bg-red-500/10 text-red-400" },
+  { value: 1 as const, label: "🟡 قيد التعلم", color: "border-amber-500/40 bg-amber-500/10 text-amber-400" },
+  { value: 2 as const, label: "🟢 مُتقن", color: "border-green-500/40 bg-green-500/10 text-green-400" },
 ]
 
 const nodeTypes = { mindMapNode: CustomMindMapNode }
@@ -114,16 +114,16 @@ function resolveMindmapErrorMessage(error: unknown): string {
   const message = error instanceof Error ? error.message : ""
 
   if (message.includes("no_context")) {
-    return "Ù„Ø§ ØªÙˆØ¬Ø¯ Ø¨ÙŠØ§Ù†Ø§Øª ÙƒØ§ÙÙŠØ© Ù„Ù‡Ø°Ø§ Ø§Ù„ÙØµÙ„ Ø¨Ø¹Ø¯. Ø¬Ø±Ù‘Ø¨ ÙØµÙ„Ø§ Ø¢Ø®Ø± Ù…Ø«Ù„ ØªØ±ÙƒÙŠØ¨ Ø§Ù„Ø¨Ø±ÙˆØªÙŠÙ†Ø§Øª."
+    return "لا توجد بيانات كافية لهذا الفصل بعد. جرّب فصلا آخر مثل تركيب البروتينات."
   }
   if (message.includes("chapitre") || message.includes("introuvable")) {
-    return "ØªØ¹Ø°Ø± Ø§Ù„Ø¹Ø«ÙˆØ± Ø¹Ù„Ù‰ Ø§Ù„ÙØµÙ„ Ø§Ù„Ù…Ø·Ù„ÙˆØ¨. ØªØ­Ù‚Ù‚ Ù…Ù† Ø§Ù„Ø±Ø§Ø¨Ø· Ø£Ùˆ Ù…Ù† Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ø¨Ø±Ù†Ø§Ù…Ø¬."
+    return "تعذر العثور على الفصل المطلوب. تحقق من الرابط أو من بيانات البرنامج."
   }
   if (message.includes("timeout") || message.includes("timeout_mindmap_generation")) {
-    return "Ø§Ù„Ø®Ø±ÙŠØ·Ø© Ù‚ÙŠØ¯ Ø§Ù„Ø¥Ù†Ø´Ø§Ø¡ ÙÙŠ Ø§Ù„Ø®Ù„ÙÙŠØ©. Ø£Ø¹Ø¯ ØªØ­Ù…ÙŠÙ„ Ø§Ù„ØµÙØ­Ø© Ø¨Ø¹Ø¯ 30 Ø«Ø§Ù†ÙŠØ©."
+    return "الخريطة قيد الإنشاء في الخلفية. أعد تحميل الصفحة بعد 30 ثانية."
   }
-  if (message.includes("503") || message.includes("Service IA non configurÃ©")) {
-    return "Ø®Ø¯Ù…Ø© Ø§Ù„Ø°ÙƒØ§Ø¡ Ø§Ù„Ø§ØµØ·Ù†Ø§Ø¹ÙŠ ØºÙŠØ± Ù…Ù‡ÙŠØ£Ø© Ø­Ø§Ù„ÙŠØ§. ØªØ­Ù‚Ù‚ Ù…Ù† Ù…ÙØ§ØªÙŠØ­ API."
+  if (message.includes("503") || message.includes("Service IA non configuré")) {
+    return "خدمة الذكاء الاصطناعي غير مهيأة حاليا. تحقق من مفاتيح API."
   }
   return UI_AR.erreur_chargement_mindmap
 }
@@ -172,7 +172,7 @@ function ChapterMindMapContent() {
         return task.mindmap
       }
       if (task.status === "failed") {
-        throw new Error(task.error || "ØªØ¹Ø°Ø± Ø¥Ù†Ø´Ø§Ø¡ Ø§Ù„Ø®Ø±ÙŠØ·Ø© Ø§Ù„Ø°Ù‡Ù†ÙŠØ©")
+        throw new Error(task.error || "تعذر إنشاء الخريطة الذهنية")
       }
       await new Promise(r => setTimeout(r, 2000))
     }
@@ -257,7 +257,7 @@ function ChapterMindMapContent() {
     try {
       const ch = getChapterBySlug(chapterSlug as string)
       if (!ch) {
-        throw new Error("ØªØ¹Ø°Ø± Ø§Ù„Ø¹Ø«ÙˆØ± Ø¹Ù„Ù‰ Ø§Ù„ÙØµÙ„ Ø§Ù„Ù…Ø·Ù„ÙˆØ¨")
+        throw new Error("تعذر العثور على الفصل المطلوب")
       }
 
       setChapterInfo({ ar: ch.chapterAr, fr: ch.chapterFr, slug: ch.slug })
@@ -272,7 +272,7 @@ function ChapterMindMapContent() {
       })
 
       if (res.status === "no_context") {
-        throw new Error(`no_context: Ù„Ø§ ØªÙˆØ¬Ø¯ Ø¨ÙŠØ§Ù†Ø§Øª RAG Ù„Ù‡Ø°Ø§ Ø§Ù„ÙØµÙ„ Ø¨Ø¹Ø¯.`)
+        throw new Error(`no_context: لا توجد بيانات RAG لهذا الفصل بعد.`)
       }
 
       let mindmapData: MindMapType
@@ -281,8 +281,8 @@ function ChapterMindMapContent() {
           mindmapData = await pollTask(res.task_id)
         } catch (e) {
           const msg = e instanceof Error ? e.message : ""
-          if (msg.includes("Ù…Ù‡Ù„Ø©") || msg.includes("timeout")) {
-            throw new Error("Ø§Ù„Ø®Ø±ÙŠØ·Ø© Ù‚ÙŠØ¯ Ø§Ù„Ø¥Ù†Ø´Ø§Ø¡ ÙÙŠ Ø§Ù„Ø®Ù„ÙÙŠØ©. Ø£Ø¹Ø¯ ØªØ­Ù…ÙŠÙ„ Ø§Ù„ØµÙØ­Ø© Ø¨Ø¹Ø¯ 30 Ø«Ø§Ù†ÙŠØ©.")
+          if (msg.includes("مهلة") || msg.includes("timeout")) {
+            throw new Error("الخريطة قيد الإنشاء في الخلفية. أعد تحميل الصفحة بعد 30 ثانية.")
           }
           throw e
         }
@@ -291,7 +291,7 @@ function ChapterMindMapContent() {
       }
 
       if (!mindmapData || !mindmapData.racine) {
-        throw new Error("Ø¨Ù†ÙŠØ© Ø§Ù„Ø®Ø±ÙŠØ·Ø© Ø§Ù„Ø°Ù‡Ù†ÙŠØ© ØºÙŠØ± ØµØ§Ù„Ø­Ø©")
+        throw new Error("بنية الخريطة الذهنية غير صالحة")
       }
 
       setMindmap(mindmapData)
@@ -315,16 +315,16 @@ function ChapterMindMapContent() {
 
   const importanceLabels: Record<string, string> = {
     critique: UI_AR.critique,
-    haute: "Ù…Ù‡Ù…",
-    moyenne: "Ù…ØªÙˆØ³Ø·"
+    haute: "مهم",
+    moyenne: "متوسط"
   }
 
   const typeLabels: Record<string, string> = {
     concept: UI_AR.concept,
-    processus: "Ø¹Ù…Ù„ÙŠØ©",
-    definition: "ØªØ¹Ø±ÙŠÙ",
-    formule: "ØµÙŠØºØ©",
-    exception: "Ø§Ø³ØªØ«Ù†Ø§Ø¡"
+    processus: "عملية",
+    definition: "تعريف",
+    formule: "صيغة",
+    exception: "استثناء"
   }
 
   const weakNodes = useMemo(() => {
@@ -361,7 +361,7 @@ function ChapterMindMapContent() {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-slate-950 p-6">
         <div className="bg-red-500/10 border border-red-500/30 rounded-2xl p-8 max-w-md text-center space-y-4">
-          <p className="text-4xl">âš ï¸</p>
+          <p className="text-4xl">⚠️</p>
           <h3 className="text-red-300 font-bold text-lg">{UI_AR.erreur_chargement}</h3>
           <p className="text-slate-300 text-sm leading-relaxed">{error || UI_AR.impossible_charger_donnees}</p>
           <div className="flex justify-center gap-3">
@@ -369,7 +369,7 @@ function ChapterMindMapContent() {
               href="/mindmap"
               className="px-4 py-2 bg-slate-800 text-slate-300 border border-slate-700 rounded-lg hover:bg-slate-700 text-sm transition"
             >
-              Ø§Ù„Ø¹ÙˆØ¯Ø© Ø¥Ù„Ù‰ Ø§Ù„Ø®Ø±ÙŠØ·Ø©
+              العودة إلى الخريطة
             </Link>
             <button
               onClick={loadChapterAndMindmap}
@@ -388,7 +388,7 @@ function ChapterMindMapContent() {
       <header className="border-b border-slate-900 bg-slate-950/80 backdrop-blur px-6 py-4 flex justify-between items-center z-10">
         <div className="flex items-center gap-4">
           <Link href="/mindmap" className="text-slate-400 hover:text-white transition">
-            â† Ø§Ù„Ø®Ø±ÙŠØ·Ø©
+            ← الخريطة
           </Link>
           <div className="h-4 w-px bg-slate-800" />
           <div>
@@ -489,7 +489,7 @@ function ChapterMindMapContent() {
                       onClick={() => handleExpandNode(selectedNode)}
                       className="w-full py-2 bg-violet-500/10 border border-violet-500/25 rounded-xl text-xs font-bold text-violet-400 hover:bg-violet-500/15 transition"
                     >
-                      ðŸ“‚ ØªÙˆØ³ÙŠØ¹ Ø§Ù„Ø¹Ù‚Ø¯ Ø§Ù„ÙØ±Ø¹ÙŠØ©
+                      📂 توسيع العقد الفرعية
                     </button>
                   )}
                 </div>
@@ -498,7 +498,7 @@ function ChapterMindMapContent() {
                   href="/drill"
                   className="block w-full py-2.5 bg-slate-800/50 border border-slate-700 rounded-xl text-center text-xs font-bold text-mint hover:bg-slate-800 transition"
                 >
-                  ðŸŽ¯ Ø±Ø§Ø¬Ø¹ Ù‡Ø°Ø§ Ø§Ù„ÙØµÙ„ ÙÙŠ Ø§Ù„Ù…Ø±Ø§Ø¬Ø¹Ø© Ø§Ù„Ø³Ø±ÙŠØ¹Ø© â†
+                  🎯 راجع هذا الفصل في المراجعة السريعة ←
                 </Link>
               </section>
             ) : (

@@ -2,10 +2,8 @@
 Modèle Streak — série quotidienne d'entraînement aux verbes d'action.
 """
 
-import uuid
-from datetime import date, datetime
 
-from sqlalchemy import Column, Date, DateTime, ForeignKey, Integer, String, func, text
+from sqlalchemy import Column, Date, DateTime, ForeignKey, Integer, func, text
 from sqlalchemy.dialects.postgresql import UUID
 
 from database import Base

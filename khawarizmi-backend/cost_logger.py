@@ -12,7 +12,7 @@ import json
 import os
 import threading
 from collections import defaultdict
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 _PRICING = {
@@ -49,7 +49,7 @@ class CostLogger:
         cost = (input_tokens * pricing["input"] + output_tokens * pricing["output"]) / 1_000_000
 
         entry = {
-            "ts": datetime.now(timezone.utc).isoformat(),
+            "ts": datetime.now(UTC).isoformat(),
             "model": model,
             "input_tokens": input_tokens,
             "output_tokens": output_tokens,
@@ -61,9 +61,8 @@ class CostLogger:
             "latency_ms": latency_ms,
         }
 
-        with self._lock:
-            with open(self._path, "a", encoding="utf-8") as f:
-                f.write(json.dumps(entry, ensure_ascii=False) + "\n")
+        with self._lock, open(self._path, "a", encoding="utf-8") as f:
+            f.write(json.dumps(entry, ensure_ascii=False) + "\n")
 
         return entry
 
@@ -71,7 +70,7 @@ class CostLogger:
         if not self._path.exists():
             return []
         entries = []
-        with open(self._path, "r", encoding="utf-8") as f:
+        with open(self._path, encoding="utf-8") as f:
             for line in f:
                 line = line.strip()
                 if line:

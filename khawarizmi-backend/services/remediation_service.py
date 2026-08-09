@@ -15,7 +15,6 @@ from __future__ import annotations
 
 from typing import Any
 
-
 REMEDIATION_MATRIX: dict[str, dict[str, dict[str, Any]]] = {
     # ═══ تعليمات مركبة (مفتوحة) ═══════════════════════════════
     "analyse": {

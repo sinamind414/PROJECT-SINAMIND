@@ -20,10 +20,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from config import get_settings
 from deps import get_current_user, get_db, get_openai
+from grading.cache import evaluate_with_cache
 from rate_limit import evaluate_limit, limiter
 from schemas.document_analysis import EvaluateRequest
 from services.correction_audit import log_correction_audit
 from services.correction_v2_retry import evaluate_answer_v2_with_retry
+from services.hashing import hash_answer
 from services.llm import _call_with_fallback
 from services.rag_service import format_rag_context, rag_search
 from services.socratic_tutor import get_socratic_hint
@@ -182,22 +184,34 @@ async def evaluer_reponses_v2(
             })
             continue
 
-        # 6b. Mode Évaluation : appel du correcteur v2 avec retry
-        result = await evaluate_answer_v2_with_retry(
+        # 6b. Mode Évaluation : appel du correcteur avec cache exact (audit C2)
+        # + pipeline (S2.1c) : sanity → savoir → legacy(retry → LLM/L2).
+        # Le wrapper cache ne fait que cacher ; le pipeline orchestre.
+        # Un hit = 0 appel (ni pipeline, ni LLM), source préservée + from_cache.
+        result = await evaluate_with_cache(
+            question_id=q["id"],
+            verb_slug=q["verb_slug"],
+            score_max=score_max,
+            student_answer=ans.answer,
+            model_id=cfg.openai_model,
+            evaluate_fn=evaluate_answer_v2_with_retry,
             scenario_context=scenario_context,
             documents=documents,
             question_prompt=q["prompt_ar"],
             question_skill=q["skill_ar"],
-            verb_slug=q["verb_slug"],
             model_answer=q["model_answer_ar"],
             learning_focus=q["learning_focus_ar"],
-            score_max=score_max,
-            student_answer=ans.answer,
             llm_call=_call_with_fallback,
             primary_client=openai_client,
             primary_model=cfg.openai_model,
             rag_context_provider=rag_provider,
             request_id=str(uuid.uuid4()),
+            # Prompt v2 optimisé : -68 % tokens (3742 → ~918) — mapping v2→v1 testé
+            use_v2_prompt=True,
+            # Correcteur local sans clé API : le site n'a pas de clé externe
+            # (llm_guard actif) → évaluation locale L2 au lieu de llm_error.
+            local_fallback=True,
+            local_fallback_db=db,
         )
 
         # 7. Persistance MINIMALE dans da_answers (décision validée).
@@ -222,7 +236,8 @@ async def evaluer_reponses_v2(
                     "question_id": str(q["id"]),
                     "verb_slug": q["verb_slug"],
                     "chapter_slug": body.chapter_slug or "",
-                    "answer_text": ans.answer,
+                    # RGPD (AGENTS.md §1.2) : jamais la copie en clair — hash SHA-256 uniquement
+                    "answer_text": hash_answer(ans.answer),
                     "score": result["score"],
                     "score_max": result["score_max"],
                     "percentage": result["percentage"],
@@ -274,6 +289,9 @@ async def evaluer_reponses_v2(
             "feedback_ar": result["feedback_ar"],
             "advice_ar": result["advice_ar"],
             "source": result["source"],
+            # Observabilité C2 : un hit cache garde la source d'origine
+            # (grading_source_total fidèle) + from_cache=True
+            "from_cache": result.get("from_cache", False),
             # Spec §3.1 — feedback enrichi
             "missing": result.get("missing", []),
             "dominant_error_code": result.get("dominant_error_code", "unknown"),
@@ -325,8 +343,13 @@ def _compute_score_max_for_verb(verb_slug: str) -> int:
 
     rules = VERB_RULES.get(verb_slug)
     if not rules:
+        logger.warning("score_max_fallback | verbe inconnu de VERB_RULES : %s → 4 pts", verb_slug)
         return 4  # fallback raisonnable
-    return sum(r.get("points", 0) for r in rules.get("rules", [])) or 4
+    total = sum(r.get("points", 0) for r in rules.get("rules", []))
+    if total <= 0:
+        logger.warning("score_max_fallback | VERB_RULES '%s' sans points → 4 pts", verb_slug)
+        return 4
+    return total
 
 
 async def _update_fsrs_v2(
@@ -336,17 +359,19 @@ async def _update_fsrs_v2(
     chapter_slug: str,
     percentage: int,
 ):
-    """Met à jour le score et le compteur FSRS (identique à document_analysis.py)."""
-    await db.execute(
-        text("""
-            INSERT INTO da_fsrs
-                (user_id, verb_slug, chapter_slug, last_score, attempts, updated_at)
-            VALUES
-                (:user_id, :verb, :chapter, :score, 1, NOW())
-            ON CONFLICT (user_id, verb_slug, chapter_slug) DO UPDATE SET
-                last_score = EXCLUDED.last_score,
-                attempts = da_fsrs.attempts + 1,
-                updated_at = NOW()
-        """),
-        {"user_id": user_id, "verb": verb_slug, "chapter": chapter_slug, "score": percentage},
+    """Met à jour le score et le compteur FSRS (identique à document_analysis.py).
+
+    S3 finale : écriture via le service unifié (update_memory verb_chapter) —
+    la table da_fsrs n'est plus écrite directement. Depuis la migration 034,
+    l'upsert MASTERY alimente la vue consolidée (tables héritées supprimées
+    en prod ; tolérance conservée pour les environnements pré-033).
+    """
+    from services.fsrs_unified import update_memory
+
+    await update_memory(
+        db, user_id, "verb_chapter",
+        item_id=f"{verb_slug}::{chapter_slug}",
+        chapter=chapter_slug,
+        last_score=percentage,
+        attempts_delta=1,
     )

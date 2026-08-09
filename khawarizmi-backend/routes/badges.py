@@ -6,8 +6,8 @@ from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from deps import get_current_user
 from database import get_db
+from deps import get_current_user
 from services.badge_service import get_user_badges
 
 router = APIRouter(prefix="/api/badges", tags=["badges"])
@@ -34,7 +34,7 @@ async def get_my_badges(
     current_user=Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    badges = await get_user_badges(db, str(current_user.id))
+    badges = await get_user_badges(db, str(current_user["id"]))
     unlocked = sum(1 for b in badges if b["unlocked"])
     return {
         "badges": badges,

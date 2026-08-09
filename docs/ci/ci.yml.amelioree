@@ -1,0 +1,204 @@
+# CI/CD Khawarizmi Pro
+# ⚠️ PRÊT MAIS NON POUSSABLE : le token GitHub App de la session n'a pas la
+# permission `workflows` (403 vérifié). Ce fichier reste la référence
+# (docs/ci/ci.yml.amelioree) à copier vers .github/workflows/ci.yml dès que
+# la permission est accordée. 5 jobs — voir commentaires inline.
+name: CI/CD Khawarizmi Pro
+
+on:
+  push:
+    branches: [main, fabuleux/*, arena/*]
+  pull_request:
+    branches: [main]
+
+jobs:
+  backend-tests:
+    runs-on: ubuntu-latest
+    services:
+      # Vrai Redis pour les tests d'intégration du cache C2 (single-flight
+      # Lua CAS réel + multi-process) — sans service, ils sont SKIP.
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          cd khawarizmi-backend
+          pip install -r requirements.txt
+          pip install ruff
+
+      - name: Lint (ruff — bloquant)
+        run: |
+          cd khawarizmi-backend
+          ruff check .
+
+      - name: Import smoke (app boote)
+        run: |
+          cd khawarizmi-backend
+          SECRET_KEY=ci-test-key-for-smoke-tests-only \
+          ENVIRONMENT=ci \
+          DATABASE_URL=postgresql+asyncpg://x:x@localhost/x \
+          REDIS_URL= python -c "
+          from main import app
+          n = len([r for r in app.routes if getattr(r, 'path', '').startswith('/api')])
+          print(f'App OK — {n} routes API')
+          assert n > 100
+          "
+
+      # S2.4 : les traces OTel sont no-op sans exporter — la suite complète
+      # (959 tests) couvre : grading (pipeline, cache, parser, mapping,
+      # post_validate, prompts, sanity, savoir, l2), chatbot handlers,
+      # observability Prometheus, tracing OTel, fsrs_unified, golden local,
+      # cache C2 sur VRAI Redis (8 tests : Lua CAS, single-flight, TTL,
+      # multi-process) — REDIS_TEST_URL pointe le service Redis du job.
+      - name: Full test suite (959 tests, preview SQLite + Redis service)
+        run: |
+          cd khawarizmi-backend
+          SECRET_KEY=ci-test-key-for-smoke-tests-only \
+          ENVIRONMENT=ci \
+          DATABASE_URL=sqlite+aiosqlite:///./ci_test.db \
+          REDIS_URL=redis://localhost:6379/9 \
+          REDIS_TEST_URL=redis://localhost:6379 \
+          python -m pytest tests/ -q --no-header
+
+      - name: Golden set (local, 0 token — BLOQUANT)
+        run: |
+          cd khawarizmi-backend
+          python tests/golden/build_golden_annotated.py
+          SECRET_KEY=ci-test-key-for-smoke-tests-only \
+          ENVIRONMENT=ci \
+          DATABASE_URL=sqlite+aiosqlite:///./ci_test.db \
+          REDIS_URL=redis://localhost:6379/9 \
+          python -m pytest tests/golden/test_golden_local.py -v --tb=short
+        # Seuils : L2 MAE ≤ 0.85 · severe ≤ 0.10 · κ ≥ 0.45
+        #          savoir MAE ≤ 0.35 · severe ≤ 0.10 (copies modèles strict
+        #          MAE == 0.0 via test_perfect_copies_strict)
+
+      # Pipeline d'annotation expert : cohérence + rapport 0 token.
+      # Une annotation experte livrée (annotator=expert_svt) déclenche les
+      # seuils absolus ; tant que c'est synthétique, le rapport affiche
+      # la baseline et le verdict remédiation (κ savoir ≥ 0.65).
+      - name: Golden annotations (validateur + rapport, 0 token)
+        run: |
+          cd khawarizmi-backend
+          SECRET_KEY=ci-test-key-for-smoke-tests-only \
+          ENVIRONMENT=ci \
+          DATABASE_URL=sqlite+aiosqlite:///./ci_test.db \
+          REDIS_URL=redis://localhost:6379/9 \
+          python scripts/validate_golden_annotations.py
+          python scripts/golden_human_report.py
+          python scripts/export_golden_template.py
+          test -s data/golden_annotation_template.csv
+
+  frontend-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: khawarizmi-frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: khawarizmi-frontend
+
+      - name: Lint (bloquant)
+        run: npm run lint
+        working-directory: khawarizmi-frontend
+
+      - name: Tests
+        run: npm run test
+        working-directory: khawarizmi-frontend
+
+      - name: Build (hermétique, sans Google Fonts)
+        run: npm run build
+        working-directory: khawarizmi-frontend
+        env:
+          NEXT_TELEMETRY_DISABLED: "1"
+
+  golden-llm-nightly:
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          cd khawarizmi-backend
+          pip install -r requirements.txt
+
+      - name: Golden set (LLM, nightly — qualité JSON natif)
+        run: |
+          cd khawarizmi-backend
+          SECRET_KEY=ci-test-key-for-smoke-tests-only \
+          ENVIRONMENT=ci \
+          ENABLE_EXTERNAL_LLM=1 \
+          OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} \
+          DATABASE_URL=sqlite+aiosqlite:///./ci_test.db \
+          REDIS_URL=redis://localhost:6379/9 \
+          python -m pytest tests/golden/test_json_mode_quality.py -m nightly -v --tb=short
+        # Seuils : MAE(json, libre) ≤ 0.15 · std(json) ≥ 0.70×std(libre)
+
+  observability-nightly:
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          cd khawarizmi-backend
+          pip install -r requirements.txt
+
+      - name: Observabilité (Prometheus + OTel, nightly — exporter OTLP)
+        run: |
+          cd khawarizmi-backend
+          SECRET_KEY=ci-test-key-for-smoke-tests-only \
+          ENVIRONMENT=ci \
+          DATABASE_URL=sqlite+aiosqlite:///./ci_test.db \
+          REDIS_URL=redis://localhost:6379/9 \
+          python -m pytest tests/test_observability.py tests/test_tracing.py -v --tb=short
+
+  deploy-railway:
+    if: github.ref == 'refs/heads/main'
+    needs: [backend-tests, frontend-tests]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Railway CLI
+        run: npm install -g @railway/cli
+
+      - name: Deploy to Railway
+        run: railway up --detach --service PROJECT-SINAMIND --environment production
+        working-directory: khawarizmi-backend
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}

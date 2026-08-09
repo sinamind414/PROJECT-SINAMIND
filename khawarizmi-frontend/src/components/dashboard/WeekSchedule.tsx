@@ -27,7 +27,7 @@ const PLANNING: Record<number, { time: string; subject: string; detail: string; 
   ],
   19: [
     { time: "09:00", subject: "الترجمة (Translation)", detail: "الفصل 4", color: "#F472B6", action: "todo" },
-    { time: "14:00", subject: "التركيب الضوئي", detail: "الوحدة 6", color: "#34D399", action: "todo" },
+    { time: "14:00", subject: "آليات تحويل الطاقة الضوئية إلى طاقة كيميائية كامنة", detail: "الوحدة 6", color: "#34D399", action: "todo" },
     { time: "18:00", subject: "مراجعة Flashcards", detail: "20 بطاقة", color: "#5EEAD4", action: "todo" }
   ],
   21: [

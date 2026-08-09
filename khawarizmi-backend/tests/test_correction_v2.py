@@ -305,3 +305,153 @@ class TestPostValidation:
         assert len(result) == 2
         assert result[0]["criterion"] == "critère 1"
         assert result[0]["why_ar"] == ""
+
+
+# ── Tests : correcteur local sans clé API ────────
+
+
+class TestLocalFallback:
+    """Sans clé API (llm_guard actif), le correcteur doit évaluer localement."""
+
+    @pytest.mark.asyncio
+    async def test_local_fallback_when_llm_disabled(self):
+        """LLM indisponible + local_fallback=True → source='local', pas llm_error."""
+        from services.correction_v2 import evaluate_answer_v2
+
+        async def mock_llm_disabled(**kwargs):
+            from services.llm_guard import LLMDisabledError
+            raise LLMDisabledError("chat.completions.create (external LLM disabled)")
+
+        result = await evaluate_answer_v2(
+            **BASE_KWARGS,
+            student_answer="الاستنساخ يتم في النواة والترجمة في الهيولى",
+            llm_call=mock_llm_disabled,
+            primary_client=MagicMock(),
+            primary_model="test",
+            local_fallback=True,
+        )
+        assert result["source"] == "local"
+        assert result["score"] >= 0
+        assert result["score_max"] == BASE_KWARGS["score_max"]
+        assert isinstance(result["feedback_ar"], str)
+        assert result["percentage"] == round(result["score"] / result["score_max"] * 100)
+
+    @pytest.mark.asyncio
+    async def test_local_fallback_off_keeps_llm_error(self):
+        """Sans local_fallback → comportement historique (llm_error)."""
+        from services.correction_v2 import evaluate_answer_v2
+
+        async def mock_llm_disabled(**kwargs):
+            from services.llm_guard import LLMDisabledError
+            raise LLMDisabledError("chat.completions.create (external LLM disabled)")
+
+        result = await evaluate_answer_v2(
+            **BASE_KWARGS,
+            student_answer="الاستنساخ يتم في النواة والترجمة في الهيولى",
+            llm_call=mock_llm_disabled,
+            primary_client=MagicMock(),
+            primary_model="test",
+        )
+        assert result["source"] == "llm_error"
+
+
+class TestJsonNativeMode:
+    """Audit O7 — intégration du JSON natif provider dans evaluate_answer_v2."""
+
+    @pytest.mark.asyncio
+    async def test_json_schema_passed_to_llm_call_in_v2(self, monkeypatch):
+        """Le schéma natif (format v2) est transmis au llm_call en mode v2
+        quand le JSON natif est ACTIVÉ (json_mode_providers non vide)."""
+        from config import get_settings
+
+        monkeypatch.setattr(get_settings(), "json_mode_providers", ["openai"])
+        captured: dict = {}
+
+        async def mock_llm(**kwargs):
+            captured.update(kwargs)
+            resp = _make_llm_response(json.dumps({
+                "score": 75,
+                "errors": [{"line": "S1", "type": "erreur scientifique",
+                            "detail": "معلومة خاطئة", "fix": "صححها"}],
+                "feedback": "إجابة متوسطة",
+                "grade": "acquis",
+            }, ensure_ascii=False))
+            resp._khawarizmi_json_mode = True
+            resp._khawarizmi_provider = "primary"
+            resp._khawarizmi_model = "test"
+            return resp
+
+        result = await evaluate_answer_v2(
+            **BASE_KWARGS,
+            student_answer="الاستنساخ يتم في النواة",
+            llm_call=mock_llm,
+            primary_client=MagicMock(),
+            primary_model="test",
+            use_v2_prompt=True,
+        )
+        assert captured.get("json_schema") is not None
+        assert captured["json_schema"]["properties"]["score"]["maximum"] == 100
+
+        # Mapping v2→v1 inchangé : score 0-100 → barème
+        assert result["source"] == "llm_v2"
+        assert result["score"] == round(75 * BASE_KWARGS["score_max"] / 100)
+        assert result["percentage"] == 75
+        # Amélioration O7 point 2 : erreur scientifique → scientific_error
+        # (au lieu de methodology_error aveugle), remédiation contenu.
+        assert result["dominant_error_code"] == "scientific_error"
+
+    @pytest.mark.asyncio
+    async def test_native_json_strategy_recorded(self, monkeypatch):
+        """json_mode_used=True → stratégie native_json comptée AVEC le label
+        provider (audit O7 point 3)."""
+        from config import get_settings
+        from grading.parser import parse_stats_by_provider
+
+        monkeypatch.setattr(get_settings(), "json_mode_providers", ["openai"])
+        before = parse_stats_by_provider().get("primary", {}).get("native_json", 0)
+
+        async def mock_llm(**kwargs):
+            resp = _make_llm_response(json.dumps({
+                "score": 50, "errors": [], "feedback": "ب", "grade": "retenir",
+            }, ensure_ascii=False))
+            resp._khawarizmi_json_mode = True
+            resp._khawarizmi_provider = "primary"
+            resp._khawarizmi_model = "test"
+            return resp
+
+        await evaluate_answer_v2(
+            **BASE_KWARGS,
+            student_answer="الاستنساخ يتم في النواة",
+            llm_call=mock_llm,
+            primary_client=MagicMock(),
+            primary_model="test",
+            use_v2_prompt=True,
+        )
+        assert parse_stats_by_provider().get("primary", {}).get(
+            "native_json", 0) == before + 1
+
+    @pytest.mark.asyncio
+    async def test_default_no_json_mode(self):
+        """Défaut : json_mode_providers=[] → aucun json_schema transmis
+        (pré-O7 — activation progressive, pas de flag global)."""
+        captured: dict = {}
+
+        async def mock_llm(**kwargs):
+            captured.update(kwargs)
+            resp = _make_llm_response(json.dumps({
+                "score": 50, "errors": [], "feedback": "ب", "grade": "retenir",
+            }, ensure_ascii=False))
+            resp._khawarizmi_json_mode = False
+            resp._khawarizmi_provider = "primary"
+            resp._khawarizmi_model = "test"
+            return resp
+
+        await evaluate_answer_v2(
+            **BASE_KWARGS,
+            student_answer="الاستنساخ يتم في النواة",
+            llm_call=mock_llm,
+            primary_client=MagicMock(),
+            primary_model="test",
+            use_v2_prompt=True,
+        )
+        assert captured.get("json_schema") is None
