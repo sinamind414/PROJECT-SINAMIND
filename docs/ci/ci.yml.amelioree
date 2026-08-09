@@ -1,3 +1,8 @@
+# CI/CD Khawarizmi Pro
+# ⚠️ PRÊT MAIS NON POUSSABLE : le token GitHub App de la session n'a pas la
+# permission `workflows` (403 vérifié). Ce fichier reste la référence
+# (docs/ci/ci.yml.amelioree) à copier vers .github/workflows/ci.yml dès que
+# la permission est accordée. 5 jobs — voir commentaires inline.
 name: CI/CD Khawarizmi Pro
 
 on:
@@ -9,6 +14,18 @@ on:
 jobs:
   backend-tests:
     runs-on: ubuntu-latest
+    services:
+      # Vrai Redis pour les tests d'intégration du cache C2 (single-flight
+      # Lua CAS réel + multi-process) — sans service, ils sont SKIP.
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 5
 
     steps:
       - uses: actions/checkout@v4
@@ -43,16 +60,19 @@ jobs:
           "
 
       # S2.4 : les traces OTel sont no-op sans exporter — la suite complète
-      # (935 tests) couvre : grading (pipeline, cache, parser, mapping,
+      # (959 tests) couvre : grading (pipeline, cache, parser, mapping,
       # post_validate, prompts, sanity, savoir, l2), chatbot handlers,
-      # observability Prometheus, tracing OTel, fsrs_unified, golden local.
-      - name: Full test suite (935 tests, preview SQLite)
+      # observability Prometheus, tracing OTel, fsrs_unified, golden local,
+      # cache C2 sur VRAI Redis (8 tests : Lua CAS, single-flight, TTL,
+      # multi-process) — REDIS_TEST_URL pointe le service Redis du job.
+      - name: Full test suite (959 tests, preview SQLite + Redis service)
         run: |
           cd khawarizmi-backend
           SECRET_KEY=ci-test-key-for-smoke-tests-only \
           ENVIRONMENT=ci \
           DATABASE_URL=sqlite+aiosqlite:///./ci_test.db \
           REDIS_URL=redis://localhost:6379/9 \
+          REDIS_TEST_URL=redis://localhost:6379 \
           python -m pytest tests/ -q --no-header
 
       - name: Golden set (local, 0 token — BLOQUANT)
@@ -67,6 +87,22 @@ jobs:
         # Seuils : L2 MAE ≤ 0.85 · severe ≤ 0.10 · κ ≥ 0.45
         #          savoir MAE ≤ 0.35 · severe ≤ 0.10 (copies modèles strict
         #          MAE == 0.0 via test_perfect_copies_strict)
+
+      # Pipeline d'annotation expert : cohérence + rapport 0 token.
+      # Une annotation experte livrée (annotator=expert_svt) déclenche les
+      # seuils absolus ; tant que c'est synthétique, le rapport affiche
+      # la baseline et le verdict remédiation (κ savoir ≥ 0.65).
+      - name: Golden annotations (validateur + rapport, 0 token)
+        run: |
+          cd khawarizmi-backend
+          SECRET_KEY=ci-test-key-for-smoke-tests-only \
+          ENVIRONMENT=ci \
+          DATABASE_URL=sqlite+aiosqlite:///./ci_test.db \
+          REDIS_URL=redis://localhost:6379/9 \
+          python scripts/validate_golden_annotations.py
+          python scripts/golden_human_report.py
+          python scripts/export_golden_template.py
+          test -s data/golden_annotation_template.csv
 
   frontend-tests:
     runs-on: ubuntu-latest

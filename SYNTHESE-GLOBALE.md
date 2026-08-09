@@ -52,9 +52,10 @@ Pipeline complet dans `grading/pipeline.py` : sanity → savoir → prompt → L
 1. **S2.4 — OpenTelemetry** ✅ : `grading/tracing.py` (import paresseux,
    spans `grading.sanity`/`grading.savoir`/`chatbot.handle`, attributs +
    exceptions) — 945 tests.
-2. **CI préparé** ✅ : `docs/ci/ci.yml.amelioree` à jour (935 tests, job
-   `observability-nightly` Prometheus+OTel) — prêt dès la permission
-   `workflows`.
+2. **CI préparé** ✅ : `docs/ci/ci.yml.amelioree` à jour (959 tests, job
+   `observability-nightly` Prometheus+OTel, service Redis pour les 8 tests
+   d'intégration cache C2, step validateur golden + rapport 0 token) — prêt
+   dès la permission `workflows` (en-tête du fichier documenté).
 3. **Golden humain (processus)** ✅ : `docs/golden-annotation-procedure.md`
    (procédure expert SVT, format, règles) + `scripts/validate_golden_
    annotations.py` (validateur de cohérence, 125 items synthétiques OK).
@@ -62,8 +63,10 @@ Pipeline complet dans `grading/pipeline.py` : sanity → savoir → prompt → L
    (checklist J0→J14, alertes Prometheus, ordre migration 033, garde-fous).
 
 ## 4. Prochaines étapes possibles
-1. **Annotations expert SVT** — exécuter la procédure (2-3 h) → κ savoir
-   ≥ 0.65 → réactiver la remédiation de l'étage savoir.
+1. **Annotations expert SVT** — le CSV est PRÊT (data/golden_annotation_
+   template.csv, 100 copies à noter + 25 vides pré-remplies ; import +
+   rapport automatisés). L'expert exécute (2-3 h) → κ savoir ≥ 0.65 →
+   réactiver la remédiation de l'étage savoir.
 2. **Permission `workflows`** — activer le CI préparé (5 jobs, golden
    bloquant, nightly LLM + observability).
 3. **Tests de charge / benchmarks** ✅ : `scripts/benchmark_cache.py` +
