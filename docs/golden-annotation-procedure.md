@@ -16,6 +16,35 @@ des mesures de justesse absolue, pas de non-régression.
 | `khawarizmi-backend/tests/golden/golden_annotated.json` | annotations — LE fichier à remplacer |
 | `khawarizmi-backend/tests/golden/metrics.py` | calcul MAE/κ/severe (inchangé) |
 | `khawarizmi-backend/tests/golden/test_golden_local.py` | tests CI avec seuils (inchangé) |
+| `khawarizmi-backend/tests/golden/scoring.py` | helpers scores système L2/savoir (partagés CI + rapport) |
+| `khawarizmi-backend/scripts/export_golden_template.py` | génère le template JSON + CSV prêt à remplir |
+| `khawarizmi-backend/scripts/import_golden_annotations.py` | réimporte le CSV expert → JSON validé (backup .bak) |
+| `khawarizmi-backend/scripts/golden_human_report.py` | rapport MAE/κ/severe + désaccords, verdict vs seuils |
+
+## 1bis. Workflow recommandé (nouveau)
+
+```bash
+# 1. Générer le template (CSV pour Excel/Sheets + JSON de contrôle)
+cd khawarizmi-backend
+python scripts/export_golden_template.py
+#    → data/golden_annotation_template.csv  (125 lignes, colonnes human_* vides)
+#    → data/golden_annotation_template.json
+
+# 2. L'expert remplit UNIQUEMENT les colonnes :
+#    human_score · human_dominant_error · human_matched_criteria ·
+#    human_unmatched_criteria   (listes séparées par ";" dans une cellule)
+#    NB : les 25 copies VIDES → human_score=0 + human_dominant_error=empty
+#    (matched/unmatched inutiles pour elles — vérifié automatiquement)
+
+# 3. Import + validation (livraison partielle OK : lignes vides = conservées)
+python scripts/import_golden_annotations.py --csv data/golden_annotation_template.csv --dry-run
+python scripts/import_golden_annotations.py --csv data/golden_annotation_template.csv
+
+# 4. Rapport de qualité immédiat (sans attendre la CI)
+python scripts/golden_human_report.py
+#    → MAE/exact/severe/κ L2 + savoir, coverage, désaccords ≥ 2 pts, verdict
+#    → --export data/golden_disagreements.csv pour revoir les désaccords
+```
 
 ## 2. Format d'un item annoté
 
@@ -74,25 +103,26 @@ Vérifie :
 - `human_score` ∈ [0, bareme] (entier) ;
 - `human_dominant_error` est un code valide ;
 - `human_matched_criteria` + `human_unmatched_criteria` partitionnent
-  `mots_cles_attendus` (tolérance aux formes fléchies ال) ;
-- une copie vide → code `empty` + score 0 ;
+  `mots_cles_attendus` (tolérance aux formes fléchies ال) — sauf copies
+  vides (partition redondante, non exigée) et copies = modèle (retour tôt) ;
+- une copie vide → code `empty` + score 0 (sans exiger matched/unmatched) ;
 - une copie égale à `reponse_attendue` → score = bareme.
 
 ## 6. Après livraison
 
-1. Remplacer le contenu de `golden_annotated.json` (garder la structure
-   `{"metadata": {...}, "items": [...]}`).
-2. Lancer `python tests/golden/build_golden_annotated.py` ? NON — ce script
-   régénère les annotations SYNTHÉTIQUES. Les annotations humaines sont
-   livrées directement dans `golden_annotated.json`.
-3. Lancer les tests :
+1. L'import a écrit `golden_annotated.json` (backup `.bak` conservé) —
+   ne PAS relancer `tests/golden/build_golden_annotated.py` (il régénère les
+   annotations SYNTHÉTIQUES).
+2. Lancer le rapport + les tests :
    ```bash
+   python scripts/golden_human_report.py
    python -m pytest tests/golden/test_golden_local.py -v --tb=short
    ```
-4. Les seuils CI (L2 MAE ≤ 0.85, savoir MAE ≤ 0.35, κ ≥ 0.45) deviennent
+3. Les seuils CI (L2 MAE ≤ 0.85, savoir MAE ≤ 0.35, κ ≥ 0.45) deviennent
    des mesures absolues. Le κ savoir ≥ 0.65 permettra de réactiver la
-   remédiation de l'étage savoir (actuellement désactivée — κ synthétique
-   0.449).
+   remédiation de l'étage savoir (le rapport donne le verdict directement ;
+   baseline synthétique : κ savoir 0.858 — à CONFIRMER par l'expert, le
+   biais de référentiel mots-clés vs lexique peut gonfler la mesure).
 
 ## 7. Stratégie de livraison progressive
 

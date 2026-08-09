@@ -85,6 +85,15 @@ def validate_item(item: dict, index: int) -> list[str]:
         return problems  # la partition littérale ne s'applique pas (concept
         # exprimé autrement dans le modèle — tous les critères sont satisfaits)
 
+    # Copie vide → empty + 0, sans exigence de partition (redondante : tous
+    # les critères sont non satisfaits par définition)
+    if not answer.strip():
+        if code != "empty":
+            problems.append(f"{prefix} copie vide mais code={code!r} (attendu empty)")
+        if score != 0:
+            problems.append(f"{prefix} copie vide mais score={score} (attendu 0)")
+        return problems
+
     # Partition des mots-clés (tolérance ال) — copies PARTIELLES uniquement
     keywords = item.get("mots_cles_attendus") or []
     matched = set(item.get("human_matched_criteria") or [])
@@ -102,13 +111,6 @@ def validate_item(item: dict, index: int) -> list[str]:
             problems.append(f"{prefix} mot-clé présent '{kw}' dans unmatched")
         if not present and not in_unmatched:
             problems.append(f"{prefix} mot-clé absent '{kw}' ni dans unmatched")
-
-    # Copie vide → empty + 0
-    if not (answer or "").strip():
-        if code != "empty":
-            problems.append(f"{prefix} copie vide mais code={code!r} (attendu empty)")
-        if score != 0:
-            problems.append(f"{prefix} copie vide mais score={score} (attendu 0)")
 
     return problems
 

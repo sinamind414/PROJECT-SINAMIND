@@ -20,13 +20,9 @@ from __future__ import annotations
 import pytest
 
 from services.answer_sanity import check_answer_sanity
-from services.embedder import get_embedder
-from services.fallback_v2 import evaluate_l2
-from services.savoir_corrector import (
-    SAVOIR_HIGH_CONFIDENCE_MIN_CONCEPTS,
-    deterministic_correct_v2,
-)
+from services.savoir_corrector import SAVOIR_HIGH_CONFIDENCE_MIN_CONCEPTS
 from tests.golden.metrics import compute_golden_metrics, format_metrics, load_golden_annotated
+from tests.golden.scoring import l2_score, savoir_result
 
 
 @pytest.fixture
@@ -37,56 +33,6 @@ def golden_set():
         pytest.skip("golden_annotated.json absent — lancez "
                     "tests/golden/build_golden_annotated.py")
     return items
-
-
-# ── Helpers de scoring ───────────────────────────────────────────────
-
-def _dominant_from_score(score: float, score_max: float) -> str:
-    if score >= score_max:
-        return "all_correct"
-    if score > 0:
-        return "partial_correct"
-    return "insufficient"
-
-
-async def _l2_score(item: dict) -> tuple[float, str]:
-    """Score L2 normalisé — reproduit exactement la logique de prod
-    (correction_v2._evaluate_local_fallback) : redistribution des poids
-    quand l'embedder sémantique est en fallback (CI sans ONNX)."""
-    question_data = {
-        "reponse_attendue": item["reponse_attendue"],
-        "concepts_requis": item["mots_cles_attendus"],
-        "points_cles": [item["reponse_attendue"]],
-        "question_id": None,
-    }
-    res = await evaluate_l2(
-        reponse_eleve=item["student_answer"],
-        question_data=question_data,
-        db=None,
-    )
-    final = res.score_final
-    try:
-        if bool(getattr(get_embedder(), "is_fallback", False)):
-            w_t, w_r = 0.25, 0.35
-            final = (w_t * res.coverage_score + w_r * res.structural_score) / (w_t + w_r)
-            final = max(0.0, min(1.0, final))
-    except Exception:
-        pass
-    score = round(final * item["bareme"])
-    return score, _dominant_from_score(score, item["bareme"])
-
-
-def _savoir_result(item: dict) -> dict:
-    """Score savoir — CHEMIN PROD RÉEL : deterministic_correct_v2 avec
-    déduction des concepts depuis la RÉPONSE MODÈLE (pas les mots-clés du
-    golden, qui ne sont pas dans da_questions)."""
-    return deterministic_correct_v2(
-        question=item["question"],
-        student_answer=item["student_answer"],
-        score_max=item["bareme"],
-        language="ar",
-        model_answer=item["reponse_attendue"],
-    )
 
 
 # ── Sanity ───────────────────────────────────────────────────────────
@@ -127,7 +73,7 @@ class TestL2OnGoldenSet:
         items = [i for i in golden_set if i["human_dominant_error"] != "empty"]
         human_scores, l2_scores, human_codes, l2_codes = [], [], [], []
         for item in items:
-            score, code = await _l2_score(item)
+            score, code = await l2_score(item)
             human_scores.append(item["human_score"])
             l2_scores.append(score)
             human_codes.append(item["human_dominant_error"])
@@ -154,7 +100,7 @@ class TestSavoirCorrectorOnGoldenSet:
         # ≥ SAVOIR_HIGH_CONFIDENCE_MIN_CONCEPTS concepts trouvés dans la copie.
         handled = []
         for item in golden_set:
-            r = _savoir_result(item)
+            r = savoir_result(item)
             if r["_savoir_can_handle"] and (
                 r["_savoir_n_concepts"] >= SAVOIR_HIGH_CONFIDENCE_MIN_CONCEPTS
             ):
