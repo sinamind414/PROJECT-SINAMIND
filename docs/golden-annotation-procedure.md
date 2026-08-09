@@ -35,6 +35,7 @@ python scripts/export_golden_template.py
 #    human_unmatched_criteria   (listes séparées par ";" dans une cellule)
 #    NB : les 25 copies VIDES → human_score=0 + human_dominant_error=empty
 #    (matched/unmatched inutiles pour elles — vérifié automatiquement)
+#    → joindre docs/guide-expert-svt.md au CSV (guide 1 page pour l'expert)
 
 # 3. Import + validation (livraison partielle OK : lignes vides = conservées)
 python scripts/import_golden_annotations.py --csv data/golden_annotation_template.csv --dry-run
