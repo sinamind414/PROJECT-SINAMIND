@@ -61,10 +61,14 @@ def _kw_list(value) -> str:
 
 
 def write_csv(items: list[dict], path: Path) -> None:
+    """Écrit le CSV. Les copies VIDES sont pré-remplies (human_score=0,
+    human_dominant_error=empty) : trivial et vérifié automatiquement —
+    l'expert ne voit que les 100 vraies copies à noter."""
     with open(path, "w", newline="", encoding="utf-8-sig") as f:
         writer = csv.DictWriter(f, fieldnames=CSV_FIELDS)
         writer.writeheader()
         for it in items:
+            is_empty = not (it.get("student_answer") or "").strip()
             writer.writerow({
                 "question_id": it["question_id"],
                 "chapitre": it.get("chapitre", ""),
@@ -74,8 +78,8 @@ def write_csv(items: list[dict], path: Path) -> None:
                 "student_answer": it["student_answer"],
                 "reponse_attendue": it["reponse_attendue"],
                 "mots_cles_attendus": _kw_list(it.get("mots_cles_attendus") or []),
-                "human_score": "",
-                "human_dominant_error": "",
+                "human_score": "0" if is_empty else "",
+                "human_dominant_error": "empty" if is_empty else "",
                 "human_matched_criteria": "",
                 "human_unmatched_criteria": "",
             })
