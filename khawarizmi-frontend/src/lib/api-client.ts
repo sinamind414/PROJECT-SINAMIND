@@ -521,13 +521,15 @@ class KhawarizmiApiClient {
 
   async submitDrillResult(
     microConceptId: string,
-    scorePercent: number
+    scorePercent: number,
+    chapter?: string
   ): Promise<Record<string, unknown>> {
     return this.request<Record<string, unknown>>("/api/drill/result", {
       method: "POST",
       body: JSON.stringify({
         micro_concept_id: microConceptId,
-        score_percent: scorePercent
+        score_percent: scorePercent,
+        ...(chapter ? { chapter } : {})
       })
     })
   }

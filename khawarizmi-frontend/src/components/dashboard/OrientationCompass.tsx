@@ -1,203 +1,210 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import { ArrowLeft, CheckCircle2, Compass, Lock, Sparkles } from "lucide-react"
-import { apiClient } from "@/lib/api-client"
-import type { RoadmapResponse } from "@/lib/types"
-
-const TONE_STYLES: Record<string, string> = {
-  focus: "border-amber-400/40 bg-amber-400/10 text-amber-200",
-  progress: "border-sky-400/40 bg-sky-400/10 text-sky-200",
-  success: "border-emerald-400/40 bg-emerald-400/10 text-emerald-200",
-  info: "border-white/15 bg-white/5 text-white/80",
-}
+import Link from "next/link"
+import {
+  AlertTriangle,
+  ArrowLeft,
+  BookOpenCheck,
+  Check,
+  CheckCircle2,
+  Compass,
+  FileCheck2,
+  Lock,
+  RefreshCw,
+} from "lucide-react"
+import type { RoadmapObjective, RoadmapResponse, RoadmapUnite } from "@/lib/types"
 
 const STATUS_BADGE = {
-  done: {
-    label: "مُتقنة",
-    className: "bg-emerald-400/15 text-emerald-300 border-emerald-400/30",
-  },
-  active: {
-    label: "هدفك الحالي",
-    className: "bg-amber-400/15 text-amber-300 border-amber-400/30",
-  },
-  locked: {
-    label: "مقفلة",
-    className: "bg-white/5 text-white/40 border-white/10",
-  },
+  done: { label: "مُثبتة", className: "border-emerald-400/30 bg-emerald-400/15 text-emerald-300" },
+  active: { label: "موقعك الآن", className: "border-amber-400/30 bg-amber-400/15 text-amber-200" },
+  locked: { label: "لاحقاً", className: "border-white/10 bg-white/5 text-white/40" },
 } as const
 
-/** Boussole du programme : unités maîtrisées, active et verrouillées. */
-export default function OrientationCompass() {
-  const [roadmap, setRoadmap] = useState<RoadmapResponse | null>(null)
-  const [error, setError] = useState(false)
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    let cancelled = false
-
-    apiClient
-      .getRoadmap()
-      .then((data) => {
-        if (!cancelled) setRoadmap(data)
-      })
-      .catch(() => {
-        if (!cancelled) setError(true)
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false)
-      })
-
-    return () => {
-      cancelled = true
-    }
-  }, [])
-
-  if (loading) {
-    return (
-      <div className="mx-4 mt-6" dir="rtl">
-        <div className="animate-pulse rounded-2xl border border-white/10 bg-white/5 p-4">
-          <div className="mb-3 h-4 w-1/3 rounded bg-white/10" />
-          <div className="h-10 rounded-xl bg-white/10" />
-        </div>
+function Proof({ ok, label, value }: { ok: boolean; label: string; value: number }) {
+  return (
+    <div className={`rounded-xl border px-2.5 py-2 ${ok ? "border-emerald-400/20 bg-emerald-400/5" : "border-white/10 bg-white/[0.025]"}`}>
+      <div className="flex items-center gap-1 text-[10px] text-white/55">
+        {ok ? <Check className="h-3 w-3 text-emerald-300" /> : <span className="h-1.5 w-1.5 rounded-full bg-white/30" />}
+        {label}
       </div>
+      <p className="mt-0.5 text-sm font-black tabular-nums text-white">{value}%</p>
+    </div>
+  )
+}
+
+function ActiveDetails({ unit, objective }: { unit: RoadmapUnite; objective: RoadmapObjective }) {
+  return (
+    <div className="mt-3 border-t border-white/10 pt-3">
+      <div className="grid grid-cols-3 gap-2">
+        <Proof ok={unit.knowledge_ready} label="المعرفة" value={unit.knowledge} />
+        <Proof ok={unit.coverage_ready} label="التغطية" value={unit.coverage} />
+        <Proof ok={unit.bac_validated} label="تطبيق BAC" value={unit.bac_score} />
+      </div>
+
+      <div className="mt-3 space-y-1.5">
+        {unit.phases.map((phase) => (
+          <div key={phase.slug} className="flex items-center gap-2 text-[11px]">
+            <span className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border ${
+              phase.status === "done"
+                ? "border-emerald-400/30 bg-emerald-400/15 text-emerald-300"
+                : phase.status === "active"
+                  ? "border-amber-400/40 bg-amber-400/15 text-amber-200"
+                  : "border-white/10 text-white/30"
+            }`}>
+              {phase.status === "done" ? <Check className="h-3 w-3" /> : phase.number}
+            </span>
+            <span className={phase.status === "active" ? "font-bold text-amber-100" : "text-white/50"}>
+              {phase.title_ar}
+            </span>
+          </div>
+        ))}
+      </div>
+
+      <div className="mt-3 rounded-xl border border-sky-400/20 bg-sky-400/5 p-3">
+        <p className="text-xs font-bold text-sky-100">لماذا الآن؟</p>
+        <p className="mt-1 text-[11px] leading-relaxed text-white/65">{objective.reason_ar}</p>
+        <p className="mt-2 text-[11px] font-semibold leading-relaxed text-amber-100">
+          شرط الفتح: {objective.unlock_condition_ar}
+        </p>
+      </div>
+    </div>
+  )
+}
+
+export default function OrientationCompass({
+  roadmap,
+  objective,
+  loading,
+  error,
+  onRetry,
+}: {
+  roadmap: RoadmapResponse | null
+  objective: RoadmapObjective
+  loading: boolean
+  error: string | null
+  onRetry: () => void
+}) {
+  if (loading && !roadmap) {
+    return (
+      <section className="mx-4 mt-6 animate-pulse rounded-3xl border border-white/10 bg-white/[0.03] p-5" aria-label="Chargement de la boussole">
+        <div className="h-5 w-2/5 rounded bg-white/10" />
+        <div className="mt-4 h-28 rounded-2xl bg-white/10" />
+      </section>
     )
   }
 
-  if (error || !roadmap) return null
+  if (!roadmap) {
+    return (
+      <section className="mx-4 mt-6 rounded-3xl border border-amber-400/30 bg-amber-400/[0.07] p-5" dir="rtl" aria-live="polite">
+        <div className="flex items-center gap-2 text-amber-200">
+          <AlertTriangle className="h-5 w-5" />
+          <h2 className="font-black">البوصلة تعمل بوضع البداية الآمن</h2>
+        </div>
+        <p className="mt-2 text-sm leading-relaxed text-white/65">{error}</p>
+        <p className="mt-3 text-sm font-bold text-white">{objective.title_ar}</p>
+        <div className="mt-4 flex flex-wrap gap-2">
+          <Link href={objective.href} className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-mint px-4 py-2 text-sm font-black text-slate-950">
+            {objective.cta_ar}<ArrowLeft className="h-4 w-4" />
+          </Link>
+          <button type="button" onClick={onRetry} className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-white/15 px-4 py-2 text-sm font-bold text-white hover:bg-white/10">
+            <RefreshCw className="h-4 w-4" /> إعادة المحاولة
+          </button>
+        </div>
+      </section>
+    )
+  }
 
-  const { coach, prochain_objectif: objective } = roadmap
-  const toneClassName = TONE_STYLES[coach.tone] || TONE_STYLES.info
+  const activeUnit = roadmap.unites.find((unit) => unit.statut === "active")
 
   return (
     <section className="mx-4 mt-6" dir="rtl" aria-labelledby="orientation-title">
-      <div className="mb-3 flex items-center gap-2 px-1">
-        <Compass className="h-4 w-4 text-mint" aria-hidden="true" />
-        <h2 id="orientation-title" className="font-bold text-white">
-          بوصلة التوجيه — برنامج البكالوريا
-        </h2>
-      </div>
-
-      <div className={`mb-4 rounded-2xl border p-4 ${toneClassName}`}>
-        <div className="flex items-start gap-2">
-          <Sparkles className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
-          <div className="flex-1">
-            <p className="text-sm font-semibold leading-relaxed">{coach.ar}</p>
-            <p className="mt-1 text-[11px] leading-relaxed text-white/50" dir="ltr">
-              {coach.fr}
-            </p>
+      <div className="rounded-3xl border border-white/10 bg-slate-950/45 p-4 shadow-xl shadow-black/10 sm:p-5">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <div className="flex items-center gap-2 text-mint">
+              <Compass className="h-5 w-5" />
+              <h2 id="orientation-title" className="font-black text-white">بوصلة برنامج البكالوريا</h2>
+            </div>
+            <p className="mt-1 text-[11px] text-white/45">3 مجالات · 11 وحدة · 22 مرحلة · تقدم متسلسل</p>
+          </div>
+          <div className="text-left">
+            <p className="text-xl font-black tabular-nums text-white">{roadmap.units_done}/11</p>
+            <p className="text-[10px] text-white/40">وحدات مثبتة</p>
           </div>
         </div>
 
-        {objective.href && roadmap.unite_active && (
-          <a
-            href={objective.href}
-            className="mt-3 inline-flex min-h-12 items-center gap-1.5 rounded-xl bg-white/15 px-3 py-2 text-xs font-bold transition hover:bg-white/25 active:opacity-70"
-          >
-            {objective.chapitre_faible
-              ? `ابدأ: ${objective.chapitre_faible.nom_ar}`
-              : `ابدأ الوحدة ${objective.num}`}
-            <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />
-          </a>
+        {error && (
+          <div className="mt-3 flex items-center justify-between gap-3 rounded-xl border border-amber-400/25 bg-amber-400/10 px-3 py-2 text-[11px] text-amber-100" role="status">
+            <span>{error} آخر تقدم معروف ما زال ظاهراً.</span>
+            <button type="button" onClick={onRetry} className="inline-flex shrink-0 items-center gap-1 font-black hover:text-white">
+              <RefreshCw className="h-3.5 w-3.5" /> أعد
+            </button>
+          </div>
         )}
+
+        <div className="mt-4 h-2 overflow-hidden rounded-full bg-white/10">
+          <div className="h-full rounded-full bg-gradient-to-l from-mint to-emerald-400 transition-all" style={{ width: `${roadmap.progression_globale}%` }} />
+        </div>
+
+        <div className="mt-4 rounded-2xl border border-amber-400/25 bg-amber-400/[0.07] p-4">
+          <div className="flex items-center gap-2 text-[11px] font-black text-amber-200">
+            {objective.kind === "bac_validation" ? <FileCheck2 className="h-4 w-4" /> : <BookOpenCheck className="h-4 w-4" />}
+            الهدف الوحيد الآن
+          </div>
+          <p className="mt-1 text-sm font-black text-white">{objective.title_ar}</p>
+          <p className="mt-1 text-[11px] leading-relaxed text-white/55">{objective.reason_ar}</p>
+          <Link href={objective.href} className="mt-3 inline-flex min-h-11 items-center gap-2 rounded-xl bg-amber-300 px-3.5 py-2 text-xs font-black text-slate-950 transition hover:bg-amber-200">
+            {objective.cta_ar}<ArrowLeft className="h-4 w-4" />
+          </Link>
+        </div>
+
+        {roadmap.domains.map((domain) => (
+          <div key={domain.id} className="mt-5">
+            <div className="mb-2 flex items-center justify-between px-1">
+              <h3 className="text-xs font-black text-white/75">المجال {domain.number} · {domain.title_ar}</h3>
+              <span className="text-[10px] text-white/35">{domain.units_done}/{domain.units_total}</span>
+            </div>
+            <div className="space-y-2">
+              {domain.unit_ids.map((unitId) => {
+                const unit = roadmap.unites.find((candidate) => candidate.id === unitId)
+                if (!unit) return null
+                const badge = STATUS_BADGE[unit.statut]
+                return (
+                  <article key={unit.id} className={`rounded-2xl border p-3 ${
+                    unit.statut === "active"
+                      ? "border-amber-400/35 bg-amber-400/[0.05]"
+                      : unit.statut === "done"
+                        ? "border-emerald-400/20 bg-emerald-400/[0.035]"
+                        : "border-white/[0.06] bg-white/[0.015]"
+                  }`}>
+                    <div className="flex items-center gap-3">
+                      <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${unit.statut === "locked" ? "bg-white/5 text-white/30" : "bg-white/10"}`}>
+                        {unit.statut === "locked" ? <Lock className="h-4 w-4" /> : unit.statut === "done" ? <CheckCircle2 className="h-5 w-5 text-emerald-300" /> : <span>{unit.emoji}</span>}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2">
+                          <span className="text-[9px] font-bold text-white/35">{String(unit.num).padStart(2, "0")}</span>
+                          <span className={`rounded-full border px-1.5 py-0.5 text-[9px] font-bold ${badge.className}`}>{badge.label}</span>
+                        </div>
+                        <p className={`truncate text-xs font-bold ${unit.statut === "locked" ? "text-white/45" : "text-white"}`}>{unit.nom_ar}</p>
+                      </div>
+                      <span className="text-sm font-black tabular-nums text-white/65">{unit.progression}%</span>
+                    </div>
+                    {unit.statut === "active" && activeUnit?.id === unit.id && <ActiveDetails unit={unit} objective={objective} />}
+                    {unit.statut === "locked" && (
+                      <p className="mt-2 text-[10px] text-white/35">افتحها بإثبات الوحدة السابقة — الاستكشاف يبقى متاحاً.</p>
+                    )}
+                  </article>
+                )
+              })}
+            </div>
+          </div>
+        ))}
+
+        <p className="mt-4 text-[10px] leading-relaxed text-white/35">
+          التحقق = معرفة FSRS {roadmap.criteria.knowledge_threshold}% + تغطية {roadmap.criteria.coverage_threshold}% + تطبيق BAC {roadmap.criteria.bac_threshold}%.
+        </p>
       </div>
-
-      <div className="space-y-2.5">
-        {roadmap.unites.map((unit) => {
-          const badge = STATUS_BADGE[unit.statut]
-          const isLocked = unit.statut === "locked"
-          const isActive = unit.statut === "active"
-
-          return (
-            <article
-              key={unit.id}
-              className={`rounded-2xl border p-3.5 transition ${
-                isActive
-                  ? "border-amber-400/40 bg-amber-400/5"
-                  : isLocked
-                    ? "border-white/5 bg-white/[0.02] opacity-60"
-                    : "border-emerald-400/25 bg-emerald-400/5"
-              }`}
-            >
-              <div className="flex items-center gap-3">
-                <div
-                  className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl text-lg ${
-                    isLocked
-                      ? "bg-white/5"
-                      : isActive
-                        ? "bg-amber-400/15"
-                        : "bg-emerald-400/15"
-                  }`}
-                >
-                  {isLocked ? (
-                    <Lock className="h-4 w-4 text-white/40" aria-hidden="true" />
-                  ) : (
-                    <span aria-hidden="true">{unit.emoji}</span>
-                  )}
-                </div>
-
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-bold text-white/40">
-                      الوحدة {String(unit.num).padStart(2, "0")}
-                    </span>
-                    <span
-                      className={`rounded-full border px-1.5 py-0.5 text-[10px] font-bold ${badge.className}`}
-                    >
-                      {badge.label}
-                    </span>
-                  </div>
-                  <p className="truncate text-sm font-bold text-white">{unit.titre_ar}</p>
-                  <p className="truncate text-[10px] text-white/40" dir="ltr">
-                    {unit.titre_fr}
-                  </p>
-                </div>
-
-                <div className="shrink-0 text-left">
-                  <p className="text-lg font-black tabular-nums text-white">
-                    {unit.maitrise}%
-                  </p>
-                  <p className="text-[9px] text-white/40">إتقان</p>
-                </div>
-              </div>
-
-              <div className="mt-2.5 h-1.5 overflow-hidden rounded-full bg-white/10">
-                <div
-                  className={`h-full rounded-full transition-all ${
-                    isLocked
-                      ? "bg-white/15"
-                      : isActive
-                        ? "bg-gradient-to-l from-amber-300 to-amber-500"
-                        : "bg-gradient-to-l from-emerald-300 to-emerald-500"
-                  }`}
-                  style={{ width: `${Math.min(100, Math.max(0, unit.maitrise))}%` }}
-                />
-              </div>
-
-              {isLocked && (
-                <p className="mt-2 text-[11px] text-white/40">
-                  🔒 أتقن الوحدة {unit.num - 1} أولاً (80٪) لفتح هذه الوحدة
-                </p>
-              )}
-              {isActive && (
-                <p className="mt-2 text-[11px] text-amber-200/70">
-                  🎯 {unit.objectif_ar}
-                </p>
-              )}
-              {unit.statut === "done" && (
-                <p className="mt-2 flex items-center gap-1 text-[11px] text-emerald-300/80">
-                  <CheckCircle2 className="h-3 w-3" aria-hidden="true" />
-                  هذه الوحدة مكتسبة — انتقل إلى التالية
-                </p>
-              )}
-            </article>
-          )
-        })}
-      </div>
-
-      <p className="mt-3 px-1 text-[10px] text-white/35">
-        أتقن كل وحدة بنسبة {roadmap.seuils.done}% على الأقل لفتح الوحدة الموالية.
-      </p>
     </section>
   )
 }

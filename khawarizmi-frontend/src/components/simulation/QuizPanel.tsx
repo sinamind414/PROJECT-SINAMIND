@@ -11,7 +11,15 @@ type QuizQuestion = {
   explanation: string
 }
 
-export function QuizPanel({ questions, simId }: { questions: QuizQuestion[]; simId: string }) {
+export function QuizPanel({
+  questions,
+  simId,
+  chapter,
+}: {
+  questions: QuizQuestion[]
+  simId: string
+  chapter?: string
+}) {
   const [answers, setAnswers] = useState<Record<string, number>>({})
   const [submitted, setSubmitted] = useState(false)
   const [score, setScore] = useState(0)
@@ -27,7 +35,7 @@ export function QuizPanel({ questions, simId }: { questions: QuizQuestion[]; sim
     setScore(s)
     setSubmitted(true)
     try {
-      await apiClient.submitDrillResult(simId, (s / questions.length) * 100)
+      await apiClient.submitDrillResult(simId, (s / questions.length) * 100, chapter)
       setSaved(true)
     } catch { /* */ }
   }

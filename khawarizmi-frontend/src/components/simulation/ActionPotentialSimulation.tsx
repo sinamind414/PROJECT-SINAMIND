@@ -158,7 +158,7 @@ export function ActionPotentialSimulation() {
     setQuizScore(score)
     setQuizSubmitted(true)
     try {
-      await apiClient.submitDrillResult("action-potential-sim", (score / QUIZ_QUESTIONS.length) * 100)
+      await apiClient.submitDrillResult("action-potential-sim", (score / QUIZ_QUESTIONS.length) * 100, "ch4_nerveux")
       setSaved(true)
     } catch {
       // fallback

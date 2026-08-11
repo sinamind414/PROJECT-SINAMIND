@@ -1,6 +1,6 @@
 import json
 import logging
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, datetime
 
 from fastapi import APIRouter, Depends, HTTPException
 from fsrs import Card
@@ -115,20 +115,23 @@ async def soumettre_resultat_drill(
     new_card = result["card"]
 
     now = datetime.now(UTC)
+    previous_state = existing_state or {}
+    reps = int(previous_state.get("reps", 0) or 0) + 1
+    lapses = int(previous_state.get("lapses", 0) or 0) + (1 if body.score_percent < 35 else 0)
     fsrs_payload = {
         "stability": new_card.stability,
         "difficulty": new_card.difficulty,
-        "scheduled_days": new_card.scheduled_days,
-        "reps": new_card.reps,
-        "lapses": new_card.lapses,
+        "scheduled_days": result["interval_jours"],
+        "reps": reps,
+        "lapses": lapses,
         "state": str(new_card.state),
         "last_review": now.isoformat(),
     }
-    fsrs_json = json.dumps(fsrs_payload)
     # S3b : upsert riche via le service unifié (total_reviews/avg_score)
     ok = await save_concept_review(
         db, user_id, body.micro_concept_id,
         concept_id_alias=body.micro_concept_id,
+        chapter=body.chapter,
         prochaine_revision=result["prochaine_revision"],
         interval_jours=result["interval_jours"],
         difficulty=result["difficulty"],
@@ -136,8 +139,8 @@ async def soumettre_resultat_drill(
         fsrs_state=fsrs_payload,
         due_date=result["prochaine_revision"],
         last_review=now,
-        reps=new_card.reps,
-        lapses=new_card.lapses,
+        reps=reps,
+        lapses=lapses,
         state=int(getattr(new_card.state, "value", 0)) if hasattr(new_card.state, "value") else 0,
         avg_score=body.score_percent,
     )
@@ -149,7 +152,7 @@ async def soumettre_resultat_drill(
 
     logger.info(
         f"FSRS drill update: user={user_id} mc={body.micro_concept_id} "
-        f"score={body.score_percent}% reps={new_card.reps} interval={result['interval_jours']}j"
+        f"score={body.score_percent}% reps={reps} interval={result['interval_jours']}j"
     )
 
     return {
@@ -157,8 +160,8 @@ async def soumettre_resultat_drill(
         "interval_jours": result["interval_jours"],
         "retrievability": result["retrievability"],
         "rating": result["rating"],
-        "reps": new_card.reps,
-        "lapses": new_card.lapses,
+        "reps": reps,
+        "lapses": lapses,
         "stability": new_card.stability,
         "difficulty": new_card.difficulty,
     }
@@ -276,14 +279,19 @@ async def soumettre_qcm_drill(
         "needs_l1_review": not is_correct,
     }
 
+    from services.chapter_identity import canonical_chapter
+
+    chapter_id = canonical_chapter(qcm.get("unit_id"), fallback="ch_inconnu")
     next_review_date = await apply_evaluation_to_fsrs(
         db=db,
         user_id=user_id,
         question_id=body.qcm_id,
         reponse_eleve=str(body.selected_idx),
         question={
-            "concept_cle": qcm.get("unit_slug", "qcm_general"),
-            "chapitre_id": qcm.get("unit_slug", ""),
+            # Chaque QCM est une preuve distincte de couverture ; unit_slug
+            # n'est pas globalement unique entre les trois domaines.
+            "concept_cle": qcm.get("concept_id") or body.qcm_id,
+            "chapitre_id": chapter_id,
         },
         eval_result=eval_result,
     )
@@ -376,23 +384,15 @@ async def review_flashcard(
 
     now = datetime.now(UTC)
     scheduler = CardScheduler()
-    scheduling_cards = scheduler.repeat(card, now)
-    new_card = scheduling_cards[fsrs_rating].card
+    reviewed = scheduler.review_card(card, fsrs_rating, now)
+    new_card = reviewed[0] if isinstance(reviewed, tuple) else reviewed
 
-    due_date = new_card.due if hasattr(new_card, "due") else now + timedelta(days=1)
-    interval = new_card.scheduled_days if hasattr(new_card, "scheduled_days") else 1
+    due_date = new_card.due
+    interval = max((due_date - now).total_seconds() / 86400, 0.0)
+    previous_state = existing_state or {}
+    reps = int(previous_state.get("reps", 0) or 0) + 1
+    lapses = int(previous_state.get("lapses", 0) or 0) + (1 if body.rating == 1 else 0)
 
-    fsrs_json = json.dumps(
-        {
-            "stability": new_card.stability,
-            "difficulty": new_card.difficulty,
-            "scheduled_days": new_card.scheduled_days,
-            "reps": new_card.reps,
-            "lapses": new_card.lapses,
-            "state": str(new_card.state),
-            "last_review": now.isoformat(),
-        }
-    )
     # S3b : upsert via le service unifié (review simple)
     ok = await save_concept_review(
         db, current_user["id"], card_id,
@@ -404,14 +404,17 @@ async def review_flashcard(
         fsrs_state={
             "stability": new_card.stability,
             "difficulty": new_card.difficulty,
-            "scheduled_days": new_card.scheduled_days,
-            "reps": new_card.reps,
-            "lapses": new_card.lapses,
+            "scheduled_days": interval,
+            "reps": reps,
+            "lapses": lapses,
             "state": str(new_card.state),
             "last_review": now.isoformat(),
         },
         due_date=due_date,
         last_review=now,
+        reps=reps,
+        lapses=lapses,
+        state=int(getattr(new_card.state, "value", 0)),
     )
     await db.commit()
     if not ok:

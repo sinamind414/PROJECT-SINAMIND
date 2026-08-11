@@ -126,6 +126,7 @@ async def _resolve_ask(
         "mode", mode,
         "chapter", chapter or "-",
         "level", level_bucket,
+        "user", str(current_user["id"]),
         "msg", message.strip().lower(),
     )
     cached = await get_cache(cache_key)
@@ -158,12 +159,16 @@ async def _resolve_ask(
         "type": result.get("type", "socratique"),
         "question_suivante": result.get("question_suivante"),
         "flashcards_suggerees": result.get("flashcards_suggerees", []),
+        "prochain_objectif": result.get("prochain_objectif"),
     }
 
-    try:
-        await set_cache(cache_key, json.dumps(response_data, ensure_ascii=False), ttl=900)
-    except Exception:
-        pass
+    # Une orientation dépend de l'utilisateur : elle ne doit jamais être
+    # réutilisée par la clé publique message/chapitre.
+    if result.get("cache_scope", "public") in ("public", "chapter_public"):
+        try:
+            await set_cache(cache_key, json.dumps(response_data, ensure_ascii=False), ttl=900)
+        except Exception:
+            pass
 
     return response_data, cache_key
 

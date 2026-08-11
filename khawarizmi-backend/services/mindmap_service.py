@@ -696,6 +696,9 @@ async def _generate_auto_flashcards(
 async def persist_flashcards_to_fsrs(
     flashcards: list, matiere: str, chapitre: str, user_id: str, db: AsyncSession
 ) -> list:
+    from services.chapter_identity import canonical_chapter
+
+    chapitre = canonical_chapter(chapitre, fallback=chapitre) or chapitre
     u_id = int(user_id)
     saved = []
 

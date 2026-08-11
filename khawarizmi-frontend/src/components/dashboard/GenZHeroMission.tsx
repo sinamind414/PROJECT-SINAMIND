@@ -3,7 +3,7 @@
 import React from "react"
 import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
-import { Play, Clock, Award } from "lucide-react"
+import { Play, Clock, Award, RefreshCw } from "lucide-react"
 
 interface GenZHeroMissionProps {
   title: string
@@ -12,15 +12,23 @@ interface GenZHeroMissionProps {
   points?: number
   href?: string
   onStart?: () => void
+  buttonLabel?: string
+  unlockCondition?: string
+  fallback?: boolean
+  onRetry?: () => void
 }
 
 export default function GenZHeroMission({
-  title = "البراكين وتوزيعها",
-  subtitle = "خريطة + توزيع + تحليل",
+  title = "ابدأ من تركيب البروتين",
+  subtitle = "هدفك التالي من بوصلة البرنامج",
   duration = "12 دقيقة",
   points = 7,
   href,
   onStart,
+  buttonLabel = "ابدأ الآن",
+  unlockCondition,
+  fallback = false,
+  onRetry,
 }: GenZHeroMissionProps) {
   const router = useRouter()
 
@@ -45,6 +53,17 @@ export default function GenZHeroMission({
         </div>
       </div>
 
+      {fallback && (
+        <div className="mb-3 flex items-center justify-between gap-2 rounded-xl border border-amber-400/25 bg-amber-400/10 px-3 py-2 text-[11px] text-amber-100" role="status">
+          <span>هدف بداية آمن — تعذر تحديث تقدمك</span>
+          {onRetry && (
+            <button type="button" onClick={onRetry} className="inline-flex items-center gap-1 font-black hover:text-white">
+              <RefreshCw className="h-3.5 w-3.5" /> أعد
+            </button>
+          )}
+        </div>
+      )}
+
       <h2 className="text-2xl sm:text-[26px] font-black text-white leading-tight tracking-[-0.5px]">
         {title}
       </h2>
@@ -68,12 +87,14 @@ export default function GenZHeroMission({
         className="mt-5 w-full h-14 rounded-2xl bg-mint text-black font-black text-lg flex items-center justify-center gap-2 active:bg-mint/90 transition-all shadow-lg shadow-mint/20"
       >
         <Play className="w-5 h-5" />
-        ابدأ الآن
+        {buttonLabel}
       </motion.button>
 
-      <p className="text-center text-[10px] text-white/50 mt-2.5">
-        يمكنك كسب هذه النقاط في أقل من 15 دقيقة
-      </p>
+      {unlockCondition && (
+        <p className="mt-2.5 text-center text-[10px] leading-relaxed text-white/55">
+          شرط الانتقال: {unlockCondition}
+        </p>
+      )}
     </div>
   )
 }

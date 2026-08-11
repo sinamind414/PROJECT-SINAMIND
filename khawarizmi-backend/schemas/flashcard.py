@@ -11,6 +11,7 @@ class DrillRequest(BaseModel):
 class ScheduleRequest(BaseModel):
     micro_concept_id: str
     score_percent: float = Field(ge=0.0, le=100.0)
+    chapter: str | None = None
     fsrs_state: dict | None = None
 
 

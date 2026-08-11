@@ -182,64 +182,58 @@ async def handle_orientation(
     context: dict | None,
     is_init: bool = False,
 ) -> dict:
-    """Orientation / daily_plan / init — orientation + boussole FSRS."""
+    """Coach d'orientation branché sur le même prochain_objectif que le dashboard."""
     context = context or {}
     orientation = await calculer_orientation(db, user_id)
-    cartes = build_cartes_from_orientation(orientation)
 
-    # Boussole unité par unité : best effort pour ne jamais bloquer le coach.
-    boussole = None
     try:
         from services.orientation_roadmap import calculer_roadmap
 
         roadmap = await calculer_roadmap(db, user_id)
-        boussole = roadmap["coach"]["ar"]
-        weakest = roadmap["prochain_objectif"].get("chapitre_faible")
-        if weakest and weakest.get("nom_ar"):
-            boussole += (
-                f"\n📚 ابدأ بـ: {weakest['nom_ar']} "
-                f"(إتقان {weakest['maitrise']}٪)."
-            )
+        objective = roadmap["prochain_objectif"]
+        coach_text = roadmap["coach"]["ar"]
     except Exception as exc:
         logger.warning("Chatbot boussole indisponible : %s", exc)
+        objective = {
+            "kind": "lesson",
+            "title_ar": "ابدأ من الوحدة 1: تركيب البروتين",
+            "reason_ar": "تعذر تحديث تقدمك؛ هذه نقطة البداية الآمنة.",
+            "unlock_condition_ar": "أعد تحميل البوصلة لرؤية شرطك الشخصي.",
+            "href": "/lecons-sciences-experimentales/phase1_chapitres_1_2",
+            "cta_ar": "ابدأ",
+        }
+        coach_text = objective["reason_ar"]
 
-    # FSRS push : si init, vérifier les concepts dus
+    compass_card = {
+        "titre": objective["title_ar"],
+        "raison": objective["reason_ar"],
+        "condition": objective["unlock_condition_ar"],
+        "action": objective["href"],
+        "bouton": objective["cta_ar"],
+        "kind": objective["kind"],
+    }
+
     due_concept = await safe_get_due_concept(db, user_id)
-    if due_concept and is_init:
-        due_push = build_due_concept_question(due_concept)
-        greeting = "سلام! "
-        if orientation.get("prediction_bac") is not None:
-            greeting += f"توقعك للبكالوريا: {orientation['prediction_bac']}/100. "
-        msg = orientation["message"] + "\n\n" + due_push["reponse"]
-        if boussole:
-            msg += "\n\n🧭 " + boussole
-        cartes = cartes + due_push.get("cartes", [])
-
-        logger.info(
-            f"Chatbot | FSRS push: concept={due_concept.get('concept_id')} stability={due_concept.get('stability')}"
-        )
-        return make_response(
-            reponse=greeting + msg,
-            type_="orientation_with_due_push",
-            question_suivante=due_push.get("question_suivante"),
-            cartes=cartes,
-            due_concept=due_concept.get("concept_id"),
-            due_chapter=due_concept.get("chapter"),
-        )
-
     greeting = "سلام! " if is_init else ""
     if is_init and orientation.get("prediction_bac") is not None:
         greeting += f"توقعك للبكالوريا: {orientation['prediction_bac']}/100. "
 
-    response_text = greeting + orientation["message"]
-    if boussole:
-        response_text += "\n\n🧭 " + boussole
+    response_text = greeting + orientation["message"] + "\n\n🧭 " + coach_text
+    if due_concept and is_init:
+        # Le rappel dû reste une information du coach, mais l'unique carte
+        # d'action demeure celle de la boussole structurée.
+        due_push = build_due_concept_question(due_concept)
+        response_text += "\n\n" + due_push["reponse"]
 
     return make_response(
         reponse=response_text,
-        type_="orientation",
+        type_="orientation_with_due_push" if due_concept and is_init else "orientation",
         question_suivante="نبدأ؟",
-        cartes=cartes,
+        cartes=[compass_card],
+        due_concept=due_concept.get("concept_id") if due_concept else None,
+        due_chapter=due_concept.get("chapter") if due_concept else None,
+        cache_scope="personalized",
+        prochain_objectif=objective,
     )
 
 

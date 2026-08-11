@@ -4,6 +4,7 @@ import { useParams } from "next/navigation"
 import Link from "next/link"
 import { AppShell } from "@/components/layout/AppShell"
 import ExperimentalLessonView from "@/components/lessons/ExperimentalLessonView"
+import { CompactOrientationCompass } from "@/components/lessons/CompactOrientationCompass"
 import { EXPERIMENTAL_LESSONS, EXPERIMENTAL_SLUGS } from "@/lib/experimental-lessons-data"
 
 export default function ExperimentalLessonPage() {
@@ -36,6 +37,7 @@ export default function ExperimentalLessonPage() {
           ← العودة إلى القائمة
         </Link>
 
+        <CompactOrientationCompass lessonSlug={slug} />
         <ExperimentalLessonView slug={slug} />
       </div>
     </AppShell>

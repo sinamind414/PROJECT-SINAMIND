@@ -165,7 +165,7 @@ export function TectonicsSimulation() {
               </p>
             </div>
           </div>
-          <QuizPanel questions={QUIZ} simId="tectonics-sim" />
+          <QuizPanel questions={QUIZ} simId="tectonics-sim" chapter="ch_tectonique_plaques" />
         </div>
       </div>
     </div>

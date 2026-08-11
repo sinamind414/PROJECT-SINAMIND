@@ -34,7 +34,15 @@ from typing import Any, Literal
 from sqlalchemy import bindparam, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from services.chapter_identity import canonical_chapter
+
 logger = logging.getLogger("khawarizmi.fsrs_unified")
+
+
+def _canonical_chapter(chapter: str | None) -> str | None:
+    """Normalise les 11 chapitres connus sans effacer une valeur inconnue."""
+    return canonical_chapter(chapter, fallback=chapter)
+
 
 MemoryKind = Literal["concept", "verb_chapter", "verb_action"]
 
@@ -156,7 +164,7 @@ async def _read_concepts(db: AsyncSession, user_id) -> list[MemoryItem]:
             last_score=row[7],
             attempts=int(row[8] or 0),
             last_review=_parse_dt(row[9]),
-            chapter=row[1],
+            chapter=_canonical_chapter(row[1]),
             extra={
                 "total_reviews": row[10],
                 "avg_score": row[11],
@@ -204,11 +212,15 @@ async def _read_verb_chapters(db: AsyncSession, user_id) -> list[MemoryItem]:
 
     if rows:
         for row in rows:
-            item_key = row[0] or ""
-            verb, _, chapter = item_key.partition("::")
+            item_key = str(row[0] or "")
+            if "::" not in item_key:
+                logger.warning("fsrs_unified: item_key verb_chapter invalide ignoré (%s)", item_key)
+                continue
+            verb, _, chapter_from_key = item_key.partition("::")
+            chapter = _canonical_chapter(row[1] or chapter_from_key) or ""
             items.append(MemoryItem(
                 kind="verb_chapter",
-                item_id=item_key or f"{verb}::{row[1]}",
+                item_id=f"{verb}::{chapter}",
                 stability=float(row[2] or 0.0),
                 difficulty=float(row[3] or 0.0),
                 fsrs_state=_parse_state(row[4]),
@@ -217,7 +229,7 @@ async def _read_verb_chapters(db: AsyncSession, user_id) -> list[MemoryItem]:
                 last_score=row[7],
                 attempts=int(row[8] or 0),
                 last_review=_parse_dt(row[9]),
-                chapter=row[1],
+                chapter=chapter,
                 extra={"verb_slug": verb},
             ))
         return items
@@ -240,9 +252,10 @@ async def _read_verb_chapters(db: AsyncSession, user_id) -> list[MemoryItem]:
             return []
 
         for row in res.fetchall():
+            chapter = _canonical_chapter(row[1]) or ""
             items.append(MemoryItem(
                 kind="verb_chapter",
-                item_id=f"{row[0]}::{row[1]}",
+                item_id=f"{row[0]}::{chapter}",
                 stability=float(row[2] or 0.0),
                 difficulty=float(row[3] or 0.0),
                 fsrs_state=_parse_state(row[4]),
@@ -251,7 +264,7 @@ async def _read_verb_chapters(db: AsyncSession, user_id) -> list[MemoryItem]:
                 last_score=row[7],
                 attempts=int(row[8] or 0),
                 last_review=_parse_dt(row[9]),
-                chapter=row[1],
+                chapter=chapter,
                 extra={"verb_slug": row[0]},
             ))
     return items
@@ -365,16 +378,17 @@ async def update_memory(
     """
     if kind == "concept":
         return await _upsert_concept(
-            db, user_id, item_id=item_id, chapter=chapter,
+            db, user_id, item_id=item_id, chapter=_canonical_chapter(chapter),
             stability=stability, difficulty=difficulty, fsrs_state=fsrs_state,
             due=due, interval_jours=interval_jours, last_score=last_score,
             attempts_delta=attempts_delta,
         )
     if kind == "verb_chapter":
         verb_slug, _, chapter_from_id = item_id.partition("::")
+        normalized_chapter = _canonical_chapter(chapter or chapter_from_id) or ""
         return await _upsert_verb_chapter(
             db, user_id, verb_slug=verb_slug or item_id,
-            chapter_slug=chapter or chapter_from_id or "",
+            chapter_slug=normalized_chapter,
             stability=stability, difficulty=difficulty, fsrs_state=fsrs_state,
             due=due, interval_jours=interval_jours, last_score=last_score,
             attempts_delta=attempts_delta,
@@ -404,7 +418,7 @@ async def _upsert_concept(db: AsyncSession, user_id, *, item_id, chapter,
                     (:uid, :cid, :chapter, :stability, :difficulty,
                      :fsrs, :due, :interval, :score, :attempts, NOW(), NOW())
                 ON CONFLICT (user_id, micro_concept_id) DO UPDATE SET
-                    chapter = EXCLUDED.chapter,
+                    chapter = COALESCE(EXCLUDED.chapter, mastery_micro_concepts.chapter),
                     stability = EXCLUDED.stability,
                     difficulty = EXCLUDED.difficulty,
                     fsrs_state = EXCLUDED.fsrs_state,
@@ -660,6 +674,7 @@ async def save_concept_review(
     - avg_score fourni → total_reviews += 1 et avg_score = moyenne pondérée ;
     - sinon → upsert simple (review flashcards).
     """
+    chapter = _canonical_chapter(chapter)
     try:
         if avg_score is not None:
             # Cas drill/result : moyenne pondérée + total_reviews +1
@@ -678,6 +693,7 @@ async def save_concept_review(
                          1, :avg, NOW())
                     ON CONFLICT (user_id, micro_concept_id) DO UPDATE SET
                         concept_id = COALESCE(mastery_micro_concepts.concept_id, EXCLUDED.concept_id),
+                        chapter = COALESCE(EXCLUDED.chapter, mastery_micro_concepts.chapter),
                         prochaine_revision = EXCLUDED.prochaine_revision,
                         interval_jours = EXCLUDED.interval_jours,
                         difficulty = EXCLUDED.difficulty,
@@ -720,6 +736,7 @@ async def save_concept_review(
                          :due, :last_review, :reps, :lapses, :state, NOW())
                     ON CONFLICT (user_id, micro_concept_id) DO UPDATE SET
                         concept_id = COALESCE(mastery_micro_concepts.concept_id, EXCLUDED.concept_id),
+                        chapter = COALESCE(EXCLUDED.chapter, mastery_micro_concepts.chapter),
                         prochaine_revision = EXCLUDED.prochaine_revision,
                         interval_jours = EXCLUDED.interval_jours,
                         difficulty = EXCLUDED.difficulty,
@@ -761,6 +778,7 @@ async def save_concept_card(
     interval_jours: float = 1.0,
 ) -> bool:
     """Crée une carte concept (create_flashcard) — upsert simple."""
+    chapter = _canonical_chapter(chapter)
     try:
         await db.execute(
             text("""
@@ -773,7 +791,7 @@ async def save_concept_card(
                      :difficulty, :stability, :state, :due,
                      :next_rev, :interval, NOW())
                 ON CONFLICT (user_id, micro_concept_id) DO UPDATE SET
-                    chapter = EXCLUDED.chapter,
+                    chapter = COALESCE(EXCLUDED.chapter, mastery_micro_concepts.chapter),
                     difficulty = EXCLUDED.difficulty,
                     updated_at = NOW()
             """),
@@ -858,6 +876,7 @@ async def save_concept_update(
     (user_id, concept_id) — pas sur micro_concept_id (les deux contraintes
     UNIQUE existent dans le schéma réel).
     """
+    chapter = _canonical_chapter(chapter) or chapter
     try:
         await db.execute(
             text(f"""
@@ -871,6 +890,7 @@ async def save_concept_update(
                      :pending_eval, NOW())
                 ON CONFLICT (user_id, concept_id)
                 DO UPDATE SET
+                    chapter            = COALESCE(EXCLUDED.chapter, mastery_micro_concepts.chapter),
                     due_date           = EXCLUDED.due_date,
                     interval_jours     = EXCLUDED.interval_jours,
                     difficulty         = EXCLUDED.difficulty,
@@ -900,6 +920,7 @@ async def tag_pending_concept(
 
     Fidèle au bloc pending d'evaluation_fsrs : pending_real_evaluation=TRUE.
     """
+    chapter = _canonical_chapter(chapter) or chapter
     try:
         await db.execute(
             text("""
@@ -909,7 +930,8 @@ async def tag_pending_concept(
                 VALUES
                     (:user_id, :mc_id, :mc_id, :chapter, TRUE, NOW())
                 ON CONFLICT (user_id, concept_id)
-                DO UPDATE SET pending_real_evaluation = TRUE, updated_at = NOW()
+                DO UPDATE SET chapter = COALESCE(EXCLUDED.chapter, mastery_micro_concepts.chapter),
+                              pending_real_evaluation = TRUE, updated_at = NOW()
             """),
             {"user_id": user_id, "mc_id": concept_id, "chapter": chapter},
         )

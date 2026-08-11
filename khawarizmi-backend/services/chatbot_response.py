@@ -18,6 +18,7 @@ def make_response(
     due_concept: str | None = None,
     due_chapter: str | None = None,
     cache_scope: str = "public",
+    prochain_objectif: dict | None = None,
 ) -> dict:
     """Construit une réponse chatbot.
 
@@ -45,6 +46,7 @@ def make_response(
         "due_concept": due_concept,
         "due_chapter": due_chapter,
         "cache_scope": cache_scope,
+        "prochain_objectif": prochain_objectif,
     }
 
 

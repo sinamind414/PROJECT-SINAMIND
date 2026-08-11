@@ -109,13 +109,26 @@ class TestOrientation:
     @pytest.mark.asyncio
     async def test_orientation_basic(self, db):
         db_orientation = {"prediction_bac": 65, "message": "أنت على المسار الصحيح"}
+        objective = {
+            "kind": "bac_validation",
+            "title_ar": "تحقق في وضعية BAC",
+            "reason_ar": "المعرفة جاهزة والتطبيق ناقص",
+            "unlock_condition_ar": "احصل على 70٪",
+            "href": "/document-analysis/chapters/d1-u1-c1-test",
+            "cta_ar": "تحقق",
+        }
         with patch("services.chatbot_handlers.calculer_orientation",
                    new=AsyncMock(return_value=db_orientation)), \
+             patch("services.orientation_roadmap.calculer_roadmap",
+                   new=AsyncMock(return_value={"prochain_objectif": objective, "coach": {"ar": "coach"}})), \
              patch("services.chatbot_handlers.get_due_concept_for_question",
                    new=AsyncMock(return_value=None)):
             r = await handle_orientation(db, 1, {}, is_init=True)
         assert r["type"] == "orientation"
         assert "65" in r["reponse"]
+        assert r["prochain_objectif"] == objective
+        assert len(r["cartes"]) == 1
+        assert r["cartes"][0]["action"] == objective["href"]
 
     @pytest.mark.asyncio
     async def test_orientation_with_due_push(self, db):

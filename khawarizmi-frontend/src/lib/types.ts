@@ -1103,32 +1103,86 @@ export interface VoteResponse {
 
 // ── Boussole d'orientation (parcours unité par unité) ────────────────
 
+export type RoadmapStatus = "done" | "active" | "locked"
+export type RoadmapObjectiveKind = "lesson" | "bac_validation" | "annales"
+
+export interface RoadmapPhase {
+  slug: string
+  number: number
+  title_ar: string
+  status: RoadmapStatus
+  href: string
+}
+
 export interface RoadmapChapitre {
-  id: string
-  maitrise: number
-}
-
-export interface RoadmapUnite {
-  id: string
-  num: number
-  titre_fr: string
-  titre_ar: string
-  emoji: string
-  objectif_fr: string
-  objectif_ar: string
-  chapitres: RoadmapChapitre[]
-  nb_concepts: number
-  maitrise: number
-  statut: "done" | "active" | "locked"
-  verrouille_par: string | null
-}
-
-export interface RoadmapChapitreFaible {
   id: string
   nom_fr: string
   nom_ar: string
   maitrise: number
+  couverture: number
   href: string
+}
+
+export interface RoadmapUnite {
+  id: string
+  roadmap_id: string
+  num: number
+  domain_id: string
+  domain_number: number
+  unit_number: number
+  nom_fr: string
+  nom_ar: string
+  emoji: string
+  chapter_id: string
+  statut: RoadmapStatus
+  verrouille_par: string | null
+  knowledge: number
+  coverage: number
+  bac_score: number
+  bac_attempts: number
+  knowledge_ready: boolean
+  coverage_ready: boolean
+  bac_validated: boolean
+  validation_complete: boolean
+  maitrise: number
+  progression: number
+  concepts_seen: number
+  concepts_expected: number
+  phases: RoadmapPhase[]
+  chapitres: RoadmapChapitre[]
+}
+
+export interface RoadmapDomain {
+  id: string
+  number: number
+  title_ar: string
+  title_fr: string
+  color: string
+  units_total: number
+  units_done: number
+  unit_ids: string[]
+}
+
+export interface RoadmapObjective {
+  kind: RoadmapObjectiveKind
+  unit_id: string | null
+  roadmap_unit_id: string | null
+  chapter_id: string | null
+  phase: RoadmapPhase | null
+  title_ar: string
+  title_fr: string
+  reason_ar: string
+  reason_fr: string
+  unlock_condition_ar: string
+  unlock_condition_fr: string
+  href: string
+  cta_ar: string
+  cta_fr: string
+  num: number | null
+  nom_ar: string
+  nom_fr: string
+  maitrise: number
+  chapitre_faible: RoadmapChapitre | null
 }
 
 export interface RoadmapCoach {
@@ -1138,20 +1192,22 @@ export interface RoadmapCoach {
 }
 
 export interface RoadmapResponse {
+  version: string
+  domains: RoadmapDomain[]
   unites: RoadmapUnite[]
   unite_active: string | null
-  prochain_objectif: {
-    unite_id: string | null
-    num: number | null
-    titre_fr: string
-    titre_ar: string
-    chapitre_faible: RoadmapChapitreFaible | null
-    href: string
+  roadmap_unit_active: string | null
+  progression_globale: number
+  units_done: number
+  units_total: number
+  phases_total: number
+  criteria: {
+    knowledge_threshold: number
+    coverage_threshold: number
+    bac_threshold: number
+    target_stability_days: number
   }
+  prochain_objectif: RoadmapObjective
   coach: RoadmapCoach
-  seuils: {
-    done: number
-    stability_max: number
-  }
 }
 

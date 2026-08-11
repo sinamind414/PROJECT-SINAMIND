@@ -34,7 +34,7 @@ async def apply_evaluation_to_fsrs(
       - GPT4O / FALLBACK_L2 → graphe de concepts ( mise à jour riche )
       - sinon ( L3 / erreur ) → carte en attente ( pending_real_evaluation )
     """
-    if eval_result["source"] in ["GPT4O", "FALLBACK_L2"]:
+    if eval_result["source"] in ["GPT4O", "FALLBACK_L2", "QCM_LOCAL"]:
         from services.fsrs_graph import (
             QuestionConceptMapping,
             load_concept_graph,

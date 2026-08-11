@@ -14,36 +14,21 @@ import { getProgressSnapshot } from "@/lib/progress-store"
 import { getContractSnapshot } from "@/lib/lesson/evidenceService"
 
 import { useDriveDashboard } from "@/hooks/useDriveDashboard"
-import type { Mission } from "@/components/drive-design/api-types"
+import { useOrientationRoadmap } from "@/hooks/useOrientationRoadmap"
 
 export default function GenZDashboardPage() {
   const state = useDriveDashboard()
+  const compass = useOrientationRoadmap()
   const [showMore, setShowMore] = useState(false)
-
-  // === B: real missions from hook ===
-  const missions: Mission[] = state.missions || []
-  const dailyMission = missions.find((m: Mission) => m.status === "pending") || missions[0] || null
-
-  // priority: Arabic title
-  const missionTitle = dailyMission?.titleAr || dailyMission?.title || "البراكين وتوزيعها"
-  const missionPoints = dailyMission?.xp_reward || 7
-
-  // === A: smart route wiring ===
-  let missionHref = dailyMission?.href || "/lecons-sciences-experimentales"
-  const titleLower = (dailyMission?.title || dailyMission?.titleAr || "").toLowerCase()
-  if (titleLower.includes("volcan") || titleLower.includes("براكين") || titleLower.includes("تكتون")) {
-    missionHref = "/lecons-sciences-experimentales/phase15_chapitres_29_30"
-  }
+  const objective = compass.objective
+  const missionPoints = objective.kind === "bac_validation" ? 15 : objective.kind === "annales" ? 20 : 10
+  const missionDuration = objective.kind === "bac_validation" ? "20 دقيقة" : "12 دقيقة"
 
   // === C: real streak + XP from profile (gamification merged by mapper) ===
   const profile = (state.profile || {}) as unknown as Record<string, unknown>
   const realStreak = Number(profile.streak ?? 0)
   const realXp = Number(profile.xp ?? 0)
   const userName = String(profile.name || "خليل")
-
-  const handleStartMission = () => {
-    window.location.href = missionHref
-  }
 
   // Pertes urgentes = erreurs réelles (progress + contrat), pas de fake hardcodé
   const progressSnap = getProgressSnapshot()
@@ -91,15 +76,24 @@ export default function GenZDashboardPage() {
           />
 
           <GenZHeroMission
-            title={missionTitle}
-            subtitle="خريطة + توزيع + تحليل"
-            duration="12 دقيقة"
+            title={objective.title_ar}
+            subtitle={objective.reason_ar}
+            duration={missionDuration}
             points={missionPoints}
-            href={missionHref}
-            onStart={handleStartMission}
+            href={objective.href}
+            buttonLabel={objective.cta_ar}
+            unlockCondition={objective.unlock_condition_ar}
+            fallback={Boolean(compass.error)}
+            onRetry={compass.retry}
           />
 
-          <OrientationCompass />
+          <OrientationCompass
+            roadmap={compass.roadmap}
+            objective={objective}
+            loading={compass.loading}
+            error={compass.error}
+            onRetry={compass.retry}
+          />
 
           <ContractPulse />
 

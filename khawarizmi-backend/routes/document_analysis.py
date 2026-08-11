@@ -6,7 +6,7 @@ avec évaluation regex + répétition espacée FSRS.
 
 import json
 import logging
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, datetime
 
 from fastapi import APIRouter, Depends, HTTPException
 from fsrs import Card
@@ -370,59 +370,60 @@ async def reviser_da(
 
     # S3 finale : lecture via la vue consolidée (mastery-first) — plus de
     # SELECT direct sur da_fsrs (table supprimée en 034).
+    from services.chapter_identity import canonical_chapter
     from services.fsrs_unified import get_user_memory, update_memory
 
-    vc_id = f"{body.verb_slug}::{body.chapter_slug}"
+    chapter_id = canonical_chapter(body.chapter_slug, fallback=body.chapter_slug) or "general"
+    vc_id = f"{body.verb_slug}::{chapter_id}"
     memory = await get_user_memory(db, current_user["id"], kinds=("verb_chapter",))
     vc_item = next((i for i in memory if i.item_id == vc_id), None)
 
     card = Card()
+    previous_reps = 0
+    previous_lapses = 0
     if vc_item and vc_item.fsrs_state:
         state = vc_item.fsrs_state
-        card.stability = state.get("stability", 0.0)
-        card.difficulty = state.get("difficulty", 0.0)
-        card.reps = state.get("reps", 0)
-        card.lapses = state.get("lapses", 0)
+        # La version moderne de py-fsrs utilise None pour une carte neuve et
+        # n'expose plus reps/lapses comme attributs Card.
+        if state.get("stability") is not None:
+            card.stability = state["stability"]
+        if state.get("difficulty") is not None:
+            card.difficulty = state["difficulty"]
+        previous_reps = int(state.get("reps", 0) or 0)
+        previous_lapses = int(state.get("lapses", 0) or 0)
 
     rating = body.rating
     if body.score_percentage is not None:
         rating = score_to_fsrs_rating(body.score_percentage)
 
     fsrs_rating = FsrsRating(rating)
-    new_card = scheduler.review_card(card, fsrs_rating)
+    engine = getattr(scheduler, "fsrs", scheduler)
+    reviewed = engine.review_card(card, fsrs_rating)
+    new_card = reviewed[0] if isinstance(reviewed, tuple) else reviewed
 
     now = datetime.now(UTC)
-    next_review = now + timedelta(days=new_card.scheduled_days)
-
-    fsrs_json = json.dumps(
-        {
-            "stability": new_card.stability,
-            "difficulty": new_card.difficulty,
-            "scheduled_days": new_card.scheduled_days,
-            "reps": new_card.reps,
-            "lapses": new_card.lapses,
-            "state": str(new_card.state),
-            "last_review": now.isoformat(),
-        }
-    )
+    next_review = new_card.due
+    interval_days = max((next_review - now).total_seconds() / 86400, 0.0)
+    reps = previous_reps + 1
+    lapses = previous_lapses + (1 if rating == 1 else 0)
 
     await update_memory(
         db, current_user["id"], "verb_chapter",
         item_id=vc_id,
-        chapter=body.chapter_slug,
+        chapter=chapter_id,
         stability=new_card.stability,
         difficulty=new_card.difficulty,
         fsrs_state={
             "stability": new_card.stability,
             "difficulty": new_card.difficulty,
-            "scheduled_days": new_card.scheduled_days,
-            "reps": new_card.reps,
-            "lapses": new_card.lapses,
+            "scheduled_days": interval_days,
+            "reps": reps,
+            "lapses": lapses,
             "state": str(new_card.state),
             "last_review": now.isoformat(),
         },
         due=next_review,
-        interval_jours=float(new_card.scheduled_days),
+        interval_jours=float(interval_days),
         last_score=body.score_percentage or 0,
         attempts_delta=1,
     )
@@ -438,7 +439,7 @@ async def reviser_da(
         "chapter_slug": body.chapter_slug,
         "rating": rating,
         "next_review": next_review.isoformat(),
-        "interval_days": float(new_card.scheduled_days),
+        "interval_days": float(interval_days),
         "stability": new_card.stability,
         "difficulty": new_card.difficulty,
     }

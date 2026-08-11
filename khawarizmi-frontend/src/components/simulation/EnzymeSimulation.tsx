@@ -95,7 +95,7 @@ export function EnzymeSimulation() {
     setQuizScore(score)
     setQuizSubmitted(true)
     try {
-      await apiClient.submitDrillResult("enzyme-activity-sim", (score / QUIZ_QUESTIONS.length) * 100)
+      await apiClient.submitDrillResult("enzyme-activity-sim", (score / QUIZ_QUESTIONS.length) * 100, "ch2_enzymes")
       setSaved(true)
     } catch {
       // fallback silencieux

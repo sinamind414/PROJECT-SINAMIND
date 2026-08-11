@@ -45,11 +45,11 @@ async def roadmap_eleve(
     current_user: dict = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    """Retourne la boussole ordonnée des cinq unités du programme SVT."""
+    """Retourne la boussole officielle : 3 domaines, 11 unités, 22 phases."""
     roadmap = await calculer_roadmap(db, current_user["id"])
 
     logger.info(
-        "Roadmap : user=%s unite_active=%s done=%s/5",
+        "Roadmap : user=%s unite_active=%s done=%s/11",
         current_user["id"],
         roadmap["unite_active"],
         sum(1 for unit in roadmap["unites"] if unit["statut"] == "done"),

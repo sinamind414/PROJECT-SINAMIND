@@ -122,7 +122,7 @@ export function PhotosynthesisSimulation() {
               </svg>
             </div>
           </div>
-          <QuizPanel questions={QUIZ} simId="photosynthesis-sim" />
+          <QuizPanel questions={QUIZ} simId="photosynthesis-sim" chapter="ch_photosynthese" />
         </div>
       </div>
     </div>
