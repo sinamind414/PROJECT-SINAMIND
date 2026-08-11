@@ -6,6 +6,7 @@ import { AppShell } from "@/components/layout/AppShell"
 
 import GenZHeader from "@/components/dashboard/GenZHeader"
 import GenZHeroMission from "@/components/dashboard/GenZHeroMission"
+import OrientationCompass from "@/components/dashboard/OrientationCompass"
 import UrgentLosses from "@/components/dashboard/UrgentLosses"
 import QuickWins from "@/components/dashboard/QuickWins"
 import { ContractPulse } from "@/components/methodology/SessionExitButton"
@@ -97,6 +98,8 @@ export default function GenZDashboardPage() {
             href={missionHref}
             onStart={handleStartMission}
           />
+
+          <OrientationCompass />
 
           <ContractPulse />
 

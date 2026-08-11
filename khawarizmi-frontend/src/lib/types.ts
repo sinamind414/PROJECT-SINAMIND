@@ -1101,3 +1101,57 @@ export interface VoteResponse {
   downvotes: number
 }
 
+// ── Boussole d'orientation (parcours unité par unité) ────────────────
+
+export interface RoadmapChapitre {
+  id: string
+  maitrise: number
+}
+
+export interface RoadmapUnite {
+  id: string
+  num: number
+  titre_fr: string
+  titre_ar: string
+  emoji: string
+  objectif_fr: string
+  objectif_ar: string
+  chapitres: RoadmapChapitre[]
+  nb_concepts: number
+  maitrise: number
+  statut: "done" | "active" | "locked"
+  verrouille_par: string | null
+}
+
+export interface RoadmapChapitreFaible {
+  id: string
+  nom_fr: string
+  nom_ar: string
+  maitrise: number
+  href: string
+}
+
+export interface RoadmapCoach {
+  fr: string
+  ar: string
+  tone: "focus" | "progress" | "success" | "info"
+}
+
+export interface RoadmapResponse {
+  unites: RoadmapUnite[]
+  unite_active: string | null
+  prochain_objectif: {
+    unite_id: string | null
+    num: number | null
+    titre_fr: string
+    titre_ar: string
+    chapitre_faible: RoadmapChapitreFaible | null
+    href: string
+  }
+  coach: RoadmapCoach
+  seuils: {
+    done: number
+    stability_max: number
+  }
+}
+

@@ -1345,6 +1345,34 @@ Tests : 959 passed (951 + 6 réel redis + 2 multi-process), 3 skipped,
 
 ---
 
+# 2ff. Boussole d'orientation — parcours unité par unité (S5) ✅
+
+L'audit signalait que l'élève voyait une mission et une readiness globale,
+mais pas sa position dans le programme ni l'ordre dans lequel progresser.
+
+Livré :
+- `services/orientation_roadmap.py` — cinq unités SVT Bac 3AS ordonnées,
+  mappées sur les 11 chapitres du programme canonique avec résolution
+  tolérante des slugs et titres FR/AR ;
+- maîtrise calculée depuis la mémoire FSRS unifiée :
+  `100 × Σ min(stability, 10) / (10 × nombre de concepts)` ;
+- verrouillage séquentiel strict à 80 %, statuts `done` / `active` / `locked`,
+  unité active, chapitre le plus faible et message coach bilingue ;
+- route authentifiée `GET /api/orientation/roadmap` ;
+- composant dashboard `OrientationCompass` : cinq cartes, pourcentages,
+  progression, statuts ✅/🎯/🔒 et CTA vers le chapitre faible ;
+- chatbot enrichi par l'objectif d'unité et le prochain chapitre ;
+- modèle SQLite preview aligné sur les colonnes de fusion FSRS et clé
+  `Integer` auto-incrémentée (le DDL PostgreSQL reste géré par Alembic).
+
+Preuve automatisée : 8 tests couvrent le parcours ordonné, les alias, l'état
+débutant, le déverrouillage U1→U2, la progression partielle, le chapitre le
+plus faible, la fin du programme et la route HTTP authentifiée. Suite complète :
+960 tests backend et 592 tests frontend passent ; Ruff, ESLint et build sont
+verts.
+
+---
+
 # 3. Réponses aux 3 questions de l'audit
 
 1. **Quel modèle ONNX ?** → `paraphrase-multilingual-MiniLM-L12-v2` (multilingue, pas anglais-only). C4 reste à mesurer (AUC 50 paires arabes) mais le remplacement d'urgence n'est pas nécessaire.

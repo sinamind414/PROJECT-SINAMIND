@@ -12,6 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from database import get_db
 from deps import get_current_user
+from services.orientation_roadmap import calculer_roadmap
 from services.orientation_service import calculer_orientation
 
 logger = logging.getLogger("khawarizmi.api")
@@ -37,3 +38,21 @@ async def orienter_eleve(
     )
 
     return orientation
+
+
+@router.get("/roadmap")
+async def roadmap_eleve(
+    current_user: dict = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Retourne la boussole ordonnée des cinq unités du programme SVT."""
+    roadmap = await calculer_roadmap(db, current_user["id"])
+
+    logger.info(
+        "Roadmap : user=%s unite_active=%s done=%s/5",
+        current_user["id"],
+        roadmap["unite_active"],
+        sum(1 for unit in roadmap["unites"] if unit["statut"] == "done"),
+    )
+
+    return roadmap

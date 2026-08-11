@@ -33,6 +33,29 @@ Pipeline complet dans `grading/pipeline.py` : sanity → savoir → prompt → L
 - `grading_pipeline_events_total{event}` (sanity_reject, savoir_promoted, l2_fallback, llm_error, llm_ok)
 - Histogrammes : latence LLM, étapes chatbot
 
+### S5 — Boussole d'orientation (parcours unité par unité)
+- **Problème** : l'élève disposait d'une mission quotidienne et d'une barre
+  globale, mais d'aucun ordre pédagogique explicite dans le programme.
+- **Backend** : `services/orientation_roadmap.py` et
+  `GET /api/orientation/roadmap` exposent 5 unités SVT Bac 3AS ordonnées
+  (Énergie → Protéines → Communication nerveuse → Immunité → Tectonique),
+  leur maîtrise issue de la mémoire FSRS, leur statut `done` / `active` /
+  `locked`, le chapitre le plus faible et un message coach FR/AR.
+- **Règle** : maîtrise d'une unité =
+  `100 × Σ min(stability, 10) / (10 × nombre de concepts)` ; seuil de
+  validation et de déverrouillage séquentiel : 80 %.
+- **Frontend** : `OrientationCompass` sous la mission du dashboard — bulle
+  coach, cinq cartes d'unité, progression, verrouillage et CTA vers le
+  chapitre faible.
+- **Chatbot** : les réponses d'orientation incluent la boussole et le prochain
+  chapitre à travailler.
+- **Preview SQLite** : le modèle `mastery_micro_concepts` reflète les colonnes
+  de fusion FSRS et utilise une clé `Integer` auto-incrémentée compatible
+  SQLite ; PostgreSQL reste piloté par les migrations Alembic.
+- **Tests** : 960 tests backend passent, dont 8 tests dédiés couvrant ordre,
+  alias, calcul, verrouillage, progression, chapitre faible, programme terminé
+  et route HTTP ; 592 tests frontend, lint et build passent également.
+
 ### S3 — FSRS unifié (4 systèmes → 1)
 - **API** : `services/fsrs_unified.py` — `get_user_memory`, `get_due_items`, `update_memory`, `save_concept_review/update/card`, `tag_pending_concept`, `clear_pending_concept`, `get_concept_states`, stats par chapitre
 - **Fusion physique** : migration `033_fsrs_unified_memory` — colonnes `source`/`item_key`/`avg_pct`/`total_users` + backfill depuis da_fsrs et action_verb_progress

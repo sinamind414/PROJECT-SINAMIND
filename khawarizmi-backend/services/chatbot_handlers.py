@@ -182,10 +182,26 @@ async def handle_orientation(
     context: dict | None,
     is_init: bool = False,
 ) -> dict:
-    """Orientation / daily_plan / init — orientation + FSRS push si init."""
+    """Orientation / daily_plan / init — orientation + boussole FSRS."""
     context = context or {}
     orientation = await calculer_orientation(db, user_id)
     cartes = build_cartes_from_orientation(orientation)
+
+    # Boussole unité par unité : best effort pour ne jamais bloquer le coach.
+    boussole = None
+    try:
+        from services.orientation_roadmap import calculer_roadmap
+
+        roadmap = await calculer_roadmap(db, user_id)
+        boussole = roadmap["coach"]["ar"]
+        weakest = roadmap["prochain_objectif"].get("chapitre_faible")
+        if weakest and weakest.get("nom_ar"):
+            boussole += (
+                f"\n📚 ابدأ بـ: {weakest['nom_ar']} "
+                f"(إتقان {weakest['maitrise']}٪)."
+            )
+    except Exception as exc:
+        logger.warning("Chatbot boussole indisponible : %s", exc)
 
     # FSRS push : si init, vérifier les concepts dus
     due_concept = await safe_get_due_concept(db, user_id)
@@ -195,6 +211,8 @@ async def handle_orientation(
         if orientation.get("prediction_bac") is not None:
             greeting += f"توقعك للبكالوريا: {orientation['prediction_bac']}/100. "
         msg = orientation["message"] + "\n\n" + due_push["reponse"]
+        if boussole:
+            msg += "\n\n🧭 " + boussole
         cartes = cartes + due_push.get("cartes", [])
 
         logger.info(
@@ -213,8 +231,12 @@ async def handle_orientation(
     if is_init and orientation.get("prediction_bac") is not None:
         greeting += f"توقعك للبكالوريا: {orientation['prediction_bac']}/100. "
 
+    response_text = greeting + orientation["message"]
+    if boussole:
+        response_text += "\n\n🧭 " + boussole
+
     return make_response(
-        reponse=greeting + orientation["message"],
+        reponse=response_text,
         type_="orientation",
         question_suivante="نبدأ؟",
         cartes=cartes,

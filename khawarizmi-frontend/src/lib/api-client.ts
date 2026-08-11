@@ -24,6 +24,7 @@ import {
   CriticalChaptersResponse,
   ProgressResponse,
   OrientationResponse,
+  RoadmapResponse,
   WeekActivityResponse,
   StartBacResponse,
   ChooseSubjectResponse,
@@ -614,6 +615,10 @@ class KhawarizmiApiClient {
 
   async getOrientation(): Promise<OrientationResponse> {
     return this.request<OrientationResponse>("/api/orientation")
+  }
+
+  async getRoadmap(): Promise<RoadmapResponse> {
+    return this.request<RoadmapResponse>("/api/orientation/roadmap")
   }
 
   async getWeekActivity(): Promise<WeekActivityResponse> {
