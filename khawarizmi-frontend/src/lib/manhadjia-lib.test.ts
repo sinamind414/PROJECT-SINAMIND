@@ -2,17 +2,22 @@ import { describe, expect, it } from "vitest"
 import {
   countHits,
   detectFassir,
+  detectIstintaj,
   highlightSpans,
   isVerbeFassir,
   isVerbeHallil,
+  isVerbeIstintaj,
   type AtelierFassirData,
+  type AtelierIstintajData,
 } from "./manhadjia-lib"
 import rawData from "../../data/ateliers/manhadjia_01_hallil_taam.json"
 import rawData02 from "../../data/ateliers/manhadjia_02_fassir_taam.json"
+import rawData03 from "../../data/ateliers/manhadjia_03_istintaj_taam.json"
 
 // Source unique de vérité : la liste fermée du JSON (pas une copie dans le test)
 const REGEX = rawData.interdits_regex
 const D02 = rawData02 as AtelierFassirData
+const D03 = rawData03 as AtelierIstintajData
 
 describe("isVerbeHallil (rituel — liste fermée)", () => {
   it("accepte حلل / حلّل / تحليل / analyser / analysez / analyse", () => {
@@ -150,5 +155,86 @@ describe("detectFassir (métier à côté — R5)", () => {
     const d = detectFassir("الخلايا القاتلة ترتفع 4,8 يوم 3 لأن الذاكرة جاهزة", D02)
     expect(d.crimes).toEqual([])
     expect(d.missing).toEqual([])
+  })
+})
+
+// ── Atelier 03 (استنتج) — القانون + دليله ────────────────────────────
+
+describe("isVerbeIstintaj (rituel J3 — liste fermée)", () => {
+  it("accepte استنتج / نستنتج / déduire / concluez / conclu", () => {
+    expect(isVerbeIstintaj("استنتج")).toBe(true)
+    expect(isVerbeIstintaj("نستنتج")).toBe(true)
+    expect(isVerbeIstintaj("déduire")).toBe(true)
+    expect(isVerbeIstintaj("deduire")).toBe(true)
+    expect(isVerbeIstintaj("concluez")).toBe(true)
+    expect(isVerbeIstintaj("conclu")).toBe(true)
+  })
+
+  it("refuse حلل / فسّر (R2 — فعل الأمس)", () => {
+    expect(isVerbeIstintaj("حلل")).toBe(false)
+    expect(isVerbeIstintaj("حلّل")).toBe(false)
+    expect(isVerbeIstintaj("فسر")).toBe(false)
+    expect(isVerbeIstintaj("فسّر")).toBe(false)
+    expect(isVerbeIstintaj("")).toBe(false)
+  })
+})
+
+describe("detectIstintaj (métier à côté — R5)", () => {
+  it("corrigé geste (3 lignes jointes) → 0 crime 0 manque (R8)", () => {
+    const d = detectIstintaj(D03.corrige_geste.join(" "), D03)
+    expect(d.crimes).toEqual([])
+    expect(d.missing).toEqual([])
+  })
+
+  it("copie A « خلوية لأن المتدخلون LTc والهدف خلايا الطعم » → 0 crime 0 manque", () => {
+    const d = detectIstintaj("خلوية لأن المتدخلون LTc والهدف خلايا الطعم.", D03)
+    expect(d.crimes).toEqual([])
+    expect(d.missing).toEqual([])
+  })
+
+  it("copie B (قصة : 10/5/4,8/2,5) → crime qissa", () => {
+    const d = detectIstintaj(
+      "رُفض في 10 أيام ثم 5 أيام والذروة 4,8 مقابل 2,5 إذن خلوية",
+      D03
+    )
+    expect(d.crimes).toContain(D03.messages.qissa)
+    expect(d.displaySpans.some((s) => s.hit)).toBe(true)
+  })
+
+  it("copie C « الاستجابة خلوية. » → manque دليل", () => {
+    const d = detectIstintaj("الاستجابة خلوية.", D03)
+    expect(d.missing).toContain(D03.messages.missing_dalil)
+  })
+
+  it("copie D (فسّر déguisé : ذاكرة تتكاثر) → crime fassir", () => {
+    const d = detectIstintaj("لأن الذاكرة تجعل LTc تتكاثر أسرع لذلك خلوية.", D03)
+    expect(d.crimes).toContain(D03.messages.fassir)
+  })
+
+  it("copie E « أجسام مضادة ترفض الطعم » → crime khaltia", () => {
+    const d = detectIstintaj("أجسام مضادة ترفض الطعم.", D03)
+    expect(d.crimes).toContain(D03.messages.khaltia)
+  })
+
+  it("copie F (paraphrase قاتلة + رفض) → 0 crime 0 manque (محترمة)", () => {
+    const d = detectIstintaj("النمط خلوي لأن الخلايا القاتلة ترتفع مع الرفض.", D03)
+    expect(d.crimes).toEqual([])
+    expect(d.missing).toEqual([])
+  })
+
+  it("« نلاحظ أن » en ouverture → crime hallil", () => {
+    const d = detectIstintaj("نلاحظ أن المنحنى يرتفع ثم نستنتج خلوية.", D03)
+    expect(d.crimes).toContain(D03.messages.hallil)
+  })
+
+  it("« ربما » → crime hedg", () => {
+    const d = detectIstintaj("ربما الاستجابة خلوية لأن LTc", D03)
+    expect(d.crimes).toContain(D03.messages.hedg)
+  })
+
+  it(">80 mots → crime max_mots", () => {
+    const long = Array.from({ length: 90 }, () => "خلوية").join(" ")
+    const d = detectIstintaj(long, D03)
+    expect(d.crimes).toContain(D03.messages.max_mots)
   })
 })

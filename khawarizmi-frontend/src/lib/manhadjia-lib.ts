@@ -42,9 +42,9 @@ export interface AtelierData {
   lien_j2?: { label: string; href: string }
 }
 
-// Palette des muscles : حلّل = أصفر (jaune), فسّر = برتقالي (orange).
-// Deux muscles, deux couleurs : l'élève sent le métier changer.
-export type MuscleVariant = "jaune" | "orange"
+// Palette des muscles : حلّل = أصفر (jaune), فسّر = برتقالي (orange),
+// استنتج = أخضر (vert). Trois muscles, trois couleurs.
+export type MuscleVariant = "jaune" | "orange" | "vert"
 
 export const MUSCLE_ACCENTS: Record<
   MuscleVariant,
@@ -94,6 +94,21 @@ export const MUSCLE_ACCENTS: Record<
     pastille: "border-orange-300/40 bg-orange-300/15 text-orange-300",
     borderActive: "border-orange-300",
   },
+  vert: {
+    border: "border-green-400/25",
+    borderSoft: "border-green-400/30",
+    bgSoft: "bg-green-400/5",
+    chipBg: "bg-green-400",
+    chipText: "text-slate-deep",
+    textAccent: "text-green-300",
+    textSoft: "text-green-200",
+    btn: "bg-green-400 hover:bg-green-300",
+    caseActive: "border-green-300/60 bg-green-300/10",
+    checkbox: "accent-green-300",
+    focus: "focus:border-green-300",
+    pastille: "border-green-300/40 bg-green-300/15 text-green-300",
+    borderActive: "border-green-300",
+  },
 }
 
 // Atelier 02 (فسّر) — détection inversée : لأن + chiffre OBLIGATOIRES,
@@ -115,6 +130,32 @@ export interface AtelierFassirData extends AtelierData {
   recap: string[]
 }
 
+// Atelier 03 (استنتج) — القانون + دليله. Crimes : re-حلّل, قصة, re-فسّر,
+// خلطية بلا دليل, ربما. Manque : دليل. Voir manhadjia_03_istintaj_taam.json
+export interface AtelierIstintajData extends AtelierData {
+  consigne_note: string
+  patterns: {
+    hallil: string
+    fassir: string
+    khaltia: string
+    hedg: string
+    chiffres: string
+    evidence: string
+  }
+  messages: {
+    hallil: string
+    qissa: string
+    fassir: string
+    khaltia: string
+    hedg: string
+    missing_dalil: string
+    max_mots: string
+  }
+  max_mots: number
+  voix: string[]
+  recap: string[]
+}
+
 // Verbes acceptés au rituel (listes fermées de la spec écran 0)
 const ACCEPTED_VERBES = new Set(["حلل", "تحليل", "analyser", "analysez", "analyse"])
 const ACCEPTED_VERBES_FASSIR = new Set([
@@ -129,6 +170,15 @@ const ACCEPTED_VERBES_FASSIR = new Set([
   "explique",
   "expliquez",
   "expliquer",
+])
+// Spec 03 : aliases [نستنتج, déduire, concluez, conclu] + استنتج.
+// Accents français retirés avant comparaison (déduire → deduire).
+const ACCEPTED_VERBES_ISTINTAJ = new Set([
+  "استنتج",
+  "نستنتج",
+  "deduire",
+  "concluez",
+  "conclu",
 ])
 
 function isDiacritic(c: string): boolean {
@@ -164,6 +214,13 @@ export function isVerbeHallil(input: string): boolean {
 export function isVerbeFassir(input: string): boolean {
   const { text } = normalizeWithMap(input.trim())
   return ACCEPTED_VERBES_FASSIR.has(text.toLowerCase())
+}
+
+/** Le verbe tapé au rituel est-il استنتج ? (fermé — R2 : حلل/فسّر refusés) */
+export function isVerbeIstintaj(input: string): boolean {
+  const { text } = normalizeWithMap(input.trim())
+  const fr = text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase()
+  return ACCEPTED_VERBES_ISTINTAJ.has(text.toLowerCase()) || ACCEPTED_VERBES_ISTINTAJ.has(fr)
 }
 
 export interface Span {
@@ -235,4 +292,61 @@ export function detectFassir(original: string, data: AtelierFassirData): FassirD
 
   const wordCount = text.trim() ? text.trim().split(/\s+/).length : 0
   return { displaySpans, crimeSpans, crimes, missing, wordCount }
+}
+
+// ── Atelier 03 (استنتج) ──────────────────────────────────────────────
+// القانون + دليله. Crimes : نلاحظ أن (re-حلّل), قصة (>2 chiffres), re-فسّر
+// (ذاكرة/تتكاثر…), خلطية بلا وثيقة, ربما. Manque : دليل من الوثيقة.
+
+export interface IstintajDetection {
+  displaySpans: Span[]
+  crimes: string[]
+  missing: string[]
+  wordCount: number
+}
+
+export function detectIstintaj(original: string, data: AtelierIstintajData): IstintajDetection {
+  const { text } = normalizeWithMap(original)
+
+  const hasHallil = new RegExp(data.patterns.hallil, "g").test(text)
+  const hasFassir = new RegExp(data.patterns.fassir, "g").test(text)
+  const hasKhaltia = new RegExp(data.patterns.khaltia, "g").test(text)
+  const hasHedg = new RegExp(data.patterns.hedg, "g").test(text)
+  const numMatches = text.match(new RegExp(data.patterns.chiffres, "g")) || []
+  const qissa = numMatches.length > 2
+
+  const crimes: string[] = []
+  const crimePatterns: string[] = []
+  if (hasHallil) {
+    crimes.push(data.messages.hallil)
+    crimePatterns.push(data.patterns.hallil)
+  }
+  if (qissa) {
+    crimes.push(data.messages.qissa)
+    crimePatterns.push(data.patterns.chiffres)
+  }
+  if (hasFassir) {
+    crimes.push(data.messages.fassir)
+    crimePatterns.push(data.patterns.fassir)
+  }
+  if (hasKhaltia) {
+    crimes.push(data.messages.khaltia)
+    crimePatterns.push(data.patterns.khaltia)
+  }
+  if (hasHedg) {
+    crimes.push(data.messages.hedg)
+    crimePatterns.push(data.patterns.hedg)
+  }
+
+  const wordCount = text.trim() ? text.trim().split(/\s+/).length : 0
+  if (wordCount > data.max_mots) crimes.push(data.messages.max_mots)
+
+  const missing: string[] = []
+  if (!new RegExp(data.patterns.evidence, "g").test(text)) {
+    missing.push(data.messages.missing_dalil)
+  }
+
+  const combined = crimePatterns.join("|")
+  const displaySpans = combined ? highlightSpans(original, combined) : highlightSpans(original, "(?!)")
+  return { displaySpans, crimes, missing, wordCount }
 }
