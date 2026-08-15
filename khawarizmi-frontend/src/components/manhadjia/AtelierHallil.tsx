@@ -1,6 +1,7 @@
 "use client"
 
 import { useMemo, useState } from "react"
+import Link from "next/link"
 import {
   countHits,
   highlightSpans,
@@ -276,6 +277,19 @@ export function AtelierHallil({ data, onReplay }: Props) {
           >
             {data.cta_fin}
           </button>
+
+          {/* Un seul lien, en bas du miroir, après envoi : bootcamp J1→J2 */}
+          {data.lien_j2 && (
+            <div className="pt-1 text-center">
+              <Link
+                href={data.lien_j2.href}
+                className="inline-block min-h-12 px-4 py-3 text-sm font-black text-yellow-200 underline underline-offset-4 hover:text-yellow-300"
+                dir="rtl"
+              >
+                {data.lien_j2.label}
+              </Link>
+            </div>
+          )}
         </section>
       )}
     </div>

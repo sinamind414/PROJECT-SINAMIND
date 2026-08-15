@@ -32,6 +32,7 @@ export default function ManhadjiaFassirPage() {
           <RitualGate
             data={DATA}
             acceptVerbe={isVerbeFassir}
+            variant="orange"
             onComplete={() => setScreen("carte")}
           />
         )}
@@ -39,6 +40,7 @@ export default function ManhadjiaFassirPage() {
         {screen === "carte" && (
           <CarteHallil
             data={DATA}
+            variant="orange"
             onTrainer={() => setScreen("ritual-atelier")}
             onBack={() => setScreen("ritual-carte")}
           />
@@ -48,13 +50,18 @@ export default function ManhadjiaFassirPage() {
           <RitualGate
             data={DATA}
             acceptVerbe={isVerbeFassir}
+            variant="orange"
             onComplete={() => setScreen("atelier")}
             onBack={() => setScreen("carte")}
           />
         )}
 
         {screen === "atelier" && (
-          <AtelierFassir data={DATA} onReplay={() => setScreen("ritual-atelier")} />
+          <AtelierFassir
+            data={DATA}
+            variant="orange"
+            onReplay={() => setScreen("ritual-atelier")}
+          />
         )}
       </div>
     </main>

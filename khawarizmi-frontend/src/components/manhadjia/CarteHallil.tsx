@@ -1,30 +1,32 @@
 "use client"
 
-import type { AtelierData } from "@/lib/manhadjia-lib"
+import { MUSCLE_ACCENTS, type AtelierData, type MuscleVariant } from "@/lib/manhadjia-lib"
 
 type Props = {
   data: AtelierData
   onTrainer: () => void
   onBack: () => void
+  variant?: MuscleVariant
 }
 
-export function CarteHallil({ data, onTrainer, onBack }: Props) {
+export function CarteHallil({ data, onTrainer, onBack, variant = "jaune" }: Props) {
+  const A = MUSCLE_ACCENTS[variant]
   return (
-    <section className="rounded-3xl border border-yellow-400/30 bg-yellow-400/5 p-6 space-y-5">
+    <section className={`rounded-3xl border ${A.borderSoft} ${A.bgSoft} p-6 space-y-5`}>
       <div className="flex items-center gap-2" dir="rtl">
-        <span className="rounded-lg bg-yellow-300 px-2 py-0.5 text-xs font-black text-slate-deep">
+        <span className={`rounded-lg px-2 py-0.5 text-xs font-black ${A.chipBg} ${A.chipText}`}>
           {data.couleur}
         </span>
-        <h1 className="text-3xl font-black text-yellow-300">{data.verbe}</h1>
+        <h1 className={`text-3xl font-black ${A.textAccent}`}>{data.verbe}</h1>
       </div>
 
       <p className="text-lg font-bold text-white" dir="rtl">
-        المهنة: <span className="text-yellow-200">{data.carte.profession}</span>
+        المهنة: <span className={A.textSoft}>{data.carte.profession}</span>
       </p>
 
       <div className="rounded-2xl border border-white/10 bg-slate-panel/60 p-4" dir="rtl">
         <p className="text-xs text-white/40 mb-1">الستة:</p>
-        <p className="text-lg font-black text-yellow-300 leading-relaxed">
+        <p className={`text-lg font-black leading-relaxed ${A.textAccent}`}>
           {data.mots_mur.join(" · ")}
         </p>
       </div>
@@ -53,7 +55,7 @@ export function CarteHallil({ data, onTrainer, onBack }: Props) {
       <div className="flex gap-3 pt-2">
         <button
           onClick={onTrainer}
-          className="min-h-14 flex-1 rounded-2xl bg-yellow-300 py-3 text-lg font-black text-slate-deep hover:bg-yellow-200"
+          className={`min-h-14 flex-1 rounded-2xl py-3 text-lg font-black ${A.btn} ${A.chipText}`}
           dir="rtl"
         >
           {`تمرن ${data.carte.duree}`}

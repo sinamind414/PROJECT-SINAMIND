@@ -1,18 +1,31 @@
 "use client"
 
 import { useState } from "react"
-import { isVerbeHallil, type AtelierData } from "@/lib/manhadjia-lib"
+import {
+  isVerbeHallil,
+  MUSCLE_ACCENTS,
+  type AtelierData,
+  type MuscleVariant,
+} from "@/lib/manhadjia-lib"
 
 type Props = {
   data: AtelierData
   onComplete: () => void
   onBack?: () => void
   acceptVerbe?: (s: string) => boolean
+  variant?: MuscleVariant
 }
 
 const TIMES = ["0–3 ث", "3–6 ث", "6–14 ث", "14–20 ث"]
 
-export function RitualGate({ data, onComplete, onBack, acceptVerbe = isVerbeHallil }: Props) {
+export function RitualGate({
+  data,
+  onComplete,
+  onBack,
+  acceptVerbe = isVerbeHallil,
+  variant = "jaune",
+}: Props) {
+  const A = MUSCLE_ACCENTS[variant]
   // step 0 = verbe · 1 = pastilles · 2 = mots un par un · 3 = bandeau
   const [step, setStep] = useState(0)
   const [verbInput, setVerbInput] = useState("")
@@ -60,11 +73,8 @@ export function RitualGate({ data, onComplete, onBack, acceptVerbe = isVerbeHall
 
       {/* Étape 0 : le verbe */}
       {step === 0 && (
-        <section className="rounded-3xl border border-yellow-400/25 bg-slate-panel/60 p-6 text-center space-y-5">
-          <p
-            className="text-6xl font-black text-yellow-300 tracking-wide"
-            dir="rtl"
-          >
+        <section className={`rounded-3xl border ${A.border} bg-slate-panel/60 p-6 text-center space-y-5`}>
+          <p className={`text-6xl font-black tracking-wide ${A.textAccent}`} dir="rtl">
             {data.verbe}
           </p>
           <div>
@@ -79,7 +89,7 @@ export function RitualGate({ data, onComplete, onBack, acceptVerbe = isVerbeHall
               onKeyDown={(e) => {
                 if (e.key === "Enter") submitVerb()
               }}
-              className="w-full max-w-xs mx-auto block rounded-xl border border-white/15 bg-slate-deep px-4 py-3 text-center text-lg font-bold text-white outline-none focus:border-yellow-300"
+              className={`w-full max-w-xs mx-auto block rounded-xl border border-white/15 bg-slate-deep px-4 py-3 text-center text-lg font-bold text-white outline-none ${A.focus}`}
               placeholder="…"
               autoFocus
             />
@@ -91,7 +101,7 @@ export function RitualGate({ data, onComplete, onBack, acceptVerbe = isVerbeHall
           )}
           <button
             onClick={submitVerb}
-            className="min-h-12 rounded-xl bg-yellow-300 px-6 py-3 font-black text-slate-deep hover:bg-yellow-200"
+            className={`min-h-12 rounded-xl px-6 py-3 font-black ${A.btn} ${A.chipText}`}
             dir="rtl"
           >
             تحقق
@@ -101,7 +111,7 @@ export function RitualGate({ data, onComplete, onBack, acceptVerbe = isVerbeHall
 
       {/* Étape 1 : les deux pastilles */}
       {step === 1 && (
-        <section className="rounded-3xl border border-yellow-400/25 bg-slate-panel/60 p-6 space-y-4">
+        <section className={`rounded-3xl border ${A.border} bg-slate-panel/60 p-6 space-y-4`}>
           <p className="text-white/80 font-bold" dir="rtl">
             الوثيقتان — كشّ عليهوم بجوج:
           </p>
@@ -112,7 +122,7 @@ export function RitualGate({ data, onComplete, onBack, acceptVerbe = isVerbeHall
                 onClick={() => togglePill(i)}
                 className={`min-h-14 flex-1 rounded-2xl border text-lg font-black transition ${
                   pills[i]
-                    ? "border-yellow-300 bg-yellow-300 text-slate-deep"
+                    ? `${A.borderActive} ${A.chipBg} ${A.chipText}`
                     : "border-white/15 bg-slate-deep text-white/70"
                 }`}
                 dir="rtl"
@@ -130,16 +140,16 @@ export function RitualGate({ data, onComplete, onBack, acceptVerbe = isVerbeHall
 
       {/* Étape 2 : les 6 mots, un par un */}
       {step === 2 && (
-        <section className="rounded-3xl border border-yellow-400/25 bg-slate-panel/60 p-6 text-center space-y-5">
+        <section className={`rounded-3xl border ${A.border} bg-slate-panel/60 p-6 text-center space-y-5`}>
           <p className="text-xs text-white/40" dir="rtl">
             الكلمة {wordIndex + 1} من {data.mots_mur.length}
           </p>
-          <p className="text-4xl font-black text-yellow-300" dir="rtl">
+          <p className={`text-4xl font-black ${A.textAccent}`} dir="rtl">
             {data.mots_mur[wordIndex]}
           </p>
           <button
             onClick={readWord}
-            className="min-h-12 rounded-xl bg-yellow-300 px-8 py-3 font-black text-slate-deep hover:bg-yellow-200"
+            className={`min-h-12 rounded-xl px-8 py-3 font-black ${A.btn} ${A.chipText}`}
             dir="rtl"
           >
             قرأت
@@ -159,7 +169,7 @@ export function RitualGate({ data, onComplete, onBack, acceptVerbe = isVerbeHall
           {!understood ? (
             <button
               onClick={() => setUnderstood(true)}
-              className="min-h-12 w-full rounded-xl bg-yellow-300 py-3 font-black text-slate-deep hover:bg-yellow-200"
+              className={`min-h-12 w-full rounded-xl py-3 font-black ${A.btn} ${A.chipText}`}
               dir="rtl"
             >
               واش فهمت
@@ -167,7 +177,7 @@ export function RitualGate({ data, onComplete, onBack, acceptVerbe = isVerbeHall
           ) : (
             <button
               onClick={onComplete}
-              className="min-h-12 w-full rounded-xl bg-yellow-300 py-3 font-black text-slate-deep hover:bg-yellow-200"
+              className={`min-h-12 w-full rounded-xl py-3 font-black ${A.btn} ${A.chipText}`}
               dir="rtl"
             >
               افتح الورشة

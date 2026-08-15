@@ -1,12 +1,19 @@
 "use client"
 
 import { useMemo, useState } from "react"
-import { detectFassir, type AtelierFassirData, type Span } from "@/lib/manhadjia-lib"
+import {
+  detectFassir,
+  MUSCLE_ACCENTS,
+  type AtelierFassirData,
+  type MuscleVariant,
+  type Span,
+} from "@/lib/manhadjia-lib"
 import { CourbeLTc } from "@/components/manhadjia/CourbeLTc"
 
 type Props = {
   data: AtelierFassirData
   onReplay: () => void
+  variant?: MuscleVariant
 }
 
 type Phase = "A" | "B" | "C"
@@ -27,7 +34,8 @@ function Rouge({ spans }: { spans: Span[] }) {
   )
 }
 
-export function AtelierFassir({ data, onReplay }: Props) {
+export function AtelierFassir({ data, onReplay, variant = "orange" }: Props) {
+  const A = MUSCLE_ACCENTS[variant]
   const [phase, setPhase] = useState<Phase>("A")
   const [checks, setChecks] = useState<boolean[]>(() => data.cases.map(() => false))
   const [text, setText] = useState("")
@@ -61,7 +69,7 @@ export function AtelierFassir({ data, onReplay }: Props) {
   return (
     <div className="space-y-6">
       <header className="space-y-2" dir="rtl">
-        <h1 className="text-2xl font-black text-yellow-300">الورشة 02 · {data.verbe}</h1>
+        <h1 className={`text-2xl font-black ${A.textAccent}`}>الورشة 02 · {data.verbe}</h1>
         <p className="text-lg font-bold text-white/90">التعليمة: {data.consigne}</p>
       </header>
 
@@ -101,7 +109,7 @@ export function AtelierFassir({ data, onReplay }: Props) {
 
       {/* Phase A — les 6 mots du mur, ordre, clavier fermé */}
       {phase === "A" && (
-        <section className="rounded-3xl border border-yellow-400/25 bg-slate-panel/60 p-5 space-y-3">
+        <section className={`rounded-3xl border ${A.border} bg-slate-panel/60 p-5 space-y-3`}>
           <div className="flex items-center justify-between">
             <h2 className="font-black text-white" dir="rtl">
               المرحلة أ — كشّ على الستة بالترتيب
@@ -120,7 +128,7 @@ export function AtelierFassir({ data, onReplay }: Props) {
                 key={c.mot}
                 className={`flex items-start gap-3 rounded-2xl border p-3 transition ${
                   checks[i]
-                    ? "border-yellow-300/60 bg-yellow-300/10"
+                    ? A.caseActive
                     : enabled
                       ? "border-white/15 bg-slate-deep cursor-pointer"
                       : "border-white/5 bg-slate-deep/40 opacity-40"
@@ -129,13 +137,13 @@ export function AtelierFassir({ data, onReplay }: Props) {
               >
                 <input
                   type="checkbox"
-                  className="mt-1 h-5 w-5 accent-yellow-300"
+                  className={`mt-1 h-5 w-5 ${A.checkbox}`}
                   checked={checks[i]}
                   disabled={!enabled}
                   onChange={() => toggleCase(i)}
                 />
                 <span>
-                  <b className="text-yellow-300">{c.mot}</b>
+                  <b className={A.textAccent}>{c.mot}</b>
                   <span className="text-sm text-white/70"> — {c.desc}</span>
                 </span>
               </label>
@@ -143,7 +151,7 @@ export function AtelierFassir({ data, onReplay }: Props) {
           })}
           <button
             onClick={() => setPhase("B")}
-            className="min-h-14 w-full rounded-2xl bg-yellow-300 py-3 text-lg font-black text-slate-deep hover:bg-yellow-200"
+            className={`min-h-14 w-full rounded-2xl py-3 text-lg font-black ${A.btn} ${A.chipText}`}
             dir="rtl"
           >
             اكتب الآن
@@ -169,7 +177,7 @@ export function AtelierFassir({ data, onReplay }: Props) {
             value={text}
             onChange={(e) => setText(e.target.value)}
             placeholder="الذروة 4,8 في اليوم 3 لأن…"
-            className="w-full rounded-2xl border border-white/15 bg-slate-deep p-4 text-base leading-relaxed text-white outline-none focus:border-yellow-300"
+            className={`w-full rounded-2xl border border-white/15 bg-slate-deep p-4 text-base leading-relaxed text-white outline-none ${A.focus}`}
           />
           <p className="text-left text-xs text-white/30" dir="ltr">
             {live.wordCount} كلمة / {text.length} حرف
@@ -198,7 +206,7 @@ export function AtelierFassir({ data, onReplay }: Props) {
           )}
           <button
             onClick={submit}
-            className="min-h-14 w-full rounded-2xl bg-yellow-300 py-3 text-lg font-black text-slate-deep hover:bg-yellow-200"
+            className={`min-h-14 w-full rounded-2xl py-3 text-lg font-black ${A.btn} ${A.chipText}`}
             dir="rtl"
           >
             قارن مع النموذج
@@ -218,7 +226,7 @@ export function AtelierFassir({ data, onReplay }: Props) {
                 مهنة غالطة
               </span>
             ) : steps === 6 ? (
-              <span className="rounded-full border border-yellow-300/40 bg-yellow-300/15 px-3 py-1 text-sm font-black text-yellow-300" dir="rtl">
+              <span className={`rounded-full border px-3 py-1 text-sm font-black ${A.pastille}`} dir="rtl">
                 مهنة محترمة
               </span>
             ) : null}
@@ -301,7 +309,7 @@ export function AtelierFassir({ data, onReplay }: Props) {
 
           <button
             onClick={onReplay}
-            className="min-h-14 w-full rounded-2xl bg-yellow-300 py-3 text-lg font-black text-slate-deep hover:bg-yellow-200"
+            className={`min-h-14 w-full rounded-2xl py-3 text-lg font-black ${A.btn} ${A.chipText}`}
             dir="rtl"
           >
             {data.cta_fin}

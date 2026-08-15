@@ -39,6 +39,61 @@ export interface AtelierData {
   bandeau_indicatif: string
   voix_ghalta: string
   cta_fin: string
+  lien_j2?: { label: string; href: string }
+}
+
+// Palette des muscles : حلّل = أصفر (jaune), فسّر = برتقالي (orange).
+// Deux muscles, deux couleurs : l'élève sent le métier changer.
+export type MuscleVariant = "jaune" | "orange"
+
+export const MUSCLE_ACCENTS: Record<
+  MuscleVariant,
+  {
+    border: string
+    borderSoft: string
+    bgSoft: string
+    chipBg: string
+    chipText: string
+    textAccent: string
+    textSoft: string
+    btn: string
+    caseActive: string
+    checkbox: string
+    focus: string
+    pastille: string
+    borderActive: string
+  }
+> = {
+  jaune: {
+    border: "border-yellow-400/25",
+    borderSoft: "border-yellow-400/30",
+    bgSoft: "bg-yellow-400/5",
+    chipBg: "bg-yellow-300",
+    chipText: "text-slate-deep",
+    textAccent: "text-yellow-300",
+    textSoft: "text-yellow-200",
+    btn: "bg-yellow-300 hover:bg-yellow-200",
+    caseActive: "border-yellow-300/60 bg-yellow-300/10",
+    checkbox: "accent-yellow-300",
+    focus: "focus:border-yellow-300",
+    pastille: "border-yellow-300/40 bg-yellow-300/15 text-yellow-300",
+    borderActive: "border-yellow-300",
+  },
+  orange: {
+    border: "border-orange-400/25",
+    borderSoft: "border-orange-400/30",
+    bgSoft: "bg-orange-400/5",
+    chipBg: "bg-orange-400",
+    chipText: "text-slate-deep",
+    textAccent: "text-orange-300",
+    textSoft: "text-orange-200",
+    btn: "bg-orange-400 hover:bg-orange-300",
+    caseActive: "border-orange-300/60 bg-orange-300/10",
+    checkbox: "accent-orange-300",
+    focus: "focus:border-orange-300",
+    pastille: "border-orange-300/40 bg-orange-300/15 text-orange-300",
+    borderActive: "border-orange-300",
+  },
 }
 
 // Atelier 02 (فسّر) — détection inversée : لأن + chiffre OBLIGATOIRES,
