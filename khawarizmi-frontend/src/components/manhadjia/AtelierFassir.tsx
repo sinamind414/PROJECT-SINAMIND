@@ -1,29 +1,40 @@
 "use client"
 
 import { useMemo, useState } from "react"
-import {
-  countHits,
-  highlightSpans,
-  type AtelierData,
-} from "@/lib/manhadjia-lib"
+import { detectFassir, type AtelierFassirData, type Span } from "@/lib/manhadjia-lib"
 import { CourbeLTc } from "@/components/manhadjia/CourbeLTc"
 
 type Props = {
-  data: AtelierData
+  data: AtelierFassirData
   onReplay: () => void
 }
 
 type Phase = "A" | "B" | "C"
 
-export function AtelierHallil({ data, onReplay }: Props) {
+function Rouge({ spans }: { spans: Span[] }) {
+  return (
+    <>
+      {spans.map((s, i) =>
+        s.hit ? (
+          <mark key={i} className="rounded bg-red-400 px-0.5 text-black">
+            {s.plain}
+          </mark>
+        ) : (
+          <span key={i}>{s.plain}</span>
+        )
+      )}
+    </>
+  )
+}
+
+export function AtelierFassir({ data, onReplay }: Props) {
   const [phase, setPhase] = useState<Phase>("A")
   const [checks, setChecks] = useState<boolean[]>(() => data.cases.map(() => false))
   const [text, setText] = useState("")
-  const [submitted, setSubmitted] = useState<{ text: string; hits: number } | null>(null)
+  const [submitted, setSubmitted] = useState<{ text: string; crimes: string[]; missing: string[] } | null>(null)
   const [mirror, setMirror] = useState<number | null>(null)
 
-  const spans = useMemo(() => highlightSpans(text, data.interdits_regex), [text, data.interdits_regex])
-  const liveHits = countHits(spans)
+  const live = useMemo(() => detectFassir(text, data), [text, data])
   const steps = checks.filter(Boolean).length
 
   const toggleCase = (i: number) => {
@@ -35,33 +46,26 @@ export function AtelierHallil({ data, onReplay }: Props) {
   }
 
   const submit = () => {
-    const finalSpans = highlightSpans(text, data.interdits_regex)
-    setSubmitted({ text, hits: countHits(finalSpans) })
+    const d = detectFassir(text, data)
+    setSubmitted({ text, crimes: d.crimes, missing: d.missing })
     setPhase("C")
   }
 
-  const pastille = submitted ? (
-    submitted.hits > 0 ? (
-      <span className="rounded-full border border-red-400/40 bg-red-500/15 px-3 py-1 text-sm font-black text-red-300" dir="rtl">
-        مهنة غالطة
-      </span>
-    ) : steps === 6 ? (
-      <span className="rounded-full border border-yellow-300/40 bg-yellow-300/15 px-3 py-1 text-sm font-black text-yellow-300" dir="rtl">
-        مهنة محترمة
-      </span>
-    ) : null
-  ) : null
+  const finalDet = useMemo(
+    () => (submitted ? detectFassir(submitted.text, data) : null),
+    [submitted, data]
+  )
+
+  const ga3lat = finalDet ? finalDet.crimes.length > 0 || finalDet.missing.length > 0 : false
 
   return (
     <div className="space-y-6">
       <header className="space-y-2" dir="rtl">
-        <h1 className="text-2xl font-black text-yellow-300">
-          الورشة 01 · {data.verbe}
-        </h1>
+        <h1 className="text-2xl font-black text-yellow-300">الورشة 02 · {data.verbe}</h1>
         <p className="text-lg font-bold text-white/90">التعليمة: {data.consigne}</p>
       </header>
 
-      {/* Documents bruts */}
+      {/* Documents bruts — identiques à l'atelier 01 */}
       <section className="space-y-4" dir="rtl">
         <div className="rounded-2xl border border-white/10 bg-slate-panel/50 p-4">
           <p className="mb-2 text-xs text-white/40">جدول</p>
@@ -95,7 +99,7 @@ export function AtelierHallil({ data, onReplay }: Props) {
         />
       </section>
 
-      {/* Phase A — 6 cases, ordre, clavier fermé */}
+      {/* Phase A — les 6 mots du mur, ordre, clavier fermé */}
       {phase === "A" && (
         <section className="rounded-3xl border border-yellow-400/25 bg-slate-panel/60 p-5 space-y-3">
           <div className="flex items-center justify-between">
@@ -147,50 +151,50 @@ export function AtelierHallil({ data, onReplay }: Props) {
         </section>
       )}
 
-      {/* Phase B — 8–12 lignes max, surlignage local */}
+      {/* Phase B — 3–6 lignes, لأن + chiffre OBLIGATOIRES */}
       {phase === "B" && (
         <section className="rounded-3xl border border-yellow-400/25 bg-slate-panel/60 p-5 space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="font-black text-white" dir="rtl">
-              المرحلة ب — اكتب التحليل
+              المرحلة ب — اكتب التفسير
             </h2>
             <span className="text-xs text-white/40" dir="rtl">
-              8–12 أسطر على الأكثر
+              3–6 أسطر على الأكثر
             </span>
           </div>
           <textarea
             dir="rtl"
             lang="ar"
-            rows={9}
-            maxLength={400}
+            rows={7}
             value={text}
             onChange={(e) => setText(e.target.value)}
-            placeholder="تمثل الوثيقتان… نلاحظ أن…"
+            placeholder="الذروة 4,8 في اليوم 3 لأن…"
             className="w-full rounded-2xl border border-white/15 bg-slate-deep p-4 text-base leading-relaxed text-white outline-none focus:border-yellow-300"
           />
           <p className="text-left text-xs text-white/30" dir="ltr">
-            {text.length}/400
+            {live.wordCount} كلمة / {text.length} حرف
           </p>
-          {liveHits > 0 && (
-            <>
-              <div
-                className="rounded-2xl border border-yellow-300/30 bg-yellow-300/5 p-3 text-sm leading-relaxed text-white/85"
-                dir="rtl"
-              >
-                {spans.map((s, i) =>
-                  s.hit ? (
-                    <mark key={i} className="rounded bg-yellow-300 px-0.5 text-black">
-                      {s.plain}
-                    </mark>
-                  ) : (
-                    <span key={i}>{s.plain}</span>
-                  )
-                )}
+          {live.wordCount > data.max_mots && (
+            <p className="text-sm font-bold text-amber-200" dir="rtl">
+              {data.message_max_mots}
+            </p>
+          )}
+          {(live.crimes.length > 0 || live.missing.length > 0) && (
+            <div className="space-y-2">
+              <div className="rounded-2xl border border-red-400/30 bg-red-500/5 p-3 text-sm leading-relaxed text-white/85" dir="rtl">
+                <Rouge spans={live.displaySpans} />
               </div>
-              <p className="text-sm font-black text-red-300" dir="rtl">
-                {data.message_regex}
-              </p>
-            </>
+              {live.crimes.map((m, i) => (
+                <p key={`c${i}`} className="text-sm font-black text-red-300" dir="rtl">
+                  ⛔ {m}
+                </p>
+              ))}
+              {live.missing.map((m, i) => (
+                <p key={`m${i}`} className="text-sm font-black text-amber-300" dir="rtl">
+                  ⚠️ {m}
+                </p>
+              ))}
+            </div>
           )}
           <button
             onClick={submit}
@@ -203,22 +207,36 @@ export function AtelierHallil({ data, onReplay }: Props) {
       )}
 
       {/* Phase C — miroir + score indicatif (jamais /10) */}
-      {phase === "C" && submitted && (
+      {phase === "C" && finalDet && (
         <section className="space-y-4">
           <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-white/10 bg-slate-panel/60 p-4">
             <span className="font-black text-white" dir="rtl">
               خطوات {steps}/6
             </span>
-            {pastille}
+            {ga3lat ? (
+              <span className="rounded-full border border-red-400/40 bg-red-500/15 px-3 py-1 text-sm font-black text-red-300" dir="rtl">
+                مهنة غالطة
+              </span>
+            ) : steps === 6 ? (
+              <span className="rounded-full border border-yellow-300/40 bg-yellow-300/15 px-3 py-1 text-sm font-black text-yellow-300" dir="rtl">
+                مهنة محترمة
+              </span>
+            ) : null}
             <p className="w-full text-xs text-white/40" dir="rtl">
               {data.bandeau_indicatif}
             </p>
-            {submitted.hits > 0 && (
-              <p className="w-full text-sm font-bold text-red-200" dir="rtl">
-                {data.voix_ghalta}
-              </p>
-            )}
           </div>
+
+          {finalDet.crimes.map((m, i) => (
+            <p key={`fc${i}`} className="text-sm font-black text-red-300" dir="rtl">
+              ⛔ {m}
+            </p>
+          ))}
+          {finalDet.missing.map((m, i) => (
+            <p key={`fm${i}`} className="text-sm font-black text-amber-300" dir="rtl">
+              ⚠️ {m}
+            </p>
+          ))}
 
           <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
             <div className="rounded-2xl border border-white/10 bg-slate-panel/60 p-4">
@@ -226,15 +244,7 @@ export function AtelierHallil({ data, onReplay }: Props) {
                 النص ديالك
               </p>
               <p className="text-sm leading-relaxed text-white/85" dir="rtl">
-                {highlightSpans(submitted.text, data.interdits_regex).map((s, i) =>
-                  s.hit ? (
-                    <mark key={i} className="rounded bg-yellow-300 px-0.5 text-black">
-                      {s.plain}
-                    </mark>
-                  ) : (
-                    <span key={i}>{s.plain}</span>
-                  )
-                )}
+                <Rouge spans={finalDet.displaySpans} />
               </p>
             </div>
             <div className="rounded-2xl border border-mint/20 bg-mint/5 p-4">
@@ -267,6 +277,26 @@ export function AtelierHallil({ data, onReplay }: Props) {
                 </label>
               ))}
             </div>
+          </div>
+
+          <div className="rounded-2xl border border-mint/20 bg-mint/5 p-4 space-y-1" dir="rtl">
+            {data.voix.map((v, i) => (
+              <p key={i} className="text-sm font-bold text-mint-soft">
+                {v}
+              </p>
+            ))}
+          </div>
+
+          <p className="text-center text-sm font-black text-white/70" dir="rtl">
+            {data.phrase_x19}
+          </p>
+
+          <div className="rounded-2xl border border-white/5 bg-slate-deep/40 p-3 text-center">
+            {data.recap.map((r, i) => (
+              <p key={i} className="text-[11px] leading-relaxed text-white/35" dir="rtl">
+                {r}
+              </p>
+            ))}
           </div>
 
           <button

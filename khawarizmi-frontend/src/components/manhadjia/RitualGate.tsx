@@ -7,11 +7,12 @@ type Props = {
   data: AtelierData
   onComplete: () => void
   onBack?: () => void
+  acceptVerbe?: (s: string) => boolean
 }
 
 const TIMES = ["0–3 ث", "3–6 ث", "6–14 ث", "14–20 ث"]
 
-export function RitualGate({ data, onComplete, onBack }: Props) {
+export function RitualGate({ data, onComplete, onBack, acceptVerbe = isVerbeHallil }: Props) {
   // step 0 = verbe · 1 = pastilles · 2 = mots un par un · 3 = bandeau
   const [step, setStep] = useState(0)
   const [verbInput, setVerbInput] = useState("")
@@ -21,7 +22,7 @@ export function RitualGate({ data, onComplete, onBack }: Props) {
   const [understood, setUnderstood] = useState(false)
 
   const submitVerb = () => {
-    if (isVerbeHallil(verbInput)) {
+    if (acceptVerbe(verbInput)) {
       setVerbError(false)
       setStep(1)
     } else {

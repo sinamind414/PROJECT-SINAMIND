@@ -28,6 +28,7 @@ export interface AtelierData {
   }
   corrige_geste: string[]
   carte: {
+    duree: string
     profession: string
     interdits: string
     obligatoire: string
@@ -40,8 +41,40 @@ export interface AtelierData {
   cta_fin: string
 }
 
-// Verbes acceptés au rituel (liste fermée de la spec écran 0)
+// Atelier 02 (فسّر) — détection inversée : لأن + chiffre OBLIGATOIRES,
+// نلاحظ (ouverture) et نستنتج = crimes. Voir manhadjia_02_fassir_taam.json
+export interface AtelierFassirData extends AtelierData {
+  connector_pattern: string
+  chiffre_pattern: string
+  crimes: {
+    re_hallil_pattern: string
+    re_hallil_message: string
+    istintaj_pattern: string
+    istintaj_message: string
+  }
+  missing_messages: { lian: string; chiffre: string }
+  max_mots: number
+  message_max_mots: string
+  voix: string[]
+  phrase_x19: string
+  recap: string[]
+}
+
+// Verbes acceptés au rituel (listes fermées de la spec écran 0)
 const ACCEPTED_VERBES = new Set(["حلل", "تحليل", "analyser", "analysez", "analyse"])
+const ACCEPTED_VERBES_FASSIR = new Set([
+  "فسر",
+  "يفسر",
+  "interprète",
+  "interprétez",
+  "interpréter",
+  "interprete",
+  "interpretez",
+  "interpreter",
+  "explique",
+  "expliquez",
+  "expliquer",
+])
 
 function isDiacritic(c: string): boolean {
   const code = c.charCodeAt(0)
@@ -72,6 +105,12 @@ export function isVerbeHallil(input: string): boolean {
   return ACCEPTED_VERBES.has(text.toLowerCase())
 }
 
+/** Le verbe tapé au rituel est-il فسّر ? (fermé, sinon refus — R2 : حلل refusé) */
+export function isVerbeFassir(input: string): boolean {
+  const { text } = normalizeWithMap(input.trim())
+  return ACCEPTED_VERBES_FASSIR.has(text.toLowerCase())
+}
+
 export interface Span {
   plain: string
   hit: boolean
@@ -90,9 +129,10 @@ export function highlightSpans(original: string, pattern: string): Span[] {
       re.lastIndex++
       continue
     }
-    // Le motif « (^|[\s،.؛:])لان(?=…) » consomme la frontière qui précède :
-    // on ne surligne que « لان », pas l'espace ou la ponctuation.
-    const lead = /^[\s،.؛:]$/.test(m[0][0]) ? 1 : 0
+    // Les motifs « (^|[\s،.؛:])… » consomment la frontière qui précède :
+    // on ne surligne que le mot, pas les espaces/ponctuations qui l'entourent.
+    let lead = 0
+    while (lead < m[0].length && /^[\s،.؛:]$/.test(m[0][lead])) lead++
     const startNorm = m.index + lead
     const endNorm = m.index + m[0].length
     const startOrig = map[startNorm] ?? 0
@@ -108,4 +148,36 @@ export function highlightSpans(original: string, pattern: string): Span[] {
 
 export function countHits(spans: Span[]): number {
   return spans.filter((s) => s.hit).length
+}
+
+// ── Atelier 02 (فسّر) ────────────────────────────────────────────────
+// Détection locale inversée vs J1 : لأن + chiffre = OBLIGATOIRES (leur
+// absence = métier à côté) ; نلاحظ (ouverture) et نستنتج = crimes (rouge).
+
+export interface FassirDetection {
+  displaySpans: Span[]
+  crimeSpans: Span[]
+  crimes: string[]
+  missing: string[]
+  wordCount: number
+}
+
+export function detectFassir(original: string, data: AtelierFassirData): FassirDetection {
+  const { text } = normalizeWithMap(original)
+
+  // Pattern combiné : segmentation complète du texte (hits = crimes)
+  const combined = `${data.crimes.re_hallil_pattern}|${data.crimes.istintaj_pattern}`
+  const displaySpans = highlightSpans(original, combined)
+  const crimeSpans = displaySpans.filter((s) => s.hit)
+
+  const crimes: string[] = []
+  if (new RegExp(data.crimes.re_hallil_pattern, "g").test(text)) crimes.push(data.crimes.re_hallil_message)
+  if (new RegExp(data.crimes.istintaj_pattern, "g").test(text)) crimes.push(data.crimes.istintaj_message)
+
+  const missing: string[] = []
+  if (!new RegExp(data.connector_pattern, "g").test(text)) missing.push(data.missing_messages.lian)
+  if (!new RegExp(data.chiffre_pattern, "g").test(text)) missing.push(data.missing_messages.chiffre)
+
+  const wordCount = text.trim() ? text.trim().split(/\s+/).length : 0
+  return { displaySpans, crimeSpans, crimes, missing, wordCount }
 }

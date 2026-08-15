@@ -56,7 +56,7 @@ export function CarteHallil({ data, onTrainer, onBack }: Props) {
           className="min-h-14 flex-1 rounded-2xl bg-yellow-300 py-3 text-lg font-black text-slate-deep hover:bg-yellow-200"
           dir="rtl"
         >
-          تمرن 12 د
+          {`تمرن ${data.carte.duree}`}
         </button>
         <button
           onClick={onBack}
