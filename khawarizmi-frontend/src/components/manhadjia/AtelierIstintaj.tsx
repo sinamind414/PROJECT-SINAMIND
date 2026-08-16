@@ -69,7 +69,8 @@ export function AtelierIstintaj({ data, onReplay, variant = "vert" }: Props) {
   return (
     <div className="space-y-6">
       <header className="space-y-2" dir="rtl">
-        <h1 className={`text-2xl font-black ${A.textAccent}`}>الورشة 03 · {data.verbe}</h1>
+        <h1 className={`text-2xl font-black ${A.textAccent}`}>{data.verbe}</h1>
+        <p className="text-sm text-white/50">الخطوة 3: الاستنتاج</p>
         <p className="text-lg font-bold text-white/90">التعليمة: {data.consigne}</p>
         <p className="text-sm text-white/50">{data.consigne_note}</p>
       </header>

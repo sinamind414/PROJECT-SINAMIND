@@ -26,6 +26,7 @@ import {
   Home,
   Clock,
   FileText,
+  Target,
 } from "lucide-react"
 
 type MenuItem = { href: string; icon: LucideIcon; labelAr: string; labelFr: string }
@@ -61,6 +62,7 @@ export const MENU_PHASES: Phase[] = [
   {
     label: "المنهجية",
     items: [
+      { href: "/manhadjia", icon: Target, labelAr: "الوضعية الإدماجية", labelFr: "Situation d'intégration" },
       { href: "/methodology", icon: ListChecks, labelAr: "منهجية البكالوريا", labelFr: "Méthode BAC" },
       { href: "/action-verbs", icon: Zap, labelAr: "أفعال الأداء", labelFr: "Verbes" },
       { href: "/document-analysis", icon: Search, labelAr: "استغلال الوثائق", labelFr: "Documents" },

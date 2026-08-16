@@ -70,7 +70,8 @@ export function AtelierFassir({ data, onReplay, variant = "orange" }: Props) {
   return (
     <div className="space-y-6">
       <header className="space-y-2" dir="rtl">
-        <h1 className={`text-2xl font-black ${A.textAccent}`}>الورشة 02 · {data.verbe}</h1>
+        <h1 className={`text-2xl font-black ${A.textAccent}`}>{data.verbe}</h1>
+        <p className="text-sm text-white/50">الخطوة 2: التفسير</p>
         <p className="text-lg font-bold text-white/90">التعليمة: {data.consigne}</p>
       </header>
 

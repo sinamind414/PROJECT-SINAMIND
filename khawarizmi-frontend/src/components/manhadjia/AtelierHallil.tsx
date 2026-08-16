@@ -57,8 +57,9 @@ export function AtelierHallil({ data, onReplay }: Props) {
     <div className="space-y-6">
       <header className="space-y-2" dir="rtl">
         <h1 className="text-2xl font-black text-yellow-300">
-          الورشة 01 · {data.verbe}
+          {data.verbe}
         </h1>
+        <p className="text-sm text-white/50">الخطوة 1: التحليل</p>
         <p className="text-lg font-bold text-white/90">التعليمة: {data.consigne}</p>
       </header>
 
