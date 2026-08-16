@@ -15,13 +15,16 @@ Le 6ᵉ texte a raison sur ses deux griefs centraux : « 5/5 exact » était un 
 
 ## 1. État consolidé — ce qui est ÉTABLI, recatégorisé (6 git + 1 pièce + 2 conditionnels)
 
-**6 constats git (vérifiés dans les fichiers)** :
+**7 constats git (vérifiés dans les fichiers)** :
 1. **0 porte** vers la file (0 lien) ; la file elle-même ne nomme **ni وضعية, ni نص علمي, ni مخطط** (0 occurrence ; seul فرضية apparaît, en voix de clôture J3).
 2. ***باك*** = 23 items : **19 résumés PDF eddirasa + 3 fragments + 1 recueil 2019** — 0 épreuve ONEC, 0 corrigé, 0 سلم ; **23/23 titres en latin** (français) contre une copie 2025 **arabe**.
 3. **n/6 file = checklist auto-cochée + regex de forme** ; le sens et le سلم ne sont pas évalués.
 4. **Domaine 2 = 10 chapitres / 46 = 22 %** (D1 = 22 dont les 2 de `lecon_transcription` ∈ المجال الأول — phase-only D1 = 20 ; D2 = 10 ; D3 = 14), le plus maigre — et c'est celui que la pièce 2025 charge dans ses deux sujets.
 5. **`students-at-risk` = prénoms + notes lisibles par tout JWT** (0 contrôle de rôle) ; `ingest-rag` protégé par secret.
-6. **24 verbes UI / 10 évalués** ; seed 5 = données mortes (2 scripts) ; **les 5 sims utilisent des canvas/SVG réels** (greppé : composants ActionPotential, Enzyme, Mitosis, Photosynthesis) — l'interactivité fine reste à vivre, pas à grepper.
+6. **24 verbes UI / 10 évalués** ; seed 5 = données mortes (2 scripts).
+7. **حلّل ABSENT des 10 verbes runtime** (table §2 ci-dessous — plus une citation : le constat est levé en git établi).
+8. **Les 5 sims = SVG réels, aucun canvas** ; geste élève : ActionPotential = **règle** (slider) · Enzyme = **règle + points enregistrés → courbe** · Mitosis = **regarde** (2 boutons) · Photosynthesis = **règle** (sliders) ; **aucune ne fait tracer** un schéma libre → la production d'un مخطط reste non couverte.
+9. **Langue des annales : titres FR (23/23) mais corps AR (26/27 exercices)** — le scénario doux : métadonnées en latin, contenu en arabe → P2 de propreté, **pas** P0 d'offre.
 
 **1 constat pièce ONEC (pas le repo)** :
 7. **Durée 2025 = 4 h 30** (cartouche) ; 3 h 30 et 4 h écartés comme dogmes ; coeff 6 ; 2 sujets ; 5+7+8.
