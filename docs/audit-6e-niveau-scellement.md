@@ -66,8 +66,11 @@ Le 6ᵉ texte a raison sur ses deux griefs centraux : « 5/5 exact » était un 
 
 **Les 3 phrases de clôture (10ᵉ texte, appliquées — fin de la chaîne d'actes)** :
 1. *27/27 = corps des exercices comptés (dont méthodo `ex_methodologie_1`) ; le « 26/27 » était un label de champ, pas une consigne. Titres باك 23/23 FR = UX de liste (l'élève ne reconnaît pas الموضوع/الدورة dans un libellé latin), pas un P0 filière. Langue des 46 leçons : encore git.*
-2. *Les 5 composants anglais ≠ liste arabe antérieure (كمون العمل / ExAO / رسم / Hill / tectonics). Mapping fait : ActionPotential = كمون العمل ✓ · Tectonics = tectonics ✓ · **ExAO = introuvable** (Enzyme n'en a pas) · **Hill = introuvable** (Photosynthesis = sliders génériques, aucun protocole Hill) · **رسم = introuvable** (le « لرسم المنحنى » d'Enzyme = enregistrer des points, pas un outil de tracé ; aucun composant de dessin libre nulle part) · **Mitosis (2AS) n'était pas dans la liste** — apparu. Trois noms de l'ancienne liste sont évaporés ou étaient des étiquettes optimistes.*
+2. *Les 5 composants anglais ≠ liste arabe antérieure (كمون العمل / ExAO / رسم / Hill / tectonics). Mapping fait : ActionPotential = كمون العمل ✓ · Tectonics = tectonics ✓ · **ExAO = introuvable** (Enzyme n'en a pas) · **Hill = introuvable** (Photosynthesis = sliders génériques, aucun protocole Hill) · **رسم = introuvable** (le « لرسم المنحنى » d'Enzyme = enregistrer des points, pas un outil de tracé ; aucun composant nommé de dessin libre dans les modules inspectés — périmètre borné : les 5 `.tsx` de simulation + grep composants méthodo, pas une affirmation front entier) · **Mitosis (2AS) n'était pas dans la liste** — apparu. Trois noms de l'ancienne liste sont évaporés ou étaient des étiquettes optimistes.*
 3. *« Lesquels on ne fait pas gagner » = les **gestes** du tableau ci-dessus (حلّل الشكل 7 pts · نص علمي 5 pts · فرضيتين 8 pts · مخطط · copie+سلم · فسر/استنتج non branchés), **pas** les 20 points un à un.*
+
+
+> *Hill / ExAO / dessin libre : introuvables dans les 5 modules (et, pour le dessin, aucun composant nommé). Photosynthesis ≠ Hill. Enzyme (points → courbe) ≠ ExAO ≠ مخطط. Mitosis = ajout 2AS.*
 
 **Plus d'acte d'audit tant que le porteur n'a pas répondu au JWT. Tout le reste est du backlog nommé.**
 
