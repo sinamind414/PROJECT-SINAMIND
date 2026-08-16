@@ -22,10 +22,14 @@ const FICHES = fichesData as FicheResume[]
 /**
  * خلاصة الدرس — fiche-résumé générée depuis les leçons existantes
  * (scripts/gen-fiches-resume.mjs). Zéro contenu inventé.
+ * Props : fileKey (pages leçons) OU ficheIds (pages chapitres, mapping
+ * validé dans data/chapitres-fiches-map.json).
  */
-export default function FicheResume({ fileKey }: { fileKey: string }) {
+export default function FicheResume({ fileKey, ficheIds }: { fileKey?: string; ficheIds?: string[] }) {
   const [open, setOpen] = useState(true)
-  const fiches = FICHES.filter((f) => f.fileKey === fileKey)
+  const fiches = ficheIds
+    ? ficheIds.map((id) => FICHES.find((f) => f.id === id)).filter(Boolean) as FicheResume[]
+    : FICHES.filter((f) => f.fileKey === fileKey)
   if (fiches.length === 0) return null
 
   return (

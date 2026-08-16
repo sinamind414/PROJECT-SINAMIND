@@ -14,6 +14,8 @@ import { CommonMistakesPanel } from "@/components/lessons/CommonMistakesPanel"
 import { BacLinkPanel } from "@/components/lessons/BacLinkPanel"
 import { MethodologyLinkPanel } from "@/components/lessons/MethodologyLinkPanel"
 import { VideosWidget } from "@/components/videos/VideosWidget"
+import FicheResume from "@/components/lessons/FicheResume"
+import chapitresFichesMap from "../../../../../../data/chapitres-fiches-map.json"
 import {
   getDomainBySlug,
   getUnitBySlug,
@@ -186,6 +188,7 @@ export default function ChapitrePage() {
   const chapter = getChapterBySlug(chapitreSlug)
   const lesson = getLessonForChapter(chapitreSlug)
   const nav = getChapterNavigation(chapitreSlug)
+  const fichesDuChapitre = chapitresFichesMap.find((m) => m.chapterSlug === chapitreSlug)
 
   if (!domain || !unit || !chapter) {
     return (
@@ -224,6 +227,7 @@ export default function ChapitrePage() {
               <div className="grid grid-cols-1 lg:grid-cols-[1fr_220px] gap-6">
                 <div className="space-y-6 min-w-0">
                   <ActiveLessonHero lesson={lesson} />
+                  {fichesDuChapitre && <FicheResume ficheIds={fichesDuChapitre.ficheIds} />}
                   <ConceptCards concepts={lesson.keyConcepts} />
                   <LessonBlocks blocks={lesson.lessonBlocks} />
                   <QuickChecks checks={lesson.quickChecks} />
