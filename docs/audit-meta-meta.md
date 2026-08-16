@@ -106,6 +106,7 @@ Réponse au grief légitime (« soit une grille, soit ne plus le citer ») :
 |---|---|---|
 | **P0** | `/admin/analytics/students-at-risk` : prénoms + notes lisibles par tout élève connecté (JWT sans rôle) | SQL vérifié |
 | **P0** | Double source de progression affichée : dashboard (localStorage) vs progress (FSRS serveur) | code vérifié |
+| **P0 produit** | Rubrique *باك* : 23 items dont **19 résumés PDF eddirasa** + 3 fragments de sujets, **0 épreuve ONEC complète, 0 corrigé, 0 سلم** (titres listés en annexe du 4ᵉ niveau) | matrice calculée |
 | **P1** | Annales : 23 sujets, **0 corrigé / 0 barème** | matrice calculée |
 | **P1** | Verbes : affichage ~28 vs API 10 | runtime vérifié |
 | **P1** | File sans porte d'entrée (0 lien) + وضعية sans surface nommée | grep vérifié |
@@ -146,4 +147,4 @@ Réponse au grief légitime (« soit une grille, soit ne plus le citer ») :
 | Ma méta | (b) existe, 6 tickets tranchés | vrai mais incomplet : file et grading sont **séparés** |
 | 3ᵉ niveau | le câblage file→grading est vide ; le 65 est un gel | **vrai sur le câblage** (et c'est un choix, pas une panne) ; faux sur le « non corrigé » |
 
-**Réponse à la question produit, enfin mesurable** : l'élève de 3AS est **corrigé sur le geste** (grilles n/6 locales, 0 LLM) ; il n'a **ni porte pour y entrer, ni corrigés d'annales, ni surface وضعية** — les trois manques les plus proches du barème. Voilà exactement ce qu'un prochain sprint honnête corrigerait, dans cet ordre : porte (1 ligne, à décider) → annales avec corrigé (chantier contenu) → وضعية nommée (entrée existante, pas un 4ᵉ écran) → IAM admin (bloquant cohorte).
+**Réponse à la question produit, enfin mesurable** : l'élève qui **trouve** les 3 écrans (aujourd'hui : personne via la nav — 0 lien) obtient une **checklist n/6 auto-cochée** (les 6 cases sont cochées par l'élève lui-même) **+ une détection de forme par regex** (crimes/mots interdits) ; **le sens scientifique et le سلم ne sont pas évalués** ; le moteur lourd (`grading/`) corrige ailleurs (3 pages monolithe). Il n'a **ni porte pour y entrer, ni corrigés d'annales, ni surface وضعية** — et la rubrique *باك* contient des **résumés**, pas des épreuves. Voilà exactement ce qu'un prochain sprint honnête corrigerait, dans cet ordre : **IAM admin d'abord si un JWT d'élève réel existe** → porte + nom وضعية **fusionnés en une seule entrée** (libellée « الوضعية الإدماجية », pas un 4ᵉ écran de concept) → annales **labelées honnêtement** (sujets sans corrigé ≠ banque) puis enrichies de copies complètes avec سلم.
