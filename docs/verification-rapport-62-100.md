@@ -10,6 +10,12 @@
 ## 0. La clé de réconciliation — le rapport n'a pas audité le même arbre
 
 - Le rapport déclare avoir analysé **`commit d6591c1`** — vérifié : **absent de notre checkout** ; c'était le tip d'une session antérieure (`arena/019fd78d`, cf. `SYNTHESE-GLOBALE.md`).
+
+**Preuve complète (13ᵉ texte, demande #3) — plus une déduction, une vérification GitHub :**
+- `d6591c1c` **existe** sur GitHub, daté **2026-08-08**, message « docs(deploy): checklist opérationnelle de déploiement progressif » (session `arena/019fd78d`, tip `0bd9d44b`).
+- **`GET contents/khawarizmi-frontend/src/app/manhadjia?ref=d6591c1` → 404** : la file n'existait pas dans l'arbre audité.
+- Nos écrans `/manhadjia` datent du **2026-08-15/16** (`0ea928d` → `6204d8b`).
+→ Le rapport a audité l'état du 8 août ; la file est née une semaine après. Le décalage est un **fait GitHub**, plus une déduction.
 - Notre base `a5b51b8` (main) est le **snapshot de cette époque** : le monolithe complet (routes `manhadjiya.py`, `methodology/`, `grading/`, 200 endpoints) existait — mais **pas** les 3 écrans `/manhadjia` (construits dans nos commits `0ea928d` → `6204d8b`), ni `ateliers/`, ni `docs/audit-*.md`.
 - **Conséquence** : le 12ᵉ texte se demandait pourquoi le rapport ne voyait pas « file hors nav, 0 fetch, ✗ sur ses verbes » — parce que **la file n'existait pas encore dans l'arbre audité**. Les deux audits ne se contredisent pas sur la file : ils n'ont pas vu le même état du repo. Son « Manhadjiya = point fort original » vise les **routes backend** de l'époque, que notre chaîne a ensuite trouvées non branchées sur les écrans — deux vérités successives, pas une contradiction frontale.
 
@@ -28,6 +34,12 @@
 | κ savoir = 0.449 · MAE L2 = 0.27 · golden 125 items | **Tracés dans le repo** : `SYNTHESE-GLOBALE.md:15-16`, `reponse-audit-architecture.md:205-225` ; `tests/golden/golden_annotated.json` = **125 items**, daté 2026-08-07 ✅ |
 | 945 tests · ruff 0 · cache single-flight 96,7 % | cohérents avec `SYNTHESE-GLOBALE.md` ✅ |
 | Le normalisateur mappe `sciences naturelles`/`snv` → `Sciences Experimentales` | `routes/programme.py:32-35` ✅ (confirmé — c'était le fait neuf du tour précédent) |
+
+**Comportement runtime du mapping (13ᵉ texte, demande #1) — tranché par 3 lignes de code :**
+1. `api-client.ts:273` : le **frontend lui-même** met `filiere: rawUser.filiere || "Sciences Naturelles"` — « Sciences Naturelles » est le **défaut du profil utilisateur**.
+2. `api-client.ts:461` : **deuxième** conflation côté front — `includes("naturelles") ? "Sciences Experimentales"`.
+3. `programme.py:32` : **troisième**, côté backend.
+→ Le rapport n'a pas halluciné une trace « SN » : **le code contient bien la chaîne**, comme défaut de profil. Le mapping est donc une **correction du défaut du produit lui-même** (conflation matière↔filière en 3 endroits). Verdict affiné : aujourd'hui **cosmétique** (une seule filière SE en base, 0 mauvais programme servi) **+ libellé de profil faux pour un Algérien** (شعبة = علوم تجريبية, « Sciences Naturelles » = matière) **+ latent** si une autre voie entre. **P1 confirmé — avec preuve, plus par déduction.**
 | Cours ~10 000 lignes markdown généré (nom « claude_opus ») | `data/courses/programme_national_svt_claude_opus.md` ✅ |
 | Aucune trace de validation par inspecteur/agrégé | ✅ rien trouvé non plus de notre côté |
 
@@ -80,4 +92,9 @@ Le rapport confirme **« aucune URL de production identifiée »** (vercel.json 
 > **2.** IAM (rôle sur `students-at-risk`) **avant** le premier élève — condition non négociable de tout déploiement ;
 > **3.** corriger `programme.py:32` (conflation matière↔filière) ou documenter le périmètre SE-seul.
 
-Zéro LLM. Zéro 4ᵉ écran. Zéro scan ONEC dans le git.
+**Impact sur les notes du rapport (13ᵉ texte, demande #2) — flagué, pas recalculé** :
+- **Axe 1 (70/100)** reposait sur un domaine 3 mal nommé (« Génétique et immunologie ») et une conformité non validée → la note **circule avec une prémisse corrigée** ; je ne la recalcule pas (aucune grille de substitution autorisée ici), je la **flag**.
+- **Axe 4 (60/100)** reposait sur « annales ne couvrent pas 2020-2025 » (nature fausse : eddirasa, 0 corrigé, 0 سلم) + « 4 exercices » (faux : 3) → **même statut : note orpheline de ses prémisses**.
+- Je n'invente pas de nouveaux nombres : les deux notes restent **« non réexaminées »**, à reprendre si le rapport est réédité.
+
+**Zéro LLM. Zéro 4ᵉ écran. Zéro scan ONEC dans le git.**
