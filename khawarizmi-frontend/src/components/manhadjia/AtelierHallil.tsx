@@ -278,15 +278,15 @@ export function AtelierHallil({ data, onReplay }: Props) {
             {data.cta_fin}
           </button>
 
-          {/* Un seul lien, en bas du miroir, après envoi : bootcamp J1→J2 */}
-          {data.lien_j2 && (
+          {/* Un seul lien, en bas du miroir, après envoi : bootcamp J→J+1 */}
+          {data.lien_suivant && (
             <div className="pt-1 text-center">
               <Link
-                href={data.lien_j2.href}
+                href={data.lien_suivant.href}
                 className="inline-block min-h-12 px-4 py-3 text-sm font-black text-yellow-200 underline underline-offset-4 hover:text-yellow-300"
                 dir="rtl"
               >
-                {data.lien_j2.label}
+                {data.lien_suivant.label}
               </Link>
             </div>
           )}

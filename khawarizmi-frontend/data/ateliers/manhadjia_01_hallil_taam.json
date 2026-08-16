@@ -68,5 +68,5 @@
   "bandeau_indicatif": "إرشادية — القرار للأساتذة ولديوان الامتحانات",
   "voix_ghalta": "ماكاش فشل. درت مهنة وحدة أخرى. رجّع، نفس الوثيقة، بلا لأن.",
   "cta_fin": "خلصنا حلّل.",
-  "lien_j2": { "label": "غدوة: فسّر — نفس الوثيقة", "href": "/manhadjia/fassir" }
+  "lien_suivant": { "label": "غدوة: فسّر — نفس الوثيقة", "href": "/manhadjia/fassir" }
 }

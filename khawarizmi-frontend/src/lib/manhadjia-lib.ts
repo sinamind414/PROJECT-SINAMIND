@@ -39,7 +39,8 @@ export interface AtelierData {
   bandeau_indicatif: string
   voix_ghalta: string
   cta_fin: string
-  lien_j2?: { label: string; href: string }
+  // Un seul lien possible, en bas du miroir après envoi (bootcamp J→J+1)
+  lien_suivant?: { label: string; href: string }
 }
 
 // Palette des muscles : حلّل = أصفر (jaune), فسّر = برتقالي (orange),
