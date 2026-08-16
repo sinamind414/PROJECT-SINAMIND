@@ -1,8 +1,9 @@
-# Acte 6 — Scellement : table des 10 collée, file greppée, grain expliqué, question fermée au porteur
+# Acte 6 — Arrêté d'instruction : table des 10 dans le corps, file greppée, grain expliqué, question fermée au porteur
 
 > **Date** : 2026-08-16 · **Branche** : `arena/01a0066d-project-sinamind`
-> **Objet** : le 6ᵉ texte (audit de mon acte 5). Vérifications repo faites, 5 substitutions appliquées, annexe A ajoutée à l'acte 5.
-> **Ce document** : la fin de la boucle d'audits. Il ne contient **aucune nouvelle affirmation** — il liste ce qui est établi, ce qui ne l'est pas, et la seule question qui reste au porteur.
+> **Objet** : le 6ᵉ texte (audit de mon acte 5). Vérifications repo faites, 5 substitutions appliquées, table des 10 collée **dans ce corps** (pas en annexe).
+> **Ce document** : fin de la controverse d'architecture — **pas** fin de l'audit (3 inspections courtes faites ici ; le git reste ouvert sur ce qui n'a pas été lu).
+
 
 ---
 
@@ -12,35 +13,66 @@ Le 6ᵉ texte a raison sur ses deux griefs centraux : « 5/5 exact » était un 
 
 ---
 
-## 1. État consolidé — ce qui est ÉTABLI (tout vérifié sur repo, actes 1–6)
+## 1. État consolidé — ce qui est ÉTABLI, recatégorisé (6 git + 1 pièce + 2 conditionnels)
 
-1. **0 porte** vers la file (0 lien nulle part) ; la file elle-même ne nomme **ni وضعية, ni نص علمي, ni مخطط** (0 occurrence ; seul فرضية apparaît, en voix de clôture J3).
-2. **حلّل absent des 10 verbes runtime** (table collée en A.1) ; le barème `/20` de la base verbes n'est exposé nulle part (le monolithe L2, lui, affiche score/score_max sur `action-verbs/[slug]`).
-3. ***باك*** = 23 items : **19 résumés PDF eddirasa + 3 fragments de sujets + 1 recueil 2019** — 0 épreuve ONEC, 0 corrigé, 0 سلم.
-4. **n/6 file = checklist auto-cochée + regex de forme** ; le sens scientifique et le سلم ne sont pas évalués — la phrase « corrigé sur le geste » est rayée de la chaîne.
-5. **Domaine 2 = 10 chapitres / 46 = 22 %** (D1=22, D2=10, D3=14), le plus maigre — et c'est celui que la pièce 2025 charge dans ses deux sujets.
-6. **`students-at-risk` = prénoms + notes lisibles par tout JWT** (0 contrôle de rôle) ; `ingest-rag` protégé par secret.
-7. **Durée 2025 = 4 h 30** (cartouche ONEC) ; 3 h 30 et 4 h écartés comme dogmes ; coeff 6 ; 2 sujets ; 5+7+8.
-8. **Double progression** : dashboard (localStorage) vs progress (FSRS serveur).
-9. **24 verbes UI / 10 évalués** ; seed 5 = données mortes (2 scripts).
+**6 constats git (vérifiés dans les fichiers)** :
+1. **0 porte** vers la file (0 lien) ; la file elle-même ne nomme **ni وضعية, ni نص علمي, ni مخطط** (0 occurrence ; seul فرضية apparaît, en voix de clôture J3).
+2. ***باك*** = 23 items : **19 résumés PDF eddirasa + 3 fragments + 1 recueil 2019** — 0 épreuve ONEC, 0 corrigé, 0 سلم ; **23/23 titres en latin** (français) contre une copie 2025 **arabe**.
+3. **n/6 file = checklist auto-cochée + regex de forme** ; le sens et le سلم ne sont pas évalués.
+4. **Domaine 2 = 10 chapitres / 46 = 22 %** (D1 = 22 dont les 2 de `lecon_transcription` ∈ المجال الأول — phase-only D1 = 20 ; D2 = 10 ; D3 = 14), le plus maigre — et c'est celui que la pièce 2025 charge dans ses deux sujets.
+5. **`students-at-risk` = prénoms + notes lisibles par tout JWT** (0 contrôle de rôle) ; `ingest-rag` protégé par secret.
+6. **24 verbes UI / 10 évalués** ; seed 5 = données mortes (2 scripts) ; **les 5 sims utilisent des canvas/SVG réels** (greppé : composants ActionPotential, Enzyme, Mitosis, Photosynthesis) — l'interactivité fine reste à vivre, pas à grepper.
 
----
+**1 constat pièce ONEC (pas le repo)** :
+7. **Durée 2025 = 4 h 30** (cartouche) ; 3 h 30 et 4 h écartés comme dogmes ; coeff 6 ; 2 sujets ; 5+7+8.
 
-## 2. Ce qui N'EST PAS établi (et où ça se décide)
-
-| Inconnu | Pourquoi le repo ne peut pas le trancher | Qui le tranche |
-|---|---|---|
-| **Un JWT d'élève existe-t-il en prod / préprod partagée ?** | hors repo (déploiement) | **le porteur — question fermée ci-dessous** |
-| Droits des 19 PDF eddirasa | hors repo (juridique) | porteur |
-| Langue des contenus vs copie arabe 2025 | mesurable, non mesuré (chantier) | audit v2 si mot |
-| رسم = production graphique réelle | mesurable (composants), non mesuré | audit v2 si mot |
-| Interactivité réelle des 5 sims | mesurable, non mesuré | audit v2 si mot |
-| Exemple chiffré de divergence dashboard vs FSRS | nécessite données de runtime | porteur / prod |
-| Liste admin au-delà de `students-at-risk` | mesurable : 3 analytics + 1 ingest connus — reste le périmètre complet | audit v2 si mot |
+**2 constats conditionnels (pas encore mesurés à l'instant) ** :
+8. **حلّل absent des 10 verbes runtime** — sous condition de la table ci-dessous (§2, collée).
+9. **Double progression** (dashboard localStorage vs progress FSRS serveur) — architecture vérifiée, **divergence chiffrée jamais exemplifiée** ; P0 d'architecture, pas constat mesuré.
 
 ---
 
-## 3. Les 5 substitutions demandées — appliquées sur l'acte 5
+## 2. La table des 10 — collée ici, croisée appelants × file
+
+`methodology/verb_database.json` v2.0 (« Livre Manhajiya Bac SVT Algérie ») :
+
+| # | Verbe (AR / FR) | max_score | evaluator.py | task_classifier.py | mindmap_methodology | **file (3 écrans)** |
+|---|---|---|---|---|---|---|
+| 1 | وضّح في نص علمي / Expliquer dans un texte scientifique | 20 | ✓ | | ✓ | **✗** |
+| 2 | صف / Décrire · Caractériser | 10 | ✓ | ✓ | | ✗ |
+| 3 | عرف / Définir | 10 | ✓ | ✓ | | ✗ |
+| 4 | أثبت / Prouver · Démontrer | 15 | ✓ | ✓ | | ✗ |
+| 5 | برّر / Justifier | 15 | ✓ | ✓ | | ✗ |
+| 6 | استنتج / Conclure · Déduire | 10 | ✓ | ✓ | | **✗ (le J3 file n'appelle pas cette base)** |
+| 7 | فسر / Expliquer · Interpréter | 15 | ✓ | ✓ | | ✗ |
+| 8 | اقترح فرضية / Proposer une hypothèse | 10 | ✓ | ✓ | | ✗ |
+| 9 | ناقش / Discuter | 15 | ✓ | ✓ | | ✗ |
+| 10 | أنجز رسما تخطيطيا / Réaliser un schéma | 10 | ✓ | ✓ | | ✗ |
+
+**حلّل : ABSENT de la table** (aucune ligne, aucun alias — vérifié sur la liste entière, plus une simple hypothèse grep).
+**La file ne charge `verb_database` par aucun des 4 appelants connus** (`methodology/__init__.py` export, `evaluator.py`, `task_classifier.py`, `mindmap_methodology_service.py`).
+
+→ **Le P0 pédagogique « حلّل hors runtime » est désormais opposable hors équipe : la table est dans cette page.**
+
+**Échelles de score — réponse à « score_max vaut 20, 6, 100 ? »** :
+- file : pastille + `خطوات n/6` (auto-cochée) ;
+- monolithe L2 (`action-verbs/[slug]`) : `score/score_max` affiché — **score_max = somme des points des règles enrichies front** (`enrichedScoringRules.reduce(points)`), **pas** le `max_score` /20 de la base verbes ; échelle variable par verbe ;
+- `verb_database.max_score` /20 : **donnée morte côté UI** (0 affichage).
+
+---
+
+## 3. Ce qui reste hors repo — et ce qui n'y était pas
+
+**Vraiment hors repo** : droits des 19 PDF eddirasa (juridique) · **un JWT d'élève réel existe-t-il en prod ?** (ops/secret).
+
+**Dans le repo, maintenant inspecté court** (ce n'est plus « intranchable ») :
+- **Langue** : 23/23 titres d'annales en latin vs copie 2025 arabe — écart mesuré ; profondeur (corps des leçons bilingues) non chiffrée.
+- **Dessin réel** : les 5 sims ont canvas/SVG (greppé) ; la **production** graphique par l'élève (upload/dessin) n'a pas été vérifiée — à vivre, pas à grepper.
+- **`lecon_transcription`** : ∈ المجال الأول (breadcrumb vérifié) — D1 = 20 phase + 2 = 22 ; le 22/10/14 est juste tel quel.
+
+---
+
+## 4. Les 5 substitutions demandées — appliquées sur l'acte 5
 
 1. ✅ « Tout … exact (5 vérifications) » → « cinq grep vont dans le même sens ; la durée vient de la pièce, pas du repo ; la table des 10 n'est pas dans cette page ».
 2. ✅ « exactement la zone du sujet » → « sous-poids face à un exercice énergie dans les deux sujets 2025. 44 puis 46 expliqué. D1/D3 publiés ».
@@ -50,7 +82,7 @@ Le 6ᵉ texte a raison sur ses deux griefs centraux : « 5/5 exact » était un 
 
 ---
 
-## 4. La question fermée — et rien d'autre
+## 5. La question fermée — et rien d'autre
 
 Le 6ᵉ texte a raison : le prochain mot utile n'est pas un 7ᵉ md. C'est :
 
