@@ -23,8 +23,8 @@ Le 6ᵉ texte a raison sur ses deux griefs centraux : « 5/5 exact » était un 
 5. **`students-at-risk` = prénoms + notes lisibles par tout JWT** (0 contrôle de rôle) ; `ingest-rag` protégé par secret.
 6. **24 verbes UI / 10 évalués** ; seed 5 = données mortes (2 scripts).
 7. **حلّل ABSENT des 10 verbes runtime** (table §2 ci-dessous — plus une citation : le constat est levé en git établi).
-8. **Les 5 sims = SVG réels, aucun canvas** ; geste élève : ActionPotential = **règle** (slider) · Enzyme = **règle + points enregistrés → courbe** · Mitosis = **regarde** (2 boutons) · Photosynthesis = **règle** (sliders) ; **aucune ne fait tracer** un schéma libre → la production d'un مخطط reste non couverte.
-9. **Langue des annales : titres FR (23/23) mais corps AR (26/27 exercices)** — le scénario doux : métadonnées en latin, contenu en arabe → P2 de propreté, **pas** P0 d'offre.
+8. **Les 5 sims = SVG réels, aucun canvas, 5/5 existent** (TectonicsSimulation.tsx compris — ma « 4 lignes » en décrivait 4 par omission d'inspection, corrigé ici) ; geste élève : ActionPotential = **règle** · Enzyme = **règle + points → courbe** · Photosynthesis = **règle** · Mitosis = **regarde + QCM** · Tectonics = **regarde + QCM** ; **aucune ne fait tracer** un schéma libre → production d'un مخطط non couverte ; **Mitosis (phases détaillées) = programme 2AS, hors tronc 3AS** → question catalogue.
+9. **Langue des annales : titres FR (23/23) mais corps AR (27/27)** — le « 27ᵉ non-AR » identifié : `ex_methodologie_1` (« Règle Méthodologique » = libellé de champ FR, **corps arabe**). P0 filière écarté, P2 métadonnées confirmé ; **langue des 46 leçons encore ouverte**.
 
 **1 constat pièce ONEC (pas le repo)** :
 7. **Durée 2025 = 4 h 30** (cartouche) ; 3 h 30 et 4 h écartés comme dogmes ; coeff 6 ; 2 sujets ; 5+7+8.
@@ -57,6 +57,13 @@ Le 6ᵉ texte a raison sur ses deux griefs centraux : « 5/5 exact » était un 
 
 → **Le P0 pédagogique « حلّل hors runtime » est désormais opposable hors équipe : la table est dans cette page.**
 
+**Lecture métier de la table (ajout du 9ᵉ texte, appliqué)** :
+1. **File ✗ y compris sur فسر، استنتج، وضّح في نص علمي، اقترح فرضية، أنجز رسما** — les gestes qu'elle nomme. L'inversion n'est plus une hypothèse : c'est une grille.
+2. **وضّح في نص علمي (20) ≠ اشرح في نص علمي du cartouche** — objet enterré au plafond du barème interne, pas absent.
+3. **اقترح فرضية ≠ فرضيتين** — le sujet 2025 ex. 3 exige deux hypothèses ; un verbe au singulier n'entraîne pas ce barème.
+4. **5 sims / 5 existent, 0 trace** ; Mitosis = phases détaillées = 2AS (hors tronc 3AS).
+5. **27/27 corps AR** (le 27ᵉ = libellé de champ FR, corps AR) — pas un P0 filière ; langue des 46 leçons encore git.
+
 **Échelles de score — réponse à « score_max vaut 20, 6, 100 ? »** :
 - file : pastille + `خطوات n/6` (auto-cochée) ;
 - monolithe L2 (`action-verbs/[slug]`) : `score/score_max` affiché — **score_max = somme des points des règles enrichies front** (`enrichedScoringRules.reduce(points)`), **pas** le `max_score` /20 de la base verbes ; échelle variable par verbe ;
@@ -80,7 +87,7 @@ Le 6ᵉ texte a raison sur ses deux griefs centraux : « 5/5 exact » était un 
 1. ✅ « Tout … exact (5 vérifications) » → « cinq grep vont dans le même sens ; la durée vient de la pièce, pas du repo ; la table des 10 n'est pas dans cette page ».
 2. ✅ « exactement la zone du sujet » → « sous-poids face à un exercice énergie dans les deux sujets 2025. 44 puis 46 expliqué. D1/D3 publiés ».
 3. ✅ Grep de la file pour les mêmes trois noms — résultat publié (0/3).
-4. ✅ Les 10 verbes collés (annexe A.1).
+4. ✅ Les 10 verbes collés — désormais dans le corps de CE document (§2), plus en annexe.
 5. ✅ « Le travail n'a pas commencé » conservé ; « définitif » réservé à la seule phrase tenable : *l'offre actuelle ne peut pas être dite préparatoire à cette copie.*
 
 ---
@@ -92,5 +99,7 @@ Le 6ᵉ texte a raison : le prochain mot utile n'est pas un 7ᵉ md. C'est :
 > **« Un JWT d'élève réel existe-t-il en production ou en préproduction partagée ? »**
 > — **Oui** → premier travail : `students-at-risk` (rôle), avant tout `href`.
 > — **Non** → premier travail : porte + entrée **الوضعية الإدماجية** (avec النص العلمي et المخطط comme noms d'ateliers sur des écrans existants), puis IAM avant le premier élève.
+
+**Statut précis (formule du 9ᵉ texte, appliquée)** : le dossier d'architecture et de lexique runtime est **complet dans le canal** (table, langue des corps 27/27 AR, gestes des 5 sims, L2 ≠ /20). Restent **hors dossier** : JWT prod · droits eddirasa · langue des 46 leçons · exemple chiffré de la double progression. « Dossier complet » tout court : retiré.
 
 Toujours : zéro LLM, zéro 4ᵉ écran de concept, zéro scan ONEC dans le git sans filière juridique.
