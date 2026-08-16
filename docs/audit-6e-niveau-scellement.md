@@ -64,6 +64,13 @@ Le 6ᵉ texte a raison sur ses deux griefs centraux : « 5/5 exact » était un 
 4. **5 sims / 5 existent, 0 trace** ; Mitosis = phases détaillées = 2AS (hors tronc 3AS).
 5. **27/27 corps AR** (le 27ᵉ = libellé de champ FR, corps AR) — pas un P0 filière ; langue des 46 leçons encore git.
 
+**Les 3 phrases de clôture (10ᵉ texte, appliquées — fin de la chaîne d'actes)** :
+1. *27/27 = corps des exercices comptés (dont méthodo `ex_methodologie_1`) ; le « 26/27 » était un label de champ, pas une consigne. Titres باك 23/23 FR = UX de liste (l'élève ne reconnaît pas الموضوع/الدورة dans un libellé latin), pas un P0 filière. Langue des 46 leçons : encore git.*
+2. *Les 5 composants anglais ≠ liste arabe antérieure (كمون العمل / ExAO / رسم / Hill / tectonics). Mapping fait : ActionPotential = كمون العمل ✓ · Tectonics = tectonics ✓ · **ExAO = introuvable** (Enzyme n'en a pas) · **Hill = introuvable** (Photosynthesis = sliders génériques, aucun protocole Hill) · **رسم = introuvable** (le « لرسم المنحنى » d'Enzyme = enregistrer des points, pas un outil de tracé ; aucun composant de dessin libre nulle part) · **Mitosis (2AS) n'était pas dans la liste** — apparu. Trois noms de l'ancienne liste sont évaporés ou étaient des étiquettes optimistes.*
+3. *« Lesquels on ne fait pas gagner » = les **gestes** du tableau ci-dessus (حلّل الشكل 7 pts · نص علمي 5 pts · فرضيتين 8 pts · مخطط · copie+سلم · فسر/استنتج non branchés), **pas** les 20 points un à un.*
+
+**Plus d'acte d'audit tant que le porteur n'a pas répondu au JWT. Tout le reste est du backlog nommé.**
+
 **Échelles de score — réponse à « score_max vaut 20, 6, 100 ? »** :
 - file : pastille + `خطوات n/6` (auto-cochée) ;
 - monolithe L2 (`action-verbs/[slug]`) : `score/score_max` affiché — **score_max = somme des points des règles enrichies front** (`enrichedScoringRules.reduce(points)`), **pas** le `max_score` /20 de la base verbes ; échelle variable par verbe ;
