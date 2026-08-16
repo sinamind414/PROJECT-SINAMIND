@@ -9,7 +9,7 @@
 
 ## 0. Verdict en une ligne
 
-La lecture expert est **la pièce qui manquait** : elle fournit la norme de comparaison (un vrai sujet + سلم) contre laquelle tout l'inventaire se relit. **Chaque affirmation vérifiable sur le repo est exacte.** La chaîne d'audits ne peut plus dire « la réponse est complète » — corrigé (elle dit désormais : *la référence de comparaison est complète, on ne l'a pas encore fait gagner*). La durée 2025 est actée : **4 h 30, ni 3 h 30, ni 4 h**.
+La lecture expert est **la pièce qui manquait** : elle fournit la norme de comparaison (un vrai sujet + سلم) contre laquelle tout l'inventaire se relit. **Les cinq grep publiés vont dans le même sens que la lecture** — mais la durée 2025 vient de la **pièce ONEC**, pas du repo (le cartouche n'y est pas), et la table des 10 verbes ne figure pas dans cette page (ajoutée en annexe A ci-dessous). La chaîne d'audits ne peut plus dire « la réponse est complète » — corrigé (elle dit désormais : *la référence de comparaison est complète, on ne l'a pas encore fait gagner*). La durée 2025 est actée : **4 h 30, ni 3 h 30, ni 4 h**.
 
 ---
 
@@ -20,7 +20,7 @@ La lecture expert est **la pièce qui manquait** : elle fournit la norme de comp
 | نص علمي / وضعية / مخطط **innommés en surface** | grep dans `Sidebar.tsx` + `methodology` + `action-verbs` + `document-analysis` : **0 occurrence** | ✅ exact |
 | Barème `/20` (max_score) **jamais exposé** | grep `max_score` dans tout le front : **0 affichage** | ✅ exact |
 | حلّل **hors des 10 verbes runtime** | `verb_database.json` : 10 verbes listés, **حلّل absent** | ✅ exact (vérifié à l'acte 4) |
-| Domaine 2 sous-doté → « 5/23 fichiers → ?/44 » | calcul exact : **5 fichiers = chapitres 21–30 = 10 chapitres / 46 = 22 %** — et c'est exactement la zone du sujet 2025 (photosynthèse ex.2 + glycolyse) | ✅ chiffré : **10/46** |
+| Domaine 2 sous-doté → « 5/23 fichiers → ?/44 » | calcul exact : **5 fichiers = chapitres 21–30 = 10 chapitres / 46 = 22 %** — **sous-poids** face à un exercice énergie dans les deux sujets 2025 (photosynthèse ex.2 + glycolyse) | ✅ chiffré : **10/46** — et **22 % en fichiers comme en chapitres** (5/23 = 21,7 %) : le changement de grain ne sauve pas le domaine 2 |
 | *باك* = 19 résumés eddirasa + 3 fragments, 0 épreuve ONEC | 23 titres listés (acte 4) | ✅ exact |
 | « Les 5 sims ne sont pas dans le texte que j'audite » | `audit-meta-meta.md` §2.5 (le texte audité par le 4ᵉ) **contient** les noms : كمون العمل · ExAO · رسم · Hill · tectonics | ⚠️ exact seulement si le 4ᵉ texte a lu un état antérieur du fichier ; dans le fichier committé, les noms y sont — point clos, sans importance |
 | Durée : ni 3 h 30 (Bac FR) ni 4 h (dogme) — 2025 = 4 h 30 | calendrier 2026 (08h30→13h00) + lecture du cartouche ONEC 2025 | ✅ acté : **4 h 30 pour 2025**, autres sessions = cartouche |
@@ -102,3 +102,44 @@ Cinq tours, une leçon stable : **chaque niveau a gagné en précision en vérif
 - les trois noms qui font les 13 points (نص علمي + وضعية + مخطط) n'existent **nulle part en surface**.
 
 Ce n'est plus une controverse. C'est un plan de travaux, chaque item nommé, chaque item avec sa preuve. Le premier mot qui lancera le sprint devra dire si un JWT d'élève réel existe — c'est lui qui décide si on commence par l'éthique ou par la porte.
+
+---
+
+## Annexe A — les trous repo comblés (demandés par le 6ᵉ texte, §6/§8)
+
+### A.1 Les 10 verbes runtime, collés
+
+`methodology/verb_database.json` v2.0 (« Livre Manhajiya Bac SVT Algérie ») :
+
+| # | AR | FR | max_score | type |
+|---|---|---|---|---|
+| 1 | وضّح في نص علمي | Expliquer dans un texte scientifique | 20 | complex |
+| 2 | صف | Décrire / Caractériser | 10 | simple |
+| 3 | عرف | Définir | 10 | simple |
+| 4 | أثبت | Prouver / Démontrer | 15 | complex |
+| 5 | برّر | Justifier | 15 | complex |
+| 6 | استنتج | Conclure / Déduire | 10 | simple |
+| 7 | فسر | Expliquer / Interpréter | 15 | complex |
+| 8 | اقترح فرضية | Proposer une hypothèse | 10 | complex |
+| 9 | ناقش | Discuter | 15 | complex |
+| 10 | أنجز رسما تخطيطيا | Réaliser un schéma | 10 | simple |
+
+**حلّل absent** — confirmé sur la table, plus une hypothèse grep.
+**Appelants runtime** : `methodology/__init__.py` (export), `methodology/evaluator.py`, `methodology/task_classifier.py`, `services/mindmap_methodology_service.py` — **la file ne les charge pas**.
+
+### A.2 Le 44 → 46 expliqué, D1/D3 publiés
+
+- **44** = les 22 fichiers `phase*_chapitres_*` (chapitres 1→44, 2 par fichier).
+- **46** = 44 + 2 attribués à `lecon_transcription` (leçon 3 de transcription, fichier autonome hors phases).
+- **Par domaine en chapitres : D1 = 22 · D2 = 10 · D3 = 14** (total 46). D2 = 22 %, **le plus maigre des trois** — et le seul domaine chargé par les deux sujets 2025.
+
+### A.3 Grep de la file elle-même (les 3 noms d'épreuve)
+
+`grep` dans `src/app/manhadjia/**`, `src/components/manhadjia/**`, `data/ateliers/*.json` :
+- **نص علمي : 0 · وضعية : 0 · مخطط : 0** — la file ne nomme pas non plus l'épreuve.
+- Seule occurrence : **فرضية**, dans la voix de clôture du J3 (« غدوة (اختياري): فرضية… »).
+→ Le trou de trouvabilité n'est pas un problème de sidebar : il est **aussi** dans la file.
+
+### A.4 Surfaces de score — nuancé
+
+`max_score` (verb_database) : **0 affichage**. MAIS le monolithe L2 affiche score/score_max/percentage sur `action-verbs/[slug]` (`result.score`, `result.score_max`). Donc : **des notes existent à l'écran** (L2, hors file) ; le **barème /20 de la base verbes** est le seul à n'être exposé nulle part.
