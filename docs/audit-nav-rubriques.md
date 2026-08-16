@@ -43,7 +43,7 @@ Sidebar (dir="rtl", donc à DROITE de l'écran)
     └── التقدم           /progress
 ```
 
-**Hors nav (présents en code, non liés)** — 14 routes orphelines :
+**Hors nav (présents en code, non liés)** — 13 répertoires (12 orphelins + `manhadjia`), soit **15 routes plates** :
 `bac-blanc` · `duel` · `exercices` (doublon FR de `exercises`) · `feynman` ·
 `leaderboard` · `map` · `pulse` · `scanner` · `shop` · `videos` ·
 `achievements` · `admin` · `manhadjia` + ses 2 sous-routes `fassir` / `istintaj`
