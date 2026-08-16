@@ -3,6 +3,7 @@
 import { useState, useRef, useLayoutEffect } from "react"
 import { getExperimentalLesson, ExperimentalLesson } from "@/lib/experimental-lessons-data"
 import LessonSlideContent from "./LessonSlideContent"
+import FicheResume from "./FicheResume"
 
 interface Props {
   slug: string
@@ -75,6 +76,8 @@ export default function ExperimentalLessonView({ slug }: Props) {
           </div>
         )}
       </div>
+
+      <FicheResume fileKey={slug} />
 
       <div className="relative">
         <div className="flex justify-between text-xs text-white/50 mb-2 px-1">
