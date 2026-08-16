@@ -39,7 +39,7 @@ Le repo ne contient aucune durée. Sources extérieures consultées :
 - **Coefficient** : SVT sciences exp = **6** [5](https://sujetbacdz.com/blog/mawad-wa-mouaamalat-chouab-bac)
 - **Deux sujets au choix** : confirmé par l'en-tête d'une épreuve 2021 (« على المترشح أن يختار أحد الموضوعين ») [1](https://www.scribd.com/document/607227754/)
 
-→ **Toute la chaîne s'est trompée** : 3 h 30 (2ᵉ texte) faux, 4 h (4ᵉ texte) faux. **4 h 30, coeff 6, 2 sujets.** La morale de la chaîne tient : sans source ONEC, on invente.
+→ **Toute la chaîne s'est trompée** : 3 h 30 (2ᵉ texte) faux, 4 h (4ᵉ texte) faux. **4 h 30, coeff 6, 2 sujets** — confirmé ensuite par la pièce ONEC 2025 (cartouche). **Règle durable** : *SNV علوم تجريبية, Bac 2025 (pièce ONEC) : 04 h 30, deux sujets, 5+7+8. Autres sessions : lire le cartouche. 3 h 30 écarté. 4 h = historique fréquent, pas 2025.* La morale de la chaîne tient : sans cartouche ONEC, on invente.
 
 ### 2.3 « ~28 devrait être un entier » — fait : **24 exactement**
 
@@ -154,7 +154,7 @@ La décomposition exacte de la « pastille » des 3 écrans :
 | Méta-méta | matrices file×grading, admin qualifié, 11/5/7 | « corrigé sur le geste » |
 | **4ᵉ texte** | **checklist ≠ correction**, annales = fausse banque, IAM d'abord | sims anonymes, 4 h |
 
-**La réponse à « l'élève gagne-t-il des points ? » est maintenant complète et vérifiée :**
+**Devant le سلم 2025 (pièce ONEC : 04 h 30, deux sujets, 5+7+8, نص علمي ×2, حلّل, مخطط, فرضيتان) :** l'élève plateforme n'entre pas dans la pièce, n'a pas cette copie, coche une checklist, et le verbe **حلّل** du premier document n'est pas dans le barème interne exposé. **On sait pourquoi on ne peut pas dire qu'il gagne des points. On ne l'a pas encore fait gagner.** La référence de comparaison est complète ; la réponse produit, elle, ne l'est pas — c'est une liste de travaux, pas un verdict.
 il ne peut **pas entrer** (0 porte) ; s'il entre par deep link, il remplit une **checklist de forme** (pas un سلم) ; la rubrique *باك* contient des **résumés sans corrigé** ; le seul barème réel (/20 par verbe, 10 verbes) **exclut حلّل** et n'est exposé sur **aucune page**. Ce n'est plus une controverse d'audit : c'est une liste de travaux, chacun nommé, chacun avec son ordre.
 
 **Ce que je retiens sans rien exécuter** : l'ordre honnête, si un mot est donné — (1) IAM `students-at-risk` si JWT élève réel, (2) une entrée nommée **الوضعية الإدماجية** qui mène à la file (en remplaçant une entrée méthodo existante, pas une 4ᵉ porte), (3) labeler *باك* « sujets partiels sans corrigé » avant toute promesse, (4) confronter les deux échelles (/20 et n/6) à un سلم officiel. Quatre travaux, zéro LLM, zéro écran de plus.
