@@ -1,0 +1,36 @@
+{
+  "_instructions": "يملأ هذا الملف بعد عودة وثيقة المراجعة من الأستاذ. corrections = تصحيح فقرة موجودة (حسب ficheId في fiches-resume.json). nouvelles_fiches = الفصول السبعة الناقصة. لا تلمس fiches-resume.json مباشرة — استعمل scripts/import-fiches-corrections.mjs.",
+  "corrections": [
+    {
+      "ficheId": "phase1_chapitres_1_2#1",
+      "champs": {
+        "objectif": "الهدف المصحح هنا",
+        "idees": ["فكرة 1 مصححة", "فكرة 2 مصححة", "فكرة 3 مصححة"],
+        "bac": ["تنبيه باك مصحح"],
+        "quiz": {
+          "question": "السؤال المصحح؟",
+          "bonneReponse": "الجواب الصحيح",
+          "pieges": ["خطأ شائع 1", "خطأ شائع 2"]
+        }
+      }
+    }
+  ],
+  "nouvelles_fiches": [
+    {
+      "chapitreSlug": "d1-u1-c1-composition-chimique-des-proteines",
+      "num": null,
+      "titre": "التركيب الكيميائي للبروتينات",
+      "breadcrumb": "المجال الأول : التخصص الوظيفي للبروتينات • الوحدة 1 : تركيب البروتين",
+      "achkalia": "الإشكالية هنا",
+      "objectif": "الهدف هنا",
+      "duree": "المدة التقديرية للتعلم الذاتي : 20 دقيقة",
+      "idees": ["فكرة 1", "فكرة 2", "فكرة 3"],
+      "bac": ["تنبيه باك"],
+      "quiz": {
+        "question": "سؤال اختبر نفسك؟",
+        "bonneReponse": "الجواب",
+        "pieges": ["لا تكتب هذا"]
+      }
+    }
+  ]
+}

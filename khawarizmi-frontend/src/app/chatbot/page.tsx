@@ -147,6 +147,20 @@ export default function ChatbotPage() {
               backHref="/dashboard"
             />
 
+            {process.env.NEXT_PUBLIC_ENABLE_EXTERNAL_LLM !== "1" && (
+              <div
+                className="rounded-2xl border border-amber-400/30 bg-amber-400/10 p-4 text-sm leading-relaxed"
+                dir="rtl"
+              >
+                <p className="font-black text-amber-300">⚠️ بكل صراحة</p>
+                <p className="text-white/85 mt-1">
+                  هذا المساعد يعمل الآن في وضع{" "}
+                  <b>الأجوبة المنهجية الجاهزة</b> — إجابات دقيقة مستندة إلى المنهاج،
+                  بدون انتظار ودون إرسال أي بيانات. إنها ليست محادثة ذكاء اصطناعي حرة.
+                </p>
+              </div>
+            )}
+
             {/* Messages */}
             <div ref={scrollRef} className="space-y-3 max-h-[60vh] overflow-y-auto" dir="rtl">
               {messages.map((msg) => (
