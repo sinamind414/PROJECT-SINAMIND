@@ -15,6 +15,7 @@ from uuid import NAMESPACE_URL, uuid5
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import text
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from database import get_db
@@ -199,9 +200,11 @@ async def get_programme(
     matiere = normalize_filiere(matiere)
     filiere = normalize_filiere(filiere)
 
-    # 1. Tentative DB
-    result = await db.execute(
-        text("""
+    # 1. Tentative DB — en preview SQLite le schema peut etre incomplet
+    # (colonnes/tables de prod absentes) ; on retombe alors sur le fallback JSON.
+    try:
+        result = await db.execute(
+            text("""
             SELECT
                 d.id as domain_id,
                 d.numero as domain_numero,
@@ -230,10 +233,17 @@ async def get_programme(
             )
             ORDER BY d.numero, u.numero, c.numero
         """),
-        {"matiere": matiere, "filiere": filiere},
-    )
-
-    rows = result.fetchall()
+            {"matiere": matiere, "filiere": filiere},
+        )
+        rows = result.fetchall()
+    except SQLAlchemyError as exc:
+        logger.warning(
+            "Programme DB indisponible pour matiere=%s filiere=%s (%s) -- JSON fallback",
+            matiere,
+            filiere,
+            exc.__class__.__name__,
+        )
+        rows = []
 
     if rows:
         return _restructure_db_rows(rows, matiere, filiere)
@@ -324,8 +334,9 @@ async def get_critical_chapters(
     matiere = normalize_filiere(matiere)
     filiere = normalize_filiere(filiere)
 
-    result = await db.execute(
-        text("""
+    try:
+        result = await db.execute(
+            text("""
             SELECT
                 c.id, c.numero, c.titre_fr, c.titre_ar,
                 c.page, c.type, c.importance,
@@ -343,9 +354,32 @@ async def get_critical_chapters(
             AND c.importance = 'critique'
             ORDER BY d.numero, u.numero, c.numero
         """),
-        {"matiere": matiere, "filiere": filiere},
-    )
-
-    chapters = [dict(r._mapping) for r in result.fetchall()]
+            {"matiere": matiere, "filiere": filiere},
+        )
+        chapters = [dict(r._mapping) for r in result.fetchall()]
+    except SQLAlchemyError as exc:
+        # Preview SQLite sans schema de prod : fallback embarqué (33 chapitres critiques)
+        logger.warning(
+            "Critical chapters DB indisponible (%s) -- fallback embarqué", exc.__class__.__name__
+        )
+        chapters = []
+        raw = _load_programme_fallback()
+        for d in raw.get("domains") or raw.get("domaines") or []:
+            for u in d.get("units") or d.get("unites") or []:
+                for c in u.get("chapters") or []:
+                    if c.get("importance") == "critique":
+                        chapters.append(
+                            {
+                                "id": str(c.get("id", c.get("numero", ""))),
+                                "numero": c.get("numero"),
+                                "titre_fr": c.get("titre_fr"),
+                                "titre_ar": c.get("titre_ar"),
+                                "page": c.get("page"),
+                                "type": c.get("type"),
+                                "importance": c.get("importance"),
+                                "unit_titre": u.get("titre_fr"),
+                                "domain_titre": d.get("titre_fr"),
+                            }
+                        )
 
     return {"matiere": matiere, "filiere": filiere, "critical_chapters": chapters, "total": len(chapters)}
