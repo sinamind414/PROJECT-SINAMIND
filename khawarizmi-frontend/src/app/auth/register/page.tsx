@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
@@ -13,7 +13,7 @@ export default function RegisterPage() {
   const [nom, setNom] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
-  const [filiere, setFiliere] = useState<Filiere>("Sciences Naturelles")
+  const [filiere, setFiliere] = useState<Filiere>("Sciences Expérimentales")
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
 

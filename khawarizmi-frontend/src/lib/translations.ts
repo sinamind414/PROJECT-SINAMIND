@@ -120,12 +120,10 @@ export const UI_AR: Record<string, string> = {
 }
 
 export const filieres: Record<string, string> = {
-  "Sciences Naturelles": "علوم تجريبية",
   "Sciences Expérimentales": "علوم تجريبية",
   "Mathématiques": "رياضيات",
-  "Lettres et Philosophie": "آداب وفلسفة",
-  "Sciences Sociales": "علوم اجتماعية",
   "Gestion et Économie": "تسيير واقتصاد",
+  "Lettres et Philosophie": "آداب وفلسفة",
   "Langues Étrangères": "لغات أجنبية",
 }
 

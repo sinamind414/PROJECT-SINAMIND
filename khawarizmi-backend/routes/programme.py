@@ -33,13 +33,31 @@ _FILIERE_ALIASES: dict[str, str] = {
     "sciences experimentales": "Sciences Experimentales",
     "se": "Sciences Experimentales",
     "snv": "Sciences Experimentales",
+    # Défaut historique du schéma d'inscription (schemas/user.py avant 2026-08-17)
+    # et libellé de profil legacy — matière vs filière : la base ne contient
+    # qu'une seule filière (SE), tout est ramené à son orthographe.
+    "sciences": "Sciences Experimentales",
 }
 
 
 def normalize_filiere(filiere: str) -> str:
-    """Normalise la filiere pour matcher la DB."""
+    """Normalise la filiere pour matcher la DB.
+
+    - NFC + strip
+    - retrait des accents (NFD + suppression des marques combinées) :
+      « Sciences Expérimentales » (libellé du formulaire) et
+      « Sciences Experimentales » (orthographe de la base) convergent
+    - alias matière↔filière (snv, sciences naturelles, sciences…) : la
+      plateforme ne couvre que la filière SE, les libellés historiques y
+      sont ramenés — pas de programme erroné servi pour une autre voie.
+    """
     f = unicodedata.normalize("NFC", filiere).strip()
-    return _FILIERE_ALIASES.get(f.lower(), f)
+    # Clé de recherche sans accents (NFD + suppression des marques combinées) :
+    # « Expérimentales » et « Experimentales » se retrouvent ; l'original (f)
+    # est renvoyé tel quel quand aucun alias ne correspond.
+    clef = unicodedata.normalize("NFD", f)
+    clef = "".join(c for c in clef if not unicodedata.combining(c)).lower()
+    return _FILIERE_ALIASES.get(clef, f)
 
 
 def stable_id(*parts: object) -> str:

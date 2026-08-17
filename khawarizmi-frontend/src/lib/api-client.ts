@@ -270,7 +270,7 @@ class KhawarizmiApiClient {
       id: String(rawUser.id),
       email: rawUser.email,
       nom: rawUser.prenom || rawUser.nom || "",
-      filiere: rawUser.filiere || "Sciences Naturelles",
+      filiere: rawUser.filiere || "Sciences Expérimentales",
       plan: rawUser.plan || "free",
       is_active: true,
       created_at: ""
