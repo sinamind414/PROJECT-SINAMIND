@@ -5,15 +5,12 @@ from . import (
     action_verbs,
     admin_analytics,
     ai_chat,
-    ai_evaluate,
     annales,
     aujourdhui,
     auth,
     avatar,
     bac_blanc,
-    bac_blanc_intelligent,
     badges,
-    chapitres,
     chatbot,
     chatbot_engagement,
     cities,
@@ -33,11 +30,9 @@ from . import (
     lessons,
     lexique,
     manhadjiya,
-    memory,
     methodology,
     methodology_flashcards,
     mindmap,
-    mindmap_methodology,
     mystery_box,
     observability,
     onboarding,
@@ -49,11 +44,9 @@ from . import (
     phase6,
     programme,
     progress,
-    pulse,
     session,
     social,
     streaks,
-    tutor,
     videos,
 )
 
@@ -61,7 +54,6 @@ ALL_ROUTERS = [
     # ── Core ──
     health.router,
     auth.router,
-    chapitres.router,
     chatbot.router,
     cours.router,
     exercices.router,
@@ -90,15 +82,11 @@ ALL_ROUTERS = [
     chatbot_engagement.router,
     # ── AI Orchestrator ──
     ai_chat.router,
-    ai_evaluate.router,
     # ── Methodology Intelligence ──
     diagnostic.router,
     methodology.router,
     methodology_flashcards.router,
-    mindmap_methodology.router,
     # ── Tutor & Bac Blanc ──
-    tutor.router,
-    bac_blanc_intelligent.router,
     # ── Social Hub (Messenger + Blog + Fichiers) ──
     social.router,
     # ── Admin Analytics (Dashboard Professeur) ──
@@ -120,9 +108,6 @@ ALL_ROUTERS = [
     onboarding.router,
     # ── Manhadjiya (LOT8 — Base de connaissance scientifique) ──
     manhadjiya.router,
-    memory.router,
-    # ── PULSE Dashboard ──
-    pulse.router,
     # ── Aujourd'hui (accueil) · Leçons actives · Bac Blanc v1 (immersif) ──
     aujourdhui.router,
     lessons.router,
