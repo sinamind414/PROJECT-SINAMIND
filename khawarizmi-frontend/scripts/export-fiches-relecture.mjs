@@ -10,15 +10,10 @@ const root = path.resolve(__dirname, "..")
 const src = JSON.parse(fs.readFileSync(path.join(root, "data/fiches-resume.json"), "utf8"))
 const out = path.resolve(root, "..", "docs", "fiches-resume-relecture.md")
 
-const GAPS = [
-  "د1-و1-ف1 : التركيب الكيميائي للبروتينات (composition chimique)",
-  "د1-و3-ف4 : دور العوامل المساعدة للإنزيمات (cofacteurs)",
-  "د1-و4-ف3 : الذاكرة المناعية (mémoire immunitaire)",
-  "د1-و4-ف4 : اللقاحات والمصل (vaccins et sérum)",
-  "د1-و5-ف1 : بنية النسيج العصبي (structure du tissu nerveux)",
-  "د2-و1-ف4 : العوامل المؤثرة في التركيب الضوئي (facteurs)",
-  "د2-و3-ف2 : نقل الغازات في الدم (transport des gaz)",
-]
+const GAPS = []
+// Les 7 chapitres manquants ont été comblés le 2026-08-17 depuis les sources du repo :
+//   cours (programme_national_svt_claude_opus.md) et الكتاب_المصحح_v1.0.md —
+//   chaque idée porte sa ligne-source. À vérifier en PRIORITÉ par l'enseignant.
 
 const order = {
   transcription: 0,
@@ -43,13 +38,13 @@ L.push("")
 L.push(`## ⚠️ À savoir avant de relire`)
 L.push("")
 L.push(`- **45 fiches** : les 44 leçons du livre + la leçon de transcription.`)
-L.push(`- **7 chapitres de la plateforme n'ont PAS de fiche** (aucune source existante — à écrire par l'enseignant, voir liste ci-dessous).`)
+L.push(`- **Les 7 chapitres autrefois sans fiche ont été comblés** (2026-08-17) depuis les sources du repo (cours + livre corrigé) — à vérifier en PRIORITÉ par l'enseignant.`)
 L.push(`- **11 chapitres « تمرين شامل »** sont des exercices de synthèse : pas de fiche par nature.`)
 L.push(`- Les numéros des fiches sont ceux du **manuel** (livre de l'élève), pas ceux de la navigation de la plateforme.`)
 L.push("")
 L.push("---")
 L.push("")
-L.push("## 📋 Les 7 chapitres SANS fiche (à écrire, ~15 min chacun)")
+L.push("## 📋 Chapitres comblés depuis le cours / livre corrigé (à vérifier en priorité)")
 L.push("")
 L.push("| Chapitre | Contenu attendu |")
 L.push("|---|---|")
@@ -61,7 +56,7 @@ L.push("---")
 L.push("")
 
 for (const f of sorted) {
-  const n = f.num === "transcription" ? "النسخ (transcription)" : `الدرس ${f.num}`
+  const n = f.num === "transcription" ? "النسخ (transcription)" : f.num != null ? `الدرس ${f.num}` : f.titre
   L.push(`## ${n}`)
   L.push("")
   L.push(`**المسار :** ${f.breadcrumb}`)
