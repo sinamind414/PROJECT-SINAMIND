@@ -41,6 +41,16 @@ export interface AtelierData {
   cta_fin: string
   // Un seul lien possible, en bas du miroir après envoi (bootcamp J→J+1)
   lien_suivant?: { label: string; href: string }
+  // Référence officielle du verbe (verb_database.json) — fassir id 7, istintaj id 6.
+  // حلّل : pas d'id (octobre). Aucun /20 affiché (doctrine).
+  verb_ref?: {
+    id: number
+    arabic: string
+    french: string
+    definition: string
+    criteria: string[]
+    common_mistakes: string[]
+  }
 }
 
 // Palette des muscles : حلّل = أصفر (jaune), فسّر = برتقالي (orange),

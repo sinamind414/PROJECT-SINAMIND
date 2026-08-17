@@ -39,6 +39,45 @@ export function CarteHallil({ data, onTrainer, onBack, variant = "jaune" }: Prop
         <p className="text-sm font-bold text-mint-soft">واجب: {data.carte.obligatoire}</p>
       </div>
 
+      {/* Référence officielle du verbe (branchée : fassir id 7 · istintaj id 6) */}
+      {data.verb_ref && (
+        <div className="rounded-2xl border border-white/15 bg-slate-deep/60 p-4 space-y-3">
+          <div className="flex items-center justify-between">
+            <p className="text-xs font-black text-white/60" dir="rtl">
+              📖 المرجع الرسمي — فعل رقم {data.verb_ref.id}
+            </p>
+            <span className="text-[10px] text-white/40" dir="ltr">
+              {data.verb_ref.french}
+            </span>
+          </div>
+          <p className="text-sm leading-relaxed text-white/85" dir="rtl">
+            {data.verb_ref.definition}
+          </p>
+          <div dir="rtl">
+            <p className="text-xs font-black text-white/60 mb-1">معايير التصحيح :</p>
+            <ul className="space-y-1">
+              {data.verb_ref.criteria.map((c, i) => (
+                <li key={i} className="text-sm text-white/85 flex items-start gap-2">
+                  <span className="text-mint shrink-0 mt-0.5">✓</span>
+                  <span>{c}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div dir="rtl">
+            <p className="text-xs font-black text-white/60 mb-1">أخطاء شائعة :</p>
+            <ul className="space-y-1">
+              {data.verb_ref.common_mistakes.map((m, i) => (
+                <li key={i} className="text-sm text-white/70 flex items-start gap-2">
+                  <span className="text-red-300 shrink-0 mt-0.5">✗</span>
+                  <span>{m}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      )}
+
       <div className="rounded-2xl border border-white/10 bg-slate-panel/60 p-4" dir="rtl">
         <p className="text-xs text-white/40 mb-2">مثال (3 أسطر):</p>
         <ol className="space-y-2 list-decimal pr-5 text-sm leading-relaxed text-white/85">
