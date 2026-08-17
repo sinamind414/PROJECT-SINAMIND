@@ -116,6 +116,20 @@ function AnnalesContent() {
             }
           />
 
+          {/* Honnêteté : pas de sujets officiels ONEC avec سلم pour l'instant */}
+          <div
+            className="rounded-2xl border border-amber-400/30 bg-amber-400/10 p-4 text-sm leading-relaxed"
+            dir="rtl"
+          >
+            <p className="font-black text-amber-300">⚠️ بكل صراحة</p>
+            <p className="text-white/85 mt-1">
+              المواضيع الرسمية لديوان الامتحانات والمسابقات (مع سلم التنقيط والتصحيح النموذجي)
+              غير متوفرة بعد على المنصة. ما يعرض هنا{" "}
+              <b>نماذج تدريبية غير رسمية</b> للتدرّب على شكل الامتحان — لا تحسبها مواضيع
+              رسمية، ولا سلم تنقيط رسمي.
+            </p>
+          </div>
+
           {/* Level 1 — Entry Type */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {([
@@ -298,6 +312,9 @@ function SujetCard({ sujet }: { sujet: SujetBac }) {
             <h3 className="text-white font-bold text-base group-hover:text-mint-soft transition-colors">
               {sujet.annee} · {sujet.session === "normale" ? "دورة عادية" : "دورة استدراكية"}
             </h3>
+            <span className="inline-block mt-1.5 text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400/15 text-amber-300 border border-amber-400/30">
+              نموذج تدريبي — غير رسمي
+            </span>
           </div>
           <span
             className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${DIFFICULTE_COLORS[sujet.difficulte]}`}

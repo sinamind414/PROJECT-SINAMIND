@@ -37,7 +37,7 @@ const MAIN_NAV: MenuItem[] = [
   { href: "/dix-minutes", icon: Clock, labelAr: "10 دقائق", labelFr: "10 minutes" },
   { href: "/drill", icon: Repeat, labelAr: "نراجع", labelFr: "Réviser" },
   { href: "/exercises", icon: Dumbbell, labelAr: "نتدرب", labelFr: "Exercices" },
-  { href: "/annales", icon: BookMarked, labelAr: "باك", labelFr: "BAC blanc" },
+  { href: "/annales", icon: BookMarked, labelAr: "باك", labelFr: "BAC — Annales" },
   { href: "/chatbot", icon: Microscope, labelAr: "نسقسي", labelFr: "Question" },
   { href: "/dashboard", icon: LayoutDashboard, labelAr: "نظرة عامة", labelFr: "Vue globale" },
   { href: "/fiche-j1", icon: FileText, labelAr: "ورقة J-1", labelFr: "Fiche J-1" },
