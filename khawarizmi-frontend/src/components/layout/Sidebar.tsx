@@ -34,14 +34,10 @@ type Phase = { label: string; items: MenuItem[] }
 
 const MAIN_NAV: MenuItem[] = [
   { href: "/aujourdhui", icon: Home, labelAr: "اليوم", labelFr: "Aujourd'hui" },
-  { href: "/dix-minutes", icon: Clock, labelAr: "10 دقائق", labelFr: "10 minutes" },
+  { href: "/annales", icon: BookMarked, labelAr: "باك", labelFr: "BAC — Annales" },
   { href: "/drill", icon: Repeat, labelAr: "نراجع", labelFr: "Réviser" },
   { href: "/exercises", icon: Dumbbell, labelAr: "نتدرب", labelFr: "Exercices" },
-  { href: "/annales", icon: BookMarked, labelAr: "باك", labelFr: "BAC — Annales" },
   { href: "/chatbot", icon: Microscope, labelAr: "نسقسي", labelFr: "Question" },
-  { href: "/dashboard", icon: LayoutDashboard, labelAr: "نظرة عامة", labelFr: "Vue globale" },
-  { href: "/fiche-j1", icon: FileText, labelAr: "ورقة J-1", labelFr: "Fiche J-1" },
-  { href: "/lecons-sciences-experimentales", icon: FlaskConical, labelAr: "التجارب المقررة", labelFr: "Expériences" },
 ]
 
 export const MENU_PHASES: Phase[] = [
@@ -50,11 +46,13 @@ export const MENU_PHASES: Phase[] = [
     items: [
       { href: "/cours", icon: BookOpen, labelAr: "الدروس النشطة", labelFr: "Cours" },
       { href: "/mindmap", icon: Network, labelAr: "الخريطة الذهنية", labelFr: "Mind map" },
+      { href: "/lecons-sciences-experimentales", icon: FlaskConical, labelAr: "التجارب المقررة", labelFr: "Expériences" },
     ],
   },
   {
     label: "التدريب",
     items: [
+      { href: "/dix-minutes", icon: Clock, labelAr: "10 دقائق", labelFr: "10 minutes" },
       { href: "/simulation", icon: Microscope, labelAr: "محاكاة تفاعلية", labelFr: "Simulation" },
       { href: "/retry-errors", icon: AlertTriangle, labelAr: "إصلاح الأخطاء", labelFr: "Erreurs" },
     ],
@@ -72,12 +70,14 @@ export const MENU_PHASES: Phase[] = [
     label: "التقييم",
     items: [
       { href: "/diagnostic", icon: ListChecks, labelAr: "التشخيص", labelFr: "Diagnostic" },
+      { href: "/fiche-j1", icon: FileText, labelAr: "ورقة J-1", labelFr: "Fiche J-1" },
     ],
   },
   {
     label: "المتابعة",
     items: [
       { href: "/progress", icon: TrendingUp, labelAr: "التقدم", labelFr: "Progression" },
+      { href: "/dashboard", icon: LayoutDashboard, labelAr: "نظرة عامة", labelFr: "Vue globale" },
     ],
   },
 ]
