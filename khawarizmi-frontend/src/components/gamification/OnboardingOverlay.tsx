@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
+import apiClient from "@/lib/api-client"
 
 const STEPS = [
   {
@@ -33,8 +34,10 @@ export function OnboardingOverlay() {
       return
     }
 
-    fetch("/api/onboarding/me")
-      .then((r) => r.json())
+    // audit technique 2026-08-18 : apiClient (timeout/retry/refresh) au lieu de
+    // fetch natif ; skipAuthRedirect préserve le comportement invité d'origine.
+    apiClient
+      .request<{ completed?: boolean }>("/api/onboarding/me", { skipAuthRedirect: true })
       .then((data) => {
         if (!data.completed) setVisible(true)
       })
@@ -47,20 +50,24 @@ export function OnboardingOverlay() {
   const handleNext = async () => {
     if (step < 2) {
       setStep(step + 1)
-      fetch("/api/onboarding/step", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ step: step + 1 }),
-      }).catch(() => {})
+      apiClient
+        .request("/api/onboarding/step", {
+          method: "POST",
+          body: JSON.stringify({ step: step + 1 }),
+          skipAuthRedirect: true,
+        })
+        .catch(() => {})
     } else {
       // Complete
       localStorage.setItem("onboarding_completed", "true")
       setVisible(false)
-      fetch("/api/onboarding/step", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ step: 3 }),
-      }).catch(() => {})
+      apiClient
+        .request("/api/onboarding/step", {
+          method: "POST",
+          body: JSON.stringify({ step: 3 }),
+          skipAuthRedirect: true,
+        })
+        .catch(() => {})
     }
   }
 

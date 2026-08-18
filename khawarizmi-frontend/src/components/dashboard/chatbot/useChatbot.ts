@@ -159,6 +159,17 @@ export function useChatbot(): UseChatbotReturn {
   const historyRef = useRef<ChatHistoryMessage[]>([])
   const initSent = useRef(false)
   const messageIdRef = useRef(0)
+  // Refs « latest value » — audit technique 2026-08-18 : les callbacks lisaient
+  // input/loading/isTutorMode/messages en direct, recréés à chaque changement
+  // d'état (re-renders en cascade). Mises à jour à chaque rendu, comportement identique.
+  const inputRef = useRef(input)
+  const loadingRef = useRef(loading)
+  const tutorModeRef = useRef(isTutorMode)
+  const messagesRef = useRef(messages)
+  inputRef.current = input
+  loadingRef.current = loading
+  tutorModeRef.current = isTutorMode
+  messagesRef.current = messages
   const [chatbotState, setChatbotState] = useState<ChatbotEngagementState | null>(null)
 
   function nextMessageId() {
@@ -240,8 +251,8 @@ export function useChatbot(): UseChatbotReturn {
   }, [chatbotState, refreshChatbotState])
 
   const sendMessage = useCallback(async (text?: string) => {
-    const msg = (text ?? input).trim()
-    if (!msg || loading) return
+    const msg = (text ?? inputRef.current).trim()
+    if (!msg || loadingRef.current) return
     setInput("")
 
     const userDisplay: DisplayMessage = {
@@ -268,7 +279,7 @@ export function useChatbot(): UseChatbotReturn {
           chapitre: topic ?? undefined,
           history: newHistory.slice(-6),
         },
-        mode: isTutorMode ? "tutor" : "quick",
+        mode: tutorModeRef.current ? "tutor" : "quick",
       })
       addAssistantMessage(resp)
       historyRef.current = [
@@ -303,7 +314,7 @@ export function useChatbot(): UseChatbotReturn {
     } finally {
       setLoading(false)
     }
-  }, [input, loading, addAssistantMessage, isTutorMode])
+  }, [addAssistantMessage])
 
   const handleFeedback = useCallback(async (msgId: number, type: FeedbackType) => {
     setMessages((prev) =>
@@ -332,7 +343,7 @@ export function useChatbot(): UseChatbotReturn {
           page_source: typeof window !== "undefined" ? window.location.pathname : undefined,
           history: newHistory.slice(-6),
         },
-        mode: isTutorMode ? "tutor" : "quick",
+        mode: tutorModeRef.current ? "tutor" : "quick",
       })
       addAssistantMessage(resp)
       historyRef.current = [
@@ -350,10 +361,10 @@ export function useChatbot(): UseChatbotReturn {
     } finally {
       setLoading(false)
     }
-  }, [addAssistantMessage, isTutorMode])
+  }, [addAssistantMessage])
 
   const toggleTutorMode = useCallback(() => {
-    const newMode = !isTutorMode
+    const newMode = !tutorModeRef.current
     setIsTutorMode(newMode)
     addAssistantMessage({
       reponse: newMode
@@ -364,7 +375,7 @@ export function useChatbot(): UseChatbotReturn {
       flashcards_suggerees: [],
       fallback_active: false,
     })
-  }, [isTutorMode, addAssistantMessage])
+  }, [addAssistantMessage])
 
   const handleSuggestion = useCallback((text: string) => {
     setInput(text)
@@ -379,7 +390,7 @@ export function useChatbot(): UseChatbotReturn {
     setLoading(true)
     try {
       if (action === "confusion") {
-        const lastMsg = messages.filter(m => m.role === "assistant").pop()
+        const lastMsg = messagesRef.current.filter(m => m.role === "assistant").pop()
         const text = lastMsg?.content || "لم أفهم"
         const result = await apiClient.detectChatbotConfusion(text)
         addAssistantMessage({
@@ -429,7 +440,7 @@ export function useChatbot(): UseChatbotReturn {
     } finally {
       setLoading(false)
     }
-  }, [messages, addAssistantMessage])
+  }, [addAssistantMessage])
 
   useEffect(() => {
     if (scrollRef.current) {

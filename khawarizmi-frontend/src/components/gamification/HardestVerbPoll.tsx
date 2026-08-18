@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { ENRICHED_ACTION_VERBS } from "@/lib/methodology-v2"
+import apiClient from "@/lib/api-client"
 
 const VERBS = ENRICHED_ACTION_VERBS.map((v) => ({
   slug: v.slug,
@@ -22,10 +23,10 @@ export function HardestVerbPoll() {
     if (!selected) return
     localStorage.setItem("hardest_verb_poll_shown", "true")
     try {
-      await fetch("/api/action-verbs/feedback/hardest", {
+      await apiClient.request("/api/action-verbs/feedback/hardest", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ verb_slug: selected }),
+        skipAuthRedirect: true,
       })
     } catch { /* silent */ }
     setSubmitted(true)
