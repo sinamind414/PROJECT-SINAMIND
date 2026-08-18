@@ -56,7 +56,8 @@ async def test_evaluate_fsrs_persisted(client: AsyncClient):
             "tentative": 1,
         },
     )
-    assert response.status_code in (200, 401, 503, 422)
+    # GEL 2026-08-17 : ai_evaluate retiré du registre → 404 toléré (route gelée)
+    assert response.status_code in (200, 401, 503, 422, 404)
 
 
 @pytest.mark.asyncio

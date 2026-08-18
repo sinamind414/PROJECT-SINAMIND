@@ -36,9 +36,11 @@ FAKE_RESULT = {
 
 @pytest.mark.asyncio
 async def test_evaluate_requires_auth(client):
-    """Sans JWT → 401."""
+    """GEL 2026-08-17 : routes/ai_evaluate.py retiré du registre (audit endpoints
+    morts — 0 référence front ; l'évaluation vivante = /api/document-analysis/evaluate-v2).
+    Sans JWT → 404 (avant le gel : 401)."""
     resp = await client.post("/api/ai/evaluate", json=_eval_request())
-    assert resp.status_code == 401
+    assert resp.status_code == 404
 
 
 @pytest.mark.asyncio
@@ -55,21 +57,13 @@ async def test_evaluate_invalid_question_returns_404(client, auth_headers):
 
 @pytest.mark.asyncio
 async def test_evaluate_endpoint_responds(client, auth_headers):
-    """L'endpoint /api/ai/evaluate répond 200."""
-    with (
-        patch("services.ai_modes.evaluation_mode.get_question", return_value=FAKE_QUESTION),
-        patch("routes.evaluate.evaluate_with_fallback", return_value=FAKE_RESULT),
-        patch("services.ai_modes.evaluation_mode.get_concept_states", return_value={}),
-        patch("services.ai_modes.evaluation_mode.save_concept_updates", return_value="2026-07-01"),
-        patch("services.fsrs_graph.load_concept_graph", return_value={}),
-        patch("services.ai_modes.evaluation_mode.update_concept_graph", return_value=[]),
-    ):
-        resp = await client.post(
-            "/api/ai/evaluate",
-            json=_eval_request(),
-            headers=auth_headers,
-        )
-        assert resp.status_code == 200
+    """GEL 2026-08-17 : /api/ai/evaluate retiré du registre → 404 (avant : 200)."""
+    resp = await client.post(
+        "/api/ai/evaluate",
+        json=_eval_request(),
+        headers=auth_headers,
+    )
+    assert resp.status_code == 404
 
 
 @pytest.mark.asyncio
@@ -88,37 +82,21 @@ async def test_evaluate_returns_json_response(client, auth_headers):
 
 @pytest.mark.asyncio
 async def test_evaluate_accepts_arabic_language(client, auth_headers):
-    """Language 'ar' doit être accepté."""
-    with (
-        patch("services.ai_modes.evaluation_mode.get_question", return_value=FAKE_QUESTION),
-        patch("routes.evaluate.evaluate_with_fallback", return_value=FAKE_RESULT),
-        patch("services.ai_modes.evaluation_mode.get_concept_states", return_value={}),
-        patch("services.ai_modes.evaluation_mode.save_concept_updates", return_value="2026-07-01"),
-        patch("services.fsrs_graph.load_concept_graph", return_value={}),
-        patch("services.ai_modes.evaluation_mode.update_concept_graph", return_value=[]),
-    ):
-        resp = await client.post(
-            "/api/ai/evaluate",
-            json=_eval_request(lang="ar", answer="إجابة اختبار"),
-            headers=auth_headers,
-        )
-        assert resp.status_code == 200
+    """GEL 2026-08-17 : /api/ai/evaluate retiré du registre → 404 (avant : 200)."""
+    resp = await client.post(
+        "/api/ai/evaluate",
+        json=_eval_request(lang="ar", answer="إجابة اختبار"),
+        headers=auth_headers,
+    )
+    assert resp.status_code == 404
 
 
 @pytest.mark.asyncio
 async def test_evaluate_returns_response_with_arabic_text(client, auth_headers):
-    """Language 'ar' passe la validation (réponse 200)."""
-    with (
-        patch("services.ai_modes.evaluation_mode.get_question", return_value=FAKE_QUESTION),
-        patch("routes.evaluate.evaluate_with_fallback", return_value=FAKE_RESULT),
-        patch("services.ai_modes.evaluation_mode.get_concept_states", return_value={}),
-        patch("services.ai_modes.evaluation_mode.save_concept_updates", return_value="2026-07-01"),
-        patch("services.fsrs_graph.load_concept_graph", return_value={}),
-        patch("services.ai_modes.evaluation_mode.update_concept_graph", return_value=[]),
-    ):
-        resp = await client.post(
-            "/api/ai/evaluate",
-            json=_eval_request(lang="ar"),
-            headers=auth_headers,
-        )
-        assert resp.status_code == 200
+    """GEL 2026-08-17 : /api/ai/evaluate retiré du registre → 404 (avant : 200)."""
+    resp = await client.post(
+        "/api/ai/evaluate",
+        json=_eval_request(lang="ar"),
+        headers=auth_headers,
+    )
+    assert resp.status_code == 404
