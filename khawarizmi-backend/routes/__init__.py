@@ -129,10 +129,11 @@ FROZEN_ENDPOINTS: set[str] = {
     "/api/gems/leaderboard",
     "/api/leaderboard/refresh",
     "/api/onboarding/welcome-gems",
+    # "/api/social/upload",  # DÉGELÉ 2026-08-18 : sécurisé (whitelist + taille),
+    #                         # le gel était un pis-aller pour l'endpoint non validé.
     "/api/phase6/events",
     "/api/phase6/session/start",
     "/api/phase6/funnels",
-    "/api/social/upload",
     "/api/streaks/me/activity",
     "/api/streaks/me/freeze",
     "/api/flashcards/methodology/",

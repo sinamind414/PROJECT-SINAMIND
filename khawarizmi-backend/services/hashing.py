@@ -14,7 +14,14 @@ from config import get_settings
 
 def _pepper() -> bytes:
     cfg = get_settings()
-    key = cfg.SECRET_KEY or "dev-only-key"
+    key = cfg.SECRET_KEY
+    if not key:
+        # Pas de fallback silencieux : un pepper fixe et public rendrait le
+        # HMAC trivialement brute-forçable. Refuser explicitement.
+        raise ValueError(
+            "SECRET_KEY non défini — impossible de hacher les réponses élèves "
+            "sans pepper serveur."
+        )
     return key.encode("utf-8")
 
 

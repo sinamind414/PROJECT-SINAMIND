@@ -42,20 +42,32 @@ class CommentCreate(BaseModel):
     content: str
 
 
+ALLOWED_UPLOAD_EXTENSIONS = {"jpg", "jpeg", "png", "gif", "webp", "pdf", "txt", "md", "doc", "docx"}
+MAX_UPLOAD_BYTES = 10 * 1024 * 1024  # 10 Mo
+
+
 @router.post("/upload")
 async def upload_file(file: UploadFile = File(...), current_user: dict = Depends(get_current_user)):
-    ext = file.filename.split(".")[-1] if "." in file.filename else "bin"
+    # Audit technique 2026-08-18 : whitelist d'extensions + limite de taille.
+    ext = file.filename.split(".")[-1].lower() if "." in file.filename else ""
+    if ext not in ALLOWED_UPLOAD_EXTENSIONS:
+        raise HTTPException(status_code=400, detail=f"Type de fichier non autorisé (.{{{ext}}})")
+    data = await file.read(MAX_UPLOAD_BYTES + 1)
+    if len(data) > MAX_UPLOAD_BYTES:
+        raise HTTPException(status_code=400, detail="Fichier trop volumineux (10 Mo maximum)")
     filename = f"{uuid.uuid4()}.{ext}"
     filepath = os.path.join(UPLOAD_DIR, filename)
     with open(filepath, "wb") as buffer:
-        buffer.write(await file.read())
+        buffer.write(data)
     return {"file_url": f"/uploads/social/{filename}", "file_type": ext}
 
 
 @router.get("/users/search")
 async def search_users(q: str, current_user: dict = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
+    # Audit technique 2026-08-18 : ne pas exposer l'email (énumération de comptes).
+    # La recherche PAR email reste possible (WHERE), le champ n'est plus renvoyé.
     result = await db.execute(
-        text("SELECT id, nom, email FROM users WHERE (nom LIKE :q OR email LIKE :q) AND id != :uid LIMIT 10"),
+        text("SELECT id, prenom as nom FROM users WHERE (prenom LIKE :q OR email LIKE :q) AND id != :uid LIMIT 10"),
         {"q": f"%{q}%", "uid": current_user["id"]},
     )
     return [dict(r._mapping) for r in result.fetchall()]
@@ -123,7 +135,7 @@ async def get_msgs(cid: int, current_user: dict = Depends(get_current_user), db:
     res = await db.execute(
         text(
             """
-            SELECT m.*, u.nom as sender_name
+            SELECT m.*, u.prenom as sender_name
             FROM messages m
             JOIN users u ON m.sender_id = u.id
             WHERE m.conversation_id = :cid
@@ -143,7 +155,7 @@ async def get_msgs(cid: int, current_user: dict = Depends(get_current_user), db:
 async def get_files(current_user: dict = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
     res = await db.execute(
         text("""
-            SELECT DISTINCT m.file_url, m.file_type, m.created_at, u.nom as shared_by
+            SELECT DISTINCT m.file_url, m.file_type, m.created_at, u.prenom as shared_by
             FROM messages m
             JOIN conversation_members cm ON m.conversation_id = cm.conversation_id
             JOIN users u ON m.sender_id = u.id
@@ -276,7 +288,7 @@ async def get_partners(current_user: dict = Depends(get_current_user), db: Async
     if not verbs:
         return {"partners": []}
     res = await db.execute(
-        text("SELECT u.id, u.nom, v.verb_slug as strong_verb FROM users u JOIN da_answers v ON u.id = v.user_id WHERE v.verb_slug IN :verbs GROUP BY u.id, v.verb_slug HAVING AVG(v.percentage) > 80 AND u.id != :uid LIMIT 5"),
+        text("SELECT u.id, u.prenom as nom, v.verb_slug as strong_verb FROM users u JOIN da_answers v ON u.id = v.user_id WHERE v.verb_slug IN :verbs GROUP BY u.id, v.verb_slug HAVING AVG(v.percentage) > 80 AND u.id != :uid LIMIT 5"),
         {"verbs": tuple(verbs), "uid": uid},
     )
     return {"partners": [dict(r._mapping) for r in res.fetchall()]}

@@ -1,6 +1,8 @@
 # routes/admin_ingest.py — Temporaire : ingestion RAG livre manhadjiya
 from pathlib import Path
 
+import hmac
+
 from fastapi import APIRouter, Header, HTTPException
 
 from config import get_settings
@@ -12,7 +14,7 @@ router = APIRouter(tags=["admin"])
 async def ingest_rag(x_admin_token: str = Header("")):
     cfg = get_settings()
     secret = cfg.ADMIN_SECRET or ""
-    if not secret or x_admin_token != secret:
+    if not secret or not hmac.compare_digest(x_admin_token, secret):
         raise HTTPException(status_code=404, detail="Not found")
     from scripts.ingest_livre_manhadjiya import (
         ingest_chunks_to_db,
