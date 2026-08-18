@@ -65,41 +65,40 @@ def test_diagnostic_report():
 
 
 def test_tutor_explain_mode():
-    """Test du tuteur en mode explication"""
+    """GEL 2026-08-17 : routes/tutor.py retiré du registre (audit endpoints
+    morts) → 404. Avant le gel : 200 + champ « explanation »."""
     payload = {
         "instruction": "وضّح في نص علمي",
         "mode": "explain"
     }
     response = client.post("/api/tutor/methodology", json=payload)
-    assert response.status_code == 200
-    data = response.json()
-    assert "explanation" in data
+    assert response.status_code == 404
 
 
 def test_tutor_correct_mode():
-    """Test du tuteur en mode correction"""
+    """GEL : idem → 404 (avant : 200)."""
     payload = {
         "instruction": "وضّح في نص علمي",
         "student_answer": "Ma reponse",
         "mode": "correct"
     }
     response = client.post("/api/tutor/methodology", json=payload)
-    assert response.status_code == 200
+    assert response.status_code == 404
 
 
 def test_tutor_diagnose_mode():
-    """Test du tuteur en mode diagnostic"""
+    """GEL : idem → 404 (avant : 200)."""
     payload = {
         "instruction": "وضّح في نص علمي",
         "student_answer": "Ma reponse",
         "mode": "diagnose"
     }
     response = client.post("/api/tutor/methodology", json=payload)
-    assert response.status_code == 200
+    assert response.status_code == 404
 
 
 def test_bac_blanc_feedback():
-    """Test du feedback Bac Blanc Intelligent"""
+    """GEL : routes/bac_blanc_intelligent.py retiré du registre → 404 (avant : 200)."""
     payload = {
         "context": "Test",
         "instruction": "وضّح في نص علمي",
@@ -107,11 +106,11 @@ def test_bac_blanc_feedback():
         "documents": []
     }
     response = client.post("/api/bac-blanc/feedback", json=payload)
-    assert response.status_code == 200
+    assert response.status_code == 404
 
 
 def test_bac_blanc_action_plan():
-    """Test du plan d'action personnalise"""
+    """GEL : idem → 404 (avant : 200)."""
     payload = {
         "context": "Test",
         "instruction": "وضّح في نص علمي",
@@ -119,28 +118,24 @@ def test_bac_blanc_action_plan():
         "documents": []
     }
     response = client.post("/api/bac-blanc/action-plan", json=payload)
-    assert response.status_code == 200
+    assert response.status_code == 404
 
 
 def test_mindmap_dynamic():
-    """Test de la mindmap dynamique"""
+    """GEL : routes/mindmap_methodology.py retiré du registre → 404 (avant : 200)."""
     payload = {"verb": "وضّح في نص علمي"}
     response = client.post("/api/mindmap/methodology/dynamic", json=payload)
-    assert response.status_code == 200
-    data = response.json()
-    assert data["generated"] is True
-    assert len(data["root"]["children"]) == 3
+    assert response.status_code == 404
 
 
 def test_mindmap_static():
-    """Test de la mindmap statique"""
+    """GEL : idem → 404 (avant : 200 + payload)."""
     response = client.get("/api/mindmap/methodology/static/structure_texte_scientifique")
-    assert response.status_code == 200
-    assert response.json()["id"] == "mm_structure"
+    assert response.status_code == 404
 
 
 def test_full_methodology_pipeline():
-    """Test du pipeline complet : evaluate -> bac-blanc -> action-plan"""
+    """Pipeline complet : evaluate (vivant) -> bac-blanc (GEL 404) -> action-plan (GEL 404)."""
     eval_payload = {
         "context": "Test pipeline",
         "instruction": "وضّح في نص علمي",
@@ -151,8 +146,9 @@ def test_full_methodology_pipeline():
     assert r.status_code == 200
     assert r.json()["task_type"] == "complex"
 
+    # GEL 2026-08-17 : bac_blanc_intelligent retiré du registre → 404
     r2 = client.post("/api/bac-blanc/feedback", json=eval_payload)
-    assert r2.status_code == 200
+    assert r2.status_code == 404
 
     r3 = client.post("/api/bac-blanc/action-plan", json=eval_payload)
-    assert r3.status_code == 200
+    assert r3.status_code == 404

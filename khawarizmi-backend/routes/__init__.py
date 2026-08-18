@@ -113,3 +113,32 @@ ALL_ROUTERS = [
     lessons.router,
     bac_blanc.router,
 ]
+
+# ════════════════════════════════════════════════════════════════
+# Gel d'endpoints orphelins — audit endpoints morts (2026-08-17)
+# ════════════════════════════════════════════════════════════════
+# Endpoints retirés du service SANS supprimer le code (réversible :
+# retirer le chemin de cette liste). Chacun vérifié : 0 référence front,
+# 0 test appelant. Différés (consommateurs de test) : /api/phase3/avatar,
+# /api/mindmap/generate-methodological, /api/drill/session.
+# Tier A (suppression physique) exige la confirmation par logs de prod.
+FROZEN_ENDPOINTS: set[str] = {
+    "/api/cities/{city_id}/unlock",
+    "/api/cities/leaderboard",
+    "/api/gems/transactions",
+    "/api/gems/leaderboard",
+    "/api/leaderboard/refresh",
+    "/api/onboarding/welcome-gems",
+    "/api/phase6/events",
+    "/api/phase6/session/start",
+    "/api/phase6/funnels",
+    "/api/social/upload",
+    "/api/streaks/me/activity",
+    "/api/streaks/me/freeze",
+    "/api/flashcards/methodology/",
+    "/api/document-analysis/review",
+    "/api/session/random",
+}
+
+for _router in ALL_ROUTERS:
+    _router.routes = [r for r in _router.routes if r.path not in FROZEN_ENDPOINTS]

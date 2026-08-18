@@ -1,10 +1,12 @@
 """tests/test_memory_routes.py — Endpoints mémoire unifiée (audit S3).
 
-- /api/memory/summary : 401 sans auth, 200 avec auth (DB mockée → tolérant).
-- /api/memory/due : items dus formatés.
+GEL 2026-08-17 : le module routes/memory.py a été retiré du registre
+(audit endpoints morts : 0 référence front, 0 import externe). Les
+endpoints répondent désormais 404 — ces tests verrouillent ce statut.
+Pour réactiver : réimporter memory.router dans routes/__init__.py et
+restaurer les assertions 200/401/422 d'origine (git history, commit
+avant 1316973).
 """
-
-from unittest.mock import patch
 
 import pytest
 
@@ -18,54 +20,27 @@ def _auth_headers():
 
 @pytest.mark.asyncio
 async def test_summary_requires_auth(client):
+    # GEL : endpoint retiré du registre → 404 (avant : 401)
     resp = await client.get("/api/memory/summary")
-    assert resp.status_code == 401
+    assert resp.status_code == 404
 
 
 @pytest.mark.asyncio
 async def test_summary_ok(client):
-    from tests.conftest import MockAsyncSession
-
-    original_execute = MockAsyncSession.execute
-
-    async def mock_execute(self, statement, *args, **kwargs):
-        sql = str(statement)
-        if "FROM users" in sql and "SELECT" in sql:
-            return await original_execute(self, statement, *args, **kwargs)
-        # tables mémoire absentes du preview → le service retourne des sources
-        # vides (tolérance) ; on simule la table indisponible
-        raise Exception("table indisponible")
-
-    with patch("tests.conftest.MockAsyncSession.execute", new=mock_execute):
-        resp = await client.get("/api/memory/summary", headers=_auth_headers())
-    assert resp.status_code == 200
-    data = resp.json()
-    assert data["total_items"] == 0
-    assert data["by_kind"] == {}
-    assert data["due_count"] == 0
+    # GEL : endpoint retiré du registre → 404 (avant : 200 + payload)
+    resp = await client.get("/api/memory/summary", headers=_auth_headers())
+    assert resp.status_code == 404
 
 
 @pytest.mark.asyncio
 async def test_due_ok(client):
-    from tests.conftest import MockAsyncSession
-
-    original_execute = MockAsyncSession.execute
-
-    async def mock_execute(self, statement, *args, **kwargs):
-        sql = str(statement)
-        if "FROM users" in sql and "SELECT" in sql:
-            return await original_execute(self, statement, *args, **kwargs)
-        raise Exception("table indisponible")
-
-    with patch("tests.conftest.MockAsyncSession.execute", new=mock_execute):
-        resp = await client.get("/api/memory/due?limit=10", headers=_auth_headers())
-    assert resp.status_code == 200
-    data = resp.json()
-    assert data["count"] == 0
-    assert data["items"] == []
+    # GEL : endpoint retiré du registre → 404 (avant : 200 + payload)
+    resp = await client.get("/api/memory/due?limit=10", headers=_auth_headers())
+    assert resp.status_code == 404
 
 
 @pytest.mark.asyncio
 async def test_due_limit_validation(client):
+    # GEL : endpoint retiré du registre → 404 (avant : 422)
     resp = await client.get("/api/memory/due?limit=9999", headers=_auth_headers())
-    assert resp.status_code == 422
+    assert resp.status_code == 404
