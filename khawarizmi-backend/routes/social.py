@@ -96,6 +96,15 @@ async def get_convs(current_user: dict = Depends(get_current_user), db: AsyncSes
 
 @router.post("/messages")
 async def send_msg(payload: MessageCreate, current_user: dict = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
+    # IDOR (audit technique 2026-08-18) : vérifier l'appartenance AVANT d'écrire
+    member = await db.execute(
+        text(
+            "SELECT 1 FROM conversation_members WHERE conversation_id = :cid AND user_id = :uid"
+        ),
+        {"cid": payload.conversation_id, "uid": current_user["id"]},
+    )
+    if member.fetchone() is None:
+        raise HTTPException(status_code=403, detail="Vous n'êtes pas membre de cette conversation")
     await db.execute(
         text("INSERT INTO messages (conversation_id, sender_id, content, file_url, file_type) VALUES (:cid, :sid, :content, :furl, :ftype)"),
         {"cid": payload.conversation_id, "sid": current_user["id"], "content": payload.content, "furl": payload.file_url, "ftype": payload.file_type},
@@ -108,9 +117,24 @@ async def send_msg(payload: MessageCreate, current_user: dict = Depends(get_curr
 
 @router.get("/conversations/{cid}/messages")
 async def get_msgs(cid: int, current_user: dict = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
+    # IDOR (audit technique 2026-08-18) : ne lire que les conversations dont
+    # l'utilisateur est membre — EXISTS évite la multiplication des lignes
+    # (contrairement à un JOIN) et renvoie une liste vide sinon.
     res = await db.execute(
-        text("SELECT m.*, u.nom as sender_name FROM messages m JOIN users u ON m.sender_id = u.id WHERE m.conversation_id = :cid ORDER BY m.created_at ASC"),
-        {"cid": cid},
+        text(
+            """
+            SELECT m.*, u.nom as sender_name
+            FROM messages m
+            JOIN users u ON m.sender_id = u.id
+            WHERE m.conversation_id = :cid
+              AND EXISTS (
+                  SELECT 1 FROM conversation_members cm
+                  WHERE cm.conversation_id = :cid AND cm.user_id = :uid
+              )
+            ORDER BY m.created_at ASC
+            """
+        ),
+        {"cid": cid, "uid": current_user["id"]},
     )
     return [dict(r._mapping) for r in res.fetchall()]
 
