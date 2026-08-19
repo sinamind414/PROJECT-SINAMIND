@@ -1,18 +1,17 @@
 "use client"
 
 import { useMemo, useState } from "react"
-import Link from "next/link"
 import {
-  detectAllil,
+  detectQuarin,
   MUSCLE_ACCENTS,
-  type AtelierAllilData,
+  type AtelierQuarinData,
   type MuscleVariant,
   type Span,
 } from "@/lib/manhadjia-lib"
 import { CourbeLTc } from "@/components/manhadjia/CourbeLTc"
 
 type Props = {
-  data: AtelierAllilData
+  data: AtelierQuarinData
   onReplay: () => void
   variant?: MuscleVariant
 }
@@ -35,7 +34,7 @@ function Rouge({ spans }: { spans: Span[] }) {
   )
 }
 
-export function AtelierAllil({ data, onReplay, variant = "bleu" }: Props) {
+export function AtelierQuarin({ data, onReplay, variant = "violet" }: Props) {
   const A = MUSCLE_ACCENTS[variant]
   const [phase, setPhase] = useState<Phase>("A")
   const [checks, setChecks] = useState<boolean[]>(() => data.cases.map(() => false))
@@ -43,7 +42,7 @@ export function AtelierAllil({ data, onReplay, variant = "bleu" }: Props) {
   const [submitted, setSubmitted] = useState<{ text: string; crimes: string[]; missing: string[] } | null>(null)
   const [mirror, setMirror] = useState<number | null>(null)
 
-  const live = useMemo(() => detectAllil(text, data), [text, data])
+  const live = useMemo(() => detectQuarin(text, data), [text, data])
   const steps = checks.filter(Boolean).length
 
   const toggleCase = (i: number) => {
@@ -55,13 +54,13 @@ export function AtelierAllil({ data, onReplay, variant = "bleu" }: Props) {
   }
 
   const submit = () => {
-    const d = detectAllil(text, data)
+    const d = detectQuarin(text, data)
     setSubmitted({ text, crimes: d.crimes, missing: d.missing })
     setPhase("C")
   }
 
   const finalDet = useMemo(
-    () => (submitted ? detectAllil(submitted.text, data) : null),
+    () => (submitted ? detectQuarin(submitted.text, data) : null),
     [submitted, data]
   )
 
@@ -71,12 +70,12 @@ export function AtelierAllil({ data, onReplay, variant = "bleu" }: Props) {
     <div className="space-y-6">
       <header className="space-y-2" dir="rtl">
         <h1 className={`text-2xl font-black ${A.textAccent}`}>{data.verbe}</h1>
-        <p className="text-sm text-white/50">الخطوة 4: التعليل</p>
+        <p className="text-sm text-white/50">الخطوة 5: المقارنة</p>
         <p className="text-lg font-bold text-white/90">التعليمة: {data.consigne}</p>
         <p className="text-sm text-white/50">{data.consigne_note}</p>
       </header>
 
-      {/* Documents bruts — identiques aux ateliers 01-03 */}
+      {/* Documents bruts — identiques aux ateliers 01-04 */}
       <section className="space-y-4" dir="rtl">
         <div className="rounded-2xl border border-white/10 bg-slate-panel/50 p-4">
           <p className="mb-2 text-xs text-white/40">جدول</p>
@@ -162,12 +161,12 @@ export function AtelierAllil({ data, onReplay, variant = "bleu" }: Props) {
         </section>
       )}
 
-      {/* Phase B — 3-6 lignes, لأن + chiffre + نعلم أن OBLIGATOIRES */}
+      {/* Phase B — 3-6 lignes, تشابه + اختلاف + أرقام الطرفين OBLIGATOIRES */}
       {phase === "B" && (
         <section className={`rounded-3xl border ${A.border} bg-slate-panel/60 p-5 space-y-4`}>
           <div className="flex items-center justify-between">
             <h2 className="font-black text-white" dir="rtl">
-              المرحلة ب — اكتب التعليل
+              المرحلة ب — اكتب المقارنة
             </h2>
             <span className="text-xs text-white/40" dir="rtl">
               3–6 أسطر على الأكثر
@@ -179,7 +178,7 @@ export function AtelierAllil({ data, onReplay, variant = "bleu" }: Props) {
             rows={6}
             value={text}
             onChange={(e) => setText(e.target.value)}
-            placeholder="الرفض في 5 أيام لأن… نعلم أن… والذروة 4,8…"
+            placeholder="أوجه التشابه : في الحالتين… أما أوجه الاختلاف : 10 أيام بينما 5 أيام…"
             className={`w-full rounded-2xl border border-white/15 bg-slate-deep p-4 text-base leading-relaxed text-white outline-none ${A.focus}`}
           />
           <p className="text-left text-xs text-white/30" dir="ltr">
@@ -313,19 +312,6 @@ export function AtelierAllil({ data, onReplay, variant = "bleu" }: Props) {
           >
             {data.cta_fin}
           </button>
-
-          {/* Un seul lien, en bas du miroir, après envoi : bootcamp J4→J5 */}
-          {data.lien_suivant && (
-            <div className="pt-1 text-center">
-              <Link
-                href={data.lien_suivant.href}
-                className={`inline-block min-h-12 px-4 py-3 text-sm font-black underline underline-offset-4 ${A.textSoft}`}
-                dir="rtl"
-              >
-                {data.lien_suivant.label}
-              </Link>
-            </div>
-          )}
         </section>
       )}
     </div>

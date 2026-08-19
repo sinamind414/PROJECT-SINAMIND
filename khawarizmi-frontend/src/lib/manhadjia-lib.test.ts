@@ -4,25 +4,30 @@ import {
   detectAllil,
   detectFassir,
   detectIstintaj,
+  detectQuarin,
   highlightSpans,
   isVerbeAllil,
   isVerbeFassir,
   isVerbeHallil,
   isVerbeIstintaj,
+  isVerbeQuarin,
   type AtelierAllilData,
   type AtelierFassirData,
   type AtelierIstintajData,
+  type AtelierQuarinData,
 } from "./manhadjia-lib"
 import rawData from "../../data/ateliers/manhadjia_01_hallil_taam.json"
 import rawData02 from "../../data/ateliers/manhadjia_02_fassir_taam.json"
 import rawData03 from "../../data/ateliers/manhadjia_03_istintaj_taam.json"
 import rawData04 from "../../data/ateliers/manhadjia_04_allil_taam.json"
+import rawData05 from "../../data/ateliers/manhadjia_05_quarin_taam.json"
 
 // Source unique de vérité : la liste fermée du JSON (pas une copie dans le test)
 const REGEX = rawData.interdits_regex
 const D02 = rawData02 as AtelierFassirData
 const D03 = rawData03 as AtelierIstintajData
 const D04 = rawData04 as AtelierAllilData
+const D05 = rawData05 as AtelierQuarinData
 
 describe("isVerbeHallil (rituel — liste fermée)", () => {
   it("accepte حلل / حلّل / تحليل / analyser / analysez / analyse", () => {
@@ -314,5 +319,78 @@ describe("detectAllil (métier à côté — R5 J4)", () => {
     const long = Array.from({ length: 90 }, () => "حجة").join(" ")
     const d = detectAllil(long, D04)
     expect(d.crimes).toContain(D04.messages.max_mots)
+  })
+})
+
+// ── Atelier 05 (قارن) — تشابه + اختلاف + أرقام الطرفين ────────────────
+
+describe("isVerbeQuarin (rituel J5 — liste fermée)", () => {
+  it("accepte قارن / قارِن / compare / comparer", () => {
+    expect(isVerbeQuarin("قارن")).toBe(true)
+    expect(isVerbeQuarin("قارِن")).toBe(true)
+    expect(isVerbeQuarin("compare")).toBe(true)
+    expect(isVerbeQuarin("comparer")).toBe(true)
+  })
+
+  it("refuse حلل / فسّر / استنتج / علّل (R2 — أفعال البارح)", () => {
+    expect(isVerbeQuarin("حلل")).toBe(false)
+    expect(isVerbeQuarin("حلّل")).toBe(false)
+    expect(isVerbeQuarin("فسر")).toBe(false)
+    expect(isVerbeQuarin("فسّر")).toBe(false)
+    expect(isVerbeQuarin("استنتج")).toBe(false)
+    expect(isVerbeQuarin("علّل")).toBe(false)
+    expect(isVerbeQuarin("")).toBe(false)
+  })
+})
+
+describe("detectQuarin (métier à côté — R5 J5)", () => {
+  it("corrigé geste (3 lignes jointes) → 0 crime 0 manque (R8)", () => {
+    const d = detectQuarin(D05.corrige_geste.join(" "), D05)
+    expect(d.crimes).toEqual([])
+    expect(d.missing).toEqual([])
+  })
+
+  it("copie complète (تشابه + بينما + أرقام الطرفين) → 0 crime 0 manque", () => {
+    const d = detectQuarin(
+      "أوجه التشابه : الرفض في الحالتين، أما أوجه الاختلاف : 10 أيام بينما 5 أيام، والذروة 2,5 مقابل 4,8",
+      D05
+    )
+    expect(d.crimes).toEqual([])
+    expect(d.missing).toEqual([])
+  })
+
+  it("وصف طرف واحد (sans تشابه) → manque sim", () => {
+    const d = detectQuarin("الرفض في 10 أيام بينما 5 أيام والذروة 4,8", D05)
+    expect(d.missing).toContain(D05.messages.missing_sim)
+  })
+
+  it("sans اختلاف (بلا بينما) → manque diff", () => {
+    const d = detectQuarin("أوجه التشابه : الرفض في الحالتين، 10 و 5 أيام، 2,5 و 4,8", D05)
+    expect(d.missing).toContain(D05.messages.missing_diff)
+  })
+
+  it("un seul chiffre → manque chiffres (il faut les DEUX côtés)", () => {
+    const d = detectQuarin("أوجه التشابه : الرفض في الحالتين بينما الذروة 4,8 أسرع", D05)
+    expect(d.missing).toContain(D05.messages.missing_chiffres)
+  })
+
+  it("« نلاحظ أن » en ouverture → crime re-حلّل", () => {
+    const d = detectQuarin("نلاحظ أن الرفض في 10 أيام بينما 5 أيام والذروة 4,8 و 2,5", D05)
+    expect(d.crimes).toContain(D05.messages.hallil)
+  })
+
+  it("paraphrase قاتلة + تشابه + بينما + 2 chiffres → محترمة", () => {
+    const d = detectQuarin(
+      "أوجه التشابه : الرفض في الحالتين، أما أوجه الاختلاف : الخلايا القاتلة تبلغ 4,8 بينما 2,5 فقط",
+      D05
+    )
+    expect(d.crimes).toEqual([])
+    expect(d.missing).toEqual([])
+  })
+
+  it(">80 mots → crime max_mots", () => {
+    const long = Array.from({ length: 90 }, () => "مقارنة").join(" ")
+    const d = detectQuarin(long, D05)
+    expect(d.crimes).toContain(D05.messages.max_mots)
   })
 })

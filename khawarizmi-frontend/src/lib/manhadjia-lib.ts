@@ -54,8 +54,8 @@ export interface AtelierData {
 }
 
 // Palette des muscles : حلّل = أصفر (jaune), فسّر = برتقالي (orange),
-// استنتج = أخضر (vert), علّل = أزرق (bleu — le lien de cause).
-export type MuscleVariant = "jaune" | "orange" | "vert" | "bleu"
+// استنتج = أخضر (vert), علّل = أزرق (bleu), قارن = بنفسجي (violet).
+export type MuscleVariant = "jaune" | "orange" | "vert" | "bleu" | "violet"
 
 export const MUSCLE_ACCENTS: Record<
   MuscleVariant,
@@ -135,6 +135,21 @@ export const MUSCLE_ACCENTS: Record<
     pastille: "border-sky-300/40 bg-sky-300/15 text-sky-300",
     borderActive: "border-sky-300",
   },
+  violet: {
+    border: "border-violet-400/25",
+    borderSoft: "border-violet-400/30",
+    bgSoft: "bg-violet-400/5",
+    chipBg: "bg-violet-400",
+    chipText: "text-slate-deep",
+    textAccent: "text-violet-300",
+    textSoft: "text-violet-200",
+    btn: "bg-violet-400 hover:bg-violet-300",
+    caseActive: "border-violet-300/60 bg-violet-300/10",
+    checkbox: "accent-violet-300",
+    focus: "focus:border-violet-300",
+    pastille: "border-violet-300/40 bg-violet-300/15 text-violet-300",
+    borderActive: "border-violet-300",
+  },
 }
 
 // Atelier 02 (فسّر) — détection inversée : لأن + chiffre OBLIGATOIRES,
@@ -175,6 +190,31 @@ export interface AtelierIstintajData extends AtelierData {
     khaltia: string
     hedg: string
     missing_dalil: string
+    max_mots: string
+  }
+  max_mots: number
+  voix: string[]
+  recap: string[]
+}
+
+// Atelier 05 (قارن) — أوجه التشابه + أوجه الاختلاف. Livre Manhadjiya §13 :
+// (1) تقديم عناصر المقارنة (2) تفكيك المعطيات في جدول مع الكلمات الدالة
+// (بينما/بالمقابل/في حين) (3) تقديم خلاصة (المعلومة المستخرجة).
+// Détection inversée : تشابه + اختلاف + أرقام الطرفين OBLIGATOIRES ;
+// نلاحظ أن (ouverture) = crime. Pas de verb_ref : قارن absent des 10 runtime.
+export interface AtelierQuarinData extends AtelierData {
+  consigne_note: string
+  patterns: {
+    hallil: string
+    sim: string
+    diff: string
+    chiffres: string
+  }
+  messages: {
+    hallil: string
+    missing_sim: string
+    missing_diff: string
+    missing_chiffres: string
     max_mots: string
   }
   max_mots: number
@@ -243,6 +283,13 @@ const ACCEPTED_VERBES_ALLIL = new Set([
   "argumente",
   "argumenter",
 ])
+// J5 قارن — le rituel accepte la forme du livre + le français.
+const ACCEPTED_VERBES_QUARIN = new Set([
+  "قارن",
+  "compare",
+  "comparez",
+  "comparer",
+])
 
 function isDiacritic(c: string): boolean {
   const code = c.charCodeAt(0)
@@ -291,6 +338,13 @@ export function isVerbeAllil(input: string): boolean {
   const { text } = normalizeWithMap(input.trim())
   const fr = text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase()
   return ACCEPTED_VERBES_ALLIL.has(text.toLowerCase()) || ACCEPTED_VERBES_ALLIL.has(fr)
+}
+
+/** Le verbe tapé au rituel est-il قارن ? (fermé — J5) */
+export function isVerbeQuarin(input: string): boolean {
+  const { text } = normalizeWithMap(input.trim())
+  const fr = text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase()
+  return ACCEPTED_VERBES_QUARIN.has(text.toLowerCase()) || ACCEPTED_VERBES_QUARIN.has(fr)
 }
 
 export interface Span {
@@ -414,6 +468,49 @@ export function detectIstintaj(original: string, data: AtelierIstintajData): Ist
   const missing: string[] = []
   if (!new RegExp(data.patterns.evidence, "g").test(text)) {
     missing.push(data.messages.missing_dalil)
+  }
+
+  const combined = crimePatterns.join("|")
+  const displaySpans = combined ? highlightSpans(original, combined) : highlightSpans(original, "(?!)")
+  return { displaySpans, crimes, missing, wordCount }
+}
+
+// ── Atelier 05 (قارن) ───────────────────────────────────────────────
+// تشابه + اختلاف + أرقام الطرفين. Crime : نلاحظ أن (re-حلّل / وصف طرف واحد).
+
+export interface QuarinDetection {
+  displaySpans: Span[]
+  crimes: string[]
+  missing: string[]
+  wordCount: number
+}
+
+export function detectQuarin(original: string, data: AtelierQuarinData): QuarinDetection {
+  const { text } = normalizeWithMap(original)
+
+  const hasHallil = new RegExp(data.patterns.hallil, "g").test(text)
+
+  const crimes: string[] = []
+  const crimePatterns: string[] = []
+  if (hasHallil) {
+    crimes.push(data.messages.hallil)
+    crimePatterns.push(data.patterns.hallil)
+  }
+
+  const wordCount = text.trim() ? text.trim().split(/\s+/).length : 0
+  if (wordCount > data.max_mots) crimes.push(data.messages.max_mots)
+
+  const missing: string[] = []
+  if (!new RegExp(data.patterns.sim, "g").test(text)) {
+    missing.push(data.messages.missing_sim)
+  }
+  if (!new RegExp(data.patterns.diff, "g").test(text)) {
+    missing.push(data.messages.missing_diff)
+  }
+  // la comparaison exige les chiffres DES DEUX côtés : ≥ 2 nombres
+  const nums = text.match(new RegExp(data.patterns.chiffres, "g")) || []
+  if (nums.length < 2) {
+    missing.push(data.messages.missing_chiffres)
   }
 
   const combined = crimePatterns.join("|")
