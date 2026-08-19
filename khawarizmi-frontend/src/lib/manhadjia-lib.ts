@@ -54,8 +54,8 @@ export interface AtelierData {
 }
 
 // Palette des muscles : حلّل = أصفر (jaune), فسّر = برتقالي (orange),
-// استنتج = أخضر (vert). Trois muscles, trois couleurs.
-export type MuscleVariant = "jaune" | "orange" | "vert"
+// استنتج = أخضر (vert), علّل = أزرق (bleu — le lien de cause).
+export type MuscleVariant = "jaune" | "orange" | "vert" | "bleu"
 
 export const MUSCLE_ACCENTS: Record<
   MuscleVariant,
@@ -120,6 +120,21 @@ export const MUSCLE_ACCENTS: Record<
     pastille: "border-green-300/40 bg-green-300/15 text-green-300",
     borderActive: "border-green-300",
   },
+  bleu: {
+    border: "border-sky-400/25",
+    borderSoft: "border-sky-400/30",
+    bgSoft: "bg-sky-400/5",
+    chipBg: "bg-sky-400",
+    chipText: "text-slate-deep",
+    textAccent: "text-sky-300",
+    textSoft: "text-sky-200",
+    btn: "bg-sky-400 hover:bg-sky-300",
+    caseActive: "border-sky-300/60 bg-sky-300/10",
+    checkbox: "accent-sky-300",
+    focus: "focus:border-sky-300",
+    pastille: "border-sky-300/40 bg-sky-300/15 text-sky-300",
+    borderActive: "border-sky-300",
+  },
 }
 
 // Atelier 02 (فسّر) — détection inversée : لأن + chiffre OBLIGATOIRES,
@@ -167,6 +182,32 @@ export interface AtelierIstintajData extends AtelierData {
   recap: string[]
 }
 
+// Atelier 04 (علّل / برّر) — الحجة + السبب + المكتسب. Livre Manhadjiya §20 :
+// (1) حجج من الوثيقة (يتبين أن/نلاحظ أن) (2) المكتسبات القبلية (نعلم أن)
+// (3) وجهة نظر داعمة (في التبرير فقط). Détection inversée : لأن + chiffre
+// + نعلم أن OBLIGATOIRES ; نلاحظ (ouverture) et نستنتج = crimes.
+export interface AtelierAllilData extends AtelierData {
+  consigne_note: string
+  patterns: {
+    hallil: string
+    istintaj: string
+    connector: string
+    savoir: string
+    chiffres: string
+  }
+  messages: {
+    hallil: string
+    istintaj: string
+    missing_lian: string
+    missing_chiffre: string
+    missing_savoir: string
+    max_mots: string
+  }
+  max_mots: number
+  voix: string[]
+  recap: string[]
+}
+
 // Verbes acceptés au rituel (listes fermées de la spec écran 0)
 const ACCEPTED_VERBES = new Set(["حلل", "تحليل", "analyser", "analysez", "analyse"])
 const ACCEPTED_VERBES_FASSIR = new Set([
@@ -190,6 +231,17 @@ const ACCEPTED_VERBES_ISTINTAJ = new Set([
   "deduire",
   "concluez",
   "conclu",
+])
+// J4 علّل / برّر — le rituel accepte les deux formes du livre + le français
+// (accents retirés avant comparaison).
+const ACCEPTED_VERBES_ALLIL = new Set([
+  "علل",
+  "برر",
+  "justifie",
+  "justifiez",
+  "justifier",
+  "argumente",
+  "argumenter",
 ])
 
 function isDiacritic(c: string): boolean {
@@ -232,6 +284,13 @@ export function isVerbeIstintaj(input: string): boolean {
   const { text } = normalizeWithMap(input.trim())
   const fr = text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase()
   return ACCEPTED_VERBES_ISTINTAJ.has(text.toLowerCase()) || ACCEPTED_VERBES_ISTINTAJ.has(fr)
+}
+
+/** Le verbe tapé au rituel est-il علّل / برّر ? (fermé — J4) */
+export function isVerbeAllil(input: string): boolean {
+  const { text } = normalizeWithMap(input.trim())
+  const fr = text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase()
+  return ACCEPTED_VERBES_ALLIL.has(text.toLowerCase()) || ACCEPTED_VERBES_ALLIL.has(fr)
 }
 
 export interface Span {
@@ -355,6 +414,53 @@ export function detectIstintaj(original: string, data: AtelierIstintajData): Ist
   const missing: string[] = []
   if (!new RegExp(data.patterns.evidence, "g").test(text)) {
     missing.push(data.messages.missing_dalil)
+  }
+
+  const combined = crimePatterns.join("|")
+  const displaySpans = combined ? highlightSpans(original, combined) : highlightSpans(original, "(?!)")
+  return { displaySpans, crimes, missing, wordCount }
+}
+
+// ── Atelier 04 (علّل / برّر) ──────────────────────────────────────────
+// الحجة + السبب + المكتسب. Crimes : نلاحظ أن (re-حلّل), نستنتج (J3).
+// Manques : لأن, chiffre de la doc, نعلم أن (le savoir court).
+
+export interface AllilDetection {
+  displaySpans: Span[]
+  crimes: string[]
+  missing: string[]
+  wordCount: number
+}
+
+export function detectAllil(original: string, data: AtelierAllilData): AllilDetection {
+  const { text } = normalizeWithMap(original)
+
+  const hasHallil = new RegExp(data.patterns.hallil, "g").test(text)
+  const hasIstintaj = new RegExp(data.patterns.istintaj, "g").test(text)
+
+  const crimes: string[] = []
+  const crimePatterns: string[] = []
+  if (hasHallil) {
+    crimes.push(data.messages.hallil)
+    crimePatterns.push(data.patterns.hallil)
+  }
+  if (hasIstintaj) {
+    crimes.push(data.messages.istintaj)
+    crimePatterns.push(data.patterns.istintaj)
+  }
+
+  const wordCount = text.trim() ? text.trim().split(/\s+/).length : 0
+  if (wordCount > data.max_mots) crimes.push(data.messages.max_mots)
+
+  const missing: string[] = []
+  if (!new RegExp(data.patterns.connector, "g").test(text)) {
+    missing.push(data.messages.missing_lian)
+  }
+  if (!new RegExp(data.patterns.chiffres, "g").test(text)) {
+    missing.push(data.messages.missing_chiffre)
+  }
+  if (!new RegExp(data.patterns.savoir, "g").test(text)) {
+    missing.push(data.messages.missing_savoir)
   }
 
   const combined = crimePatterns.join("|")

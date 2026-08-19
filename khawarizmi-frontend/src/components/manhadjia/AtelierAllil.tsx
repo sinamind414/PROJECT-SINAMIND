@@ -1,18 +1,17 @@
 "use client"
 
 import { useMemo, useState } from "react"
-import Link from "next/link"
 import {
-  detectIstintaj,
+  detectAllil,
   MUSCLE_ACCENTS,
-  type AtelierIstintajData,
+  type AtelierAllilData,
   type MuscleVariant,
   type Span,
 } from "@/lib/manhadjia-lib"
 import { CourbeLTc } from "@/components/manhadjia/CourbeLTc"
 
 type Props = {
-  data: AtelierIstintajData
+  data: AtelierAllilData
   onReplay: () => void
   variant?: MuscleVariant
 }
@@ -35,7 +34,7 @@ function Rouge({ spans }: { spans: Span[] }) {
   )
 }
 
-export function AtelierIstintaj({ data, onReplay, variant = "vert" }: Props) {
+export function AtelierAllil({ data, onReplay, variant = "bleu" }: Props) {
   const A = MUSCLE_ACCENTS[variant]
   const [phase, setPhase] = useState<Phase>("A")
   const [checks, setChecks] = useState<boolean[]>(() => data.cases.map(() => false))
@@ -43,7 +42,7 @@ export function AtelierIstintaj({ data, onReplay, variant = "vert" }: Props) {
   const [submitted, setSubmitted] = useState<{ text: string; crimes: string[]; missing: string[] } | null>(null)
   const [mirror, setMirror] = useState<number | null>(null)
 
-  const live = useMemo(() => detectIstintaj(text, data), [text, data])
+  const live = useMemo(() => detectAllil(text, data), [text, data])
   const steps = checks.filter(Boolean).length
 
   const toggleCase = (i: number) => {
@@ -55,13 +54,13 @@ export function AtelierIstintaj({ data, onReplay, variant = "vert" }: Props) {
   }
 
   const submit = () => {
-    const d = detectIstintaj(text, data)
+    const d = detectAllil(text, data)
     setSubmitted({ text, crimes: d.crimes, missing: d.missing })
     setPhase("C")
   }
 
   const finalDet = useMemo(
-    () => (submitted ? detectIstintaj(submitted.text, data) : null),
+    () => (submitted ? detectAllil(submitted.text, data) : null),
     [submitted, data]
   )
 
@@ -71,12 +70,12 @@ export function AtelierIstintaj({ data, onReplay, variant = "vert" }: Props) {
     <div className="space-y-6">
       <header className="space-y-2" dir="rtl">
         <h1 className={`text-2xl font-black ${A.textAccent}`}>{data.verbe}</h1>
-        <p className="text-sm text-white/50">الخطوة 3: الاستنتاج</p>
+        <p className="text-sm text-white/50">الخطوة 4: التعليل</p>
         <p className="text-lg font-bold text-white/90">التعليمة: {data.consigne}</p>
         <p className="text-sm text-white/50">{data.consigne_note}</p>
       </header>
 
-      {/* Documents bruts — identiques aux ateliers 01 et 02 */}
+      {/* Documents bruts — identiques aux ateliers 01-03 */}
       <section className="space-y-4" dir="rtl">
         <div className="rounded-2xl border border-white/10 bg-slate-panel/50 p-4">
           <p className="mb-2 text-xs text-white/40">جدول</p>
@@ -110,7 +109,7 @@ export function AtelierIstintaj({ data, onReplay, variant = "vert" }: Props) {
         />
       </section>
 
-      {/* Phase A — 6 cases (mur 4 mots + 2 garde-fous), ordre, clavier fermé */}
+      {/* Phase A — 6 cases (mur), ordre, clavier fermé */}
       {phase === "A" && (
         <section className={`rounded-3xl border ${A.border} bg-slate-panel/60 p-5 space-y-3`}>
           <div className="flex items-center justify-between">
@@ -162,24 +161,24 @@ export function AtelierIstintaj({ data, onReplay, variant = "vert" }: Props) {
         </section>
       )}
 
-      {/* Phase B — 1–3 phrases, pas un pavé */}
+      {/* Phase B — 3-6 lignes, لأن + chiffre + نعلم أن OBLIGATOIRES */}
       {phase === "B" && (
         <section className={`rounded-3xl border ${A.border} bg-slate-panel/60 p-5 space-y-4`}>
           <div className="flex items-center justify-between">
             <h2 className="font-black text-white" dir="rtl">
-              المرحلة ب — اكتب الاستنتاج
+              المرحلة ب — اكتب التعليل
             </h2>
             <span className="text-xs text-white/40" dir="rtl">
-              1–3 جمل على الأكثر
+              3–6 أسطر على الأكثر
             </span>
           </div>
           <textarea
             dir="rtl"
             lang="ar"
-            rows={5}
+            rows={6}
             value={text}
             onChange={(e) => setText(e.target.value)}
-            placeholder="نستنتج أن الاستجابة المتدخلة خلوية. الدليل: …"
+            placeholder="الرفض في 5 أيام لأن… نعلم أن… والذروة 4,8…"
             className={`w-full rounded-2xl border border-white/15 bg-slate-deep p-4 text-base leading-relaxed text-white outline-none ${A.focus}`}
           />
           <p className="text-left text-xs text-white/30" dir="ltr">
@@ -313,19 +312,6 @@ export function AtelierIstintaj({ data, onReplay, variant = "vert" }: Props) {
           >
             {data.cta_fin}
           </button>
-
-          {/* Un seul lien, en bas du miroir, après envoi : bootcamp J3→J4 */}
-          {data.lien_suivant && (
-            <div className="pt-1 text-center">
-              <Link
-                href={data.lien_suivant.href}
-                className={`inline-block min-h-12 px-4 py-3 text-sm font-black underline underline-offset-4 ${A.textSoft}`}
-                dir="rtl"
-              >
-                {data.lien_suivant.label}
-              </Link>
-            </div>
-          )}
         </section>
       )}
     </div>

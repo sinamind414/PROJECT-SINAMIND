@@ -1,23 +1,28 @@
 import { describe, expect, it } from "vitest"
 import {
   countHits,
+  detectAllil,
   detectFassir,
   detectIstintaj,
   highlightSpans,
+  isVerbeAllil,
   isVerbeFassir,
   isVerbeHallil,
   isVerbeIstintaj,
+  type AtelierAllilData,
   type AtelierFassirData,
   type AtelierIstintajData,
 } from "./manhadjia-lib"
 import rawData from "../../data/ateliers/manhadjia_01_hallil_taam.json"
 import rawData02 from "../../data/ateliers/manhadjia_02_fassir_taam.json"
 import rawData03 from "../../data/ateliers/manhadjia_03_istintaj_taam.json"
+import rawData04 from "../../data/ateliers/manhadjia_04_allil_taam.json"
 
 // Source unique de vérité : la liste fermée du JSON (pas une copie dans le test)
 const REGEX = rawData.interdits_regex
 const D02 = rawData02 as AtelierFassirData
 const D03 = rawData03 as AtelierIstintajData
+const D04 = rawData04 as AtelierAllilData
 
 describe("isVerbeHallil (rituel — liste fermée)", () => {
   it("accepte حلل / حلّل / تحليل / analyser / analysez / analyse", () => {
@@ -236,5 +241,78 @@ describe("detectIstintaj (métier à côté — R5)", () => {
     const long = Array.from({ length: 90 }, () => "خلوية").join(" ")
     const d = detectIstintaj(long, D03)
     expect(d.crimes).toContain(D03.messages.max_mots)
+  })
+})
+
+// ── Atelier 04 (علّل / برّر) — الحجة + السبب + المكتسب ─────────────────
+
+describe("isVerbeAllil (rituel J4 — liste fermée)", () => {
+  it("accepte علل / علّل / برر / برّر / justifie / argumente", () => {
+    expect(isVerbeAllil("علل")).toBe(true)
+    expect(isVerbeAllil("علّل")).toBe(true)
+    expect(isVerbeAllil("برر")).toBe(true)
+    expect(isVerbeAllil("برّر")).toBe(true)
+    expect(isVerbeAllil("justifie")).toBe(true)
+    expect(isVerbeAllil("argumente")).toBe(true)
+  })
+
+  it("refuse حلل / فسّر / استنتج (R2 — أفعال البارح)", () => {
+    expect(isVerbeAllil("حلل")).toBe(false)
+    expect(isVerbeAllil("حلّل")).toBe(false)
+    expect(isVerbeAllil("فسر")).toBe(false)
+    expect(isVerbeAllil("فسّر")).toBe(false)
+    expect(isVerbeAllil("استنتج")).toBe(false)
+    expect(isVerbeAllil("")).toBe(false)
+  })
+})
+
+describe("detectAllil (métier à côté — R5 J4)", () => {
+  it("corrigé geste (3 lignes jointes) → 0 crime 0 manque (R8)", () => {
+    const d = detectAllil(D04.corrige_geste.join(" "), D04)
+    expect(d.crimes).toEqual([])
+    expect(d.missing).toEqual([])
+  })
+
+  it("copie complète (حجة + لأن + رقم + نعلم أن) → 0 crime 0 manque", () => {
+    const d = detectAllil("الرفض في 5 أيام لأن الملامسة الأولى كوّنت ذاكرة، نعلم أن الذاكرة تعطي استجابة أسرع، والذروة 4,8 في اليوم 3", D04)
+    expect(d.crimes).toEqual([])
+    expect(d.missing).toEqual([])
+  })
+
+  it("« نلاحظ أن » en ouverture → crime re-حلّل", () => {
+    const d = detectAllil("نلاحظ أن الرفض في 5 أيام لأن الذاكرة 4,8", D04)
+    expect(d.crimes).toContain(D04.messages.hallil)
+  })
+
+  it("« إذن نستنتج » → crime (fait le J3)", () => {
+    const d = detectAllil("إذن نستنتج أن الاستجابة خلوية لأن 4,8 نعلم أن الذاكرة", D04)
+    expect(d.crimes).toContain(D04.messages.istintaj)
+  })
+
+  it("hجة sans لأن → manque lian (R5)", () => {
+    const d = detectAllil("الرفض في 5 أيام والذروة 4,8 في اليوم 3 نعلم أن الذاكرة", D04)
+    expect(d.missing).toContain(D04.messages.missing_lian)
+  })
+
+  it("لأن sans chiffre → manque chiffre (R5)", () => {
+    const d = detectAllil("الرفض سريع لأن الذاكرة المناعية نعلم أنها موجودة", D04)
+    expect(d.missing).toContain(D04.messages.missing_chiffre)
+  })
+
+  it("لأن + chiffre sans نعلم أن → manque savoir (R5)", () => {
+    const d = detectAllil("الرفض في 5 أيام لأن المنحنى الثاني أعلى 4,8", D04)
+    expect(d.missing).toContain(D04.messages.missing_savoir)
+  })
+
+  it("paraphrase قاتلة + لأن + رقم + نعلم أن → محترمة", () => {
+    const d = detectAllil("الرفض في 5 أيام لأن الخلايا القاتلة جاهزة، نعلم أن الذاكرة تسرّع الاستجابة، والذروة 4,8", D04)
+    expect(d.crimes).toEqual([])
+    expect(d.missing).toEqual([])
+  })
+
+  it(">80 mots → crime max_mots", () => {
+    const long = Array.from({ length: 90 }, () => "حجة").join(" ")
+    const d = detectAllil(long, D04)
+    expect(d.crimes).toContain(D04.messages.max_mots)
   })
 })

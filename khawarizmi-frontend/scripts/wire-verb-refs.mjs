@@ -23,6 +23,11 @@ const WIRING = [
     outFile: path.join(root, "data/ateliers/manhadjia_03_istintaj_taam.json"),
     key: "verb_ref",
   },
+  {
+    id: 5, // برّر / Justifier — max 15
+    outFile: path.join(root, "data/ateliers/manhadjia_04_allil_taam.json"),
+    key: "verb_ref",
+  },
 ]
 
 for (const { id, outFile, key } of WIRING) {
