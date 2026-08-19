@@ -1,18 +1,17 @@
 "use client"
 
 import { useMemo, useState } from "react"
-import Link from "next/link"
 import {
-  detectQuarin,
+  detectMoukhattat,
   MUSCLE_ACCENTS,
-  type AtelierQuarinData,
+  type AtelierMoukhattatData,
   type MuscleVariant,
   type Span,
 } from "@/lib/manhadjia-lib"
 import { CourbeLTc } from "@/components/manhadjia/CourbeLTc"
 
 type Props = {
-  data: AtelierQuarinData
+  data: AtelierMoukhattatData
   onReplay: () => void
   variant?: MuscleVariant
 }
@@ -35,7 +34,7 @@ function Rouge({ spans }: { spans: Span[] }) {
   )
 }
 
-export function AtelierQuarin({ data, onReplay, variant = "violet" }: Props) {
+export function AtelierMoukhattat({ data, onReplay, variant = "cyan" }: Props) {
   const A = MUSCLE_ACCENTS[variant]
   const [phase, setPhase] = useState<Phase>("A")
   const [checks, setChecks] = useState<boolean[]>(() => data.cases.map(() => false))
@@ -43,7 +42,7 @@ export function AtelierQuarin({ data, onReplay, variant = "violet" }: Props) {
   const [submitted, setSubmitted] = useState<{ text: string; crimes: string[]; missing: string[] } | null>(null)
   const [mirror, setMirror] = useState<number | null>(null)
 
-  const live = useMemo(() => detectQuarin(text, data), [text, data])
+  const live = useMemo(() => detectMoukhattat(text, data), [text, data])
   const steps = checks.filter(Boolean).length
 
   const toggleCase = (i: number) => {
@@ -55,13 +54,13 @@ export function AtelierQuarin({ data, onReplay, variant = "violet" }: Props) {
   }
 
   const submit = () => {
-    const d = detectQuarin(text, data)
+    const d = detectMoukhattat(text, data)
     setSubmitted({ text, crimes: d.crimes, missing: d.missing })
     setPhase("C")
   }
 
   const finalDet = useMemo(
-    () => (submitted ? detectQuarin(submitted.text, data) : null),
+    () => (submitted ? detectMoukhattat(submitted.text, data) : null),
     [submitted, data]
   )
 
@@ -71,12 +70,12 @@ export function AtelierQuarin({ data, onReplay, variant = "violet" }: Props) {
     <div className="space-y-6">
       <header className="space-y-2" dir="rtl">
         <h1 className={`text-2xl font-black ${A.textAccent}`}>{data.verbe}</h1>
-        <p className="text-sm text-white/50">الخطوة 5: المقارنة</p>
+        <p className="text-sm text-white/50">الخطوة 7: المخطط</p>
         <p className="text-lg font-bold text-white/90">التعليمة: {data.consigne}</p>
         <p className="text-sm text-white/50">{data.consigne_note}</p>
       </header>
 
-      {/* Documents bruts — identiques aux ateliers 01-04 */}
+      {/* Documents bruts — identiques aux ateliers 01-06 */}
       <section className="space-y-4" dir="rtl">
         <div className="rounded-2xl border border-white/10 bg-slate-panel/50 p-4">
           <p className="mb-2 text-xs text-white/40">جدول</p>
@@ -162,24 +161,27 @@ export function AtelierQuarin({ data, onReplay, variant = "violet" }: Props) {
         </section>
       )}
 
-      {/* Phase B — 3-6 lignes, تشابه + اختلاف + أرقام الطرفين OBLIGATOIRES */}
+      {/* Phase B — الوصف النصي للمخطط : عنوان + أسهم + ترقيم + مفتاح OBLIGATOIRES */}
       {phase === "B" && (
         <section className={`rounded-3xl border ${A.border} bg-slate-panel/60 p-5 space-y-4`}>
           <div className="flex items-center justify-between">
             <h2 className="font-black text-white" dir="rtl">
-              المرحلة ب — اكتب المقارنة
+              المرحلة ب — صف مخططك
             </h2>
             <span className="text-xs text-white/40" dir="rtl">
               3–6 أسطر على الأكثر
             </span>
           </div>
+          <p className="text-xs text-white/40" dir="rtl">
+            ارسم المخطط على الورق (ما كانش أداة رسم هنا)، واكتب وصفه : العنوان، الإطارات، الأسهم، الترقيم، المفتاح.
+          </p>
           <textarea
             dir="rtl"
             lang="ar"
             rows={6}
             value={text}
             onChange={(e) => setText(e.target.value)}
-            placeholder="أوجه التشابه : في الحالتين… أما أوجه الاختلاف : 10 أيام بينما 5 أيام…"
+            placeholder="العنوان: مخطط يوضح… إطارات: مستضد ← ذاكرة LTc ← رفض. أسهم: 1- الملامسة، 2- الذاكرة… مفتاح أسفل المخطط."
             className={`w-full rounded-2xl border border-white/15 bg-slate-deep p-4 text-base leading-relaxed text-white outline-none ${A.focus}`}
           />
           <p className="text-left text-xs text-white/30" dir="ltr">
@@ -252,7 +254,7 @@ export function AtelierQuarin({ data, onReplay, variant = "violet" }: Props) {
           <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
             <div className="rounded-2xl border border-white/10 bg-slate-panel/60 p-4">
               <p className="mb-2 text-xs text-white/40" dir="rtl">
-                النص ديالك
+                وصفك ديالك
               </p>
               <p className="text-sm leading-relaxed text-white/85" dir="rtl">
                 <Rouge spans={finalDet.displaySpans} />
@@ -313,19 +315,6 @@ export function AtelierQuarin({ data, onReplay, variant = "violet" }: Props) {
           >
             {data.cta_fin}
           </button>
-
-          {/* Un seul lien, en bas du miroir, après envoi : bootcamp J5→J6 */}
-          {data.lien_suivant && (
-            <div className="pt-1 text-center">
-              <Link
-                href={data.lien_suivant.href}
-                className={`inline-block min-h-12 px-4 py-3 text-sm font-black underline underline-offset-4 ${A.textSoft}`}
-                dir="rtl"
-              >
-                {data.lien_suivant.label}
-              </Link>
-            </div>
-          )}
         </section>
       )}
     </div>

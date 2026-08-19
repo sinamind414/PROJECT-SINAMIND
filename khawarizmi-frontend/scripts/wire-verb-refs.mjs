@@ -1,5 +1,6 @@
 // Injection des références verbes officielles dans les écrans de la file
 // fassir  -> id 7 (فسر)   ·   istintaj -> id 6 (استنتج)   ·   حلّل : pas d'id (octobre)
+// allil    -> id 5 (برّر) ·   nas ilmi -> id 1 (وضّح في نص علمي) · moukhattat -> id 10 (أنجز رسما تخطيطيا)
 // Source unique : khawarizmi-backend/methodology/verb_database.json
 // Usage : node scripts/wire-verb-refs.mjs
 // Ne touche pas aux 6 cases ni au moteur local (aucune API, aucun LLM, aucun /20 affiché).
@@ -26,6 +27,16 @@ const WIRING = [
   {
     id: 5, // برّر / Justifier — max 15
     outFile: path.join(root, "data/ateliers/manhadjia_04_allil_taam.json"),
+    key: "verb_ref",
+  },
+  {
+    id: 1, // وضّح في نص علمي / Composer — le seul verbe à max 20 (jamais affiché)
+    outFile: path.join(root, "data/ateliers/manhadjia_06_nas_ilmi_taam.json"),
+    key: "verb_ref",
+  },
+  {
+    id: 10, // أنجز رسما تخطيطيا / Réaliser un schéma — max 10
+    outFile: path.join(root, "data/ateliers/manhadjia_07_moukhattat_taam.json"),
     key: "verb_ref",
   },
 ]

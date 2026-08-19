@@ -54,8 +54,9 @@ export interface AtelierData {
 }
 
 // Palette des muscles : حلّل = أصفر (jaune), فسّر = برتقالي (orange),
-// استنتج = أخضر (vert), علّل = أزرق (bleu), قارن = بنفسجي (violet).
-export type MuscleVariant = "jaune" | "orange" | "vert" | "bleu" | "violet"
+// استنتج = أخضر (vert), علّل = أزرق (bleu), قارن = بنفسجي (violet),
+// نص علمي = وردي (rose), مخطط = سماوي (cyan).
+export type MuscleVariant = "jaune" | "orange" | "vert" | "bleu" | "violet" | "rose" | "cyan"
 
 export const MUSCLE_ACCENTS: Record<
   MuscleVariant,
@@ -149,6 +150,36 @@ export const MUSCLE_ACCENTS: Record<
     focus: "focus:border-violet-300",
     pastille: "border-violet-300/40 bg-violet-300/15 text-violet-300",
     borderActive: "border-violet-300",
+  },
+  rose: {
+    border: "border-rose-400/25",
+    borderSoft: "border-rose-400/30",
+    bgSoft: "bg-rose-400/5",
+    chipBg: "bg-rose-400",
+    chipText: "text-slate-deep",
+    textAccent: "text-rose-300",
+    textSoft: "text-rose-200",
+    btn: "bg-rose-400 hover:bg-rose-300",
+    caseActive: "border-rose-300/60 bg-rose-300/10",
+    checkbox: "accent-rose-300",
+    focus: "focus:border-rose-300",
+    pastille: "border-rose-300/40 bg-rose-300/15 text-rose-300",
+    borderActive: "border-rose-300",
+  },
+  cyan: {
+    border: "border-cyan-400/25",
+    borderSoft: "border-cyan-400/30",
+    bgSoft: "bg-cyan-400/5",
+    chipBg: "bg-cyan-400",
+    chipText: "text-slate-deep",
+    textAccent: "text-cyan-300",
+    textSoft: "text-cyan-200",
+    btn: "bg-cyan-400 hover:bg-cyan-300",
+    caseActive: "border-cyan-300/60 bg-cyan-300/10",
+    checkbox: "accent-cyan-300",
+    focus: "focus:border-cyan-300",
+    pastille: "border-cyan-300/40 bg-cyan-300/15 text-cyan-300",
+    borderActive: "border-cyan-300",
   },
 }
 
@@ -248,6 +279,64 @@ export interface AtelierAllilData extends AtelierData {
   recap: string[]
 }
 
+// Atelier 06 (نص علمي) — المقدمة + العرض + الخاتمة. Livre Manhadjiya §8 :
+// (1) المقدمة : سياق عام + طرح المشكل العلمي (2) العرض : إجابة مفصلة منظمة
+// (3) الخاتمة : إجابة موجزة للمشكل. Détection inversée : مقدمة + عرض
+// (مصطلحات علمية) + خاتمة + أرقام الوثيقة OBLIGATOIRES ;
+// نلاحظ أن (ouverture J1) et قصة الأيام (≥ 5 أرقام) = crimes.
+export interface AtelierNasIlmiData extends AtelierData {
+  consigne_note: string
+  patterns: {
+    hallil: string
+    intro: string
+    corps: string
+    khitam: string
+    chiffres: string
+  }
+  messages: {
+    hallil: string
+    qissa: string
+    missing_intro: string
+    missing_corps: string
+    missing_khitam: string
+    missing_chiffres: string
+    max_mots: string
+  }
+  max_mots: number
+  voix: string[]
+  recap: string[]
+}
+
+// Atelier 07 (مخطط / رسم تخطيطي) — الإطارات + الأسهم + المفتاح.
+// Livre Manhadjiya §9-11 : (1) كل معلومة في إطار (2) الربط بأسهم محددة
+// الاتجاه (3) ترقيم الظواهر زمنيا (4) مفتاح الأرقام (5) عنوان + إطار عام.
+// Pas d'outil de dessin dans le produit : checklist + texte descriptif
+// (le dessin se fait sur papier). Détection inversée : عنوان + أسهم +
+// خطوات مرقمة + إطارات + مفتاح OBLIGATOIRES ; نلاحظ أن (فقرة وصفية) = crime.
+export interface AtelierMoukhattatData extends AtelierData {
+  consigne_note: string
+  patterns: {
+    hallil: string
+    title: string
+    souham: string
+    khatwat: string
+    itarat: string
+    miftah: string
+  }
+  messages: {
+    hallil: string
+    missing_title: string
+    missing_souham: string
+    missing_khatwat: string
+    missing_itarat: string
+    missing_miftah: string
+    max_mots: string
+  }
+  max_mots: number
+  voix: string[]
+  recap: string[]
+}
+
 // Verbes acceptés au rituel (listes fermées de la spec écran 0)
 const ACCEPTED_VERBES = new Set(["حلل", "تحليل", "analyser", "analysez", "analyse"])
 const ACCEPTED_VERBES_FASSIR = new Set([
@@ -289,6 +378,30 @@ const ACCEPTED_VERBES_QUARIN = new Set([
   "compare",
   "comparez",
   "comparer",
+])
+// J6 اكتب نصا علميا — formes du livre §8 (tanween retiré par la normalisation)
+// + le français de la méthode (Composer / rédiger).
+const ACCEPTED_VERBES_NAS_ILMI = new Set([
+  "اكتب نصا علميا",
+  "اكتب نص علمي",
+  "اكتب النص العلمي",
+  "اكتب نصا",
+  "نص علمي",
+  "composer",
+  "redige",
+  "rediger",
+])
+// J7 أنجز مخططا — formes du livre §9-11 (مخططا / رسما تخطيطيا)
+// + le français de la méthode (schématiser).
+const ACCEPTED_VERBES_MOUKHATTAT = new Set([
+  "انجز مخططا",
+  "انجز مخطط",
+  "انجز رسما تخطيطيا",
+  "انجز رسما",
+  "مخطط",
+  "رسم تخطيطي",
+  "schematiser",
+  "schematise",
 ])
 
 function isDiacritic(c: string): boolean {
@@ -345,6 +458,20 @@ export function isVerbeQuarin(input: string): boolean {
   const { text } = normalizeWithMap(input.trim())
   const fr = text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase()
   return ACCEPTED_VERBES_QUARIN.has(text.toLowerCase()) || ACCEPTED_VERBES_QUARIN.has(fr)
+}
+
+/** Le verbe tapé au rituel est-il اكتب نصا علميا ? (fermé — J6) */
+export function isVerbeNasIlmi(input: string): boolean {
+  const { text } = normalizeWithMap(input.trim())
+  const fr = text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase()
+  return ACCEPTED_VERBES_NAS_ILMI.has(text.toLowerCase()) || ACCEPTED_VERBES_NAS_ILMI.has(fr)
+}
+
+/** Le verbe tapé au rituel est-il أنجز مخططا ? (fermé — J7) */
+export function isVerbeMoukhattat(input: string): boolean {
+  const { text } = normalizeWithMap(input.trim())
+  const fr = text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase()
+  return ACCEPTED_VERBES_MOUKHATTAT.has(text.toLowerCase()) || ACCEPTED_VERBES_MOUKHATTAT.has(fr)
 }
 
 export interface Span {
@@ -558,6 +685,104 @@ export function detectAllil(original: string, data: AtelierAllilData): AllilDete
   }
   if (!new RegExp(data.patterns.savoir, "g").test(text)) {
     missing.push(data.messages.missing_savoir)
+  }
+
+  const combined = crimePatterns.join("|")
+  const displaySpans = combined ? highlightSpans(original, combined) : highlightSpans(original, "(?!)")
+  return { displaySpans, crimes, missing, wordCount }
+}
+
+// ── Atelier 06 (نص علمي) ────────────────────────────────────────────
+// مقدمة (سياق + مشكل) + عرض (مصطلحات) + خاتمة + أرقام الوثيقة.
+// Crimes : نلاحظ أن (re-حلّل), قصة الأيام (≥ 5 أرقام).
+
+export interface NasIlmiDetection {
+  displaySpans: Span[]
+  crimes: string[]
+  missing: string[]
+  wordCount: number
+}
+
+export function detectNasIlmi(original: string, data: AtelierNasIlmiData): NasIlmiDetection {
+  const { text } = normalizeWithMap(original)
+
+  const hasHallil = new RegExp(data.patterns.hallil, "g").test(text)
+  const numMatches = text.match(new RegExp(data.patterns.chiffres, "g")) || []
+  const qissa = numMatches.length >= 5
+
+  const crimes: string[] = []
+  const crimePatterns: string[] = []
+  if (hasHallil) {
+    crimes.push(data.messages.hallil)
+    crimePatterns.push(data.patterns.hallil)
+  }
+  if (qissa) {
+    crimes.push(data.messages.qissa)
+    crimePatterns.push(data.patterns.chiffres)
+  }
+
+  const wordCount = text.trim() ? text.trim().split(/\s+/).length : 0
+  if (wordCount > data.max_mots) crimes.push(data.messages.max_mots)
+
+  const missing: string[] = []
+  if (!new RegExp(data.patterns.intro, "g").test(text)) {
+    missing.push(data.messages.missing_intro)
+  }
+  if (!new RegExp(data.patterns.corps, "g").test(text)) {
+    missing.push(data.messages.missing_corps)
+  }
+  if (!new RegExp(data.patterns.khitam, "g").test(text)) {
+    missing.push(data.messages.missing_khitam)
+  }
+  if (numMatches.length === 0) {
+    missing.push(data.messages.missing_chiffres)
+  }
+
+  const combined = crimePatterns.join("|")
+  const displaySpans = combined ? highlightSpans(original, combined) : highlightSpans(original, "(?!)")
+  return { displaySpans, crimes, missing, wordCount }
+}
+
+// ── Atelier 07 (مخطط / رسم تخطيطي) ───────────────────────────────────
+// عنوان + أسهم + خطوات مرقمة + إطارات + مفتاح. Crime : نلاحظ أن (فقرة وصفية).
+
+export interface MoukhattatDetection {
+  displaySpans: Span[]
+  crimes: string[]
+  missing: string[]
+  wordCount: number
+}
+
+export function detectMoukhattat(original: string, data: AtelierMoukhattatData): MoukhattatDetection {
+  const { text } = normalizeWithMap(original)
+
+  const hasHallil = new RegExp(data.patterns.hallil, "g").test(text)
+
+  const crimes: string[] = []
+  const crimePatterns: string[] = []
+  if (hasHallil) {
+    crimes.push(data.messages.hallil)
+    crimePatterns.push(data.patterns.hallil)
+  }
+
+  const wordCount = text.trim() ? text.trim().split(/\s+/).length : 0
+  if (wordCount > data.max_mots) crimes.push(data.messages.max_mots)
+
+  const missing: string[] = []
+  if (!new RegExp(data.patterns.title, "g").test(text)) {
+    missing.push(data.messages.missing_title)
+  }
+  if (!new RegExp(data.patterns.souham, "g").test(text)) {
+    missing.push(data.messages.missing_souham)
+  }
+  if (!new RegExp(data.patterns.khatwat, "g").test(text)) {
+    missing.push(data.messages.missing_khatwat)
+  }
+  if (!new RegExp(data.patterns.itarat, "g").test(text)) {
+    missing.push(data.messages.missing_itarat)
+  }
+  if (!new RegExp(data.patterns.miftah, "g").test(text)) {
+    missing.push(data.messages.missing_miftah)
   }
 
   const combined = crimePatterns.join("|")

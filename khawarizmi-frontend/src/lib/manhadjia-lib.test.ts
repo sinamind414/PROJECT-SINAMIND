@@ -4,16 +4,22 @@ import {
   detectAllil,
   detectFassir,
   detectIstintaj,
+  detectMoukhattat,
+  detectNasIlmi,
   detectQuarin,
   highlightSpans,
   isVerbeAllil,
   isVerbeFassir,
   isVerbeHallil,
   isVerbeIstintaj,
+  isVerbeMoukhattat,
+  isVerbeNasIlmi,
   isVerbeQuarin,
   type AtelierAllilData,
   type AtelierFassirData,
   type AtelierIstintajData,
+  type AtelierMoukhattatData,
+  type AtelierNasIlmiData,
   type AtelierQuarinData,
 } from "./manhadjia-lib"
 import rawData from "../../data/ateliers/manhadjia_01_hallil_taam.json"
@@ -21,6 +27,8 @@ import rawData02 from "../../data/ateliers/manhadjia_02_fassir_taam.json"
 import rawData03 from "../../data/ateliers/manhadjia_03_istintaj_taam.json"
 import rawData04 from "../../data/ateliers/manhadjia_04_allil_taam.json"
 import rawData05 from "../../data/ateliers/manhadjia_05_quarin_taam.json"
+import rawData06 from "../../data/ateliers/manhadjia_06_nas_ilmi_taam.json"
+import rawData07 from "../../data/ateliers/manhadjia_07_moukhattat_taam.json"
 
 // Source unique de vérité : la liste fermée du JSON (pas une copie dans le test)
 const REGEX = rawData.interdits_regex
@@ -28,6 +36,8 @@ const D02 = rawData02 as AtelierFassirData
 const D03 = rawData03 as AtelierIstintajData
 const D04 = rawData04 as AtelierAllilData
 const D05 = rawData05 as AtelierQuarinData
+const D06 = rawData06 as AtelierNasIlmiData
+const D07 = rawData07 as AtelierMoukhattatData
 
 describe("isVerbeHallil (rituel — liste fermée)", () => {
   it("accepte حلل / حلّل / تحليل / analyser / analysez / analyse", () => {
@@ -392,5 +402,179 @@ describe("detectQuarin (métier à côté — R5 J5)", () => {
     const long = Array.from({ length: 90 }, () => "مقارنة").join(" ")
     const d = detectQuarin(long, D05)
     expect(d.crimes).toContain(D05.messages.max_mots)
+  })
+})
+
+// ── Atelier 06 (نص علمي) — مقدمة + عرض + خاتمة ───────────────────────
+
+describe("isVerbeNasIlmi (rituel J6 — liste fermée)", () => {
+  it("accepte اكتب نصا علميا / اكتب نص علمي / نص علمي / rédiger / composer", () => {
+    expect(isVerbeNasIlmi("اكتب نصا علميا")).toBe(true)
+    expect(isVerbeNasIlmi("اكتب نصاً علمياً")).toBe(true) // tanween strip avant match
+    expect(isVerbeNasIlmi("اكتب نص علمي")).toBe(true)
+    expect(isVerbeNasIlmi("اكتب النص العلمي")).toBe(true)
+    expect(isVerbeNasIlmi("نص علمي")).toBe(true)
+    expect(isVerbeNasIlmi("rédiger")).toBe(true)
+    expect(isVerbeNasIlmi("rediger")).toBe(true)
+    expect(isVerbeNasIlmi("composer")).toBe(true)
+  })
+
+  it("refuse حلل / فسّر / استنتج / علّل / قارن / أنجز مخططا (R2)", () => {
+    expect(isVerbeNasIlmi("حلل")).toBe(false)
+    expect(isVerbeNasIlmi("فسّر")).toBe(false)
+    expect(isVerbeNasIlmi("استنتج")).toBe(false)
+    expect(isVerbeNasIlmi("علّل")).toBe(false)
+    expect(isVerbeNasIlmi("قارن")).toBe(false)
+    expect(isVerbeNasIlmi("انجز مخططا")).toBe(false)
+    expect(isVerbeNasIlmi("")).toBe(false)
+  })
+})
+
+describe("detectNasIlmi (métier à côté — R5 J6)", () => {
+  it("corrigé geste (3 lignes jointes) → 0 crime 0 manque (R8)", () => {
+    const d = detectNasIlmi(D06.corrige_geste.join(" "), D06)
+    expect(d.crimes).toEqual([])
+    expect(d.missing).toEqual([])
+  })
+
+  it("copie complète (مقدمة+مشكل+عرض+خاتمة+رقم) → 0 crime 0 manque", () => {
+    const d = detectNasIlmi(
+      "المقدمة: المناعة تدافع عن الجسم. فما هي آلية الاستجابة الخلوية؟ العرض: الملامسة الأولى كوّنت ذاكرة مناعية LTc، فتتكاثر الخلايا القاتلة وتبلغ الذروة 4,8 في اليوم 3. الخاتمة: الاستجابة الثانية أسرع وأشد.",
+      D06
+    )
+    expect(d.crimes).toEqual([])
+    expect(d.missing).toEqual([])
+  })
+
+  it("« نلاحظ أن » en ouverture → crime re-حلّل", () => {
+    const d = detectNasIlmi("نلاحظ أن الرفض في 10 أيام ثم 5 أيام والذروة 4,8", D06)
+    expect(d.crimes).toContain(D06.messages.hallil)
+  })
+
+  it("قصة الأيام (10/5/4,8/2,5 + الأيام) → crime qissa", () => {
+    const d = detectNasIlmi("رفض في 10 أيام ثم 5 أيام والذروة 4,8 يوم 3 مقابل 2,5 يوم 8", D06)
+    expect(d.crimes).toContain(D06.messages.qissa)
+  })
+
+  it("sans مقدمة ni مشكل → manque intro", () => {
+    const d = detectNasIlmi("العرض: الذاكرة المناعية LTc تتكاثر بسرعة 4,8 يوم 3. الخاتمة: الاستجابة أسرع.", D06)
+    expect(d.missing).toContain(D06.messages.missing_intro)
+  })
+
+  it("sans عرض (بلا مصطلحات علمية) → manque corps", () => {
+    const d = detectNasIlmi("المقدمة: فما هي آلية الرفض السريع؟ الخاتمة: إذن الاستجابة الثانية أسرع.", D06)
+    expect(d.missing).toContain(D06.messages.missing_corps)
+  })
+
+  it("sans خاتمة → manque khitam", () => {
+    const d = detectNasIlmi("المقدمة: فما هي آلية الاستجابة الخلوية؟ العرض: الذاكرة المناعية LTc تتكاثر وتبلغ 4,8 يوم 3.", D06)
+    expect(d.missing).toContain(D06.messages.missing_khitam)
+  })
+
+  it("sans chiffre de la doc → manque chiffres", () => {
+    const d = detectNasIlmi("المقدمة: فما هي آلية الاستجابة؟ العرض: الذاكرة المناعية LTc تجعل الخلايا القاتلة تتكاثر. الخاتمة: إذن الاستجابة الثانية أسرع.", D06)
+    expect(d.missing).toContain(D06.messages.missing_chiffres)
+  })
+
+  it("paraphrase محترمة (مقدمة+عرض+خاتمة+رقم) → 0 crime 0 manque", () => {
+    const d = detectNasIlmi(
+      "مقدمة: فما هي آلية الاستجابة الثانية؟ عرض: خلايا الذاكرة LTc تتحول إلى خلايا قاتلة بسرعة وتبلغ 4,8 يوم 3. خاتمة: الاستجابة الثانية أقوى وأسرع.",
+      D06
+    )
+    expect(d.crimes).toEqual([])
+    expect(d.missing).toEqual([])
+  })
+
+  it(">120 mots → crime max_mots", () => {
+    const long = Array.from({ length: 130 }, () => "خلوية").join(" ")
+    const d = detectNasIlmi(long, D06)
+    expect(d.crimes).toContain(D06.messages.max_mots)
+  })
+})
+
+// ── Atelier 07 (مخطط / رسم تخطيطي) — عنوان + أسهم + ترقيم + مفتاح ─────
+
+describe("isVerbeMoukhattat (rituel J7 — liste fermée)", () => {
+  it("accepte أنجز مخططا / انجز رسما تخطيطيا / مخطط / schématiser", () => {
+    expect(isVerbeMoukhattat("أنجز مخططا")).toBe(true)
+    expect(isVerbeMoukhattat("انجز مخططا")).toBe(true)
+    expect(isVerbeMoukhattat("انجز مخطط")).toBe(true)
+    expect(isVerbeMoukhattat("انجز رسما تخطيطيا")).toBe(true)
+    expect(isVerbeMoukhattat("مخطط")).toBe(true)
+    expect(isVerbeMoukhattat("رسم تخطيطي")).toBe(true)
+    expect(isVerbeMoukhattat("schématiser")).toBe(true)
+    expect(isVerbeMoukhattat("schematiser")).toBe(true)
+  })
+
+  it("refuse حلل / فسّر / استنتج / علّل / قارن / اكتب نصا علميا (R2)", () => {
+    expect(isVerbeMoukhattat("حلل")).toBe(false)
+    expect(isVerbeMoukhattat("فسّر")).toBe(false)
+    expect(isVerbeMoukhattat("استنتج")).toBe(false)
+    expect(isVerbeMoukhattat("علّل")).toBe(false)
+    expect(isVerbeMoukhattat("قارن")).toBe(false)
+    expect(isVerbeMoukhattat("اكتب نصا علميا")).toBe(false)
+    expect(isVerbeMoukhattat("")).toBe(false)
+  })
+})
+
+describe("detectMoukhattat (métier à côté — R5 J7)", () => {
+  it("corrigé geste (3 lignes jointes) → 0 crime 0 manque (R8)", () => {
+    const d = detectMoukhattat(D07.corrige_geste.join(" "), D07)
+    expect(d.crimes).toEqual([])
+    expect(d.missing).toEqual([])
+  })
+
+  it("copie complète (عنوان+إطارات+أسهم+ترقيم+مفتاح) → 0 crime 0 manque", () => {
+    const d = detectMoukhattat(
+      "عنوان: مخطط يوضح آلية الاستجابة الخلوية. إطارات: مستضد، ذاكرة LTc، رفض. أسهم تربط الإطارات. 1- ملامسة، 2- ذاكرة، 3- رفض. مفتاح أسفل المخطط.",
+      D07
+    )
+    expect(d.crimes).toEqual([])
+    expect(d.missing).toEqual([])
+  })
+
+  it("« نلاحظ أن » en ouverture → crime (فقرة وصفية)", () => {
+    const d = detectMoukhattat("نلاحظ أن المنحنى يرتفع ثم المخطط يوضح ذلك", D07)
+    expect(d.crimes).toContain(D07.messages.hallil)
+  })
+
+  it("sans عنوان → manque title", () => {
+    const d = detectMoukhattat("إطارات مترابطة بأسهم: مستضد ← ذاكرة. خطوات: 1- ملامسة، 2- رفض. مفتاح أسفل المخطط.", D07)
+    expect(d.missing).toContain(D07.messages.missing_title)
+  })
+
+  it("sans أسهم → manque souham", () => {
+    const d = detectMoukhattat("عنوان: مخطط الاستجابة الخلوية. إطارات: مستضد، ذاكرة، رفض. 1- ملامسة، 2- رفض. مفتاح أسفل.", D07)
+    expect(d.missing).toContain(D07.messages.missing_souham)
+  })
+
+  it("sans ترقيم → manque khatwat", () => {
+    const d = detectMoukhattat("عنوان: مخطط يوضح آلية الاستجابة. إطارات بأسهم: مستضد ← ذاكرة ← رفض. مفتاح أسفل المخطط.", D07)
+    expect(d.missing).toContain(D07.messages.missing_khatwat)
+  })
+
+  it("sans إطارات → manque itarat", () => {
+    const d = detectMoukhattat("عنوان: مخطط يوضح الاستجابة. أسهم تربط المستضد بالذاكرة. خطوات: 1- ملامسة، 2- رفض. مفتاح أسفل.", D07)
+    expect(d.missing).toContain(D07.messages.missing_itarat)
+  })
+
+  it("sans مفتاح → manque miftah", () => {
+    const d = detectMoukhattat("عنوان: مخطط يوضح الاستجابة. إطارات بأسهم: مستضد ← ذاكرة. 1- ملامسة، 2- رفض.", D07)
+    expect(d.missing).toContain(D07.messages.missing_miftah)
+  })
+
+  it("paraphrase محترمة (عنوان+سهام+مراحل+إطار+مفتاح) → 0 crime 0 manque", () => {
+    const d = detectMoukhattat(
+      "عنوان: مخطط يبيّن الاستجابة المناعية الخلوية. إطارات صغيرة بسهام: مستضد (ب) ← ذاكرة LTc ← خلايا قاتلة. مراحل: 1- الملامسة الأولى، 2- الرفض السريع. ثم مفتاح الأرقام أسفل الرسم.",
+      D07
+    )
+    expect(d.crimes).toEqual([])
+    expect(d.missing).toEqual([])
+  })
+
+  it(">80 mots → crime max_mots", () => {
+    const long = Array.from({ length: 90 }, () => "مخطط").join(" ")
+    const d = detectMoukhattat(long, D07)
+    expect(d.crimes).toContain(D07.messages.max_mots)
   })
 })
