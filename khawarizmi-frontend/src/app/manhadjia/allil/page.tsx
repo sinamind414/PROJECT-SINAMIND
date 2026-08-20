@@ -20,7 +20,7 @@ const SCREEN_LABEL: Record<Screen, string> = {
 }
 
 // Atelier 04 — علّل / برّر : même machine d'états, même greffe (4,8/2,5).
-// حجة + لأن + نعلم أن OBLIGATOIRES. 0 appel API, 0 LLM, 0 note /10.
+// حجة + لأن + نعلم أن OBLIGATOIRES. 1 appel API officiel (remédiation phase ب, repli silencieux), 0 LLM, 0 note /10.
 export default function ManhadjiaAllilPage() {
   const [screen, setScreen] = useState<Screen>("ritual-carte")
 

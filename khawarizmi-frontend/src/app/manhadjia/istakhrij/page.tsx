@@ -20,7 +20,7 @@ const SCREEN_LABEL: Record<Screen, string> = {
 }
 
 // قمر 12 — استخرج (من الكتاب §19) : même machine d'états que le bootcamp,
-// identité فضي, hors boucle J1→J7. 0 appel API, 0 LLM, 0 note /10.
+// identité فضي, hors boucle J1→J7. 1 appel API officiel (remédiation phase ب, repli silencieux), 0 LLM, 0 note /10.
 export default function ManhadjiaIstakhrijPage() {
   const [screen, setScreen] = useState<Screen>("ritual-carte")
 

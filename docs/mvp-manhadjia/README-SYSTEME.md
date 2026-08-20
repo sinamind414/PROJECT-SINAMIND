@@ -7,7 +7,7 @@
 
 | Règle | Valeur |
 |---|---|
-| Appels API | **0** — toutes les données sont dans les JSON frontend |
+| Appels API | **1 seul** : `POST /api/manhadjiya/contextual-remediation` (phase ب, debounce 1,2 s, timeout 2,5 s, **repli silencieux** — échec = rien affiché). Tout le reste est statique (JSON frontend). |
 | LLM | **0** — détection locale par regex listes fermées |
 | Note /20 | **0** — jamais de score officiel affiché à l'élève |
 | Verbes | 1 verbe = 1 atelier, rituel → carte → atelier (phases أ/ب/ج) |
@@ -80,11 +80,13 @@ Phase ج (miroir) : lien_suivant = قمر N+1 (boucle → bootcamp)
 
 ## 6. Tests
 
-- `khawarizmi-frontend/src/lib/manhadjia-lib.test.ts` : **142 tests** — registres
+- `khawarizmi-frontend/src/lib/manhadjia-lib.test.ts` : **143 tests** — registres
   (7+15), cohérence JSON↔registre, accepteurs rituel fermés, détection
   modèle/pièges par verbe, chaînes bouclées, données officielles,
   scope-fence bootcamp, invariant de couverture verb_ref 1→10.
-- Suite complète frontend : **787 tests verts** (`npx vitest run`).
+- `khawarizmi-frontend/src/lib/manhadjia-remediation.test.ts` : **11 tests** —
+  point d'équilibre (timeout/abort, échecs silencieux, normalisation, garde).
+- Suite complète frontend : **799 tests verts** (`npx vitest run`).
 - Environnement vitest = `node` (pas de jsdom/RTL — les composants ne sont
   pas testés en rendu ; la vérification se fait sur le HTML servi + build).
 
@@ -97,6 +99,7 @@ Phase ج (miroir) : lien_suivant = قمر N+1 (boucle → bootcamp)
 
 ## 8. Reste possible (non fait — à valider)
 
-- Branchement **runtime** des APIs `/api/manhadjiya/*` (casserait la doctrine 0 API).
+- Branchement runtime **complet** (cartes/unites/exemples via API) : refusé — l'injection statique reste supérieure (0 latence, 0 panne).
 - Rendu tests (jsdom + @testing-library/react) : changement d'infra test.
 - Capture d'écran automatisée : navigateur headless indisponible dans le sandbox.
+- Backend : modèle ONNX corrompu + écart `unite5-energie`/`unite5-energetique` (voir `audit-runtime-remediation.md` §6).

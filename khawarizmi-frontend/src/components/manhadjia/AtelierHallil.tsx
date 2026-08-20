@@ -8,6 +8,7 @@ import {
   type AtelierData,
 } from "@/lib/manhadjia-lib"
 import { CourbeLTc } from "@/components/manhadjia/CourbeLTc"
+import { RemediationHint } from "@/components/manhadjia/RemediationHint"
 
 type Props = {
   data: AtelierData
@@ -194,6 +195,8 @@ export function AtelierHallil({ data, onReplay }: Props) {
               </p>
             </>
           )}
+          <RemediationHint verbSlug={data.verb_slug} text={text} />
+
           <button
             onClick={submit}
             className="min-h-14 w-full rounded-2xl bg-yellow-300 py-3 text-lg font-black text-slate-deep hover:bg-yellow-200"

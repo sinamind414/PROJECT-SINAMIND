@@ -21,7 +21,7 @@ const SCREEN_LABEL: Record<Screen, string> = {
 
 // قمر 06 — استنتج على وثيقة جديدة (المشبك / الكورار — §19 du livre) :
 // même verbe que J3, même machine d'états, même rituel (isVerbeIstintaj).
-// جدول 5 تجارب + رسم تخطيطي (بلا منحنى). 0 appel API, 0 LLM, 0 note /10.
+// جدول 5 تجارب + رسم تخطيطي (بلا منحنى). 1 appel API officiel (remédiation phase ب, repli silencieux), 0 LLM, 0 note /10.
 export default function ManhadjiaSynapsePage() {
   const [screen, setScreen] = useState<Screen>("ritual-carte")
 

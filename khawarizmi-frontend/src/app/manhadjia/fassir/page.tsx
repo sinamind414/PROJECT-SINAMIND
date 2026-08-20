@@ -20,7 +20,7 @@ const SCREEN_LABEL: Record<Screen, string> = {
 }
 
 // Atelier 02 — فسّر : même machine d'états que /manhadjia, même greffe (4,8/2,5).
-// لأن + chiffre OBLIGATOIRES. 0 appel API, 0 LLM, 0 note /10, 0 lien externe.
+// لأن + chiffre OBLIGATOIRES. 1 appel API officiel (remédiation phase ب, repli silencieux), 0 LLM, 0 note /10, 0 lien externe.
 export default function ManhadjiaFassirPage() {
   const [screen, setScreen] = useState<Screen>("ritual-carte")
 

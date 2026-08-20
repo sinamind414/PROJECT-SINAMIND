@@ -20,7 +20,7 @@ const SCREEN_LABEL: Record<Screen, string> = {
 }
 
 // MVP 3 écrans — route unique /manhadjia
-// 0 appel API, 0 LLM, 0 note /10, 0 lien vers le reste du site.
+// 1 appel API officiel (remédiation phase ب, repli silencieux), 0 LLM, 0 note /10, 0 lien vers le reste du site.
 export default function ManhadjiaPage() {
   const [screen, setScreen] = useState<Screen>("ritual-carte")
 

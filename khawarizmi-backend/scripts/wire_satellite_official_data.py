@@ -82,12 +82,13 @@ def main() -> None:
         unites = units_for(verb_slugs)
         exemples = exemples_for(categories)
         data["unites"] = unites
+        data["verb_slug"] = verb_slugs[0]
         if exemples:
             data["exemples"] = exemples
         path.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
         total_units += len(unites)
         total_exemples += len(exemples)
-        print(f"✅ {filename} <- {len(unites)} unités · {len(exemples)} exemples ({slug})")
+        print(f"✅ {filename} <- {len(unites)} unités · {len(exemples)} exemples · verb_slug={verb_slugs[0]} ({slug})")
     print(f"Total : {total_units} unités, {total_exemples} exemples sur 15 satellites — bootcamp intact.")
 
 if __name__ == "__main__":

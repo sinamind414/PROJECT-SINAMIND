@@ -14,6 +14,9 @@ export interface AtelierData {
   couleur: string
   // jour = position dans le bootcamp J1→J7. Absent pour les ateliers satellites.
   jour?: number
+  // slug backend (VERB_UNIT_MAP) pour POST /api/manhadjiya/contextual-remediation
+  // — le seul appel runtime du système (repli silencieux, voir manhadjia-remediation.ts).
+  verb_slug: string
   mots_mur: string[]
   cases: { mot: string; desc: string }[]
   erreur_verbe: string

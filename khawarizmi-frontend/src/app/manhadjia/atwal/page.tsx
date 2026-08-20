@@ -23,7 +23,7 @@ const DATA: AtelierSatelliteData[] = [
 ] as AtelierSatelliteData[]
 
 // Hub des 15 ateliers satellites (verbes hors bootcamp).
-// 0 appel API, 0 LLM, 0 note /10.
+// 1 appel API officiel (remédiation phase ب, repli silencieux), 0 LLM, 0 note /10.
 export default function ManhadjiaAtwalPage() {
   return (
     <main dir="rtl" lang="ar" className="min-h-screen bg-slate-deep text-white">

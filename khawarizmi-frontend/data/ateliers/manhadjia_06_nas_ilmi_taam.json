@@ -3,6 +3,7 @@
   "verbe": "اكتب نصا علميا",
   "couleur": "وردي",
   "jour": 6,
+  "verb_slug": "scientific-text",
   "mots_mur": [
     "مقدمة",
     "مشكل",

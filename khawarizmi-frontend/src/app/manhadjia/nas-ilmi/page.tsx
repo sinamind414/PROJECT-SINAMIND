@@ -20,7 +20,7 @@ const SCREEN_LABEL: Record<Screen, string> = {
 }
 
 // Atelier 06 — اكتب نصا علميا : même machine d'états, même greffe (4,8/2,5).
-// مقدمة (سياق + مشكل) + عرض + خاتمة OBLIGATOIRES. 0 appel API, 0 LLM, 0 note /10.
+// مقدمة (سياق + مشكل) + عرض + خاتمة OBLIGATOIRES. 1 appel API officiel (remédiation phase ب, repli silencieux), 0 LLM, 0 note /10.
 export default function ManhadjiaNasIlmiPage() {
   const [screen, setScreen] = useState<Screen>("ritual-carte")
 

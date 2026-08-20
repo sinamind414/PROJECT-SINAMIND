@@ -829,6 +829,25 @@ describe("SATELLITE_DAYS (15 satellites : référentiel + livre)", () => {
     expect(ids).toHaveLength(11)
     expect(ids.filter((id) => id === 6)).toHaveLength(2)
   })
+
+  it("invariant : les 22 JSON portent un verb_slug du VERB_UNIT_MAP backend", () => {
+    const ALLOWED = new Set([
+      "analyse", "citer", "classer", "comment", "compare", "critiquer", "decrire",
+      "deduce", "definir", "determiner", "discuss", "distinguer", "enumerer",
+      "evaluate-critique", "expliquer", "exploit-document", "extract", "extract-info",
+      "formulate-problem", "hypothesis", "interpret", "justify", "nommer", "prove",
+      "prove-experimentally", "relationship", "schema-explicatif", "schema-fonctionnel",
+      "schematiser", "scientific-text", "synthese", "validate-hypothesis",
+    ])
+    const all = [
+      rawData, rawData02, rawData03, rawData04, rawData05, rawData06, rawData07,
+      ...RAWS,
+    ] as { verb_slug?: string }[]
+    for (const raw of all) {
+      expect(typeof raw.verb_slug).toBe("string")
+      expect(ALLOWED.has(raw.verb_slug!)).toBe(true)
+    }
+  })
 })
 
 describe("isVerbe* satellites (rituel — listes fermées)", () => {
