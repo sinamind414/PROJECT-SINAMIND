@@ -79,9 +79,17 @@ Ces deux bugs étaient committés dans la base de session (`f45018c`) :
     désactivent déjà correctement quand `is_semantic` est False).
   - `scripts/check_onnx_asset.py` (nouveau) : diagnostic du statut
     (OK / LFS / CORROMPU / MANQUANT / ZIP) + commande de récupération exacte.
-- **Action côté utilisateur** (réseau du sandbox bloqué pour media.githubusercontent.com) :
-  sur une machine avec git-lfs : `git lfs pull --include 'khawarizmi-backend/models/minilm_onnx_int8/*'`
-  puis redéployer. En attendant, le RAG mot-clé reste fonctionnel.
+- **Action côté utilisateur** (réseau du sandbox bloqué pour les CDN de contenu
+  GitHub — vérifié : media/objects/github-cloud.githubusercontent.com
+  inaccessibles, seul api.github.com et le protocole git répondent) :
+  sur une machine avec accès réseau :
+  `git lfs pull --include 'khawarizmi-backend/models/minilm_onnx_int8/*'`
+  puis redéployer. Alternative sans git-lfs : le batch API LFS
+  (`POST https://github.com/sinamind414/PROJECT-SINAMIND.git/info/lfs/objects/batch`,
+  en-têtes `application/vnd.git-lfs+json`, oid `fac7bbc8…`, size `118086323`)
+  renvoie une URL de téléchargement signée valable 1 h — testé depuis le
+  sandbox : le batch répond, seul le CDN de contenu est bloqué.
+  En attendant, le RAG mot-clé reste fonctionnel.
 
 ### 6.2 Écart `unite5-energie` vs `unite5-energetique` — corrigé
 - `prompts/scientific_knowledge.py` : helper `_canonical_unit_id()` (alias) appliqué
@@ -103,8 +111,8 @@ Ces deux bugs étaient committés dans la base de session (`f45018c`) :
 | `services/chatbot_handlers.py` | `make_response()` appelé avec `prochain_objectif` inconnu → `TypeError` | paramètre optionnel ajouté dans `chatbot_response.py` (rétro-compatible) |
 | `services/pulse_service.py` | carte déjà complétée → streak renvoyé faux (0 au lieu du streak réel) | requête streak inline dans la branche idempotente + helper `_streak_summary_from_row` partagé |
 
-**Preuves finales backend** : `pytest -q` → **997 passed, 10 skipped, 5 xfailed, 0 failed**
-(contre : suite impossible à collecter avant la session). Boot uvicorn propre,
+**Preuves finales backend** : `pytest -q` → **1000 passed, 10 skipped, 5 xfailed, 0 failed**
+(997 + 3 du garde portabilité SQL v2). Boot uvicorn propre,
 `/api/manhadjiya/*` 200, `/api/pulse/*` montées (401 sans JWT, normal).
 
 ## 8. Suite — garde-fou mort + bugs asyncpg/SQLite (2026-08-20)
@@ -123,6 +131,9 @@ encode la règle moderne :
 - le hook `database.py` (`:param = ANY(col)` → json_each) doit rester présent.
 Vérifié adversariellement : un fichier scratch violant la règle fait
 échouer le test avec un message précis ; 3 tests verts en conditions réelles.
+Balayage complet des skips « Fichier introuvable » : c'est le SEUL garde mort
+(mindmap_service.py, llm.py, rag_service.py existent tous ; les skips
+golden_annotated ne se déclenchent jamais — fichier committé).
 
 ### 8.2 Bugs réels trouvés par cette vérification — corrigés
 | Fichier | Bug | Correction |
@@ -133,7 +144,7 @@ Vérifié adversariellement : un fichier scratch violant la règle fait
 | `database.py` | `:recherche2 = ANY(tags)` (recherche d'annales) plantait sur SQLite ; `_ANY_RE` était défini mais **jamais utilisé** (dead code) | Hook SQLite : `:param = ANY(colonne)` → `EXISTS (SELECT 1 FROM json_each(col) WHERE json_each.value = param)` — gère les binds `%(nom)s`/`:nom`/`?` ; toute la recherche d'annales fonctionne désormais en preview |
 
 Vérifications : démo SQLite réelle (tag + titre + expanding) ✓ · ruff 0 ✓ ·
-997 tests verts ✓ · PostgreSQL inchangé (le hook ne compile que pour sqlite).
+1000 tests verts ✓ · PostgreSQL inchangé (le hook ne compile que pour sqlite).
 
 ## 9. CI — découverte et blocage de permission
 - Les 9 derniers runs CI échouaient au **parse du workflow** (un `: ` dans un
