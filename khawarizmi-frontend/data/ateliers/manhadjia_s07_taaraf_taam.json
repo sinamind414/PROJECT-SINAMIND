@@ -141,5 +141,27 @@
   ],
   "recap": [
     "تعرّف: اسم علمي · أ · ب · العنصر 1"
+  ],
+  "unites": [
+    {
+      "id": "unite1-synthese-proteines",
+      "titre_ar": "الوحدة الأولى: تركيب البروتين"
+    },
+    {
+      "id": "unite2-immunite",
+      "titre_ar": "الوحدة الثانية: المناعة والدفاع عن الذات"
+    },
+    {
+      "id": "unite3-systeme-nerveux",
+      "titre_ar": "الوحدة الثالثة: الجهاز العصبي"
+    },
+    {
+      "id": "unite4-geologie",
+      "titre_ar": "الوحدة الرابعة: الجيولوجيا"
+    },
+    {
+      "id": "unite5-energie",
+      "titre_ar": "الوحدة الخامسة: التحولات الطاقوية"
+    }
   ]
 }

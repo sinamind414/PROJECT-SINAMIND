@@ -289,5 +289,11 @@
       "Hypothèse non scientifique",
       "Hypothèse hors contexte"
     ]
-  }
+  },
+  "unites": [
+    {
+      "id": "unite2-immunite",
+      "titre_ar": "الوحدة الثانية: المناعة والدفاع عن الذات"
+    }
+  ]
 }

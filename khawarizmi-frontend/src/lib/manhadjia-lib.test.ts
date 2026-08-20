@@ -784,6 +784,39 @@ describe("SATELLITE_DAYS (15 satellites : référentiel + livre)", () => {
     }
     expect(DS08.docs.courbe).toBeDefined() // اذكر = greffe LTc (courbe présente)
   })
+
+  it("données officielles injectées : 15 satellites avec unites non vides", () => {
+    RAWS.forEach((raw) => {
+      expect(raw.unites).toBeDefined()
+      expect(raw.unites!.length).toBeGreaterThan(0)
+      for (const u of raw.unites!) {
+        expect(u.id.length).toBeGreaterThan(0)
+        expect(u.titre_ar.length).toBeGreaterThan(0)
+      }
+    })
+  })
+
+  it("exemples officiels sur أثبت · مشبك · استخرج uniquement", () => {
+    const withExemples = RAWS.filter((raw) => raw.exemples && raw.exemples.length > 0)
+    expect(withExemples.map((r) => r.atelier_id)).toEqual([
+      "manhadjia_s03_atbat_taam",
+      "manhadjia_s06_synapse_taam",
+      "manhadjia_s12_istakhrij_taam",
+    ])
+    for (const raw of withExemples) {
+      for (const ex of raw.exemples!) {
+        expect(ex.title.length).toBeGreaterThan(0)
+        expect(ex.content.length).toBeGreaterThan(20)
+      }
+    }
+  })
+
+  it("scope-fence : les 7 JSON du bootcamp n'ont ni unites ni exemples", () => {
+    for (const raw of [rawData, rawData02, rawData03, rawData04, rawData05, rawData06, rawData07]) {
+      expect((raw as Partial<AtelierSatelliteData>).unites).toBeUndefined()
+      expect((raw as Partial<AtelierSatelliteData>).exemples).toBeUndefined()
+    }
+  })
 })
 
 describe("isVerbe* satellites (rituel — listes fermées)", () => {

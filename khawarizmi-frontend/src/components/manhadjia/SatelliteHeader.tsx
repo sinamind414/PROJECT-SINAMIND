@@ -26,12 +26,18 @@ export function SatelliteHeader({ slug }: Props) {
           {day.verbRefId !== null ? `فعل رقم ${day.verbRefId}` : "من الكتاب — بلا رقم رسمي"}
         </span>
       </div>
-      <div className="flex items-center justify-between" dir="rtl">
+      <div className="flex items-center justify-between gap-2" dir="rtl">
         <Link
           href="/manhadjia"
           className="text-xs font-bold text-white/40 underline underline-offset-4 hover:text-white/70"
         >
-          → البوتكامب: اليوم 1 حلّل
+          → البوتكامب
+        </Link>
+        <Link
+          href="/manhadjia/atwal"
+          className="text-xs font-bold text-slate-300 underline underline-offset-4 hover:text-white/80"
+        >
+          كل الأقمار ({SATELLITE_TOTAL})
         </Link>
         <Link
           href={next.href}

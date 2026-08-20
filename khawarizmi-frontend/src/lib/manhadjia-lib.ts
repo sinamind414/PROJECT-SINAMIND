@@ -52,6 +52,11 @@ export interface AtelierData {
     criteria: string[]
     common_mistakes: string[]
   }
+  // Données officielles injectées statiquement (sans API) par
+  // khawarizmi-backend/scripts/wire_satellite_official_data.py —
+  // uniquement présentes sur les satellites.
+  unites?: { id: string; titre_ar: string }[]
+  exemples?: { title: string; context: string; content: string; unit: string }[]
 }
 
 // Props structurelles des composants partagés (bootcamp + satellites).
@@ -64,7 +69,7 @@ export type RitualData = Pick<
 
 export type CarteData = Pick<
   AtelierData,
-  "couleur" | "verbe" | "mots_mur" | "carte" | "corrige_geste" | "verb_ref"
+  "couleur" | "verbe" | "mots_mur" | "carte" | "corrige_geste" | "verb_ref" | "unites" | "exemples"
 >
 
 // Palette des muscles : حلّل = أصفر (jaune), فسّر = برتقالي (orange),

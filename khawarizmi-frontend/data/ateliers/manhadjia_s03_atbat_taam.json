@@ -296,5 +296,35 @@
       "Arguments sans lien avec les documents",
       "Conclusion sans preuves"
     ]
-  }
+  },
+  "unites": [
+    {
+      "id": "unite1-synthese-proteines",
+      "titre_ar": "الوحدة الأولى: تركيب البروتين"
+    },
+    {
+      "id": "unite2-immunite",
+      "titre_ar": "الوحدة الثانية: المناعة والدفاع عن الذات"
+    },
+    {
+      "id": "unite3-systeme-nerveux",
+      "titre_ar": "الوحدة الثالثة: الجهاز العصبي"
+    },
+    {
+      "id": "unite4-geologie",
+      "titre_ar": "الوحدة الرابعة: الجيولوجيا"
+    },
+    {
+      "id": "unite5-energie",
+      "titre_ar": "الوحدة الخامسة: التحولات الطاقوية"
+    }
+  ],
+  "exemples": [
+    {
+      "title": "إثبات دور ARN بوليميراز تجريبياً",
+      "context": "تجربة بحضور ADN + نيوكليوتيدات + أو بدون ARN بوليميراز",
+      "content": "التجربة 1 (شاهد): حضانة ADN + نيوكليوتيدات مشعة → ظهور ARN مشع (النتيجة إيجابية). التجربة 2 (اختبار): حضانة ADN + نيوكليوتيدات مشعة + مثبط ARN بوليميراز → لا ظهور ARN مشع (النتيجة سلبية). الملاحظة: في وجود ARN بوليميراز يتكون ARN، في غيابه لا يتكون. النتيجة: ARN بوليميراز ضروري لتشكل ARN انطلاقاً من ADN.",
+      "unit": "unite1-synthese-proteines"
+    }
+  ]
 }

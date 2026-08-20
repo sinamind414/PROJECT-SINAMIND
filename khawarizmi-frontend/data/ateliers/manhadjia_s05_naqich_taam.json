@@ -287,5 +287,11 @@
       "Position sans argumentation",
       "Analyse trop superficielle"
     ]
-  }
+  },
+  "unites": [
+    {
+      "id": "unite2-immunite",
+      "titre_ar": "الوحدة الثانية: المناعة والدفاع عن الذات"
+    }
+  ]
 }

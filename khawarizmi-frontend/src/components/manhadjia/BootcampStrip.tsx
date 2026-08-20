@@ -5,7 +5,7 @@ import {
   BOOTCAMP_DAYS,
   BOOTCAMP_TOTAL_DAYS,
   MUSCLE_ACCENTS,
-  SATELLITE_DAYS,
+  SATELLITE_TOTAL,
   getBootcampDay,
 } from "@/lib/manhadjia-lib"
 
@@ -72,20 +72,15 @@ export function BootcampStrip({ current }: Props) {
         })}
       </div>
 
-      {/* Entrée vers les 5 ateliers satellites (verbes hors bootcamp) */}
-      <div className="mt-2 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 border-t border-white/5 pt-2" dir="rtl">
-        <span className="text-[10px] font-black text-white/30">أقمار صناعية:</span>
-        {SATELLITE_DAYS.map((d) => (
-          <Link
-            key={d.slug}
-            href={d.href}
-            title={`قمر ${d.num} — ${d.verbe} (فعل ${d.verbRefId})`}
-            className="rounded-md px-1.5 py-0.5 text-[10px] font-bold text-slate-300 hover:bg-slate-300/10 hover:text-white"
-            dir="rtl"
-          >
-            {d.verbeCourt}
-          </Link>
-        ))}
+      {/* Entrée vers le hub des ateliers satellites (verbes hors bootcamp) */}
+      <div className="mt-2 flex items-center justify-center gap-2 border-t border-white/5 pt-2" dir="rtl">
+        <Link
+          href="/manhadjia/atwal"
+          className="rounded-md px-2 py-0.5 text-[10px] font-bold text-slate-300 hover:bg-slate-300/10 hover:text-white"
+          dir="rtl"
+        >
+          أقمار صناعية ({SATELLITE_TOTAL}) — صف · عرّف · أثبت · فرضية · ناقش · استنتج ٢ · …
+        </Link>
       </div>
     </nav>
   )
