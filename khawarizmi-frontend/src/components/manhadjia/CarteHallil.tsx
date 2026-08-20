@@ -1,9 +1,9 @@
 "use client"
 
-import { MUSCLE_ACCENTS, type AtelierData, type MuscleVariant } from "@/lib/manhadjia-lib"
+import { MUSCLE_ACCENTS, type CarteData, type MuscleVariant } from "@/lib/manhadjia-lib"
 
 type Props = {
-  data: AtelierData
+  data: CarteData
   onTrainer: () => void
   onBack: () => void
   variant?: MuscleVariant

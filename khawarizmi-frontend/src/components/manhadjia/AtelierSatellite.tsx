@@ -75,11 +75,12 @@ export function AtelierSatellite({ data, onReplay, variant = "satellite" }: Prop
     <div className="space-y-6">
       <header className="space-y-2" dir="rtl">
         <h1 className={`text-2xl font-black ${A.textAccent}`}>{data.verbe}</h1>
-        <p className="text-sm text-white/50">قمر صناعي — نفس وثيقة البوتكامب</p>
+        <p className="text-sm text-white/50">قمر صناعي</p>
         <p className="text-lg font-bold text-white/90">التعليمة: {data.consigne}</p>
       </header>
 
-      {/* Documents bruts — identiques au bootcamp (greffe LTc 4,8/2,5) */}
+      {/* Documents bruts — les 5 premiers satellites reprennent la greffe LTc,
+          le satellite synapse a son propre tableau + schéma décrit */}
       <section className="space-y-4" dir="rtl">
         <div className="rounded-2xl border border-white/10 bg-slate-panel/50 p-4">
           <p className="mb-2 text-xs text-white/40">جدول</p>
@@ -106,11 +107,19 @@ export function AtelierSatellite({ data, onReplay, variant = "satellite" }: Prop
             </tbody>
           </table>
         </div>
-        <CourbeLTc
-          serieLabel="منحنى عدد LTc بدلالة الزمن"
-          courbe={data.docs.courbe}
-          phrase={data.docs.phrase_sous_graphe}
-        />
+        {data.docs.courbe && (
+          <CourbeLTc
+            serieLabel="منحنى عدد LTc بدلالة الزمن"
+            courbe={data.docs.courbe}
+            phrase={data.docs.phrase_sous_graphe ?? ""}
+          />
+        )}
+        {data.docs.schema && (
+          <div className="rounded-2xl border border-white/10 bg-slate-panel/50 p-4">
+            <p className="mb-2 text-xs text-white/40">رسم تخطيطي (الشكل ب)</p>
+            <p className="text-sm leading-relaxed text-white/90">{data.docs.schema}</p>
+          </div>
+        )}
       </section>
 
       {/* Phase A — les 6 mots du mur, ordre, clavier fermé */}

@@ -47,6 +47,7 @@ import rawSat02 from "../../data/ateliers/manhadjia_s02_arif_taam.json"
 import rawSat03 from "../../data/ateliers/manhadjia_s03_atbat_taam.json"
 import rawSat04 from "../../data/ateliers/manhadjia_s04_fardiya_taam.json"
 import rawSat05 from "../../data/ateliers/manhadjia_s05_naqich_taam.json"
+import rawSat06 from "../../data/ateliers/manhadjia_s06_synapse_taam.json"
 
 // Source unique de vérité : la liste fermée du JSON (pas une copie dans le test)
 const REGEX = rawData.interdits_regex
@@ -61,6 +62,7 @@ const DS02 = rawSat02 as AtelierSatelliteData
 const DS03 = rawSat03 as AtelierSatelliteData
 const DS04 = rawSat04 as AtelierSatelliteData
 const DS05 = rawSat05 as AtelierSatelliteData
+const DS06 = rawSat06 as AtelierSatelliteData
 
 describe("isVerbeHallil (rituel — liste fermée)", () => {
   it("accepte حلل / حلّل / تحليل / analyser / analysez / analyse", () => {
@@ -667,24 +669,25 @@ describe("BOOTCAMP_DAYS (J1→J7, 7 jours, 7 couleurs)", () => {
   })
 })
 
-describe("SATELLITE_DAYS (5 verbes officiels hors bootcamp)", () => {
-  const RAWS = [rawSat01, rawSat02, rawSat03, rawSat04, rawSat05]
+describe("SATELLITE_DAYS (5 verbes officiels hors bootcamp + استنتج/مشبك)", () => {
+  const RAWS = [rawSat01, rawSat02, rawSat03, rawSat04, rawSat05, rawSat06]
 
-  it("5 satellites, numéros 1→5, slugs et hrefs uniques", () => {
-    expect(SATELLITE_TOTAL).toBe(5)
-    expect(SATELLITE_DAYS.map((d) => d.num)).toEqual([1, 2, 3, 4, 5])
-    expect(new Set(SATELLITE_DAYS.map((d) => d.slug)).size).toBe(5)
-    expect(new Set(SATELLITE_DAYS.map((d) => d.href)).size).toBe(5)
+  it("6 satellites, numéros 1→6, slugs et hrefs uniques", () => {
+    expect(SATELLITE_TOTAL).toBe(6)
+    expect(SATELLITE_DAYS.map((d) => d.num)).toEqual([1, 2, 3, 4, 5, 6])
+    expect(new Set(SATELLITE_DAYS.map((d) => d.slug)).size).toBe(6)
+    expect(new Set(SATELLITE_DAYS.map((d) => d.href)).size).toBe(6)
   })
 
-  it("verb_ref officiels 2·3·4·8·9 et routes exactes", () => {
-    expect(SATELLITE_DAYS.map((d) => d.verbRefId)).toEqual([2, 3, 4, 8, 9])
+  it("verb_ref officiels 2·3·4·8·9·6 et routes exactes", () => {
+    expect(SATELLITE_DAYS.map((d) => d.verbRefId)).toEqual([2, 3, 4, 8, 9, 6])
     expect(SATELLITE_DAYS.map((d) => d.href)).toEqual([
       "/manhadjia/saf",
       "/manhadjia/arif",
       "/manhadjia/atbat",
       "/manhadjia/fardiya",
       "/manhadjia/naqich",
+      "/manhadjia/synapse",
     ])
   })
 
@@ -692,10 +695,11 @@ describe("SATELLITE_DAYS (5 verbes officiels hors bootcamp)", () => {
     expect(getSatelliteDay("saf")?.verbRefId).toBe(2)
     expect(getSatelliteDay("arif")?.verbe).toBe("عرّف")
     expect(getSatelliteDay("naqich")?.num).toBe(5)
+    expect(getSatelliteDay("synapse")?.verbRefId).toBe(6)
     expect(getSatelliteDay("hallil")).toBeUndefined()
   })
 
-  it("cohérence registre ↔ 5 JSON (couleur فضي · verb_ref · pas de jour bootcamp)", () => {
+  it("cohérence registre ↔ 6 JSON (couleur فضي · verb_ref · pas de jour bootcamp)", () => {
     RAWS.forEach((raw, i) => {
       const day = SATELLITE_DAYS[i]
       expect(raw.couleur).toBe("فضي")
@@ -704,13 +708,20 @@ describe("SATELLITE_DAYS (5 verbes officiels hors bootcamp)", () => {
     })
   })
 
-  it("chaîne lien_suivant : صف→عرّف→أثبت→فرضية→ناقش→البوتكامب", () => {
+  it("chaîne lien_suivant : صف→عرّف→أثبت→فرضية→ناقش→مشبك→البوتكامب", () => {
     RAWS.forEach((raw, i) => {
-      const next = i < 4 ? SATELLITE_DAYS[i + 1] : null
+      const next = i < 5 ? SATELLITE_DAYS[i + 1] : null
       const link = (raw as { lien_suivant?: { label: string; href: string } }).lien_suivant
       expect(link?.href).toBe(next ? next.href : "/manhadjia")
       expect(link?.label.length).toBeGreaterThan(0)
     })
+  })
+
+  it("synapse = docs مشبك (pas de courbe LTc, schéma présent)", () => {
+    expect(DS06.docs.courbe).toBeUndefined()
+    expect(DS06.docs.schema?.length).toBeGreaterThan(20)
+    expect(DS06.docs.tableau.lignes).toHaveLength(5)
+    expect(DS06.docs.tableau.colonnes).toHaveLength(3)
   })
 })
 
@@ -831,5 +842,30 @@ describe("detectSatellite (métier par liste fermée)", () => {
     const d = detectSatellite("أعتقد أنها صحيحة.", DS05)
     expect(d.crimes.length).toBe(1)
     expect(d.missing.length).toBeGreaterThan(0)
+  })
+
+  it("مشبك : réponse modèle → 0 crime 0 manque", () => {
+    const d = detectSatellite(
+      "تمثل الوثيقة جدولا يلخص 5 تجارب على مشبك عصبي–عصبي. في التجربة 1 ظهر كمون عمل في الخليتين، وفي التجربة 4 مع الكورار ظهر فقط في الخلية (أ). كلما ارتبط الوسيط العصبي بمستقبلاته النوعية انتقلت الرسالة العصبية. ومنه نستنتج أن الكورار يشغل مكان الوسيط على المستقبلات فيتوقف النقل المشبكي.",
+      DS06
+    )
+    expect(d.crimes).toEqual([])
+    expect(d.missing).toEqual([])
+  })
+
+  it("مشبك : «ربما الكورار يمنع الارتباط» → crime ربما", () => {
+    const d = detectSatellite("ربما الكورار يمنع الارتباط.", DS06)
+    expect(d.crimes.length).toBe(1)
+    expect(d.missing.length).toBeGreaterThan(0)
+  })
+
+  it("مشبك : «نلاحظ أن» → crime تحليل", () => {
+    const d = detectSatellite("نلاحظ أن الكمون ظهر في الخليتين.", DS06)
+    expect(d.crimes.length).toBe(1)
+  })
+
+  it("مشبك : «الانخفاض» → 0 crime لان imbriqué", () => {
+    const d = detectSatellite("توقف النقل والانخفاض في النتائج.", DS06)
+    expect(d.crimes).toEqual([])
   })
 })

@@ -65,6 +65,11 @@ const WIRING = [
     outFile: path.join(root, "data/ateliers/manhadjia_s05_naqich_taam.json"),
     key: "verb_ref",
   },
+  {
+    id: 6, // استنتج — satellite وثيقة المشبك (قمر 6, même verbe que J3)
+    outFile: path.join(root, "data/ateliers/manhadjia_s06_synapse_taam.json"),
+    key: "verb_ref",
+  },
 ]
 
 for (const { id, outFile, key } of WIRING) {

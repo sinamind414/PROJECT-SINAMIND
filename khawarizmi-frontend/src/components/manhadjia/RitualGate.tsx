@@ -4,12 +4,12 @@ import { useState } from "react"
 import {
   isVerbeHallil,
   MUSCLE_ACCENTS,
-  type AtelierData,
   type MuscleVariant,
+  type RitualData,
 } from "@/lib/manhadjia-lib"
 
 type Props = {
-  data: AtelierData
+  data: RitualData
   onComplete: () => void
   onBack?: () => void
   acceptVerbe?: (s: string) => boolean

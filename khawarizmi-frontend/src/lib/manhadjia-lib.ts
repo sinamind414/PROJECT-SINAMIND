@@ -54,6 +54,19 @@ export interface AtelierData {
   }
 }
 
+// Props structurelles des composants partagés (bootcamp + satellites).
+// Les satellites n'ont ni jour ni docs.courbe obligatoires : ces types
+// minimaux permettent de passer les deux familles de données.
+export type RitualData = Pick<
+  AtelierData,
+  "verbe" | "erreur_verbe" | "bandeau_rituel" | "pastilles" | "mots_mur"
+>
+
+export type CarteData = Pick<
+  AtelierData,
+  "couleur" | "verbe" | "mots_mur" | "carte" | "corrige_geste" | "verb_ref"
+>
+
 // Palette des muscles : حلّل = أصفر (jaune), فسّر = برتقالي (orange),
 // استنتج = أخضر (vert), علّل = أزرق (bleu), قارن = بنفسجي (violet),
 // نص علمي = وردي (rose), مخطط = سماوي (cyan).
@@ -329,6 +342,14 @@ export const SATELLITE_DAYS: SatelliteDay[] = [
     verbRefId: 8,
   },
   { num: 5, slug: "naqich", href: "/manhadjia/naqich", verbe: "ناقش", verbeCourt: "ناقش", verbRefId: 9 },
+  {
+    num: 6,
+    slug: "synapse",
+    href: "/manhadjia/synapse",
+    verbe: "استنتج — وثيقة المشبك",
+    verbeCourt: "استنتج ٢",
+    verbRefId: 6,
+  },
 ]
 
 export const SATELLITE_TOTAL = SATELLITE_DAYS.length
@@ -491,7 +512,7 @@ export interface AtelierMoukhattatData extends AtelierData {
   recap: string[]
 }
 
-// ── Ateliers satellites (صف · عرّف · أثبت · اقترح فرضية · ناقش) ─────────
+// ── Ateliers satellites (صف · عرّف · أثبت · اقترح فرضية · ناقش · استنتج/مشبك) ─
 // Machine générique pilotée par le JSON : liste fermée d'obligatoires et
 // d'interdits (regex testées sur le texte normalisé أ→ا, diacritiques ôtés).
 // Le surlignage combine tous les interdits. 0 API, 0 LLM, 0 note /20.
@@ -500,7 +521,18 @@ export interface SatelliteRule {
   message: string
 }
 
-export interface AtelierSatelliteData extends AtelierData {
+// Docs satellites : tableau obligatoire, courbe optionnelle (les 5 premiers
+// satellites réutilisent la courbe LTc ; le satellite synapse n'a pas de
+// courbe mais un schéma décrit en texte).
+export interface SatelliteDocs {
+  tableau: { colonnes: string[]; lignes: string[][] }
+  courbe?: { axeX: string; axeY: string; series: CourbeSerie[] }
+  phrase_sous_graphe?: string
+  schema?: string
+}
+
+export interface AtelierSatelliteData extends Omit<AtelierData, "docs"> {
+  docs: SatelliteDocs
   detection: {
     obligatoires: SatelliteRule[]
     interdits: SatelliteRule[]
