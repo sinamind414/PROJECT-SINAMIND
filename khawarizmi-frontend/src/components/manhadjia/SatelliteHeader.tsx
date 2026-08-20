@@ -22,7 +22,8 @@ export function SatelliteHeader({ slug }: Props) {
           قمر صناعي — خارج البوتكامب
         </span>
         <span className="text-[10px] font-black text-white/45" dir="rtl">
-          القمر {day.num}/{SATELLITE_TOTAL} · فعل رقم {day.verbRefId}
+          القمر {day.num}/{SATELLITE_TOTAL} ·{" "}
+          {day.verbRefId !== null ? `فعل رقم ${day.verbRefId}` : "من الكتاب — بلا رقم رسمي"}
         </span>
       </div>
       <div className="flex items-center justify-between" dir="rtl">

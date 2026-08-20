@@ -316,9 +316,9 @@ export function getBootcampDay(slug: string): BootcampDay | undefined {
   return BOOTCAMP_DAYS.find((d) => d.slug === slug)
 }
 
-// أقمار صناعية — 5 verbes officiels du référentiel (verb_database.json)
-// qui n'ont pas leur jour dans le bootcamp : صف 2 · عرّف 3 · أثبت 4 ·
-// اقترح فرضية 8 · ناقش 9. Même machine d'états, identité فضي partagée,
+// أقمار صناعية — verbes du référentiel officiel (verb_database.json)
+// et verbes du livre sans numéro officiel (verbRefId null, affichés
+// «من الكتاب»). Même machine d'états, identité فضي partagée,
 // hors boucle J1→J7 (entrée par le bandeau du bootcamp).
 export interface SatelliteDay {
   num: number
@@ -326,7 +326,7 @@ export interface SatelliteDay {
   href: string
   verbe: string
   verbeCourt: string
-  verbRefId: number
+  verbRefId: number | null
 }
 
 export const SATELLITE_DAYS: SatelliteDay[] = [
@@ -349,6 +349,29 @@ export const SATELLITE_DAYS: SatelliteDay[] = [
     verbe: "استنتج — وثيقة المشبك",
     verbeCourt: "استنتج ٢",
     verbRefId: 6,
+  },
+  { num: 7, slug: "taaraf", href: "/manhadjia/taaraf", verbe: "تعرّف / سمّ", verbeCourt: "تعرّف", verbRefId: null },
+  { num: 8, slug: "oudkur", href: "/manhadjia/oudkur", verbe: "اذكر", verbeCourt: "اذكر", verbRefId: null },
+  { num: 9, slug: "addid", href: "/manhadjia/addid", verbe: "عدّد", verbeCourt: "عدّد", verbRefId: null },
+  { num: 10, slug: "sannif", href: "/manhadjia/sannif", verbe: "صنّف", verbeCourt: "صنّف", verbRefId: null },
+  { num: 11, slug: "mayyiz", href: "/manhadjia/mayyiz", verbe: "ميّز", verbeCourt: "ميّز", verbRefId: null },
+  {
+    num: 12,
+    slug: "istakhrij",
+    href: "/manhadjia/istakhrij",
+    verbe: "استخرج",
+    verbeCourt: "استخرج",
+    verbRefId: null,
+  },
+  { num: 13, slug: "alliq", href: "/manhadjia/alliq", verbe: "علّق", verbeCourt: "علّق", verbRefId: null },
+  { num: 14, slug: "anqid", href: "/manhadjia/anqid", verbe: "انقد", verbeCourt: "انقد", verbRefId: null },
+  {
+    num: 15,
+    slug: "mochkil",
+    href: "/manhadjia/mochkil",
+    verbe: "صياغة مشكل علمي",
+    verbeCourt: "مشكل",
+    verbRefId: null,
   },
 ]
 
@@ -749,6 +772,77 @@ export function isVerbeNaqich(input: string): boolean {
   const { text } = normalizeWithMap(input.trim())
   const fr = text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase()
   return ACCEPTED_VERBES_NAQICH.has(text.toLowerCase()) || ACCEPTED_VERBES_NAQICH.has(fr)
+}
+
+// ── Verbes du livre sans verb_ref officiel (أقمار 07 → 15) ─────────────
+const ACCEPTED_VERBES_TAARAF = new Set(["تعرف", "تعرف على", "سم", "nomme", "nommer"])
+const ACCEPTED_VERBES_OUDKUR = new Set(["اذكر", "ذكر", "cite", "citer"])
+const ACCEPTED_VERBES_ADDID = new Set(["عدد", "enumerer", "enumere", "liste", "lister"])
+const ACCEPTED_VERBES_SANNIF = new Set(["صنف", "تصنيف", "classer", "classe", "classez", "classifie", "classifier"])
+const ACCEPTED_VERBES_MAYYIZ = new Set(["ميز", "تمييز", "distingue", "distinguer"])
+const ACCEPTED_VERBES_ISTAKHRIJ = new Set(["استخرج", "استخراج", "extrais", "extraire"])
+const ACCEPTED_VERBES_ALLIQ = new Set(["علق", "تعليق", "commente", "commenter"])
+const ACCEPTED_VERBES_ANQID = new Set(["انقد", "نقد", "critique", "critiquer"])
+const ACCEPTED_VERBES_MOCHKIL = new Set([
+  "صياغة مشكل علمي",
+  "صياغة المشكل",
+  "صياغه مشكل علمي",
+  "مشكل علمي",
+  "حدد المشكل",
+  "formuler un probleme",
+  "probleme scientifique",
+  "formuler le probleme",
+])
+
+function inSet(input: string, set: Set<string>): boolean {
+  const { text } = normalizeWithMap(input.trim())
+  const fr = text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase()
+  return set.has(text.toLowerCase()) || set.has(fr)
+}
+
+/** Le verbe tapé au rituel est-il تعرّف / سمّ ? (fermé — قمر 07) */
+export function isVerbeTaaraf(input: string): boolean {
+  return inSet(input, ACCEPTED_VERBES_TAARAF)
+}
+
+/** Le verbe tapé au rituel est-il اذكر ? (fermé — قمر 08) */
+export function isVerbeOudkur(input: string): boolean {
+  return inSet(input, ACCEPTED_VERBES_OUDKUR)
+}
+
+/** Le verbe tapé au rituel est-il عدّد ? (fermé — قمر 09) */
+export function isVerbeAddid(input: string): boolean {
+  return inSet(input, ACCEPTED_VERBES_ADDID)
+}
+
+/** Le verbe tapé au rituel est-il صنّف ? (fermé — قمر 10) */
+export function isVerbeSannif(input: string): boolean {
+  return inSet(input, ACCEPTED_VERBES_SANNIF)
+}
+
+/** Le verbe tapé au rituel est-il ميّز ? (fermé — قمر 11) */
+export function isVerbeMayyiz(input: string): boolean {
+  return inSet(input, ACCEPTED_VERBES_MAYYIZ)
+}
+
+/** Le verbe tapé au rituel est-il استخرج ? (fermé — قمر 12) */
+export function isVerbeIstakhrij(input: string): boolean {
+  return inSet(input, ACCEPTED_VERBES_ISTAKHRIJ)
+}
+
+/** Le verbe tapé au rituel est-il علّق ? (fermé — قمر 13) */
+export function isVerbeAlliq(input: string): boolean {
+  return inSet(input, ACCEPTED_VERBES_ALLIQ)
+}
+
+/** Le verbe tapé au rituel est-il انقد ? (fermé — قمر 14) */
+export function isVerbeAnqid(input: string): boolean {
+  return inSet(input, ACCEPTED_VERBES_ANQID)
+}
+
+/** Le verbe tapé au rituel est-il صياغة مشكل علمي ? (fermé — قمر 15) */
+export function isVerbeMochkil(input: string): boolean {
+  return inSet(input, ACCEPTED_VERBES_MOCHKIL)
 }
 
 export interface Span {
