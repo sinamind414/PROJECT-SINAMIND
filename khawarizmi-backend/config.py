@@ -50,6 +50,16 @@ class Settings(BaseSettings):
     # (J1 : 1 verbe → J3 : 2 → J7 : bilan — cf. reponse-audit-architecture.md).
     savoir_enabled_verbs: list[str] = []
 
+    # Remédiation savoir (page du livre associée au code d'erreur dominant).
+    # Gate du processus golden (scripts/golden_human_report.py) : κ savoir
+    # ≥ 0.65 → « RÉACTIVER la remédiation savoir ». Mesure 2026-08-20 sur le
+    # golden set actuel : κ = 0.858 ≥ 0.65 (MAE 0.279, exact 0.791) → verdict
+    # RÉACTIVER. Défaut False = comportement historique (remediation=None,
+    # raison local_savoir_no_remediation — verrouillé par test_savoir_branching).
+    # Pour activer en prod : SAVOIR_REMEDIATION_ENABLED=true (progressive,
+    # mesurer le feedback élève avant d'étendre).
+    savoir_remediation_enabled: bool = False
+
     VISION_API_KEY: str = ""
     vision_base_url: str = "https://api.openai.com/v1"
     vision_model: str = "gpt-4o-mini"

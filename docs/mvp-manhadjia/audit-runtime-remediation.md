@@ -146,7 +146,30 @@ golden_annotated ne se déclenchent jamais — fichier committé).
 Vérifications : démo SQLite réelle (tag + titre + expanding) ✓ · ruff 0 ✓ ·
 1000 tests verts ✓ · PostgreSQL inchangé (le hook ne compile que pour sqlite).
 
-## 9. CI — découverte et blocage de permission
+## 9. Gate de remédiation savoir — verdict golden appliqué (2026-08-20)
+
+- Le processus golden (`scripts/golden_human_report.py`) dit : κ savoir ≥ 0.65
+  → « RÉACTIVER la remédiation savoir ». Les commentaires de code affirmaient
+  κ = 0.449 (périmé). **Mesure réelle sur le golden set actuel : κ = 0.858**
+  (MAE 0.279, exact 0.791, severe 0.058) → verdict RÉACTIVER confirmé.
+- Implémentation : `config.savoir_remediation_enabled` (défaut **False** =
+  comportement historique, verrouillé par le test gelé `test_savoir_branching`).
+  À True, la remédiation savoir réutilise la MÊME matrice que le chemin LLM
+  (`services/remediation_service` : verbe-spécifique puis générique).
+  Activation production : `SAVOIR_REMEDIATION_ENABLED=true` (progressive).
+- Preuves : `tests/test_savoir_remediation_gate.py` (4 tests : défaut inerte,
+  wiring matrice, fallback silencieux, chaîne réelle scientific_error → page
+  spécifique au verbe) ; suite complète 1004 passed / 0 failed.
+
+## 10. Clôture de session
+
+- Branche : `arena/01a01f52-project-sinamind` (15 commits) — PR ouverte vers master.
+- Actions utilisateur restantes : (1) copier `docs/ci/ci.yml.corrigee` vers
+  `.github/workflows/ci.yml` (permission workflows) puis merger sur master ;
+  (2) `git lfs pull` pour le modèle ONNX ; (3) activer
+  `SAVOIR_REMEDIATION_ENABLED` quand le feedback élève le justifie.
+## 11. CI — découverte et blocage de permission
+
 - Les 9 derniers runs CI échouaient au **parse du workflow** (un `: ` dans un
   block scalar YAML → « workflow file issue », 0 s).
 - Le token de session peut *déclencher* des runs mais pas *écrire*
