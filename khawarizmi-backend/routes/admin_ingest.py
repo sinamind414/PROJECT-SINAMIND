@@ -1,7 +1,6 @@
 # routes/admin_ingest.py — Temporaire : ingestion RAG livre manhadjiya
-from pathlib import Path
-
 import hmac
+from pathlib import Path
 
 from fastapi import APIRouter, Header, HTTPException
 

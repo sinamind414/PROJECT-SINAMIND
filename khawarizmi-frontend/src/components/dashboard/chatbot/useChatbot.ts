@@ -166,10 +166,17 @@ export function useChatbot(): UseChatbotReturn {
   const loadingRef = useRef(loading)
   const tutorModeRef = useRef(isTutorMode)
   const messagesRef = useRef(messages)
-  inputRef.current = input
-  loadingRef.current = loading
-  tutorModeRef.current = isTutorMode
-  messagesRef.current = messages
+  // « Latest value » mis à jour APRÈS chaque rendu (effet) au lieu de
+  // pendant le rendu : même fraîcheur pour les callbacks asynchrones,
+  // sans écriture de ref pendant le render (react-hooks/refs — fix
+  // lint bloquant CI 2026-08-20). Comportement identique : les lecteurs
+  // de ces refs sont tous des handlers asynchrones post-render.
+  useEffect(() => {
+    inputRef.current = input
+    loadingRef.current = loading
+    tutorModeRef.current = isTutorMode
+    messagesRef.current = messages
+  })
   const [chatbotState, setChatbotState] = useState<ChatbotEngagementState | null>(null)
 
   function nextMessageId() {

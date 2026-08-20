@@ -26,6 +26,7 @@ from . import (
     gamification,
     gems,
     health,
+    kunz_tunnel,
     leaderboard,
     lessons,
     lexique,
@@ -49,7 +50,6 @@ from . import (
     social,
     streaks,
     videos,
-    kunz_tunnel,
 )
 
 ALL_ROUTERS = [

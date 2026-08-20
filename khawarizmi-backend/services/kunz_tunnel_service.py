@@ -13,9 +13,10 @@ ATTENTION — RÈGLE ABSOLUE (P2.3) :
 from __future__ import annotations
 
 import uuid
+from collections.abc import Sequence
 from dataclasses import dataclass
-from datetime import datetime, timedelta, timezone
-from typing import Any, Optional, Sequence
+from datetime import UTC, datetime, timedelta
+from typing import Any
 
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -29,18 +30,18 @@ class TunnelEventIn:
     session_id: str
     event_type: str
     payload: dict[str, Any]
-    client_event_id: Optional[str] = None
-    client_ts: Optional[datetime] = None
+    client_event_id: str | None = None
+    client_ts: datetime | None = None
 
 
 @dataclass(frozen=True)
 class RecallDueDTO:
     recall_item_id: str
     lesson_id: str
-    concept_id: Optional[str]
+    concept_id: str | None
     stage: int
     next_review_at: datetime
-    last_result: Optional[str]
+    last_result: str | None
 
 
 async def append_event(
@@ -92,10 +93,10 @@ async def list_due_recall(
     db: AsyncSession,
     *,
     user_id: int,
-    now: Optional[datetime] = None,
+    now: datetime | None = None,
     limit: int = 50,
 ) -> Sequence[RecallDueDTO]:
-    now = now or datetime.now(timezone.utc)
+    now = now or datetime.now(UTC)
     rows = await db.execute(
         text("""
             SELECT id, lesson_id, concept_id, stage, next_review_at, last_result
@@ -127,9 +128,9 @@ async def apply_recall_result(
     user_id: int,
     recall_item_id: str,
     success: bool,
-    now: Optional[datetime] = None,
+    now: datetime | None = None,
 ) -> RecallDueDTO:
-    now = now or datetime.now(timezone.utc)
+    now = now or datetime.now(UTC)
     row = await db.execute(
         text("""
             SELECT id, lesson_id, concept_id, stage, next_review_at, last_result

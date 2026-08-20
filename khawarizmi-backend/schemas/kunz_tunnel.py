@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Any, Optional
+from typing import Any
 
 from pydantic import BaseModel
 
@@ -10,8 +10,8 @@ class TunnelEventRequest(BaseModel):
     session_id: str
     type: str
     payload: dict[str, Any] = {}
-    client_event_id: Optional[str] = None
-    client_ts: Optional[datetime] = None
+    client_event_id: str | None = None
+    client_ts: datetime | None = None
 
     model_config = {"from_attributes": True}
 
@@ -23,10 +23,10 @@ class TunnelEventResponse(BaseModel):
 class RecallDueItem(BaseModel):
     recall_item_id: str
     lesson_id: str
-    concept_id: Optional[str] = None
+    concept_id: str | None = None
     stage: int = 0
     next_review_at: datetime
-    last_result: Optional[str] = None
+    last_result: str | None = None
 
 
 class RecallResultRequest(BaseModel):

@@ -80,3 +80,21 @@ ignore = [
 fixable = ["ALL"]
 unfixable = []
 preview = true
+
+[per-file-ignores]
+# Tests existants (gelés par AGENT_RULES — pas de modification de test) :
+# style accepté tel quel, la logique est couverte par la suite complète.
+"tests/conftest.py" = [
+    "collapsible-if",
+    "unsorted-imports",
+    "too-many-blank-lines",
+    "incorrectly-parenthesized-tuple-in-subscript",
+]
+"tests/test_actions_immediates.py" = ["class-as-data-structure", "unsorted-imports"]
+"tests/test_admin_guard.py" = ["class-as-data-structure"]
+"tests/test_kunz_tunnel.py" = [
+    "unsorted-imports",
+    "datetime-timezone-utc",
+    "incorrectly-parenthesized-tuple-in-subscript",
+]
+"tests/test_orientation_roadmap.py" = ["unsorted-imports", "missing-newline-at-end-of-file"]
