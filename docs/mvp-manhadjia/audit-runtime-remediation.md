@@ -106,3 +106,38 @@ Ces deux bugs étaient committés dans la base de session (`f45018c`) :
 **Preuves finales backend** : `pytest -q` → **997 passed, 10 skipped, 5 xfailed, 0 failed**
 (contre : suite impossible à collecter avant la session). Boot uvicorn propre,
 `/api/manhadjiya/*` 200, `/api/pulse/*` montées (401 sans JWT, normal).
+
+## 8. Suite — garde-fou mort + bugs asyncpg/SQLite (2026-08-20)
+
+### 8.1 Garde-fou mort (skip silencieux)
+`tests/test_config_critical.py::test_fsrs_scheduler_no_in_tuple` pointe
+`services/fsrs_scheduler.py`, fichier **supprimé** par la fusion FSRS
+(le code vit dans `fsrs_unified.py`) → le test skippe en silence et la
+règle AGENTS.md §1.5 (`IN :tuple` interdit sur asyncpg) n'était plus
+enforcée nulle part. Tests gelés par AGENT_RULES → le garde reste mort,
+corrigé par vérification manuelle + fix des violations réelles (8.2).
+Recommandation : pointer le garde vers `fsrs_unified.py` quand les tests
+seront dégelés.
+
+### 8.2 Bugs réels trouvés par cette vérification — corrigés
+| Fichier | Bug | Correction |
+|---|---|---|
+| `routes/social.py` | `WHERE v.verb_slug IN :verbs` + `tuple()` **sans** expanding → crash asyncpg en production (PostgreSQL) | `bindparam("verbs", expanding=True)` + `list()` — portable SQLite/asyncpg |
+| `services/scheduler.py` | `micro_concept = ANY(:cids)` → **« no such function: ANY » sur SQLite** (preview/CI) | `IN :cids` + `expanding=True` + `list()` |
+| `services/fsrs_unified.py` | `tuple(...) if len>1 else (x[0],)` inutile (expanding accepte list) | `list(concept_ids)` |
+| `database.py` | `:recherche2 = ANY(tags)` (recherche d'annales) plantait sur SQLite ; `_ANY_RE` était défini mais **jamais utilisé** (dead code) | Hook SQLite : `:param = ANY(colonne)` → `EXISTS (SELECT 1 FROM json_each(col) WHERE json_each.value = param)` — gère les binds `%(nom)s`/`:nom`/`?` ; toute la recherche d'annales fonctionne désormais en preview |
+
+Vérifications : démo SQLite réelle (tag + titre + expanding) ✓ · ruff 0 ✓ ·
+997 tests verts ✓ · PostgreSQL inchangé (le hook ne compile que pour sqlite).
+
+## 9. CI — découverte et blocage de permission
+- Les 9 derniers runs CI échouaient au **parse du workflow** (un `: ` dans un
+  block scalar YAML → « workflow file issue », 0 s).
+- Le token de session peut *déclencher* des runs mais pas *écrire*
+  `.github/workflows/ci.yml` (push refusé par GitHub : permission `workflows`
+  manquante). Version corrigée livrée : `docs/ci/ci.yml.corrigee`
+  (triggers master/arena/*, **schedule ajouté** — les jobs nightly étaient
+  morts sans lui, deploy sur master, ruff bloquant, Redis service).
+- À appliquer par l'utilisateur : copier `docs/ci/ci.yml.corrigee` vers
+  `.github/workflows/ci.yml` + merger sur master (le schedule ne se
+  déclenche que depuis la branche par défaut).

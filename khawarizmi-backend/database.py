@@ -77,13 +77,34 @@ def _sqlite_compat() -> None:
     _ILIKE_RE = re.compile(r"\bILIKE\b", re.IGNORECASE)
     _NOW_RE = re.compile(r"\bNOW\s*\(\s*\)", re.IGNORECASE)
     _UUID_RE = re.compile(r"\bgen_random_uuid\s*\(\s*\)", re.IGNORECASE)
-    # ANY(...) n'existe pas en SQLite → remplacer par une série de LIKE OR
-    _ANY_RE = re.compile(r"I?LIKE\s+ANY\s*\(\s*:(\w+)\s*\)", re.IGNORECASE)
+    # ANY(...) n'existe pas en SQLite. Deux formes :
+    # 1) « :param = ANY(colonne) » (colonne ARRAY — ex. annales.tags, JSON sur
+    #    SQLite) → EXISTS (SELECT 1 FROM json_each(colonne) WHERE value = param)
+    #    (fix 2026-08-20 : la recherche d'annales plantait sur SQLite)
+    #    NB : visit_textclause rend les binds en « %(nom)s » (pyformat) — on
+    #    accepte aussi « :nom » et « ? » pour préserver l'ordre de liaison.
+    # 2) « colonne = ANY(:param) » (liste en paramètre) → interdit : utiliser
+    #    IN + bindparam(expanding=True), portable SQLite/asyncpg.
+    _PARAM_EQ_ANY_COL_RE = re.compile(
+        r"(?::(\w+)|%\((\w+)\)s|\?)\s*=\s*ANY\s*\(\s*([\w.]+)\s*\)", re.IGNORECASE
+    )
+
+    def _param_eq_any_col_sqlite(match: re.Match[str]) -> str:
+        if match.group(1):
+            param = f":{match.group(1)}"
+        elif match.group(2):
+            param = f"%({match.group(2)})s"
+        else:
+            param = "?"
+        col = match.group(3)
+        return f"EXISTS (SELECT 1 FROM json_each({col}) WHERE json_each.value = {param})"
 
     @compiles(TextClause, "sqlite")
     def _compile_text_sqlite(element, compiler, **kw):
         rendered = compiler.visit_textclause(element, **kw)
         rendered = _CAST_RE.sub("", rendered)
+        # :param = ANY(colonne) → EXISTS json_each (portabilité SQLite)
+        rendered = _PARAM_EQ_ANY_COL_RE.sub(_param_eq_any_col_sqlite, rendered)
         # ILIKE → LIKE (simple car LOWER() est déjà utilisé la plupart du temps)
         rendered = _ILIKE_RE.sub("LIKE", rendered)
         # NOW() → CURRENT_TIMESTAMP (fonction SQLite native)

@@ -352,7 +352,7 @@ class KhawarizmiScheduler:
         return due_concepts
 
     async def select_next_question(self, student_id: int, db: AsyncSession) -> dict[str, Any] | None:
-        from sqlalchemy import text
+        from sqlalchemy import bindparam, text
 
         due_concepts = await self.get_due_concepts(student_id, db)
         if not due_concepts:
@@ -384,11 +384,13 @@ class KhawarizmiScheduler:
         concept_ids = [c["concept_id"] for c in due_concepts]
         concept_stability = {c["concept_id"]: c["stability"] for c in due_concepts}
         cids_param = list(concept_ids)
+        # IN + expanding (portable SQLite/asyncpg) au lieu de « = ANY(:cids) »
+        # (cassé sur SQLite : no such function ANY — fix 2026-08-20).
         query_mappings = text("""
             SELECT question_id, micro_concept, weight
             FROM question_concept_map
-            WHERE micro_concept = ANY(:cids)
-        """)
+            WHERE micro_concept IN :cids
+        """).bindparams(bindparam("cids", expanding=True))
         res_mappings = await db.execute(query_mappings, {"cids": cids_param})
         mappings = res_mappings.fetchall()
         if not mappings:

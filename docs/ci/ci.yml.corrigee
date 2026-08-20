@@ -14,6 +14,12 @@ on:
     branches: [master, main, fabuleux/*, arena/*]
   pull_request:
     branches: [master, main]
+  schedule:
+    # Nightly 02:00 UTC — active golden-llm-nightly + observability-nightly.
+    # ⚠️ Un schedule ne se déclenche que si ce fichier est sur la branche
+    #    PAR DÉFAUT du repo (master) — après copie, merger sur master.
+    # ⚠️ golden-llm-nightly exige le secret OPENAI_API_KEY (défini dans le repo).
+    - cron: "0 2 * * *"
 
 jobs:
   backend-tests:

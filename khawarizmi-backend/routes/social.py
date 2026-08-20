@@ -4,7 +4,7 @@ import uuid
 
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from pydantic import BaseModel
-from sqlalchemy import text
+from sqlalchemy import bindparam, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from database import get_db
@@ -288,7 +288,9 @@ async def get_partners(current_user: dict = Depends(get_current_user), db: Async
     if not verbs:
         return {"partners": []}
     res = await db.execute(
-        text("SELECT u.id, u.prenom as nom, v.verb_slug as strong_verb FROM users u JOIN da_answers v ON u.id = v.user_id WHERE v.verb_slug IN :verbs GROUP BY u.id, v.verb_slug HAVING AVG(v.percentage) > 80 AND u.id != :uid LIMIT 5"),
-        {"verbs": tuple(verbs), "uid": uid},
+        text("SELECT u.id, u.prenom as nom, v.verb_slug as strong_verb FROM users u JOIN da_answers v ON u.id = v.user_id WHERE v.verb_slug IN :verbs GROUP BY u.id, v.verb_slug HAVING AVG(v.percentage) > 80 AND u.id != :uid LIMIT 5").bindparams(
+            bindparam("verbs", expanding=True)
+        ),
+        {"verbs": list(verbs), "uid": uid},
     )
     return {"partners": [dict(r._mapping) for r in res.fetchall()]}
