@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { BootcampStrip } from "@/components/manhadjia/BootcampStrip"
 import { RitualGate } from "@/components/manhadjia/RitualGate"
 import { CarteHallil } from "@/components/manhadjia/CarteHallil"
 import { AtelierQuarin } from "@/components/manhadjia/AtelierQuarin"
@@ -26,7 +27,8 @@ export default function ManhadjiaQuarinPage() {
   return (
     <main dir="rtl" lang="ar" className="min-h-screen bg-slate-deep text-white">
       <div className="mx-auto max-w-2xl px-4 py-8 pb-24">
-        <p className="mb-6 text-center text-xs text-white/30">{SCREEN_LABEL[screen]}</p>
+        <BootcampStrip current="quarin" />
+        <p className="mt-6 mb-6 text-center text-xs text-white/30">{SCREEN_LABEL[screen]}</p>
 
         {screen === "ritual-carte" && (
           <RitualGate

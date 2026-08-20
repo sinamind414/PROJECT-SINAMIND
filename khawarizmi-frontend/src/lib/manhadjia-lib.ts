@@ -183,6 +183,100 @@ export const MUSCLE_ACCENTS: Record<
   },
 }
 
+// Bootcamp J1→J7 — registre unique des 7 ateliers (7 jours, 7 couleurs).
+// Source de vérité du bandeau de navigation partagé sur les 7 routes.
+// verb_ref = id officiel dans khawarizmi-backend/methodology/verb_database.json
+// (حلّل et قارن : pas d'id — doctrine « pas de note /20 affichée »).
+export interface BootcampDay {
+  jour: number
+  slug: string
+  href: string
+  verbe: string
+  verbeCourt: string
+  variant: MuscleVariant
+  couleurAr: string
+  verbRefId: number | null
+}
+
+export const BOOTCAMP_DAYS: BootcampDay[] = [
+  {
+    jour: 1,
+    slug: "hallil",
+    href: "/manhadjia",
+    verbe: "حلّل",
+    verbeCourt: "حلّل",
+    variant: "jaune",
+    couleurAr: "أصفر",
+    verbRefId: null,
+  },
+  {
+    jour: 2,
+    slug: "fassir",
+    href: "/manhadjia/fassir",
+    verbe: "فسّر",
+    verbeCourt: "فسّر",
+    variant: "orange",
+    couleurAr: "برتقالي",
+    verbRefId: 7,
+  },
+  {
+    jour: 3,
+    slug: "istintaj",
+    href: "/manhadjia/istintaj",
+    verbe: "استنتج",
+    verbeCourt: "استنتج",
+    variant: "vert",
+    couleurAr: "أخضر",
+    verbRefId: 6,
+  },
+  {
+    jour: 4,
+    slug: "allil",
+    href: "/manhadjia/allil",
+    verbe: "علّل",
+    verbeCourt: "علّل",
+    variant: "bleu",
+    couleurAr: "أزرق",
+    verbRefId: 5,
+  },
+  {
+    jour: 5,
+    slug: "quarin",
+    href: "/manhadjia/quarin",
+    verbe: "قارن",
+    verbeCourt: "قارن",
+    variant: "violet",
+    couleurAr: "بنفسجي",
+    verbRefId: null,
+  },
+  {
+    jour: 6,
+    slug: "nas-ilmi",
+    href: "/manhadjia/nas-ilmi",
+    verbe: "نص علمي",
+    verbeCourt: "نص",
+    variant: "rose",
+    couleurAr: "وردي",
+    verbRefId: 1,
+  },
+  {
+    jour: 7,
+    slug: "moukhattat",
+    href: "/manhadjia/moukhattat",
+    verbe: "مخطط",
+    verbeCourt: "مخطط",
+    variant: "cyan",
+    couleurAr: "سماوي",
+    verbRefId: 10,
+  },
+]
+
+export const BOOTCAMP_TOTAL_DAYS = BOOTCAMP_DAYS.length
+
+export function getBootcampDay(slug: string): BootcampDay | undefined {
+  return BOOTCAMP_DAYS.find((d) => d.slug === slug)
+}
+
 // Atelier 02 (فسّر) — détection inversée : لأن + chiffre OBLIGATOIRES,
 // نلاحظ (ouverture) et نستنتج = crimes. Voir manhadjia_02_fassir_taam.json
 export interface AtelierFassirData extends AtelierData {

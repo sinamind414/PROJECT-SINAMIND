@@ -1,6 +1,7 @@
 "use client"
 
 import { useMemo, useState } from "react"
+import Link from "next/link"
 import {
   detectMoukhattat,
   MUSCLE_ACCENTS,
@@ -315,6 +316,19 @@ export function AtelierMoukhattat({ data, onReplay, variant = "cyan" }: Props) {
           >
             {data.cta_fin}
           </button>
+
+          {/* Un seul lien, en bas du miroir, après envoi : clôture J7 → nouvelle boucle J1 */}
+          {data.lien_suivant && (
+            <div className="pt-1 text-center">
+              <Link
+                href={data.lien_suivant.href}
+                className={`inline-block min-h-12 px-4 py-3 text-sm font-black underline underline-offset-4 ${A.textSoft}`}
+                dir="rtl"
+              >
+                {data.lien_suivant.label}
+              </Link>
+            </div>
+          )}
         </section>
       )}
     </div>

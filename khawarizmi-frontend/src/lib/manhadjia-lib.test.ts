@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest"
 import {
+  BOOTCAMP_DAYS,
+  BOOTCAMP_TOTAL_DAYS,
   countHits,
   detectAllil,
   detectFassir,
@@ -7,6 +9,7 @@ import {
   detectMoukhattat,
   detectNasIlmi,
   detectQuarin,
+  getBootcampDay,
   highlightSpans,
   isVerbeAllil,
   isVerbeFassir,
@@ -576,5 +579,70 @@ describe("detectMoukhattat (métier à côté — R5 J7)", () => {
     const long = Array.from({ length: 90 }, () => "مخطط").join(" ")
     const d = detectMoukhattat(long, D07)
     expect(d.crimes).toContain(D07.messages.max_mots)
+  })
+})
+
+describe("BOOTCAMP_DAYS (J1→J7, 7 jours, 7 couleurs)", () => {
+  const RAWS = [rawData, rawData02, rawData03, rawData04, rawData05, rawData06, rawData07]
+
+  it("7 jours exactement, ordre 1→7, slugs et hrefs uniques", () => {
+    expect(BOOTCAMP_TOTAL_DAYS).toBe(7)
+    expect(BOOTCAMP_DAYS.map((d) => d.jour)).toEqual([1, 2, 3, 4, 5, 6, 7])
+    expect(new Set(BOOTCAMP_DAYS.map((d) => d.slug)).size).toBe(7)
+    expect(new Set(BOOTCAMP_DAYS.map((d) => d.href)).size).toBe(7)
+  })
+
+  it("7 couleurs distinctes dans l'ordre de la palette (jaune→cyan)", () => {
+    expect(BOOTCAMP_DAYS.map((d) => d.variant)).toEqual([
+      "jaune",
+      "orange",
+      "vert",
+      "bleu",
+      "violet",
+      "rose",
+      "cyan",
+    ])
+  })
+
+  it("routes exactes de la spec", () => {
+    expect(BOOTCAMP_DAYS.map((d) => d.href)).toEqual([
+      "/manhadjia",
+      "/manhadjia/fassir",
+      "/manhadjia/istintaj",
+      "/manhadjia/allil",
+      "/manhadjia/quarin",
+      "/manhadjia/nas-ilmi",
+      "/manhadjia/moukhattat",
+    ])
+  })
+
+  it("verb_ref officiels 7·6·5·1·10 — حلّل et قارن sans id", () => {
+    expect(BOOTCAMP_DAYS.map((d) => d.verbRefId)).toEqual([null, 7, 6, 5, null, 1, 10])
+  })
+
+  it("getBootcampDay retrouve chaque slug, undefined sinon", () => {
+    expect(getBootcampDay("hallil")?.jour).toBe(1)
+    expect(getBootcampDay("fassir")?.variant).toBe("orange")
+    expect(getBootcampDay("moukhattat")?.verbRefId).toBe(10)
+    expect(getBootcampDay("n-existe-pas")).toBeUndefined()
+  })
+
+  it("cohérence registre ↔ 7 JSON de données (jour · couleur · verb_ref)", () => {
+    RAWS.forEach((raw, i) => {
+      const day = BOOTCAMP_DAYS[i]
+      expect(raw.jour).toBe(day.jour)
+      expect(raw.couleur).toBe(day.couleurAr)
+      const refId = (raw as { verb_ref?: { id: number } }).verb_ref?.id ?? null
+      expect(refId).toBe(day.verbRefId)
+    })
+  })
+
+  it("chaîne lien_suivant bouclée : J1→J2→…→J7→J1 (bootcamp fermé)", () => {
+    RAWS.forEach((raw, i) => {
+      const next = BOOTCAMP_DAYS[(i + 1) % BOOTCAMP_DAYS.length]
+      const link = (raw as { lien_suivant?: { label: string; href: string } }).lien_suivant
+      expect(link?.href).toBe(next.href)
+      expect(link?.label.length).toBeGreaterThan(0)
+    })
   })
 })
