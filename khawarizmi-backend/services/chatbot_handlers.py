@@ -184,6 +184,10 @@ async def handle_orientation(
 ) -> dict:
     """Coach d'orientation branché sur le même prochain_objectif que le dashboard."""
     context = context or {}
+    # Salutation reconstruite (2026-08-20) : la moitié perdue du conflit git
+    # définissait `greeting` — absent, chaque message d'orientation levait
+    # NameError en production. Tests existants (test_chatbot_handlers) fixés.
+    greeting = "أهلاً بك! 👋\n" if is_init else ""
     orientation = await calculer_orientation(db, user_id)
 
     try:
@@ -219,7 +223,13 @@ async def handle_orientation(
     }
 
     due_concept = await safe_get_due_concept(db, user_id)
-    response_text = greeting + orientation["message"] + "\n\n🧭 " + coach_text
+    # Reconstruction 2026-08-20 : la moitié perdue du conflit incluaient
+    # la prédiction du bac dans la réponse (contrat test_orientation_basic).
+    response_text = greeting + orientation["message"]
+    prediction = orientation.get("prediction_bac")
+    if prediction is not None:
+        response_text += f"\n🎯 فرصة النجاح المتوقعة: {prediction}%"
+    response_text += "\n\n🧭 " + coach_text
     if due_concept and is_init:
         # Le rappel dû reste une information du coach, mais l'unique carte
         # d'action demeure celle de la boussole structurée.

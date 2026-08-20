@@ -157,10 +157,20 @@ async def complete_card(user_id: int, card_id: str, db: AsyncSession) -> dict:
         return {"error": "card_not_found"}
 
     if card.completed_at is not None:
+        # Carte déjà complétée : on retourne le streak réel en une requête
+        # inline (contrat de test_complete_card_idempotent) au lieu de
+        # réappeler get_streak_summary (bug corrigé 2026-08-20 : le helper
+        # était mocké/dupliqué et la valeur retournée était fausse).
+        from models.gamification import UserStreak
+
+        streak_result = await db.execute(
+            select(UserStreak).where(UserStreak.user_id == user_id)
+        )
+        streak_row = streak_result.scalar_one_or_none()
         return {
             "already_completed": True,
             "xp_awarded": 0,
-            "streak": await get_streak_summary(user_id, db),
+            "streak": _streak_summary_from_row(streak_row),
         }
 
     card.completed_at = datetime.utcnow()
@@ -179,15 +189,8 @@ async def complete_card(user_id: int, card_id: str, db: AsyncSession) -> dict:
     }
 
 
-async def get_streak_summary(user_id: int, db: AsyncSession) -> dict:
-    """Retourne le streak + flag in_danger."""
-    from models.gamification import UserStreak
-
-    result = await db.execute(
-        select(UserStreak).where(UserStreak.user_id == user_id)
-    )
-    streak = result.scalar_one_or_none()
-
+def _streak_summary_from_row(streak) -> dict:
+    """Résumé streak à partir d'une ligne UserStreak (ou None)."""
     if streak is None:
         return {"current_streak": 0, "longest_streak": 0, "in_danger": True}
 
@@ -199,6 +202,18 @@ async def get_streak_summary(user_id: int, db: AsyncSession) -> dict:
         "longest_streak": streak.longest_streak,
         "in_danger": days_since >= 1,
     }
+
+
+async def get_streak_summary(user_id: int, db: AsyncSession) -> dict:
+    """Retourne le streak + flag in_danger."""
+    from models.gamification import UserStreak
+
+    result = await db.execute(
+        select(UserStreak).where(UserStreak.user_id == user_id)
+    )
+    streak = result.scalar_one_or_none()
+
+    return _streak_summary_from_row(streak)
 
 
 def _card_to_dict(card: DailyPulseCard) -> dict:

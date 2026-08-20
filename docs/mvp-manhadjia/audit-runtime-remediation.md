@@ -65,10 +65,44 @@ Ces deux bugs étaient committés dans la base de session (`f45018c`) :
 - Bout en bout : `POST /api/manhadjiya/contextual-remediation` → **42 ms**, 12 erreurs officielles renvoyées pour `deduce`.
 - Repli : backend arrêté → HTTP 500 → composant muet (testé).
 
-## 6. Reste à signaler (hors scope, non corrigé)
+## 6. Bugs résiduels — corrigés le 2026-08-20 (même session)
 
-- **Redis absent** en preview (warning toléré — rate-limit/cache dégradés, pas bloquant).
-- **Modèle ONNX corrompu** (`minilm_onnx_int8/model_quantized.onnx` : INVALID_PROTOBUF)
-  → RAG sémantique en fallback bag-of-ngrams (le RAG mot-clé fonctionne).
-- `unite5-energie` (VERB_UNIT_MAP) vs `unite5-energetique` (ALL_UNITS) — écart
-  d'identifiant géré dans `wire_satellite_official_data.py`, à harmoniser un jour côté backend.
+### 6.1 Modèle ONNX « corrompu » — cause racine : pointeur Git LFS
+- Le fichier `model_quantized.onnx` (134 octets) est un **pointeur Git LFS**
+  (oid sha256:fac7bbc8…, taille réelle 118 Mo) jamais téléchargé.
+- Corrections livrées :
+  - `services/embedder.py` : détection explicite du pointeur → message
+    actionnable (« git lfs pull puis redémarrer ») au lieu de l'INVALID_PROTOBUF
+    cryptique ; récupération depuis `model_quantized.zip` si présent (sans
+    jamais supprimer le fichier tracké par git) ; fallback déterministe propre
+    (les consommateurs sémantiques — rag_service, l2, semantic_cache — se
+    désactivent déjà correctement quand `is_semantic` est False).
+  - `scripts/check_onnx_asset.py` (nouveau) : diagnostic du statut
+    (OK / LFS / CORROMPU / MANQUANT / ZIP) + commande de récupération exacte.
+- **Action côté utilisateur** (réseau du sandbox bloqué pour media.githubusercontent.com) :
+  sur une machine avec git-lfs : `git lfs pull --include 'khawarizmi-backend/models/minilm_onnx_int8/*'`
+  puis redéployer. En attendant, le RAG mot-clé reste fonctionnel.
+
+### 6.2 Écart `unite5-energie` vs `unite5-energetique` — corrigé
+- `prompts/scientific_knowledge.py` : helper `_canonical_unit_id()` (alias) appliqué
+  à `get_unit_specific_errors`, `build_knowledge_block`, `get_practical_examples`.
+- Les deux orthographes sont verrouillées par des tests existants → **aucune
+  constante modifiée**. Résultat : les erreurs énergétiques (photosynthèse…)
+  apparaissent maintenant dans la remédiation (15 erreurs pour « interpret »
+  au lieu de 12). 4 tests de non-régression dans `tests/test_unit_id_alias.py`.
+
+### 6.3 Redis absent en preview
+- Toléré par design (warning, rate-limit/cache dégradés, zéro blocage) —
+  pas un bug code, aucun changement.
+
+## 7. Bugs supplémentaires découverts par la suite backend (jusqu'ici masqués : le backend ne démarrait pas)
+
+| Fichier | Bug | Correction |
+|---|---|---|
+| `services/chatbot_handlers.py` | `handle_orientation` levait `NameError: greeting` sur **chaque message d'orientation** (moitié perdue du conflit git) | `greeting` reconstruit (salutation si `is_init`) + `prediction_bac` inclus dans la réponse (contrat de test) |
+| `services/chatbot_handlers.py` | `make_response()` appelé avec `prochain_objectif` inconnu → `TypeError` | paramètre optionnel ajouté dans `chatbot_response.py` (rétro-compatible) |
+| `services/pulse_service.py` | carte déjà complétée → streak renvoyé faux (0 au lieu du streak réel) | requête streak inline dans la branche idempotente + helper `_streak_summary_from_row` partagé |
+
+**Preuves finales backend** : `pytest -q` → **997 passed, 10 skipped, 5 xfailed, 0 failed**
+(contre : suite impossible à collecter avant la session). Boot uvicorn propre,
+`/api/manhadjiya/*` 200, `/api/pulse/*` montées (401 sans JWT, normal).

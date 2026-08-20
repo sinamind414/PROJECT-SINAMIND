@@ -18,6 +18,7 @@ def make_response(
     due_concept: str | None = None,
     due_chapter: str | None = None,
     cache_scope: str = "public",
+    prochain_objectif: dict | None = None,
 ) -> dict:
     """Construit une réponse chatbot.
 
@@ -45,6 +46,10 @@ def make_response(
         "due_concept": due_concept,
         "due_chapter": due_chapter,
         "cache_scope": cache_scope,
+        # Coach d'orientation : prochain_objectif du dashboard (frontend
+        # OrientationCompass) — ajouté 2026-08-20 (bug : TypeError au
+        # make_response, chaque message d'orientation échouait en prod).
+        "prochain_objectif": prochain_objectif,
     }
 
 
