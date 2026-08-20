@@ -182,7 +182,6 @@ async def handle_orientation(
     context: dict | None,
     is_init: bool = False,
 ) -> dict:
-<<<<<<< HEAD
     """Coach d'orientation branché sur le même prochain_objectif que le dashboard."""
     context = context or {}
     orientation = await calculer_orientation(db, user_id)

@@ -44,6 +44,7 @@ from . import (
     phase6,
     programme,
     progress,
+    pulse,
     session,
     social,
     streaks,

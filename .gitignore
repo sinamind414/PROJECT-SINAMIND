@@ -1,4 +1,4 @@
-﻿# Environnement — CRITIQUE
+# Environnement — CRITIQUE
 **/.env
 **/.env.*
 !**/.env.example
@@ -22,6 +22,8 @@ __pycache__/
 .pytest_cache/
 .coverage
 htmlcov/
+**/.venv/
+khawarizmi-backend/preview_runtime.db
 
 # Node
 node_modules/
