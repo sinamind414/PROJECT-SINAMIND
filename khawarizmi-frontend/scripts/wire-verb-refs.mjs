@@ -88,6 +88,13 @@ for (const { id, outFile, key } of WIRING) {
     common_mistakes: verb.common_mistakes,
   }
   const data = JSON.parse(fs.readFileSync(outFile, "utf8"))
+  // Idempotence (2026-08-20) : ne réécrit pas si le verb_ref est déjà à jour.
+  // Avant, chaque run reformatait les JSON (diffs cosmétiques, notamment les
+  // 7 fichiers bootcamp pourtant inchangés sur le fond).
+  if (JSON.stringify(data[key]) === JSON.stringify(ref)) {
+    console.log(`⏭️  ${path.basename(outFile)} inchangé (verb_ref id=${ref.id})`)
+    continue
+  }
   data[key] = ref
   fs.writeFileSync(outFile, JSON.stringify(data, null, 2) + "\n", "utf8")
   console.log(`✅ ${path.basename(outFile)} <- verb_ref id=${ref.id} (${ref.arabic} · ${ref.french})`)

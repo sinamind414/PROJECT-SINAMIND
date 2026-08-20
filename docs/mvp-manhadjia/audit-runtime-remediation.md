@@ -109,15 +109,20 @@ Ces deux bugs étaient committés dans la base de session (`f45018c`) :
 
 ## 8. Suite — garde-fou mort + bugs asyncpg/SQLite (2026-08-20)
 
-### 8.1 Garde-fou mort (skip silencieux)
+### 8.1 Garde-fou mort (skip silencieux) → ressuscité en v2
 `tests/test_config_critical.py::test_fsrs_scheduler_no_in_tuple` pointe
 `services/fsrs_scheduler.py`, fichier **supprimé** par la fusion FSRS
 (le code vit dans `fsrs_unified.py`) → le test skippe en silence et la
 règle AGENTS.md §1.5 (`IN :tuple` interdit sur asyncpg) n'était plus
-enforcée nulle part. Tests gelés par AGENT_RULES → le garde reste mort,
-corrigé par vérification manuelle + fix des violations réelles (8.2).
-Recommandation : pointer le garde vers `fsrs_unified.py` quand les tests
-seront dégelés.
+enforcée nulle part. Tests gelés par AGENT_RULES → **nouveau fichier**
+`tests/test_sql_portability_guard.py` (aucun test existant modifié) qui
+encode la règle moderne :
+- chaque « IN :param » exige `bindparam(param, expanding=True)` dans le
+  même fichier (seule forme portable SQLite/asyncpg) ;
+- « col = ANY(:param) » interdit (non portable SQLite) ;
+- le hook `database.py` (`:param = ANY(col)` → json_each) doit rester présent.
+Vérifié adversariellement : un fichier scratch violant la règle fait
+échouer le test avec un message précis ; 3 tests verts en conditions réelles.
 
 ### 8.2 Bugs réels trouvés par cette vérification — corrigés
 | Fichier | Bug | Correction |
