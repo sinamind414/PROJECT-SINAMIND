@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest"
 import {
   BOOTCAMP_DAYS,
   BOOTCAMP_TOTAL_DAYS,
+  SATELLITE_DAYS,
+  SATELLITE_TOTAL,
   countHits,
   detectAllil,
   detectFassir,
@@ -9,21 +11,29 @@ import {
   detectMoukhattat,
   detectNasIlmi,
   detectQuarin,
+  detectSatellite,
   getBootcampDay,
+  getSatelliteDay,
   highlightSpans,
   isVerbeAllil,
+  isVerbeArif,
+  isVerbeAtbat,
+  isVerbeFardiya,
   isVerbeFassir,
   isVerbeHallil,
   isVerbeIstintaj,
   isVerbeMoukhattat,
+  isVerbeNaqich,
   isVerbeNasIlmi,
   isVerbeQuarin,
+  isVerbeSaf,
   type AtelierAllilData,
   type AtelierFassirData,
   type AtelierIstintajData,
   type AtelierMoukhattatData,
   type AtelierNasIlmiData,
   type AtelierQuarinData,
+  type AtelierSatelliteData,
 } from "./manhadjia-lib"
 import rawData from "../../data/ateliers/manhadjia_01_hallil_taam.json"
 import rawData02 from "../../data/ateliers/manhadjia_02_fassir_taam.json"
@@ -32,6 +42,11 @@ import rawData04 from "../../data/ateliers/manhadjia_04_allil_taam.json"
 import rawData05 from "../../data/ateliers/manhadjia_05_quarin_taam.json"
 import rawData06 from "../../data/ateliers/manhadjia_06_nas_ilmi_taam.json"
 import rawData07 from "../../data/ateliers/manhadjia_07_moukhattat_taam.json"
+import rawSat01 from "../../data/ateliers/manhadjia_s01_saf_taam.json"
+import rawSat02 from "../../data/ateliers/manhadjia_s02_arif_taam.json"
+import rawSat03 from "../../data/ateliers/manhadjia_s03_atbat_taam.json"
+import rawSat04 from "../../data/ateliers/manhadjia_s04_fardiya_taam.json"
+import rawSat05 from "../../data/ateliers/manhadjia_s05_naqich_taam.json"
 
 // Source unique de vérité : la liste fermée du JSON (pas une copie dans le test)
 const REGEX = rawData.interdits_regex
@@ -41,6 +56,11 @@ const D04 = rawData04 as AtelierAllilData
 const D05 = rawData05 as AtelierQuarinData
 const D06 = rawData06 as AtelierNasIlmiData
 const D07 = rawData07 as AtelierMoukhattatData
+const DS01 = rawSat01 as AtelierSatelliteData
+const DS02 = rawSat02 as AtelierSatelliteData
+const DS03 = rawSat03 as AtelierSatelliteData
+const DS04 = rawSat04 as AtelierSatelliteData
+const DS05 = rawSat05 as AtelierSatelliteData
 
 describe("isVerbeHallil (rituel — liste fermée)", () => {
   it("accepte حلل / حلّل / تحليل / analyser / analysez / analyse", () => {
@@ -644,5 +664,172 @@ describe("BOOTCAMP_DAYS (J1→J7, 7 jours, 7 couleurs)", () => {
       expect(link?.href).toBe(next.href)
       expect(link?.label.length).toBeGreaterThan(0)
     })
+  })
+})
+
+describe("SATELLITE_DAYS (5 verbes officiels hors bootcamp)", () => {
+  const RAWS = [rawSat01, rawSat02, rawSat03, rawSat04, rawSat05]
+
+  it("5 satellites, numéros 1→5, slugs et hrefs uniques", () => {
+    expect(SATELLITE_TOTAL).toBe(5)
+    expect(SATELLITE_DAYS.map((d) => d.num)).toEqual([1, 2, 3, 4, 5])
+    expect(new Set(SATELLITE_DAYS.map((d) => d.slug)).size).toBe(5)
+    expect(new Set(SATELLITE_DAYS.map((d) => d.href)).size).toBe(5)
+  })
+
+  it("verb_ref officiels 2·3·4·8·9 et routes exactes", () => {
+    expect(SATELLITE_DAYS.map((d) => d.verbRefId)).toEqual([2, 3, 4, 8, 9])
+    expect(SATELLITE_DAYS.map((d) => d.href)).toEqual([
+      "/manhadjia/saf",
+      "/manhadjia/arif",
+      "/manhadjia/atbat",
+      "/manhadjia/fardiya",
+      "/manhadjia/naqich",
+    ])
+  })
+
+  it("getSatelliteDay retrouve chaque slug, undefined sinon", () => {
+    expect(getSatelliteDay("saf")?.verbRefId).toBe(2)
+    expect(getSatelliteDay("arif")?.verbe).toBe("عرّف")
+    expect(getSatelliteDay("naqich")?.num).toBe(5)
+    expect(getSatelliteDay("hallil")).toBeUndefined()
+  })
+
+  it("cohérence registre ↔ 5 JSON (couleur فضي · verb_ref · pas de jour bootcamp)", () => {
+    RAWS.forEach((raw, i) => {
+      const day = SATELLITE_DAYS[i]
+      expect(raw.couleur).toBe("فضي")
+      expect(raw.jour).toBeUndefined()
+      expect(raw.verb_ref?.id).toBe(day.verbRefId)
+    })
+  })
+
+  it("chaîne lien_suivant : صف→عرّف→أثبت→فرضية→ناقش→البوتكامب", () => {
+    RAWS.forEach((raw, i) => {
+      const next = i < 4 ? SATELLITE_DAYS[i + 1] : null
+      const link = (raw as { lien_suivant?: { label: string; href: string } }).lien_suivant
+      expect(link?.href).toBe(next ? next.href : "/manhadjia")
+      expect(link?.label.length).toBeGreaterThan(0)
+    })
+  })
+})
+
+describe("isVerbe* satellites (rituel — listes fermées)", () => {
+  it("صف : accepte صف/وصف/decrire, refuse حلّل", () => {
+    expect(isVerbeSaf("صف")).toBe(true)
+    expect(isVerbeSaf("وصف")).toBe(true)
+    expect(isVerbeSaf("décrire")).toBe(true)
+    expect(isVerbeSaf("حلل")).toBe(false)
+  })
+
+  it("عرّف : accepte عرف/تعريف/definir, refuse صف", () => {
+    expect(isVerbeArif("عرّف")).toBe(true)
+    expect(isVerbeArif("تعريف")).toBe(true)
+    expect(isVerbeArif("définir")).toBe(true)
+    expect(isVerbeArif("صف")).toBe(false)
+  })
+
+  it("أثبت : accepte اثبت/برهن/demontrer, refuse ناقش", () => {
+    expect(isVerbeAtbat("أثبت")).toBe(true)
+    expect(isVerbeAtbat("برهن")).toBe(true)
+    expect(isVerbeAtbat("démontrer")).toBe(true)
+    expect(isVerbeAtbat("ناقش")).toBe(false)
+  })
+
+  it("اقترح فرضية : accepte فرضية/hypothese, refuse استنتج", () => {
+    expect(isVerbeFardiya("اقترح فرضية")).toBe(true)
+    expect(isVerbeFardiya("فرضية")).toBe(true)
+    expect(isVerbeFardiya("hypothèse")).toBe(true)
+    expect(isVerbeFardiya("استنتج")).toBe(false)
+  })
+
+  it("ناقش : accepte ناقش/مناقشة/discuter, refuse أثبت", () => {
+    expect(isVerbeNaqich("ناقش")).toBe(true)
+    expect(isVerbeNaqich("مناقشة")).toBe(true)
+    expect(isVerbeNaqich("discuter")).toBe(true)
+    expect(isVerbeNaqich("اثبت")).toBe(false)
+  })
+})
+
+describe("detectSatellite (métier par liste fermée)", () => {
+  it("صف : réponse modèle → 0 crime 0 manque", () => {
+    const d = detectSatellite(
+      "تمثل الوثيقة منحنى يبين تطور عدد LTc. يرتفع العدد ليبلغ ذروة 4,8 في اليوم 3 ثم ينخفض.",
+      DS01
+    )
+    expect(d.crimes).toEqual([])
+    expect(d.missing).toEqual([])
+  })
+
+  it("صف : «لأن الذاكرة جاهزة» → crime تفسير + surlignage", () => {
+    const d = detectSatellite("لأن الذاكرة جاهزة.", DS01)
+    expect(d.crimes.length).toBe(1)
+    expect(countHits(d.displaySpans)).toBeGreaterThan(0)
+    expect(d.missing.length).toBeGreaterThan(0)
+  })
+
+  it("صف : «الانخفاض» (لان dans un mot) → 0 crime", () => {
+    const d = detectSatellite("نلاحظ الانخفاض في اليوم 8", DS01)
+    // نلاحظ = crime, mais لان imbriqué ne doit PAS compter en plus
+    expect(d.crimes.length).toBe(1)
+  })
+
+  it("عرّف : réponse modèle → 0 crime 0 manque", () => {
+    const d = detectSatellite(
+      "الذاكرة المناعية هي استجابة مناعية خلوية ثانوية سريعة ومكثفة بفضل خلايا LTc الذاكرة.",
+      DS02
+    )
+    expect(d.crimes).toEqual([])
+    expect(d.missing).toEqual([])
+  })
+
+  it("عرّف : «نلاحظ أن المنحنى يرتفع» → crimes نلاحظ + وصف", () => {
+    const d = detectSatellite("نلاحظ أن المنحنى يرتفع ثم ينخفض.", DS02)
+    expect(d.crimes.length).toBe(2)
+    expect(d.missing.length).toBeGreaterThan(0)
+  })
+
+  it("أثبت : réponse modèle → 0 crime 0 manque", () => {
+    const d = detectSatellite(
+      "الفرضية: الرفض السريع راجع إلى الذاكرة. تمثل الوثيقة جدولا ومنحنى. نلاحظ رفضا في 5 أيام لأن المستضد معروف. كلما وجدت الذاكرة كان الرفض أسرع، ومنه نستنتج أن الفرضية صحيحة.",
+      DS03
+    )
+    expect(d.crimes).toEqual([])
+    expect(d.missing).toEqual([])
+  })
+
+  it("أثبت : «ربما الرفض سريع» → crime ربما", () => {
+    const d = detectSatellite("ربما الرفض سريع.", DS03)
+    expect(d.crimes.length).toBe(1)
+  })
+
+  it("فرضية : réponse modèle → 0 crime 0 manque", () => {
+    const d = detectSatellite(
+      "يعود سبب سرعة الرفض عند الملامسة الثانية إلى تشكل خلايا LTc ذاكرة تتكاثر بسرعة.",
+      DS04
+    )
+    expect(d.crimes).toEqual([])
+    expect(d.missing).toEqual([])
+  })
+
+  it("فرضية : «نستنتج أن الرفض سريع» → crime استنتاج", () => {
+    const d = detectSatellite("نستنتج أن الرفض سريع.", DS04)
+    expect(d.crimes.length).toBe(1)
+    expect(d.missing.length).toBeGreaterThan(0)
+  })
+
+  it("ناقش : réponse modèle → 0 crime 0 manque", () => {
+    const d = detectSatellite(
+      "الفرضية: الرفض السريع ناتج عن خلايا LTc ذاكرة. رُفض الطعم في 5 أيام لأن المستضد معروف. إذن الفرضية صحيحة.",
+      DS05
+    )
+    expect(d.crimes).toEqual([])
+    expect(d.missing).toEqual([])
+  })
+
+  it("ناقش : «أعتقد أنها صحيحة» → crime رأي", () => {
+    const d = detectSatellite("أعتقد أنها صحيحة.", DS05)
+    expect(d.crimes.length).toBe(1)
+    expect(d.missing.length).toBeGreaterThan(0)
   })
 })

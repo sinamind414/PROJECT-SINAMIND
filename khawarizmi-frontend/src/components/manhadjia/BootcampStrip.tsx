@@ -1,7 +1,13 @@
 "use client"
 
 import Link from "next/link"
-import { BOOTCAMP_DAYS, BOOTCAMP_TOTAL_DAYS, MUSCLE_ACCENTS, getBootcampDay } from "@/lib/manhadjia-lib"
+import {
+  BOOTCAMP_DAYS,
+  BOOTCAMP_TOTAL_DAYS,
+  MUSCLE_ACCENTS,
+  SATELLITE_DAYS,
+  getBootcampDay,
+} from "@/lib/manhadjia-lib"
 
 type Props = {
   /** slug du jour courant (ex. "hallil", "fassir"…) */
@@ -64,6 +70,22 @@ export function BootcampStrip({ current }: Props) {
             </Link>
           )
         })}
+      </div>
+
+      {/* Entrée vers les 5 ateliers satellites (verbes hors bootcamp) */}
+      <div className="mt-2 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 border-t border-white/5 pt-2" dir="rtl">
+        <span className="text-[10px] font-black text-white/30">أقمار صناعية:</span>
+        {SATELLITE_DAYS.map((d) => (
+          <Link
+            key={d.slug}
+            href={d.href}
+            title={`قمر ${d.num} — ${d.verbe} (فعل ${d.verbRefId})`}
+            className="rounded-md px-1.5 py-0.5 text-[10px] font-bold text-slate-300 hover:bg-slate-300/10 hover:text-white"
+            dir="rtl"
+          >
+            {d.verbeCourt}
+          </Link>
+        ))}
       </div>
     </nav>
   )

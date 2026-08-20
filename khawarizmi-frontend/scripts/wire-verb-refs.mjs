@@ -39,6 +39,32 @@ const WIRING = [
     outFile: path.join(root, "data/ateliers/manhadjia_07_moukhattat_taam.json"),
     key: "verb_ref",
   },
+  // ── Ateliers satellites (hors bootcamp) — 5 verbes officiels restants ──
+  {
+    id: 2, // صف / Décrire — max 10
+    outFile: path.join(root, "data/ateliers/manhadjia_s01_saf_taam.json"),
+    key: "verb_ref",
+  },
+  {
+    id: 3, // عرّف / Définir — max 10
+    outFile: path.join(root, "data/ateliers/manhadjia_s02_arif_taam.json"),
+    key: "verb_ref",
+  },
+  {
+    id: 4, // أثبت / Prouver — max 15
+    outFile: path.join(root, "data/ateliers/manhadjia_s03_atbat_taam.json"),
+    key: "verb_ref",
+  },
+  {
+    id: 8, // اقترح فرضية / Proposer une hypothèse — max 10
+    outFile: path.join(root, "data/ateliers/manhadjia_s04_fardiya_taam.json"),
+    key: "verb_ref",
+  },
+  {
+    id: 9, // ناقش / Discuter — max 15
+    outFile: path.join(root, "data/ateliers/manhadjia_s05_naqich_taam.json"),
+    key: "verb_ref",
+  },
 ]
 
 for (const { id, outFile, key } of WIRING) {
