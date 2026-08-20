@@ -817,6 +817,18 @@ describe("SATELLITE_DAYS (15 satellites : référentiel + livre)", () => {
       expect((raw as Partial<AtelierSatelliteData>).exemples).toBeUndefined()
     }
   })
+
+  it("invariant : bootcamp + satellites couvrent les 10 verb_ref officiels (1→10)", () => {
+    const ids = [
+      ...BOOTCAMP_DAYS.map((d) => d.verbRefId),
+      ...SATELLITE_DAYS.map((d) => d.verbRefId),
+    ].filter((id): id is number => id !== null)
+    // Couverture complète du référentiel…
+    expect([...new Set(ids)].sort((a, b) => a - b)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+    // …avec un seul verbe en double atelier : استنتج (J3 + قمر 6)
+    expect(ids).toHaveLength(11)
+    expect(ids.filter((id) => id === 6)).toHaveLength(2)
+  })
 })
 
 describe("isVerbe* satellites (rituel — listes fermées)", () => {
