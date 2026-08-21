@@ -176,7 +176,12 @@ Vérifications : démo SQLite réelle (tag + titre + expanding) ✓ · ruff 0 �
 
 ## 11. Clôture de session
 
-- Branche : `arena/01a01f52-project-sinamind` (15 commits) — PR ouverte vers master.
+- Branche : `arena/01a01f52-project-sinamind` (16 commits) — **PR #12 ouverte
+  vers master, statut MERGEABLE / CLEAN** (vérifié via API GitHub 2026-08-21).
+- Infra vérifiée : `startup.sh` cohérent avec railway.toml (fix migration 017
+  héritée + alembic + uvicorn), main.py 60 ≤ 110 lignes (hook pre-commit),
+  35 migrations + alembic.ini présents. Pre-commit corrigé : `no-commit-to-branch`
+  protégeait `main` (mort) → `master` (branche par défaut + deploy).
 - Actions utilisateur restantes : (1) copier `docs/ci/ci.yml.corrigee` vers
   `.github/workflows/ci.yml` (permission workflows) puis merger sur master ;
   (2) `git lfs pull` pour le modèle ONNX ; (3) activer
