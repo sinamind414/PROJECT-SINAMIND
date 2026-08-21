@@ -244,6 +244,25 @@ Vérifications : démo SQLite réelle (tag + titre + expanding) ✓ · ruff 0 �
 - Preuves : **1015 tests backend verts / 0 erreur** · ruff 0 · smoke GET 99
   routes + smoke all 176 opérations sans 500.
 
+## 16. Audits de clôture — méthode×chemin, xfails, conformité AGENT_RULES (2026-08-21)
+
+- **Audit méthode×chemin** : 28 appels frontend uniques (apiClient.get/post/
+  request + fetch, template literals normalisés, préfixes base-URL exclus)
+  comparés aux routes montées (méthode+path). Résultat : **0 écart** —
+  complément de l'audit des orphelins (§14) qui avait trouvé l'endpoint
+  feedback manquant, désormais corrigé. Le contrat frontend↔backend est
+  aligné sur les deux axes.
+- **Audit des xfails** : les 5 xfails restants sont documentés et
+  intentionnels (routes phase2/phase4 retirées comme doublons — cohérent
+  avec le commentaire d'ALL_ROUTERS). Aucun xpass : pas de régression
+  masquée par strict-xfail.
+- **Conformité AGENT_RULES** : PR de 102 fichiers — aucun fichier protégé
+  touché (drill/, feynman/, diagnostic/, scanner/, mindmap_service.py,
+  main.py, migrations) **sauf config.py** (ajout additif inerte :
+  savoir_remediation_enabled, défaut False — divulgué §9, emplacement
+  naturel des flags, à déplacer si l'utilisateur le demande). Aucun test
+  existant modifié : 6 fichiers de tests nouveaux uniquement.
+
 ## 12. CI — découverte et blocage de permission
 
 - Les 9 derniers runs CI échouaient au **parse du workflow** (un `: ` dans un
