@@ -12,7 +12,10 @@ repos:
       - id: mixed-line-ending
         args: [--fix=lf]
       - id: no-commit-to-branch
-        args: [--branch, main]
+        # La branche par défaut du repo est master (déploiement Railway +
+        # schedule CI) — avant, seul `main` était protégé (protection morte,
+        # fix 2026-08-21).
+        args: [--branch, master]
       - id: check-added-large-files
         args: [--maxkb=500]
 

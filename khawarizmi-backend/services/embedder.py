@@ -15,6 +15,16 @@ from config import get_settings
 logger = logging.getLogger("khawarizmi.embedder")
 
 
+def _is_lfs_pointer(path: str) -> bool:
+    """Vrai si le fichier est un pointeur Git LFS (métadonnées, pas le modèle)."""
+    try:
+        with open(path, "rb") as f:
+            head = f.read(64)
+        return head.startswith(b"version https://git-lfs.github.com/spec/")
+    except OSError:
+        return False
+
+
 class KhawarizmiEmbedder:
     """
     Service d'embeddings optimisé utilisant onnxruntime et tokenizers directement,
@@ -53,10 +63,24 @@ class KhawarizmiEmbedder:
 
         logger.info(f"Initialisation de l'embedder ONNX à : {model_path}")
 
-        # Décompresser le modèle zip s'il n'existe pas en tant qu'onnx
         onnx_file = os.path.join(model_path, "model_quantized.onnx")
         zip_file = os.path.join(model_path, "model_quantized.zip")
-        if not os.path.exists(onnx_file) and os.path.exists(zip_file):
+
+        # Détection explicite d'un pointeur Git LFS non téléchargé :
+        # le fichier existe mais ne contient pas le modèle (134 octets de
+        # métadonnées) — sans cette garde, onnxruntime échouait avec un
+        # INVALID_PROTOBUF cryptique (bug corrigé 2026-08-20).
+        lfs_pointer = os.path.exists(onnx_file) and _is_lfs_pointer(onnx_file)
+        if lfs_pointer:
+            logger.warning(
+                "Le fichier model_quantized.onnx est un pointeur Git LFS non téléchargé. "
+                "Récupération : git lfs pull (puis redémarrer). Tentative du zip local si présent."
+            )
+
+        # Récupération depuis le zip local quand le .onnx est absent ou
+        # pointeur LFS. On ne supprime JAMAIS le fichier tracké par git :
+        # l'extraction écrase le pointeur uniquement quand le zip existe.
+        if os.path.exists(zip_file) and (not os.path.exists(onnx_file) or lfs_pointer):
             logger.info(f"Décompression du modèle ONNX depuis {zip_file}...")
             try:
                 with zipfile.ZipFile(zip_file, "r") as zip_ref:
@@ -81,16 +105,24 @@ class KhawarizmiEmbedder:
         self._fallback_mode = False
 
         if os.path.exists(onnx_file):
-            try:
-                sess_options = ort.SessionOptions()
-                sess_options.intra_op_num_threads = 1
-                sess_options.inter_op_num_threads = 1
-                self.session = ort.InferenceSession(onnx_file, sess_options)
-                logger.info("Embedder ONNX (sans PyTorch) initialisé avec succès.")
-            except Exception as e:
-                self._fallback_reason = f"ONNX Runtime: {e}"
-                logger.error(f"Erreur d'initialisation ONNX Runtime: {e}. Activation du mode Fallback.")
+            if _is_lfs_pointer(onnx_file):
+                self._fallback_reason = (
+                    f"model_quantized.onnx est un pointeur Git LFS non téléchargé ({onnx_file}). "
+                    "Récupération : git lfs pull puis redémarrer."
+                )
+                logger.error(f"{self._fallback_reason} Activation du mode Fallback.")
                 self._fallback_mode = True
+            else:
+                try:
+                    sess_options = ort.SessionOptions()
+                    sess_options.intra_op_num_threads = 1
+                    sess_options.inter_op_num_threads = 1
+                    self.session = ort.InferenceSession(onnx_file, sess_options)
+                    logger.info("Embedder ONNX (sans PyTorch) initialisé avec succès.")
+                except Exception as e:
+                    self._fallback_reason = f"ONNX Runtime: {e}"
+                    logger.error(f"Erreur d'initialisation ONNX Runtime: {e}. Activation du mode Fallback.")
+                    self._fallback_mode = True
         else:
             self._fallback_reason = f"fichier ONNX manquant ({onnx_file})"
             logger.warning(f"Fichier ONNX manquant ({onnx_file}). Activation du mode Fallback déterministe TF-IDF.")

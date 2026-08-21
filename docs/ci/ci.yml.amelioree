@@ -1,4 +1,7 @@
 # CI/CD Khawarizmi Pro
+# ⚠️ SUPERSÉDÉ par docs/ci/ci.yml.corrigee (2026-08-20) : triggers master/arena/*,
+#    trigger schedule ajouté (les jobs nightly étaient morts sans lui),
+#    deploy sur master (branche par défaut du repo). Utiliser ci.yml.corrigee.
 # ⚠️ PRÊT MAIS NON POUSSABLE : le token GitHub App de la session n'a pas la
 # permission `workflows` (403 vérifié). Ce fichier reste la référence
 # (docs/ci/ci.yml.amelioree) à copier vers .github/workflows/ci.yml dès que

@@ -808,7 +808,7 @@ async def get_concept_states(
     if not concept_ids:
         return states
 
-    cids_param = tuple(concept_ids) if len(concept_ids) > 1 else (concept_ids[0],)
+    cids_param = list(concept_ids)
     stmt = text(
         "SELECT concept_id, fsrs_state FROM mastery_micro_concepts "
         "WHERE user_id = :uid AND concept_id IN :cids"

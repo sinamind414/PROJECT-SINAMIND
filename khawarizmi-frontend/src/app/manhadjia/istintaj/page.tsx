@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { BootcampStrip } from "@/components/manhadjia/BootcampStrip"
 import { RitualGate } from "@/components/manhadjia/RitualGate"
 import { CarteHallil } from "@/components/manhadjia/CarteHallil"
 import { AtelierIstintaj } from "@/components/manhadjia/AtelierIstintaj"
@@ -19,14 +20,15 @@ const SCREEN_LABEL: Record<Screen, string> = {
 }
 
 // Atelier 03 — استنتج : même machine d'états, même greffe (4,8/2,5).
-// القانون + دليله, 1–3 جمل. 0 appel API, 0 LLM, 0 note /10, 0 lien externe.
+// القانون + دليله, 1–3 جمل. 1 appel API officiel (remédiation phase ب, repli silencieux), 0 LLM, 0 note /10, 0 lien externe.
 export default function ManhadjiaIstintajPage() {
   const [screen, setScreen] = useState<Screen>("ritual-carte")
 
   return (
     <main dir="rtl" lang="ar" className="min-h-screen bg-slate-deep text-white">
       <div className="mx-auto max-w-2xl px-4 py-8 pb-24">
-        <p className="mb-6 text-center text-xs text-white/30">{SCREEN_LABEL[screen]}</p>
+        <BootcampStrip current="istintaj" />
+        <p className="mt-6 mb-6 text-center text-xs text-white/30">{SCREEN_LABEL[screen]}</p>
 
         {screen === "ritual-carte" && (
           <RitualGate

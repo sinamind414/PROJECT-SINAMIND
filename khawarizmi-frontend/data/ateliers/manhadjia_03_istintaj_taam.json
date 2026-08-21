@@ -3,6 +3,7 @@
   "verbe": "استنتج",
   "couleur": "أخضر",
   "jour": 3,
+  "verb_slug": "deduce",
   "mots_mur": [
     "إذن",
     "جملة",

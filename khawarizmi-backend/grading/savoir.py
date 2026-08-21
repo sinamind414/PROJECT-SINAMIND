@@ -9,7 +9,9 @@ Règles de promotion (design validé + mesuré par le golden set) :
 - ≥ SAVOIR_HIGH_CONFIDENCE_MIN_CONCEPTS concepts trouvés DANS LA COPIE
   (périmètre validé : MAE 0.279 global, copies modèles MAE 0.000).
   NB : le seuil 0.92 est DÉRIVÉ (3/3) — ne pas l'ajuster dynamiquement.
-- Remédiation DÉSACTIVÉE (κ 0.449 < 0.65) : jamais de mauvaise page de livre.
+- Remédiation : gate config.savoir_remediation_enabled (défaut False).
+  Le golden set actuel mesure κ = 0.858 ≥ 0.65 → le processus golden dit
+  « RÉACTIVER » — activation en prod via SAVOIR_REMEDIATION_ENABLED=true.
 
 Retourne un résultat PROMU au contrat v2 (source="local_savoir",
 parse_status="local", attempts=0, remediation=None, métadonnées _savoir_*
@@ -20,6 +22,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from config import get_settings
 from services.savoir_corrector import (
     SAVOIR_HIGH_CONFIDENCE_MIN_CONCEPTS,
     deterministic_correct_v2,
@@ -61,7 +64,19 @@ def run_savoir(
     result["attempts"] = 0
     result["parse_status"] = "local"
     result["finish_reason"] = "savoir_high_confidence"
-    # κ modéré (0.449 < 0.65) : jamais de remédiation erronée (audit V0.2)
+    # Remédiation : gate de production (κ golden = 0.858 ≥ 0.65, 2026-08-20).
+    # Défaut désactivé → comportement identique à l'historique (tests gelés).
+    # Activée, la remédiation réutilise la MÊME matrice que le chemin LLM
+    # (services.remediation_service) pour un shape de payload identique.
     result["remediation"] = None
     result["remediation_reason"] = "local_savoir_no_remediation"
+    if get_settings().savoir_remediation_enabled:
+        from services.remediation_service import get_generic_remediation, get_remediation
+
+        remediation = get_remediation(verb_slug, result["dominant_error_code"])
+        if remediation is None:
+            remediation = get_generic_remediation(result["dominant_error_code"])
+        if remediation is not None:
+            result["remediation"] = remediation
+            result["remediation_reason"] = "local_savoir_lexique"
     return result

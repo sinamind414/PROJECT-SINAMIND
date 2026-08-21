@@ -10,6 +10,7 @@ import {
   type Span,
 } from "@/lib/manhadjia-lib"
 import { CourbeLTc } from "@/components/manhadjia/CourbeLTc"
+import { RemediationHint } from "@/components/manhadjia/RemediationHint"
 
 type Props = {
   data: AtelierIstintajData
@@ -207,6 +208,8 @@ export function AtelierIstintaj({ data, onReplay, variant = "vert" }: Props) {
               ))}
             </div>
           )}
+          <RemediationHint verbSlug={data.verb_slug} text={text} />
+
           <button
             onClick={submit}
             className={`min-h-14 w-full rounded-2xl py-3 text-lg font-black ${A.btn} ${A.chipText}`}

@@ -770,9 +770,29 @@ def get_relevant_knowledge_raw(context: str, max_units: int = 2) -> list[dict[st
     return [unit for _, unit in scores[:max_units]]
 
 
+# ── Normalisation des identifiants d'unités ─────────────────────────────
+# VERB_UNIT_MAP et PRACTICAL_EXAMPLES utilisent « unite5-energie » alors que
+# ALL_UNITS utilise « unite5-energetique » (les deux orthographes sont
+# verrouillées par des tests existants). Toute recherche dans ALL_UNITS
+# passe par cette canonisation pour que les deux formes résolvent la même
+# unité (bug corrigé 2026-08-20 : les erreurs/connaissances de l'unité 5
+# étaient silencieusement absentes de la remédiation).
+_UNIT_ID_ALIASES: dict[str, str] = {
+    "unite5-energie": "unite5-energetique",
+}
+
+
+def _canonical_unit_id(unit_id: str) -> str:
+    """Résout l'identifiant canonique d'une unité (alias → id ALL_UNITS)."""
+    if not unit_id:
+        return unit_id
+    return _UNIT_ID_ALIASES.get(unit_id, unit_id)
+
+
 def build_knowledge_block(unit_ids: list[str]) -> str:
     """Formate un bloc de connaissance pour les unités specifiees par leur id."""
-    units = [u for u in ALL_UNITS if u["id"] in unit_ids]
+    ids = {_canonical_unit_id(i) for i in unit_ids}
+    units = [u for u in ALL_UNITS if u["id"] in ids]
     if not units:
         return ""
     return _build_knowledge_block(units)
@@ -888,8 +908,9 @@ def get_units_for_verb(verb_slug: str) -> list[str]:
 
 def get_unit_specific_errors(unit_key: str) -> list[str]:
     """Retourne les erreurs specifiques a une unite pour la remediation."""
+    canonical = _canonical_unit_id(unit_key)
     for unit in ALL_UNITS:
-        if unit["id"] == unit_key:
+        if unit["id"] == canonical:
             return unit.get("errors", [])[:_MAX_ERRORS]
     return []
 
@@ -988,11 +1009,12 @@ PRACTICAL_EXAMPLES: dict[str, list[dict[str, str]]] = {
 def get_practical_examples(category: str | None = None, unit: str | None = None) -> list[dict[str, str]]:
     """Retourne les exemples pratiques filtres par categorie et/ou unite."""
     result: list[dict[str, str]] = []
+    unit_canonical = _canonical_unit_id(unit) if unit else None
     for cat, examples in PRACTICAL_EXAMPLES.items():
         if category and cat != category:
             continue
         for ex in examples:
-            if unit and ex.get("unit") != unit:
+            if unit_canonical and _canonical_unit_id(ex.get("unit", "")) != unit_canonical:
                 continue
             result.append({**ex, "category": cat})
     return result

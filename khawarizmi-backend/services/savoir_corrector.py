@@ -572,8 +572,9 @@ def build_savoir_highlights(
 def _savoir_dominant_error(raw: dict, score: int, score_max: int) -> str:
     """Code d'erreur dominant pour un résultat savoir.
 
-    κ modéré (0.449) : le code est une heuristique, la remédiation est
-    désactivée (remediation=None) tant que κ < 0.65 sur golden humain.
+    Le code est une heuristique. La remédiation est gatée par
+    config.savoir_remediation_enabled (défaut False) ; le golden set actuel
+    mesure κ = 0.858 ≥ 0.65 → le processus golden dit « RÉACTIVER ».
     """
     if any("خطأ مفاهيمي" in e for e in raw.get("erreurs", [])):
         return "scientific_error"

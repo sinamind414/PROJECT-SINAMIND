@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { BootcampStrip } from "@/components/manhadjia/BootcampStrip"
 import { RitualGate } from "@/components/manhadjia/RitualGate"
 import { CarteHallil } from "@/components/manhadjia/CarteHallil"
 import { AtelierNasIlmi } from "@/components/manhadjia/AtelierNasIlmi"
@@ -19,14 +20,15 @@ const SCREEN_LABEL: Record<Screen, string> = {
 }
 
 // Atelier 06 — اكتب نصا علميا : même machine d'états, même greffe (4,8/2,5).
-// مقدمة (سياق + مشكل) + عرض + خاتمة OBLIGATOIRES. 0 appel API, 0 LLM, 0 note /10.
+// مقدمة (سياق + مشكل) + عرض + خاتمة OBLIGATOIRES. 1 appel API officiel (remédiation phase ب, repli silencieux), 0 LLM, 0 note /10.
 export default function ManhadjiaNasIlmiPage() {
   const [screen, setScreen] = useState<Screen>("ritual-carte")
 
   return (
     <main dir="rtl" lang="ar" className="min-h-screen bg-slate-deep text-white">
       <div className="mx-auto max-w-2xl px-4 py-8 pb-24">
-        <p className="mb-6 text-center text-xs text-white/30">{SCREEN_LABEL[screen]}</p>
+        <BootcampStrip current="nas-ilmi" />
+        <p className="mt-6 mb-6 text-center text-xs text-white/30">{SCREEN_LABEL[screen]}</p>
 
         {screen === "ritual-carte" && (
           <RitualGate

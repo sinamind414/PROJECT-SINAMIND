@@ -12,7 +12,11 @@ export interface AtelierData {
   atelier_id: string
   verbe: string
   couleur: string
-  jour: number
+  // jour = position dans le bootcamp J1→J7. Absent pour les ateliers satellites.
+  jour?: number
+  // slug backend (VERB_UNIT_MAP) pour POST /api/manhadjiya/contextual-remediation
+  // — le seul appel runtime du système (repli silencieux, voir manhadjia-remediation.ts).
+  verb_slug: string
   mots_mur: string[]
   cases: { mot: string; desc: string }[]
   erreur_verbe: string
@@ -51,12 +55,39 @@ export interface AtelierData {
     criteria: string[]
     common_mistakes: string[]
   }
+  // Données officielles injectées statiquement (sans API) par
+  // khawarizmi-backend/scripts/wire_satellite_official_data.py —
+  // uniquement présentes sur les satellites.
+  unites?: { id: string; titre_ar: string }[]
+  exemples?: { title: string; context: string; content: string; unit: string }[]
 }
+
+// Props structurelles des composants partagés (bootcamp + satellites).
+// Les satellites n'ont ni jour ni docs.courbe obligatoires : ces types
+// minimaux permettent de passer les deux familles de données.
+export type RitualData = Pick<
+  AtelierData,
+  "verbe" | "erreur_verbe" | "bandeau_rituel" | "pastilles" | "mots_mur"
+>
+
+export type CarteData = Pick<
+  AtelierData,
+  "couleur" | "verbe" | "mots_mur" | "carte" | "corrige_geste" | "verb_ref" | "unites" | "exemples"
+>
 
 // Palette des muscles : حلّل = أصفر (jaune), فسّر = برتقالي (orange),
 // استنتج = أخضر (vert), علّل = أزرق (bleu), قارن = بنفسجي (violet),
 // نص علمي = وردي (rose), مخطط = سماوي (cyan).
-export type MuscleVariant = "jaune" | "orange" | "vert" | "bleu" | "violet" | "rose" | "cyan"
+// أقمار صناعية (satellites, hors bootcamp) = فضي (silver) partagé.
+export type MuscleVariant =
+  | "jaune"
+  | "orange"
+  | "vert"
+  | "bleu"
+  | "violet"
+  | "rose"
+  | "cyan"
+  | "satellite"
 
 export const MUSCLE_ACCENTS: Record<
   MuscleVariant,
@@ -181,6 +212,181 @@ export const MUSCLE_ACCENTS: Record<
     pastille: "border-cyan-300/40 bg-cyan-300/15 text-cyan-300",
     borderActive: "border-cyan-300",
   },
+  // أقمار صناعية — فضي موحّد (les 7 couleurs restent réservées au bootcamp)
+  satellite: {
+    border: "border-slate-300/25",
+    borderSoft: "border-slate-300/30",
+    bgSoft: "bg-slate-300/5",
+    chipBg: "bg-slate-300",
+    chipText: "text-slate-deep",
+    textAccent: "text-slate-200",
+    textSoft: "text-slate-300",
+    btn: "bg-slate-300 hover:bg-slate-200",
+    caseActive: "border-slate-300/60 bg-slate-300/10",
+    checkbox: "accent-slate-300",
+    focus: "focus:border-slate-300",
+    pastille: "border-slate-300/40 bg-slate-300/15 text-slate-300",
+    borderActive: "border-slate-300",
+  },
+}
+
+// Bootcamp J1→J7 — registre unique des 7 ateliers (7 jours, 7 couleurs).
+// Source de vérité du bandeau de navigation partagé sur les 7 routes.
+// verb_ref = id officiel dans khawarizmi-backend/methodology/verb_database.json
+// (حلّل et قارن : pas d'id — doctrine « pas de note /20 affichée »).
+export interface BootcampDay {
+  jour: number
+  slug: string
+  href: string
+  verbe: string
+  verbeCourt: string
+  variant: MuscleVariant
+  couleurAr: string
+  verbRefId: number | null
+}
+
+export const BOOTCAMP_DAYS: BootcampDay[] = [
+  {
+    jour: 1,
+    slug: "hallil",
+    href: "/manhadjia",
+    verbe: "حلّل",
+    verbeCourt: "حلّل",
+    variant: "jaune",
+    couleurAr: "أصفر",
+    verbRefId: null,
+  },
+  {
+    jour: 2,
+    slug: "fassir",
+    href: "/manhadjia/fassir",
+    verbe: "فسّر",
+    verbeCourt: "فسّر",
+    variant: "orange",
+    couleurAr: "برتقالي",
+    verbRefId: 7,
+  },
+  {
+    jour: 3,
+    slug: "istintaj",
+    href: "/manhadjia/istintaj",
+    verbe: "استنتج",
+    verbeCourt: "استنتج",
+    variant: "vert",
+    couleurAr: "أخضر",
+    verbRefId: 6,
+  },
+  {
+    jour: 4,
+    slug: "allil",
+    href: "/manhadjia/allil",
+    verbe: "علّل",
+    verbeCourt: "علّل",
+    variant: "bleu",
+    couleurAr: "أزرق",
+    verbRefId: 5,
+  },
+  {
+    jour: 5,
+    slug: "quarin",
+    href: "/manhadjia/quarin",
+    verbe: "قارن",
+    verbeCourt: "قارن",
+    variant: "violet",
+    couleurAr: "بنفسجي",
+    verbRefId: null,
+  },
+  {
+    jour: 6,
+    slug: "nas-ilmi",
+    href: "/manhadjia/nas-ilmi",
+    verbe: "نص علمي",
+    verbeCourt: "نص",
+    variant: "rose",
+    couleurAr: "وردي",
+    verbRefId: 1,
+  },
+  {
+    jour: 7,
+    slug: "moukhattat",
+    href: "/manhadjia/moukhattat",
+    verbe: "مخطط",
+    verbeCourt: "مخطط",
+    variant: "cyan",
+    couleurAr: "سماوي",
+    verbRefId: 10,
+  },
+]
+
+export const BOOTCAMP_TOTAL_DAYS = BOOTCAMP_DAYS.length
+
+export function getBootcampDay(slug: string): BootcampDay | undefined {
+  return BOOTCAMP_DAYS.find((d) => d.slug === slug)
+}
+
+// أقمار صناعية — verbes du référentiel officiel (verb_database.json)
+// et verbes du livre sans numéro officiel (verbRefId null, affichés
+// «من الكتاب»). Même machine d'états, identité فضي partagée,
+// hors boucle J1→J7 (entrée par le bandeau du bootcamp).
+export interface SatelliteDay {
+  num: number
+  slug: string
+  href: string
+  verbe: string
+  verbeCourt: string
+  verbRefId: number | null
+}
+
+export const SATELLITE_DAYS: SatelliteDay[] = [
+  { num: 1, slug: "saf", href: "/manhadjia/saf", verbe: "صف", verbeCourt: "صف", verbRefId: 2 },
+  { num: 2, slug: "arif", href: "/manhadjia/arif", verbe: "عرّف", verbeCourt: "عرّف", verbRefId: 3 },
+  { num: 3, slug: "atbat", href: "/manhadjia/atbat", verbe: "أثبت", verbeCourt: "أثبت", verbRefId: 4 },
+  {
+    num: 4,
+    slug: "fardiya",
+    href: "/manhadjia/fardiya",
+    verbe: "اقترح فرضية",
+    verbeCourt: "فرضية",
+    verbRefId: 8,
+  },
+  { num: 5, slug: "naqich", href: "/manhadjia/naqich", verbe: "ناقش", verbeCourt: "ناقش", verbRefId: 9 },
+  {
+    num: 6,
+    slug: "synapse",
+    href: "/manhadjia/synapse",
+    verbe: "استنتج — وثيقة المشبك",
+    verbeCourt: "استنتج ٢",
+    verbRefId: 6,
+  },
+  { num: 7, slug: "taaraf", href: "/manhadjia/taaraf", verbe: "تعرّف / سمّ", verbeCourt: "تعرّف", verbRefId: null },
+  { num: 8, slug: "oudkur", href: "/manhadjia/oudkur", verbe: "اذكر", verbeCourt: "اذكر", verbRefId: null },
+  { num: 9, slug: "addid", href: "/manhadjia/addid", verbe: "عدّد", verbeCourt: "عدّد", verbRefId: null },
+  { num: 10, slug: "sannif", href: "/manhadjia/sannif", verbe: "صنّف", verbeCourt: "صنّف", verbRefId: null },
+  { num: 11, slug: "mayyiz", href: "/manhadjia/mayyiz", verbe: "ميّز", verbeCourt: "ميّز", verbRefId: null },
+  {
+    num: 12,
+    slug: "istakhrij",
+    href: "/manhadjia/istakhrij",
+    verbe: "استخرج",
+    verbeCourt: "استخرج",
+    verbRefId: null,
+  },
+  { num: 13, slug: "alliq", href: "/manhadjia/alliq", verbe: "علّق", verbeCourt: "علّق", verbRefId: null },
+  { num: 14, slug: "anqid", href: "/manhadjia/anqid", verbe: "انقد", verbeCourt: "انقد", verbRefId: null },
+  {
+    num: 15,
+    slug: "mochkil",
+    href: "/manhadjia/mochkil",
+    verbe: "صياغة مشكل علمي",
+    verbeCourt: "مشكل",
+    verbRefId: null,
+  },
+]
+
+export const SATELLITE_TOTAL = SATELLITE_DAYS.length
+
+export function getSatelliteDay(slug: string): SatelliteDay | undefined {
+  return SATELLITE_DAYS.find((d) => d.slug === slug)
 }
 
 // Atelier 02 (فسّر) — détection inversée : لأن + chiffre OBLIGATOIRES,
@@ -337,6 +543,58 @@ export interface AtelierMoukhattatData extends AtelierData {
   recap: string[]
 }
 
+// ── Ateliers satellites (صف · عرّف · أثبت · اقترح فرضية · ناقش · استنتج/مشبك) ─
+// Machine générique pilotée par le JSON : liste fermée d'obligatoires et
+// d'interdits (regex testées sur le texte normalisé أ→ا, diacritiques ôtés).
+// Le surlignage combine tous les interdits. 0 API, 0 LLM, 0 note /20.
+export interface SatelliteRule {
+  pattern: string
+  message: string
+}
+
+// Docs satellites : tableau obligatoire, courbe optionnelle (les 5 premiers
+// satellites réutilisent la courbe LTc ; le satellite synapse n'a pas de
+// courbe mais un schéma décrit en texte).
+export interface SatelliteDocs {
+  tableau: { colonnes: string[]; lignes: string[][] }
+  courbe?: { axeX: string; axeY: string; series: CourbeSerie[] }
+  phrase_sous_graphe?: string
+  schema?: string
+}
+
+export interface AtelierSatelliteData extends Omit<AtelierData, "docs"> {
+  docs: SatelliteDocs
+  detection: {
+    obligatoires: SatelliteRule[]
+    interdits: SatelliteRule[]
+  }
+  voix: string[]
+  recap: string[]
+}
+
+export interface SatelliteDetection {
+  displaySpans: Span[]
+  crimes: string[]
+  missing: string[]
+  wordCount: number
+}
+
+export function detectSatellite(original: string, data: AtelierSatelliteData): SatelliteDetection {
+  const { text } = normalizeWithMap(original)
+  const interRegex = data.detection.interdits.map((r) => r.pattern).join("|")
+  const displaySpans = interRegex ? highlightSpans(original, interRegex) : []
+  const crimes: string[] = []
+  for (const r of data.detection.interdits) {
+    if (new RegExp(r.pattern, "g").test(text)) crimes.push(r.message)
+  }
+  const missing: string[] = []
+  for (const r of data.detection.obligatoires) {
+    if (!new RegExp(r.pattern, "g").test(text)) missing.push(r.message)
+  }
+  const wordCount = text.trim() ? text.trim().split(/\s+/).length : 0
+  return { displaySpans, crimes, missing, wordCount }
+}
+
 // Verbes acceptés au rituel (listes fermées de la spec écran 0)
 const ACCEPTED_VERBES = new Set(["حلل", "تحليل", "analyser", "analysez", "analyse"])
 const ACCEPTED_VERBES_FASSIR = new Set([
@@ -472,6 +730,127 @@ export function isVerbeMoukhattat(input: string): boolean {
   const { text } = normalizeWithMap(input.trim())
   const fr = text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase()
   return ACCEPTED_VERBES_MOUKHATTAT.has(text.toLowerCase()) || ACCEPTED_VERBES_MOUKHATTAT.has(fr)
+}
+
+// ── Verbes des ateliers satellites (listes fermées) ────────────────────
+const ACCEPTED_VERBES_SAF = new Set(["صف", "وصف", "decris", "decrire", "decrit", "caracterise", "caracteriser", "describe"])
+const ACCEPTED_VERBES_ARIF = new Set(["عرف", "تعريف", "define", "definir", "definis", "definissez"])
+const ACCEPTED_VERBES_ATBAT = new Set(["اثبت", "برهن", "اثبات", "برهان", "prouve", "prouver", "demontre", "demontrer"])
+const ACCEPTED_VERBES_FARDIYA = new Set([
+  "اقترح فرضية",
+  "اقترح فرضيه",
+  "فرضية",
+  "فرضيه",
+  "hypothese",
+  "proposer une hypothese",
+  "propose une hypothese",
+])
+const ACCEPTED_VERBES_NAQICH = new Set(["ناقش", "مناقشة", "discute", "discuter", "discutez", "discuter"])
+
+/** Le verbe tapé au rituel est-il صف ? (fermé — قمر 01) */
+export function isVerbeSaf(input: string): boolean {
+  const { text } = normalizeWithMap(input.trim())
+  const fr = text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase()
+  return ACCEPTED_VERBES_SAF.has(text.toLowerCase()) || ACCEPTED_VERBES_SAF.has(fr)
+}
+
+/** Le verbe tapé au rituel est-il عرّف ? (fermé — قمر 02) */
+export function isVerbeArif(input: string): boolean {
+  const { text } = normalizeWithMap(input.trim())
+  const fr = text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase()
+  return ACCEPTED_VERBES_ARIF.has(text.toLowerCase()) || ACCEPTED_VERBES_ARIF.has(fr)
+}
+
+/** Le verbe tapé au rituel est-il أثبت / برهن ? (fermé — قمر 03) */
+export function isVerbeAtbat(input: string): boolean {
+  const { text } = normalizeWithMap(input.trim())
+  const fr = text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase()
+  return ACCEPTED_VERBES_ATBAT.has(text.toLowerCase()) || ACCEPTED_VERBES_ATBAT.has(fr)
+}
+
+/** Le verbe tapé au rituel est-il اقترح فرضية ? (fermé — قمر 04) */
+export function isVerbeFardiya(input: string): boolean {
+  const { text } = normalizeWithMap(input.trim())
+  const fr = text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase()
+  return ACCEPTED_VERBES_FARDIYA.has(text.toLowerCase()) || ACCEPTED_VERBES_FARDIYA.has(fr)
+}
+
+/** Le verbe tapé au rituel est-il ناقش ? (fermé — قمر 05) */
+export function isVerbeNaqich(input: string): boolean {
+  const { text } = normalizeWithMap(input.trim())
+  const fr = text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase()
+  return ACCEPTED_VERBES_NAQICH.has(text.toLowerCase()) || ACCEPTED_VERBES_NAQICH.has(fr)
+}
+
+// ── Verbes du livre sans verb_ref officiel (أقمار 07 → 15) ─────────────
+const ACCEPTED_VERBES_TAARAF = new Set(["تعرف", "تعرف على", "سم", "nomme", "nommer"])
+const ACCEPTED_VERBES_OUDKUR = new Set(["اذكر", "ذكر", "cite", "citer"])
+const ACCEPTED_VERBES_ADDID = new Set(["عدد", "enumerer", "enumere", "liste", "lister"])
+const ACCEPTED_VERBES_SANNIF = new Set(["صنف", "تصنيف", "classer", "classe", "classez", "classifie", "classifier"])
+const ACCEPTED_VERBES_MAYYIZ = new Set(["ميز", "تمييز", "distingue", "distinguer"])
+const ACCEPTED_VERBES_ISTAKHRIJ = new Set(["استخرج", "استخراج", "extrais", "extraire"])
+const ACCEPTED_VERBES_ALLIQ = new Set(["علق", "تعليق", "commente", "commenter"])
+const ACCEPTED_VERBES_ANQID = new Set(["انقد", "نقد", "critique", "critiquer"])
+const ACCEPTED_VERBES_MOCHKIL = new Set([
+  "صياغة مشكل علمي",
+  "صياغة المشكل",
+  "صياغه مشكل علمي",
+  "مشكل علمي",
+  "حدد المشكل",
+  "formuler un probleme",
+  "probleme scientifique",
+  "formuler le probleme",
+])
+
+function inSet(input: string, set: Set<string>): boolean {
+  const { text } = normalizeWithMap(input.trim())
+  const fr = text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase()
+  return set.has(text.toLowerCase()) || set.has(fr)
+}
+
+/** Le verbe tapé au rituel est-il تعرّف / سمّ ? (fermé — قمر 07) */
+export function isVerbeTaaraf(input: string): boolean {
+  return inSet(input, ACCEPTED_VERBES_TAARAF)
+}
+
+/** Le verbe tapé au rituel est-il اذكر ? (fermé — قمر 08) */
+export function isVerbeOudkur(input: string): boolean {
+  return inSet(input, ACCEPTED_VERBES_OUDKUR)
+}
+
+/** Le verbe tapé au rituel est-il عدّد ? (fermé — قمر 09) */
+export function isVerbeAddid(input: string): boolean {
+  return inSet(input, ACCEPTED_VERBES_ADDID)
+}
+
+/** Le verbe tapé au rituel est-il صنّف ? (fermé — قمر 10) */
+export function isVerbeSannif(input: string): boolean {
+  return inSet(input, ACCEPTED_VERBES_SANNIF)
+}
+
+/** Le verbe tapé au rituel est-il ميّز ? (fermé — قمر 11) */
+export function isVerbeMayyiz(input: string): boolean {
+  return inSet(input, ACCEPTED_VERBES_MAYYIZ)
+}
+
+/** Le verbe tapé au rituel est-il استخرج ? (fermé — قمر 12) */
+export function isVerbeIstakhrij(input: string): boolean {
+  return inSet(input, ACCEPTED_VERBES_ISTAKHRIJ)
+}
+
+/** Le verbe tapé au rituel est-il علّق ? (fermé — قمر 13) */
+export function isVerbeAlliq(input: string): boolean {
+  return inSet(input, ACCEPTED_VERBES_ALLIQ)
+}
+
+/** Le verbe tapé au rituel est-il انقد ? (fermé — قمر 14) */
+export function isVerbeAnqid(input: string): boolean {
+  return inSet(input, ACCEPTED_VERBES_ANQID)
+}
+
+/** Le verbe tapé au rituel est-il صياغة مشكل علمي ? (fermé — قمر 15) */
+export function isVerbeMochkil(input: string): boolean {
+  return inSet(input, ACCEPTED_VERBES_MOCHKIL)
 }
 
 export interface Span {

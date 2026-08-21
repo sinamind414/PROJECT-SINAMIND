@@ -7,6 +7,7 @@ du BAC algérien via pratique guidée + répétition espacée FSRS.
 import json
 import logging
 from datetime import UTC, datetime, timedelta
+from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException
 from fsrs import Card
@@ -14,6 +15,7 @@ from fsrs import Rating as FsrsRating
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app_state import state
 from database import get_db
 from deps import get_current_user, get_scheduler
 from schemas.action_verb import (
@@ -283,6 +285,37 @@ async def reviser_verbe(
         "stability": new_card.stability,
         "difficulty": new_card.difficulty,
     }
+
+
+# ── 7. POST /api/action-verbs/feedback/hardest — sondage « verbe le plus difficile » ──
+# Le frontend (HardestVerbPoll, page /action-verbs) postait vers cet endpoint
+# depuis toujours, mais il n'existait PAS au backend : 404 avalé par le catch
+# silencieux du composant → aucun vote jamais collecté. Fix 2026-08-21.
+
+
+@router.post("/feedback/hardest")
+async def feedback_verbe_difficile(body: dict[str, Any] | None = None):
+    """Enregistre un vote anonyme « ce verbe est le plus difficile pour moi ».
+
+    Public (pas de JWT — le sondage est anonyme). Persistance Redis INCR
+    quand Redis est disponible (production), sinon log structuré seul
+    (preview) — dégradation gracieuse, jamais de 500.
+    """
+    verb_slug = str((body or {}).get("verb_slug", "")).strip()
+    if not verb_slug:
+        raise HTTPException(400, "verb_slug requis")
+    if len(verb_slug) > 80:
+        raise HTTPException(400, "verb_slug trop long")
+
+    count: int | None = None
+    if state.redis is not None:
+        try:
+            count = await state.redis.incr(f"khawarizmi:hardest_verb_feedback:{verb_slug}")
+        except Exception as exc:
+            logger.warning(f"Hardest-verb feedback Redis indisponible : {exc}")
+
+    logger.info("hardest_verb_feedback verb=%s count=%s", verb_slug, count)
+    return {"status": "ok", "verb_slug": verb_slug, "count": count}
 
 
 # ── Helper : enregistrer tentative ────────────────

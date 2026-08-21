@@ -1,6 +1,7 @@
 "use client"
 
 import { useMemo, useState } from "react"
+import Link from "next/link"
 import {
   detectMoukhattat,
   MUSCLE_ACCENTS,
@@ -9,6 +10,7 @@ import {
   type Span,
 } from "@/lib/manhadjia-lib"
 import { CourbeLTc } from "@/components/manhadjia/CourbeLTc"
+import { RemediationHint } from "@/components/manhadjia/RemediationHint"
 
 type Props = {
   data: AtelierMoukhattatData
@@ -209,6 +211,8 @@ export function AtelierMoukhattat({ data, onReplay, variant = "cyan" }: Props) {
               ))}
             </div>
           )}
+          <RemediationHint verbSlug={data.verb_slug} text={text} />
+
           <button
             onClick={submit}
             className={`min-h-14 w-full rounded-2xl py-3 text-lg font-black ${A.btn} ${A.chipText}`}
@@ -315,6 +319,19 @@ export function AtelierMoukhattat({ data, onReplay, variant = "cyan" }: Props) {
           >
             {data.cta_fin}
           </button>
+
+          {/* Un seul lien, en bas du miroir, après envoi : clôture J7 → nouvelle boucle J1 */}
+          {data.lien_suivant && (
+            <div className="pt-1 text-center">
+              <Link
+                href={data.lien_suivant.href}
+                className={`inline-block min-h-12 px-4 py-3 text-sm font-black underline underline-offset-4 ${A.textSoft}`}
+                dir="rtl"
+              >
+                {data.lien_suivant.label}
+              </Link>
+            </div>
+          )}
         </section>
       )}
     </div>

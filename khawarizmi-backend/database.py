@@ -13,6 +13,7 @@ aux tables créées hors metadata par migrations).
 """
 from __future__ import annotations
 
+import os
 import sys
 import types
 from contextlib import asynccontextmanager
@@ -27,7 +28,19 @@ from app_state import state
 def _sqlite_compat() -> None:
     """Patche les types PostgreSQL (JSONB/ARRAY/UUID) et le constructeur
     ARRAY générique, et remplace les casts `::jsonb`/`::text` etc. pour
-    permettre aux modèles de compiler sous SQLite (preview/dev)."""
+    permettre aux modèles de compiler sous SQLite (preview/dev).
+
+    ⚠️ Appliqué UNIQUEMENT quand la base cible est SQLite (ou inconnue :
+    imports directs des tests). Avant le fix 2026-08-21, le patch était
+    inconditionnel et empoisonnait `sqlalchemy.dialects.postgresql` via
+    sys.modules.setdefault → en production (DATABASE_URL postgres),
+    create_async_engine levait « module 'sqlalchemy.dialects' has no
+    attribute 'postgresql' », le lifespan dégradaient TOUTE l'API en 503.
+    """
+    cfg_url = (os.environ.get("DATABASE_URL") or "").lower()
+    if cfg_url and "sqlite" not in cfg_url:
+        return  # PostgreSQL (ou autre) : ne JAMAIS patcher le dialect réel
+
     import re
 
     import sqlalchemy as _sa
@@ -67,23 +80,51 @@ def _sqlite_compat() -> None:
     fake_pg.JSONB = _CompatJSONB
     fake_pg.UUID = _CompatUUID
     fake_pg.ARRAY = _CompatARRAY
+    # Marqueur : permet à ensure_dialect_for_url() de retirer le module
+    # factice si la cible devient PostgreSQL plus tard dans le process.
+    fake_pg._KHARIZMI_FAKE = True  # type: ignore[attr-defined]
     sys.modules.setdefault("sqlalchemy.dialects.postgresql", fake_pg)
     _sa.ARRAY = _CompatARRAY
 
     # ── Supprime les casts PostgreSQL ::jsonb / ::text des DDL SQLite ──
     # Et remplace ILIKE par LIKE (SQLite LIKE est déjà insensible à la casse
     # pour l'ASCII quand les patterns sont en minuscule via LOWER()).
-    _CAST_RE = re.compile(r"::[a-zA-Z_]+(?:\[\])?")
+    # Casts PostgreSQL « ::type » supprimés des DDL/requêtes SQLite, Y COMPRIS
+    # la précision optionnelle « ::numeric(3,2) » / « ::varchar(255) » :
+    # sans cela, « AVG(x)::numeric(3,2) » devenait « AVG(x)(3,2) » → syntaxe
+    # invalide (GET /api/social/blog plantait sur SQLite — fix 2026-08-21).
+    _CAST_RE = re.compile(r"::[a-zA-Z_]+(?:\[\])?(?:\s*\(\s*[0-9\s,]*\s*\))?")
     _ILIKE_RE = re.compile(r"\bILIKE\b", re.IGNORECASE)
     _NOW_RE = re.compile(r"\bNOW\s*\(\s*\)", re.IGNORECASE)
     _UUID_RE = re.compile(r"\bgen_random_uuid\s*\(\s*\)", re.IGNORECASE)
-    # ANY(...) n'existe pas en SQLite → remplacer par une série de LIKE OR
-    _ANY_RE = re.compile(r"I?LIKE\s+ANY\s*\(\s*:(\w+)\s*\)", re.IGNORECASE)
+    # ANY(...) n'existe pas en SQLite. Deux formes :
+    # 1) « :param = ANY(colonne) » (colonne ARRAY — ex. annales.tags, JSON sur
+    #    SQLite) → EXISTS (SELECT 1 FROM json_each(colonne) WHERE value = param)
+    #    (fix 2026-08-20 : la recherche d'annales plantait sur SQLite)
+    #    NB : visit_textclause rend les binds en « %(nom)s » (pyformat) — on
+    #    accepte aussi « :nom » et « ? » pour préserver l'ordre de liaison.
+    # 2) « colonne = ANY(:param) » (liste en paramètre) → interdit : utiliser
+    #    IN + bindparam(expanding=True), portable SQLite/asyncpg.
+    _PARAM_EQ_ANY_COL_RE = re.compile(
+        r"(?::(\w+)|%\((\w+)\)s|\?)\s*=\s*ANY\s*\(\s*([\w.]+)\s*\)", re.IGNORECASE
+    )
+
+    def _param_eq_any_col_sqlite(match: re.Match[str]) -> str:
+        if match.group(1):
+            param = f":{match.group(1)}"
+        elif match.group(2):
+            param = f"%({match.group(2)})s"
+        else:
+            param = "?"
+        col = match.group(3)
+        return f"EXISTS (SELECT 1 FROM json_each({col}) WHERE json_each.value = {param})"
 
     @compiles(TextClause, "sqlite")
     def _compile_text_sqlite(element, compiler, **kw):
         rendered = compiler.visit_textclause(element, **kw)
         rendered = _CAST_RE.sub("", rendered)
+        # :param = ANY(colonne) → EXISTS json_each (portabilité SQLite)
+        rendered = _PARAM_EQ_ANY_COL_RE.sub(_param_eq_any_col_sqlite, rendered)
         # ILIKE → LIKE (simple car LOWER() est déjà utilisé la plupart du temps)
         rendered = _ILIKE_RE.sub("LIKE", rendered)
         # NOW() → CURRENT_TIMESTAMP (fonction SQLite native)
@@ -122,6 +163,32 @@ def _sqlite_compat() -> None:
         _sa.func.now = _Now
     except Exception:
         pass
+
+
+def ensure_dialect_for_url(url: str) -> None:
+    """Prépare le dialect SQLAlchemy selon la base cible (appelé par le
+    lifespan AVANT la création du moteur — l'ordre d'import ne compte plus).
+
+    - SQLite → applique le patch de compatibilité (idempotent).
+    - Non-SQLite (PostgreSQL…) → retire un éventuel module factice installé
+      plus tôt dans le process (cas : import avant que DATABASE_URL ne soit
+      défini) et restaure le constructeur ARRAY réel.
+    """
+    is_sqlite = "sqlite" in (url or "").lower()
+    if is_sqlite:
+        _sqlite_compat()
+        return
+    mod = sys.modules.get("sqlalchemy.dialects.postgresql")
+    if mod is not None and getattr(mod, "_KHARIZMI_FAKE", False):
+        del sys.modules["sqlalchemy.dialects.postgresql"]
+        import sqlalchemy as _sa
+
+        if getattr(_sa, "ARRAY", None) is not None and getattr(
+            _sa.ARRAY, "__name__", ""
+        ) == "_CompatARRAY":
+            from sqlalchemy import ARRAY as _REAL_ARRAY
+
+            _sa.ARRAY = _REAL_ARRAY
 
 
 _sqlite_compat()
@@ -315,8 +382,12 @@ def _sqlite_extra_ddl() -> list[str]:
             created_at {ts}
         )""",
         # ── Videos ─────────────────────────────────────────
+        # Aligné sur migration 006 (pas de colonne url en production) —
+        # avant, `url TEXT NOT NULL` ici faisait échouer POST /api/videos/seed
+        # en preview (NOT NULL constraint failed) alors que la production
+        # (PostgreSQL, sans cette colonne) acceptait l'INSERT. Fix 2026-08-21.
         f"""CREATE TABLE IF NOT EXISTS videos (
-            id {pk}, titre TEXT, title TEXT, url TEXT NOT NULL, youtube_id TEXT,
+            id {pk}, titre TEXT, title TEXT, youtube_id TEXT,
             chapitre TEXT, description TEXT, chaine TEXT,
             duree INTEGER DEFAULT 0, duration_seconds INTEGER DEFAULT 0,
             created_at {ts}

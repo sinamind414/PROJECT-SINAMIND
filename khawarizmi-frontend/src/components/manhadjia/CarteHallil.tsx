@@ -1,9 +1,9 @@
 "use client"
 
-import { MUSCLE_ACCENTS, type AtelierData, type MuscleVariant } from "@/lib/manhadjia-lib"
+import { MUSCLE_ACCENTS, type CarteData, type MuscleVariant } from "@/lib/manhadjia-lib"
 
 type Props = {
-  data: AtelierData
+  data: CarteData
   onTrainer: () => void
   onBack: () => void
   variant?: MuscleVariant
@@ -75,6 +75,36 @@ export function CarteHallil({ data, onTrainer, onBack, variant = "jaune" }: Prop
               ))}
             </ul>
           </div>
+        </div>
+      )}
+
+      {/* Données officielles injectées statiquement (satellites uniquement) */}
+      {data.unites && data.unites.length > 0 && (
+        <div className="rounded-2xl border border-white/15 bg-slate-deep/60 p-4 space-y-2" dir="rtl">
+          <p className="text-xs font-black text-white/60">📚 وحدات البرنامج (ديوان):</p>
+          <div className="flex flex-wrap gap-1.5">
+            {data.unites.map((u) => (
+              <span
+                key={u.id}
+                className="rounded-full border border-white/15 bg-white/5 px-2 py-0.5 text-[10px] font-bold text-white/70"
+              >
+                {u.titre_ar}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {data.exemples && data.exemples.length > 0 && (
+        <div className="rounded-2xl border border-white/15 bg-slate-deep/60 p-4 space-y-3" dir="rtl">
+          <p className="text-xs font-black text-white/60">📝 أمثلة رسمية (الديوان):</p>
+          {data.exemples.map((ex, i) => (
+            <div key={i} className="space-y-1">
+              <p className="text-sm font-bold text-white/90">{ex.title}</p>
+              {ex.context && <p className="text-[11px] text-white/45">{ex.context}</p>}
+              <p className="text-xs leading-relaxed text-white/70">{ex.content}</p>
+            </div>
+          ))}
         </div>
       )}
 
