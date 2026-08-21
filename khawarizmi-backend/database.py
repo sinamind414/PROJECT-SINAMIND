@@ -73,7 +73,11 @@ def _sqlite_compat() -> None:
     # ── Supprime les casts PostgreSQL ::jsonb / ::text des DDL SQLite ──
     # Et remplace ILIKE par LIKE (SQLite LIKE est déjà insensible à la casse
     # pour l'ASCII quand les patterns sont en minuscule via LOWER()).
-    _CAST_RE = re.compile(r"::[a-zA-Z_]+(?:\[\])?")
+    # Casts PostgreSQL « ::type » supprimés des DDL/requêtes SQLite, Y COMPRIS
+    # la précision optionnelle « ::numeric(3,2) » / « ::varchar(255) » :
+    # sans cela, « AVG(x)::numeric(3,2) » devenait « AVG(x)(3,2) » → syntaxe
+    # invalide (GET /api/social/blog plantait sur SQLite — fix 2026-08-21).
+    _CAST_RE = re.compile(r"::[a-zA-Z_]+(?:\[\])?(?:\s*\(\s*[0-9\s,]*\s*\))?")
     _ILIKE_RE = re.compile(r"\bILIKE\b", re.IGNORECASE)
     _NOW_RE = re.compile(r"\bNOW\s*\(\s*\)", re.IGNORECASE)
     _UUID_RE = re.compile(r"\bgen_random_uuid\s*\(\s*\)", re.IGNORECASE)

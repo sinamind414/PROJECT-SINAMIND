@@ -161,14 +161,27 @@ Vérifications : démo SQLite réelle (tag + titre + expanding) ✓ · ruff 0 �
   wiring matrice, fallback silencieux, chaîne réelle scientific_error → page
   spécifique au verbe) ; suite complète 1004 passed / 0 failed.
 
-## 10. Clôture de session
+## 10. Smoke test GET sur SQLite — 99 routes vérifiées (2026-08-21)
+
+- Nouveau `scripts/smoke_api_get.py` : énumère les 99 routes GET `/api/*`
+  depuis l'app FastAPI, les appelle sans auth (lifespan réel, SQLite preview)
+  et remonte uniquement les 500. Résultat après corrections : **0 erreur**
+  (200 publics · 401/403 attendus · 404 dummy-id · 422 validation).
+- Bug attrapé et corrigé : `GET /api/social/blog` → 500 « near "(": syntax
+  error ». Cause : `AVG(rating)::numeric(3,2)` — le hook SQLite supprimait
+  `::numeric` mais laissait la précision `(3,2)` orpheline. Fix général dans
+  `database.py` : `_CAST_RE` engloutit aussi la précision optionnelle
+  (`::type`, `::type(3,2)`, `::type[]`). Vérifié : blog → 200, rating → 404
+  propre, aucune autre route en 500.
+
+## 11. Clôture de session
 
 - Branche : `arena/01a01f52-project-sinamind` (15 commits) — PR ouverte vers master.
 - Actions utilisateur restantes : (1) copier `docs/ci/ci.yml.corrigee` vers
   `.github/workflows/ci.yml` (permission workflows) puis merger sur master ;
   (2) `git lfs pull` pour le modèle ONNX ; (3) activer
   `SAVOIR_REMEDIATION_ENABLED` quand le feedback élève le justifie.
-## 11. CI — découverte et blocage de permission
+## 12. CI — découverte et blocage de permission
 
 - Les 9 derniers runs CI échouaient au **parse du workflow** (un `: ` dans un
   block scalar YAML → « workflow file issue », 0 s).
