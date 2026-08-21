@@ -13,6 +13,7 @@ aux tables créées hors metadata par migrations).
 """
 from __future__ import annotations
 
+import os
 import sys
 import types
 from contextlib import asynccontextmanager
@@ -27,7 +28,19 @@ from app_state import state
 def _sqlite_compat() -> None:
     """Patche les types PostgreSQL (JSONB/ARRAY/UUID) et le constructeur
     ARRAY générique, et remplace les casts `::jsonb`/`::text` etc. pour
-    permettre aux modèles de compiler sous SQLite (preview/dev)."""
+    permettre aux modèles de compiler sous SQLite (preview/dev).
+
+    ⚠️ Appliqué UNIQUEMENT quand la base cible est SQLite (ou inconnue :
+    imports directs des tests). Avant le fix 2026-08-21, le patch était
+    inconditionnel et empoisonnait `sqlalchemy.dialects.postgresql` via
+    sys.modules.setdefault → en production (DATABASE_URL postgres),
+    create_async_engine levait « module 'sqlalchemy.dialects' has no
+    attribute 'postgresql' », le lifespan dégradaient TOUTE l'API en 503.
+    """
+    cfg_url = (os.environ.get("DATABASE_URL") or "").lower()
+    if cfg_url and "sqlite" not in cfg_url:
+        return  # PostgreSQL (ou autre) : ne JAMAIS patcher le dialect réel
+
     import re
 
     import sqlalchemy as _sa
@@ -67,6 +80,9 @@ def _sqlite_compat() -> None:
     fake_pg.JSONB = _CompatJSONB
     fake_pg.UUID = _CompatUUID
     fake_pg.ARRAY = _CompatARRAY
+    # Marqueur : permet à ensure_dialect_for_url() de retirer le module
+    # factice si la cible devient PostgreSQL plus tard dans le process.
+    fake_pg._KHARIZMI_FAKE = True  # type: ignore[attr-defined]
     sys.modules.setdefault("sqlalchemy.dialects.postgresql", fake_pg)
     _sa.ARRAY = _CompatARRAY
 
@@ -147,6 +163,32 @@ def _sqlite_compat() -> None:
         _sa.func.now = _Now
     except Exception:
         pass
+
+
+def ensure_dialect_for_url(url: str) -> None:
+    """Prépare le dialect SQLAlchemy selon la base cible (appelé par le
+    lifespan AVANT la création du moteur — l'ordre d'import ne compte plus).
+
+    - SQLite → applique le patch de compatibilité (idempotent).
+    - Non-SQLite (PostgreSQL…) → retire un éventuel module factice installé
+      plus tôt dans le process (cas : import avant que DATABASE_URL ne soit
+      défini) et restaure le constructeur ARRAY réel.
+    """
+    is_sqlite = "sqlite" in (url or "").lower()
+    if is_sqlite:
+        _sqlite_compat()
+        return
+    mod = sys.modules.get("sqlalchemy.dialects.postgresql")
+    if mod is not None and getattr(mod, "_KHARIZMI_FAKE", False):
+        del sys.modules["sqlalchemy.dialects.postgresql"]
+        import sqlalchemy as _sa
+
+        if getattr(_sa, "ARRAY", None) is not None and getattr(
+            _sa.ARRAY, "__name__", ""
+        ) == "_CompatARRAY":
+            from sqlalchemy import ARRAY as _REAL_ARRAY
+
+            _sa.ARRAY = _REAL_ARRAY
 
 
 _sqlite_compat()

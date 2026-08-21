@@ -125,6 +125,14 @@ async def lifespan(app: FastAPI):
     if cfg.DATABASE_URL:
         try:
             db_url = cfg.DATABASE_URL
+            # Avant TOUTE création de moteur : préparer le dialect selon la
+            # cible (SQLite → patch compat ; PostgreSQL → dialect réel).
+            # Fix 2026-08-21 : sans cela, un process démarré avec une URL
+            # postgres pouvait hériter du module factice du patch SQLite et
+            # échouer (AttributeError sqlalchemy.dialects.postgresql) → 503.
+            from database import ensure_dialect_for_url
+
+            ensure_dialect_for_url(db_url)
             is_sqlite = db_url.startswith("sqlite://") or db_url.startswith("sqlite+aiosqlite://")
             if db_url.startswith("postgresql://") or db_url.startswith("postgres://"):
                 db_url = db_url.replace("postgresql://", "postgresql+asyncpg://", 1).replace(

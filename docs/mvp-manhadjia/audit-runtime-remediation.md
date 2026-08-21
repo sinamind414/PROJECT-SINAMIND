@@ -186,6 +186,27 @@ Vérifications : démo SQLite réelle (tag + titre + expanding) ✓ · ruff 0 �
   `.github/workflows/ci.yml` (permission workflows) puis merger sur master ;
   (2) `git lfs pull` pour le modèle ONNX ; (3) activer
   `SAVOIR_REMEDIATION_ENABLED` quand le feedback élève le justifie.
+## 13. Bug production critique — dialect PostgreSQL empoisonné (2026-08-21)
+
+- **Symptôme** : avec `DATABASE_URL` postgres (configuration Railway), le
+  lifespan échouait `DB init error: module 'sqlalchemy.dialects' has no
+  attribute 'postgresql'` → **toute l'API partait en 503 dégradé** en
+  production. Reproduit en process frais.
+- **Cause racine** : `_sqlite_compat()` (database.py) était appliqué
+  **inconditionnellement** à l'import et installait un module factice
+  `sqlalchemy.dialects.postgresql` via `sys.modules.setdefault` ; quand le
+  vrai dialect n'avait pas encore été importé (cas standard), le moteur
+  asyncpg ne pouvait plus se construire.
+- **Fix** : shim conditionnel (uniquement SQLite ou URL inconnue) ;
+  `ensure_dialect_for_url(url)` appelé par le lifespan AVANT la création du
+  moteur (l'ordre d'import ne compte plus) ; le module factice est marqué
+  (`_KHARIZMI_FAKE`) et retiré si la cible devient PostgreSQL ; ARRAY réel
+  restauré.
+- **Preuves** : `tests/test_dialect_guard.py` (4 tests : process frais
+  postgres, process frais sqlite, env tardif restauré, aller-retour
+  postgres→sqlite) ; suite complète **1008 passed / 0 failed** ; smoke
+  99 routes GET sans 500 ; boot SQLite inchangé (75+ tables).
+
 ## 12. CI — découverte et blocage de permission
 
 - Les 9 derniers runs CI échouaient au **parse du workflow** (un `: ` dans un
