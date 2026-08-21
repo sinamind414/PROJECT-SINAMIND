@@ -207,6 +207,22 @@ Vérifications : démo SQLite réelle (tag + titre + expanding) ✓ · ruff 0 �
   postgres→sqlite) ; suite complète **1008 passed / 0 failed** ; smoke
   99 routes GET sans 500 ; boot SQLite inchangé (75+ tables).
 
+## 14. Endpoint frontend orphelin — sondage « verbe le plus difficile » (2026-08-21)
+
+- Audit de couverture endpoints : 131 chemins appelés par le frontend
+  (littéraux + template literals normalisés) comparés aux 172 chemins /api
+  montés. Un seul orphelin réel : `POST /api/action-verbs/feedback/hardest`
+  (HardestVerbPoll, page /action-verbs) — l'endpoint **n'existait pas** au
+  backend : 404 avalé par le catch silencieux du composant → aucun vote
+  jamais collecté depuis la mise en ligne du sondage.
+- Fix : endpoint public ajouté dans routes/action_verbs.py (pas de JWT —
+  sondage anonyme), validation verb_slug (requis, ≤ 80), compteur Redis
+  `khawarizmi:hardest_verb_feedback:{slug}` quand Redis est disponible
+  (production), sinon log structuré seul (preview) — dégradation gracieuse.
+- Preuves : tests/test_action_verbs_feedback.py (5 tests : vote valide
+  anonyme, 400 sans slug/corps vide/trop long, votes répétables) · suite
+  complète **1013 passed / 0 failed** · ruff 0.
+
 ## 12. CI — découverte et blocage de permission
 
 - Les 9 derniers runs CI échouaient au **parse du workflow** (un `: ` dans un
