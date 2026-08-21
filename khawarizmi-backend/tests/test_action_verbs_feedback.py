@@ -4,24 +4,17 @@ Le frontend (HardestVerbPoll) postait /api/action-verbs/feedback/hardest
 qui n'existait PAS au backend (404 avalé par catch silencieux — aucun vote
 jamais collecté). L'endpoint public existe désormais : 200 avec compteur
 Redis optionnel, 400 si verb_slug absent/vide/trop long.
+
+NB : l'endpoint n'utilise PAS la DB (Redis optionnel → None en test, log
+structuré en secours) — pas de lifespan ici, le fixture `client` du conftest
+suffit (pas de fuite de boucle d'événements).
 """
 from __future__ import annotations
 
 import pytest
-from httpx import ASGITransport, AsyncClient
-
-from main import app
-from routes.lifespan import lifespan
+from httpx import AsyncClient
 
 pytestmark = pytest.mark.asyncio
-
-
-@pytest.fixture(scope="module")
-async def client():
-    async with lifespan(app):
-        transport = ASGITransport(app=app)
-        async with AsyncClient(transport=transport, base_url="http://test") as c:
-            yield c
 
 
 async def test_vote_valide_sans_auth(client: AsyncClient) -> None:

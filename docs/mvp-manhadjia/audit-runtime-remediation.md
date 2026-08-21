@@ -223,6 +223,27 @@ Vérifications : démo SQLite réelle (tag + titre + expanding) ✓ · ruff 0 �
   anonyme, 400 sans slug/corps vide/trop long, votes répétables) · suite
   complète **1013 passed / 0 failed** · ruff 0.
 
+## 15. Smoke toutes méthodes HTTP + drift d'auto-DDL vidéos (2026-08-21)
+
+- Nouveau `scripts/smoke_api_all.py` : 176 opérations HTTP sous /api (GET +
+  POST/PUT/PATCH/DELETE, corps vide {}, sans auth, denylist des routes à
+  effet de bord coûteux). Attendu : 401/403/422/404/405 — seuls les 500
+  comptent. Résultat après corrections : **0 échec**.
+- Bug attrapé : `POST /api/videos/seed` → 500 `NOT NULL constraint failed:
+  videos.url`. Cause : l'auto-DDL SQLite exigeait `url TEXT NOT NULL` alors
+  que la migration 006 (production PostgreSQL) n'a PAS cette colonne —
+  le seed fonctionnait en prod mais plantait en preview. Fix : auto-DDL
+  alignée sur la migration (colonne retirée) ; vérifié seed ×2 → 200,
+  10 vidéos importées.
+- Tests : tests/test_videos_seed.py (garde DDL + e2e en sous-processus —
+  le lifespan ne se ré-entre pas sous pytest-asyncio, queue liée au premier
+  loop : artefact de test, pas un bug prod) · tests/test_action_verbs_feedback.py
+  simplifié sur le fixture `client` du conftest (l'endpoint n'utilise pas la DB).
+- Job nightly CI validé : `pytest -m nightly --collect-only` → 2 tests
+  collectés (le marker existe, le job ne mourra pas à la collecte).
+- Preuves : **1015 tests backend verts / 0 erreur** · ruff 0 · smoke GET 99
+  routes + smoke all 176 opérations sans 500.
+
 ## 12. CI — découverte et blocage de permission
 
 - Les 9 derniers runs CI échouaient au **parse du workflow** (un `: ` dans un

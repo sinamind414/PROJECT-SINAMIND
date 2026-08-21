@@ -382,8 +382,12 @@ def _sqlite_extra_ddl() -> list[str]:
             created_at {ts}
         )""",
         # ── Videos ─────────────────────────────────────────
+        # Aligné sur migration 006 (pas de colonne url en production) —
+        # avant, `url TEXT NOT NULL` ici faisait échouer POST /api/videos/seed
+        # en preview (NOT NULL constraint failed) alors que la production
+        # (PostgreSQL, sans cette colonne) acceptait l'INSERT. Fix 2026-08-21.
         f"""CREATE TABLE IF NOT EXISTS videos (
-            id {pk}, titre TEXT, title TEXT, url TEXT NOT NULL, youtube_id TEXT,
+            id {pk}, titre TEXT, title TEXT, youtube_id TEXT,
             chapitre TEXT, description TEXT, chaine TEXT,
             duree INTEGER DEFAULT 0, duration_seconds INTEGER DEFAULT 0,
             created_at {ts}
