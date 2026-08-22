@@ -23,6 +23,8 @@ export default function ExperimentalLessonView({ slug }: Props) {
   }, [])
 
   const totalFrames = phases.length
+  const baseSlug = slug.replace(/-part-2$/, "")
+  const ficheIds = [`${baseSlug}#${slug.endsWith("-part-2") ? 2 : 1}`]
 
   const scrollToFrame = (i: number) => {
     const el = scrollRef.current
@@ -60,7 +62,7 @@ export default function ExperimentalLessonView({ slug }: Props) {
   return (
     <div dir="rtl" className="pb-12">
       <div className="mb-5 rounded-3xl bg-gradient-to-br from-emerald-700 to-green-800 px-5 py-6 text-white">
-        <div className="text-xs opacity-80">GEN Z • المحتوى الرسمي لوزارة التربية</div>
+        <div className="text-xs opacity-80">GEN Z • محتوى تدريبي مبني على المرجع الداخلي 3AS — في انتظار اعتماد تربوي خارجي</div>
         <h1 className="text-[26px] font-black tracking-[-1px] mt-1">{lesson.titleAr}</h1>
         <div className="text-sm opacity-75 mt-1">
           {lesson.breadcrumb}
@@ -77,7 +79,7 @@ export default function ExperimentalLessonView({ slug }: Props) {
         )}
       </div>
 
-      <FicheResume fileKey={slug} />
+      <FicheResume ficheIds={ficheIds} />
 
       <div className="relative">
         <div className="flex justify-between text-xs text-white/50 mb-2 px-1">
@@ -135,7 +137,7 @@ export default function ExperimentalLessonView({ slug }: Props) {
       </div>
 
       <div className="text-center text-[10px] text-white/30 mt-8">
-        المحتوى مستخرج من الدروس الرسمية • بكالوريا 2026
+محتوى تدريبي للمراجعة • لا يحل محل الكتاب المدرسي أو توجيه الأستاذ
       </div>
     </div>
   )

@@ -1,4 +1,4 @@
-﻿// src/lib/annales-bac.ts
+// src/lib/annales-bac.ts
 // Types et données — Annales immersives Bac SVT SE (10 sujets, 2 sous-sujets chacun)
 
 export type ExerciceType = "qcm" | "analyse_document" | "raisonnement" | "schema" | "argumentation"
@@ -63,8 +63,8 @@ const SUJETS: SujetBac[] = [
     titre: "موضوع بكالوريا 2026", titreAr: "موضوع بكالوريا علوم الطبيعة والحياة 2026", difficulte: "moyen", duree: 180,
     totalPages: 10,
     chapitres: ["الوراثة", "المناعة", "الجهاز العصبي"],
-    url_pdf: "/pdfs/bac-svt/bac-svt-sujet-2026.pdf",
-    url_corrige: "/pdfs/bac-svt/bac-svt-correction-2026.pdf",
+    url_pdf: "",
+    url_corrige: undefined,
     exercices: [],
     subjects: []
   },
@@ -80,8 +80,8 @@ const SUJETS: SujetBac[] = [
     duree: 180,
     totalPages: 10,
     chapitres: ["الوراثة", "المناعة", "الجهاز العصبي"],
-    url_pdf: "/pdfs/bac-svt/bac-svt-sujet-2025.pdf",
-    url_corrige: "/pdfs/bac-svt/bac-svt-correction-2025.pdf",
+    url_pdf: "",
+    url_corrige: undefined,
     exercices: [],
     subjects: [
       {
@@ -144,8 +144,8 @@ const SUJETS: SujetBac[] = [
     titre: "موضوع بكالوريا 2024", titreAr: "موضوع بكالوريا علوم الطبيعة والحياة 2024", difficulte: "moyen", duree: 180,
     totalPages: 10,
     chapitres: ["الوراثة", "المناعة", "الجهاز العصبي"],
-    url_pdf: "/pdfs/bac-svt/bac-svt-sujet-2024.pdf",
-    url_corrige: "/pdfs/bac-svt/bac-svt-correction-2024.pdf",
+    url_pdf: "",
+    url_corrige: undefined,
     exercices: [],
     subjects: [
       {
@@ -160,7 +160,7 @@ const SUJETS: SujetBac[] = [
             documents: [{ titre: "Doc 1", nature: "Schéma", description: "Structure en double hélice" }],
             questions: [
               { id: "q1-2024", texte: "Décrivez la structure de l'ADN.", verb: "وصف", points: 4 },
-              { id: "q2-2024", texte: "Expliquez le mécanisme de réplication.", verb: "شرح", points: 5, indices: ["ADN polymérase", "Brin leader"] },
+              { id: "q2-2024", texte: "Expliquez comment l'information de l'ADN est transcrite en ARNm.", verb: "شرح", points: 5, indices: ["ARN polymérase", "Brin transcrit", "Complémentarité"] },
             ]
           },
           {
@@ -168,8 +168,8 @@ const SUJETS: SujetBac[] = [
             duree_minutes: 45, points: 9,
             documents: [{ titre: "Doc 2", nature: "Schéma", description: "Étapes de l'expression génique" }],
             questions: [
-              { id: "q1b-2024", texte: "Définissez les termes : exon, intron, épissage.", verb: "تعريف", points: 3 },
-              { id: "q2b-2024", texte: "Expliquez le devenir du pré-ARNm après transcription.", verb: "شرح", points: 6, indices: ["Maturation", "Épissage", "Export nucléaire"] },
+              { id: "q1b-2024", texte: "Définissez les termes : codon, anticodon et ARNt.", verb: "تعريف", points: 3 },
+              { id: "q2b-2024", texte: "Expliquez les étapes de la traduction de l'ARNm en chaîne peptidique.", verb: "شرح", points: 6, indices: ["Initiation", "Élongation", "Terminaison"] },
             ]
           },
         ]
@@ -192,10 +192,10 @@ const SUJETS: SujetBac[] = [
           {
             id: "ex2b-2024", titre: "Moyens de lutte contre le VIH", type: "argumentation",
             duree_minutes: 45, points: 9,
-            documents: [{ titre: "Doc 2", nature: "Texte", description: "Traitements antirétroviraux actuels" }],
+            documents: [{ titre: "Doc 2", nature: "Schéma", description: "Évolution du VIH et diminution des lymphocytes LT4" }],
             questions: [
-              { id: "q5-2024", texte: "Expliquez le mode d'action des antirétroviraux.", verb: "شرح", points: 4 },
-              { id: "q6-2024", texte: "Discutez de l'efficacité de la trithérapie.", verb: "نقاش", points: 5, indices: ["Synergie", "Résistance", "Observance"] },
+              { id: "q5-2024", texte: "Expliquez comment le VIH provoque la diminution des lymphocytes LT4.", verb: "شرح", points: 4 },
+              { id: "q6-2024", texte: "Reliez la chute des LT4 à la perte progressive des réponses immunitaires humorale et cellulaire.", verb: "نقاش", points: 5, indices: ["Coopération cellulaire", "LB", "LTc"] },
             ]
           },
         ]
@@ -208,7 +208,7 @@ const SUJETS: SujetBac[] = [
     titre: "موضوع بكالوريا 2023", titreAr: "موضوع بكالوريا علوم الطبيعة والحياة 2023", difficulte: "moyen", duree: 180,
     totalPages: 10,
     chapitres: ["الوراثة", "المناعة", "الإنزيمات"],
-    url_pdf: "/pdfs/bac-svt/bac-svt-sujet-2023.pdf",
+    url_pdf: "",
     exercices: [],
     subjects: [
       {
@@ -249,7 +249,7 @@ const SUJETS: SujetBac[] = [
             documents: [{ titre: "Doc 1", nature: "Graphique", description: "Cinétique de production d'anticorps" }],
             questions: [
               { id: "q3-2023", texte: "Décrivez le rôle des plasmocytes.", verb: "وصف", points: 4 },
-              { id: "q4-2023", texte: "Expliquez le phénomène de commutation isotypique.", verb: "شرح", points: 5, indices: ["IgM", "IgG", "Cytokines"] },
+              { id: "q4-2023", texte: "Expliquez l'activation des lymphocytes B et leur différenciation en plasmocytes.", verb: "شرح", points: 5, indices: ["Reconnaissance", "Sélection clonale", "Anticorps"] },
             ]
           },
           {
@@ -258,7 +258,7 @@ const SUJETS: SujetBac[] = [
             documents: [{ titre: "Doc 2", nature: "Schéma", description: "Précipitation antigène-anticorps" }],
             questions: [
               { id: "q5-2023", texte: "Expliquez le principe de la précipitation.", verb: "شرح", points: 4 },
-              { id: "q6-2023", texte: "Décrivez une application diagnostique de cette réaction.", verb: "وصف", points: 4, indices: ["Tests sérologiques", "ELISA"] },
+              { id: "q6-2023", texte: "Décrivez le devenir du complexe immun après sa formation.", verb: "وصف", points: 4, indices: ["Phagocytose", "Digestion", "Élimination"] },
             ]
           },
         ]
@@ -271,8 +271,8 @@ const SUJETS: SujetBac[] = [
     titre: "موضوع بكالوريا 2022", titreAr: "موضوع بكالوريا علوم الطبيعة والحياة 2022", difficulte: "difficile", duree: 180,
     totalPages: 10,
     chapitres: ["الوراثة", "المناعة", "الجهاز العصبي", "الإنزيمات"],
-    url_pdf: "/pdfs/bac-svt/bac-svt-sujet-2022.pdf",
-    url_corrige: "/pdfs/bac-svt/bac-svt-correction-2022.pdf",
+    url_pdf: "",
+    url_corrige: undefined,
     exercices: [],
     subjects: [
       {
@@ -312,8 +312,8 @@ const SUJETS: SujetBac[] = [
             duree_minutes: 50, points: 10,
             documents: [{ titre: "Doc 1", nature: "Schéma", description: "Réarrangements géniques des immunoglobulines" }],
             questions: [
-              { id: "q3-2022", texte: "Expliquez le mécanisme de recombination V(D)J.", verb: "شرح", points: 6, indices: ["RAG", "Segments V/J/C"] },
-              { id: "q4-2022", texte: "Justifiez la diversité potentielle des anticorps.", verb: "تبرير", points: 4 },
+              { id: "q3-2022", texte: "Expliquez la complémentarité entre un anticorps et le déterminant antigénique reconnu.", verb: "شرح", points: 6, indices: ["Site de fixation", "Structure spatiale", "Spécificité"] },
+              { id: "q4-2022", texte: "Justifiez la spécificité de la réponse immunitaire humorale.", verb: "تبرير", points: 4 },
             ]
           },
           {
@@ -322,7 +322,7 @@ const SUJETS: SujetBac[] = [
             documents: [{ titre: "Doc 2", nature: "Texte", description: "Théorie de Burnet" }],
             questions: [
               { id: "q5-2022", texte: "Expliquez la théorie de la sélection clonale.", verb: "شرح", points: 4 },
-              { id: "q6-2022", texte: "Quelle est la différence entre tolérance centrale et périphérique ?", verb: "مقارنة", points: 4 },
+              { id: "q6-2022", texte: "Comparez la réponse immunitaire humorale et la réponse à médiation cellulaire.", verb: "مقارنة", points: 4 },
             ]
           },
         ]
@@ -335,7 +335,7 @@ const SUJETS: SujetBac[] = [
     titre: "موضوع بكالوريا 2021", titreAr: "موضوع بكالوريا علوم الطبيعة والحياة 2021", difficulte: "facile", duree: 180,
     totalPages: 10,
     chapitres: ["الوراثة", "المناعة"],
-    url_pdf: "/pdfs/bac-svt/bac-svt-sujet-2021.pdf",
+    url_pdf: "",
     exercices: [],
     subjects: [
       {
@@ -382,10 +382,10 @@ const SUJETS: SujetBac[] = [
           {
             id: "ex2b-2021", titre: "Médiateurs chimiques", type: "analyse_document",
             duree_minutes: 35, points: 7,
-            documents: [{ titre: "Doc 2", nature: "Tableau", description: "Principaux médiateurs de l'inflammation" }],
+            documents: [{ titre: "Doc 2", nature: "Schéma", description: "Étapes successives de la phagocytose" }],
             questions: [
-              { id: "q5-2021", texte: "Citez trois médiateurs de l'inflammation et leur rôle.", verb: "ذكر", points: 3 },
-              { id: "q6-2021", texte: "Expliquez le rôle de l'histamine.", verb: "شرح", points: 4, indices: ["Vasodilatation", "Perméabilité"] },
+              { id: "q5-2021", texte: "Citez dans l'ordre les étapes de la phagocytose.", verb: "ذكر", points: 3 },
+              { id: "q6-2021", texte: "Expliquez pourquoi la phagocytose appartient à la défense non spécifique.", verb: "شرح", points: 4, indices: ["Reconnaissance", "Ingestion", "Digestion"] },
             ]
           },
         ]
@@ -398,7 +398,7 @@ const SUJETS: SujetBac[] = [
     titre: "موضوع بكالوريا 2020", titreAr: "موضوع بكالوريا علوم الطبيعة والحياة 2020", difficulte: "moyen", duree: 180,
     totalPages: 10,
     chapitres: ["الجهاز العصبي", "المناعة", "الوراثة"],
-    url_pdf: "/pdfs/bac-svt/bac-svt-sujet-2020.pdf",
+    url_pdf: "",
     exercices: [],
     subjects: [
       {
@@ -443,12 +443,12 @@ const SUJETS: SujetBac[] = [
             ]
           },
           {
-            id: "ex2b-2020", titre: "Allergies et auto-immunité", type: "raisonnement",
+            id: "ex2b-2020", titre: "Soi, non-soi et compatibilité tissulaire", type: "raisonnement",
             duree_minutes: 40, points: 8,
-            documents: [{ titre: "Doc 2", nature: "Texte", description: "Cas clinique d'allergie" }],
+            documents: [{ titre: "Doc 2", nature: "Tableau", description: "Résultats comparés de greffes entre individus" }],
             questions: [
-              { id: "q5-2020", texte: "Expliquez la différence entre allergie et auto-immunité.", verb: "شرح", points: 4 },
-              { id: "q6-2020", texte: "Décrivez la réaction IgE-dépendante.", verb: "وصف", points: 4, indices: ["Mastocytes", "Histamine"] },
+              { id: "q5-2020", texte: "Distinguez le soi du non-soi à partir des résultats de greffe.", verb: "شرح", points: 4 },
+              { id: "q6-2020", texte: "Expliquez le rôle des molécules du CMH dans la compatibilité tissulaire.", verb: "وصف", points: 4, indices: ["Marqueurs membranaires", "Reconnaissance", "Rejet"] },
             ]
           },
         ]
@@ -461,8 +461,8 @@ const SUJETS: SujetBac[] = [
     titre: "موضوع بكالوريا 2019", titreAr: "موضوع بكالوريا علوم الطبيعة والحياة 2019", difficulte: "difficile", duree: 180,
     totalPages: 10,
     chapitres: ["Génétique", "Enzymologie", "Système nerveux"],
-    url_pdf: "/pdfs/bac-svt/bac-svt-sujet-2019.pdf",
-    url_corrige: "/pdfs/bac-svt/bac-svt-correction-2019.pdf",
+    url_pdf: "",
+    url_corrige: undefined,
     exercices: [],
     subjects: [
       {
@@ -525,8 +525,8 @@ const SUJETS: SujetBac[] = [
     titre: "موضوع بكالوريا 2018", titreAr: "موضوع بكالوريا علوم الطبيعة والحياة 2018", difficulte: "facile", duree: 180,
     totalPages: 10,
     chapitres: ["المناعة", "الوراثة"],
-    url_pdf: "/pdfs/bac-svt/bac-svt-sujet-2018.pdf",
-    url_corrige: "/pdfs/bac-svt/bac-svt-correction-2018.pdf",
+    url_pdf: "",
+    url_corrige: undefined,
     exercices: [],
     subjects: [
       {
@@ -589,7 +589,7 @@ const SUJETS: SujetBac[] = [
     titre: "موضوع بكالوريا 2017", titreAr: "موضوع بكالوريا علوم الطبيعة والحياة 2017", difficulte: "moyen", duree: 180,
     totalPages: 10,
     chapitres: ["الجهاز العصبي", "المناعة", "الوراثة", "الإنزيمات"],
-    url_pdf: "/pdfs/bac-svt/bac-svt-sujet-2017.pdf",
+    url_pdf: "",
     exercices: [],
     subjects: [
       {
@@ -652,7 +652,7 @@ const SUJETS: SujetBac[] = [
     titre: "موضوع بكالوريا 2016", titreAr: "موضوع بكالوريا علوم الطبيعة والحياة 2016", difficulte: "facile", duree: 180,
     totalPages: 10,
     chapitres: ["الوراثة", "المناعة"],
-    url_pdf: "/pdfs/bac-svt/bac-svt-sujet-2016.pdf",
+    url_pdf: "",
     exercices: [],
     subjects: [
       {
@@ -715,7 +715,7 @@ const SUJETS: SujetBac[] = [
     titre: "موضوع بكالوريا 2011", titreAr: "موضوع بكالорيا SVT علوم تجريبية 2011", difficulte: "difficile", duree: 180,
     totalPages: 10,
     chapitres: ["الوراثة", "المناعة", "الجهاز العصبي"],
-    url_pdf: "/pdfs/bac-svt/bac-svt-sujet-2011.pdf",
+    url_pdf: "",
     exercices: [],
     subjects: []
   },
@@ -725,7 +725,7 @@ const SUJETS: SujetBac[] = [
     titre: "موضوع بكالوريا 2010", titreAr: "موضوع بكالوريا علوم الطبيعة والحياة 2010", difficulte: "moyen", duree: 180,
     totalPages: 10,
     chapitres: ["الوراثة", "المناعة"],
-    url_pdf: "/pdfs/bac-svt/bac-svt-sujet-2010.pdf",
+    url_pdf: "",
     exercices: [],
     subjects: []
   },
@@ -735,7 +735,7 @@ const SUJETS: SujetBac[] = [
     titre: "موضوع بكالوريا 2009", titreAr: "موضوع بكالوريا علوم الطبيعة والحياة 2009", difficulte: "moyen", duree: 180,
     totalPages: 10,
     chapitres: ["الوراثة", "الجهاز العصبي"],
-    url_pdf: "/pdfs/bac-svt/bac-svt-sujet-2009.pdf",
+    url_pdf: "",
     exercices: [],
     subjects: []
   },
@@ -745,7 +745,7 @@ const SUJETS: SujetBac[] = [
     titre: "موضوع بكالوريا 2008", titreAr: "موضوع بكالوريا علوم الطبيعة والحياة 2008", difficulte: "moyen", duree: 180,
     totalPages: 10,
     chapitres: ["الوراثة", "المناعة"],
-    url_pdf: "/pdfs/bac-svt/bac-svt-sujet-2008.pdf",
+    url_pdf: "",
     exercices: [],
     subjects: []
   },
@@ -761,7 +761,7 @@ const SUJETS: SujetBac[] = [
     titreAr: "موضوع بكالوريا علوم طبيعية شعبة رياضيات 2026",
     difficulte: "moyen", duree: 180, totalPages: 8,
     chapitres: ["الوراثة", "البيئة"],
-    url_pdf: "/pdfs/bac-svt-math/bac-svt-math-2026.pdf",
+    url_pdf: "",
     exercices: [], subjects: []
   },
   {
@@ -771,7 +771,7 @@ const SUJETS: SujetBac[] = [
     titreAr: "موضوع بكالوريا علوم طبيعية شعبة رياضيات 2025",
     difficulte: "moyen", duree: 180, totalPages: 8,
     chapitres: ["الوراثة", "المناعة"],
-    url_pdf: "/pdfs/bac-svt-math/bac-svt-math-2025.pdf",
+    url_pdf: "",
     exercices: [], subjects: []
   },
   {
@@ -781,7 +781,7 @@ const SUJETS: SujetBac[] = [
     titreAr: "موضوع بكالوريا علوم طبيعية شعبة رياضيات 2024",
     difficulte: "moyen", duree: 180, totalPages: 8,
     chapitres: ["الوراثة", "الجهاز العصبي"],
-    url_pdf: "/pdfs/bac-svt-math/bac-svt-math-2024.pdf",
+    url_pdf: "",
     exercices: [], subjects: []
   },
   {
@@ -791,7 +791,7 @@ const SUJETS: SujetBac[] = [
     titreAr: "موضوع بكالوريا علوم طبيعية شعبة رياضيات 2023",
     difficulte: "moyen", duree: 180, totalPages: 8,
     chapitres: ["المناعة", "الإنزيمات"],
-    url_pdf: "/pdfs/bac-svt-math/bac-svt-math-2023.pdf",
+    url_pdf: "",
     exercices: [], subjects: []
   },
   {
@@ -801,7 +801,7 @@ const SUJETS: SujetBac[] = [
     titreAr: "موضوع بكالوريا علوم طبيعية شعبة رياضيات 2022",
     difficulte: "moyen", duree: 180, totalPages: 8,
     chapitres: ["الوراثة", "البيئة"],
-    url_pdf: "/pdfs/bac-svt-math/bac-svt-math-2022.pdf",
+    url_pdf: "",
     exercices: [], subjects: []
   },
   {
@@ -811,7 +811,7 @@ const SUJETS: SujetBac[] = [
     titreAr: "موضوع بكالوريا علوم طبيعية شعبة رياضيات 2021",
     difficulte: "moyen", duree: 180, totalPages: 8,
     chapitres: ["الوراثة", "الجهاز العصبي"],
-    url_pdf: "/pdfs/bac-svt-math/bac-svt-math-2021.pdf",
+    url_pdf: "",
     exercices: [], subjects: []
   },
   {
@@ -821,7 +821,7 @@ const SUJETS: SujetBac[] = [
     titreAr: "موضوع بكالوريا علوم طبيعية شعبة رياضيات 2020",
     difficulte: "moyen", duree: 180, totalPages: 8,
     chapitres: ["الوراثة", "المناعة"],
-    url_pdf: "/pdfs/bac-svt-math/bac-svt-math-2020.pdf",
+    url_pdf: "",
     exercices: [], subjects: []
   },
   {
@@ -831,7 +831,7 @@ const SUJETS: SujetBac[] = [
     titreAr: "موضوع بكالوريا علوم طبيعية شعبة رياضيات 2019",
     difficulte: "moyen", duree: 180, totalPages: 8,
     chapitres: ["الوراثة", "البيئة"],
-    url_pdf: "/pdfs/bac-svt-math/bac-svt-math-2019.pdf",
+    url_pdf: "",
     exercices: [], subjects: []
   },
   {
@@ -841,7 +841,7 @@ const SUJETS: SujetBac[] = [
     titreAr: "موضوع بكالوريا علوم طبيعية شعبة رياضيات 2018",
     difficulte: "moyen", duree: 180, totalPages: 8,
     chapitres: ["الوراثة", "الجهاز العصبي"],
-    url_pdf: "/pdfs/bac-svt-math/bac-svt-math-2018.pdf",
+    url_pdf: "",
     exercices: [], subjects: []
   },
   {
@@ -851,7 +851,7 @@ const SUJETS: SujetBac[] = [
     titreAr: "موضوع بكالوريا علوم طبيعية شعبة رياضيات 2017",
     difficulte: "moyen", duree: 180, totalPages: 8,
     chapitres: ["الوراثة", "المناعة"],
-    url_pdf: "/pdfs/bac-svt-math/bac-svt-math-2017.pdf",
+    url_pdf: "",
     exercices: [], subjects: []
   },
   {
@@ -861,7 +861,7 @@ const SUJETS: SujetBac[] = [
     titreAr: "موضوع بكالوريا علوم طبيعية شعبة رياضيات 2016",
     difficulte: "moyen", duree: 180, totalPages: 8,
     chapitres: ["الوراثة", "البيئة"],
-    url_pdf: "/pdfs/bac-svt-math/bac-svt-math-2016.pdf",
+    url_pdf: "",
     exercices: [], subjects: []
   },
   {
@@ -871,7 +871,7 @@ const SUJETS: SujetBac[] = [
     titreAr: "موضوع بكالوريا علوم طبيعية شعبة رياضيات 2015",
     difficulte: "moyen", duree: 180, totalPages: 8,
     chapitres: ["الوراثة", "الجهاز العصبي"],
-    url_pdf: "/pdfs/bac-svt-math/bac-svt-math-2015.pdf",
+    url_pdf: "",
     exercices: [], subjects: []
   },
   {
@@ -881,7 +881,7 @@ const SUJETS: SujetBac[] = [
     titreAr: "موضوع بكالوريا علوم طبيعية شعبة رياضيات 2014",
     difficulte: "moyen", duree: 180, totalPages: 8,
     chapitres: ["الوراثة", "المناعة"],
-    url_pdf: "/pdfs/bac-svt-math/bac-svt-math-2014.pdf",
+    url_pdf: "",
     exercices: [], subjects: []
   },
   {
@@ -891,7 +891,7 @@ const SUJETS: SujetBac[] = [
     titreAr: "موضوع بكالوريا علوم طبيعية شعبة رياضيات 2013",
     difficulte: "moyen", duree: 180, totalPages: 8,
     chapitres: ["الوراثة", "البيئة"],
-    url_pdf: "/pdfs/bac-svt-math/bac-svt-math-2013.pdf",
+    url_pdf: "",
     exercices: [], subjects: []
   },
   {
@@ -901,29 +901,40 @@ const SUJETS: SujetBac[] = [
     titreAr: "موضوع بكالوريا علوم طبيعية شعبة رياضيات 2008",
     difficulte: "moyen", duree: 180, totalPages: 8,
     chapitres: ["الوراثة", "الجهاز العصبي"],
-    url_pdf: "/pdfs/bac-svt-math/bac-svt-math-2008.pdf",
+    url_pdf: "",
     exercices: [], subjects: []
   },
 ]
 
-// populate exercices from subjects for backward compatibility
-for (const s of SUJETS) {
-  s.exercices = s.subjects.flatMap((sub) => sub.exercises)
+// Populate exercises from subjects for backward compatibility.
+for (const subject of SUJETS) {
+  subject.exercices = subject.subjects.flatMap((part) => part.exercises)
 }
 
+// Aucun PDF n'est publié tant que son origine, son barème et son binaire LFS
+// n'ont pas été vérifiés. Les objets restent des modèles d'entraînement : une
+// année dans le slug sert uniquement à stabiliser les anciennes URL.
+const TRAINING_SUJETS: SujetBac[] = SUJETS.map((subject, index) => ({
+  ...subject,
+  titre: `Modèle d'entraînement SVT ${index + 1}`,
+  titreAr: `نموذج تدريبي في علوم الطبيعة والحياة رقم ${index + 1}`,
+  url_pdf: "",
+  url_corrige: undefined,
+}))
+
 export function getAllSujets(): SujetBac[] {
-  return SUJETS
+  return TRAINING_SUJETS
 }
 
 export function getSujetBySlug(slug: string): SujetBac | undefined {
-  const exact = SUJETS.find((s) => s.slug === slug)
+  const exact = TRAINING_SUJETS.find((s) => s.slug === slug)
   if (exact) return exact
 
   // Fallback tolérant : correspondance par année extraite du slug
   const yearMatch = slug.match(/\d{4}/)
   if (yearMatch) {
     const year = parseInt(yearMatch[0], 10)
-    return SUJETS.find((s) => s.annee === year)
+    return TRAINING_SUJETS.find((s) => s.annee === year)
   }
   return undefined
 }

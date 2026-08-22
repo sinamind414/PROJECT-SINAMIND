@@ -1,7 +1,8 @@
-﻿"use client"
+"use client"
 
 import { useCallback, useEffect, useState } from "react"
 import Link from "next/link"
+import { apiClient } from "@/lib/api-client"
 import { VideoCard } from "./VideoCard"
 
 interface Video {
@@ -20,19 +21,8 @@ export function VideosWidget({ chapitre }: { chapitre: string }) {
 
   const loadVideos = useCallback(async () => {
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || ""
-
-      const response = await fetch(
-        `${apiUrl}/api/videos/by-chapter/${encodeURIComponent(chapitre)}`,
-        {
-          credentials: "include",
-        }
-      )
-
-      if (response.ok) {
-        const data = (await response.json()) as Video[]
-        setVideos(() => data.slice(0, 3))
-      }
+      const data = await apiClient.getVideosByChapter(chapitre) as unknown as Video[]
+      setVideos(() => data.slice(0, 3))
     } catch (err) {
       console.error("Erreur vidéos:", err)
     } finally {

@@ -1,13 +1,15 @@
 import json
 import logging
+import re
 from pathlib import Path
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from database import get_db
 from deps import get_current_user
+from routes.cours import COURSE_FILE, extract_unit_scope
 
 logger = logging.getLogger("khawarizmi.api")
 router = APIRouter(prefix="/api/exercices", tags=["Exercices"])
@@ -34,9 +36,35 @@ def get_keywords(chapitre: str) -> list[str]:
     return [chapitre]
 
 
+def _fallback_unit_exercises(domain_num: int | None, unit_num: int | None) -> str | None:
+    """Retourne les exercices corrigés de l'unité lorsque le RAG est vide."""
+    if domain_num is None or unit_num is None or not COURSE_FILE.exists():
+        return None
+    unit_content = extract_unit_scope(
+        COURSE_FILE.read_text(encoding="utf-8"),
+        domain_num,
+        unit_num,
+    )
+    if not unit_content:
+        return None
+
+    start_match = re.search(r"^##\s+✅\s+التمارين التطبيقية", unit_content, re.MULTILINE)
+    if not start_match:
+        return None
+    end_match = re.search(
+        r"^##\s+(?:🎓\s+نصائح|🏆\s+اختبار|#)|^#\s+",
+        unit_content[start_match.end():],
+        re.MULTILINE,
+    )
+    end = start_match.end() + end_match.start() if end_match else len(unit_content)
+    return unit_content[start_match.start():end].strip()
+
+
 @router.get("/{chapitre}")
 async def get_exercices(
     chapitre: str,
+    domain_num: int | None = Query(None, ge=1, le=3),
+    unit_num: int | None = Query(None, ge=1, le=5),
     current_user: dict = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
@@ -94,12 +122,17 @@ async def get_exercices(
         rows = result.fetchall()
 
     if not rows:
-        raise HTTPException(
-            status_code=404,
-            detail=f"Aucun exercice trouve pour : {decoded}",
-        )
+        content = _fallback_unit_exercises(domain_num, unit_num)
+        if not content:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Aucun exercice trouve pour : {decoded}",
+            )
+        source_sections = 1
+    else:
+        content = "\n\n".join(r.content for r in rows)
+        source_sections = len(rows)
 
-    content = "\n\n".join(r.content for r in rows)
     nb_exercices = content.count("التمرين") + content.count("Exercice")
     nb_corrections = content.count("إجابة") + content.count("Correction")
 
@@ -108,7 +141,7 @@ async def get_exercices(
         "contenu": content,
         "nb_exercices": nb_exercices,
         "nb_corrections": nb_corrections,
-        "nb_sections": len(rows),
+        "nb_sections": source_sections,
     }
 
 

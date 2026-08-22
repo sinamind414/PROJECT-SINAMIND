@@ -5,11 +5,11 @@ import { AuthGuard } from "@/components/auth/AuthGuard"
 import { AppShell } from "@/components/layout/AppShell"
 
 const SUJETS = [
-  { slug: "bac-svt-se-2026", label: "بكالوريا 2026 — علوم تجريبية", emoji: "🔥" },
-  { slug: "bac-svt-se-2025", label: "بكالوريا 2025 — علوم تجريبية", emoji: "📄" },
-  { slug: "bac-svt-se-2024", label: "بكالوريا 2024 — علوم تجريبية", emoji: "📄" },
-  { slug: "bac-svt-math-2026", label: "بكالوريا 2026 — رياضيات", emoji: "📐" },
-  { slug: "bac-svt-math-2025", label: "بكالوريا 2025 — رياضيات", emoji: "📐" },
+  { slug: "bac-svt-se-2026", label: "نموذج تدريبي 1 — علوم تجريبية", emoji: "🔥" },
+  { slug: "bac-svt-se-2025", label: "نموذج تدريبي 2 — علوم تجريبية", emoji: "📄" },
+  { slug: "bac-svt-se-2024", label: "نموذج تدريبي 3 — علوم تجريبية", emoji: "📄" },
+  { slug: "bac-svt-math-2026", label: "نموذج تدريبي 4 — رياضيات", emoji: "📐" },
+  { slug: "bac-svt-math-2025", label: "نموذج تدريبي 5 — رياضيات", emoji: "📐" },
 ]
 
 export default function Page() {

@@ -481,20 +481,38 @@ class KhawarizmiApiClient {
 
   // ── Cours ──────────────────────────────────────
 
-  async getCours(chapitre: string): Promise<CoursResponse> {
+  async getCours(
+    chapitre: string,
+    context?: { domainNumero: number; unitNumero: number },
+  ): Promise<CoursResponse> {
     const encoded = encodeURIComponent(chapitre)
-    return this.request<CoursResponse>(`/api/cours/${encoded}`)
+    const query = context
+      ? `?domain_num=${context.domainNumero}&unit_num=${context.unitNumero}`
+      : ""
+    return this.request<CoursResponse>(`/api/cours/${encoded}${query}`)
   }
 
-  async getExercices(chapitre: string): Promise<ExercicesResponse> {
+  async getExercices(
+    chapitre: string,
+    context?: { domainNumero: number; unitNumero: number },
+  ): Promise<ExercicesResponse> {
     const encoded = encodeURIComponent(chapitre)
-    return this.request<ExercicesResponse>(`/api/exercices/${encoded}`)
+    const query = context
+      ? `?domain_num=${context.domainNumero}&unit_num=${context.unitNumero}`
+      : ""
+    return this.request<ExercicesResponse>(`/api/exercices/${encoded}${query}`)
   }
 
   // ── Vidéos ─────────────────────────────────────
 
   async getVideos(): Promise<Record<string, unknown>[]> {
     return this.request<Record<string, unknown>[]>("/api/videos/all")
+  }
+
+  async getVideosByChapter(chapitre: string): Promise<Record<string, unknown>[]> {
+    return this.request<Record<string, unknown>[]>(
+      `/api/videos/by-chapter/${encodeURIComponent(chapitre)}`,
+    )
   }
 
   // ── Session / Drill ────────────────────────────

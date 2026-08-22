@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import { useEffect, useMemo, useRef, useState } from "react"
 import { useParams } from "next/navigation"
@@ -75,6 +75,23 @@ function ReadContent() {
       <AppShell>
         <main className="flex-1 flex items-center justify-center">
           <p className="text-slate-400">الموضوع غير موجود</p>
+        </main>
+      </AppShell>
+    )
+  }
+
+  if (!sujet.url_pdf) {
+    return (
+      <AppShell>
+        <main className="flex-1 flex items-center justify-center p-6" dir="rtl">
+          <div className="max-w-lg text-center rounded-3xl border border-amber-400/30 bg-amber-400/10 p-8">
+            <p className="text-5xl mb-4">📄</p>
+            <h1 className="text-xl font-black text-white">ملف PDF غير منشور</h1>
+            <p className="text-white/70 text-sm mt-2 leading-relaxed">
+              لن يُعرض الملف قبل التحقق من مصدره، تصحيحه وسلم تنقيطه وتنزيل ملفه الحقيقي بدلا من مؤشر Git LFS.
+            </p>
+            <Link href={`/annales/${sujet.slug}`} className="inline-block mt-5 text-mint font-bold">العودة إلى النموذج ←</Link>
+          </div>
         </main>
       </AppShell>
     )

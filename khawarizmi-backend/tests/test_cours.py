@@ -76,9 +76,10 @@ async def test_get_cours_handles_url_encoded_title(client):
     """Le titre peut contenir %20 ou + (espace). Pas de crash."""
     resp1 = await client.get("/api/cours/Prot%C3%A9ines")
     resp2 = await client.get("/api/cours/ADN+et+g%C3%A9n%C3%A9tique")
-    # Pas de 5xx sur les caractères spéciaux (URL bien formée)
-    assert resp1.status_code in (200, 503)
-    assert resp2.status_code in (200, 503)
+    # Pas de 5xx sur les caractères spéciaux. Un titre inconnu doit être 404,
+    # jamais remplacé silencieusement par les 10 000 lignes du cours.
+    assert resp1.status_code in (200, 404, 503)
+    assert resp2.status_code in (200, 404, 503)
 
 
 @pytest.mark.asyncio

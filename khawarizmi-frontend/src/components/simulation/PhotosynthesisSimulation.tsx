@@ -4,8 +4,11 @@ import { useState, useMemo, useEffect } from "react"
 import { QuizPanel } from "./QuizPanel"
 
 function computeO2(light: number, co2: number): number {
-  const lf = light <= 70 ? light / 70 : Math.max(0.5, 1 - (light - 70) / 200)
-  return Math.round(Math.max(0, Math.min(100, lf * (co2 / 100) * 100)))
+  // Modèle didactique de saturation : au-delà du seuil, la lumière n'est
+  // plus limitante. Une photoinhibition exigerait un protocole et des données
+  // spécifiques ; elle ne doit pas être inventée par la courbe.
+  const lightFactor = Math.min(1, light / 70)
+  return Math.round(Math.max(0, Math.min(100, lightFactor * (co2 / 100) * 100)))
 }
 
 const QUIZ = [

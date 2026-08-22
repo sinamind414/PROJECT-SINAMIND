@@ -3,7 +3,7 @@ import logging
 import re
 from pathlib import Path
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -235,20 +235,24 @@ def convert_numbered_lists(content: str) -> str:
 
 
 def remove_ascii_schemas(content: str) -> str:
-    lines = content.split("\n")
+    """Retire les lignes purement décoratives sans supprimer le savoir.
+
+    Les anciens cours placent aussi des protocoles, des bilans et les étapes
+    de mécanismes dans des blocs ```. L'ancienne implémentation supprimait le
+    bloc entier et faisait notamment disparaître initiation, élongation et
+    terminaison. On conserve désormais les blocs et seules les lignes dont la
+    majorité est constituée de caractères de dessin sont retirées.
+    """
+    ascii_chars = set("═║╔╗╚╝╠╣╦╩╬─│┌┐└┘├┤┬┴┼↔↕←↑→↓")
     cleaned = []
-    in_code_block = False
-    for line in lines:
+    for line in content.split("\n"):
         stripped = line.strip()
         if stripped.startswith("```"):
-            in_code_block = not in_code_block
+            cleaned.append(line)
             continue
-        if in_code_block:
-            continue
-        ascii_chars = set("═║╔╗╚╝╠╣╦╩╬─│┌┐└┘├┤┬┴┼↔↕←↑→↓")
         if stripped and len(stripped) > 3:
-            ratio = sum(1 for c in stripped if c in ascii_chars) / len(stripped)
-            if ratio > 0.4:
+            ratio = sum(1 for char in stripped if char in ascii_chars) / len(stripped)
+            if ratio > 0.55:
                 continue
         cleaned.append(line)
     return "\n".join(cleaned)
@@ -308,18 +312,11 @@ SECTION_KEYWORDS = {
         "activité enzymatique",
         "Site actif",
     ],
-    "Etude de l'influence de la temperature sur l'activite enzymatique": ["température", "temperature", "dénaturation"],
+    "Etude de l'influence de la temperature sur l'activite enzymatique": ["تأثير درجة الحرارة على النشاط الإنزيمي"],
     "Etude de l'influence du pH du milieu sur l'activite enzymatique": ["pH"],
-    "Niveaux de la structure spatiale des proteines": [
-        "Structure spatiale",
-        "Niveaux",
-        "البنية",
-        "primaire",
-        "secondaire",
-        "tertiaire",
-    ],
-    "Relation entre structure et fonction de la proteine": ["Structure", "Fonction", "Relation"],
-    "Representation de la structure tridimensionnelle de la proteine": ["tridimensionnelle", "3D"],
+    "Niveaux de la structure spatiale des proteines": ["مستويات البنية الفراغية للبروتين"],
+    "Relation entre structure et fonction de la proteine": ["العلاقة بين البنية والوظيفة"],
+    "Representation de la structure tridimensionnelle de la proteine": ["مستويات البنية الفراغية للبروتين"],
     "Le soi et le non-soi": ["Soi", "non-soi", "الذات", "Antigène"],
     "Les elements de defense dans le deuxieme cas (immunite specifique)": ["spécifique", "specificité"],
     "Les molecules de defense dans le premier cas (immunite non specifique)": ["non spécifique", "non specifique"],
@@ -327,7 +324,7 @@ SECTION_KEYWORDS = {
     "Origine des lymphocytes LTc": ["LTc", "lymphocyte T"],
     "Modes d'action des lymphocytes LTc": ["LTc", "cytotoxique", "perforine"],
     "Le complexe immun": ["complexe immun", "Immun"],
-    "Choix du type de reponse immunitaire": ["réponse immunitaire", "reponse immunitaire"],
+    "Choix du type de reponse immunitaire": ["اختيار نمط الاستجابة المناعية"],
     "Activation des cellules LB et LT": ["LB", "LT", "lymphocyte"],
     "Cause de la perte de l'immunite acquise (SIDA)": ["SIDA", "VIH", "immunité acquise"],
     "La transmission synaptique (potentiel membranaire)": ["synaptique", "membranaire", "potentiel"],
@@ -335,8 +332,8 @@ SECTION_KEYWORDS = {
     "Le potentiel d'action": ["potentiel d'action", "كمون العمل", "dépolarisation"],
     "Mecanisme de la transmission synaptique": ["transmission synaptique", "neurotransmetteur"],
     "Mecanisme de l'integration nerveuse": ["intégration nerveuse", "integration", "sommation"],
-    "Effet des drogues au niveau des synapses": ["drogues", "synapses", "drogue"],
-    "Siege de la photosynthese - Ultrastructure du chloroplaste": ["chloroplaste", "Photosynthèse", "photosynth"],
+    "Effet des drogues au niveau des synapses": ["تأثير المخدرات على المشابك"],
+    "Siege de la photosynthese - Ultrastructure du chloroplaste": ["مقر التركيب الضوئي"],
     "Reactions de la phase photochimique (phase claire)": [
         "phase photochimique",
         "phase claire",
@@ -344,24 +341,24 @@ SECTION_KEYWORDS = {
     ],
     "Reactions de la phase chimique (cycle de Calvin - phase sombre)": ["Calvin", "phase sombre", "cycle de Calvin"],
     "La glycolyse": ["glycolyse", "Glycolyse", "glucose"],
-    "Siege de l'oxydation respiratoire": ["mitochondrie", "oxydation respiratoire"],
+    "Siege de l'oxydation respiratoire": ["مقر التنفس الخلوي"],
     "Etapes de degradation de l'acide pyruvique (reactions du cycle de Krebs)": [
         "Krebs",
         "pyruvique",
         "cycle de Krebs",
     ],
     "La phosphorylation oxydative": ["phosphorylation oxydative", "ATP", "ATP synthase"],
-    "Les transformations energetiques au niveau cellulaire": ["Transformations Énergétiques", "énergétique"],
+    "Les transformations energetiques au niveau cellulaire": ["تحويل الطاقة على المستوى الخلوي", "الوحدة 3"],
     "Mecanismes de conversion en milieu anaerobie (fermentation)": [
         "fermentation",
         "anaérobie",
         "fermentation lactique",
     ],
-    "Identification des plaques tectoniques": ["plaques tectoniques", "Identification", "lithosphère"],
-    "Mouvements des plaques tectoniques": ["plaques tectoniques", "Mouvements", "plaques"],
+    "Identification des plaques tectoniques": ["تحديد الصفائح التكتونية"],
+    "Mouvements des plaques tectoniques": ["حركات الصفائح التكتونية"],
     "Les ondes sismiques": ["ondes sismiques", "Sismique", "séisme"],
     "Indices d'un ancien ocean (ophiolites)": ["ophiolite", "ancien océan", "océanique"],
-    "Indices du raccourcissement": ["raccourcissement", "plis", "failles"],
+    "Indices du raccourcissement": ["شواهد التقلّص"],
     "Phenomenes lies a la subduction": ["subduction", "plongement", "fosse"],
     "Disparition de la plaque oceanique et phenomenes lies a la subduction": [
         "plaque océanique",
@@ -371,8 +368,8 @@ SECTION_KEYWORDS = {
     "Le magmatisme et la formation de la plaque oceanique": ["magmatisme", "plaque océanique", "dorsale"],
     "Caracteristiques des dorsales medio-oceaniques": ["dorsale", "médio-océanique"],
     "Formation des roches caracteristiques de la dorsale medio-oceanique": ["dorsale", "roches", "basalte"],
-    "Modelisation de la structure interne du globe terrestre": ["structure interne", "globe"],
-    "L'energie interne du globe terrestre": ["énergie interne"],
+    "Modelisation de la structure interne du globe terrestre": ["نمذجة البنية الداخلية للكرة الأرضية"],
+    "L'energie interne du globe terrestre": ["الطاقة الداخلية للكرة الأرضية"],
     "Reliefs resultant de la collision": ["collision", "relief"],
     "Composition chimique des roches de la croute terrestre et du manteau": ["croute terrestre", "manteau", "roches"],
 }
@@ -389,9 +386,58 @@ SECTION_EMOJI_PATTERN = re.compile(
 )
 
 
-def _clean_course_content(raw: str, chapitre: str) -> str:
-    """Pipeline de nettoyage partagé : extraction de section + nettoyage ASCII."""
-    focused = extract_section(raw, chapitre)
+def extract_unit_scope(content: str, domain_num: int | None, unit_num: int | None) -> str:
+    """Isole une unité afin de lever les ambiguïtés des titres répétés.
+
+    « Rappel des acquis » existe dans plusieurs unités. Le contexte D/U envoyé
+    par le frontend garantit que le cours retourné appartient à la bonne
+    unité. Si le contenu est déjà un chunk sans en-têtes de domaine, il est
+    laissé intact.
+    """
+    if domain_num is None or unit_num is None:
+        return content
+
+    lines = content.split("\n")
+    domain_pattern = re.compile(rf"^#\s+.*المجال\s+(?:{domain_num}|{'الأول' if domain_num == 1 else 'الثاني' if domain_num == 2 else 'الثالث'})\b")
+    unit_pattern = re.compile(rf"^#\s+.*الوحدة\s+{unit_num}\b")
+
+    domain_start = next((i for i, line in enumerate(lines) if domain_pattern.search(line.strip())), None)
+    if domain_start is None:
+        return content
+
+    # Le fichier répète l'en-tête du même domaine avant chaque unité. On ne
+    # clôt donc le scope qu'au premier en-tête d'un domaine différent.
+    domain_end = next(
+        (
+            i for i in range(domain_start + 1, len(lines))
+            if re.match(r"^#\s+.*المجال\s+", lines[i].strip())
+            and not domain_pattern.search(lines[i].strip())
+        ),
+        len(lines),
+    )
+    unit_start = next(
+        (i for i in range(domain_start, domain_end) if unit_pattern.search(lines[i].strip())),
+        None,
+    )
+    if unit_start is None:
+        return ""
+
+    unit_end = next(
+        (i for i in range(unit_start + 1, domain_end) if re.match(r"^#\s+.*الوحدة\s+\d+\b", lines[i].strip())),
+        domain_end,
+    )
+    return "\n".join(lines[unit_start:unit_end])
+
+
+def _clean_course_content(
+    raw: str,
+    chapitre: str,
+    domain_num: int | None = None,
+    unit_num: int | None = None,
+) -> str:
+    """Pipeline partagé : unité officielle, chapitre, puis rendu Markdown."""
+    scoped = extract_unit_scope(raw, domain_num, unit_num)
+    focused = extract_section(scoped, chapitre)
     no_schemas = remove_ascii_schemas(focused)
     cleaned = clean_ascii_tables(no_schemas)
     no_ascii = remove_ascii_art(cleaned)
@@ -431,7 +477,9 @@ def extract_section(content: str, chapitre: str) -> str:
                 candidates.append((i, level))
 
     if not candidates:
-        return content  # aucun match → l'appelant filtre (rejette si trop long)
+        # Ne jamais substituer le cours intégral à un chapitre introuvable.
+        # L'appelant transforme cette absence explicite en 404.
+        return ""
 
     # 2. Niveau le plus haut disponible (priorité aux sections ##), puis 1er index.
     best_level = min(c[1] for c in candidates)
@@ -465,6 +513,8 @@ async def list_chapitres(
 @router.get("/{chapitre_title}")
 async def get_cours(
     chapitre_title: str,
+    domain_num: int | None = Query(None, ge=1, le=3),
+    unit_num: int | None = Query(None, ge=1, le=5),
     db: AsyncSession = Depends(get_db),
 ):
     decoded = chapitre_title.replace("%20", " ").replace("+", " ")
@@ -603,9 +653,8 @@ async def get_cours(
             )
         try:
             raw = COURSE_FILE.read_text(encoding="utf-8")
-            final_content = _clean_course_content(raw, decoded)
-            # extract_section() retourne tout le contenu si rien ne matche :
-            # on refuse alors pour éviter de servir 10 000 lignes hors-sujet.
+            final_content = _clean_course_content(raw, decoded, domain_num, unit_num)
+            # Une section absente est refusée : jamais de cours intégral hors sujet.
             if len(final_content.strip()) < 100:
                 logger.warning(
                     f"Section vide pour '{decoded}' (fallback fichier) — "
@@ -637,7 +686,7 @@ async def get_cours(
     chapitre_reel = rows[0].chapitre
     importance = rows[0].importance if rows[0].importance else "moyenne"
 
-    final_content = _clean_course_content(content, decoded)
+    final_content = _clean_course_content(content, decoded, domain_num, unit_num)
 
     return {
         "chapitre": decoded,

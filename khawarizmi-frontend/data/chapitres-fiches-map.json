@@ -1,312 +1,385 @@
 [
   {
-    "chapterSlug": "d1-u1-c2-relation-entre-adn-et-proteine",
-    "chapterAr": "العلاقة بين ADN والبروتين",
+    "chapterSlug": "d1-u1-c1-rappel-des-acquis",
+    "chapterAr": "تذكير بالمكتسبات",
     "ficheIds": [
-      "phase1_chapitres_1_2#2"
+      "phase1_chapitres_1_2#1"
     ]
   },
   {
-    "chapterSlug": "d1-u1-c3-transcription-de-linformation-genetique-au-niveau-de-ladn",
+    "chapterSlug": "d1-u1-c2-siege-de-la-synthese-des-proteines",
+    "chapterAr": "مقر تركيب البروتين",
+    "ficheIds": [
+      "phase1_chapitres_1_2#1"
+    ]
+  },
+  {
+    "chapterSlug": "d1-u1-c3-transcription-de-l-information-genetique-au-niveau-de-l-adn",
     "chapterAr": "استنساخ المعلومات الوراثية الموجودة على مستوى ADN",
     "ficheIds": [
       "lecon_transcription#1"
     ]
   },
   {
-    "chapterSlug": "d1-u1-c4-traduction-de-larnm-en-proteine",
-    "chapterAr": "الترجمة: من ARNm إلى البروتين",
+    "chapterSlug": "d1-u1-c4-la-traduction",
+    "chapterAr": "الترجمة",
     "ficheIds": [
       "phase2_chapitres_3_4#1"
     ]
   },
   {
-    "chapterSlug": "d1-u2-c1-structure-spatiale-des-proteines",
-    "chapterAr": "البنية الفراغية للبروتينات",
+    "chapterSlug": "d1-u1-c5-les-etapes-de-la-traduction",
+    "chapterAr": "مراحل الترجمة",
+    "ficheIds": [
+      "phase2_chapitres_3_4#1"
+    ]
+  },
+  {
+    "chapterSlug": "d1-u2-c1-representation-de-la-structure-tridimensionnelle-de-la-proteine",
+    "chapterAr": "تمثيل البنية الفراغية للبروتين",
     "ficheIds": [
       "phase2_chapitres_3_4#2"
     ]
   },
   {
-    "chapterSlug": "d1-u2-c2-relation-structure-fonction-enzymatique",
-    "chapterAr": "العلاقة بين البنية والوظيفة الإنزيمية",
+    "chapterSlug": "d1-u2-c2-niveaux-de-la-structure-spatiale-des-proteines",
+    "chapterAr": "مستويات البنية الفراغية للبروتينات",
     "ficheIds": [
-      "phase3_chapitres_5_6#2"
+      "phase2_chapitres_3_4#2"
     ]
   },
   {
-    "chapterSlug": "d1-u2-c3-proteines-de-transport-exemple-hemoglobine",
-    "chapterAr": "البروتينات الناقلة: مثال الهيموغلوبين",
-    "ficheIds": [
-      "phase3_chapitres_5_6#1"
-    ]
-  },
-  {
-    "chapterSlug": "d1-u2-c4-effet-des-mutations-sur-la-structure-des-proteines",
-    "chapterAr": "تأثير الطفرات على بنية البروتين",
+    "chapterSlug": "d1-u2-c3-relation-entre-structure-et-fonction-de-la-proteine",
+    "chapterAr": "العلاقة بين بنية ووظيفة البروتين",
     "ficheIds": [
       "phase3_chapitres_5_6#1"
     ]
   },
   {
-    "chapterSlug": "d1-u3-c1-proprietes-des-enzymes",
-    "chapterAr": "خصائص الإنزيمات",
+    "chapterSlug": "d1-u3-c1-notion-d-enzyme-et-son-importance",
+    "chapterAr": "مفهوم الإنزيم وأهميته",
     "ficheIds": [
       "phase3_chapitres_5_6#2"
     ]
   },
   {
-    "chapterSlug": "d1-u3-c2-effet-de-la-temperature-sur-lactivite-enzymatique",
-    "chapterAr": "تأثير درجة الحرارة على النشاط الإنزيمي",
+    "chapterSlug": "d1-u3-c2-l-activite-enzymatique-et-sa-relation-avec-la-structure-de-l-enzyme",
+    "chapterAr": "النشاط الإنزيمي وعلاقته ببنية الإنزيم",
     "ficheIds": [
-      "phase4_chapitres_7_8#2"
+      "phase3_chapitres_5_6#2"
     ]
   },
   {
-    "chapterSlug": "d1-u3-c3-effet-du-ph-sur-lactivite-enzymatique",
-    "chapterAr": "تأثير pH الوسط على النشاط الإنزيمي",
+    "chapterSlug": "d1-u3-c3-etude-de-l-influence-du-ph-du-milieu-sur-l-activite-enzymatique",
+    "chapterAr": "دراسة تأثير تغير درجة pH الوسط على نشاط الإنزيم",
     "ficheIds": [
       "phase4_chapitres_7_8#1"
     ]
   },
   {
-    "chapterSlug": "d1-u4-c1-reponse-immunitaire-humorale",
-    "chapterAr": "الاستجابة المناعية الخلطية",
+    "chapterSlug": "d1-u3-c4-etude-de-l-influence-de-la-temperature-sur-l-activite-enzymatique",
+    "chapterAr": "دراسة تأثير تغيرات درجة الحرارة على نشاط الإنزيم",
+    "ficheIds": [
+      "phase4_chapitres_7_8#2"
+    ]
+  },
+  {
+    "chapterSlug": "d1-u4-c1-rappel-des-acquis",
+    "chapterAr": "تذكير بالمكتسبات",
+    "ficheIds": [
+      "phase5_chapitres_9_10#1"
+    ]
+  },
+  {
+    "chapterSlug": "d1-u4-c2-le-soi-et-le-non-soi",
+    "chapterAr": "الذات واللاذات",
+    "ficheIds": [
+      "phase5_chapitres_9_10#1"
+    ]
+  },
+  {
+    "chapterSlug": "d1-u4-c3-les-molecules-de-defense-dans-le-premier-cas-immunite-non-specifique",
+    "chapterAr": "الحزينات الدفاعية في الحالة الأولى",
+    "ficheIds": [
+      "phase6_chapitres_11_12#2"
+    ]
+  },
+  {
+    "chapterSlug": "d1-u4-c4-le-complexe-immun",
+    "chapterAr": "المعقد المناعي",
+    "ficheIds": [
+      "phase6_chapitres_11_12#2"
+    ]
+  },
+  {
+    "chapterSlug": "d1-u4-c5-origine-des-anticorps",
+    "chapterAr": "مصدر الأجسام المضادة",
     "ficheIds": [
       "phase6_chapitres_11_12#1"
     ]
   },
   {
-    "chapterSlug": "d1-u4-c2-reponse-immunitaire-cellulaire",
-    "chapterAr": "الاستجابة المناعية الخلوية",
+    "chapterSlug": "d1-u4-c6-les-elements-de-defense-dans-le-deuxieme-cas-immunite-specifique",
+    "chapterAr": "العناصر الدفاعية في الحالة الثانية",
+    "ficheIds": [
+      "phase6_chapitres_11_12#1"
+    ]
+  },
+  {
+    "chapterSlug": "d1-u4-c7-modes-d-action-des-lymphocytes-ltc",
+    "chapterAr": "طرق تأثير اللمفاويات LTc",
     "ficheIds": [
       "phase7_chapitres_13_14#1"
     ]
   },
   {
-    "chapterSlug": "d1-u5-c2-potentiel-de-repos-et-daction",
-    "chapterAr": "كمون الراحة وكمون العمل",
+    "chapterSlug": "d1-u4-c8-origine-des-lymphocytes-ltc",
+    "chapterAr": "مصدر اللمفاويات LTc",
     "ficheIds": [
-      "phase8_chapitres_15_16#1",
+      "phase7_chapitres_13_14#1"
+    ]
+  },
+  {
+    "chapterSlug": "d1-u4-c9-activation-des-cellules-lb-et-lt",
+    "chapterAr": "تحفيز الخلايا LB و LT",
+    "ficheIds": [
+      "phase7_chapitres_13_14#2"
+    ]
+  },
+  {
+    "chapterSlug": "d1-u4-c10-choix-du-type-de-reponse-immunitaire",
+    "chapterAr": "اختيار نمط الاستجابة المناعية",
+    "ficheIds": [
+      "phase7_chapitres_13_14#2"
+    ]
+  },
+  {
+    "chapterSlug": "d1-u4-c11-cause-de-la-perte-de-l-immunite-acquise-sida",
+    "chapterAr": "سبب فقدان المناعة المكتسبة",
+    "ficheIds": [
+      "phase7_chapitres_13_14#2"
+    ]
+  },
+  {
+    "chapterSlug": "d1-u5-c1-rappel-des-acquis",
+    "chapterAr": "تذكير بالمكتسبات",
+    "ficheIds": [
+      "phase8_chapitres_15_16#1"
+    ]
+  },
+  {
+    "chapterSlug": "d1-u5-c2-la-transmission-synaptique-potentiel-membranaire",
+    "chapterAr": "النقل المشبكي (الكمون الغشائي)",
+    "ficheIds": [
       "phase8_chapitres_15_16#2"
     ]
   },
   {
-    "chapterSlug": "d1-u5-c3-transmission-synaptique",
-    "chapterAr": "النقل المشبكي",
+    "chapterSlug": "d1-u5-c3-mecanisme-de-la-transmission-synaptique",
+    "chapterAr": "آلية النقل المشبكي",
     "ficheIds": [
       "phase9_chapitres_17_18#1"
     ]
   },
   {
-    "chapterSlug": "d1-u5-c4-role-des-neurotransmetteurs",
-    "chapterAr": "دور الناقلات العصبية",
+    "chapterSlug": "d1-u5-c4-le-potentiel-de-repos",
+    "chapterAr": "كمون الراحة",
+    "ficheIds": [
+      "phase8_chapitres_15_16#1"
+    ]
+  },
+  {
+    "chapterSlug": "d1-u5-c5-le-potentiel-d-action",
+    "chapterAr": "كمون العمل",
+    "ficheIds": [
+      "phase8_chapitres_15_16#2"
+    ]
+  },
+  {
+    "chapterSlug": "d1-u5-c6-mecanisme-de-l-integration-nerveuse",
+    "chapterAr": "آلية الإدماج العصبي",
+    "ficheIds": [
+      "phase9_chapitres_17_18#2"
+    ]
+  },
+  {
+    "chapterSlug": "d1-u5-c7-effet-des-drogues-au-niveau-des-synapses",
+    "chapterAr": "تأثير المخدرات على مستوى المشابك",
     "ficheIds": [
       "phase10_chapitres_19_20#1"
     ]
   },
   {
-    "chapterSlug": "d2-u1-c1-structure-du-chloroplaste",
-    "chapterAr": "بنية الصانعة اليخضورية",
+    "chapterSlug": "d2-u1-c1-rappel-des-acquis-conditions-et-manifestations-de-la-photosynthese",
+    "chapterAr": "تذكير بالمكتسبات",
     "ficheIds": [
       "phase10_chapitres_19_20#2"
     ]
   },
   {
-    "chapterSlug": "d2-u1-c2-reactions-photochimiques-phase-claire",
-    "chapterAr": "التفاعلات الضوئية (الطور الضوئي)",
+    "chapterSlug": "d2-u1-c2-siege-de-la-photosynthese-ultrastructure-du-chloroplaste",
+    "chapterAr": "مقر عملية التركيب الضوئي - ما فوق البنية الخلوية للصانعة الخضراء",
     "ficheIds": [
-      "phase11_chapitres_21_22#1"
+      "phase10_chapitres_19_20#2"
     ]
   },
   {
-    "chapterSlug": "d2-u1-c3-reactions-non-photochimiques-phase-sombre",
-    "chapterAr": "التفاعلات اللاضوئية (طور التثبيت)",
+    "chapterSlug": "d2-u1-c3-reactions-de-la-phase-photochimique-phase-claire",
+    "chapterAr": "تفاعلات المرحلة الكيموضوئية",
     "ficheIds": [
-      "phase12_chapitres_23_24#1"
+      "phase11_chapitres_21_22#1",
+      "phase11_chapitres_21_22#2"
     ]
   },
   {
-    "chapterSlug": "d2-u2-c1-respiration-cellulaire-concept-general",
-    "chapterAr": "التنفس الخلوي: مفهوم عام",
+    "chapterSlug": "d2-u1-c4-reactions-de-la-phase-chimique-cycle-de-calvin-phase-sombre",
+    "chapterAr": "تفاعلات المرحلة الكيموحيوية",
+    "ficheIds": [
+      "phase12_chapitres_23_24#1",
+      "phase12_chapitres_23_24#2"
+    ]
+  },
+  {
+    "chapterSlug": "d2-u2-c1-rappel-des-acquis",
+    "chapterAr": "تذكير بالمكتسبات",
     "ficheIds": [
       "phase13_chapitres_25_26#1"
     ]
   },
   {
-    "chapterSlug": "d2-u2-c2-glycolyse",
+    "chapterSlug": "d2-u2-c2-siege-de-l-oxydation-respiratoire",
+    "chapterAr": "مقر الأكسدة التنفسية",
+    "ficheIds": [
+      "phase13_chapitres_25_26#2"
+    ]
+  },
+  {
+    "chapterSlug": "d2-u2-c3-la-glycolyse",
     "chapterAr": "التحلل السكري",
     "ficheIds": [
       "phase13_chapitres_25_26#1"
     ]
   },
   {
-    "chapterSlug": "d2-u2-c3-cycle-de-krebs-et-chaine-respiratoire",
-    "chapterAr": "دورة كريبس وسلسلة التنفس",
+    "chapterSlug": "d2-u2-c4-etapes-de-degradation-de-l-acide-pyruvique-reactions-du-cycle-de-krebs",
+    "chapterAr": "مراحل تفكك حمض البيروفيك",
     "ficheIds": [
-      "phase13_chapitres_25_26#2",
+      "phase13_chapitres_25_26#2"
+    ]
+  },
+  {
+    "chapterSlug": "d2-u2-c5-la-phosphorylation-oxydative",
+    "chapterAr": "الفسفرة التأكسدية",
+    "ficheIds": [
       "phase14_chapitres_27_28#1"
     ]
   },
   {
-    "chapterSlug": "d2-u2-c4-fermentation",
-    "chapterAr": "التخمر",
+    "chapterSlug": "d2-u2-c6-mecanismes-de-conversion-en-milieu-anaerobie-fermentation",
+    "chapterAr": "آليات تحويل الطاقة الكيميائية الكامنة في وسط لا هوائي",
     "ficheIds": [
       "phase14_chapitres_27_28#2"
     ]
   },
   {
-    "chapterSlug": "d2-u3-c1-echanges-gazeux-pulmonaires",
-    "chapterAr": "تبادل الغازات على مستوى الرئة",
-    "ficheIds": [
-      "phase15_chapitres_29_30#2"
-    ]
-  },
-  {
-    "chapterSlug": "d2-u3-c3-integration-fonctionnelle-des-organites",
-    "chapterAr": "التكامل الوظيفي بين العضيات",
+    "chapterSlug": "d2-u3-c1-les-transformations-energetiques-au-niveau-cellulaire",
+    "chapterAr": "التحولات الطاقوية على المستوى الخلوي",
     "ficheIds": [
       "phase15_chapitres_29_30#1"
     ]
   },
   {
-    "chapterSlug": "d2-u3-c4-comparaison-chloroplaste-mitochondrie",
-    "chapterAr": "مقارنة بين اليخضور والميتوكندري",
-    "ficheIds": [
-      "phase15_chapitres_29_30#1"
-    ]
-  },
-  {
-    "chapterSlug": "d3-u1-c2-seismes-et-leur-distribution",
-    "chapterAr": "الزلازل وتوزيعها",
+    "chapterSlug": "d3-u1-c1-identification-des-plaques-tectoniques",
+    "chapterAr": "تحديد الصفائح التكتونية",
     "ficheIds": [
       "phase16_chapitres_31_32#1"
     ]
   },
   {
-    "chapterSlug": "d3-u1-c3-volcans-et-leur-distribution",
-    "chapterAr": "البراكين وتوزيعها",
+    "chapterSlug": "d3-u1-c2-mouvements-des-plaques-tectoniques",
+    "chapterAr": "حركات الصفائح التكتونية",
     "ficheIds": [
-      "phase16_chapitres_31_32#1"
+      "phase16_chapitres_31_32#2",
+      "phase17_chapitres_33_34#1"
     ]
   },
   {
-    "chapterSlug": "d3-u1-c4-limites-des-plaques-tectoniques",
-    "chapterAr": "الحدود بين الصفائح التكتونية",
+    "chapterSlug": "d3-u1-c3-l-energie-interne-du-globe-terrestre",
+    "chapterAr": "الطاقة الداخلية للكرة الأرضية",
     "ficheIds": [
-      "phase16_chapitres_31_32#1"
+      "phase18_chapitres_35_36#1",
+      "phase18_chapitres_35_36#2"
     ]
   },
   {
-    "chapterSlug": "d3-u2-c1-ondes-sismiques-et-structure-de-la-terre",
-    "chapterAr": "الموجات الزلزالية وبنية الأرض",
+    "chapterSlug": "d3-u2-c1-les-ondes-sismiques",
+    "chapterAr": "الموجات الزلزالية",
     "ficheIds": [
       "phase19_chapitres_37_38#1"
     ]
   },
   {
-    "chapterSlug": "d3-u2-c2-structure-de-la-croute-terrestre",
-    "chapterAr": "بنية القشرة الأرضية",
+    "chapterSlug": "d3-u2-c2-composition-chimique-des-roches-de-la-croute-terrestre-et-du-manteau",
+    "chapterAr": "التركيب الكيميائي لصخور القشرة الأرضية والمعطف",
     "ficheIds": [
       "phase19_chapitres_37_38#2"
     ]
   },
   {
-    "chapterSlug": "d3-u2-c3-lithosphere-et-asthenosphere",
-    "chapterAr": "الغلاف الصخري والغلاف الموري",
-    "ficheIds": [
-      "phase19_chapitres_37_38#2"
-    ]
-  },
-  {
-    "chapterSlug": "d3-u2-c4-atmosphere-et-hydrosphere",
-    "chapterAr": "الغلاف الجوي والغلاف المائي",
+    "chapterSlug": "d3-u2-c3-modelisation-de-la-structure-interne-du-globe-terrestre",
+    "chapterAr": "نمذجة البنية الداخلية للكرة الأرضية",
     "ficheIds": [
       "phase20_chapitres_39_40#1"
     ]
   },
   {
-    "chapterSlug": "d3-u3-c1-expansion-oceanique-et-magnetisme",
-    "chapterAr": "توسع قاع المحيط والحرية المغناطيسية",
+    "chapterSlug": "d3-u3-c1-caracteristiques-des-dorsales-medio-oceaniques",
+    "chapterAr": "الظواهر المرتبطة بالبناء",
     "ficheIds": [
-      "phase16_chapitres_31_32#2"
+      "phase21_chapitres_41_42#1"
     ]
   },
   {
-    "chapterSlug": "d3-u3-c2-subduction",
-    "chapterAr": "الغوص",
+    "chapterSlug": "d3-u3-c2-le-magmatisme-et-la-formation-de-la-plaque-oceanique",
+    "chapterAr": "المغماتية وتشكل اللوح المحيطي",
+    "ficheIds": [
+      "phase21_chapitres_41_42#1"
+    ]
+  },
+  {
+    "chapterSlug": "d3-u3-c3-formation-des-roches-caracteristiques-de-la-dorsale-medio-oceanique",
+    "chapterAr": "تشكل الصخور المميزة للظهرة وسط محيطية",
+    "ficheIds": [
+      "phase21_chapitres_41_42#1"
+    ]
+  },
+  {
+    "chapterSlug": "d3-u3-c4-phenomenes-lies-a-la-subduction",
+    "chapterAr": "الظواهر المرتبطة بالغوص",
     "ficheIds": [
       "phase17_chapitres_33_34#1"
     ]
   },
   {
-    "chapterSlug": "d3-u3-c3-collision-continentale",
-    "chapterAr": "التصادم القاري",
-    "ficheIds": [
-      "phase21_chapitres_41_42#2"
-    ]
-  },
-  {
-    "chapterSlug": "d3-u3-c4-formation-des-chaines-de-montagnes",
-    "chapterAr": "تشكل السلاسل الجبلية",
-    "ficheIds": [
-      "phase21_chapitres_41_42#2"
-    ]
-  },
-  {
     "chapterSlug": "d3-u3-c5-disparition-de-la-plaque-oceanique-et-phenomenes-lies-a-la-subduction",
-    "chapterAr": "اختفاء الصفيحة المحيطية والظواهر المرتبطة بالغوص",
+    "chapterAr": "اختفاء اللوح المحيطي والظواهر المرتبطة بالغوص",
     "ficheIds": [
       "phase17_chapitres_33_34#2"
     ]
   },
   {
-    "chapterSlug": "d1-u1-c1-composition-chimique-des-proteines",
-    "chapterAr": "التركيب الكيميائي للبروتينات",
+    "chapterSlug": "d3-u3-c6-reliefs-resultant-de-la-collision",
+    "chapterAr": "التضاريس الناجمة عن التصادم",
     "ficheIds": [
-      "fiche-cours-d1-u1-c1-composition-chimique-des-proteines"
+      "phase21_chapitres_41_42#2"
     ]
   },
   {
-    "chapterSlug": "d1-u3-c4-role-des-cofacteurs-enzymatique",
-    "chapterAr": "عوامل أخرى مؤثرة في النشاط الإنزيمي",
+    "chapterSlug": "d3-u3-c7-indices-du-raccourcissement",
+    "chapterAr": "شواهد التقلص",
     "ficheIds": [
-      "fiche-cours-d1-u3-c4-role-des-cofacteurs-enzymatique"
-    ]
-  },
-  {
-    "chapterSlug": "d1-u4-c3-memoire-immunitaire",
-    "chapterAr": "الذاكرة المناعية",
-    "ficheIds": [
-      "fiche-livre-d1-u4-c3-memoire-immunitaire"
-    ]
-  },
-  {
-    "chapterSlug": "d1-u4-c4-vaccins-et-serum",
-    "chapterAr": "اللقاحات والمصل",
-    "ficheIds": [
-      "fiche-livre-d1-u4-c4-vaccins-et-serum"
-    ]
-  },
-  {
-    "chapterSlug": "d1-u5-c1-structure-du-tissu-nerveux",
-    "chapterAr": "بنية الخلية العصبية (النسيج العصبي)",
-    "ficheIds": [
-      "fiche-cours-d1-u5-c1-structure-du-tissu-nerveux"
-    ]
-  },
-  {
-    "chapterSlug": "d2-u1-c4-facteurs-influencant-la-photosy",
-    "chapterAr": "العوامل المؤثرة في سرعة التركيب الضوئي",
-    "ficheIds": [
-      "fiche-cours-d2-u1-c4-facteurs-influencant-la-photosy"
-    ]
-  },
-  {
-    "chapterSlug": "d2-u3-c2-transport-des-gaz-dans-le-sang",
-    "chapterAr": "نقل الغازات في الدم (الهيموغلوبين)",
-    "ficheIds": [
-      "fiche-cours-d2-u3-c2-transport-des-gaz-dans-le-sang"
+      "phase20_chapitres_39_40#2",
+      "phase21_chapitres_41_42#2"
     ]
   }
 ]

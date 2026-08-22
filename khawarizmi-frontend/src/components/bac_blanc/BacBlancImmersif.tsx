@@ -154,8 +154,8 @@ export function BacBlancImmersif({ annaleSlug }: { annaleSlug: string }) {
       <div dir="rtl" className="flex items-center justify-center min-h-[60vh]">
         <div className="text-center space-y-6 max-w-lg">
           <div className="text-6xl">📝</div>
-          <h1 className="text-3xl font-bold text-white">البكالوريا التجريبي</h1>
-          <p className="text-gray-400">SVT · 2026</p>
+          <h1 className="text-3xl font-bold text-white">نموذج تدريب في ظروف الامتحان</h1>
+          <p className="text-gray-400">SVT · غير رسمي · بدون سلم ONEC</p>
           <div className="rounded-2xl p-5 bg-[#182730] border border-white/[0.06] space-y-3 text-right">
             <div className="flex justify-between"><span className="text-gray-400 text-sm">المدة</span><span className="text-white font-bold">2:00</span></div>
             <div className="flex justify-between"><span className="text-gray-400 text-sm">المواضيع</span><span className="text-white font-bold">2 (اختر واحدا)</span></div>

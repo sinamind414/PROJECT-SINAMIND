@@ -310,7 +310,7 @@ function SujetCard({ sujet }: { sujet: SujetBac }) {
               </span>
             </div>
             <h3 className="text-white font-bold text-base group-hover:text-mint-soft transition-colors">
-              {sujet.annee} · {sujet.session === "normale" ? "دورة عادية" : "دورة استدراكية"}
+              {sujet.titreAr}
             </h3>
             <span className="inline-block mt-1.5 text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400/15 text-amber-300 border border-amber-400/30">
               نموذج تدريبي — غير رسمي

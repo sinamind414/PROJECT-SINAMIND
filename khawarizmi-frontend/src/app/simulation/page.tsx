@@ -33,15 +33,6 @@ const SIMULATIONS = [
     color: "linear-gradient(135deg, #10B981, #059669, #F59E0B)",
   },
   {
-    slug: "mitosis",
-    emoji: "🧬",
-    titleAr: "الانقسام المتساو",
-    titleFr: "انقسام خلوي",
-    descAr: "انتقل عبر أطوار الانقسام وشاهد كيف تنقسم الخلية",
-    chapter: "تركيب البروتين",
-    color: "linear-gradient(135deg, #EC4899, #BE185D, #8B5CF6)",
-  },
-  {
     slug: "tectonics",
     emoji: "🌋",
     titleAr: "الصفائح التكتونية",

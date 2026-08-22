@@ -3,57 +3,61 @@
 import { useState, useMemo, useEffect } from "react"
 import { apiClient } from "@/lib/api-client"
 
-function computeActivity(temp: number, ph: number): number {
-  let tempFactor: number
-  if (temp >= 55) {
-    tempFactor = 0
-  } else if (temp >= 45) {
-    tempFactor = Math.exp(-Math.pow((temp - 37) / 8, 2)) * (1 - (temp - 45) / 10)
-  } else {
-    tempFactor = Math.exp(-Math.pow((temp - 37) / 15, 2))
-  }
+type EnzymeKey = "pepsin" | "amylase" | "trypsin"
 
-  let phFactor: number
-  if (ph <= 2 || ph >= 12) {
-    phFactor = 0
-  } else {
-    phFactor = Math.exp(-Math.pow((ph - 7) / 2.5, 2))
-  }
-
-  return Math.round(tempFactor * phFactor * 100)
+type EnzymeProfile = {
+  labelAr: string
+  optimumTemp: number
+  optimumPh: number
+  phWidth: number
+  denaturationTemp: number
 }
 
-function isDenatured(temp: number, ph: number): boolean {
-  return temp >= 55 || ph <= 2 || ph >= 12
+const ENZYMES: Record<EnzymeKey, EnzymeProfile> = {
+  pepsin: { labelAr: "البيبسين (المعدة)", optimumTemp: 37, optimumPh: 2, phWidth: 1.4, denaturationTemp: 60 },
+  amylase: { labelAr: "الأميلاز اللعابي", optimumTemp: 37, optimumPh: 7, phWidth: 2, denaturationTemp: 55 },
+  trypsin: { labelAr: "التربسين (الأمعاء)", optimumTemp: 37, optimumPh: 8, phWidth: 2, denaturationTemp: 55 },
+}
+
+function computeActivity(temp: number, ph: number, profile: EnzymeProfile): number {
+  if (temp >= profile.denaturationTemp) return 0
+  const tempFactor = Math.exp(-Math.pow((temp - profile.optimumTemp) / 15, 2))
+  const phFactor = Math.exp(-Math.pow((ph - profile.optimumPh) / profile.phWidth, 2))
+  return Math.round(Math.max(0, Math.min(1, tempFactor * phFactor)) * 100)
+}
+
+function isDenatured(temp: number, profile: EnzymeProfile): boolean {
+  return temp >= profile.denaturationTemp
 }
 
 const QUIZ_QUESTIONS = [
   {
     id: "q1",
-    question: "ما هي درجة الحرارة المثلى لنشاط الإنزيم؟",
-    options: ["20°C", "37°C", "50°C", "60°C"],
+    question: "هل تمتلك جميع الإنزيمات نفس pH الأمثل؟",
+    options: ["نعم، دائما pH 7", "لا، يختلف حسب بنية الإنزيم ووسط عمله", "نعم، دائما pH 2", "لا علاقة بين pH والنشاط"],
     correct: 1,
-    explanation: "النشاط الأقصى يكون عند 37°C لأنها حرارة الجسم.",
+    explanation: "لكل إنزيم مجال أمثل مرتبط ببنيته ووسطه: البيبسين حمضي، الأميلاز قريب من المتعادل، والتربسين قاعدي قليلا.",
   },
   {
     id: "q2",
-    question: "ماذا يحدث للإنزيم عند 60°C؟",
-    options: ["يزداد نشاطه", "يبقى ثابتا", "يتخرب (تمسخ) ويفقد نشاطه", "يتضاعف"],
+    question: "ماذا يحدث عادة لبروتين إنزيمي بشري عند حرارة مرتفعة جدا؟",
+    options: ["يزداد نشاطه بلا حد", "يبقى ثابتا", "يتمسخ ويتغير موقعه الفعال", "يتضاعف"],
     correct: 2,
-    explanation: "عند الحرارة المرتفعة يتخرب الموقع الفعال للإنزيم (تمسخ) ويفقد نشاطه بشكل لا رجعي.",
+    explanation: "الحرارة المرتفعة تفكك الروابط المثبتة للبنية الفراغية فتغير الموقع الفعال وتخفض النشاط.",
   },
   {
     id: "q3",
-    question: "لماذا ينخفض النشاط عند pH = 2؟",
-    options: ["لأن الإنزيم يحتاج وسطا قاعديا", "لأن الحموضة تغير شحنة الموقع الفعال", "لأن الركيزة تتحلل", "لا يحدث شيء"],
-    correct: 1,
-    explanation: "الـ pH المتطرف يغير شحنة الأحماض الأمينية في الموقع الفعال فيمنع ارتباط الركيزة.",
+    question: "لماذا يبقى البيبسين نشطا قرب pH = 2؟",
+    options: ["لأنه متكيف بنيويا مع الوسط الحمضي للمعدة", "لأن كل الإنزيمات تعمل عند pH 2", "لأن الركيزة لا تتأثر", "لأن pH لا يغير الشحنات"],
+    correct: 0,
+    explanation: "البنية الفراغية وموقع البيبسين الفعال ملائمان للوسط الحمضي؛ لذلك لا يجوز تعميم pH أمثل واحد على كل الإنزيمات.",
   },
 ]
 
 type CurvePoint = { temp: number; activity: number }
 
 export function EnzymeSimulation() {
+  const [enzymeKey, setEnzymeKey] = useState<EnzymeKey>("amylase")
   const [temperature, setTemperature] = useState(37)
   const [ph, setPh] = useState(7)
   const [isRunning, setIsRunning] = useState(false)
@@ -64,8 +68,9 @@ export function EnzymeSimulation() {
   const [quizScore, setQuizScore] = useState(0)
   const [saved, setSaved] = useState(false)
 
-  const activity = useMemo(() => computeActivity(temperature, ph), [temperature, ph])
-  const denatured = isDenatured(temperature, ph)
+  const enzyme = ENZYMES[enzymeKey]
+  const activity = useMemo(() => computeActivity(temperature, ph, enzyme), [temperature, ph, enzyme])
+  const denatured = isDenatured(temperature, enzyme)
 
   useEffect(() => {
     if (!isRunning) return
@@ -184,31 +189,53 @@ export function EnzymeSimulation() {
             </svg>
           </div>
 
-          {/* Sliders */}
+          {/* Enzyme + paramètres */}
           <div className="space-y-4">
+            <div>
+              <label htmlFor="enzyme-profile" className="text-white text-sm font-bold mb-2 block">الإنزيم المدروس</label>
+              <select
+                id="enzyme-profile"
+                value={enzymeKey}
+                onChange={(event) => {
+                  const nextKey = event.target.value as EnzymeKey
+                  const next = ENZYMES[nextKey]
+                  setEnzymeKey(nextKey)
+                  setTemperature(next.optimumTemp)
+                  setPh(next.optimumPh)
+                  setCurvePoints([])
+                }}
+                className="w-full rounded-xl bg-[#0C151A] border border-white/[0.08] text-white px-3 py-2"
+              >
+                {Object.entries(ENZYMES).map(([key, profile]) => (
+                  <option key={key} value={key}>{profile.labelAr} — pH {profile.optimumPh}</option>
+                ))}
+              </select>
+              <p className="text-xs text-gray-500 mt-2">القيمة المثلى خاصية للإنزيم وليست قاعدة واحدة لكل الإنزيمات.</p>
+            </div>
+
             <div>
               <div className="flex items-center justify-between mb-2">
                 <label className="text-white text-sm font-bold">درجة الحرارة</label>
-                <span className="px-3 py-1 rounded-lg text-sm font-bold" style={{ background: temperature > 50 ? "rgba(239,68,68,0.15)" : "rgba(45,212,191,0.15)", color: temperature > 50 ? "#EF4444" : "#2DD4BF" }}>
+                <span className="px-3 py-1 rounded-lg text-sm font-bold" style={{ background: denatured ? "rgba(239,68,68,0.15)" : "rgba(45,212,191,0.15)", color: denatured ? "#EF4444" : "#2DD4BF" }}>
                   {temperature}°C
                 </span>
               </div>
-              <input type="range" min="0" max="80" value={temperature} onChange={(e) => setTemperature(Number(e.target.value))} className="w-full" style={{ accentColor: temperature > 50 ? "#EF4444" : "#2DD4BF" }} />
+              <input type="range" min="0" max="80" value={temperature} onChange={(e) => setTemperature(Number(e.target.value))} className="w-full" style={{ accentColor: denatured ? "#EF4444" : "#2DD4BF" }} />
               <div className="flex justify-between text-xs text-gray-500 mt-1">
-                <span>0°C</span><span className="text-mint-soft">37°C</span><span className="text-red-400">80°C</span>
+                <span>0°C</span><span className="text-mint-soft">الأمثل: {enzyme.optimumTemp}°C</span><span className="text-red-400">80°C</span>
               </div>
             </div>
 
             <div>
               <div className="flex items-center justify-between mb-2">
                 <label className="text-white text-sm font-bold">درجة الحموضة (pH)</label>
-                <span className="px-3 py-1 rounded-lg text-sm font-bold" style={{ background: (ph < 3 || ph > 11) ? "rgba(239,68,68,0.15)" : "rgba(45,212,191,0.15)", color: (ph < 3 || ph > 11) ? "#EF4444" : "#2DD4BF" }}>
+                <span className="px-3 py-1 rounded-lg text-sm font-bold bg-mint/15 text-mint-soft">
                   pH {ph}
                 </span>
               </div>
-              <input type="range" min="1" max="14" step="0.5" value={ph} onChange={(e) => setPh(Number(e.target.value))} className="w-full" style={{ accentColor: (ph < 3 || ph > 11) ? "#EF4444" : "#2DD4BF" }} />
+              <input type="range" min="1" max="14" step="0.5" value={ph} onChange={(e) => setPh(Number(e.target.value))} className="w-full" style={{ accentColor: "#2DD4BF" }} />
               <div className="flex justify-between text-xs text-gray-500 mt-1">
-                <span className="text-red-400">1 حمضي</span><span className="text-mint-soft">7 متعادل</span><span className="text-red-400">14 قاعدي</span>
+                <span>1 حمضي</span><span className="text-mint-soft">الأمثل: pH {enzyme.optimumPh}</span><span>14 قاعدي</span>
               </div>
             </div>
           </div>

@@ -1,12 +1,12 @@
 {
   "metadata": {
     "version": "2026.2.1",
-    "source": "ONEC - Programme officiel SVT Terminale Sciences Expérimentales Algérie",
+    "source": "Référentiel interne 3AS dérivé de la progression nationale; pièce ministérielle primaire à archiver",
     "matiere": "SVT",
     "niveau": "3AS",
     "filiere": "Sciences Expérimentales",
     "date": "2026-06-20",
-    "status": "FOUNDATION"
+    "status": "INTERNAL_FOUNDATION_PENDING_EXTERNAL_SIGNOFF"
   },
   "domaines": [
     {
