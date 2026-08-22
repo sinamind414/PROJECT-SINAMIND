@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { useParams } from "next/navigation"
 import Link from "next/link"
 import ReactMarkdown from "react-markdown"
@@ -9,6 +9,7 @@ import { AuthGuard } from "@/components/auth/AuthGuard"
 import { AppShell } from "@/components/layout/AppShell"
 import { Breadcrumb } from "@/components/cours/Breadcrumb"
 import { ChapterBacChecklist } from "@/components/cours/ChapterBacChecklist"
+import { ChapterActivePractice } from "@/components/cours/ChapterActivePractice"
 import { VideosWidget } from "@/components/videos/VideosWidget"
 import FicheResume from "@/components/lessons/FicheResume"
 import chapitresFichesMap from "../../../../../../data/chapitres-fiches-map.json"
@@ -20,6 +21,7 @@ import {
   getChapterNavigation,
 } from "@/lib/cours-data"
 import { apiClient } from "@/lib/api-client"
+import { getChapterActivePracticeTask } from "@/lib/chapter-practice-data"
 import type { CoursResponse } from "@/lib/types"
 
 type ChapterLearningContract = {
@@ -27,6 +29,9 @@ type ChapterLearningContract = {
   objectiveAr: string
   checklistAr: string[]
   validationStatus: string
+  ficheIds: string[]
+  practiceHref: string
+  exerciseHref: string
 }
 
 const LEARNING_CONTRACTS = learningContractsData.contracts as ChapterLearningContract[]
@@ -119,6 +124,12 @@ export default function ChapitrePage() {
   const domaineSlug = (params.domaine as string) || ""
   const uniteSlug = (params.unite as string) || ""
   const chapitreSlug = (params.chapitre as string) || ""
+  const [readyChapterSlug, setReadyChapterSlug] = useState("")
+  const checklistReady = readyChapterSlug === chapitreSlug
+  const handleChecklistReady = useCallback(
+    (ready: boolean) => setReadyChapterSlug(ready ? chapitreSlug : ""),
+    [chapitreSlug],
+  )
 
   const domain = getDomainBySlug(domaineSlug)
   const unit = useMemo(
@@ -129,8 +140,11 @@ export default function ChapitrePage() {
   const nav = getChapterNavigation(chapitreSlug)
   const fiche = chapitresFichesMap.find((item) => item.chapterSlug === chapitreSlug)
   const learningContract = LEARNING_CONTRACTS.find((item) => item.chapterSlug === chapitreSlug)
+  const activePracticeTask = learningContract
+    ? getChapterActivePracticeTask(chapitreSlug, learningContract.ficheIds)
+    : null
 
-  if (!domain || !unit || !chapter || !learningContract || chapter.domainNumero !== domain.numero || chapter.unitNumero !== unit.unitNumero) {
+  if (!domain || !unit || !chapter || !learningContract || !activePracticeTask || chapter.domainNumero !== domain.numero || chapter.unitNumero !== unit.unitNumero) {
     return (
       <AuthGuard>
         <AppShell>
@@ -161,17 +175,25 @@ export default function ChapitrePage() {
               <h1 className="text-2xl font-bold text-white">{chapter.chapterAr}</h1>
               <p className="text-gray-400 text-sm mt-1" dir="ltr">{chapter.chapterFr}</p>
               <div className="mt-4 flex flex-wrap gap-2">
-                <Link href={`/exercices/${chapter.slug}`} className="px-4 py-2 rounded-xl bg-mint text-slate-deep text-sm font-bold">تمارين الوحدة ←</Link>
-                <Link href={`/document-analysis/chapters/${chapter.slug}`} className="px-4 py-2 rounded-xl bg-white/10 text-white text-sm font-bold">تدريب منهجي ←</Link>
+                <Link href={learningContract.exerciseHref} className="px-4 py-2 rounded-xl bg-mint text-slate-deep text-sm font-bold">تمارين الفصل ←</Link>
+                <Link href={learningContract.practiceHref} className="px-4 py-2 rounded-xl bg-white/10 text-white text-sm font-bold">تدريب منهجي ←</Link>
               </div>
             </header>
 
-            {fiche && <FicheResume ficheIds={fiche.ficheIds} />}
+            {fiche && <FicheResume ficheIds={fiche.ficheIds} hideQuiz />}
             <ChapterBacChecklist
               chapterSlug={learningContract.chapterSlug}
               objectiveAr={learningContract.objectiveAr}
               checklistAr={learningContract.checklistAr}
               validationStatus={learningContract.validationStatus}
+              onReadyChange={handleChecklistReady}
+            />
+            <ChapterActivePractice
+              chapterSlug={learningContract.chapterSlug}
+              task={activePracticeTask}
+              checklistReady={checklistReady}
+              practiceHref={learningContract.practiceHref}
+              exerciseHref={learningContract.exerciseHref}
             />
             <CourseMarkdown chapterTitle={chapter.chapterFr} domainNumero={domain.numero} unitNumero={unit.unitNumero} />
             <VideosWidget chapitre={chapter.chapterFr} />

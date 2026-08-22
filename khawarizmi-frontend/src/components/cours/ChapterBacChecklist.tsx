@@ -1,12 +1,17 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import {
+  getChapterPracticeProgress,
+  saveChapterChecklist,
+} from "@/lib/lesson/evidenceService"
 
 type Props = {
   chapterSlug: string
   objectiveAr: string
   checklistAr: string[]
   validationStatus: string
+  onReadyChange?: (ready: boolean) => void
 }
 
 export function ChapterBacChecklist({
@@ -14,18 +19,29 @@ export function ChapterBacChecklist({
   objectiveAr,
   checklistAr,
   validationStatus,
+  onReadyChange,
 }: Props) {
   const [checked, setChecked] = useState<boolean[]>(() => checklistAr.map(() => false))
 
   useEffect(() => {
-    setChecked(checklistAr.map(() => false))
-  }, [chapterSlug, checklistAr])
+    const persisted = getChapterPracticeProgress(chapterSlug)?.checklist
+    const restored = persisted?.length === checklistAr.length
+      ? persisted
+      : checklistAr.map(() => false)
+    setChecked(restored)
+    onReadyChange?.(restored.every(Boolean))
+  }, [chapterSlug, checklistAr, onReadyChange])
 
   const completed = checked.filter(Boolean).length
   const ready = completed === checklistAr.length
 
   function toggle(index: number) {
-    setChecked((current) => current.map((value, itemIndex) => itemIndex === index ? !value : value))
+    setChecked((current) => {
+      const next = current.map((value, itemIndex) => itemIndex === index ? !value : value)
+      saveChapterChecklist(chapterSlug, next)
+      onReadyChange?.(next.every(Boolean))
+      return next
+    })
   }
 
   return (

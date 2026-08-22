@@ -25,7 +25,15 @@ const FICHES = fichesData as FicheResume[]
  * Props : fileKey (pages leçons) OU ficheIds (pages chapitres, mapping
  * validé dans data/chapitres-fiches-map.json).
  */
-export default function FicheResume({ fileKey, ficheIds }: { fileKey?: string; ficheIds?: string[] }) {
+export default function FicheResume({
+  fileKey,
+  ficheIds,
+  hideQuiz = false,
+}: {
+  fileKey?: string
+  ficheIds?: string[]
+  hideQuiz?: boolean
+}) {
   const [open, setOpen] = useState(true)
   const fiches = ficheIds
     ? ficheIds.map((id) => FICHES.find((f) => f.id === id)).filter(Boolean) as FicheResume[]
@@ -93,7 +101,7 @@ export default function FicheResume({ fileKey, ficheIds }: { fileKey?: string; f
               )}
 
               {/* اختبر نفسك + الأخطاء */}
-              {f.quiz && (
+              {f.quiz && !hideQuiz && (
                 <div className="rounded-xl border border-white/10 bg-slate-deep/50 p-3 space-y-2">
                   <p className="text-xs font-black text-white/60">✔️ اختبر نفسك</p>
                   <p className="text-sm text-white/85 font-bold">{f.quiz.question}</p>

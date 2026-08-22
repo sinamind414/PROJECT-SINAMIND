@@ -30,7 +30,7 @@
 - aucune route ou fiche manquante ;
 - test automatique bloquant et build frontend vert.
 
-**État : EN COURS — première tranche appliquée dans ce lot.**
+**État : TERMINÉ — 55 contrats, 55 fiches reliées et six réflexes par chapitre.**
 
 ## Lot 2 — Boucle active dans la page de chapitre
 
@@ -45,6 +45,8 @@
 
 **Acceptation :** la réponse modèle n’est jamais visible avant une tentative ; chaque CTA mène à une route existante.
 
+**État : TERMINÉ —** espace de réponse actif sur 55/55 chapitres, corrigé masqué avant soumission et de nouveau masqué lors d’une reprise, auto-évaluation formative, nouvelle tentative immédiate, progression locale sans texte d’élève en clair, routes cours/document/exercices contrôlées 55/55.
+
 ## Lot 3 — Banque d’exercices alignée
 
 **But :** au moins une activité documentaire et une activité de restitution par chapitre.
@@ -54,6 +56,8 @@
 - question, documents, réponse de référence, critères et barème présents ;
 - contenus hors programme marqués « enrichissement » ;
 - aucune annale présentée comme ONEC sans preuve primaire.
+
+**État : À FAIRE —** les questions de restitution réutilisées par la boucle du lot 2 ne valent pas encore banque distincte et alignée 55/55.
 
 ## Lot 4 — Correcteur et coach en boucle fermée
 

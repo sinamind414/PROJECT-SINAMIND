@@ -9,6 +9,7 @@ import {
   outcomeAllowsDocumentRecall,
   outcomeAllowsMethodMastery,
 } from "./tunnelTypes"
+import type { ChapterPracticeOutcome } from "../chapter-practice"
 import type { SessionEffect, SessionSnapshot } from "./sessionReduce"
 import {
   createScheduledRecallItem,
@@ -21,6 +22,15 @@ const ERRORS_KEY = "khawarizmi.learning_errors.v1"
 const RECALL_GATE_KEY = "khawarizmi.recall_gate.v1"
 const SESSION_KEY = "khawarizmi.lesson_session.v1"
 const RECALL_ITEMS_KEY = "khawarizmi.recall_items.v1"
+const CHAPTER_PRACTICE_KEY = "khawarizmi.chapter_practice.v1"
+
+export type ChapterPracticeProgress = {
+  chapterSlug: string
+  checklist: boolean[]
+  attemptCount: number
+  lastOutcome: ChapterPracticeOutcome
+  updatedAt: string
+}
 
 export type EvidenceKind = "document" | "method"
 
@@ -93,7 +103,8 @@ function writeJson(key: string, value: unknown) {
       key === ERRORS_KEY ||
       key === RECALL_GATE_KEY ||
       key === SESSION_KEY ||
-      key === RECALL_ITEMS_KEY
+      key === RECALL_ITEMS_KEY ||
+      key === CHAPTER_PRACTICE_KEY
     ) {
       window.dispatchEvent(new Event("khawarizmi-contract-updated"))
       window.dispatchEvent(new Event("sinamind-progress-updated"))
@@ -112,7 +123,64 @@ export function __resetEvidenceStoreForTests() {
     window.localStorage.removeItem(RECALL_GATE_KEY)
     window.localStorage.removeItem(SESSION_KEY)
     window.localStorage.removeItem(RECALL_ITEMS_KEY)
+    window.localStorage.removeItem(CHAPTER_PRACTICE_KEY)
   }
+}
+
+export function listChapterPracticeProgress(): ChapterPracticeProgress[] {
+  return readJson<ChapterPracticeProgress[]>(CHAPTER_PRACTICE_KEY, [])
+}
+
+export function getChapterPracticeProgress(chapterSlug: string): ChapterPracticeProgress | null {
+  return listChapterPracticeProgress().find((item) => item.chapterSlug === chapterSlug) ?? null
+}
+
+function writeChapterPracticeProgress(next: ChapterPracticeProgress) {
+  const current = listChapterPracticeProgress()
+  const withoutCurrent = current.filter((item) => item.chapterSlug !== next.chapterSlug)
+  writeJson(CHAPTER_PRACTICE_KEY, [...withoutCurrent, next])
+  return next
+}
+
+/** Persiste uniquement les cases cochées, jamais le texte rédigé par l'élève. */
+export function saveChapterChecklist(
+  chapterSlug: string,
+  checklist: boolean[],
+): ChapterPracticeProgress {
+  const current = getChapterPracticeProgress(chapterSlug)
+  return writeChapterPracticeProgress({
+    chapterSlug,
+    checklist: [...checklist],
+    attemptCount: current?.attemptCount ?? 0,
+    lastOutcome: current?.lastOutcome ?? "not_started",
+    updatedAt: new Date().toISOString(),
+  })
+}
+
+/** Persiste le résultat de processus, sans réponse en clair ni note certificative. */
+export function recordChapterPracticeSubmission(chapterSlug: string): ChapterPracticeProgress {
+  const current = getChapterPracticeProgress(chapterSlug)
+  return writeChapterPracticeProgress({
+    chapterSlug,
+    checklist: current?.checklist ?? [],
+    attemptCount: (current?.attemptCount ?? 0) + 1,
+    lastOutcome: "awaiting_self_check",
+    updatedAt: new Date().toISOString(),
+  })
+}
+
+export function recordChapterPracticeOutcome(
+  chapterSlug: string,
+  lastOutcome: Extract<ChapterPracticeOutcome, "needs_retry" | "self_checked">,
+): ChapterPracticeProgress {
+  const current = getChapterPracticeProgress(chapterSlug)
+  return writeChapterPracticeProgress({
+    chapterSlug,
+    checklist: current?.checklist ?? [],
+    attemptCount: current?.attemptCount ?? 0,
+    lastOutcome,
+    updatedAt: new Date().toISOString(),
+  })
 }
 
 export function listEvidences(): EvidenceRecord[] {
