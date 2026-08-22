@@ -3,6 +3,8 @@ import { resolve } from "node:path"
 import { describe, expect, it } from "vitest"
 import { methodologyChapterLinks, UNITS_CONFIG } from "@/lib/methodology-chapters"
 import { EXPERIMENTAL_LESSONS, EXPERIMENTAL_SLUGS } from "@/lib/experimental-lessons-data"
+import chapterFicheMap from "../../data/chapitres-fiches-map.json"
+import fichesData from "../../data/fiches-resume.json"
 
 const EXPECTED_COUNTS: Record<string, number> = {
   "1-1": 5,
@@ -48,6 +50,28 @@ describe("alignement pédagogique du catalogue 3AS", () => {
     const frontend = readFileSync(resolve(process.cwd(), "data/referentiel-interne-svt-3as.json"), "utf8")
     const backend = readFileSync(resolve(process.cwd(), "../khawarizmi-backend/data/programmes/svt_sciences_experimentales.json"), "utf8")
     expect(frontend).toBe(backend)
+  })
+
+  it("fournit une fiche de révision complète à chacun des 55 chapitres", () => {
+    const chapterSlugs = new Set(methodologyChapterLinks.map((chapter) => chapter.slug))
+    const mappedSlugs = new Set(chapterFicheMap.map((entry) => entry.chapterSlug))
+    const fiches = new Map(fichesData.map((fiche) => [fiche.id, fiche]))
+
+    expect(mappedSlugs).toEqual(chapterSlugs)
+    expect(chapterFicheMap).toHaveLength(55)
+
+    for (const entry of chapterFicheMap) {
+      expect(entry.ficheIds.length, entry.chapterSlug).toBeGreaterThan(0)
+      for (const ficheId of entry.ficheIds) {
+        const fiche = fiches.get(ficheId)
+        expect(fiche, `${entry.chapterSlug} -> ${ficheId}`).toBeDefined()
+        expect(fiche!.objectif.trim().length).toBeGreaterThan(20)
+        expect(fiche!.achkalia.trim().length).toBeGreaterThan(20)
+        expect(fiche!.idees.length).toBeGreaterThanOrEqual(3)
+        expect(fiche!.quiz).not.toBeNull()
+        expect(JSON.stringify(fiche)).not.toContain("…")
+      }
+    }
   })
 })
 

@@ -9,6 +9,7 @@ import { fileURLToPath } from "node:url"
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const root = path.resolve(__dirname, "..")
 const srcPath = path.join(root, "src/lib/experimental-lessons-data.ts")
+const curatedPath = path.join(root, "data/fiches-resume-curated.json")
 const outPath = path.join(root, "data/fiches-resume.json")
 
 const src = fs.readFileSync(srcPath, "utf8")
@@ -29,7 +30,19 @@ const isUiPrompt = (t) => {
   return UI_PREFIXES.some((p) => s.startsWith(p))
 }
 const clean = (t) => t.replace(/\s+/g, " ").trim()
-const clip = (t, max = 150) => (t.length > max ? t.slice(0, max - 1) + "…" : t)
+// Ne jamais couper une idée scientifique au milieu d'une phrase. On préfère
+// une fiche légèrement plus longue à une définition terminée par « … ».
+const clip = (t, max = 360) => {
+  if (t.length <= max) return t
+  const head = t.slice(0, max)
+  const lastStop = Math.max(
+    head.lastIndexOf("."),
+    head.lastIndexOf("؟"),
+    head.lastIndexOf("!"),
+    head.lastIndexOf("؛"),
+  )
+  return lastStop >= Math.floor(max * 0.55) ? head.slice(0, lastStop + 1).trim() : t
+}
 const stripEmoji = (t) => t.replace(/^[^\u0600-\u06FFa-zA-Z0-9]+/, "")
 
 const fiches = []
@@ -38,6 +51,8 @@ const stats = { fichiers: 0, lecons: 0, avecQuiz: 0, ideesMin: 99, ideesMax: 0 }
 for (const fileKey of Object.keys(data)) {
   stats.fichiers++
   const file = data[fileKey]
+  const isSecondPart = fileKey.endsWith("-part-2")
+  const baseFileKey = fileKey.replace(/-part-2$/, "")
   // Découpage des leçons : chaque leçon commence par un step "1"
   const starts = []
   file.phases.forEach((p, i) => {
@@ -52,7 +67,7 @@ for (const fileKey of Object.keys(data)) {
 
     // الإشكالية = le bloc problem (1 par leçon)
     const problem = blocks.find((b) => b.type === "problem")
-    const achkalia = problem ? clip(clean((problem.texts || [""])[0]), 160) : ""
+    const achkalia = problem ? clip(clean((problem.texts || [""])[0]), 420) : ""
 
     // الأفكار = scientific_text + text non-UI
     const idees = []
@@ -82,7 +97,7 @@ for (const fileKey of Object.keys(data)) {
         for (const t of b.texts || []) {
           const c = clean(t)
           if (!c || c.length < 25) continue
-          bac.push(clip(c, 200))
+          bac.push(clip(c, 400))
           if (bac.length >= 2) break
         }
       }
@@ -110,14 +125,15 @@ for (const fileKey of Object.keys(data)) {
     stats.ideesMax = Math.max(stats.ideesMax, idees.length)
 
     // Numéro de leçon : depuis la clé de fichier (chapitres_X_Y → leçons X, Y)
-    const chapMatch = fileKey.match(/chapitres_(\d+)_(\d+)/)
-    const num = chapMatch ? (li === 0 ? +chapMatch[1] : +chapMatch[2]) : "transcription"
+    const chapMatch = baseFileKey.match(/chapitres_(\d+)_(\d+)/)
+    const partNumber = isSecondPart ? 2 : li + 1
+    const num = chapMatch ? +(partNumber === 1 ? chapMatch[1] : chapMatch[2]) : "transcription"
 
     fiches.push({
-      id: `${fileKey}#${li + 1}`,
-      fileKey,
+      id: `${baseFileKey}#${partNumber}`,
+      fileKey: baseFileKey,
       num,
-      titre: li === 0 ? clean(file.titleAr) : `الدرس ${num}`,
+      titre: clean(file.titleAr),
       breadcrumb: clean(file.breadcrumb || ""),
       achkalia,
       objectif,
@@ -129,7 +145,17 @@ for (const fileKey of Object.keys(data)) {
   })
 }
 
-fs.writeFileSync(outPath, JSON.stringify(fiches, null, 2), "utf8")
+const curated = fs.existsSync(curatedPath)
+  ? JSON.parse(fs.readFileSync(curatedPath, "utf8"))
+  : []
+const generatedIds = new Set(fiches.map((fiche) => fiche.id))
+for (const fiche of curated) {
+  if (generatedIds.has(fiche.id)) throw new Error(`Identifiant de fiche dupliqué: ${fiche.id}`)
+  fiches.push(fiche)
+  generatedIds.add(fiche.id)
+}
+
+fs.writeFileSync(outPath, JSON.stringify(fiches, null, 2) + "\n", "utf8")
 console.log("✅ fiches générées :", outPath)
 console.log("fichiers:", stats.fichiers, "| leçons:", stats.lecons, "| avec quiz:", stats.avecQuiz)
 console.log("idées par fiche : min", stats.ideesMin, "max", stats.ideesMax)
