@@ -749,6 +749,7 @@ Type d'erreur non identifié.
             temperature=cfg.ia_temperature,
             max_tokens=cfg.ia_max_tokens,
             timeout=30.0,
+            feature="engine",
         )
 
         raw = response.choices[0].message.content or ""

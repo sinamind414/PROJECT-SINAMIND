@@ -58,9 +58,18 @@ def sanitize_response(text: str) -> str:
     return text
 
 
-async def call_llm(prompt: str, openai_client=None, max_tokens: int = 350) -> str | None:
+async def call_llm(prompt: str, openai_client=None, max_tokens: int = 350, feature: str = "evaluate") -> str | None:
     """Appelle le LLM avec fallback. Sanitize la réponse avant retour."""
     if not openai_client:
+        return None
+
+    # Budget LLM + kill-switch (G0-3) : si le LLM externe est coupé, on
+    # retourne None (voix « sans IA » existante) — et on ne tente PAS
+    # l'appel direct openai_client plus bas, qui contournerait la porte.
+    from services.llm_budget import get_budget
+
+    if not get_budget().is_allowed(feature):
+        logger.warning(f"🛑 LLM_EXTERNAL_DISABLED | feature={feature} (call_llm) → sans LLM.")
         return None
 
     try:
@@ -80,6 +89,7 @@ async def call_llm(prompt: str, openai_client=None, max_tokens: int = 350) -> st
                 temperature=0.7,
                 max_tokens=max_tokens,
                 timeout=15.0,
+                feature=feature,
             )
             ai_text = (response.choices[0].message.content or "").strip()
             if ai_text:

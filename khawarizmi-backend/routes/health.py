@@ -20,6 +20,15 @@ def _get_state():
     return state
 
 
+def _llm_budget_status() -> dict:
+    try:
+        from services.llm_budget import get_budget
+
+        return get_budget().status()
+    except Exception as e:
+        return {"error": str(e)}
+
+
 @router.get("/", tags=["Système"])
 async def root():
     return {"status": "ok", "app": "khawarizmi"}
@@ -58,6 +67,9 @@ async def health_check():
         "scheduler_initialized": s.scheduler is not None,
         "tutor_initialized": s.tutor is not None,
         "dual_coding_configured": s.dual_coding is not None,
+        # Budget LLM journalier + kill-switch (G0-3) : coût du jour, plafond,
+        # et état de coupure (auto budget / manuel).
+        "llm_budget": _llm_budget_status(),
     }
 
     # rag_chunks count (si DB disponible)

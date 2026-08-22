@@ -16,7 +16,16 @@ def _get_user_plan(request: Request):
         return None
     try:
         cfg = _get_cfg()
-        payload = jwt.decode(token, cfg.SECRET_KEY, algorithms=[cfg.JWT_ALGORITHM])
+        # verify_sub=False : les tokens portent sub en INT (pattern aligné sur
+        # deps.get_current_user — python-jose exigerait une chaîne sinon
+        # JWTClaimsError et la clé rate-limit retombait sur l'IP : tous les
+        # élèves derrière la même IP/NAT partageaient un seul compteur free,
+        # et le tier pro (80/h) n'était jamais appliqué. Bug corrigé 2026-08-21,
+        # tests : tests/test_rate_limit.py.)
+        payload = jwt.decode(
+            token, cfg.SECRET_KEY, algorithms=[cfg.JWT_ALGORITHM],
+            options={"verify_sub": False},
+        )
         return payload.get("sub"), payload.get("plan", "free")
     except Exception:
         return None

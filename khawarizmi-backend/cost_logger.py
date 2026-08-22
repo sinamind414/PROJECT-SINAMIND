@@ -29,6 +29,13 @@ _DEFAULT_LOG_PATH = os.environ.get(
 )
 
 
+def estimate_cost(model: str, input_tokens: int, output_tokens: int) -> float:
+    """Coût d'un appel selon la grille tarifaire (fonction publique,
+    utilisée par le budget LLM — services/llm_budget.py)."""
+    pricing = _PRICING.get(model, _PRICING["gpt-4o-mini"])
+    return (input_tokens * pricing["input"] + output_tokens * pricing["output"]) / 1_000_000
+
+
 class CostLogger:
     def __init__(self, log_path: str = _DEFAULT_LOG_PATH):
         self._path = Path(log_path)
@@ -44,6 +51,7 @@ class CostLogger:
         verb_slug: str = "",
         scenario_id: str = "",
         latency_ms: int = 0,
+        feature: str = "",
     ) -> dict:
         pricing = _PRICING.get(model, _PRICING["gpt-4o-mini"])
         cost = (input_tokens * pricing["input"] + output_tokens * pricing["output"]) / 1_000_000
@@ -59,6 +67,7 @@ class CostLogger:
             "verb_slug": verb_slug,
             "scenario_id": scenario_id,
             "latency_ms": latency_ms,
+            "feature": feature,
         }
 
         with self._lock, open(self._path, "a", encoding="utf-8") as f:

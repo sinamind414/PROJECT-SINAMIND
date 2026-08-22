@@ -24,6 +24,7 @@ from tenacity import retry, stop_after_attempt, wait_exponential
 
 from config import get_settings
 from prompts.evaluation_prompt import EVALUATION_SYSTEM_PROMPT, build_evaluation_prompt
+from services.llm_budget import LLMExternalDisabled, get_budget
 from services.llm_parser import parse_llm_json
 from services.llm_providers import apply_json_mode
 
@@ -84,6 +85,25 @@ def _get_glm47_client():
     return None
 
 
+def _record_llm_usage(response: object, model: str, feature: str) -> None:
+    """Enregistre le coût RÉEL d'un appel LLM externe réussi (G0-3) :
+    cost_log.jsonl (cost_logger) + compteur budgétaire journalier
+    (services/llm_budget). Défensif : un échec de traçage ne doit jamais
+    casser l'appel lui-même."""
+    try:
+        usage = getattr(response, "usage", None)
+        tin = int(getattr(usage, "prompt_tokens", 0) or 0)
+        tout = int(getattr(usage, "completion_tokens", 0) or 0)
+        if tin <= 0 and tout <= 0:
+            return
+        from cost_logger import get_logger
+
+        entry = get_logger().record(model, tin, tout, "", feature=feature)
+        get_budget().record_cost(entry["cost_usd"], model=model)
+    except Exception as e:  # traçage = best-effort
+        logger.debug(f"usage_record_skip | {e!s}")
+
+
 async def _call_with_fallback(
     messages: list,
     primary_client: AsyncOpenAI,
@@ -93,7 +113,22 @@ async def _call_with_fallback(
     timeout: float = 8.0,
     response_validator: Callable[[str], bool] | None = None,
     json_schema: dict | None = None,
+    feature: str = "general",
 ) -> object:
+    # ── Budget LLM + kill-switch (G0-3) : porte d'entrée unique du LLM externe ──
+    budget = get_budget()
+    if not budget.is_allowed(feature):
+        st = budget.status()
+        logger.warning(
+            f"🛑 LLM_EXTERNAL_DISABLED | feature={feature} | "
+            f"day_cost={st['day_cost_usd']} USD / budget={st['budget_usd']} USD | "
+            f"auto_killed={st['auto_killed']} manual_kill={st['manual_kill']} "
+            f"killed_features={st['killed_features']} → bascule étages locaux."
+        )
+        raise LLMExternalDisabled(
+            f"LLM externe désactivé (feature={feature}) : budget journalier "
+            f"dépassé ou kill-switch actif (LLM_KILL / LLM_KILL_FEATURES)."
+        )
     cfg = get_settings()
     providers = []
 
@@ -175,6 +210,7 @@ async def _call_with_fallback(
                 )
                 raise ValueError(f"extract_failed: {ve}")
         _breaker_record_success("primary")
+        _record_llm_usage(primary_response, primary_model, feature)
         return _tag_response_provider(
             primary_response, "primary", primary_model, primary_json
         )
@@ -218,6 +254,7 @@ async def _call_with_fallback(
                     continue
             _breaker_record_success(name)
             logger.info(f"✅ Fallback {name} réussi.")
+            _record_llm_usage(resp, model, feature)
             return _tag_response_provider(resp, name, model, fallback_json)
         except Exception as fallback_err:
             _breaker_record_failure(name)
@@ -266,13 +303,19 @@ REPONSE_ELEVE: {reponse}"""
         messages=messages,
         primary_client=client,
         primary_model=_model,
+        feature="evaluate",
     )
 
     content = response.choices[0].message.content or ""
     result = parse_llm_json(content)
 
     if not result:
-        raise ValueError(f"Échec de l'extraction JSON de la réponse : {content!r}")
+        # Tronqué : la sortie LLM peut citer la réponse de l'élève — on ne
+        # veut pas qu'elle transite entière via le message d'exception
+        # (logs / Sentry). Revue des logs 2026-08-21 (R19).
+        raise ValueError(
+            f"Échec de l'extraction JSON de la réponse : {content[:200]!r}"
+        )
 
     global_score = float(result.get("global_score", 0.0))
     score_10 = int(round(global_score * 10))

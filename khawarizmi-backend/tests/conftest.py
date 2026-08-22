@@ -17,6 +17,12 @@ os.environ.setdefault("DATABASE_URL", "postgresql+asyncpg://postgres:testpass@lo
 os.environ.setdefault("REDIS_URL", "redis://localhost:6379/1")
 os.environ.setdefault("GEMINI_API_KEY", "test-gemini-key")
 os.environ.setdefault("ENVIRONMENT", "test")
+# Log de coût LLM isolé du cost_log.jsonl de prod (tracké dans le repo) :
+# les fakes de LLM de la suite enregistrent de l'usage réel (G0-3).
+os.environ.setdefault(
+    "COST_LOG_PATH",
+    str(Path(__file__).parent / "cost_log_test.jsonl"),
+)
 
 from database import get_db as db_get_db
 from deps import get_db, get_openai

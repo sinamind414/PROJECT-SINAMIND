@@ -1,0 +1,210 @@
+[
+ {
+  "fichier": "annales_sciences_3as",
+  "item": "minhajiya_ملخص-الوحدة02-علاقة-بن-البنية-والوظيفة::q_0",
+  "champ": "reponse_attendue",
+  "verdict": "SUSPECT",
+  "score": 0.169,
+  "formes_presentation": 0,
+  "mots_suspets": [
+   "أ",
+   "أ",
+   "أ",
+   "أ",
+   "األ",
+   "ها",
+   "تسل",
+   "ئات.",
+   "ة..،",
+   "بني",
+   "ة",
+   "ه:ي"
+  ],
+  "extrait": "تمثيل البنية الفراغية للبروتين \n\n \n:تمثيل البنية الفراغية للجزيئات البسيطة \n:يمكن تمثيلها بعدة نماذج أهمها \n( * نموذج الكرة والعودBoules et…"
+ },
+ {
+  "fichier": "exercices/resumes bac",
+  "item": "sciences_resumes.json::minhajiya_ملخص-الوحدة02-علاقة-بن-البنية-والوظيفة_ex_methodologie_1_q_0",
+  "champ": "reponse_attendue",
+  "verdict": "SUSPECT",
+  "score": 0.169,
+  "formes_presentation": 0,
+  "mots_suspets": [
+   "أ",
+   "أ",
+   "أ",
+   "أ",
+   "األ",
+   "ها",
+   "تسل",
+   "ئات.",
+   "ة..،",
+   "بني",
+   "ة",
+   "ه:ي"
+  ],
+  "extrait": "تمثيل البنية الفراغية للبروتين \n\n \n:تمثيل البنية الفراغية للجزيئات البسيطة \n:يمكن تمثيلها بعدة نماذج أهمها \n( * نموذج الكرة والعودBoules et…"
+ },
+ {
+  "fichier": "methodologie (16 doc)",
+  "item": "methodologie::documents[13]/documents[0]/contenu",
+  "champ": "text",
+  "verdict": "SUSPECT",
+  "score": 0.169,
+  "formes_presentation": 0,
+  "mots_suspets": [
+   "أ",
+   "أ",
+   "أ",
+   "أ",
+   "األ",
+   "ها",
+   "تسل",
+   "ئات.",
+   "ة..،",
+   "بني",
+   "ة",
+   "ه:ي"
+  ],
+  "extrait": "تمثيل البنية الفراغية للبروتين \n\n \n:تمثيل البنية الفراغية للجزيئات البسيطة \n:يمكن تمثيلها بعدة نماذج أهمها \n( * نموذج الكرة والعودBoules et…"
+ },
+ {
+  "fichier": "lexique",
+  "item": "lexique::domaines[0]/categories[4]/termes[5]/definition_ar",
+  "champ": "text",
+  "verdict": "SUSPECT",
+  "score": 0.143,
+  "formes_presentation": 0,
+  "mots_suspets": [
+   "فرط",
+   "فتح"
+  ],
+  "extrait": "فرط استقطاب للغشاء بعد المشبكي ناتج عن فتح قنوات Cl- أو K+ بتأثير ناقل عصبي مثبط"
+ },
+ {
+  "fichier": "lexique",
+  "item": "lexique::domaines[0]/categories[4]/termes[16]/definition_ar",
+  "champ": "text",
+  "verdict": "SUSPECT",
+  "score": 0.133,
+  "formes_presentation": 0,
+  "mots_suspets": [
+   "ينص",
+   "إما"
+  ],
+  "extrait": "مبدأ ينص على أن كمون العمل إما ينطلق بسعة قصوى ثابتة أو لا ينطلق أبداً"
+ },
+ {
+  "fichier": "lexique",
+  "item": "lexique::domaines[0]/categories[4]/termes[17]/definition_ar",
+  "champ": "text",
+  "verdict": "SUSPECT",
+  "score": 0.182,
+  "formes_presentation": 0,
+  "mots_suspets": [
+   "قيم",
+   "أقل"
+  ],
+  "extrait": "انخفاض كمون الغشاء نحو قيم أقل سلبية بسبب دخول Na+ إلى الخلية"
+ },
+ {
+  "fichier": "lexique",
+  "item": "lexique::domaines[1]/categories[1]/termes[9]/definition_ar",
+  "champ": "text",
+  "verdict": "SUSPECT",
+  "score": 0.167,
+  "formes_presentation": 0,
+  "mots_suspets": [
+   "حيز",
+   "تضخ"
+  ],
+  "extrait": "حيز بين الغشاءين الخارجي والداخلي للميتوكندري حيث تضخ البروتونات لإحداث التدرج الكهروكيميائي"
+ },
+ {
+  "fichier": "lexique",
+  "item": "lexique::domaines[2]/categories[1]/termes[12]/definition_ar",
+  "champ": "text",
+  "verdict": "SUSPECT",
+  "score": 0.235,
+  "formes_presentation": 0,
+  "mots_suspets": [
+   "(نصف",
+   "قطر",
+   "عال",
+   "جداً"
+  ],
+  "extrait": "الجزء الصلب المركزي للأرض (نصف قطر ~1220 كم) مكون من حديد ونيكل صلبين، في ~5500°C تحت ضغط عال جداً"
+ },
+ {
+  "fichier": "lexique",
+  "item": "lexique::domaines[3]/categories[0]/termes[8]/terme_ar",
+  "champ": "text",
+  "verdict": "SUSPECT",
+  "score": 0.143,
+  "formes_presentation": 0,
+  "mots_suspets": [
+   "صحة"
+  ],
+  "extrait": "تحقق من صحة الفرضية / صادق على فرضية"
+ },
+ {
+  "fichier": "manhadjiya_seed",
+  "item": "manhadjiya::action_verbs[0]/answer_pattern_ar",
+  "champ": "text",
+  "verdict": "SUSPECT",
+  "score": 0.125,
+  "formes_presentation": 0,
+  "mots_suspets": [
+   "شرح"
+  ],
+  "extrait": "اذكر الاسم العلمي المطلوب مباشرة دون شرح طويل."
+ },
+ {
+  "fichier": "manhadjiya_seed",
+  "item": "manhadjiya::action_verbs[9]/answer_pattern_ar",
+  "champ": "text",
+  "verdict": "SUSPECT",
+  "score": 0.125,
+  "formes_presentation": 0,
+  "mots_suspets": [
+   "لزم"
+  ],
+  "extrait": "رسم واضح + بيانات + عنوان + اتجاهات إذا لزم الأمر."
+ },
+ {
+  "fichier": "manhadjiya_seed",
+  "item": "manhadjiya::action_verbs[9]/common_errors_ar[2]",
+  "champ": "text",
+  "verdict": "SUSPECT",
+  "score": 0.167,
+  "formes_presentation": 0,
+  "mots_suspets": [
+   "عدم"
+  ],
+  "extrait": "عدم احترام الوظيفة أو التفسير المطلوب"
+ },
+ {
+  "fichier": "manhadjiya_seed",
+  "item": "manhadjiya::action_verbs[13]/answer_pattern_ar",
+  "champ": "text",
+  "verdict": "SUSPECT",
+  "score": 0.167,
+  "formes_presentation": 0,
+  "mots_suspets": [
+   "فإن"
+  ],
+  "extrait": "كلما ... فإن ... / العلاقة بين X و Y هي ..."
+ },
+ {
+  "fichier": "manhadjiya_seed",
+  "item": "manhadjiya::action_verbs[18]/common_errors_ar[1]",
+  "champ": "text",
+  "verdict": "SUSPECT",
+  "score": 0.167,
+  "formes_presentation": 0,
+  "mots_suspets": [
+   "ربط"
+  ],
+  "extrait": "دليل من الوثيقة دون ربط بالمعرفة"
+ }
+]

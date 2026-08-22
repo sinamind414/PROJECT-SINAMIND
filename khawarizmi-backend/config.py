@@ -35,6 +35,22 @@ class Settings(BaseSettings):
     openai_model: str = "gpt-4o-mini"
     OPENAI_FALLBACK_API_KEY: str = ""
     REAL_OPENAI_API_KEY: str = ""  # DEPRECATED — utiliser OPENAI_API_KEY
+    # ── Budget LLM + kill-switch (G0-3, grille go-no-go-100k) ──────────
+    # Plafond de coût LLM EXTERNE par jour UTC. Dépassement → coupure
+    # automatique du LLM externe pour la journée (fallback local actif,
+    # alerte CRITICAL dans les logs). 0 = pas de plafond automatique.
+    LLM_DAILY_BUDGET_USD: float = 2.0
+    # Kill-switch manuel GLOBAL (LLM_KILL=1) : coupe tout le LLM externe
+    # immédiatement, sans redémarrage (vérifié à chaque appel).
+    LLM_KILL: bool = False
+    # Kill-switch PAR FEATURE : liste de features séparées par des virgules
+    # (ex. "evaluate,chat") — coupe le LLM externe seulement pour ces
+    # trajets, les autres continuent.
+    LLM_KILL_FEATURES: str = ""
+    # Webhook d'alerte BUDGET_KILL (optionnel) : POST JSON
+    # {"event": "BUDGET_KILL", "day", "day_cost_usd", "budget_usd", "model"}
+    # — Telegram/Discord/n8n/Bark… Envoi best-effort (thread fond, 3 s).
+    BUDGET_ALERT_WEBHOOK: str = ""
     ia_temperature: float = 0.3
     ia_max_tokens: int = 600
     AI_MODEL_PRIMARY: str = "gemini-2.5-flash"

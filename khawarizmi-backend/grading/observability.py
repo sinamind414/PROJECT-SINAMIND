@@ -29,6 +29,7 @@ logger = logging.getLogger("khawarizmi.observability")
 try:
     from prometheus_client import (
         Counter,
+        Gauge,
         Histogram,
         generate_latest,
     )
@@ -36,7 +37,7 @@ try:
     _ENABLED = True
 except Exception:  # pragma: no cover — dépendance optionnelle
     _ENABLED = False
-    Counter = Histogram = generate_latest = None  # type: ignore[assignment,misc]
+    Counter = Gauge = Histogram = generate_latest = None  # type: ignore[assignment,misc]
 
 
 def is_enabled() -> bool:
@@ -82,9 +83,23 @@ if _ENABLED:
         ["step"],
         buckets=(5, 20, 50, 100, 250, 500, 1000, 3000, float("inf")),
     )
+    # Budget LLM (G0-3) : coût du jour UTC + état de coupure.
+    _llm_budget_cost = Gauge(
+        "llm_budget_day_cost_usd",
+        "Coût LLM externe du jour UTC (USD)",
+    )
+    _llm_budget_killed = Gauge(
+        "llm_budget_auto_killed",
+        "1 = LLM externe coupé (budget journalier dépassé)",
+    )
+    _llm_budget_kills = Counter(
+        "llm_budget_kills_total",
+        "Nombre de coupures budget (BUDGET_KILL)",
+    )
 else:  # pragma: no cover — no-op
     _grading_source = _parse_strategy = _cache_ops = _pipeline_events = None
     _llm_latency = _chatbot_messages = _chatbot_step = None
+    _llm_budget_cost = _llm_budget_killed = _llm_budget_kills = None
 
 
 # ── Fonctions d'enregistrement (no-op si désactivé) ──────────────────
@@ -124,6 +139,19 @@ def observe_chatbot_step(step: str, duration_ms: float) -> None:
         _chatbot_step.labels(step=step).observe(duration_ms)
 
 
+def observe_llm_budget(day_cost_usd: float, auto_killed: bool) -> None:
+    """État du budget LLM (G0-3) — appelé par services/llm_budget."""
+    if _ENABLED:
+        _llm_budget_cost.set(day_cost_usd)
+        _llm_budget_killed.set(1.0 if auto_killed else 0.0)
+
+
+def record_budget_kill() -> None:
+    """Une coupure budget (BUDGET_KILL) a eu lieu (G0-3)."""
+    if _ENABLED:
+        _llm_budget_kills.inc()
+
+
 def metrics_text() -> str:
     """Texte Prometheus (format exposition) — vide si désactivé."""
     if not _ENABLED:
@@ -144,7 +172,9 @@ def metrics_summary() -> dict[str, Any]:
         if metric.name in ("grading_source", "parse_strategy",
                            "correction_cache_ops",
                            "grading_pipeline_events",
-                           "chatbot_messages"):
+                           "chatbot_messages",
+                           "llm_budget_cost", "llm_budget_killed",
+                           "llm_budget_kills"):
             samples: dict[str, float] = {}
             for s in metric.samples:
                 # Ignorer le sample *_created (gauge timestamp) — seule la

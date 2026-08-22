@@ -135,6 +135,7 @@ async def get_socratic_hint(
             primary_model=cfg.openai_model,
             temperature=0.7,
             max_tokens=512,
+            feature="tutor",
         )
         content = response.choices[0].message.content or ""
         # Nettoyer les fences markdown avant parse

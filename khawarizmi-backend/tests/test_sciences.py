@@ -13,9 +13,11 @@ def tester_sciences():
     data_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data")
     tutor = KhawarizmiTutor(data_dir=data_dir)
 
-    # Sujet et question issus de l'annale Sciences
-    sujet_id = "revision_605_questions"
-    question_id = "q_6"
+    # Sujet et question issus de l'annale Sciences — source SANE : la banque
+    # « revision_605_questions » (100 % OCR corrompu) a été purgée le
+    # 2026-08-22 (audit docs/audit-contenu/rapport-corruption-ocr-2026-08-22.md).
+    sujet_id = "el_mojtahid_3as"
+    question_id = "q1_mojtahid_transcription"
 
     # Simuler une réponse d'élève pour l'Analyse (où il fait une erreur de méthode par ex)
     student_input = "نلاحظ خروج البروتين"
