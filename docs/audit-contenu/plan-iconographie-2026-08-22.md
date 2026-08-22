@@ -5,13 +5,13 @@
 > (ré-exécutable à chaque évolution du cours) · inventaire machine :
 > `docs/audit-contenu/iconographie_inventaire.json`.
 
-## 1. Situation constatée
+## 1. Situation initiale et état actuel
 
-Le cours intégral (10 007 lignes, 11 unités) contient pour chaque unité une
-section « 🗺️ وصف الرسوم التوضيحية (لتوليدها بأدوات الذكاء الاصطناعية) » —
-**les schémas sont décrits (contenu, couleurs, étiquettes, mécanisme) mais ne
-sont pas produits**. Exemple (U1, figure 1 — transcription, 363 caractères de
-spec) :
+Le cours intégral (10 007 lignes, 11 unités) contenait pour chaque unité une
+section « 🗺️ وصف الرسوم التوضيحية (لتوليدها بأدوات الذكاء الاصطناعية) » :
+les schémas étaient décrits mais non produits. **Au 2026-08-22, 35/35
+propositions techniques existent dans `docs/`, mais 0/35 est validée ou
+publiable**. Exemple de spec (U1, figure 1 — transcription) :
 
 > « Noyau d'une eucaryote, molécule d'ADN partiellement ouverte, ARN
 > polymérase (ellipse bleue) avançant sur la chaîne codante de droite à
@@ -35,7 +35,7 @@ La spec est prête — il manque la production.
 | U9 — Activité tectonique des plaques | 3 | Carte des plaques · Coupes des 3 types de limites · Courants de convection |
 | U10 — Structure interne du globe | 3 | Sismogramme et interprétation · Zones d'ombre sismiques · Coupe globale de la Terre |
 | U11 — Structures géologiques | 3 | plaque océanique au niveau de la dorsale · Séquence ophiolithique · Cycle de Wilson |
-| **TOTAL** | **35** | **35 figures à produire (specs 100 % prêtes)** |
+| **TOTAL** | **35** | **35 specs prêtes · 35 propositions produites · 0 validée** |
 
 ## 3. Constat U7 (Respiration cellulaire) — **RESTAURÉ le 2026-08-22** ✅
 
@@ -76,9 +76,9 @@ subduction/ophiolite. P2 = le reste du programme.
    - **Schémas d'ultrastructure / cycles → génération IA assistée** possible
      (les specs sont écrites pour ça), sous relecture stricte.
 3. **Relecture scientifique** (1 enseignant SVT par figure) — critères
-   d'acceptation : exactitude des étiquettes ; nomenclature FR/AR **identique
-   au manuel officiel** ; lisibilité en A4 ; légende type Bac (« document 1 :
-   … »).
+   d'acceptation : exactitude des étiquettes ; nomenclature FR/AR confrontée
+   au manuel 3AS validé lorsque la pièce source sera archivée ; lisibilité A4
+   et légende type Bac (« document 1 : … »).
 4. **Intégration** : dans le cours (remplacement de la section « à générer »
    par la figure + légende) et dans les blocs de leçon si pertinent ;
    traçabilité (qui a relu, quand).
@@ -113,8 +113,9 @@ oxydative U7 · ophiolithe + cycle de Wilson U11.
   avant relecture enseignant).
 - Note de méthode : le modèle ajoute parfois des étiquettes EN — remplacées
   par l'arabe officiel en relecture (point 2 de la checklist).
-- **Reste : P2 (15 figures)** — à lancer sur GO (plafond 10 images/turn →
-  2 tranches).
+- **P2 produite : 15/15 propositions** dans `figures-pilote-p2/`.
+- **Reste bloquant :** relecture scientifique humaine 35/35, overlay AR/FR
+  35/35 et tests mobile/A4 consignés ; aucune publication avant ces étapes.
 
 ## 8. Reçu (R-Audit-ICÔNO)
 
@@ -123,6 +124,7 @@ oxydative U7 · ophiolithe + cycle de Wilson U11.
   présents en format non capté)
 - **U7 RESTAURÉE le 2026-08-22** : en-tête + 15 marqueurs `## ` + 4 specs
   reformatées (contenu non altéré, vérifications de cohérence passées)
-- **État final : 11 unités / 35 figures (specs 100 % prêtes) · 35 figures à
-  produire** — inventaire re-exécutable : `audit_iconography_inventory.py` +
-  JSON `iconographie_inventaire.json` (specs complètes, 196-363 car./figure)
+- **État de production : 11 unités / 35 specs / 35 propositions** — inventaire
+  re-exécutable : `audit_iconography_inventory.py` + JSON
+  `iconographie_inventaire.json` ; contrôle publication/accessibilité :
+  `iconography-manifest.json` (**0 validation humaine, 0 publiable**).

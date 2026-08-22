@@ -91,6 +91,8 @@
 
 **Acceptation :** 35/35 figures relues, labels AR/FR, provenance, lisibilité mobile/A4, texte alternatif et validation enseignant.
 
+**État : PRODUCTION TECHNIQUE TERMINÉE, PUBLICATION BLOQUÉE —** 35/35 propositions sont produites et inventoriées avec hash, provenance, listes de labels AR/FR et textes alternatifs AR/FR. Les labels vectoriels ne sont pas encore appliqués, la lisibilité mobile/A4 reste à confirmer humainement et la validation enseignante est **0/35** ; aucune figure n’est intégrée au produit. U8-F3 est explicitement classée enrichissement hors socle.
+
 ## Lot 7 — Validation humaine et publication
 
 **But :** passer du formatif au publiable.

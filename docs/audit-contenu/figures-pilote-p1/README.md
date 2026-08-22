@@ -1,10 +1,9 @@
-# Pilote iconographique P1 — 4 PROPOSITIONS sous relecture (2026-08-22)
+# Vague iconographique P1 — 20 PROPOSITIONS sous relecture (2026-08-22)
 
 > **STATUT : PROPOSITIONS — NE PAS PUBLIER ni intégrer au cours avant
-> relecture enseignant SVT.** Ces 4 figures sont les premières du plan
-> iconographique (`plan-iconographie-2026-08-22.md`) : elles valident le
-> pipeline (spec → génération → relecture → intégration) et lancent la
-> vague P1 (20 figures type Bac).
+> relecture enseignant SVT.** Les 4 premières figures ont validé le pipeline
+> technique ; les trois tranches totalisent maintenant 20 propositions P1.
+> Validation enseignante : 0/20. Overlay bilingue AR/FR : 0/20.
 
 ## Méthode
 
@@ -28,8 +27,8 @@
 
 ## Checklist de relecture (par figure — à signer)
 
-1. ☐ Exactitude scientifique des structures/éléments (confrontée au manuel
-   officiel 3AS).
+1. ☐ Exactitude scientifique des structures/éléments (à confronter au manuel
+   3AS validé dès archivage de la pièce source).
 2. ☐ Étiquettes arabes ajoutées (surimpression vectorielle) + légende type
    Bac « Document 1 : … ».
 3. ☐ Détails spécifiques au point « à traiter » ci-contre.
@@ -71,19 +70,17 @@ au point 2 de la checklist, ce n'est pas un défaut de fond).
 | 19 | `u11-fig2-ophiolite-proposition.png` | U11 — Séquence ophiolitique | ✅ panneau gauche : plaque océanique (6 couches + magma) · panneau droit : même pile inclinée dans un prisme continental brun · flèche de transfert | étiquettes AR (basalte en coussins, filons, gabbro, péridotite) |
 | 20 | `u11-fig3-wilson-cycle-proposition.png` | U11 — Cycle de Wilson | ✅ 6 coupes circulaires : rift → océan jeune → océan mature → subduction/arc → océan rétréci → collision/orogénèse · couleurs cohérentes (brique/mar/rouge/orange) | étiquettes AR des 6 phases |
 
-## Vague P2 (15 figures) — à lancer sur GO
+## Vague P2 (15 figures) — propositions produites 15/15
 
-U1 (transcription, traduction, polyribosome) · U2 (4 structures, hémoglobine
-drépanocytique, collagène) · U8 (bilan énergétique, cellule animale/végétale,
-pyramide) · U9 (carte des plaques, 3 types de limites, convection) · U10
-(sismogramme, zones d'ombre, coupe de la Terre). Specs prêtes dans l'inventaire.
+U1, U2, U8, U9 et U10 sont produits sous le même statut bloqué. Inventaire,
+points d’amendement et accessibilité : `../figures-pilote-p2/README.md` et
+`../iconography-manifest.json`. Aucune proposition P1/P2 n’est publiée.
 
 ## Résultat du pilote
 
-- 4/4 conformes aux specs sur le fond (structures, code couleur, flux) —
-  qualité « base de publication » après relecture.
+- Pré-contrôle agent uniquement : 20 fichiers présents et rapprochés des
+  specs ; cela ne vaut ni conformité scientifique ni validation humaine.
 - Temps réel de production : ~1 figure / 2 min (génération) — l'effort du
-  plan (~50-80 h) est dominé par la **relecture** (30 min/figure) et
-  l'ajout des étiquettes (15-30 min/figure), pas par la génération.
-- **Prochaine tranche** (sur GO) : les 16 autres figures P1 (U3 ×2, U4 ×3,
-  U5 ×2, U6 ×2, U7 ×4, U11 ×2) puis P2 (15).
+  plan reste dominé par la **relecture**, l’overlay AR/FR et les tests
+  mobile/A4.
+- État global après P2 : 35 propositions produites, 0 validée, 0 publiable.

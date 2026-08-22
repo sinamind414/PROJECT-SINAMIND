@@ -1,0 +1,2092 @@
+{
+  "metadata": {
+    "version": "2026-08-22.1",
+    "count": 35,
+    "p1Count": 20,
+    "p2Count": 15,
+    "producedProposals": 35,
+    "humanValidated": 0,
+    "publicationReady": 0,
+    "labelOverlayComplete": 0,
+    "status": "PROPOSALS_BLOCKED_PENDING_TEACHER_REVIEW",
+    "noticeFr": "Production technique complète; aucune figure n'est validée ni publiable sans relecture humaine et surimpression AR/FR.",
+    "noticeAr": "اكتمل الإنتاج التقني للمقترحات، لكن لا يوجد أي شكل معتمد أو قابل للنشر قبل المراجعة البشرية وإضافة الملصقات AR/FR."
+  },
+  "figures": [
+    {
+      "id": "u1-fig1",
+      "unit": 1,
+      "figure": 1,
+      "tier": "P2",
+      "titleAr": "الاستنساخ",
+      "titleFr": "Transcription",
+      "file": "docs/audit-contenu/figures-pilote-p2/u1-fig1-transcription-proposition.png",
+      "sha256": "a96ebfa875df54248ad617d25396cead4f2d5819b23cb93d74397afed8950e92",
+      "width": 1376,
+      "height": 768,
+      "aspectRatio": 1.792,
+      "sourceSpec": "docs/audit-contenu/iconographie_inventaire.json",
+      "sourceAuthority": "internal_pending_teacher",
+      "productionMethod": "AI-generated proposal from internal specification",
+      "productionDate": "2026-08-22",
+      "isEnrichment": false,
+      "labelsAr": [
+        "النواة",
+        "ADN",
+        "ARN بوليميراز",
+        "ARNm",
+        "المسام النووية",
+        "الريبوزوم"
+      ],
+      "labelsFr": [
+        "Noyau",
+        "ADN",
+        "ARN polymérase",
+        "ARNm",
+        "Pore nucléaire",
+        "Ribosome"
+      ],
+      "labelOverlayStatus": "pending_vector_overlay",
+      "altAr": "مقترح رسم علمي يوضح الاستنساخ. العناصر الأساسية: النواة، ADN، ARN بوليميراز، ARNm، المسام النووية، الريبوزوم.",
+      "altFr": "Proposition de schéma scientifique illustrant Transcription. Éléments clés : Noyau, ADN, ARN polymérase, ARNm, Pore nucléaire, Ribosome.",
+      "accessibility": {
+        "highResolution": true,
+        "mobileReadableCandidate": true,
+        "a4ReadableCandidate": true,
+        "bilingualTextAlternativePresent": true,
+        "visualContrast": "requires_human_check"
+      },
+      "precheck": {
+        "status": "agent_precheck_only",
+        "note": "Vérifier le brin matrice, le sens 3′→5′ de lecture et la synthèse 5′→3′ de l'ARNm."
+      },
+      "humanReview": {
+        "status": "required",
+        "reviewer": null,
+        "reviewedAt": null,
+        "decision": null,
+        "scientificAccuracy": false,
+        "bilingualLabelsApplied": false,
+        "mobilePrintReadability": false
+      },
+      "publicationStatus": "blocked_pending_teacher_review",
+      "licenseStatus": "internal_proposal_not_cleared_for_publication"
+    },
+    {
+      "id": "u1-fig2",
+      "unit": 1,
+      "figure": 2,
+      "tier": "P2",
+      "titleAr": "مراحل الترجمة",
+      "titleFr": "Étapes de la traduction",
+      "file": "docs/audit-contenu/figures-pilote-p2/u1-fig2-translation-stages-proposition.png",
+      "sha256": "503e8b36da2a703ffc4357ab462f7353d329bf84ca9b71542b0643e4e3909585",
+      "width": 1376,
+      "height": 768,
+      "aspectRatio": 1.792,
+      "sourceSpec": "docs/audit-contenu/iconographie_inventaire.json",
+      "sourceAuthority": "internal_pending_teacher",
+      "productionMethod": "AI-generated proposal from internal specification",
+      "productionDate": "2026-08-22",
+      "isEnrichment": false,
+      "labelsAr": [
+        "البداية",
+        "الاستطالة",
+        "النهاية",
+        "ARNm",
+        "ARNt",
+        "الريبوزوم",
+        "السلسلة الببتيدية"
+      ],
+      "labelsFr": [
+        "Initiation",
+        "Élongation",
+        "Terminaison",
+        "ARNm",
+        "ARNt",
+        "Ribosome",
+        "Chaîne peptidique"
+      ],
+      "labelOverlayStatus": "pending_vector_overlay",
+      "altAr": "مقترح رسم علمي يوضح مراحل الترجمة. العناصر الأساسية: البداية، الاستطالة، النهاية، ARNm، ARNt، الريبوزوم، السلسلة الببتيدية.",
+      "altFr": "Proposition de schéma scientifique illustrant Étapes de la traduction. Éléments clés : Initiation, Élongation, Terminaison, ARNm, ARNt, Ribosome, Chaîne peptidique.",
+      "accessibility": {
+        "highResolution": true,
+        "mobileReadableCandidate": true,
+        "a4ReadableCandidate": true,
+        "bilingualTextAlternativePresent": true,
+        "visualContrast": "requires_human_check"
+      },
+      "precheck": {
+        "status": "agent_precheck_only",
+        "note": "Remplacer tous les labels anglais; vérifier les sites A/P/E et le facteur de terminaison."
+      },
+      "humanReview": {
+        "status": "required",
+        "reviewer": null,
+        "reviewedAt": null,
+        "decision": null,
+        "scientificAccuracy": false,
+        "bilingualLabelsApplied": false,
+        "mobilePrintReadability": false
+      },
+      "publicationStatus": "blocked_pending_teacher_review",
+      "licenseStatus": "internal_proposal_not_cleared_for_publication"
+    },
+    {
+      "id": "u1-fig3",
+      "unit": 1,
+      "figure": 3,
+      "tier": "P2",
+      "titleAr": "متعدد الريبوزوم",
+      "titleFr": "Polyribosome",
+      "file": "docs/audit-contenu/figures-pilote-p2/u1-fig3-polyribosome-proposition.png",
+      "sha256": "b3093e98b475289c314f6b53e676ee813f2a544af9a0742b42837bd685228c71",
+      "width": 1376,
+      "height": 768,
+      "aspectRatio": 1.792,
+      "sourceSpec": "docs/audit-contenu/iconographie_inventaire.json",
+      "sourceAuthority": "internal_pending_teacher",
+      "productionMethod": "AI-generated proposal from internal specification",
+      "productionDate": "2026-08-22",
+      "isEnrichment": false,
+      "labelsAr": [
+        "ARNm",
+        "الريبوزومات",
+        "السلاسل الببتيدية",
+        "اتجاه القراءة"
+      ],
+      "labelsFr": [
+        "ARNm",
+        "Ribosomes",
+        "Chaînes peptidiques",
+        "Sens de lecture"
+      ],
+      "labelOverlayStatus": "pending_vector_overlay",
+      "altAr": "مقترح رسم علمي يوضح متعدد الريبوزوم. العناصر الأساسية: ARNm، الريبوزومات، السلاسل الببتيدية، اتجاه القراءة.",
+      "altFr": "Proposition de schéma scientifique illustrant Polyribosome. Éléments clés : ARNm, Ribosomes, Chaînes peptidiques, Sens de lecture.",
+      "accessibility": {
+        "highResolution": true,
+        "mobileReadableCandidate": true,
+        "a4ReadableCandidate": true,
+        "bilingualTextAlternativePresent": true,
+        "visualContrast": "requires_human_check"
+      },
+      "precheck": {
+        "status": "agent_precheck_only",
+        "note": "Vérifier que la longueur des chaînes augmente dans le sens de lecture de l'ARNm."
+      },
+      "humanReview": {
+        "status": "required",
+        "reviewer": null,
+        "reviewedAt": null,
+        "decision": null,
+        "scientificAccuracy": false,
+        "bilingualLabelsApplied": false,
+        "mobilePrintReadability": false
+      },
+      "publicationStatus": "blocked_pending_teacher_review",
+      "licenseStatus": "internal_proposal_not_cleared_for_publication"
+    },
+    {
+      "id": "u2-fig1",
+      "unit": 2,
+      "figure": 1,
+      "tier": "P2",
+      "titleAr": "المستويات الأربعة للبنية الفراغية",
+      "titleFr": "Quatre niveaux de structure protéique",
+      "file": "docs/audit-contenu/figures-pilote-p2/u2-fig1-protein-structure-levels-proposition.png",
+      "sha256": "f1ec9a2341c4203aa57b0986323211f9b8821b8b430c4a27aff9ad67f168e198",
+      "width": 1376,
+      "height": 768,
+      "aspectRatio": 1.792,
+      "sourceSpec": "docs/audit-contenu/iconographie_inventaire.json",
+      "sourceAuthority": "internal_pending_teacher",
+      "productionMethod": "AI-generated proposal from internal specification",
+      "productionDate": "2026-08-22",
+      "isEnrichment": false,
+      "labelsAr": [
+        "البنية الأولية",
+        "البنية الثانوية",
+        "البنية الثالثية",
+        "البنية الرابعية"
+      ],
+      "labelsFr": [
+        "Structure primaire",
+        "Structure secondaire",
+        "Structure tertiaire",
+        "Structure quaternaire"
+      ],
+      "labelOverlayStatus": "pending_vector_overlay",
+      "altAr": "مقترح رسم علمي يوضح المستويات الأربعة للبنية الفراغية. العناصر الأساسية: البنية الأولية، البنية الثانوية، البنية الثالثية، البنية الرابعية.",
+      "altFr": "Proposition de schéma scientifique illustrant Quatre niveaux de structure protéique. Éléments clés : Structure primaire, Structure secondaire, Structure tertiaire, Structure quaternaire.",
+      "accessibility": {
+        "highResolution": true,
+        "mobileReadableCandidate": true,
+        "a4ReadableCandidate": true,
+        "bilingualTextAlternativePresent": true,
+        "visualContrast": "requires_human_check"
+      },
+      "precheck": {
+        "status": "agent_precheck_only",
+        "note": "Vérifier l'hélice alpha, le feuillet bêta et l'assemblage quaternaire; ajouter les liaisons pertinentes."
+      },
+      "humanReview": {
+        "status": "required",
+        "reviewer": null,
+        "reviewedAt": null,
+        "decision": null,
+        "scientificAccuracy": false,
+        "bilingualLabelsApplied": false,
+        "mobilePrintReadability": false
+      },
+      "publicationStatus": "blocked_pending_teacher_review",
+      "licenseStatus": "internal_proposal_not_cleared_for_publication"
+    },
+    {
+      "id": "u2-fig2",
+      "unit": 2,
+      "figure": 2,
+      "tier": "P2",
+      "titleAr": "الهيموغلوبين الطبيعي والمنجلي",
+      "titleFr": "Hémoglobine normale et drépanocytaire",
+      "file": "docs/audit-contenu/figures-pilote-p2/u2-fig2-hemoglobin-sickle-proposition.png",
+      "sha256": "f9ac0f975b30bb1090498c69a6a8a5d43d3d562b8042f228c2b79c7c429232d6",
+      "width": 1376,
+      "height": 768,
+      "aspectRatio": 1.792,
+      "sourceSpec": "docs/audit-contenu/iconographie_inventaire.json",
+      "sourceAuthority": "internal_pending_teacher",
+      "productionMethod": "AI-generated proposal from internal specification",
+      "productionDate": "2026-08-22",
+      "isEnrichment": false,
+      "labelsAr": [
+        "كرية حمراء طبيعية",
+        "كرية منجلية",
+        "HbA",
+        "HbS",
+        "Glu",
+        "Val",
+        "الليف البروتيني"
+      ],
+      "labelsFr": [
+        "Hématie normale",
+        "Hématie falciforme",
+        "HbA",
+        "HbS",
+        "Glu",
+        "Val",
+        "Fibre protéique"
+      ],
+      "labelOverlayStatus": "pending_vector_overlay",
+      "altAr": "مقترح رسم علمي يوضح الهيموغلوبين الطبيعي والمنجلي. العناصر الأساسية: كرية حمراء طبيعية، كرية منجلية، HbA، HbS، Glu، Val، الليف البروتيني.",
+      "altFr": "Proposition de schéma scientifique illustrant Hémoglobine normale et drépanocytaire. Éléments clés : Hématie normale, Hématie falciforme, HbA, HbS, Glu, Val, Fibre protéique.",
+      "accessibility": {
+        "highResolution": true,
+        "mobileReadableCandidate": true,
+        "a4ReadableCandidate": true,
+        "bilingualTextAlternativePresent": true,
+        "visualContrast": "requires_human_check"
+      },
+      "precheck": {
+        "status": "agent_precheck_only",
+        "note": "Remplacer les labels anglais; expliciter β6 Glu→Val sans suggérer une mutation de plusieurs résidus."
+      },
+      "humanReview": {
+        "status": "required",
+        "reviewer": null,
+        "reviewedAt": null,
+        "decision": null,
+        "scientificAccuracy": false,
+        "bilingualLabelsApplied": false,
+        "mobilePrintReadability": false
+      },
+      "publicationStatus": "blocked_pending_teacher_review",
+      "licenseStatus": "internal_proposal_not_cleared_for_publication"
+    },
+    {
+      "id": "u2-fig3",
+      "unit": 2,
+      "figure": 3,
+      "tier": "P2",
+      "titleAr": "بنية الكولاجين",
+      "titleFr": "Structure du collagène",
+      "file": "docs/audit-contenu/figures-pilote-p2/u2-fig3-collagen-proposition.png",
+      "sha256": "ed654c9347147f4df3f2e242f1eb2afb7fa8894fa90c006bebbaf5c56f7fba08",
+      "width": 1376,
+      "height": 768,
+      "aspectRatio": 1.792,
+      "sourceSpec": "docs/audit-contenu/iconographie_inventaire.json",
+      "sourceAuthority": "internal_pending_teacher",
+      "productionMethod": "AI-generated proposal from internal specification",
+      "productionDate": "2026-08-22",
+      "isEnrichment": false,
+      "labelsAr": [
+        "ثلاث سلاسل ببتيدية",
+        "حلزون ثلاثي",
+        "Gly",
+        "Pro",
+        "Hyp",
+        "لييف كولاجيني"
+      ],
+      "labelsFr": [
+        "Trois chaînes peptidiques",
+        "Triple hélice",
+        "Gly",
+        "Pro",
+        "Hyp",
+        "Fibrille de collagène"
+      ],
+      "labelOverlayStatus": "pending_vector_overlay",
+      "altAr": "مقترح رسم علمي يوضح بنية الكولاجين. العناصر الأساسية: ثلاث سلاسل ببتيدية، حلزون ثلاثي، Gly، Pro، Hyp، لييف كولاجيني.",
+      "altFr": "Proposition de schéma scientifique illustrant Structure du collagène. Éléments clés : Trois chaînes peptidiques, Triple hélice, Gly, Pro, Hyp, Fibrille de collagène.",
+      "accessibility": {
+        "highResolution": true,
+        "mobileReadableCandidate": true,
+        "a4ReadableCandidate": true,
+        "bilingualTextAlternativePresent": true,
+        "visualContrast": "requires_human_check"
+      },
+      "precheck": {
+        "status": "agent_precheck_only",
+        "note": "Vérifier la triple hélice, Gly tous les trois résidus et le passage vers la fibrille."
+      },
+      "humanReview": {
+        "status": "required",
+        "reviewer": null,
+        "reviewedAt": null,
+        "decision": null,
+        "scientificAccuracy": false,
+        "bilingualLabelsApplied": false,
+        "mobilePrintReadability": false
+      },
+      "publicationStatus": "blocked_pending_teacher_review",
+      "licenseStatus": "internal_proposal_not_cleared_for_publication"
+    },
+    {
+      "id": "u3-fig1",
+      "unit": 3,
+      "figure": 1,
+      "tier": "P1",
+      "titleAr": "نموذج القفل والمفتاح مقابل التلاؤم المحفّز",
+      "titleFr": "Clé-serrure et ajustement induit",
+      "file": "docs/audit-contenu/figures-pilote-p1/u3-fig1-clef-serrure-proposition.png",
+      "sha256": "4cc1f08757fb9a053211ffde8fc7ca9210e8b0667bc2a71aff0d48107a88a27e",
+      "width": 1408,
+      "height": 768,
+      "aspectRatio": 1.833,
+      "sourceSpec": "docs/audit-contenu/iconographie_inventaire.json",
+      "sourceAuthority": "internal_pending_teacher",
+      "productionMethod": "AI-generated proposal from internal specification",
+      "productionDate": "2026-08-22",
+      "isEnrichment": false,
+      "labelsAr": [
+        "الإنزيم",
+        "الموقع الفعال",
+        "الركيزة",
+        "معقد ES",
+        "التلاؤم المحفز"
+      ],
+      "labelsFr": [
+        "Enzyme",
+        "Site actif",
+        "Substrat",
+        "Complexe ES",
+        "Ajustement induit"
+      ],
+      "labelOverlayStatus": "pending_vector_overlay",
+      "altAr": "مقترح رسم علمي يوضح نموذج القفل والمفتاح مقابل التلاؤم المحفّز. العناصر الأساسية: الإنزيم، الموقع الفعال، الركيزة، معقد ES، التلاؤم المحفز.",
+      "altFr": "Proposition de schéma scientifique illustrant Clé-serrure et ajustement induit. Éléments clés : Enzyme, Site actif, Substrat, Complexe ES, Ajustement induit.",
+      "accessibility": {
+        "highResolution": true,
+        "mobileReadableCandidate": true,
+        "a4ReadableCandidate": true,
+        "bilingualTextAlternativePresent": true,
+        "visualContrast": "requires_human_check"
+      },
+      "precheck": {
+        "status": "agent_precheck_only",
+        "note": "Appliquer les points de relecture consignés dans figures-pilote-p1/README.md."
+      },
+      "humanReview": {
+        "status": "required",
+        "reviewer": null,
+        "reviewedAt": null,
+        "decision": null,
+        "scientificAccuracy": false,
+        "bilingualLabelsApplied": false,
+        "mobilePrintReadability": false
+      },
+      "publicationStatus": "blocked_pending_teacher_review",
+      "licenseStatus": "internal_proposal_not_cleared_for_publication"
+    },
+    {
+      "id": "u3-fig2",
+      "unit": 3,
+      "figure": 2,
+      "tier": "P1",
+      "titleAr": "منحنيات تأثير pH",
+      "titleFr": "Influence du pH sur l'activité enzymatique",
+      "file": "docs/audit-contenu/figures-pilote-p1/u3-fig2-ph-curves-proposition.png",
+      "sha256": "89bf4d02699e04a9445e1fa7ec52f14cb21292b1021f8d440cd00e771d78b764",
+      "width": 1408,
+      "height": 768,
+      "aspectRatio": 1.833,
+      "sourceSpec": "docs/audit-contenu/iconographie_inventaire.json",
+      "sourceAuthority": "internal_pending_teacher",
+      "productionMethod": "AI-generated proposal from internal specification",
+      "productionDate": "2026-08-22",
+      "isEnrichment": false,
+      "labelsAr": [
+        "سرعة التفاعل",
+        "pH",
+        "بيبسين",
+        "أميلاز",
+        "تريبسين",
+        "pH أمثل"
+      ],
+      "labelsFr": [
+        "Vitesse",
+        "pH",
+        "Pepsine",
+        "Amylase",
+        "Trypsine",
+        "pH optimal"
+      ],
+      "labelOverlayStatus": "pending_vector_overlay",
+      "altAr": "مقترح رسم علمي يوضح منحنيات تأثير pH. العناصر الأساسية: سرعة التفاعل، pH، بيبسين، أميلاز، تريبسين، pH أمثل.",
+      "altFr": "Proposition de schéma scientifique illustrant Influence du pH sur l'activité enzymatique. Éléments clés : Vitesse, pH, Pepsine, Amylase, Trypsine, pH optimal.",
+      "accessibility": {
+        "highResolution": true,
+        "mobileReadableCandidate": true,
+        "a4ReadableCandidate": true,
+        "bilingualTextAlternativePresent": true,
+        "visualContrast": "requires_human_check"
+      },
+      "precheck": {
+        "status": "agent_precheck_only",
+        "note": "Appliquer les points de relecture consignés dans figures-pilote-p1/README.md."
+      },
+      "humanReview": {
+        "status": "required",
+        "reviewer": null,
+        "reviewedAt": null,
+        "decision": null,
+        "scientificAccuracy": false,
+        "bilingualLabelsApplied": false,
+        "mobilePrintReadability": false
+      },
+      "publicationStatus": "blocked_pending_teacher_review",
+      "licenseStatus": "internal_proposal_not_cleared_for_publication"
+    },
+    {
+      "id": "u3-fig3",
+      "unit": 3,
+      "figure": 3,
+      "tier": "P1",
+      "titleAr": "منحنى تأثير درجة الحرارة",
+      "titleFr": "Influence de la température sur l'activité enzymatique",
+      "file": "docs/audit-contenu/figures-pilote-p1/u3-fig3-temp-curve-proposition.png",
+      "sha256": "22dba206c69632775df690575c84e7ef045ce30d9b2cc032131331772460aa84",
+      "width": 1408,
+      "height": 768,
+      "aspectRatio": 1.833,
+      "sourceSpec": "docs/audit-contenu/iconographie_inventaire.json",
+      "sourceAuthority": "internal_pending_teacher",
+      "productionMethod": "AI-generated proposal from internal specification",
+      "productionDate": "2026-08-22",
+      "isEnrichment": false,
+      "labelsAr": [
+        "سرعة التفاعل",
+        "درجة الحرارة",
+        "درجة مثلى",
+        "التصادمات",
+        "التمسخ"
+      ],
+      "labelsFr": [
+        "Vitesse",
+        "Température",
+        "Température optimale",
+        "Collisions",
+        "Dénaturation"
+      ],
+      "labelOverlayStatus": "pending_vector_overlay",
+      "altAr": "مقترح رسم علمي يوضح منحنى تأثير درجة الحرارة. العناصر الأساسية: سرعة التفاعل، درجة الحرارة، درجة مثلى، التصادمات، التمسخ.",
+      "altFr": "Proposition de schéma scientifique illustrant Influence de la température sur l'activité enzymatique. Éléments clés : Vitesse, Température, Température optimale, Collisions, Dénaturation.",
+      "accessibility": {
+        "highResolution": true,
+        "mobileReadableCandidate": true,
+        "a4ReadableCandidate": true,
+        "bilingualTextAlternativePresent": true,
+        "visualContrast": "requires_human_check"
+      },
+      "precheck": {
+        "status": "agent_precheck_only",
+        "note": "Appliquer les points de relecture consignés dans figures-pilote-p1/README.md."
+      },
+      "humanReview": {
+        "status": "required",
+        "reviewer": null,
+        "reviewedAt": null,
+        "decision": null,
+        "scientificAccuracy": false,
+        "bilingualLabelsApplied": false,
+        "mobilePrintReadability": false
+      },
+      "publicationStatus": "blocked_pending_teacher_review",
+      "licenseStatus": "internal_proposal_not_cleared_for_publication"
+    },
+    {
+      "id": "u3-fig4",
+      "unit": 3,
+      "figure": 4,
+      "tier": "P1",
+      "titleAr": "آلية عمل الإنزيم (المراحل الثلاث)",
+      "titleFr": "Étapes de l'action enzymatique",
+      "file": "docs/audit-contenu/figures-pilote-p1/u3-fig4-enzyme-stages-proposition.png",
+      "sha256": "a7f8869bd604ec70c4a92c21cac1c2167cc250927d45b27866ec49cae100fbe4",
+      "width": 1408,
+      "height": 768,
+      "aspectRatio": 1.833,
+      "sourceSpec": "docs/audit-contenu/iconographie_inventaire.json",
+      "sourceAuthority": "internal_pending_teacher",
+      "productionMethod": "AI-generated proposal from internal specification",
+      "productionDate": "2026-08-22",
+      "isEnrichment": false,
+      "labelsAr": [
+        "الإنزيم",
+        "الركيزة",
+        "معقد ES",
+        "النواتج"
+      ],
+      "labelsFr": [
+        "Enzyme",
+        "Substrat",
+        "Complexe ES",
+        "Produits"
+      ],
+      "labelOverlayStatus": "pending_vector_overlay",
+      "altAr": "مقترح رسم علمي يوضح آلية عمل الإنزيم (المراحل الثلاث). العناصر الأساسية: الإنزيم، الركيزة، معقد ES، النواتج.",
+      "altFr": "Proposition de schéma scientifique illustrant Étapes de l'action enzymatique. Éléments clés : Enzyme, Substrat, Complexe ES, Produits.",
+      "accessibility": {
+        "highResolution": true,
+        "mobileReadableCandidate": true,
+        "a4ReadableCandidate": true,
+        "bilingualTextAlternativePresent": true,
+        "visualContrast": "requires_human_check"
+      },
+      "precheck": {
+        "status": "agent_precheck_only",
+        "note": "Appliquer les points de relecture consignés dans figures-pilote-p1/README.md."
+      },
+      "humanReview": {
+        "status": "required",
+        "reviewer": null,
+        "reviewedAt": null,
+        "decision": null,
+        "scientificAccuracy": false,
+        "bilingualLabelsApplied": false,
+        "mobilePrintReadability": false
+      },
+      "publicationStatus": "blocked_pending_teacher_review",
+      "licenseStatus": "internal_proposal_not_cleared_for_publication"
+    },
+    {
+      "id": "u4-fig1",
+      "unit": 4,
+      "figure": 1,
+      "tier": "P1",
+      "titleAr": "المخطط الشامل للاستجابة المناعية",
+      "titleFr": "Réponse immunitaire spécifique",
+      "file": "docs/audit-contenu/figures-pilote-p1/u4-fig1-immune-response-proposition.png",
+      "sha256": "505069ceb965e7bc570348e27528819a015eb6297b3679ba0f8ecb03909fa01c",
+      "width": 1408,
+      "height": 768,
+      "aspectRatio": 1.833,
+      "sourceSpec": "docs/audit-contenu/iconographie_inventaire.json",
+      "sourceAuthority": "internal_pending_teacher",
+      "productionMethod": "AI-generated proposal from internal specification",
+      "productionDate": "2026-08-22",
+      "isEnrichment": false,
+      "labelsAr": [
+        "المستضد",
+        "البلعمية",
+        "LTh",
+        "LB",
+        "الخلايا البلازمية",
+        "الأجسام المضادة",
+        "LTc",
+        "خلايا الذاكرة"
+      ],
+      "labelsFr": [
+        "Antigène",
+        "Phagocyte",
+        "LTh",
+        "LB",
+        "Plasmocytes",
+        "Anticorps",
+        "LTc",
+        "Cellules mémoire"
+      ],
+      "labelOverlayStatus": "pending_vector_overlay",
+      "altAr": "مقترح رسم علمي يوضح المخطط الشامل للاستجابة المناعية. العناصر الأساسية: المستضد، البلعمية، LTh، LB، الخلايا البلازمية، الأجسام المضادة، LTc، خلايا الذاكرة.",
+      "altFr": "Proposition de schéma scientifique illustrant Réponse immunitaire spécifique. Éléments clés : Antigène, Phagocyte, LTh, LB, Plasmocytes, Anticorps, LTc, Cellules mémoire.",
+      "accessibility": {
+        "highResolution": true,
+        "mobileReadableCandidate": true,
+        "a4ReadableCandidate": true,
+        "bilingualTextAlternativePresent": true,
+        "visualContrast": "requires_human_check"
+      },
+      "precheck": {
+        "status": "agent_precheck_only",
+        "note": "Appliquer les points de relecture consignés dans figures-pilote-p1/README.md."
+      },
+      "humanReview": {
+        "status": "required",
+        "reviewer": null,
+        "reviewedAt": null,
+        "decision": null,
+        "scientificAccuracy": false,
+        "bilingualLabelsApplied": false,
+        "mobilePrintReadability": false
+      },
+      "publicationStatus": "blocked_pending_teacher_review",
+      "licenseStatus": "internal_proposal_not_cleared_for_publication"
+    },
+    {
+      "id": "u4-fig2",
+      "unit": 4,
+      "figure": 2,
+      "tier": "P1",
+      "titleAr": "دورة حياة VIH في LTh",
+      "titleFr": "Cycle du VIH dans un lymphocyte T auxiliaire",
+      "file": "docs/audit-contenu/figures-pilote-p1/u4-fig2-vih-cycle-proposition.png",
+      "sha256": "d0487462dbeb0f2642a2095eacbc5c45390dc1605fc927b0bf229389e70f1b14",
+      "width": 1408,
+      "height": 768,
+      "aspectRatio": 1.833,
+      "sourceSpec": "docs/audit-contenu/iconographie_inventaire.json",
+      "sourceAuthority": "internal_pending_teacher",
+      "productionMethod": "AI-generated proposal from internal specification",
+      "productionDate": "2026-08-22",
+      "isEnrichment": false,
+      "labelsAr": [
+        "VIH",
+        "LTh / CD4",
+        "الارتباط",
+        "الاندماج",
+        "النسخ العكسي",
+        "الإدماج",
+        "التكاثر",
+        "التبرعم"
+      ],
+      "labelsFr": [
+        "VIH",
+        "LTh / CD4",
+        "Fixation",
+        "Fusion",
+        "Transcription inverse",
+        "Intégration",
+        "Réplication",
+        "Bourgeonnement"
+      ],
+      "labelOverlayStatus": "pending_vector_overlay",
+      "altAr": "مقترح رسم علمي يوضح دورة حياة VIH في LTh. العناصر الأساسية: VIH، LTh / CD4، الارتباط، الاندماج، النسخ العكسي، الإدماج، التكاثر، التبرعم.",
+      "altFr": "Proposition de schéma scientifique illustrant Cycle du VIH dans un lymphocyte T auxiliaire. Éléments clés : VIH, LTh / CD4, Fixation, Fusion, Transcription inverse, Intégration, Réplication, Bourgeonnement.",
+      "accessibility": {
+        "highResolution": true,
+        "mobileReadableCandidate": true,
+        "a4ReadableCandidate": true,
+        "bilingualTextAlternativePresent": true,
+        "visualContrast": "requires_human_check"
+      },
+      "precheck": {
+        "status": "agent_precheck_only",
+        "note": "Appliquer les points de relecture consignés dans figures-pilote-p1/README.md."
+      },
+      "humanReview": {
+        "status": "required",
+        "reviewer": null,
+        "reviewedAt": null,
+        "decision": null,
+        "scientificAccuracy": false,
+        "bilingualLabelsApplied": false,
+        "mobilePrintReadability": false
+      },
+      "publicationStatus": "blocked_pending_teacher_review",
+      "licenseStatus": "internal_proposal_not_cleared_for_publication"
+    },
+    {
+      "id": "u4-fig3",
+      "unit": 4,
+      "figure": 3,
+      "tier": "P1",
+      "titleAr": "آلية عمل LTc",
+      "titleFr": "Mécanisme d'action du lymphocyte T cytotoxique",
+      "file": "docs/audit-contenu/figures-pilote-p1/u4-fig3-ltc-mechanism-proposition.png",
+      "sha256": "76153fca715d9086e7bbb9fcb540ce697bb0c85f9e2214d26080fe1d8b250507",
+      "width": 1408,
+      "height": 768,
+      "aspectRatio": 1.833,
+      "sourceSpec": "docs/audit-contenu/iconographie_inventaire.json",
+      "sourceAuthority": "internal_pending_teacher",
+      "productionMethod": "AI-generated proposal from internal specification",
+      "productionDate": "2026-08-22",
+      "isEnrichment": false,
+      "labelsAr": [
+        "LTc",
+        "الخلية الهدف",
+        "البيرفورين",
+        "الغرانزيم",
+        "الاستماتة"
+      ],
+      "labelsFr": [
+        "LTc",
+        "Cellule cible",
+        "Perforine",
+        "Granzyme",
+        "Apoptose"
+      ],
+      "labelOverlayStatus": "pending_vector_overlay",
+      "altAr": "مقترح رسم علمي يوضح آلية عمل LTc. العناصر الأساسية: LTc، الخلية الهدف، البيرفورين، الغرانزيم، الاستماتة.",
+      "altFr": "Proposition de schéma scientifique illustrant Mécanisme d'action du lymphocyte T cytotoxique. Éléments clés : LTc, Cellule cible, Perforine, Granzyme, Apoptose.",
+      "accessibility": {
+        "highResolution": true,
+        "mobileReadableCandidate": true,
+        "a4ReadableCandidate": true,
+        "bilingualTextAlternativePresent": true,
+        "visualContrast": "requires_human_check"
+      },
+      "precheck": {
+        "status": "agent_precheck_only",
+        "note": "Appliquer les points de relecture consignés dans figures-pilote-p1/README.md."
+      },
+      "humanReview": {
+        "status": "required",
+        "reviewer": null,
+        "reviewedAt": null,
+        "decision": null,
+        "scientificAccuracy": false,
+        "bilingualLabelsApplied": false,
+        "mobilePrintReadability": false
+      },
+      "publicationStatus": "blocked_pending_teacher_review",
+      "licenseStatus": "internal_proposal_not_cleared_for_publication"
+    },
+    {
+      "id": "u5-fig1",
+      "unit": 5,
+      "figure": 1,
+      "tier": "P1",
+      "titleAr": "منحنى كمون العمل",
+      "titleFr": "Potentiel d'action",
+      "file": "docs/audit-contenu/figures-pilote-p1/u5-fig1-action-potential-proposition.png",
+      "sha256": "938d582a0576e202dcdad2f3f4e5801e1b07fe2281b1df4b7c32a110c768b6bc",
+      "width": 1408,
+      "height": 768,
+      "aspectRatio": 1.833,
+      "sourceSpec": "docs/audit-contenu/iconographie_inventaire.json",
+      "sourceAuthority": "internal_pending_teacher",
+      "productionMethod": "AI-generated proposal from internal specification",
+      "productionDate": "2026-08-22",
+      "isEnrichment": false,
+      "labelsAr": [
+        "كمون الراحة",
+        "زوال الاستقطاب",
+        "إعادة الاستقطاب",
+        "فرط الاستقطاب",
+        "mV",
+        "الزمن"
+      ],
+      "labelsFr": [
+        "Potentiel de repos",
+        "Dépolarisation",
+        "Repolarisation",
+        "Hyperpolarisation",
+        "mV",
+        "Temps"
+      ],
+      "labelOverlayStatus": "pending_vector_overlay",
+      "altAr": "مقترح رسم علمي يوضح منحنى كمون العمل. العناصر الأساسية: كمون الراحة، زوال الاستقطاب، إعادة الاستقطاب، فرط الاستقطاب، mV، الزمن.",
+      "altFr": "Proposition de schéma scientifique illustrant Potentiel d'action. Éléments clés : Potentiel de repos, Dépolarisation, Repolarisation, Hyperpolarisation, mV, Temps.",
+      "accessibility": {
+        "highResolution": true,
+        "mobileReadableCandidate": true,
+        "a4ReadableCandidate": true,
+        "bilingualTextAlternativePresent": true,
+        "visualContrast": "requires_human_check"
+      },
+      "precheck": {
+        "status": "agent_precheck_only",
+        "note": "Appliquer les points de relecture consignés dans figures-pilote-p1/README.md."
+      },
+      "humanReview": {
+        "status": "required",
+        "reviewer": null,
+        "reviewedAt": null,
+        "decision": null,
+        "scientificAccuracy": false,
+        "bilingualLabelsApplied": false,
+        "mobilePrintReadability": false
+      },
+      "publicationStatus": "blocked_pending_teacher_review",
+      "licenseStatus": "internal_proposal_not_cleared_for_publication"
+    },
+    {
+      "id": "u5-fig2",
+      "unit": 5,
+      "figure": 2,
+      "tier": "P1",
+      "titleAr": "المشبك العصبي",
+      "titleFr": "Synapse chimique",
+      "file": "docs/audit-contenu/figures-pilote-p1/u5-fig2-synapse-proposition.png",
+      "sha256": "2dbec39af6e7f55495ddd9965397ecf37b62277bdbb3e9575c9865957da6d30c",
+      "width": 1408,
+      "height": 768,
+      "aspectRatio": 1.833,
+      "sourceSpec": "docs/audit-contenu/iconographie_inventaire.json",
+      "sourceAuthority": "internal_pending_teacher",
+      "productionMethod": "AI-generated proposal from internal specification",
+      "productionDate": "2026-08-22",
+      "isEnrichment": false,
+      "labelsAr": [
+        "النهاية قبل المشبكية",
+        "الحويصلات",
+        "Ca²⁺",
+        "الشق المشبكي",
+        "الناقل العصبي",
+        "المستقبلات"
+      ],
+      "labelsFr": [
+        "Terminaison présynaptique",
+        "Vésicules",
+        "Ca²⁺",
+        "Fente synaptique",
+        "Neurotransmetteur",
+        "Récepteurs"
+      ],
+      "labelOverlayStatus": "pending_vector_overlay",
+      "altAr": "مقترح رسم علمي يوضح المشبك العصبي. العناصر الأساسية: النهاية قبل المشبكية، الحويصلات، Ca²⁺، الشق المشبكي، الناقل العصبي، المستقبلات.",
+      "altFr": "Proposition de schéma scientifique illustrant Synapse chimique. Éléments clés : Terminaison présynaptique, Vésicules, Ca²⁺, Fente synaptique, Neurotransmetteur, Récepteurs.",
+      "accessibility": {
+        "highResolution": true,
+        "mobileReadableCandidate": true,
+        "a4ReadableCandidate": true,
+        "bilingualTextAlternativePresent": true,
+        "visualContrast": "requires_human_check"
+      },
+      "precheck": {
+        "status": "agent_precheck_only",
+        "note": "Appliquer les points de relecture consignés dans figures-pilote-p1/README.md."
+      },
+      "humanReview": {
+        "status": "required",
+        "reviewer": null,
+        "reviewedAt": null,
+        "decision": null,
+        "scientificAccuracy": false,
+        "bilingualLabelsApplied": false,
+        "mobilePrintReadability": false
+      },
+      "publicationStatus": "blocked_pending_teacher_review",
+      "licenseStatus": "internal_proposal_not_cleared_for_publication"
+    },
+    {
+      "id": "u5-fig3",
+      "unit": 5,
+      "figure": 3,
+      "tier": "P1",
+      "titleAr": "الإدماج العصبي",
+      "titleFr": "Intégration nerveuse",
+      "file": "docs/audit-contenu/figures-pilote-p1/u5-fig3-neural-integration-proposition.png",
+      "sha256": "5238ffbf3fe9714b190ce6988a9173a3c5192d116ca2d27e9db8ae832dce15ad",
+      "width": 1408,
+      "height": 768,
+      "aspectRatio": 1.833,
+      "sourceSpec": "docs/audit-contenu/iconographie_inventaire.json",
+      "sourceAuthority": "internal_pending_teacher",
+      "productionMethod": "AI-generated proposal from internal specification",
+      "productionDate": "2026-08-22",
+      "isEnrichment": false,
+      "labelsAr": [
+        "PPSE",
+        "PPSI",
+        "الجمع",
+        "القطعة الابتدائية",
+        "كمون العمل"
+      ],
+      "labelsFr": [
+        "PPSE",
+        "PPSI",
+        "Sommation",
+        "Segment initial",
+        "Potentiel d'action"
+      ],
+      "labelOverlayStatus": "pending_vector_overlay",
+      "altAr": "مقترح رسم علمي يوضح الإدماج العصبي. العناصر الأساسية: PPSE، PPSI، الجمع، القطعة الابتدائية، كمون العمل.",
+      "altFr": "Proposition de schéma scientifique illustrant Intégration nerveuse. Éléments clés : PPSE, PPSI, Sommation, Segment initial, Potentiel d'action.",
+      "accessibility": {
+        "highResolution": true,
+        "mobileReadableCandidate": true,
+        "a4ReadableCandidate": true,
+        "bilingualTextAlternativePresent": true,
+        "visualContrast": "requires_human_check"
+      },
+      "precheck": {
+        "status": "agent_precheck_only",
+        "note": "Appliquer les points de relecture consignés dans figures-pilote-p1/README.md."
+      },
+      "humanReview": {
+        "status": "required",
+        "reviewer": null,
+        "reviewedAt": null,
+        "decision": null,
+        "scientificAccuracy": false,
+        "bilingualLabelsApplied": false,
+        "mobilePrintReadability": false
+      },
+      "publicationStatus": "blocked_pending_teacher_review",
+      "licenseStatus": "internal_proposal_not_cleared_for_publication"
+    },
+    {
+      "id": "u6-fig1",
+      "unit": 6,
+      "figure": 1,
+      "tier": "P1",
+      "titleAr": "البنية الدقيقة للصانعة الخضراء",
+      "titleFr": "Ultrastructure du chloroplaste",
+      "file": "docs/audit-contenu/figures-pilote-p1/u6-fig1-chloroplast-proposition.png",
+      "sha256": "58ec77419866e0c17350fcb523c500af610a1a37d6e9b4002e1f1f4c59091a2e",
+      "width": 1408,
+      "height": 768,
+      "aspectRatio": 1.833,
+      "sourceSpec": "docs/audit-contenu/iconographie_inventaire.json",
+      "sourceAuthority": "internal_pending_teacher",
+      "productionMethod": "AI-generated proposal from internal specification",
+      "productionDate": "2026-08-22",
+      "isEnrichment": false,
+      "labelsAr": [
+        "الغشاء الخارجي",
+        "الغشاء الداخلي",
+        "الغرانا",
+        "الثايلاكويد",
+        "الصفائح بين الحبيبية",
+        "الحشوة"
+      ],
+      "labelsFr": [
+        "Membrane externe",
+        "Membrane interne",
+        "Grana",
+        "Thylakoïde",
+        "Lamelles intergranaires",
+        "Stroma"
+      ],
+      "labelOverlayStatus": "pending_vector_overlay",
+      "altAr": "مقترح رسم علمي يوضح البنية الدقيقة للصانعة الخضراء. العناصر الأساسية: الغشاء الخارجي، الغشاء الداخلي، الغرانا، الثايلاكويد، الصفائح بين الحبيبية، الحشوة.",
+      "altFr": "Proposition de schéma scientifique illustrant Ultrastructure du chloroplaste. Éléments clés : Membrane externe, Membrane interne, Grana, Thylakoïde, Lamelles intergranaires, Stroma.",
+      "accessibility": {
+        "highResolution": true,
+        "mobileReadableCandidate": true,
+        "a4ReadableCandidate": true,
+        "bilingualTextAlternativePresent": true,
+        "visualContrast": "requires_human_check"
+      },
+      "precheck": {
+        "status": "agent_precheck_only",
+        "note": "Appliquer les points de relecture consignés dans figures-pilote-p1/README.md."
+      },
+      "humanReview": {
+        "status": "required",
+        "reviewer": null,
+        "reviewedAt": null,
+        "decision": null,
+        "scientificAccuracy": false,
+        "bilingualLabelsApplied": false,
+        "mobilePrintReadability": false
+      },
+      "publicationStatus": "blocked_pending_teacher_review",
+      "licenseStatus": "internal_proposal_not_cleared_for_publication"
+    },
+    {
+      "id": "u6-fig2",
+      "unit": 6,
+      "figure": 2,
+      "tier": "P1",
+      "titleAr": "مخطط Z للمرحلة الكيموضوئية",
+      "titleFr": "Schéma Z de la phase photochimique",
+      "file": "docs/audit-contenu/figures-pilote-p1/u6-fig2-z-scheme-proposition.png",
+      "sha256": "8446562b20f1eab5b6f4bc89648059d16790a68835d9df9ef61e782ffcdeac6a",
+      "width": 1408,
+      "height": 768,
+      "aspectRatio": 1.833,
+      "sourceSpec": "docs/audit-contenu/iconographie_inventaire.json",
+      "sourceAuthority": "internal_pending_teacher",
+      "productionMethod": "AI-generated proposal from internal specification",
+      "productionDate": "2026-08-22",
+      "isEnrichment": false,
+      "labelsAr": [
+        "PSII",
+        "PSI",
+        "الضوء",
+        "سلسلة نقل الإلكترونات",
+        "H⁺",
+        "ATP",
+        "NADPH",
+        "O₂"
+      ],
+      "labelsFr": [
+        "PSII",
+        "PSI",
+        "Lumière",
+        "Chaîne de transport d'électrons",
+        "H⁺",
+        "ATP",
+        "NADPH",
+        "O₂"
+      ],
+      "labelOverlayStatus": "pending_vector_overlay",
+      "altAr": "مقترح رسم علمي يوضح مخطط Z للمرحلة الكيموضوئية. العناصر الأساسية: PSII، PSI، الضوء، سلسلة نقل الإلكترونات، H⁺، ATP، NADPH، O₂.",
+      "altFr": "Proposition de schéma scientifique illustrant Schéma Z de la phase photochimique. Éléments clés : PSII, PSI, Lumière, Chaîne de transport d'électrons, H⁺, ATP, NADPH, O₂.",
+      "accessibility": {
+        "highResolution": true,
+        "mobileReadableCandidate": true,
+        "a4ReadableCandidate": true,
+        "bilingualTextAlternativePresent": true,
+        "visualContrast": "requires_human_check"
+      },
+      "precheck": {
+        "status": "agent_precheck_only",
+        "note": "Appliquer les points de relecture consignés dans figures-pilote-p1/README.md."
+      },
+      "humanReview": {
+        "status": "required",
+        "reviewer": null,
+        "reviewedAt": null,
+        "decision": null,
+        "scientificAccuracy": false,
+        "bilingualLabelsApplied": false,
+        "mobilePrintReadability": false
+      },
+      "publicationStatus": "blocked_pending_teacher_review",
+      "licenseStatus": "internal_proposal_not_cleared_for_publication"
+    },
+    {
+      "id": "u6-fig3",
+      "unit": 6,
+      "figure": 3,
+      "tier": "P1",
+      "titleAr": "حلقة كالفن",
+      "titleFr": "Cycle de Calvin",
+      "file": "docs/audit-contenu/figures-pilote-p1/u6-fig3-calvin-proposition.png",
+      "sha256": "550e00618355bbfd0b8041a08154158b5180f0a60415e464bb6456b512662ad3",
+      "width": 1408,
+      "height": 768,
+      "aspectRatio": 1.833,
+      "sourceSpec": "docs/audit-contenu/iconographie_inventaire.json",
+      "sourceAuthority": "internal_pending_teacher",
+      "productionMethod": "AI-generated proposal from internal specification",
+      "productionDate": "2026-08-22",
+      "isEnrichment": false,
+      "labelsAr": [
+        "التثبيت",
+        "CO₂",
+        "RuBP",
+        "RuBisCO",
+        "APG / 3-PGA",
+        "G3P",
+        "ATP",
+        "NADPH"
+      ],
+      "labelsFr": [
+        "Fixation",
+        "CO₂",
+        "RuBP",
+        "RuBisCO",
+        "APG / 3-PGA",
+        "G3P",
+        "ATP",
+        "NADPH"
+      ],
+      "labelOverlayStatus": "pending_vector_overlay",
+      "altAr": "مقترح رسم علمي يوضح حلقة كالفن. العناصر الأساسية: التثبيت، CO₂، RuBP، RuBisCO، APG / 3-PGA، G3P، ATP، NADPH.",
+      "altFr": "Proposition de schéma scientifique illustrant Cycle de Calvin. Éléments clés : Fixation, CO₂, RuBP, RuBisCO, APG / 3-PGA, G3P, ATP, NADPH.",
+      "accessibility": {
+        "highResolution": true,
+        "mobileReadableCandidate": true,
+        "a4ReadableCandidate": true,
+        "bilingualTextAlternativePresent": true,
+        "visualContrast": "requires_human_check"
+      },
+      "precheck": {
+        "status": "agent_precheck_only",
+        "note": "Appliquer les points de relecture consignés dans figures-pilote-p1/README.md."
+      },
+      "humanReview": {
+        "status": "required",
+        "reviewer": null,
+        "reviewedAt": null,
+        "decision": null,
+        "scientificAccuracy": false,
+        "bilingualLabelsApplied": false,
+        "mobilePrintReadability": false
+      },
+      "publicationStatus": "blocked_pending_teacher_review",
+      "licenseStatus": "internal_proposal_not_cleared_for_publication"
+    },
+    {
+      "id": "u7-fig1",
+      "unit": 7,
+      "figure": 1,
+      "tier": "P1",
+      "titleAr": "البنية الدقيقة للميتوكندري",
+      "titleFr": "Ultrastructure de la mitochondrie",
+      "file": "docs/audit-contenu/figures-pilote-p1/u7-fig1-mitochondrion-proposition.png",
+      "sha256": "c2a067b114541bf6d8d367a8b61695e51ef09e2488b3abe52c7a6a3707f1977c",
+      "width": 1408,
+      "height": 768,
+      "aspectRatio": 1.833,
+      "sourceSpec": "docs/audit-contenu/iconographie_inventaire.json",
+      "sourceAuthority": "internal_pending_teacher",
+      "productionMethod": "AI-generated proposal from internal specification",
+      "productionDate": "2026-08-22",
+      "isEnrichment": false,
+      "labelsAr": [
+        "الغشاء الخارجي",
+        "الغشاء الداخلي",
+        "الحيز بين الغشائين",
+        "الأعراف",
+        "المطرس",
+        "ATP synthase"
+      ],
+      "labelsFr": [
+        "Membrane externe",
+        "Membrane interne",
+        "Espace intermembranaire",
+        "Crêtes",
+        "Matrice",
+        "ATP synthase"
+      ],
+      "labelOverlayStatus": "pending_vector_overlay",
+      "altAr": "مقترح رسم علمي يوضح البنية الدقيقة للميتوكندري. العناصر الأساسية: الغشاء الخارجي، الغشاء الداخلي، الحيز بين الغشائين، الأعراف، المطرس، ATP synthase.",
+      "altFr": "Proposition de schéma scientifique illustrant Ultrastructure de la mitochondrie. Éléments clés : Membrane externe, Membrane interne, Espace intermembranaire, Crêtes, Matrice, ATP synthase.",
+      "accessibility": {
+        "highResolution": true,
+        "mobileReadableCandidate": true,
+        "a4ReadableCandidate": true,
+        "bilingualTextAlternativePresent": true,
+        "visualContrast": "requires_human_check"
+      },
+      "precheck": {
+        "status": "agent_precheck_only",
+        "note": "Appliquer les points de relecture consignés dans figures-pilote-p1/README.md."
+      },
+      "humanReview": {
+        "status": "required",
+        "reviewer": null,
+        "reviewedAt": null,
+        "decision": null,
+        "scientificAccuracy": false,
+        "bilingualLabelsApplied": false,
+        "mobilePrintReadability": false
+      },
+      "publicationStatus": "blocked_pending_teacher_review",
+      "licenseStatus": "internal_proposal_not_cleared_for_publication"
+    },
+    {
+      "id": "u7-fig2",
+      "unit": 7,
+      "figure": 2,
+      "tier": "P1",
+      "titleAr": "التحلل السكري",
+      "titleFr": "Glycolyse",
+      "file": "docs/audit-contenu/figures-pilote-p1/u7-fig2-glycolysis-proposition.png",
+      "sha256": "f4996a6ecb991c44209a44244a6c4b308eff66b9ab85c473255aeec28ee6583c",
+      "width": 768,
+      "height": 1376,
+      "aspectRatio": 0.558,
+      "sourceSpec": "docs/audit-contenu/iconographie_inventaire.json",
+      "sourceAuthority": "internal_pending_teacher",
+      "productionMethod": "AI-generated proposal from internal specification",
+      "productionDate": "2026-08-22",
+      "isEnrichment": false,
+      "labelsAr": [
+        "الغلوكوز",
+        "مرحلة الاستثمار",
+        "مرحلة الإنتاج",
+        "البيروفات",
+        "ATP",
+        "NADH"
+      ],
+      "labelsFr": [
+        "Glucose",
+        "Phase d'investissement",
+        "Phase de production",
+        "Pyruvate",
+        "ATP",
+        "NADH"
+      ],
+      "labelOverlayStatus": "pending_vector_overlay",
+      "altAr": "مقترح رسم علمي يوضح التحلل السكري. العناصر الأساسية: الغلوكوز، مرحلة الاستثمار، مرحلة الإنتاج، البيروفات، ATP، NADH.",
+      "altFr": "Proposition de schéma scientifique illustrant Glycolyse. Éléments clés : Glucose, Phase d'investissement, Phase de production, Pyruvate, ATP, NADH.",
+      "accessibility": {
+        "highResolution": false,
+        "mobileReadableCandidate": true,
+        "a4ReadableCandidate": false,
+        "bilingualTextAlternativePresent": true,
+        "visualContrast": "requires_human_check"
+      },
+      "precheck": {
+        "status": "agent_precheck_only",
+        "note": "Appliquer les points de relecture consignés dans figures-pilote-p1/README.md."
+      },
+      "humanReview": {
+        "status": "required",
+        "reviewer": null,
+        "reviewedAt": null,
+        "decision": null,
+        "scientificAccuracy": false,
+        "bilingualLabelsApplied": false,
+        "mobilePrintReadability": false
+      },
+      "publicationStatus": "blocked_pending_teacher_review",
+      "licenseStatus": "internal_proposal_not_cleared_for_publication"
+    },
+    {
+      "id": "u7-fig3",
+      "unit": 7,
+      "figure": 3,
+      "tier": "P1",
+      "titleAr": "حلقة كريبس",
+      "titleFr": "Cycle de Krebs",
+      "file": "docs/audit-contenu/figures-pilote-p1/u7-fig3-krebs-proposition.png",
+      "sha256": "23dab770c9bddd549e0cf779ac12cf616f309c0061c25975f79f0fa303304e04",
+      "width": 1408,
+      "height": 768,
+      "aspectRatio": 1.833,
+      "sourceSpec": "docs/audit-contenu/iconographie_inventaire.json",
+      "sourceAuthority": "internal_pending_teacher",
+      "productionMethod": "AI-generated proposal from internal specification",
+      "productionDate": "2026-08-22",
+      "isEnrichment": false,
+      "labelsAr": [
+        "Acétyl-CoA",
+        "السترات",
+        "CO₂",
+        "NADH",
+        "FADH₂",
+        "ATP"
+      ],
+      "labelsFr": [
+        "Acétyl-CoA",
+        "Citrate",
+        "CO₂",
+        "NADH",
+        "FADH₂",
+        "ATP"
+      ],
+      "labelOverlayStatus": "pending_vector_overlay",
+      "altAr": "مقترح رسم علمي يوضح حلقة كريبس. العناصر الأساسية: Acétyl-CoA، السترات، CO₂، NADH، FADH₂، ATP.",
+      "altFr": "Proposition de schéma scientifique illustrant Cycle de Krebs. Éléments clés : Acétyl-CoA, Citrate, CO₂, NADH, FADH₂, ATP.",
+      "accessibility": {
+        "highResolution": true,
+        "mobileReadableCandidate": true,
+        "a4ReadableCandidate": true,
+        "bilingualTextAlternativePresent": true,
+        "visualContrast": "requires_human_check"
+      },
+      "precheck": {
+        "status": "agent_precheck_only",
+        "note": "Appliquer les points de relecture consignés dans figures-pilote-p1/README.md."
+      },
+      "humanReview": {
+        "status": "required",
+        "reviewer": null,
+        "reviewedAt": null,
+        "decision": null,
+        "scientificAccuracy": false,
+        "bilingualLabelsApplied": false,
+        "mobilePrintReadability": false
+      },
+      "publicationStatus": "blocked_pending_teacher_review",
+      "licenseStatus": "internal_proposal_not_cleared_for_publication"
+    },
+    {
+      "id": "u7-fig4",
+      "unit": 7,
+      "figure": 4,
+      "tier": "P1",
+      "titleAr": "الفسفرة التأكسدية",
+      "titleFr": "Phosphorylation oxydative",
+      "file": "docs/audit-contenu/figures-pilote-p1/u7-fig4-oxidative-phosphorylation-proposition.png",
+      "sha256": "251543fba10276b3163aba321ba10bc333e8d5a7db5c795cb6309a8ed56ec6b0",
+      "width": 1408,
+      "height": 768,
+      "aspectRatio": 1.833,
+      "sourceSpec": "docs/audit-contenu/iconographie_inventaire.json",
+      "sourceAuthority": "internal_pending_teacher",
+      "productionMethod": "AI-generated proposal from internal specification",
+      "productionDate": "2026-08-22",
+      "isEnrichment": false,
+      "labelsAr": [
+        "المطرس",
+        "الحيز بين الغشائين",
+        "المعقدات I–IV",
+        "الإلكترونات",
+        "H⁺",
+        "ATP synthase",
+        "O₂",
+        "H₂O"
+      ],
+      "labelsFr": [
+        "Matrice",
+        "Espace intermembranaire",
+        "Complexes I–IV",
+        "Électrons",
+        "H⁺",
+        "ATP synthase",
+        "O₂",
+        "H₂O"
+      ],
+      "labelOverlayStatus": "pending_vector_overlay",
+      "altAr": "مقترح رسم علمي يوضح الفسفرة التأكسدية. العناصر الأساسية: المطرس، الحيز بين الغشائين، المعقدات I–IV، الإلكترونات، H⁺، ATP synthase، O₂، H₂O.",
+      "altFr": "Proposition de schéma scientifique illustrant Phosphorylation oxydative. Éléments clés : Matrice, Espace intermembranaire, Complexes I–IV, Électrons, H⁺, ATP synthase, O₂, H₂O.",
+      "accessibility": {
+        "highResolution": true,
+        "mobileReadableCandidate": true,
+        "a4ReadableCandidate": true,
+        "bilingualTextAlternativePresent": true,
+        "visualContrast": "requires_human_check"
+      },
+      "precheck": {
+        "status": "agent_precheck_only",
+        "note": "Appliquer les points de relecture consignés dans figures-pilote-p1/README.md."
+      },
+      "humanReview": {
+        "status": "required",
+        "reviewer": null,
+        "reviewedAt": null,
+        "decision": null,
+        "scientificAccuracy": false,
+        "bilingualLabelsApplied": false,
+        "mobilePrintReadability": false
+      },
+      "publicationStatus": "blocked_pending_teacher_review",
+      "licenseStatus": "internal_proposal_not_cleared_for_publication"
+    },
+    {
+      "id": "u8-fig1",
+      "unit": 8,
+      "figure": 1,
+      "tier": "P2",
+      "titleAr": "المخطط الشامل للتحولات الطاقوية",
+      "titleFr": "Vue d'ensemble des transformations énergétiques cellulaires",
+      "file": "docs/audit-contenu/figures-pilote-p2/u8-fig1-cellular-energy-overview-proposition.png",
+      "sha256": "f2bff5be2f2dcbdf15db02aa3f1e04d5f508edf40432c4c7c79184a7d4d94e59",
+      "width": 1376,
+      "height": 768,
+      "aspectRatio": 1.792,
+      "sourceSpec": "docs/audit-contenu/iconographie_inventaire.json",
+      "sourceAuthority": "internal_pending_teacher",
+      "productionMethod": "AI-generated proposal from internal specification",
+      "productionDate": "2026-08-22",
+      "isEnrichment": false,
+      "labelsAr": [
+        "الضوء",
+        "الصانعة الخضراء",
+        "الغلوكوز",
+        "O₂",
+        "الميتوكندري",
+        "ATP",
+        "CO₂",
+        "H₂O"
+      ],
+      "labelsFr": [
+        "Lumière",
+        "Chloroplaste",
+        "Glucose",
+        "O₂",
+        "Mitochondrie",
+        "ATP",
+        "CO₂",
+        "H₂O"
+      ],
+      "labelOverlayStatus": "pending_vector_overlay",
+      "altAr": "مقترح رسم علمي يوضح المخطط الشامل للتحولات الطاقوية. العناصر الأساسية: الضوء، الصانعة الخضراء، الغلوكوز، O₂، الميتوكندري، ATP، CO₂، H₂O.",
+      "altFr": "Proposition de schéma scientifique illustrant Vue d'ensemble des transformations énergétiques cellulaires. Éléments clés : Lumière, Chloroplaste, Glucose, O₂, Mitochondrie, ATP, CO₂, H₂O.",
+      "accessibility": {
+        "highResolution": true,
+        "mobileReadableCandidate": true,
+        "a4ReadableCandidate": true,
+        "bilingualTextAlternativePresent": true,
+        "visualContrast": "requires_human_check"
+      },
+      "precheck": {
+        "status": "agent_precheck_only",
+        "note": "Remplacer les labels anglais et contrôler le sens de chaque flux CO₂/O₂/glucose/H₂O."
+      },
+      "humanReview": {
+        "status": "required",
+        "reviewer": null,
+        "reviewedAt": null,
+        "decision": null,
+        "scientificAccuracy": false,
+        "bilingualLabelsApplied": false,
+        "mobilePrintReadability": false
+      },
+      "publicationStatus": "blocked_pending_teacher_review",
+      "licenseStatus": "internal_proposal_not_cleared_for_publication"
+    },
+    {
+      "id": "u8-fig2",
+      "unit": 8,
+      "figure": 2,
+      "tier": "P2",
+      "titleAr": "مقارنة الخلية الحيوانية والنباتية",
+      "titleFr": "Comparaison énergétique des cellules végétale et animale",
+      "file": "docs/audit-contenu/figures-pilote-p2/u8-fig2-plant-animal-cell-energy-proposition.png",
+      "sha256": "71047ce3ccb6fa705540de8bc21036f9c360e21f9098d57b0dadf9a1605b2df8",
+      "width": 1376,
+      "height": 768,
+      "aspectRatio": 1.792,
+      "sourceSpec": "docs/audit-contenu/iconographie_inventaire.json",
+      "sourceAuthority": "internal_pending_teacher",
+      "productionMethod": "AI-generated proposal from internal specification",
+      "productionDate": "2026-08-22",
+      "isEnrichment": false,
+      "labelsAr": [
+        "خلية نباتية",
+        "خلية حيوانية",
+        "الصانعة الخضراء",
+        "الميتوكندري",
+        "التركيب الضوئي",
+        "التنفس"
+      ],
+      "labelsFr": [
+        "Cellule végétale",
+        "Cellule animale",
+        "Chloroplaste",
+        "Mitochondrie",
+        "Photosynthèse",
+        "Respiration"
+      ],
+      "labelOverlayStatus": "pending_vector_overlay",
+      "altAr": "مقترح رسم علمي يوضح مقارنة الخلية الحيوانية والنباتية. العناصر الأساسية: خلية نباتية، خلية حيوانية، الصانعة الخضراء، الميتوكندري، التركيب الضوئي، التنفس.",
+      "altFr": "Proposition de schéma scientifique illustrant Comparaison énergétique des cellules végétale et animale. Éléments clés : Cellule végétale, Cellule animale, Chloroplaste, Mitochondrie, Photosynthèse, Respiration.",
+      "accessibility": {
+        "highResolution": true,
+        "mobileReadableCandidate": true,
+        "a4ReadableCandidate": true,
+        "bilingualTextAlternativePresent": true,
+        "visualContrast": "requires_human_check"
+      },
+      "precheck": {
+        "status": "agent_precheck_only",
+        "note": "Éviter le doublon avec U8-F1; vérifier l'absence de chloroplaste dans la cellule animale."
+      },
+      "humanReview": {
+        "status": "required",
+        "reviewer": null,
+        "reviewedAt": null,
+        "decision": null,
+        "scientificAccuracy": false,
+        "bilingualLabelsApplied": false,
+        "mobilePrintReadability": false
+      },
+      "publicationStatus": "blocked_pending_teacher_review",
+      "licenseStatus": "internal_proposal_not_cleared_for_publication"
+    },
+    {
+      "id": "u8-fig3",
+      "unit": 8,
+      "figure": 3,
+      "tier": "P2",
+      "titleAr": "هرم الطاقة في النظام البيئي",
+      "titleFr": "Pyramide énergétique (enrichissement)",
+      "file": "docs/audit-contenu/figures-pilote-p2/u8-fig3-energy-pyramid-proposition.png",
+      "sha256": "d64d51ce4bbf6e7ec8cb0129537018c96d8ac22a7843ce1b68c310b41b8e8672",
+      "width": 1376,
+      "height": 768,
+      "aspectRatio": 1.792,
+      "sourceSpec": "docs/audit-contenu/iconographie_inventaire.json",
+      "sourceAuthority": "internal_pending_teacher",
+      "productionMethod": "AI-generated proposal from internal specification",
+      "productionDate": "2026-08-22",
+      "isEnrichment": true,
+      "labelsAr": [
+        "المنتجون",
+        "المستهلك الأول",
+        "المستهلك الثاني",
+        "المفترس القمّي",
+        "فقدان الطاقة"
+      ],
+      "labelsFr": [
+        "Producteurs",
+        "Consommateur primaire",
+        "Consommateur secondaire",
+        "Superprédateur",
+        "Perte d'énergie"
+      ],
+      "labelOverlayStatus": "pending_vector_overlay",
+      "altAr": "مقترح رسم علمي يوضح هرم الطاقة في النظام البيئي. العناصر الأساسية: المنتجون، المستهلك الأول، المستهلك الثاني، المفترس القمّي، فقدان الطاقة.",
+      "altFr": "Proposition de schéma scientifique illustrant Pyramide énergétique (enrichissement). Éléments clés : Producteurs, Consommateur primaire, Consommateur secondaire, Superprédateur, Perte d'énergie.",
+      "accessibility": {
+        "highResolution": true,
+        "mobileReadableCandidate": true,
+        "a4ReadableCandidate": true,
+        "bilingualTextAlternativePresent": true,
+        "visualContrast": "requires_human_check"
+      },
+      "precheck": {
+        "status": "agent_precheck_only",
+        "note": "ENRICHISSEMENT hors socle 55 chapitres: ne pas publier dans le parcours Bac sans décision pédagogique."
+      },
+      "humanReview": {
+        "status": "required",
+        "reviewer": null,
+        "reviewedAt": null,
+        "decision": null,
+        "scientificAccuracy": false,
+        "bilingualLabelsApplied": false,
+        "mobilePrintReadability": false
+      },
+      "publicationStatus": "blocked_pending_teacher_review",
+      "licenseStatus": "internal_proposal_not_cleared_for_publication"
+    },
+    {
+      "id": "u9-fig1",
+      "unit": 9,
+      "figure": 1,
+      "tier": "P2",
+      "titleAr": "خريطة الصفائح التكتونية",
+      "titleFr": "Carte schématique des plaques tectoniques",
+      "file": "docs/audit-contenu/figures-pilote-p2/u9-fig1-tectonic-plates-map-proposition.png",
+      "sha256": "f9a45287f5c9126b347daa0df211b40570dcec864526e0f692c42cbb91435dfd",
+      "width": 1376,
+      "height": 768,
+      "aspectRatio": 1.792,
+      "sourceSpec": "docs/audit-contenu/iconographie_inventaire.json",
+      "sourceAuthority": "internal_pending_teacher",
+      "productionMethod": "AI-generated proposal from internal specification",
+      "productionDate": "2026-08-22",
+      "isEnrichment": false,
+      "labelsAr": [
+        "الصفائح الكبرى",
+        "حدود تباعدية",
+        "حدود تقاربية",
+        "حدود تحويلية",
+        "البراكين"
+      ],
+      "labelsFr": [
+        "Plaques majeures",
+        "Limites divergentes",
+        "Limites convergentes",
+        "Limites transformantes",
+        "Volcans"
+      ],
+      "labelOverlayStatus": "pending_vector_overlay",
+      "altAr": "مقترح رسم علمي يوضح خريطة الصفائح التكتونية. العناصر الأساسية: الصفائح الكبرى، حدود تباعدية، حدود تقاربية، حدود تحويلية، البراكين.",
+      "altFr": "Proposition de schéma scientifique illustrant Carte schématique des plaques tectoniques. Éléments clés : Plaques majeures, Limites divergentes, Limites convergentes, Limites transformantes, Volcans.",
+      "accessibility": {
+        "highResolution": true,
+        "mobileReadableCandidate": true,
+        "a4ReadableCandidate": true,
+        "bilingualTextAlternativePresent": true,
+        "visualContrast": "requires_human_check"
+      },
+      "precheck": {
+        "status": "agent_precheck_only",
+        "note": "Carte schématique à confronter à une carte de référence; contrôler toutes les limites et directions."
+      },
+      "humanReview": {
+        "status": "required",
+        "reviewer": null,
+        "reviewedAt": null,
+        "decision": null,
+        "scientificAccuracy": false,
+        "bilingualLabelsApplied": false,
+        "mobilePrintReadability": false
+      },
+      "publicationStatus": "blocked_pending_teacher_review",
+      "licenseStatus": "internal_proposal_not_cleared_for_publication"
+    },
+    {
+      "id": "u9-fig2",
+      "unit": 9,
+      "figure": 2,
+      "tier": "P2",
+      "titleAr": "مقاطع عرضية لأنواع الحدود الثلاثة",
+      "titleFr": "Trois types de limites de plaques",
+      "file": "docs/audit-contenu/figures-pilote-p2/u9-fig2-plate-boundaries-proposition.png",
+      "sha256": "4fde6ae61ce434a93d5f5d41400a6ad2ba3c2ad01e292a5d37df4b72d0adfebf",
+      "width": 1376,
+      "height": 768,
+      "aspectRatio": 1.792,
+      "sourceSpec": "docs/audit-contenu/iconographie_inventaire.json",
+      "sourceAuthority": "internal_pending_teacher",
+      "productionMethod": "AI-generated proposal from internal specification",
+      "productionDate": "2026-08-22",
+      "isEnrichment": false,
+      "labelsAr": [
+        "التباعد",
+        "الظهرة",
+        "الغوص",
+        "الخندق",
+        "القوس البركاني",
+        "الفالق التحويلي"
+      ],
+      "labelsFr": [
+        "Divergence",
+        "Dorsale",
+        "Subduction",
+        "Fosse",
+        "Arc volcanique",
+        "Faille transformante"
+      ],
+      "labelOverlayStatus": "pending_vector_overlay",
+      "altAr": "مقترح رسم علمي يوضح مقاطع عرضية لأنواع الحدود الثلاثة. العناصر الأساسية: التباعد، الظهرة، الغوص، الخندق، القوس البركاني، الفالق التحويلي.",
+      "altFr": "Proposition de schéma scientifique illustrant Trois types de limites de plaques. Éléments clés : Divergence, Dorsale, Subduction, Fosse, Arc volcanique, Faille transformante.",
+      "accessibility": {
+        "highResolution": true,
+        "mobileReadableCandidate": true,
+        "a4ReadableCandidate": true,
+        "bilingualTextAlternativePresent": true,
+        "visualContrast": "requires_human_check"
+      },
+      "precheck": {
+        "status": "agent_precheck_only",
+        "note": "Remplacer tous les labels anglais; vérifier le plan de Benioff et la géométrie de la faille transformante."
+      },
+      "humanReview": {
+        "status": "required",
+        "reviewer": null,
+        "reviewedAt": null,
+        "decision": null,
+        "scientificAccuracy": false,
+        "bilingualLabelsApplied": false,
+        "mobilePrintReadability": false
+      },
+      "publicationStatus": "blocked_pending_teacher_review",
+      "licenseStatus": "internal_proposal_not_cleared_for_publication"
+    },
+    {
+      "id": "u9-fig3",
+      "unit": 9,
+      "figure": 3,
+      "tier": "P2",
+      "titleAr": "التيارات الحملية في البرنس",
+      "titleFr": "Convection mantellique",
+      "file": "docs/audit-contenu/figures-pilote-p2/u9-fig3-mantle-convection-proposition.png",
+      "sha256": "e6dc388ec9625947d265c8f97079771f82cfeea26aecfce765eed88820949eb9",
+      "width": 1376,
+      "height": 768,
+      "aspectRatio": 1.792,
+      "sourceSpec": "docs/audit-contenu/iconographie_inventaire.json",
+      "sourceAuthority": "internal_pending_teacher",
+      "productionMethod": "AI-generated proposal from internal specification",
+      "productionDate": "2026-08-22",
+      "isEnrichment": false,
+      "labelsAr": [
+        "الغلاف الصخري",
+        "البرنس",
+        "تيار صاعد ساخن",
+        "تيار هابط بارد",
+        "الظهرة",
+        "الغوص"
+      ],
+      "labelsFr": [
+        "Lithosphère",
+        "Manteau",
+        "Courant chaud ascendant",
+        "Courant froid descendant",
+        "Dorsale",
+        "Subduction"
+      ],
+      "labelOverlayStatus": "pending_vector_overlay",
+      "altAr": "مقترح رسم علمي يوضح التيارات الحملية في البرنس. العناصر الأساسية: الغلاف الصخري، البرنس، تيار صاعد ساخن، تيار هابط بارد، الظهرة، الغوص.",
+      "altFr": "Proposition de schéma scientifique illustrant Convection mantellique. Éléments clés : Lithosphère, Manteau, Courant chaud ascendant, Courant froid descendant, Dorsale, Subduction.",
+      "accessibility": {
+        "highResolution": true,
+        "mobileReadableCandidate": true,
+        "a4ReadableCandidate": true,
+        "bilingualTextAlternativePresent": true,
+        "visualContrast": "requires_human_check"
+      },
+      "precheck": {
+        "status": "agent_precheck_only",
+        "note": "Contrôler que le manteau est présenté comme solide déformable et non comme liquide; revoir les callouts."
+      },
+      "humanReview": {
+        "status": "required",
+        "reviewer": null,
+        "reviewedAt": null,
+        "decision": null,
+        "scientificAccuracy": false,
+        "bilingualLabelsApplied": false,
+        "mobilePrintReadability": false
+      },
+      "publicationStatus": "blocked_pending_teacher_review",
+      "licenseStatus": "internal_proposal_not_cleared_for_publication"
+    },
+    {
+      "id": "u10-fig1",
+      "unit": 10,
+      "figure": 1,
+      "tier": "P2",
+      "titleAr": "السيزموغرام وتفسيره",
+      "titleFr": "Sismogramme et arrivées P, S, L",
+      "file": "docs/audit-contenu/figures-pilote-p2/u10-fig1-seismogram-proposition.png",
+      "sha256": "6b72c95ea3854c7e1fe11bdc44c247dd21c3f1be9fadd7978d5b5db55030752f",
+      "width": 1376,
+      "height": 768,
+      "aspectRatio": 1.792,
+      "sourceSpec": "docs/audit-contenu/iconographie_inventaire.json",
+      "sourceAuthority": "internal_pending_teacher",
+      "productionMethod": "AI-generated proposal from internal specification",
+      "productionDate": "2026-08-22",
+      "isEnrichment": false,
+      "labelsAr": [
+        "السعة",
+        "الزمن",
+        "موجات P",
+        "موجات S",
+        "موجات L",
+        "فرق الوصول P–S"
+      ],
+      "labelsFr": [
+        "Amplitude",
+        "Temps",
+        "Ondes P",
+        "Ondes S",
+        "Ondes L",
+        "Écart d'arrivée P–S"
+      ],
+      "labelOverlayStatus": "pending_vector_overlay",
+      "altAr": "مقترح رسم علمي يوضح السيزموغرام وتفسيره. العناصر الأساسية: السعة، الزمن، موجات P، موجات S، موجات L، فرق الوصول P–S.",
+      "altFr": "Proposition de schéma scientifique illustrant Sismogramme et arrivées P, S, L. Éléments clés : Amplitude, Temps, Ondes P, Ondes S, Ondes L, Écart d'arrivée P–S.",
+      "accessibility": {
+        "highResolution": true,
+        "mobileReadableCandidate": true,
+        "a4ReadableCandidate": true,
+        "bilingualTextAlternativePresent": true,
+        "visualContrast": "requires_human_check"
+      },
+      "precheck": {
+        "status": "agent_precheck_only",
+        "note": "Contrôler l'ordre P–S–L, les amplitudes et l'intervalle P–S; ajouter les axes AR/FR."
+      },
+      "humanReview": {
+        "status": "required",
+        "reviewer": null,
+        "reviewedAt": null,
+        "decision": null,
+        "scientificAccuracy": false,
+        "bilingualLabelsApplied": false,
+        "mobilePrintReadability": false
+      },
+      "publicationStatus": "blocked_pending_teacher_review",
+      "licenseStatus": "internal_proposal_not_cleared_for_publication"
+    },
+    {
+      "id": "u10-fig2",
+      "unit": 10,
+      "figure": 2,
+      "tier": "P2",
+      "titleAr": "مناطق الظل الزلزالي",
+      "titleFr": "Zones d'ombre sismiques",
+      "file": "docs/audit-contenu/figures-pilote-p2/u10-fig2-seismic-shadow-zones-proposition.png",
+      "sha256": "cbef2df58846392d63632c8e3842d64d6aa9a900f98ffb1bca7d5aaa82fa5e59",
+      "width": 1376,
+      "height": 768,
+      "aspectRatio": 1.792,
+      "sourceSpec": "docs/audit-contenu/iconographie_inventaire.json",
+      "sourceAuthority": "internal_pending_teacher",
+      "productionMethod": "AI-generated proposal from internal specification",
+      "productionDate": "2026-08-22",
+      "isEnrichment": false,
+      "labelsAr": [
+        "البؤرة",
+        "موجات P",
+        "موجات S",
+        "النواة الخارجية السائلة",
+        "منطقة الظل",
+        "103°",
+        "143°"
+      ],
+      "labelsFr": [
+        "Foyer",
+        "Ondes P",
+        "Ondes S",
+        "Noyau externe liquide",
+        "Zone d'ombre",
+        "103°",
+        "143°"
+      ],
+      "labelOverlayStatus": "pending_vector_overlay",
+      "altAr": "مقترح رسم علمي يوضح مناطق الظل الزلزالي. العناصر الأساسية: البؤرة، موجات P، موجات S، النواة الخارجية السائلة، منطقة الظل، 103°، 143°.",
+      "altFr": "Proposition de schéma scientifique illustrant Zones d'ombre sismiques. Éléments clés : Foyer, Ondes P, Ondes S, Noyau externe liquide, Zone d'ombre, 103°, 143°.",
+      "accessibility": {
+        "highResolution": true,
+        "mobileReadableCandidate": true,
+        "a4ReadableCandidate": true,
+        "bilingualTextAlternativePresent": true,
+        "visualContrast": "requires_human_check"
+      },
+      "precheck": {
+        "status": "agent_precheck_only",
+        "note": "Vérifier les trajets P/S et les angles 103°/143°; la couleur des rayons ne doit pas inverser P et S."
+      },
+      "humanReview": {
+        "status": "required",
+        "reviewer": null,
+        "reviewedAt": null,
+        "decision": null,
+        "scientificAccuracy": false,
+        "bilingualLabelsApplied": false,
+        "mobilePrintReadability": false
+      },
+      "publicationStatus": "blocked_pending_teacher_review",
+      "licenseStatus": "internal_proposal_not_cleared_for_publication"
+    },
+    {
+      "id": "u10-fig3",
+      "unit": 10,
+      "figure": 3,
+      "tier": "P2",
+      "titleAr": "المقطع الشامل لبنية الأرض",
+      "titleFr": "Structure interne de la Terre",
+      "file": "docs/audit-contenu/figures-pilote-p2/u10-fig3-earth-interior-proposition.png",
+      "sha256": "cc5047f130fb6cafdaf30a5fed2a0ccc7d5ee7992e626190c6267e76cbc6dea1",
+      "width": 1376,
+      "height": 768,
+      "aspectRatio": 1.792,
+      "sourceSpec": "docs/audit-contenu/iconographie_inventaire.json",
+      "sourceAuthority": "internal_pending_teacher",
+      "productionMethod": "AI-generated proposal from internal specification",
+      "productionDate": "2026-08-22",
+      "isEnrichment": false,
+      "labelsAr": [
+        "القشرة",
+        "الغلاف الصخري",
+        "الأستينوسفير",
+        "البرنس",
+        "النواة الخارجية",
+        "النواة الداخلية",
+        "Fe–Ni"
+      ],
+      "labelsFr": [
+        "Croûte",
+        "Lithosphère",
+        "Asthénosphère",
+        "Manteau",
+        "Noyau externe",
+        "Noyau interne",
+        "Fe–Ni"
+      ],
+      "labelOverlayStatus": "pending_vector_overlay",
+      "altAr": "مقترح رسم علمي يوضح المقطع الشامل لبنية الأرض. العناصر الأساسية: القشرة، الغلاف الصخري، الأستينوسفير، البرنس، النواة الخارجية، النواة الداخلية، Fe–Ni.",
+      "altFr": "Proposition de schéma scientifique illustrant Structure interne de la Terre. Éléments clés : Croûte, Lithosphère, Asthénosphère, Manteau, Noyau externe, Noyau interne, Fe–Ni.",
+      "accessibility": {
+        "highResolution": true,
+        "mobileReadableCandidate": true,
+        "a4ReadableCandidate": true,
+        "bilingualTextAlternativePresent": true,
+        "visualContrast": "requires_human_check"
+      },
+      "precheck": {
+        "status": "agent_precheck_only",
+        "note": "AMENDEMENT MAJEUR: supprimer les labels anglais/gibberish et corriger la représentation hybride avant toute utilisation."
+      },
+      "humanReview": {
+        "status": "required",
+        "reviewer": null,
+        "reviewedAt": null,
+        "decision": null,
+        "scientificAccuracy": false,
+        "bilingualLabelsApplied": false,
+        "mobilePrintReadability": false
+      },
+      "publicationStatus": "blocked_pending_teacher_review",
+      "licenseStatus": "internal_proposal_not_cleared_for_publication"
+    },
+    {
+      "id": "u11-fig1",
+      "unit": 11,
+      "figure": 1,
+      "tier": "P1",
+      "titleAr": "بنية اللوح المحيطي عند الظهرة",
+      "titleFr": "Structure de la plaque océanique à la dorsale",
+      "file": "docs/audit-contenu/figures-pilote-p1/u11-fig1-ridges-proposition.png",
+      "sha256": "873908fa6edd819527c4385e82ccbb2a8f8ffb212f34e015a37d1e08a69c3c40",
+      "width": 1408,
+      "height": 768,
+      "aspectRatio": 1.833,
+      "sourceSpec": "docs/audit-contenu/iconographie_inventaire.json",
+      "sourceAuthority": "internal_pending_teacher",
+      "productionMethod": "AI-generated proposal from internal specification",
+      "productionDate": "2026-08-22",
+      "isEnrichment": false,
+      "labelsAr": [
+        "الرواسب",
+        "البازلت الوسائدي",
+        "عروق الدوليريت",
+        "الغابرو",
+        "البيريدوتيت",
+        "الصهارة",
+        "التباعد"
+      ],
+      "labelsFr": [
+        "Sédiments",
+        "Basaltes en coussins",
+        "Filons de dolérite",
+        "Gabbro",
+        "Péridotite",
+        "Magma",
+        "Divergence"
+      ],
+      "labelOverlayStatus": "pending_vector_overlay",
+      "altAr": "مقترح رسم علمي يوضح بنية اللوح المحيطي عند الظهرة. العناصر الأساسية: الرواسب، البازلت الوسائدي، عروق الدوليريت، الغابرو، البيريدوتيت، الصهارة، التباعد.",
+      "altFr": "Proposition de schéma scientifique illustrant Structure de la plaque océanique à la dorsale. Éléments clés : Sédiments, Basaltes en coussins, Filons de dolérite, Gabbro, Péridotite, Magma, Divergence.",
+      "accessibility": {
+        "highResolution": true,
+        "mobileReadableCandidate": true,
+        "a4ReadableCandidate": true,
+        "bilingualTextAlternativePresent": true,
+        "visualContrast": "requires_human_check"
+      },
+      "precheck": {
+        "status": "agent_precheck_only",
+        "note": "Appliquer les points de relecture consignés dans figures-pilote-p1/README.md."
+      },
+      "humanReview": {
+        "status": "required",
+        "reviewer": null,
+        "reviewedAt": null,
+        "decision": null,
+        "scientificAccuracy": false,
+        "bilingualLabelsApplied": false,
+        "mobilePrintReadability": false
+      },
+      "publicationStatus": "blocked_pending_teacher_review",
+      "licenseStatus": "internal_proposal_not_cleared_for_publication"
+    },
+    {
+      "id": "u11-fig2",
+      "unit": 11,
+      "figure": 2,
+      "tier": "P1",
+      "titleAr": "تسلسل الأوفيوليت",
+      "titleFr": "Séquence ophiolitique",
+      "file": "docs/audit-contenu/figures-pilote-p1/u11-fig2-ophiolite-proposition.png",
+      "sha256": "7e57b47c0709c33c32f9ce1bb4b57e2ad7023186b5fd975562a1b4c1e6de3626",
+      "width": 1408,
+      "height": 768,
+      "aspectRatio": 1.833,
+      "sourceSpec": "docs/audit-contenu/iconographie_inventaire.json",
+      "sourceAuthority": "internal_pending_teacher",
+      "productionMethod": "AI-generated proposal from internal specification",
+      "productionDate": "2026-08-22",
+      "isEnrichment": false,
+      "labelsAr": [
+        "اللوح المحيطي",
+        "الأوفيوليت",
+        "البازلت الوسائدي",
+        "الدوليريت",
+        "الغابرو",
+        "البيريدوتيت"
+      ],
+      "labelsFr": [
+        "Plaque océanique",
+        "Ophiolite",
+        "Basaltes en coussins",
+        "Dolérite",
+        "Gabbro",
+        "Péridotite"
+      ],
+      "labelOverlayStatus": "pending_vector_overlay",
+      "altAr": "مقترح رسم علمي يوضح تسلسل الأوفيوليت. العناصر الأساسية: اللوح المحيطي، الأوفيوليت، البازلت الوسائدي، الدوليريت، الغابرو، البيريدوتيت.",
+      "altFr": "Proposition de schéma scientifique illustrant Séquence ophiolitique. Éléments clés : Plaque océanique, Ophiolite, Basaltes en coussins, Dolérite, Gabbro, Péridotite.",
+      "accessibility": {
+        "highResolution": true,
+        "mobileReadableCandidate": true,
+        "a4ReadableCandidate": true,
+        "bilingualTextAlternativePresent": true,
+        "visualContrast": "requires_human_check"
+      },
+      "precheck": {
+        "status": "agent_precheck_only",
+        "note": "Appliquer les points de relecture consignés dans figures-pilote-p1/README.md."
+      },
+      "humanReview": {
+        "status": "required",
+        "reviewer": null,
+        "reviewedAt": null,
+        "decision": null,
+        "scientificAccuracy": false,
+        "bilingualLabelsApplied": false,
+        "mobilePrintReadability": false
+      },
+      "publicationStatus": "blocked_pending_teacher_review",
+      "licenseStatus": "internal_proposal_not_cleared_for_publication"
+    },
+    {
+      "id": "u11-fig3",
+      "unit": 11,
+      "figure": 3,
+      "tier": "P1",
+      "titleAr": "دورة ويلسون الكاملة",
+      "titleFr": "Cycle de Wilson",
+      "file": "docs/audit-contenu/figures-pilote-p1/u11-fig3-wilson-cycle-proposition.png",
+      "sha256": "9cde25da225a873e6ebc90e6a6ec8bf9dfd8daab0890d9354dd1910d1c5d111b",
+      "width": 1408,
+      "height": 768,
+      "aspectRatio": 1.833,
+      "sourceSpec": "docs/audit-contenu/iconographie_inventaire.json",
+      "sourceAuthority": "internal_pending_teacher",
+      "productionMethod": "AI-generated proposal from internal specification",
+      "productionDate": "2026-08-22",
+      "isEnrichment": false,
+      "labelsAr": [
+        "التصدع",
+        "محيط فتي",
+        "محيط ناضج",
+        "الغوص",
+        "انغلاق المحيط",
+        "التصادم"
+      ],
+      "labelsFr": [
+        "Rifting",
+        "Océan jeune",
+        "Océan mature",
+        "Subduction",
+        "Fermeture océanique",
+        "Collision"
+      ],
+      "labelOverlayStatus": "pending_vector_overlay",
+      "altAr": "مقترح رسم علمي يوضح دورة ويلسون الكاملة. العناصر الأساسية: التصدع، محيط فتي، محيط ناضج، الغوص، انغلاق المحيط، التصادم.",
+      "altFr": "Proposition de schéma scientifique illustrant Cycle de Wilson. Éléments clés : Rifting, Océan jeune, Océan mature, Subduction, Fermeture océanique, Collision.",
+      "accessibility": {
+        "highResolution": true,
+        "mobileReadableCandidate": true,
+        "a4ReadableCandidate": true,
+        "bilingualTextAlternativePresent": true,
+        "visualContrast": "requires_human_check"
+      },
+      "precheck": {
+        "status": "agent_precheck_only",
+        "note": "Appliquer les points de relecture consignés dans figures-pilote-p1/README.md."
+      },
+      "humanReview": {
+        "status": "required",
+        "reviewer": null,
+        "reviewedAt": null,
+        "decision": null,
+        "scientificAccuracy": false,
+        "bilingualLabelsApplied": false,
+        "mobilePrintReadability": false
+      },
+      "publicationStatus": "blocked_pending_teacher_review",
+      "licenseStatus": "internal_proposal_not_cleared_for_publication"
+    }
+  ]
+}
