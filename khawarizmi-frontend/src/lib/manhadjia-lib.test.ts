@@ -697,22 +697,22 @@ describe("BOOTCAMP_DAYS (J1→J7, 7 jours, 7 couleurs)", () => {
 })
 
 describe("SATELLITE_DAYS (15 satellites : référentiel + livre)", () => {
-  const RAWS = [
-    rawSat01,
-    rawSat02,
-    rawSat03,
-    rawSat04,
-    rawSat05,
-    rawSat06,
-    rawSat07,
-    rawSat08,
-    rawSat09,
-    rawSat10,
-    rawSat11,
-    rawSat12,
-    rawSat13,
-    rawSat14,
-    rawSat15,
+  const RAWS: AtelierSatelliteData[] = [
+    DS01,
+    DS02,
+    DS03,
+    DS04,
+    DS05,
+    DS06,
+    DS07,
+    DS08,
+    DS09,
+    DS10,
+    DS11,
+    DS12,
+    DS13,
+    DS14,
+    DS15,
   ]
 
   it("15 satellites, numéros 1→15, slugs et hrefs uniques", () => {

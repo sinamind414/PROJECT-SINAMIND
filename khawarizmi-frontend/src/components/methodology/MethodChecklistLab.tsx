@@ -13,7 +13,7 @@ import type { SessionEvent } from "@/lib/lesson/tunnelTypes"
 import { buildMethodOutcome } from "@/lib/method/methodVerdict"
 import { buildMethodErrorInputs } from "@/lib/method/methodErrorsAdapter"
 import { upsertLearningError } from "@/lib/lesson/evidenceService"
-import { Check, ChevronLeft, ListChecks, RotateCcw, Lightbulb, SendHorizonal, ArrowLeft } from "lucide-react"
+import { Check, ChevronLeft, ListChecks, RotateCcw, Lightbulb, SendHorizonal } from "lucide-react"
 
 type Props = {
   initialModeId?: MethodModeId
@@ -58,7 +58,6 @@ export function MethodChecklistLab({
 
   const [modeId, setModeId] = useState<MethodModeId>(initialModeId)
   const [localChecked, setLocalChecked] = useState<Record<string, boolean>>({})
-  const [localStarted, setLocalStarted] = useState(false)
   const [proofInput, setProofInput] = useState("")
 
   const mode: MethodMode = useMemo(
@@ -109,14 +108,13 @@ export function MethodChecklistLab({
   const run = isSessionMode ? methodRun : null
   const currentStepIdx = run?.currentStepIndex ?? 0
   const committed = run?.committed ?? localChecked
-  const proofs = run?.proofs ?? {}
   const selfCheck = run?.selfCheck ?? {}
   const hintsUsed = run?.hintsUsed ?? 0
   const contentWeakSelf = run?.contentWeakSelf ?? false
 
   const activeStepId = run?.stepIds[currentStepIdx] ?? null
   const isStepCommitted = (id: string) => !!committed[id]
-  const hasSelfCheck = (id: string) => !!selfCheck[id]
+  const hasSelfCheck = (id: string) => !isSessionMode || !!selfCheck[id]
 
   const totalSteps = displaySteps.length
   const doneCount = displaySteps.filter((s) => isStepCommitted(s.id) && hasSelfCheck(s.id)).length
@@ -126,13 +124,11 @@ export function MethodChecklistLab({
   function selectMode(id: MethodModeId) {
     setModeId(id)
     setLocalChecked({})
-    setLocalStarted(false)
     setProofInput("")
   }
 
   function reset() {
     setLocalChecked({})
-    setLocalStarted(false)
     setProofInput("")
     if (isSessionMode && dispatchSessionEvent) {
       dispatchSessionEvent({ type: "METHOD_RUN_CLEAR" })
@@ -230,7 +226,6 @@ export function MethodChecklistLab({
 
   function toggleStep(id: string) {
     if (isSessionMode) return
-    if (!localStarted) setLocalStarted(true)
     setLocalChecked((prev) => ({ ...prev, [id]: !prev[id] }))
   }
 
@@ -334,7 +329,6 @@ export function MethodChecklistLab({
             const isCommitted = isStepCommitted(step.id)
             const sc = selfCheck[step.id]
             const isActive = activeStepId === step.id
-            const canEdit = isSessionMode ? isActive && !isCommitted : true
 
             return (
               <li key={step.id}>
@@ -348,17 +342,33 @@ export function MethodChecklistLab({
                   }`}
                 >
                   <div className="flex items-start gap-3">
-                    <span
-                      className={`mt-0.5 w-7 h-7 shrink-0 rounded-lg flex items-center justify-center text-xs font-black ${
-                        isCommitted && sc
-                          ? "bg-mint text-ink"
-                          : isCommitted
-                            ? "bg-amber-500/20 text-amber-300"
-                            : "bg-white/10 text-white/60"
-                      }`}
-                    >
-                      {isCommitted && sc ? <Check className="w-4 h-4" strokeWidth={3} /> : idx + 1}
-                    </span>
+                    {isSessionMode ? (
+                      <span
+                        className={`mt-0.5 w-7 h-7 shrink-0 rounded-lg flex items-center justify-center text-xs font-black ${
+                          isCommitted && sc
+                            ? "bg-mint text-ink"
+                            : isCommitted
+                              ? "bg-amber-500/20 text-amber-300"
+                              : "bg-white/10 text-white/60"
+                        }`}
+                      >
+                        {isCommitted && sc ? <Check className="w-4 h-4" strokeWidth={3} /> : idx + 1}
+                      </span>
+                    ) : (
+                      <button
+                        type="button"
+                        aria-pressed={isCommitted}
+                        aria-label={`${isCommitted ? "إلغاء" : "تأكيد"} ${step.title}`}
+                        onClick={() => toggleStep(step.id)}
+                        className={`mt-0.5 w-7 h-7 shrink-0 rounded-lg flex items-center justify-center text-xs font-black transition ${
+                          isCommitted
+                            ? "bg-mint text-ink"
+                            : "bg-white/10 text-white/60 hover:bg-white/20"
+                        }`}
+                      >
+                        {isCommitted ? <Check className="w-4 h-4" strokeWidth={3} /> : idx + 1}
+                      </button>
+                    )}
                     <div className="flex-1 min-w-0">
                       <span
                         className={`block text-sm font-bold ${

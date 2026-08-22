@@ -57,7 +57,7 @@ export default function AnalyseGeneExpressionPage() {
     ) {
       dispatch({ type: "SESSION_RESUME" })
     }
-  }, [])
+  }, [dispatch, snapshot.context.suspendedFrom, snapshot.state])
 
   const methodRun = snapshot.context.methodRun
 

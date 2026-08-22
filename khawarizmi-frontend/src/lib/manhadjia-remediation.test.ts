@@ -61,15 +61,16 @@ describe("fetchContextualRemediation (point d'équilibre)", () => {
   const LONG_TEXT = "تمثل الوثيقة منحنى يبين تطور عدد LTc بدلالة الأيام"
 
   it("succès → POST au bon endpoint avec verb_slug + context", async () => {
-    let captured: { url: string; init: RequestInit } | null = null
+    const calls: Array<{ url: string; init: RequestInit }> = []
     const r = await fetchContextualRemediation(
       "deduce",
       LONG_TEXT,
       fakeFetch(async (url, init) => {
-        captured = { url, init }
+        calls.push({ url, init })
         return okResponse({ data: { verb: "deduce", units: ["unite2-immunite"], relevant_errors: ["خطأ"] } })
       })
     )
+    const captured = calls[0]
     expect(r?.errors).toEqual(["خطأ"])
     expect(captured?.url).toBe(REMEDIATION_ENDPOINT)
     expect(captured?.init.method).toBe("POST")

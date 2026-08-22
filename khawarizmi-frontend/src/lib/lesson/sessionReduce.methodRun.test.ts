@@ -4,7 +4,6 @@ import { initialSessionContext } from "./tunnelTypes"
 import type { SessionSnapshot } from "./sessionReduce"
 import type {
   LessonSessionContext,
-  SessionEvent,
   SessionState,
 } from "./tunnelTypes"
 
