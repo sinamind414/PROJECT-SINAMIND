@@ -14,6 +14,10 @@ expert). Usage :
     python scripts/golden_human_report.py
     python scripts/golden_human_report.py --min-items 30   # seuil de confiance
     python scripts/golden_human_report.py --export data/golden_disagreements.csv
+    python scripts/golden_human_report.py \
+      --input ../docs/pedagogie/validation-humaine/evidence/golden-human-annotated.json \
+      --consensus ../docs/pedagogie/validation-humaine/evidence/golden-consensus.json \
+      --metrics-output ../docs/pedagogie/validation-humaine/evidence/human-metrics.json
 """
 
 from __future__ import annotations
@@ -21,8 +25,10 @@ from __future__ import annotations
 import argparse
 import asyncio
 import csv
+import hashlib
 import json
 import sys
+from datetime import UTC, datetime
 from pathlib import Path
 
 BACKEND = Path(__file__).parent.parent
@@ -70,11 +76,17 @@ async def main() -> int:
     parser.add_argument("--export", default="", help="export CSV des désaccords")
     parser.add_argument("--min-items", type=int, default=0,
                         help="n items minimum pour considérer le verdict fiable")
+    parser.add_argument("--input", default="", help="golden humain JSON alternatif")
+    parser.add_argument("--consensus", default="", help="golden-consensus.json pour lier le hash")
+    parser.add_argument("--metrics-output", default="", help="écrit human-metrics.json")
     args = parser.parse_args()
 
-    from tests.golden.metrics import load_golden_annotated
-
-    items = load_golden_annotated()
+    if args.input:
+        payload = json.loads(Path(args.input).read_text(encoding="utf-8"))
+        items = payload.get("items", [])
+    else:
+        from tests.golden.metrics import load_golden_annotated
+        items = load_golden_annotated()
     if not items:
         print("❌ golden_annotated.json absent ou vide")
         return 1
@@ -149,12 +161,53 @@ async def main() -> int:
         export_disagreements(sorted(rows, key=lambda r: -r["ecart"]),
                              BACKEND / args.export)
 
+    if args.metrics_output:
+        if not args.consensus:
+            print("❌ --metrics-output exige --consensus")
+            return 1
+        consensus_payload = json.loads(Path(args.consensus).read_text(encoding="utf-8"))
+        consensus_items = consensus_payload.get("items", [])
+        consensus_hash = hashlib.sha256(
+            json.dumps(consensus_items, sort_keys=True, ensure_ascii=False).encode()
+        ).hexdigest()
+        l2_passed = (
+            m_l2.get("mae") is not None
+            and m_l2["mae"] <= THRESHOLDS["l2"]["mae"]
+            and m_l2["severe_error_rate"] <= THRESHOLDS["l2"]["severe"]
+            and (m_l2.get("kappa") is None or m_l2["kappa"] >= THRESHOLDS["l2"]["kappa"])
+        )
+        savoir_passed = bool(handled) and (
+            m_savoir.get("mae") is not None
+            and m_savoir["mae"] <= THRESHOLDS["savoir"]["mae"]
+            and m_savoir["severe_error_rate"] <= THRESHOLDS["savoir"]["severe"]
+            and (m_savoir.get("kappa") is None or m_savoir["kappa"] >= THRESHOLDS["savoir"]["kappa"])
+        )
+        metrics = {
+            "consensus_sha256": consensus_hash,
+            "n": len(consensus_items),
+            "mae_l2": m_l2.get("mae"),
+            "kappa_l2": m_l2.get("kappa"),
+            "severe_error_rate_l2": m_l2.get("severe_error_rate"),
+            "mae_savoir": m_savoir.get("mae") if handled else None,
+            "kappa_savoir": m_savoir.get("kappa") if handled else None,
+            "severe_error_rate_savoir": m_savoir.get("severe_error_rate") if handled else None,
+            "thresholds_passed": l2_passed and savoir_passed,
+            "computed_at": datetime.now(UTC).isoformat(),
+            "computed_by": "golden_human_report.py",
+        }
+        Path(args.metrics_output).write_text(
+            json.dumps(metrics, ensure_ascii=False, indent=2) + "\n",
+            encoding="utf-8",
+        )
+        print(f"  → métriques humaines exportées : {args.metrics_output}")
+
     # ── Verdict global ──────────────────────────────────────────────
     print("\n── Verdict ──")
-    n_human = sum(1 for it in items if it.get("annotator") == "expert_svt")
+    valid_human_annotators = {"expert_svt_double_blind"}
+    n_human = sum(1 for it in items if it.get("annotator") in valid_human_annotators)
     if n_human == 0:
-        print("  ⚠️ Aucune annotation experte (annotator=expert_svt) — ce rapport "
-              "reflète le golden SYNTHÉTIQUE (baseline).")
+        print("  ⚠️ Aucune annotation humaine validante — ce rapport reflète "
+              "une baseline synthétique ou mono-correcteur.")
     else:
         print(f"  ✅ {n_human}/{len(items)} items annotés par expert")
         if n_human < args.min_items:

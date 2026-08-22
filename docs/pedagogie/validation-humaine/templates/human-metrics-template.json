@@ -1,0 +1,13 @@
+{
+  "consensus_sha256": "",
+  "n": null,
+  "mae_l2": null,
+  "kappa_l2": null,
+  "severe_error_rate_l2": null,
+  "mae_savoir": null,
+  "kappa_savoir": null,
+  "severe_error_rate_savoir": null,
+  "thresholds_passed": false,
+  "computed_at": "",
+  "computed_by": ""
+}

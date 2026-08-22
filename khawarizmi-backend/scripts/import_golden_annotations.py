@@ -1,6 +1,7 @@
-"""scripts/import_golden_annotations.py — Import des annotations expert SVT.
+"""scripts/import_golden_annotations.py — Import historique mono-correcteur.
 
-Lit le CSV complété par l'expert (data/golden_annotation_template.csv ou
+Ne débloque jamais la publication Lot 7. Lit le CSV complété par un relecteur
+(data/golden_annotation_template.csv ou
 tout CSV au même format), fusionne avec les items sources (champs
 non-humains préservés), VALIDE avec validate_golden_annotations puis écrit
 tests/golden/golden_annotated.json (backup .bak conservé).
@@ -82,7 +83,7 @@ def merge_csv(csv_path: Path, source_items: list[dict]) -> list[dict]:
         item["human_dominant_error"] = (row.get("human_dominant_error") or "").strip()
         item["human_matched_criteria"] = _parse_list(row.get("human_matched_criteria") or "")
         item["human_unmatched_criteria"] = _parse_list(row.get("human_unmatched_criteria") or "")
-        item["annotator"] = "expert_svt"
+        item["annotator"] = "human_single_reviewer_unverified"
         item["annotation_date"] = (row.get("annotation_date") or "").strip()
         merged.append(item)
 
@@ -130,7 +131,7 @@ def main() -> int:
         return 1
 
     kept = len(source_items) - len(merged)
-    print(f"✅ {len(merged)} items annotés VALIDES (annotator=expert_svt)"
+    print(f"✅ {len(merged)} items mono-annotés cohérents (non validants pour publication)"
           + (f" · {kept} items non annotés conservés tels quels" if kept else ""))
 
     if args.dry_run:
@@ -140,12 +141,11 @@ def main() -> int:
     shutil.copy(GOLDEN_ANNOTATED, str(GOLDEN_ANNOTATED) + ".bak")
     GOLDEN_ANNOTATED.write_text(json.dumps({
         "metadata": {
-            "source": "golden_set_onec.json (ONEC Bac SVT)",
-            "annotation_type": "expert_svt",
-            "annotator": "expert_svt",
+            "source": "golden_set_onec.json (nom historique) — jeu candidat interne, provenance primaire non établie",
+            "annotation_type": "human_single_reviewer",
+            "annotator": "human_single_reviewer_unverified",
             "date": max((it.get("annotation_date") or "") for it in merged) or "",
-            "note": "Annotations humaines expert SVT — remplacement des "
-                    "annotations synthétiques (synthetic_keyword_v1)",
+            "note": "Annotation humaine mono-correcteur non vérifiée : reste formative et ne remplace pas le double aveugle Lot 7.",
         },
         "items": merged,
     }, ensure_ascii=False, indent=2), encoding="utf-8")

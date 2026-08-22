@@ -1,0 +1,21 @@
+{
+  "reviewers": [
+    {
+      "reviewer_id": "",
+      "role": "teacher_or_inspector_svt",
+      "organization": "",
+      "declaration_reference": ""
+    },
+    {
+      "reviewer_id": "",
+      "role": "teacher_or_inspector_svt",
+      "organization": "",
+      "declaration_reference": ""
+    }
+  ],
+  "arbiter": {
+    "reviewer_id": "",
+    "role": "teacher_or_inspector_svt",
+    "declaration_reference": ""
+  }
+}

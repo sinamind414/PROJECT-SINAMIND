@@ -1,10 +1,10 @@
 {
   "metadata": {
-    "source": "golden_set_onec.json (ONEC Bac SVT)",
+    "source": "golden_set_onec.json (nom historique) — jeu candidat interne, provenance primaire non établie",
     "annotation_type": "synthetic_keyword_based",
     "annotator": "synthetic_keyword_v1",
     "date": "2026-08-07",
-    "note": "Approche B — remplacer par annotations expert_svt (même format) quand disponible"
+    "note": "Baseline synthétique uniquement — ne vaut ni annotation humaine ni validation ONEC"
   },
   "items": [
     {

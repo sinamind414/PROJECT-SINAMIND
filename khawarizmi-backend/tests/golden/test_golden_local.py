@@ -6,9 +6,9 @@ prérequis pour activer O1 (gating par confiance) et brancher savoir_corrector
 en production.
 
 ⚠️ Annotation : golden_annotated.json est SYNTHÉTIQUE (baseline mots-clés,
-voir build_golden_annotated.py) — format identique à l'annotation humaine
-prévue (approche A du plan) ; remplacer annotator par "expert_svt" quand les
-vraies annotations existent, la mécanique ne change pas.
+voir build_golden_annotated.py) — cette baseline ne devient jamais humaine
+par changement de métadonnée. Le remplacement exige le consensus double
+aveugle validé par la garde Lot 7.
 
 Seuils (plan, calibrés sur première exécution) :
     L2     : MAE ≤ 0.85/4 · severe ≤ 0.10 · κ ≥ 0.45

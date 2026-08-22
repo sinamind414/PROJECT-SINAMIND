@@ -1,6 +1,7 @@
-"""scripts/export_golden_template.py — Template d'annotation expert SVT.
+"""scripts/export_golden_template.py — Template historique mono-correcteur.
 
-Exporte depuis tests/golden/golden_annotated.json un template PRÊT À
+Ne débloque jamais la publication Lot 7 (double aveugle requis). Exporte
+depuis tests/golden/golden_annotated.json un template PRÊT À
 REMPLIR par l'expert (champs human_* vidés) en 2 formats :
   - data/golden_annotation_template.json  : structure JSON finale
   - data/golden_annotation_template.csv   : tableur (Excel/Sheets/LibreOffice)
@@ -46,7 +47,7 @@ def blank_item(item: dict) -> dict:
         "human_dominant_error": "",
         "human_matched_criteria": [],
         "human_unmatched_criteria": [],
-        "annotator": "expert_svt",
+        "annotator": "",
         "annotation_date": "",
     })
     return out
@@ -102,10 +103,9 @@ def main() -> int:
     OUT_JSON.parent.mkdir(exist_ok=True)
     OUT_JSON.write_text(json.dumps({
         "metadata": {
-            "source": "golden_annotated.json (ONEC Bac SVT)",
-            "annotation_type": "expert_svt",
-            "note": "Template vierge — remplir human_* (CSV conseillé), puis "
-                    "scripts/import_golden_annotations.py --csv",
+            "source": "golden_annotated.json — jeu candidat interne, provenance primaire non établie",
+            "annotation_type": "human_single_reviewer_template",
+            "note": "Template mono-correcteur historique : ne débloque pas la publication. Utiliser docs/pedagogie/validation-humaine/templates pour le double aveugle.",
         },
         "items": template_items,
     }, ensure_ascii=False, indent=2), encoding="utf-8")

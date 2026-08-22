@@ -1,8 +1,8 @@
 {
   "metadata": {
     "version": "1.0",
-    "source": "ONEC — Bac Sciences Expérimentales SVT",
-    "description": "Golden Set pour benchmark qualité RAG + Eval Engine",
+    "source": "Jeu candidat interne — provenance ONEC non établie; pièce primaire à archiver",
+    "description": "Jeu candidat interne pour benchmark formatif RAG + Eval Engine, non certificatif",
     "usage": "scripts/benchmark_golden_set.py",
     "total_questions": 50,
     "created": "2026-06-22",

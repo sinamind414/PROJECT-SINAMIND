@@ -1,0 +1,60 @@
+{
+  "evaluated_at": "2026-08-22",
+  "decision": "NO_GO",
+  "mechanical_gate_passed": false,
+  "human_authenticity_note": "Le logiciel contrôle présence, cohérence et hashes; l'authenticité des identités/signatures reste une responsabilité humaine externe.",
+  "criteria": {
+    "primary_ministerial_source": {
+      "passed": false,
+      "problems": [
+        "evidence/primary-source.json absent"
+      ]
+    },
+    "golden_double_blind": {
+      "passed": false,
+      "problems": [
+        "couverture attendue 125, reçue 0",
+        "un reviewer_id unique et non vide est requis par fichier",
+        "couverture attendue 125, reçue 0",
+        "un reviewer_id unique et non vide est requis par fichier",
+        "evidence/reviewers.json absent"
+      ]
+    },
+    "golden_arbitration": {
+      "passed": false,
+      "problems": [
+        "annotations double aveugle incomplètes"
+      ]
+    },
+    "human_metrics": {
+      "passed": false,
+      "problems": [
+        "evidence/human-metrics.json ou consensus absent"
+      ]
+    },
+    "contents_55": {
+      "passed": false,
+      "problems": [
+        "evidence/content-review.csv absent"
+      ]
+    },
+    "rubrics_110": {
+      "passed": false,
+      "problems": [
+        "evidence/rubric-review.csv absent"
+      ]
+    },
+    "figures_35": {
+      "passed": false,
+      "problems": [
+        "evidence/figure-review.csv absent"
+      ]
+    },
+    "publication_signoff": {
+      "passed": false,
+      "problems": [
+        "evidence/publication-signoff.json absent"
+      ]
+    }
+  }
+}

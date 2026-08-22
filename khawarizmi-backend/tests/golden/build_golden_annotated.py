@@ -2,8 +2,8 @@
 
 ⚠️ Annotations SYNTHÉTIQUES déterministes (approche B du plan) : en l'absence
 d'expert SVT disponible pour annoter 50 copies (approche A, 2-3 h), le score
-humain est défini par CONSTRUCTION à partir des mots-clés attendus du golden
-set ONEC :
+humain est défini par CONSTRUCTION à partir des mots-clés attendus du jeu
+candidat interne (nom de fichier historique « onec », provenance non établie) :
 
   - copie parfaite  = reponse_attendue (tous les mots-clés) → barème, all_correct
   - copie partielle = texte tronqué à ~55 % (limite de mot) → score = barème ×
@@ -11,10 +11,9 @@ set ONEC :
     ou insufficient
   - copie vide (1 item sur 2) → 0, empty (teste les vrais rejets sanity)
 
-Le format est IDENTIQUE à l'annotation humaine du plan (human_score,
-human_dominant_error, annotator, annotation_date) : il suffira de remplacer
-annotator: "synthetic_keyword_v1" par "expert_svt" et les scores humains par
-les vraies annotations — la mécanique de mesure ne change pas.
+Le format reprend les champs historiques human_score/human_dominant_error,
+mais changer une métadonnée ne crée aucune validation humaine. La publication
+requiert le workflow double aveugle et la garde Lot 7.
 
 Usage :
     python tests/golden/build_golden_annotated.py
@@ -44,7 +43,7 @@ def _truncate_to_word(text: str, ratio: float) -> str:
 def _strip_article(word: str) -> str:
     """Retire l'article arabe défini 'ال' en tête de mot (len > 4).
 
-    Le golden set ONEC liste des mots-clés canoniques ('حرارة مثلى') que la
+    Le jeu candidat liste des mots-clés canoniques ('حرارة مثلى') que la
     reponse_attendue écrit sous forme définie ('الحرارة المثلى') — le matching
     d'annotation doit tolérer cette flexion, sinon des copies parfaites sont
     annotées avec des scores faux (artefact mesuré : gs_016 noté 4/4 humain
@@ -141,12 +140,11 @@ if __name__ == "__main__":
     OUT.write_text(
         json.dumps({
             "metadata": {
-                "source": "golden_set_onec.json (ONEC Bac SVT)",
+                "source": "golden_set_onec.json (nom historique) — jeu candidat interne, provenance primaire non établie",
                 "annotation_type": "synthetic_keyword_based",
                 "annotator": ANNOTATOR,
                 "date": ANNOTATION_DATE,
-                "note": "Approche B — remplacer par annotations expert_svt "
-                        "(même format) quand disponible",
+                "note": "Baseline synthétique uniquement — ne vaut ni annotation humaine ni validation ONEC",
             },
             "items": items,
         }, ensure_ascii=False, indent=2),

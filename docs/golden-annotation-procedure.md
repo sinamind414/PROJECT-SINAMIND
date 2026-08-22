@@ -1,8 +1,13 @@
-# Procédure d'annotation humaine du golden set (approche A)
+# Procédure historique mono-correcteur du golden set
 
-**Objectif** : remplacer les annotations SYNTHÉTIQUES (`synthetic_keyword_v1`)
-par des annotations d'un expert SVT — les métriques MAE/κ deviennent alors
-des mesures de justesse absolue, pas de non-régression.
+> **NE DÉBLOQUE PAS LA PUBLICATION.** Cette procédure reste utile pour un
+> pré-audit formatif, mais le Lot 7 exige deux annotations indépendantes, un
+> arbitrage et des références de déclarations humaines. Workflow validant :
+> `docs/pedagogie/validation-humaine/README.md`.
+
+**Objectif historique** : remplacer la baseline SYNTHÉTIQUE
+(`synthetic_keyword_v1`) par une première lecture humaine. Même complétée,
+cette lecture unique reste non certificative.
 
 **Durée estimée** : 2-3 h pour 50 questions × 2-3 copies (125 items).
 
@@ -12,7 +17,7 @@ des mesures de justesse absolue, pas de non-régression.
 
 | Fichier | Rôle |
 |---|---|
-| `khawarizmi-backend/data/golden_set_onec.json` | questions sources (50) — NE PAS MODIFIER |
+| `khawarizmi-backend/data/golden_set_onec.json` | jeu candidat interne (nom historique ; provenance primaire non établie) — NE PAS MODIFIER |
 | `khawarizmi-backend/tests/golden/golden_annotated.json` | annotations — LE fichier à remplacer |
 | `khawarizmi-backend/tests/golden/metrics.py` | calcul MAE/κ/severe (inchangé) |
 | `khawarizmi-backend/tests/golden/test_golden_local.py` | tests CI avec seuils (inchangé) |
@@ -64,7 +69,7 @@ python scripts/golden_human_report.py
   "human_dominant_error": "all_correct",
   "human_matched_criteria": ["النواة", "ADN", "نسخ"],
   "human_unmatched_criteria": [],
-  "annotator": "expert_svt",
+  "annotator": "human_single_reviewer_unverified",
   "annotation_date": "2026-08-15"
 }
 ```
@@ -82,7 +87,7 @@ python scripts/golden_human_report.py
 4. **Ne PAS modifier** : question_id, verb_slug, chapitre, question,
    student_answer, bareme, reponse_attendue, mots_cles_attendus — ces champs
    viennent du golden source.
-5. **annotator** : `"expert_svt"` + `annotation_date` au format ISO.
+5. **annotator** : l'import marque `human_single_reviewer_unverified` ; cette valeur ne peut jamais ouvrir la garde double aveugle.
 
 ## 4. Codes `human_dominant_error` valides
 

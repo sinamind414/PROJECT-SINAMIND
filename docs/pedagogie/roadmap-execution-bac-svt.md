@@ -104,6 +104,8 @@
 - seuils MAE/κ recalculés sur annotations humaines ;
 - GO signé pour contenus, figures et barèmes.
 
+**État : NO-GO — DOSSIER TECHNIQUE PRÊT, PREUVES HUMAINES ABSENTES.** Les templates couvrent 125 annotations A/B, arbitrage, 55 contenus, 110 barèmes et 35 figures. La garde `scripts/check_publication_gate.py` bloque mécaniquement la publication : pièce primaire, deux annotations, arbitrage, métriques humaines, validations et signatures sont tous absents. Aucun de ces critères n’a été artificiellement rempli.
+
 ## Hors périmètre automatique
 
 Un agent logiciel ne signe pas une validation scientifique, ne fabrique pas une provenance ONEC et ne transforme pas une baseline synthétique en annotation humaine.
