@@ -71,6 +71,8 @@
 - absence de référence → note plafonnée et avertissement ;
 - tests adversariaux et score toujours borné au barème.
 
+**État : TERMINÉ POUR LE PARCOURS FORMATIF —** les 110 activités de chapitre appellent désormais le correcteur déterministe « science d’abord », limité à 4 000 caractères et sans persistance de la copie. Une erreur scientifique renvoie au chapitre exact, une erreur méthodologique à l’atelier du verbe exact, le coach affiche deux priorités maximum et la reprise remasque le corrigé. Le statut reste non certificatif tant que les barèmes et annotations n’ont pas reçu la validation humaine du lot 7.
+
 ## Lot 5 — Mémoire et boussole
 
 **But :** FSRS choisit quoi revoir, le coach explique pourquoi.

@@ -3,13 +3,16 @@ import logging
 import re
 from pathlib import Path
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from database import get_db
 from deps import get_current_user
+from rate_limit import evaluate_limit, limiter
 from routes.cours import COURSE_FILE, extract_unit_scope
+from schemas.exercise import ChapterExerciseEvaluateRequest
+from services.chapter_exercise_corrector import evaluate_chapter_activity
 
 logger = logging.getLogger("khawarizmi.api")
 router = APIRouter(prefix="/api/exercices", tags=["Exercices"])
@@ -143,6 +146,29 @@ async def get_exercices(
         "nb_corrections": nb_corrections,
         "nb_sections": source_sections,
     }
+
+
+@router.post("/chapter/{chapter_slug}/{activity_kind}/evaluate")
+@limiter.limit(evaluate_limit)
+async def evaluate_chapter_exercise(
+    request: Request,
+    chapter_slug: str,
+    activity_kind: str,
+    body: ChapterExerciseEvaluateRequest,
+    current_user: dict = Depends(get_current_user),
+):
+    """Corrige une activité 55/55 sans persister la copie en clair."""
+    del request, current_user
+    if activity_kind not in {"restitution", "document"}:
+        raise HTTPException(status_code=404, detail="Type d'activité introuvable")
+    result = evaluate_chapter_activity(
+        chapter_slug=chapter_slug,
+        activity_kind=activity_kind,
+        student_answer=body.answer,
+    )
+    if not result:
+        raise HTTPException(status_code=404, detail="Activité de chapitre introuvable")
+    return result
 
 
 from pydantic import BaseModel

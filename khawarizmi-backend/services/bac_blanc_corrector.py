@@ -78,6 +78,10 @@ def correct_bac_answer(exercise: dict[str, Any], student_answer: str) -> dict[st
         "feedback": " | ".join(feedback_parts),
         "scientific_ratio": round(scientific_ratio, 3),
         "methodology_ratio": round(methodology_ratio, 3),
+        "scientific_errors": scientific_errors[:3],
+        "scientific_strengths": [str(item) for item in scientific.get("points_forts", [])][:3],
+        "methodology_advice": str(methodology.get("advice") or ""),
+        "methodology_error_code": str(methodology.get("dominant_error_code") or "partial_correct"),
         "dominant_error_code": (
             "scientific_error" if grave
             else methodology.get("dominant_error_code") or "partial_correct"

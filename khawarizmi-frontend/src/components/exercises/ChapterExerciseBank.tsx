@@ -2,35 +2,67 @@
 
 import { useState } from "react"
 import Link from "next/link"
+import { CoachPanel } from "@/components/methodology/CoachPanel"
+import { apiClient } from "@/lib/api-client"
 import {
   mayShowExerciseCorrection,
   type ChapterExerciseActivity,
   type ChapterExerciseBankEntry,
 } from "@/lib/chapter-exercise-bank"
+import type { ChapterExerciseEvaluation } from "@/lib/types"
 
 function ExerciseActivityCard({
   activity,
+  chapterSlug,
   index,
 }: {
   activity: ChapterExerciseActivity
+  chapterSlug: string
   index: number
 }) {
   const [answer, setAnswer] = useState("")
   const [submitted, setSubmitted] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
   const [validationError, setValidationError] = useState(false)
+  const [backendFallback, setBackendFallback] = useState(false)
+  const [evaluation, setEvaluation] = useState<ChapterExerciseEvaluation | null>(null)
   const [checkedCriteria, setCheckedCriteria] = useState<string[]>([])
   const showCorrection = mayShowExerciseCorrection(submitted)
   const selfScore = activity.criteria
     .filter((criterion) => checkedCriteria.includes(criterion.code))
     .reduce((total, criterion) => total + criterion.points, 0)
 
-  function submit() {
+  const learningErrors = evaluation?.error_types.map((code, errorIndex) => ({
+    id: `${activity.id}:${code}:${errorIndex}`,
+    lessonId: `exercise:${activity.id}`,
+    verbSlug: evaluation.verb_slug,
+    source: code === "methodology_error" ? "method" as const : "document" as const,
+    code,
+    createdAt: "2026-08-22T00:00:00.000Z",
+  })) ?? []
+
+  async function submit() {
     if (answer.trim().length < 3) {
       setValidationError(true)
       return
     }
     setValidationError(false)
-    setSubmitted(true)
+    setSubmitting(true)
+    setBackendFallback(false)
+    try {
+      const result = await apiClient.evaluateChapterExercise({
+        chapterSlug,
+        activityKind: activity.kind,
+        answer,
+      })
+      setEvaluation(result)
+    } catch {
+      setEvaluation(null)
+      setBackendFallback(true)
+    } finally {
+      setSubmitting(false)
+      setSubmitted(true)
+    }
   }
 
   function toggleCriterion(code: string) {
@@ -44,16 +76,23 @@ function ExerciseActivityCard({
   function retry() {
     setAnswer("")
     setSubmitted(false)
+    setSubmitting(false)
     setValidationError(false)
+    setBackendFallback(false)
+    setEvaluation(null)
     setCheckedCriteria([])
   }
 
   return (
-    <article className="rounded-3xl border border-white/[0.08] bg-[#131E24] p-5 md:p-6">
+    <article
+      id={`activity-${activity.id}`}
+      className="scroll-mt-6 rounded-3xl border border-white/[0.08] bg-[#131E24] p-5 md:p-6"
+    >
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <p className="text-xs font-black text-mint-soft">النشاط {index + 1} · {activity.kind === "restitution" ? "استرجاع" : "وثيقة"}</p>
           <h2 className="mt-1 text-xl font-black text-white">{activity.titleAr}</h2>
+          <p className="mt-1 text-[11px] text-white/35" dir="ltr">Verbe · {activity.verbSlug}</p>
         </div>
         <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-bold text-white/60">
           سلم {activity.scoreMax} نقاط
@@ -81,7 +120,8 @@ function ExerciseActivityCard({
         <textarea
           value={answer}
           onChange={(event) => setAnswer(event.target.value)}
-          disabled={submitted}
+          disabled={submitted || submitting}
+          maxLength={4000}
           rows={6}
           aria-label={`إجابة ${activity.titleAr}`}
           className="mt-4 w-full rounded-2xl border border-white/10 bg-slate-950/60 p-4 text-white outline-none focus:border-mint disabled:opacity-70"
@@ -91,21 +131,69 @@ function ExerciseActivityCard({
           <button
             type="button"
             onClick={submit}
-            className="mt-3 min-h-12 rounded-xl bg-mint px-5 py-3 text-sm font-black text-slate-deep"
+            disabled={submitting}
+            className="mt-3 min-h-12 rounded-xl bg-mint px-5 py-3 text-sm font-black text-slate-deep disabled:opacity-50"
           >
-            أرسل المحاولة وأظهر التصحيح
+            {submitting ? "جاري فحص المحتوى العلمي..." : "أرسل المحاولة إلى المصحح"}
           </button>
         )}
         {validationError && (
           <p role="alert" className="mt-2 text-xs font-bold text-red-300">اكتب إجابة قبل الإرسال.</p>
         )}
+        <p className="mt-2 text-[10px] text-white/30">لا تُسجل الإجابة في الواجهة ولا يحفظها هذا المسار في قاعدة البيانات.</p>
       </div>
 
       {showCorrection && (
         <section className="mt-5 space-y-4" data-testid={`exercise-correction-${activity.id}`}>
+          {evaluation && (
+            <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <p className="text-xs font-black text-white/45">تصحيح تكويني · العلم قبل المنهجية</p>
+                  <p className={`mt-1 text-sm font-black ${evaluation.passed ? "text-emerald-300" : "text-orange-300"}`}>
+                    {evaluation.passed ? "محاولة مقبولة تكوينيا" : "تحتاج إلى إصلاح ثم إعادة المحاولة"}
+                  </p>
+                </div>
+                <span className="text-2xl font-black text-white">{evaluation.score}/{evaluation.score_max}</span>
+              </div>
+
+              <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <div className="rounded-xl border border-sky-400/20 bg-sky-400/[0.06] p-3">
+                  <p className="text-xs font-black text-sky-200">1. المحتوى العلمي</p>
+                  <p className="mt-1 text-xl font-black text-white">{evaluation.scientific.percentage}%</p>
+                  {evaluation.scientific.errors.map((error) => (
+                    <p key={error} className="mt-1 text-xs leading-relaxed text-red-200">✗ {error}</p>
+                  ))}
+                  {evaluation.scientific.strengths.slice(0, 2).map((strength) => (
+                    <p key={strength} className="mt-1 text-xs leading-relaxed text-emerald-200">{strength}</p>
+                  ))}
+                </div>
+                <div className="rounded-xl border border-violet-400/20 bg-violet-400/[0.06] p-3">
+                  <p className="text-xs font-black text-violet-200">2. المنهجية</p>
+                  <p className="mt-1 text-xl font-black text-white">{evaluation.methodology.percentage}%</p>
+                  <p className="mt-1 text-xs leading-relaxed text-white/60">{evaluation.methodology.advice_ar}</p>
+                </div>
+              </div>
+
+              {evaluation.warning_ar && (
+                <p className="mt-3 rounded-xl bg-red-500/10 p-3 text-xs font-bold text-red-200">{evaluation.warning_ar}</p>
+              )}
+              <p className="mt-3 text-[11px] text-amber-200/70">{evaluation.grading_validation.message_ar}</p>
+            </div>
+          )}
+
+          {backendFallback && (
+            <div className="rounded-2xl border border-amber-400/25 bg-amber-400/10 p-4">
+              <p className="text-sm font-black text-amber-100">المصحح غير متاح: انتقلنا إلى مقارنة ذاتية محلية.</p>
+              <p className="mt-1 text-xs text-amber-100/60">لا تمنح هذه المقارنة نقطة أو إثبات إتقان.</p>
+            </div>
+          )}
+
           <div className="rounded-2xl border border-emerald-400/25 bg-emerald-500/10 p-4">
             <p className="text-xs font-black text-emerald-300">الإجابة المرجعية الداخلية</p>
-            <p className="mt-2 text-sm leading-relaxed text-white/85">{activity.referenceAnswerAr}</p>
+            <p className="mt-2 text-sm leading-relaxed text-white/85">
+              {evaluation?.reference_answer_ar || activity.referenceAnswerAr}
+            </p>
           </div>
 
           <div className="rounded-2xl border border-amber-300/20 bg-amber-400/[0.06] p-4">
@@ -139,6 +227,17 @@ function ExerciseActivityCard({
             <p className="mt-3 text-[11px] text-amber-100/50">هذا تقدير ذاتي تكويني، وليس علامة BAC أو تصحيحا مصادقا عليه.</p>
           </div>
 
+          {evaluation && !evaluation.passed && (
+            <CoachPanel
+              onlyIfFailed={false}
+              outcome="failed"
+              feedbackSeen
+              lessonId={`exercise:${activity.id}`}
+              verbSlug={evaluation.verb_slug}
+              learningErrors={learningErrors}
+            />
+          )}
+
           <button
             type="button"
             onClick={retry}
@@ -163,12 +262,17 @@ export function ChapterExerciseBank({ chapter }: { chapter: ChapterExerciseBankE
         <p className="text-xs font-black text-mint-soft">بنك الفصل · نشاطان إلزاميان</p>
         <h2 id="aligned-exercise-bank-title" className="mt-1 text-xl font-black text-white">استرجاع علمي ثم استغلال وثيقة</h2>
         <p className="mt-2 text-sm leading-relaxed text-white/55">
-          اكتب قبل التصحيح. يبدأ التقويم بالمحتوى العلمي، ثم تفحص تنظيم الإجابة والمنهجية.
+          اكتب قبل التصحيح. يفحص المحرك المحتوى العلمي أولا، ثم منهجية فعل التعليمة، ويقترح أولويتين كحد أقصى.
         </p>
       </div>
 
       {chapter.activities.map((activity, index) => (
-        <ExerciseActivityCard key={activity.id} activity={activity} index={index} />
+        <ExerciseActivityCard
+          key={activity.id}
+          activity={activity}
+          chapterSlug={chapter.chapterSlug}
+          index={index}
+        />
       ))}
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">

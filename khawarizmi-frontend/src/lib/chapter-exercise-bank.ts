@@ -17,6 +17,7 @@ export type ExerciseDocument = {
 export type ChapterExerciseActivity = {
   id: string
   kind: "restitution" | "document"
+  verbSlug: string
   titleAr: string
   promptAr: string
   documents: ExerciseDocument[]

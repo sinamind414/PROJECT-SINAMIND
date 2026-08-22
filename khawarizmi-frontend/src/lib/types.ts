@@ -240,6 +240,46 @@ export interface ExercicesResponse {
   nb_sections: number
 }
 
+export interface ChapterExerciseEvaluation {
+  chapter_slug: string
+  activity_id: string
+  activity_kind: "restitution" | "document"
+  verb_slug: string
+  score: number
+  score_max: number
+  percentage: number
+  passed: boolean
+  scientific: {
+    percentage: number
+    errors: string[]
+    strengths: string[]
+  }
+  methodology: {
+    percentage: number
+    dominant_error_code: string
+    advice_ar: string
+  }
+  error_types: Array<"scientific_error" | "methodology_error" | "off_topic">
+  priorities: Array<{
+    type: "scientific" | "methodology" | "off_topic" | "retry"
+    title_ar: string
+    detail_ar: string
+    href: string
+    label_ar: string
+  }>
+  reference_answer_ar: string
+  reference_missing: boolean
+  warning_ar: string
+  allow_second_attempt: boolean
+  source: "deterministic-science-first"
+  grading_validation: {
+    human_validated: boolean
+    scope: "validated" | "formative_only"
+    message_fr: string
+    message_ar: string
+  }
+}
+
 // ═══════════════════════════════════════════════
 // Programme officiel
 // ═══════════════════════════════════════════════

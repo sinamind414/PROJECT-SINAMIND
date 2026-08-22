@@ -9,7 +9,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 CONTRACTS_PATH = ROOT / "khawarizmi-frontend/data/chapter-learning-contracts.json"
 FICHES_PATH = ROOT / "khawarizmi-frontend/data/fiches-resume.json"
-OUTPUT_PATH = ROOT / "khawarizmi-frontend/data/chapter-exercise-bank.json"
+FRONTEND_OUTPUT_PATH = ROOT / "khawarizmi-frontend/data/chapter-exercise-bank.json"
+BACKEND_OUTPUT_PATH = ROOT / "khawarizmi-backend/data/chapter_exercise_bank.json"
 
 RESTITUTION_PROMPTS = {
     "rappel": "من ذاكرتك، اذكر المكتسبات الضرورية لفهم «{title}» ونظمها في فقرة علمية قصيرة.",
@@ -20,12 +21,15 @@ RESTITUTION_PROMPTS = {
 }
 
 DOCUMENT_PROMPTS = {
-    "rappel": "استخرج من الوثيقة معلومتين ضروريتين لفهم «{title}»، ثم اربطهما بخلاصة قصيرة.",
-    "concept": "حلّل معطيات الوثيقة حول «{title}»: استخرج معلومتين علميتين ثم صغ استنتاجا دقيقا.",
-    "processus": "اعتمادا على الوثيقة، رتّب معطيات «{title}» واربط بينها لتفسير تسلسل العملية ثم استنتج.",
-    "experience": "حلّل معطيات الوثيقة المتعلقة بـ«{title}»، وحدد أثر العامل المدروس ثم صغ استنتاجا.",
-    "synthese": "استغل جميع معطيات الوثيقة لبناء علاقة علمية منظمة حول «{title}»، ثم اختم باستنتاج.",
+    "rappel": "استخرج من الوثيقة معلومتين ضروريتين لفهم «{title}»، ثم نظمهما في خلاصة قصيرة.",
+    "concept": "استخرج من الوثيقة معلومتين علميتين تحددان «{title}» أو خصائصه الأساسية.",
+    "processus": "استخرج من الوثيقة المراحل أو العلاقات الأساسية المرتبطة بـ«{title}» ورتبها بوضوح.",
+    "experience": "استخرج من الوثيقة العامل المدروس وأثره في «{title}»، ثم لخص النتيجة.",
+    "synthese": "استخرج من الوثيقة العلاقات العلمية الأساسية حول «{title}» ونظمها في خلاصة.",
 }
+
+RESTITUTION_VERBS = {chapter_type: "scientific-text" for chapter_type in RESTITUTION_PROMPTS}
+DOCUMENT_VERBS = {chapter_type: "extract" for chapter_type in DOCUMENT_PROMPTS}
 
 EXCLUDED_MARKERS = (
     "اضغط",
@@ -76,6 +80,11 @@ CURATED_POINTS: dict[str, list[str]] = {
         "تتم السلسلة التنفسية والفسفرة التأكسدية على مستوى الغشاء الداخلي وأعراف الميتوكندري.",
         "إذن الميتوكندري هو مقر الأكسدة التنفسية الأساسية، ويضمن تنظيمه الحجيري تكامل مراحل إنتاج ATP.",
     ],
+    "d2-u2-c5-la-phosphorylation-oxydative": [
+        "الأكسجين هو المستقبل النهائي لإلكترونات السلسلة التنفسية، ويؤدي إرجاعه إلى تشكل الماء.",
+        "حسب الحصيلة المعتمدة داخليا، تسمح أكسدة كل NADH بإنتاج 3 ATP وكل FADH₂ بإنتاج 2 ATP.",
+        "ينشئ انتقال الإلكترونات تدرجا بروتونيا عبر الغشاء الداخلي، وتستعمل ATP synthase هذا التدرج لفسفرة ADP.",
+    ],
     "d2-u2-c6-mecanismes-de-conversion-en-milieu-anaerobie-fermentation": [
         "يحدث التخمر في الهيولى عند غياب الأكسجين ويهدم الغلوكوز هدما جزئيا.",
         "يسمح التخمر بتجديد +NAD الضروري لاستمرار التحلل السكري، وتبقى حصيلته الطاقوية الصافية 2 ATP لكل غلوكوز.",
@@ -96,6 +105,7 @@ CURATED_POINTS: dict[str, list[str]] = {
 
 def clean_text(value: str) -> str:
     value = re.sub(r"^[\s•*#🟢🟡🔴💡📈🧪✅⚠️]+", "", value).strip()
+    value = value.replace("؟", ".").replace("?", ".")
     return re.sub(r"\s+", " ", value)
 
 
@@ -135,11 +145,27 @@ def select_scientific_points(
     return candidates[:limit]
 
 
-def build_reference(points: list[dict[str, str]], objective: str) -> str:
+def build_reference(
+    points: list[dict[str, str]],
+    objective: str,
+    *,
+    kind: str,
+    title: str,
+) -> str:
     statements = [point["textAr"] for point in points[:3]]
     if len(statements) < 2:
         statements.append(objective)
-    return " ".join(statements)
+    if kind == "document":
+        return (
+            f"يتضح من الوثيقة حول «{title}» أن {statements[0]} "
+            f"كما يظهر أن {statements[1]} "
+            f"نستخلص أن {statements[2] if len(statements) > 2 else objective}"
+        )
+    return (
+        f"مقدمة: يتناول الفصل «{title}». أولا، {statements[0]} "
+        f"ثانيا، {statements[1]} "
+        f"في الختام، نستنتج أن {statements[2] if len(statements) > 2 else objective}"
+    )
 
 
 def main() -> None:
@@ -159,7 +185,18 @@ def main() -> None:
 
         chapter_type = contract.get("type", "concept")
         title = contract["titleAr"]
-        reference = build_reference(points, contract["objectiveAr"])
+        restitution_reference = build_reference(
+            points,
+            contract["objectiveAr"],
+            kind="restitution",
+            title=title,
+        )
+        document_reference = build_reference(
+            points,
+            contract["objectiveAr"],
+            kind="document",
+            title=title,
+        )
         source_ids = [fiche["id"] for fiche in linked_fiches]
         common = {
             "validationStatus": "internal_pending_teacher",
@@ -176,10 +213,11 @@ def main() -> None:
         restitution = {
             "id": f"{contract['chapterSlug']}:restitution",
             "kind": "restitution",
+            "verbSlug": RESTITUTION_VERBS.get(chapter_type, "scientific-text"),
             "titleAr": "نشاط استرجاع علمي",
             "promptAr": RESTITUTION_PROMPTS.get(chapter_type, RESTITUTION_PROMPTS["concept"]).format(title=title),
             "documents": [],
-            "referenceAnswerAr": reference,
+            "referenceAnswerAr": restitution_reference,
             "criteria": [
                 {"code": "scientific_core", "labelAr": "يذكر المعارف العلمية الأساسية المرتبطة بالفصل.", "points": 2},
                 {"code": "scientific_relation", "labelAr": "يربط العناصر أو المراحل بعلاقة علمية صحيحة.", "points": 1},
@@ -192,6 +230,7 @@ def main() -> None:
         document = {
             "id": f"{contract['chapterSlug']}:document",
             "kind": "document",
+            "verbSlug": DOCUMENT_VERBS.get(chapter_type, "analyse"),
             "titleAr": "نشاط استغلال وثيقة",
             "promptAr": DOCUMENT_PROMPTS.get(chapter_type, DOCUMENT_PROMPTS["concept"]).format(title=title),
             "documents": [
@@ -203,7 +242,7 @@ def main() -> None:
                     "sourceFicheIds": sorted({point["sourceFicheId"] for point in points}),
                 }
             ],
-            "referenceAnswerAr": reference,
+            "referenceAnswerAr": document_reference,
             "criteria": [
                 {"code": "document_evidence", "labelAr": "يستخرج معلومتين واضحتين من الوثيقة دون نسخ عشوائي.", "points": 2},
                 {"code": "document_relation", "labelAr": "يربط المعطيات وفق المطلوب وعلاقة علمية صحيحة.", "points": 1},
@@ -234,7 +273,7 @@ def main() -> None:
 
     output = {
         "metadata": {
-            "version": "2026-08-22.1",
+            "version": "2026-08-22.2",
             "source": "fiches-resume-et-syntheses-internes",
             "validationStatus": "internal_pending_teacher",
             "scope": "formative_only",
@@ -246,8 +285,13 @@ def main() -> None:
         },
         "chapters": chapters,
     }
-    OUTPUT_PATH.write_text(json.dumps(output, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    print(f"Generated {OUTPUT_PATH} ({len(chapters)} chapters, 110 activities)")
+    serialized = json.dumps(output, ensure_ascii=False, indent=2) + "\n"
+    FRONTEND_OUTPUT_PATH.write_text(serialized, encoding="utf-8")
+    BACKEND_OUTPUT_PATH.write_text(serialized, encoding="utf-8")
+    print(
+        f"Generated {FRONTEND_OUTPUT_PATH} and {BACKEND_OUTPUT_PATH} "
+        f"({len(chapters)} chapters, 110 activities)"
+    )
 
 
 if __name__ == "__main__":

@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs"
+import { resolve } from "node:path"
 import { describe, expect, it } from "vitest"
 import learningContractsData from "../../data/chapter-learning-contracts.json"
 import fichesData from "../../data/fiches-resume.json"
@@ -11,6 +13,12 @@ const contracts = learningContractsData.contracts
 const ficheIds = new Set(fichesData.map((fiche) => fiche.id))
 
 describe("banque d'exercices alignée sur les 55 chapitres", () => {
+  it("garde les copies frontend et backend strictement synchronisées", () => {
+    const frontend = readFileSync(resolve(process.cwd(), "data/chapter-exercise-bank.json"), "utf8")
+    const backend = readFileSync(resolve(process.cwd(), "../khawarizmi-backend/data/chapter_exercise_bank.json"), "utf8")
+    expect(frontend).toBe(backend)
+  })
+
   it("couvre exactement les 55 slugs avec deux activités uniques par chapitre", () => {
     const expectedSlugs = new Set(contracts.map((contract) => contract.chapterSlug))
     const bankSlugs = new Set(CHAPTER_EXERCISE_BANK.chapters.map((chapter) => chapter.chapterSlug))
@@ -39,6 +47,9 @@ describe("banque d'exercices alignée sur les 55 chapitres", () => {
       for (const activity of chapter.activities) {
         expect(activity.promptAr.trim().length, activity.id).toBeGreaterThan(20)
         expect(activity.referenceAnswerAr.trim().length, activity.id).toBeGreaterThan(40)
+        expect(activity.verbSlug, activity.id).toBe(
+          activity.kind === "restitution" ? "scientific-text" : "extract",
+        )
         expect(activity.criteria.length, activity.id).toBeGreaterThanOrEqual(3)
         expect(
           activity.criteria.reduce((total, criterion) => total + criterion.points, 0),

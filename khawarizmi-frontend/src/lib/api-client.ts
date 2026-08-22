@@ -10,6 +10,7 @@ import {
   ChatResponse,
   CoursResponse,
   ExercicesResponse,
+  ChapterExerciseEvaluation,
   Flashcard,
   HealthCheck,
   MindMap,
@@ -501,6 +502,21 @@ class KhawarizmiApiClient {
       ? `?domain_num=${context.domainNumero}&unit_num=${context.unitNumero}`
       : ""
     return this.request<ExercicesResponse>(`/api/exercices/${encoded}${query}`)
+  }
+
+  async evaluateChapterExercise(payload: {
+    chapterSlug: string
+    activityKind: "restitution" | "document"
+    answer: string
+  }): Promise<ChapterExerciseEvaluation> {
+    return this.request<ChapterExerciseEvaluation>(
+      `/api/exercices/chapter/${encodeURIComponent(payload.chapterSlug)}/${payload.activityKind}/evaluate`,
+      {
+        method: "POST",
+        body: JSON.stringify({ answer: payload.answer, language: "ar" }),
+        timeoutMs: 15000,
+      },
+    )
   }
 
   // ── Vidéos ─────────────────────────────────────
