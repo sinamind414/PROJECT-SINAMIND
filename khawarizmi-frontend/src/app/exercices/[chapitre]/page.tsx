@@ -7,8 +7,10 @@ import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
 import { AuthGuard } from "@/components/auth/AuthGuard"
 import { AppShell } from "@/components/layout/AppShell"
+import { ChapterExerciseBank } from "@/components/exercises/ChapterExerciseBank"
 import { apiClient } from "@/lib/api-client"
 import { getChapterBySlug } from "@/lib/cours-data"
+import { getChapterExerciseBank } from "@/lib/chapter-exercise-bank"
 import type { ExercicesResponse } from "@/lib/types"
 
 export default function ExercicesPage() {
@@ -16,10 +18,16 @@ export default function ExercicesPage() {
   const rawParam = decodeURIComponent((params.chapitre as string) || "")
   const chapter = getChapterBySlug(rawParam)
   const chapterTitle = chapter?.chapterFr || rawParam
+  const exerciseBank = chapter ? getChapterExerciseBank(chapter.slug) : null
   const [data, setData] = useState<ExercicesResponse | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    if (exerciseBank) {
+      setData(null)
+      setLoading(false)
+      return
+    }
     setLoading(true)
     apiClient
       .getExercices(
@@ -29,7 +37,7 @@ export default function ExercicesPage() {
       .then(setData)
       .catch(() => setData(null))
       .finally(() => setLoading(false))
-  }, [chapter, chapterTitle])
+  }, [chapter, chapterTitle, exerciseBank])
 
   return (
     <AuthGuard>
@@ -37,7 +45,9 @@ export default function ExercicesPage() {
         <main className="flex-1 p-4 md:p-7 overflow-auto" dir="rtl">
           <div className="max-w-4xl mx-auto">
             <header className="rounded-3xl p-6 mb-6 bg-gradient-to-br from-amber-500/15 to-slate-900 border border-amber-500/20">
-              <p className="text-amber-300 text-xs font-bold mb-2">تمارين مصححة من وحدة البرنامج</p>
+              <p className="text-amber-300 text-xs font-bold mb-2">
+                {exerciseBank ? "تدريب تكويني خاص بالفصل" : "تمارين مصححة من وحدة البرنامج"}
+              </p>
               <h1 className="text-2xl font-black text-white">{chapter?.chapterAr || chapterTitle}</h1>
               <p className="text-gray-400 text-sm mt-1" dir="ltr">{chapterTitle}</p>
               {chapter && (
@@ -47,7 +57,9 @@ export default function ExercicesPage() {
               )}
             </header>
 
-            {loading ? (
+            {exerciseBank ? (
+              <ChapterExerciseBank chapter={exerciseBank} />
+            ) : loading ? (
               <div className="flex justify-center py-20"><div className="w-8 h-8 border-2 border-mint border-t-transparent rounded-full animate-spin" /></div>
             ) : !data ? (
               <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-8 text-center">

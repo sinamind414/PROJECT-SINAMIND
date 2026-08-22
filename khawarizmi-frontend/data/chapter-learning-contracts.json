@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "version": "2026-08-22.1",
+    "version": "2026-08-22.2",
     "source": "referentiel-interne-svt-3as",
     "validationStatus": "internal_pending_teacher",
     "count": 55,
@@ -456,12 +456,12 @@
       "domainNumero": 1,
       "unitNumero": 4,
       "chapterNumero": 3,
-      "titleAr": "الحزينات الدفاعية في الحالة الأولى",
+      "titleAr": "الجزيئات الدفاعية في الحالة الأولى (المناعة غير النوعية)",
       "titleFr": "Les molecules de defense dans le premier cas (immunite non specifique)",
       "type": "concept",
       "importance": "haute",
       "validationStatus": "internal_pending_teacher",
-      "objectiveAr": "أن يتمكن التلميذ من معالجة «الحزينات الدفاعية في الحالة الأولى» بدقة علمية ووفق فعل التعليمة في وضعية بكالوريا.",
+      "objectiveAr": "أن يتمكن التلميذ من معالجة «الجزيئات الدفاعية في الحالة الأولى (المناعة غير النوعية)» بدقة علمية ووفق فعل التعليمة في وضعية بكالوريا.",
       "recommendedVerbs": [
         "analyse",
         "interpret",

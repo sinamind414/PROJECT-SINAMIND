@@ -116,7 +116,7 @@ def main() -> None:
 
     output = {
         "metadata": {
-            "version": "2026-08-22.1",
+            "version": "2026-08-22.2",
             "source": "referentiel-interne-svt-3as",
             "validationStatus": "internal_pending_teacher",
             "count": len(contracts),

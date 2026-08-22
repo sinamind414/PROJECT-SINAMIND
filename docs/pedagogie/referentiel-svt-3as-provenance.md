@@ -9,8 +9,10 @@
 - Copie frontend contrôlée :
   `khawarizmi-frontend/data/referentiel-interne-svt-3as.json`.
 - Empreinte SHA-256 commune à cette version :
-  `0f5ff7e6128af10705bf611beea9d19bfc7cb745e3c072d6e82d7dce846635ec`.
+  `009790ae0850f2be907bd2827706ae15dbb0a4cb1ba89e2c74fe355e3ac6d21d`.
 - Structure : **3 domaines, 11 unités, 55 chapitres/activités**.
+- Correction terminologique interne de cette empreinte : D1/U4/C3 emploie
+  « الجزيئات الدفاعية » au lieu de la coquille « الحزينات الدفاعية ».
 - Matériau de recoupement présent dans le dépôt : transcription OCR d'une
   progression ministérielle de juillet 2017 dans
   `khawarizmi-backend/data/methodologie_sciences_3as.json`.

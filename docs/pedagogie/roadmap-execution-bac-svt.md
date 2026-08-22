@@ -57,7 +57,7 @@
 - contenus hors programme marqués « enrichissement » ;
 - aucune annale présentée comme ONEC sans preuve primaire.
 
-**État : À FAIRE —** les questions de restitution réutilisées par la boucle du lot 2 ne valent pas encore banque distincte et alignée 55/55.
+**État : TERMINÉ POUR LE SOCLE FORMATIF INTERNE —** 55 activités de restitution et 55 activités d’exploitation d’un document textuel, chacune avec question, données, réponse de référence, trois critères et barème sur 4. Les corrigés restent masqués avant tentative et les sources portent explicitement le statut interne non-ONEC. La validation scientifique enseignante et l’ajout progressif de documents Bac authentifiés restent requis avant publication certificative.
 
 ## Lot 4 — Correcteur et coach en boucle fermée
 
