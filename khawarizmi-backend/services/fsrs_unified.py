@@ -102,8 +102,8 @@ def _is_postgres(db: AsyncSession) -> bool:
 
 
 def _fsrs_cast(db: AsyncSession) -> str:
-    """CAST jsonb en Postgres ; string brute ailleurs (SQLite/preview)."""
-    return "{_fsrs_cast(db)}" if _is_postgres(db) else ":fsrs"
+    """CAST JSONB en Postgres ; chaîne JSON brute ailleurs (SQLite/preview)."""
+    return "CAST(:fsrs AS JSONB)" if _is_postgres(db) else ":fsrs"
 
 
 def _parse_state(value: Any) -> dict[str, Any]:
@@ -390,6 +390,81 @@ async def update_memory(
     return False
 
 
+async def review_memory_from_score(
+    db: AsyncSession,
+    user_id,
+    kind: MemoryKind,
+    *,
+    item_id: str,
+    chapter: str | None,
+    score_percent: int,
+    now: datetime | None = None,
+) -> dict[str, Any]:
+    """Applique une vraie étape FSRS puis persiste uniquement son résultat.
+
+    La réponse élève n'entre jamais dans ce service. Les trois dimensions
+    mémoire restent des lignes de ``mastery_micro_concepts`` distinguées par
+    ``source`` ; aucun scheduler parallèle n'est créé.
+    """
+    from fsrs import Card, Scheduler, State
+
+    from services.fsrs_graph import score_to_fsrs_rating
+
+    review_time = now or _now()
+    score = max(0, min(100, int(score_percent)))
+    existing_items = await get_user_memory(db, user_id, kinds=(kind,))
+    existing = next((item for item in existing_items if item.item_id == item_id), None)
+
+    card: Card
+    state_payload = existing.fsrs_state if existing else {}
+    if state_payload.get("card_id") and state_payload.get("due"):
+        try:
+            card = Card.from_dict(state_payload)
+        except (KeyError, TypeError, ValueError):
+            card = Card(due=review_time)
+    elif existing and existing.stability > 0 and existing.difficulty > 0:
+        card = Card(
+            state=State.Review,
+            step=None,
+            stability=existing.stability,
+            difficulty=existing.difficulty,
+            due=existing.due or review_time,
+            last_review=existing.last_review or review_time,
+        )
+    else:
+        card = Card(due=review_time)
+
+    rating = score_to_fsrs_rating(score / 100.0)
+    updated_card, _ = Scheduler().review_card(card, rating, review_time)
+    interval_days = max(
+        0.0,
+        (updated_card.due - review_time).total_seconds() / 86400,
+    )
+    persisted = await update_memory(
+        db,
+        user_id,
+        kind,
+        item_id=item_id,
+        chapter=chapter,
+        stability=float(updated_card.stability or 0.0),
+        difficulty=float(updated_card.difficulty or 0.0),
+        fsrs_state=updated_card.to_dict(),
+        due=updated_card.due,
+        interval_jours=interval_days,
+        last_score=score,
+        attempts_delta=1,
+    )
+    return {
+        "updated": persisted,
+        "kind": kind,
+        "item_id": item_id,
+        "rating": rating.name,
+        "score_percent": score,
+        "next_review_at": updated_card.due.isoformat(),
+        "interval_days": round(interval_days, 4),
+    }
+
+
 async def _upsert_concept(db: AsyncSession, user_id, *, item_id, chapter,
                           stability, difficulty, fsrs_state, due,
                           interval_jours, last_score, attempts_delta) -> bool:
@@ -402,7 +477,7 @@ async def _upsert_concept(db: AsyncSession, user_id, *, item_id, chapter,
                      last_score, attempts, last_review, updated_at)
                 VALUES
                     (:uid, :cid, :chapter, :stability, :difficulty,
-                     :fsrs, :due, :interval, :score, :attempts, NOW(), NOW())
+                     :fsrs, :due, :interval, :score, :attempts, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
                 ON CONFLICT (user_id, micro_concept_id) DO UPDATE SET
                     chapter = EXCLUDED.chapter,
                     stability = EXCLUDED.stability,
@@ -412,8 +487,8 @@ async def _upsert_concept(db: AsyncSession, user_id, *, item_id, chapter,
                     interval_jours = EXCLUDED.interval_jours,
                     last_score = EXCLUDED.last_score,
                     attempts = mastery_micro_concepts.attempts + :attempts_delta,
-                    last_review = NOW(),
-                    updated_at = NOW()
+                    last_review = CURRENT_TIMESTAMP,
+                    updated_at = CURRENT_TIMESTAMP
             """),
             {"uid": user_id, "cid": item_id, "chapter": chapter,
              "stability": stability if stability is not None else 0.0,
@@ -455,8 +530,8 @@ async def _upsert_verb_chapter(db: AsyncSession, user_id, *, verb_slug, chapter_
                      source, item_key, updated_at)
                 VALUES
                     (:uid, :cid, :alias, :chapter, :stability, :difficulty,
-                     :fsrs, :due, :interval, :score, :attempts, NOW(),
-                     'verb_chapter', :item_key, NOW())
+                     :fsrs, :due, :interval, :score, :attempts, CURRENT_TIMESTAMP,
+                     'verb_chapter', :item_key, CURRENT_TIMESTAMP)
                 ON CONFLICT (user_id, concept_id) DO UPDATE SET
                     chapter = EXCLUDED.chapter,
                     stability = EXCLUDED.stability,
@@ -466,8 +541,8 @@ async def _upsert_verb_chapter(db: AsyncSession, user_id, *, verb_slug, chapter_
                     interval_jours = EXCLUDED.interval_jours,
                     last_score = EXCLUDED.last_score,
                     attempts = mastery_micro_concepts.attempts + :attempts_delta,
-                    last_review = NOW(),
-                    updated_at = NOW()
+                    last_review = CURRENT_TIMESTAMP,
+                    updated_at = CURRENT_TIMESTAMP
             """),
             payload,
         )
@@ -484,7 +559,7 @@ async def _upsert_verb_chapter(db: AsyncSession, user_id, *, verb_slug, chapter_
                          last_score, attempts, last_review, updated_at)
                     VALUES
                         (:uid, :verb, :chapter, :stability, :difficulty,
-                         :fsrs, :due, :interval, :score, :attempts, NOW(), NOW())
+                         :fsrs, :due, :interval, :score, :attempts, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
                     ON CONFLICT (user_id, verb_slug, chapter_slug) DO UPDATE SET
                         stability = EXCLUDED.stability,
                         difficulty = EXCLUDED.difficulty,
@@ -493,8 +568,8 @@ async def _upsert_verb_chapter(db: AsyncSession, user_id, *, verb_slug, chapter_
                         interval_jours = EXCLUDED.interval_jours,
                         last_score = EXCLUDED.last_score,
                         attempts = da_fsrs.attempts + :attempts_delta,
-                        last_review = NOW(),
-                        updated_at = NOW()
+                        last_review = CURRENT_TIMESTAMP,
+                        updated_at = CURRENT_TIMESTAMP
                 """),
                 {"uid": user_id, "verb": verb_slug, "chapter": chapter_slug,
                  "stability": payload["stability"], "difficulty": payload["difficulty"],
@@ -534,7 +609,7 @@ async def _upsert_verb_action(db: AsyncSession, user_id, *, verb_slug,
                 VALUES
                     (:uid, :cid, :alias, :stability, :difficulty, :fsrs,
                      :due, :interval, :score, :attempts,
-                     'verb_action', :item_key, NOW())
+                     'verb_action', :item_key, CURRENT_TIMESTAMP)
                 ON CONFLICT (user_id, concept_id) DO UPDATE SET
                     stability = EXCLUDED.stability,
                     difficulty = EXCLUDED.difficulty,
@@ -543,7 +618,7 @@ async def _upsert_verb_action(db: AsyncSession, user_id, *, verb_slug,
                     interval_jours = EXCLUDED.interval_jours,
                     last_score = EXCLUDED.last_score,
                     attempts = mastery_micro_concepts.attempts + :attempts_delta,
-                    updated_at = NOW()
+                    updated_at = CURRENT_TIMESTAMP
             """),
             payload,
         )
@@ -560,7 +635,7 @@ async def _upsert_verb_action(db: AsyncSession, user_id, *, verb_slug,
                          attempts, updated_at)
                     VALUES
                         (:uid, :verb, :stability, :difficulty, :fsrs,
-                         :due, :interval, :score, :attempts, NOW())
+                         :due, :interval, :score, :attempts, CURRENT_TIMESTAMP)
                     ON CONFLICT (user_id, verb_slug) DO UPDATE SET
                         stability = EXCLUDED.stability,
                         difficulty = EXCLUDED.difficulty,
@@ -569,7 +644,7 @@ async def _upsert_verb_action(db: AsyncSession, user_id, *, verb_slug,
                         interval_jours = EXCLUDED.interval_jours,
                         last_score = EXCLUDED.last_score,
                         attempts = action_verb_progress.attempts + :attempts_delta,
-                        updated_at = NOW()
+                        updated_at = CURRENT_TIMESTAMP
                 """),
                 {"uid": user_id, "verb": verb_slug,
                  "stability": payload["stability"], "difficulty": payload["difficulty"],
@@ -675,7 +750,7 @@ async def save_concept_review(
                         (:uid, :cid, :alias, :chapter, :next_rev, :interval,
                          :difficulty, :stability, {_fsrs_cast(db)},
                          :due, :last_review, :reps, :lapses, :state,
-                         1, :avg, NOW())
+                         1, :avg, CURRENT_TIMESTAMP)
                     ON CONFLICT (user_id, micro_concept_id) DO UPDATE SET
                         concept_id = COALESCE(mastery_micro_concepts.concept_id, EXCLUDED.concept_id),
                         prochaine_revision = EXCLUDED.prochaine_revision,
@@ -694,7 +769,7 @@ async def save_concept_review(
                              * COALESCE(mastery_micro_concepts.total_reviews, 0))
                             + :avg
                         ) / NULLIF(COALESCE(mastery_micro_concepts.total_reviews, 0) + 1, 0),
-                        updated_at = NOW()
+                        updated_at = CURRENT_TIMESTAMP
                 """),
                 {"uid": user_id, "cid": concept_id,
                  "alias": concept_id_alias or concept_id,
@@ -717,7 +792,7 @@ async def save_concept_review(
                     VALUES
                         (:uid, :cid, :alias, :chapter, :next_rev, :interval,
                          :difficulty, :stability, {_fsrs_cast(db)},
-                         :due, :last_review, :reps, :lapses, :state, NOW())
+                         :due, :last_review, :reps, :lapses, :state, CURRENT_TIMESTAMP)
                     ON CONFLICT (user_id, micro_concept_id) DO UPDATE SET
                         concept_id = COALESCE(mastery_micro_concepts.concept_id, EXCLUDED.concept_id),
                         prochaine_revision = EXCLUDED.prochaine_revision,
@@ -730,7 +805,7 @@ async def save_concept_review(
                         reps = EXCLUDED.reps,
                         lapses = EXCLUDED.lapses,
                         state = EXCLUDED.state,
-                        updated_at = NOW()
+                        updated_at = CURRENT_TIMESTAMP
                 """),
                 {"uid": user_id, "cid": concept_id,
                  "alias": concept_id_alias or concept_id,
@@ -771,11 +846,11 @@ async def save_concept_card(
                 VALUES
                     (:uid, :cid, :alias, :chapter,
                      :difficulty, :stability, :state, :due,
-                     :next_rev, :interval, NOW())
+                     :next_rev, :interval, CURRENT_TIMESTAMP)
                 ON CONFLICT (user_id, micro_concept_id) DO UPDATE SET
                     chapter = EXCLUDED.chapter,
                     difficulty = EXCLUDED.difficulty,
-                    updated_at = NOW()
+                    updated_at = CURRENT_TIMESTAMP
             """),
             {"uid": user_id, "cid": concept_id,
              "alias": concept_id_alias or concept_id,
@@ -868,7 +943,7 @@ async def save_concept_update(
                 VALUES
                     (:user_id, :c_id, :c_id, :chapter, :due,
                      :interval, :difficulty, :stability, {_fsrs_cast(db)},
-                     :pending_eval, NOW())
+                     :pending_eval, CURRENT_TIMESTAMP)
                 ON CONFLICT (user_id, concept_id)
                 DO UPDATE SET
                     due_date           = EXCLUDED.due_date,
@@ -877,7 +952,7 @@ async def save_concept_update(
                     stability          = EXCLUDED.stability,
                     fsrs_state         = EXCLUDED.fsrs_state,
                     pending_real_evaluation = EXCLUDED.pending_real_evaluation,
-                    updated_at         = NOW()
+                    updated_at         = CURRENT_TIMESTAMP
             """),
             {"user_id": user_id, "c_id": concept_id,
              "chapter": chapter, "due": due, "interval": interval_jours,
@@ -907,9 +982,9 @@ async def tag_pending_concept(
                     (user_id, micro_concept_id, concept_id, chapter,
                      pending_real_evaluation, updated_at)
                 VALUES
-                    (:user_id, :mc_id, :mc_id, :chapter, TRUE, NOW())
+                    (:user_id, :mc_id, :mc_id, :chapter, TRUE, CURRENT_TIMESTAMP)
                 ON CONFLICT (user_id, concept_id)
-                DO UPDATE SET pending_real_evaluation = TRUE, updated_at = NOW()
+                DO UPDATE SET pending_real_evaluation = TRUE, updated_at = CURRENT_TIMESTAMP
             """),
             {"user_id": user_id, "mc_id": concept_id, "chapter": chapter},
         )
@@ -986,7 +1061,7 @@ async def save_concept_update_existing(
                 SET due_date = :due, interval_jours = :interval,
                     difficulty = :difficulty, stability = :stability,
                     fsrs_state = {_fsrs_cast(db)},
-                    pending_real_evaluation = FALSE, updated_at = NOW()
+                    pending_real_evaluation = FALSE, updated_at = CURRENT_TIMESTAMP
                 WHERE user_id = :uid AND concept_id = :cid
             """),
             {"uid": user_id, "cid": concept_id, "due": due,
@@ -1012,7 +1087,7 @@ async def clear_pending_concept(
         await db.execute(
             text("""
                 UPDATE mastery_micro_concepts
-                SET pending_real_evaluation = FALSE, updated_at = NOW()
+                SET pending_real_evaluation = FALSE, updated_at = CURRENT_TIMESTAMP
                 WHERE user_id = :uid AND concept_id = :cid
             """),
             {"uid": user_id, "cid": concept_id},

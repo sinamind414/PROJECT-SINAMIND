@@ -83,6 +83,8 @@
 - une seule source de vérité mémoire ;
 - aucune « prédiction Bac » non calibrée présentée comme certaine.
 
+**État : TERMINÉ POUR LE PARCOURS FORMATIF —** chaque correction de chapitre applique une étape FSRS réelle aux dimensions chapitre/verbe dans l’unique table `mastery_micro_concepts`, sans conserver la copie. L’élève voit pourquoi et quand revoir ; la boussole des 11 unités est maintenant chargée sur le dashboard avec routes contrôlées. Les anciennes réponses locales sont automatiquement expurgées et les valeurs non calibrées sont libellées « indicateur mémoire », jamais « prédiction Bac ».
+
 ## Lot 6 — Iconographie et accessibilité
 
 **But :** schémas utilisables dans une copie Bac et interface mobile accessible.

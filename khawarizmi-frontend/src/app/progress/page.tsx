@@ -108,8 +108,9 @@ export default function ProgressPage() {
 
         {source === "api" && apiReady !== null && (
           <SurfaceCard>
-            <p className="text-gray-400 text-[10px] mb-1">تنبؤ البكالوريا</p>
+            <p className="text-gray-400 text-[10px] mb-1">مؤشر الذاكرة التقريبي</p>
             <p className="text-3xl font-bold text-emerald-400">{apiReady}/20</p>
+            <p className="text-gray-500 text-[9px] mt-1">ليس تنبؤا بعلامة البكالوريا</p>
           </SurfaceCard>
         )}
 
@@ -330,7 +331,7 @@ export default function ProgressPage() {
           </RevealSection>
         )}
 
-        <RevealSection title="آخر الإجابات المخزنة">
+        <RevealSection title="آخر نتائج المحاولات">
           <div className="space-y-2">
             {data.history.slice(0, 8).map((item) => (
               <div
@@ -339,7 +340,9 @@ export default function ProgressPage() {
                 style={{ background: "rgba(255,255,255,0.02)" }}
               >
                 <p className="text-mint text-sm font-bold" dir="ltr">{item.verbSlug}</p>
-                <p className="text-gray-300 text-sm line-clamp-2">{item.answer || "إجابة فارغة"}</p>
+                <p className="text-gray-300 text-sm line-clamp-2">
+                  {item.errors[0] || item.success[0] || "تم تسجيل النتيجة دون حفظ نص الإجابة"}
+                </p>
                 <p className="text-white font-bold text-left">{item.percentage}%</p>
               </div>
             ))}

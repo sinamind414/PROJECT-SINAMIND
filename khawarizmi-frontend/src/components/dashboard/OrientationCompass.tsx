@@ -7,7 +7,7 @@ import type { RoadmapResponse } from "@/lib/types"
 /**
  * Boussole d'orientation — le parcours unité par unité du programme SVT Bac.
  *
- * Montre à l'élève : où il en est (5 unités), ce qui est maîtrisé ✅,
+ * Montre à l'élève : où il en est (11 unités), ce qui est maîtrisé ✅,
  * son objectif courant 🎯, ce qui est verrouillé 🔒 (maîtrise d'abord
  * l'unité précédente), et le message du coach qui guide phase par phase.
  */
@@ -48,7 +48,16 @@ export default function OrientationCompass({
   }
 
   if (error || !roadmap) {
-    return null // silencieux en cas d'erreur — ne casse pas le dashboard
+    return (
+      <div className="mx-4 mt-6 rounded-2xl border border-amber-400/20 bg-amber-400/[0.06] p-4" dir="rtl">
+        <p className="text-sm font-bold text-amber-100">تعذر تحميل بوصلة FSRS.</p>
+        {onRetry && (
+          <button type="button" onClick={onRetry} className="mt-2 min-h-11 rounded-xl bg-white/10 px-4 py-2 text-xs font-bold text-white">
+            إعادة المحاولة
+          </button>
+        )}
+      </div>
+    )
   }
 
   const coach = roadmap.coach
@@ -60,7 +69,7 @@ export default function OrientationCompass({
       {/* ── Titre ── */}
       <div className="flex items-center gap-2 mb-3 px-1">
         <Compass className="w-4 h-4 text-mint" />
-        <span className="font-bold text-white">بوصلة التوجيه — برنامج البكالوريا</span>
+        <span className="font-bold text-white">بوصلة التوجيه — المرجع الداخلي 3AS</span>
       </div>
 
       {/* ── Message du coach ── */}
@@ -87,7 +96,7 @@ export default function OrientationCompass({
         )}
       </div>
 
-      {/* ── Les 5 unités ── */}
+      {/* ── Les 11 unités ── */}
       <div className="space-y-2.5">
         {roadmap.unites.map((u) => {
           const badge = STATUT_BADGE[u.statut]
@@ -169,6 +178,15 @@ export default function OrientationCompass({
           )
         })}
       </div>
+
+      {roadmap.memory && (
+        <div className="mt-3 rounded-xl border border-sky-400/15 bg-sky-400/[0.04] p-3">
+          <p className="text-[11px] leading-relaxed text-sky-100/65">{roadmap.memory.message_ar}</p>
+          <p className="mt-1 text-[10px] text-white/30" dir="ltr">
+            {roadmap.memory.source} · {roadmap.memory.items_count} items
+          </p>
+        </div>
+      )}
 
       {/* Légende seuil */}
       <div className="mt-3 text-[10px] text-white/35 px-1">

@@ -178,6 +178,21 @@ function ExerciseActivityCard({
               {evaluation.warning_ar && (
                 <p className="mt-3 rounded-xl bg-red-500/10 p-3 text-xs font-bold text-red-200">{evaluation.warning_ar}</p>
               )}
+              {evaluation.memory && (
+                <div className={`mt-3 rounded-xl border p-3 ${
+                  evaluation.memory.updated
+                    ? "border-sky-400/20 bg-sky-400/[0.06]"
+                    : "border-amber-400/20 bg-amber-400/[0.06]"
+                }`}>
+                  <p className="text-xs font-black text-sky-200">FSRS · لماذا ومتى تراجع؟</p>
+                  <p className="mt-1 text-xs leading-relaxed text-white/70">{evaluation.memory.reason_ar}</p>
+                  {evaluation.memory.next_review_at && (
+                    <p className="mt-1 text-[11px] font-bold text-sky-200">
+                      المراجعة القادمة: {new Date(evaluation.memory.next_review_at).toLocaleString("ar-DZ")}
+                    </p>
+                  )}
+                </div>
+              )}
               <p className="mt-3 text-[11px] text-amber-200/70">{evaluation.grading_validation.message_ar}</p>
             </div>
           )}

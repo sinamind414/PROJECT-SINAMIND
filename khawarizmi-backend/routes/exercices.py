@@ -13,6 +13,7 @@ from rate_limit import evaluate_limit, limiter
 from routes.cours import COURSE_FILE, extract_unit_scope
 from schemas.exercise import ChapterExerciseEvaluateRequest
 from services.chapter_exercise_corrector import evaluate_chapter_activity
+from services.fsrs_unified import review_memory_from_score
 
 logger = logging.getLogger("khawarizmi.api")
 router = APIRouter(prefix="/api/exercices", tags=["Exercices"])
@@ -156,9 +157,10 @@ async def evaluate_chapter_exercise(
     activity_kind: str,
     body: ChapterExerciseEvaluateRequest,
     current_user: dict = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
 ):
-    """Corrige une activité 55/55 sans persister la copie en clair."""
-    del request, current_user
+    """Corrige puis planifie la révision FSRS, sans persister la copie."""
+    del request
     if activity_kind not in {"restitution", "document"}:
         raise HTTPException(status_code=404, detail="Type d'activité introuvable")
     result = evaluate_chapter_activity(
@@ -168,6 +170,47 @@ async def evaluate_chapter_exercise(
     )
     if not result:
         raise HTTPException(status_code=404, detail="Activité de chapitre introuvable")
+
+    chapter_memory = await review_memory_from_score(
+        db,
+        current_user["id"],
+        "verb_chapter",
+        item_id=f"{result['verb_slug']}::{chapter_slug}",
+        chapter=chapter_slug,
+        score_percent=result["percentage"],
+    )
+    verb_memory = await review_memory_from_score(
+        db,
+        current_user["id"],
+        "verb_action",
+        item_id=result["verb_slug"],
+        chapter=None,
+        score_percent=result["methodology"]["percentage"],
+    )
+    await db.commit()
+
+    if "scientific_error" in result["error_types"]:
+        reason_ar = "أعاد FSRS برمجة الفصل لأن المحتوى العلمي يحتاج إلى إصلاح."
+    elif "methodology_error" in result["error_types"]:
+        reason_ar = "أعاد FSRS برمجة فعل التعليمة لأن المنهجية ما زالت ضعيفة."
+    elif "off_topic" in result["error_types"]:
+        reason_ar = "أعاد FSRS برمجة النشاط لأن الإجابة لم تعالج المطلوب."
+    else:
+        reason_ar = "برمج FSRS مراجعة لاحقة لتثبيت المحاولة المقبولة."
+
+    next_reviews = [
+        item["next_review_at"]
+        for item in (chapter_memory, verb_memory)
+        if item.get("updated") and item.get("next_review_at")
+    ]
+    result["memory"] = {
+        "updated": bool(next_reviews),
+        "storage": "mastery_micro_concepts",
+        "next_review_at": min(next_reviews) if next_reviews else None,
+        "reason_ar": reason_ar,
+        "chapter": chapter_memory,
+        "verb": verb_memory,
+    }
     return result
 
 

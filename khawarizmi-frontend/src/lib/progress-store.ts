@@ -92,6 +92,7 @@ export type ProgressSnapshot = {
 }
 
 const STORAGE_KEY = "sinamind.methodology.answers.v1"
+const REDACTED_ANSWER = "[redacted]"
 
 const GAMIFICATION_KEY = "sinamind.gamification.v1"
 const STREAK_KEY = "sinamind.streak.count"
@@ -293,11 +294,19 @@ export function updateDailyStreak() {
   return streak
 }
 
+export function redactStoredMethodologyAnswers(
+  records: StoredMethodologyAnswer[],
+): StoredMethodologyAnswer[] {
+  return records.map((record) => ({ ...record, answer: REDACTED_ANSWER }))
+}
+
 function safeParse(value: string | null): StoredMethodologyAnswer[] {
   if (!value) return []
   try {
     const parsed = JSON.parse(value)
-    return Array.isArray(parsed) ? parsed : []
+    return Array.isArray(parsed)
+      ? redactStoredMethodologyAnswers(parsed as StoredMethodologyAnswer[])
+      : []
   } catch {
     return []
   }
@@ -305,7 +314,12 @@ function safeParse(value: string | null): StoredMethodologyAnswer[] {
 
 export function getStoredAnswers(): StoredMethodologyAnswer[] {
   if (!isBrowser()) return []
-  return safeParse(window.localStorage.getItem(STORAGE_KEY))
+  const raw = window.localStorage.getItem(STORAGE_KEY)
+  const sanitized = safeParse(raw)
+  if (raw && raw !== JSON.stringify(sanitized)) {
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(sanitized))
+  }
+  return sanitized
 }
 
 export function clearStoredProgress() {
@@ -330,7 +344,7 @@ export function saveMethodologyEvaluation(input: {
     id: `${Date.now()}_${Math.random().toString(16).slice(2)}`,
     source: input.source,
     verbSlug: input.verbSlug,
-    answer: input.answer,
+    answer: REDACTED_ANSWER,
     score: input.evaluation.score,
     scoreMax: input.evaluation.scoreMax,
     percentage: input.evaluation.percentage,
@@ -364,7 +378,7 @@ export function saveMethodologyEvaluations(records: Array<{
       id: `${Date.now()}_${index}_${Math.random().toString(16).slice(2)}`,
       source: input.source,
       verbSlug: input.verbSlug,
-      answer: input.answer,
+      answer: REDACTED_ANSWER,
       score: input.evaluation.score,
       scoreMax: input.evaluation.scoreMax,
       percentage: input.evaluation.percentage,
@@ -393,7 +407,6 @@ export function saveBacBlancErrors(input: {
   if (!isBrowser()) return
 
   const current = getStoredAnswers()
-  const existing = new Set(current.map((item) => item.answer))
   const records = input.scoresByVerb
     .filter((score) => score.percentage < 75)
     .map((score) => {
@@ -420,7 +433,7 @@ export function saveBacBlancErrors(input: {
         },
       }
     })
-    .filter((record) => !existing.has(record.marker))
+    .filter((record) => !current.some((item) => item.errors.includes(record.evaluation.errors[0])))
 
   if (!records.length) return
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

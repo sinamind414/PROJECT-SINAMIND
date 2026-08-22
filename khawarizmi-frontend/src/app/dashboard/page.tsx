@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { useCallback, useEffect, useState } from "react"
 import { AuthGuard } from "@/components/auth/AuthGuard"
 import { AppShell } from "@/components/layout/AppShell"
 
@@ -8,16 +8,38 @@ import GenZHeader from "@/components/dashboard/GenZHeader"
 import GenZHeroMission from "@/components/dashboard/GenZHeroMission"
 import UrgentLosses from "@/components/dashboard/UrgentLosses"
 import QuickWins from "@/components/dashboard/QuickWins"
+import OrientationCompass from "@/components/dashboard/OrientationCompass"
 import { ContractPulse } from "@/components/methodology/SessionExitButton"
+import { apiClient } from "@/lib/api-client"
 import { getProgressSnapshot } from "@/lib/progress-store"
 import { getContractSnapshot } from "@/lib/lesson/evidenceService"
 
 import { useDriveDashboard } from "@/hooks/useDriveDashboard"
 import type { Mission } from "@/components/drive-design/api-types"
+import type { RoadmapResponse } from "@/lib/types"
 
 export default function GenZDashboardPage() {
   const state = useDriveDashboard()
   const [showMore, setShowMore] = useState(false)
+  const [roadmap, setRoadmap] = useState<RoadmapResponse | null>(null)
+  const [roadmapLoading, setRoadmapLoading] = useState(true)
+  const [roadmapError, setRoadmapError] = useState<string | null>(null)
+
+  const loadRoadmap = useCallback(async () => {
+    setRoadmapLoading(true)
+    setRoadmapError(null)
+    try {
+      setRoadmap(await apiClient.getOrientationRoadmap())
+    } catch {
+      setRoadmapError("roadmap_unavailable")
+    } finally {
+      setRoadmapLoading(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    void loadRoadmap()
+  }, [loadRoadmap])
 
   // === B: real missions from hook ===
   const missions: Mission[] = state.missions || []
@@ -99,6 +121,13 @@ export default function GenZDashboardPage() {
           />
 
           <ContractPulse />
+
+          <OrientationCompass
+            roadmap={roadmap}
+            loading={roadmapLoading}
+            error={roadmapError}
+            onRetry={() => void loadRoadmap()}
+          />
 
           <UrgentLosses items={urgentItems} />
 

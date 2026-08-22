@@ -1,7 +1,7 @@
 """services/orientation_roadmap.py — La BOUSSOLE : parcours unité par unité.
 
 Répond au besoin : « l'élève n'a pas de boussole, il est désorienté ».
-Transforme le programme SVT Bac Algérie (3AS) en un parcours ORDONNÉ de
+Transforme le référentiel interne SVT 3AS en un parcours ORDONNÉ de
 11 unités, calcule la maîtrise réelle de l'élève par unité (depuis la
 mémoire FSRS unifiée) et détermine :
 
@@ -36,7 +36,7 @@ from services.fsrs_unified import get_user_memory
 
 logger = logging.getLogger("khawarizmi.orientation_roadmap")
 
-# ── Parcours officiel (ordre d'apprentissage recommandé Bac SVT 3AS) ─
+# ── Parcours interne (ordre d'apprentissage recommandé Bac SVT 3AS) ─
 
 PARCOURS: list[dict[str, Any]] = [
     {
@@ -298,6 +298,13 @@ async def calculer_roadmap(db: AsyncSession, user_id) -> dict[str, Any]:
         },
         "coach": coach,
         "seuils": {"done": SEUIL_DONE, "stability_max": STABILITY_MAX},
+        "memory": {
+            "source": "mastery_micro_concepts",
+            "items_count": len(items),
+            "scope": "memory_indicator_not_bac_prediction",
+            "message_ar": "تُحسب البوصلة من ذاكرة FSRS الموحدة؛ هي مؤشر مراجعة وليست تنبؤا بعلامة البكالوريا.",
+            "message_fr": "Boussole calculée depuis la mémoire FSRS unifiée : indicateur de révision, pas prédiction de note au Bac.",
+        },
     }
 
 

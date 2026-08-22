@@ -272,6 +272,30 @@ export interface ChapterExerciseEvaluation {
   warning_ar: string
   allow_second_attempt: boolean
   source: "deterministic-science-first"
+  memory?: {
+    updated: boolean
+    storage: "mastery_micro_concepts"
+    next_review_at: string | null
+    reason_ar: string
+    chapter: {
+      updated: boolean
+      kind: "verb_chapter"
+      item_id: string
+      rating: "Again" | "Hard" | "Good" | "Easy"
+      score_percent: number
+      next_review_at: string
+      interval_days: number
+    }
+    verb: {
+      updated: boolean
+      kind: "verb_action"
+      item_id: string
+      rating: "Again" | "Hard" | "Good" | "Easy"
+      score_percent: number
+      next_review_at: string
+      interval_days: number
+    }
+  }
   grading_validation: {
     human_validated: boolean
     scope: "validated" | "formative_only"
@@ -813,6 +837,8 @@ export interface OrientationRecommendation {
 
 export interface OrientationResponse {
   prediction_bac: number | null
+  prediction_scope?: "memory_indicator_not_bac_prediction"
+  prediction_message?: string
   dues_aujourd_hui: {
     flashcards: number
     action_verbs: number
@@ -1190,5 +1216,12 @@ export interface RoadmapResponse {
   }
   coach: RoadmapCoach
   seuils: { done: number; stability_max: number }
+  memory?: {
+    source: "mastery_micro_concepts"
+    items_count: number
+    scope: "memory_indicator_not_bac_prediction"
+    message_ar: string
+    message_fr: string
+  }
 }
 

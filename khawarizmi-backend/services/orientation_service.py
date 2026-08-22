@@ -479,6 +479,12 @@ async def calculer_orientation(
 
     return {
         "prediction_bac": prediction_bac,
+        "prediction_scope": "memory_indicator_not_bac_prediction",
+        "prediction_message": (
+            "Indicateur de stabilité mémoire non calibré sur des notes Bac réelles."
+            if prediction_bac is not None else
+            "Pas assez de données mémoire pour calculer l'indicateur."
+        ),
         "dues_aujourd_hui": {
             "flashcards": total_fc_dues,
             "action_verbs": total_av_dues,

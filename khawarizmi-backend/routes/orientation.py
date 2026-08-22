@@ -45,7 +45,7 @@ async def roadmap_eleve(
     current_user: dict = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    """Retourne la boussole officielle : 3 domaines, 11 unités, 22 phases."""
+    """Retourne la boussole interne : 3 domaines et 11 unités."""
     roadmap = await calculer_roadmap(db, current_user["id"])
 
     logger.info(
