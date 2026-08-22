@@ -1,6 +1,5 @@
 import { describe, expect, it } from "vitest"
 import { buildCoachPlan, buildCoachPlanFromOutcome } from "./coachService"
-import type { SessionOutcome } from "./tunnelTypes"
 
 function makeErr(overrides: Partial<{
   id: string; lessonId: string; verbSlug: string | null; source: "document" | "bac"; createdAt: string
@@ -82,12 +81,12 @@ describe("buildCoachPlanFromOutcome", () => {
     })
     expect(plan.kind).toBe("remediation")
     expect(plan.items.length).toBeLessThanOrEqual(2)
-    // bac severity = 1 > document severity = 0
-    expect(plan.items[0].severity).toBe(1)
-    expect(plan.items[1].severity).toBe(1)
+    // bac severity = 2 > document severity = 0
+    expect(plan.items[0].severity).toBe(2)
+    expect(plan.items[1].severity).toBe(2)
   })
 
-  it("K3: failed + feedbackSeen + 0 errors → remediation, items[]", () => {
+  it("K3: failed + feedbackSeen + 0 errors → remédiation générique navigable", () => {
     const plan = buildCoachPlanFromOutcome({
       outcome: "failed",
       feedbackSeen: true,
@@ -95,7 +94,8 @@ describe("buildCoachPlanFromOutcome", () => {
       context: ctx,
     })
     expect(plan.kind).toBe("remediation")
-    expect(plan.items).toHaveLength(0)
+    expect(plan.items).toHaveLength(1)
+    expect(plan.items[0].route.href.startsWith("/")).toBe(true)
     expect(plan.headline).toBeTruthy()
   })
 
@@ -144,10 +144,40 @@ describe("buildCoachPlanFromOutcome", () => {
     expect(plan.items).toHaveLength(1)
   })
 
-  it("K8: ordre stable à severity égale (tie-break id asc)", () => {
+  it("K8: chaque action de coach possède une route réelle", () => {
+    const plan = buildCoachPlanFromOutcome({
+      outcome: "failed",
+      feedbackSeen: true,
+      errors: [makeErr({ id: "e1", source: "document", verbSlug: "analyse" })],
+      context: ctx,
+    })
+    expect(plan.items).toHaveLength(1)
+    expect(plan.items[0].route.href).toBe("/action-verbs/analyse")
+  })
+
+  it("K9: une erreur scientifique renvoie au chapitre précis", () => {
+    const chapterSlug = "d2-u2-c3-la-glycolyse"
+    const plan = buildCoachPlanFromOutcome({
+      outcome: "failed",
+      feedbackSeen: true,
+      errors: [{
+        id: "science-1",
+        lessonId: `da:scenario:${chapterSlug}:analyse`,
+        verbSlug: "analyse",
+        source: "document",
+        code: "scientific_error",
+        createdAt: "2026-08-22T00:00:00.000Z",
+      }],
+      context: ctx,
+    })
+    expect(plan.items[0].route.href).toBe(`/cours/d2/u2/${chapterSlug}`)
+  })
+
+  it("K10: ordre stable à severity égale (tie-break id asc)", () => {
+    const createdAt = "2026-08-22T00:00:00.000Z"
     const errs = [
-      makeErr({ id: "z-err" }),
-      makeErr({ id: "a-err" }),
+      makeErr({ id: "z-err", createdAt }),
+      makeErr({ id: "a-err", createdAt }),
     ]
     const plan = buildCoachPlanFromOutcome({
       outcome: "failed",

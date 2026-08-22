@@ -27,6 +27,7 @@ from schemas.document_analysis import (
     WeakSpotsResponse,
 )
 from services.document_analysis_service import evaluate_answer, score_to_fsrs_rating
+from services.hashing import hash_answer
 
 logger = logging.getLogger("khawarizmi.api")
 router = APIRouter(prefix="/api/document-analysis", tags=["Document Analysis"])
@@ -215,7 +216,7 @@ async def evaluer_reponses(
                 "question_id": question_id,
                 "verb_slug": verb_slug,
                 "chapter_slug": body.chapter_slug or "",
-                "answer_text": ans.answer,
+                "answer_text": hash_answer(ans.answer),
                 "score": evaluation["score"],
                 "score_max": evaluation["score_max"],
                 "percentage": evaluation["percentage"],

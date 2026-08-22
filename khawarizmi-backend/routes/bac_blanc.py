@@ -34,7 +34,7 @@ from schemas.bac_blanc import (
     SubmitBacResponse,
     VerbScore,
 )
-from services.document_analysis_service import evaluate_answer
+from services.bac_blanc_corrector import correct_bac_answer
 
 logger = logging.getLogger("khawarizmi.api")
 router = APIRouter(prefix="/api/bac-blanc", tags=["Bac Blanc"])
@@ -282,10 +282,10 @@ async def submit_bac(
             percentage = 0
             feedback = "تم تخطي هذا التمرين"
         else:
-            evaluation = evaluate_answer(verb, answer_text, ex.get("model_answer_ar"))
+            evaluation = correct_bac_answer(ex, answer_text)
             score = evaluation["score"]
             percentage = evaluation["percentage"]
-            feedback = evaluation["advice"]
+            feedback = evaluation["feedback"]
 
             try:
                 methodo = await evaluate_methodology(
@@ -350,7 +350,7 @@ async def submit_bac(
         for v, s in verb_scores_map.items()
     ]
 
-    score_global = round(total_score / max(total_max, 1) * 100)
+    score_global = max(0, min(100, round(total_score / max(total_max, 1) * 100)))
 
     if score_global >= 75:
         debrief = f"أحسنت! نتيجتك {score_global}%. أنت جاهز للبكالوريا. ركز على المراجعة الدورية."

@@ -7,6 +7,10 @@ document-analysis, mindmap) et calcule des recommandations priorisées.
 """
 
 from datetime import UTC, datetime
+import json
+import re
+import unicodedata
+from pathlib import Path
 
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -24,6 +28,71 @@ CRITICAL_DANGER_STABILITY_THRESHOLD = 3.0
 WEAK_SCORE_THRESHOLD = 60
 SEVERE_VERB_THRESHOLD = 35
 MAX_RECOMMENDATIONS = 3
+
+_NAV_PROGRAMME_PATH = Path(__file__).parent.parent / "data" / "programmes" / "svt_sciences_experimentales.json"
+_CANONICAL_TO_UNIT = {
+    "ch1_proteines": (1, 1), "ch_structure_proteines": (1, 2),
+    "ch2_enzymes": (1, 3), "ch3_immunite": (1, 4), "ch4_nerveux": (1, 5),
+    "ch_photosynthese": (2, 1), "ch_respiration": (2, 2),
+    "ch_bilan_energetique": (2, 3), "ch_tectonique_plaques": (3, 1),
+    "ch_structure_terre": (3, 2), "ch_banies_geologiques": (3, 3),
+}
+_CHAPTER_ROUTE_ALIASES: dict[str, str] | None = None
+
+
+def _norm_route(value: str) -> str:
+    text_value = unicodedata.normalize("NFD", value or "").lower()
+    text_value = "".join(char for char in text_value if not unicodedata.combining(char))
+    return re.sub(r"[^a-z0-9\u0600-\u06ff]", "", text_value)
+
+
+def _slugify(value: str) -> str:
+    value = unicodedata.normalize("NFD", value or "").lower()
+    value = "".join(char for char in value if not unicodedata.combining(char))
+    return re.sub(r"^-+|-+$", "", re.sub(r"[^a-z0-9]+", "-", value))
+
+
+def _chapter_route_aliases() -> dict[str, str]:
+    global _CHAPTER_ROUTE_ALIASES
+    if _CHAPTER_ROUTE_ALIASES is not None:
+        return _CHAPTER_ROUTE_ALIASES
+    aliases: dict[str, str] = {}
+    data = json.loads(_NAV_PROGRAMME_PATH.read_text(encoding="utf-8"))
+    first_by_unit: dict[tuple[int, int], str] = {}
+    for domain in data.get("domains", []):
+        for unit in domain.get("units", []):
+            for chapter in unit.get("chapters", []):
+                slug = (
+                    f"d{domain['numero']}-u{unit['numero']}-c{chapter['numero']}-"
+                    f"{_slugify(chapter['titre_fr'])}"
+                )
+                first_by_unit.setdefault((domain["numero"], unit["numero"]), slug)
+                for alias in (slug, chapter.get("titre_fr", ""), chapter.get("titre_ar", "")):
+                    aliases[_norm_route(alias)] = slug
+    for canonical, unit_key in _CANONICAL_TO_UNIT.items():
+        if unit_key in first_by_unit:
+            aliases[_norm_route(canonical)] = first_by_unit[unit_key]
+    _CHAPTER_ROUTE_ALIASES = aliases
+    return aliases
+
+
+def _chapter_route_slug(chapter: str) -> str | None:
+    if re.match(r"^d[1-3]-u\d+-c\d+-", chapter or ""):
+        return chapter
+    return _chapter_route_aliases().get(_norm_route(chapter))
+
+
+def _course_action(chapter: str) -> str:
+    slug = _chapter_route_slug(chapter)
+    if not slug:
+        return "/cours"
+    match = re.match(r"^d(\d+)-u(\d+)-", slug)
+    return f"/cours/d{match.group(1)}/u{match.group(2)}/{slug}" if match else "/cours"
+
+
+def _document_action(chapter: str) -> str:
+    slug = _chapter_route_slug(chapter)
+    return f"/document-analysis/chapters/{slug}" if slug else "/document-analysis"
 
 
 def _chapter_priority_score(
@@ -323,7 +392,7 @@ async def calculer_orientation(
                 "chapitre_slug": cs["chapter"],
                 "chapitre_ar": cs["titre_ar"],
                 "raison": " · ".join(raisons),
-                "action": f"/cours/{cs['chapter']}",
+                "action": _course_action(cs["chapter"]),
                 "score_priorite": cs["score"],
                 "niveau_urgence": cs["niveau_urgence"],
                 "nature_besoin": cs["nature_besoin"],
@@ -390,7 +459,7 @@ async def calculer_orientation(
                     "chapitre_slug": ch,
                     "chapitre_ar": meta.get("titre_ar", ch),
                     "raison": f"{nb} analyse(s) de document en retard (FSRS)",
-                    "action": f"/document-analysis/chapters/{ch}",
+                    "action": _document_action(ch),
                     "score_priorite": da_score,
                     "niveau_urgence": niveau_urgence,
                     "nature_besoin": nature_besoin,

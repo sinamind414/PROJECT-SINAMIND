@@ -42,6 +42,7 @@ export type OutcomeCoachItem = {
   title: string
   action: string
   severity: number
+  route: CoachRoute
   sourceErrorId?: string
 }
 
@@ -115,6 +116,26 @@ const VERB_ROUTE: Record<string, CoachRoute> = {
 }
 
 const ERROR_ROUTE: Record<string, CoachRoute> = {
+  scientific_error: {
+    href: "/cours",
+    labelAr: "راجع المحتوى العلمي",
+    labelFr: "Revoir le contenu scientifique",
+  },
+  methodology_error: {
+    href: "/methodology#lab",
+    labelAr: "راجع منهجية الفعل",
+    labelFr: "Revoir la méthodologie",
+  },
+  off_topic: {
+    href: "/document-analysis",
+    labelAr: "أعد قراءة التعليمة والوثيقة",
+    labelFr: "Relire la consigne",
+  },
+  insufficient: {
+    href: "/cours",
+    labelAr: "راجع الدرس ثم أعد المحاولة",
+    labelFr: "Revoir la leçon",
+  },
   mixed_analysis_interpretation: {
     href: "/methodology#lab",
     labelAr: "وضع حلّل vs فسّر",
@@ -225,8 +246,8 @@ export function buildCoachPlan(input: {
     const route = routeForError(input.dominantErrorCode) ?? routeForVerb(verb)
     push({
       id: `err:${input.dominantErrorCode}`,
-      titleAr: errMeta?.labelAr ?? "خطأ منهجي رئيسي",
-      titleFr: errMeta?.labelFr ?? "Erreur méthodologique dominante",
+      titleAr: errMeta?.labelAr ?? (input.dominantErrorCode === "scientific_error" ? "خطأ علمي رئيسي" : "خطأ منهجي رئيسي"),
+      titleFr: errMeta?.labelFr ?? (input.dominantErrorCode === "scientific_error" ? "Erreur scientifique dominante" : "Erreur méthodologique dominante"),
       detailAr: "ركّز على هذا الخطأ فقط قبل إعادة المحاولة.",
       detailFr: "Concentre-toi sur cette erreur avant de réessayer.",
       route,
@@ -300,17 +321,46 @@ export function buildCoachPlan(input: {
   }
 }
 
+function errorSeverity(err: LearningErrorLike): number {
+  const codeWeight: Record<string, number> = {
+    scientific_error: 4,
+    off_topic: 3,
+    methodology_error: 2,
+    insufficient: 2,
+  }
+  return (err.source === "bac" ? 2 : err.source === "method" ? 1 : 0)
+    + (codeWeight[err.code || ""] || 0)
+}
+
+function courseRouteFromLessonId(lessonId: string): CoachRoute | null {
+  const match = lessonId.match(/(d([1-3])-u(\d+)-c\d+-[a-z0-9-]+)/)
+  if (!match) return null
+  return {
+    href: `/cours/d${match[2]}/u${match[3]}/${match[1]}`,
+    labelAr: "راجع الفصل العلمي",
+    labelFr: "Revoir le chapitre",
+  }
+}
+
 function errorToCoachItem(err: LearningErrorLike): OutcomeCoachItem {
+  const specificRoute = err.code === "scientific_error"
+    ? courseRouteFromLessonId(err.lessonId)
+    : null
   const mapped = err.source === "method" ? mapMethodErrorToCoachItem(err) : null
-  if (mapped) return mapped
+  if (mapped) {
+    return { ...mapped, route: specificRoute ?? routeForError(err.code) ?? routeForVerb(err.verbSlug) }
+  }
   return {
     id: `coach:${err.id}`,
     conceptId: err.verbSlug ?? err.lessonId,
-    title: err.source === "bac" ? "ضعف في تحدي BAC" : "ضعف في استغلال الوثيقة",
+    title: err.code === "scientific_error"
+      ? "صحّح الخطأ العلمي أولا"
+      : err.source === "bac" ? "ضعف في تحدي BAC" : "ضعف في استغلال الوثيقة",
     action: err.verbSlug
       ? `درّب على «${err.verbSlug}» قبل إعادة المحاولة`
       : "راجع المنهجية قبل إعادة المحاولة",
-    severity: err.source === "bac" ? 1 : 0,
+    severity: errorSeverity(err),
+    route: specificRoute ?? routeForError(err.code) ?? routeForVerb(err.verbSlug),
     sourceErrorId: err.id,
   }
 }
@@ -345,6 +395,7 @@ export function buildCoachPlanFromOutcome(input: {
             title: "أحسنت! استمر في التدريب",
             action: `درّب على «${input.context.verbSlug}» مرة أخرى لتثبيت المنهجية`,
             severity: 0,
+            route: routeForVerb(input.context.verbSlug),
           },
         ],
         headline: "إتقان جيد — حافظ على المستوى",
@@ -365,6 +416,7 @@ export function buildCoachPlanFromOutcome(input: {
             title: "وثيقة مقبولة — أنت بحاجة لتحدي BAC",
             action: `طبق «${input.context.verbSlug}» في سياق BAC للوصول إلى الإتقان`,
             severity: 0,
+            route: routeForVerb(input.context.verbSlug),
           },
         ],
         headline: "وثيقة OK — ارفع المستوى بتحدي BAC",
@@ -375,21 +427,30 @@ export function buildCoachPlanFromOutcome(input: {
 
   const ranked = [...input.errors]
     .sort((a, b) => {
-      const sa = a.source === "bac" ? 1 : 0
-      const sb = b.source === "bac" ? 1 : 0
-      if (sb !== sa) return sb - sa
+      const severityDelta = errorSeverity(b) - errorSeverity(a)
+      if (severityDelta !== 0) return severityDelta
+      const dateDelta = Date.parse(b.createdAt) - Date.parse(a.createdAt)
+      if (dateDelta !== 0) return dateDelta
       return a.id.localeCompare(b.id)
     })
     .slice(0, 2)
     .map(errorToCoachItem)
 
+  if (ranked.length === 0) {
+    ranked.push({
+      id: "remediation:fallback",
+      conceptId: input.context.verbSlug ?? input.context.lessonId,
+      title: "راجع المنهجية ثم أعد المحاولة",
+      action: "ابدأ بقائمة التحقق الخاصة بالفعل المطلوب.",
+      severity: 0,
+      route: routeForVerb(input.context.verbSlug),
+    })
+  }
+
   return {
     kind: "remediation",
     outcome: "failed",
     items: ranked,
-    headline:
-      ranked.length > 0
-        ? "ركّز على هذين الخطأين قبل إعادة المحاولة"
-        : "لا توجد أخطاء مسجلة — راجع المنهجية العامة",
+    headline: "ركّز على أولويتين كحد أقصى قبل إعادة المحاولة",
   }
 }

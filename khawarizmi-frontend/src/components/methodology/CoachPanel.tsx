@@ -177,15 +177,13 @@ function OutcomeCoachInner({
             >
               <p className="text-xs font-black text-white">{i + 1}. {item.title}</p>
               <p className="text-xs text-white/70 leading-relaxed">{item.action}</p>
-              {verbSlug && (
-                <Link
-                  href={`/action-verbs/${verbSlug}`}
-                  className="inline-flex items-center gap-1 text-[11px] font-bold text-mint hover:underline mt-1"
-                >
-                  تدريب: {verbSlug}
-                  <ChevronLeft className="w-3 h-3" />
-                </Link>
-              )}
+              <Link
+                href={item.route.href}
+                className="inline-flex items-center gap-1 text-[11px] font-bold text-mint hover:underline mt-1"
+              >
+                {item.route.labelAr}
+                <ChevronLeft className="w-3 h-3" />
+              </Link>
             </li>
           ))}
         </ol>

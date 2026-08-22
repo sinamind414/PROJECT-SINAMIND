@@ -5,9 +5,9 @@ synchrone — le plumbing async (appel au rag_context_provider) reste chez
 l'appelant jusqu'à S2.1f, qui passe le contexte RAG déjà calculé.
 
 Fidélité stricte :
-- v2 : build_correction_prompt_v2 (contexte, réponse de l'élève, méthodo du
-  verbe, documents résumés, focus) → un seul message user ; prompt_hash du
-  prompt complet (sha256[12]).
+- v2 : vrai message system + message user contenant contexte, question,
+  documents et données, réponse de référence, barème, méthodologie, focus et
+  copie délimitée ; prompt_hash du couple system+user (sha256[12]).
 - v1 : build_correction_prompt (contexte, documents, consigne, skill, verbe,
   réponse modèle, focus, barème, copie) + enrichment RAG optionnel →
   system + user ; prompt_hash = hash_answer(user_prompt) (HMAC-SHA256).
@@ -21,7 +21,10 @@ from prompts.correction_prompt import (
     SYSTEM_PROMPT_AR,
     build_correction_prompt,
 )
-from prompts.correction_prompt_v2 import build_correction_prompt_v2
+from prompts.correction_prompt_v2 import (
+    SYSTEM_PROMPT_AR as SYSTEM_PROMPT_V2_AR,
+    build_correction_prompt_v2,
+)
 from services.hashing import hash_answer
 
 
@@ -45,17 +48,21 @@ def build_prompt(
     n'utilise pas le RAG). Retourne (messages, prompt_hash).
     """
     if use_v2_prompt:
-        # Phase C — prompt v2 optimisé (~918 tokens vs ~3742) ; le system
-        # prompt est inclus dans le user_prompt (note v2).
         user_prompt, prompt_hash = build_correction_prompt_v2(
             scenario_context=scenario_context,
-            model_answer=student_answer,  # ⚠️ nom trompeur : reçoit la copie
+            question_prompt=question_prompt,
+            reference_answer=model_answer,
+            student_answer=student_answer,
+            score_max=score_max,
             verb_methodology=question_skill,
             documents=documents,
             learning_focus=learning_focus or "",
             verb_slug=verb_slug,
         )
-        messages = [{"role": "user", "content": user_prompt}]
+        messages = [
+            {"role": "system", "content": SYSTEM_PROMPT_V2_AR},
+            {"role": "user", "content": user_prompt},
+        ]
         return messages, prompt_hash
 
     # Prompt v1 original (+ enrichment RAG optionnel)

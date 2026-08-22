@@ -27,6 +27,7 @@ from services.correction_audit import log_correction_audit
 from services.correction_v2_retry import evaluate_answer_v2_with_retry
 from services.hashing import hash_answer
 from services.llm import _call_with_fallback
+from services.pedagogical_validation import grading_validation_status
 from services.rag_service import format_rag_context, rag_search
 from services.socratic_tutor import get_socratic_hint
 
@@ -332,6 +333,7 @@ async def evaluer_reponses_v2(
         "percentage": global_pct,
         "evaluations": evaluations,
         "technical_errors": n_errors,
+        "grading_validation": grading_validation_status(),
     }
 
 

@@ -937,31 +937,6 @@ class KhawarizmiApiClient {
 
   // ── Document Analysis ─────────────────────────
 
-  async evaluateDaAnswers(payload: {
-    scenario_id: string
-    chapter_slug?: string
-    answers: Array<{ question_id: string; verb_slug?: string; answer: string }>
-  }) {
-    return this.request<{
-      evaluations: Array<{
-        question_id: string
-        verb_slug: string
-        score: number
-        score_max: number
-        percentage: number
-        success: string[]
-        errors: string[]
-        missing_markers: string[]
-        forbidden_found: string[]
-        advice: string
-        dominant_error_code?: string
-      }>
-    }>("/api/document-analysis/evaluate", {
-      method: "POST",
-      body: JSON.stringify(payload)
-    })
-  }
-
   async evaluateDaAnswersV2(payload: {
     scenario_id: string
     chapter_slug: string | null
@@ -973,6 +948,12 @@ class KhawarizmiApiClient {
       score_global: number
       score_max: number
       percentage: number
+      grading_validation?: {
+        human_validated: boolean
+        scope: "validated" | "formative_only"
+        message_fr: string
+        message_ar: string
+      }
       evaluations: Array<{
         question_id: string
         verb_slug: string
@@ -990,7 +971,9 @@ class KhawarizmiApiClient {
         unmatched_criteria: Array<{ criterion: string; why_ar: string; from_model_answer: string }>
         feedback_ar: string
         advice_ar: string
-        source: "sanity" | "llm" | "llm_recovered" | "llm_error" | "socratic"
+        source: "sanity" | "local" | "local_savoir" | "local_l2_high_conf" |
+                "llm" | "llm_v2" | "llm_recovered" | "llm_retried" |
+                "llm_error" | "cached_evaluation" | "socratic"
         dominant_error_code?: string
         missing?: Array<{ expected: string; why_ar: string; from_model_answer: string }>
         success?: string[]

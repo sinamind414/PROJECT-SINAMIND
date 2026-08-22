@@ -74,7 +74,9 @@ def evaluate_answer(
     forbidden = verb.get("forbidden_markers", [])
     scoring_rules = verb.get("scoring_rules", [])
 
-    missing = [m for m in required if normalize_arabic(m) not in normalize_arabic(answer)]
+    # required_markers contient des formulations alternatives, pas une liste
+    # cumulative à réciter. Un seul marqueur pertinent suffit.
+    missing = [] if (not required or includes_any(answer, required)) else required[:3]
     forbidden_found = [m for m in forbidden if normalize_arabic(m) in normalize_arabic(answer)]
 
     score = 0

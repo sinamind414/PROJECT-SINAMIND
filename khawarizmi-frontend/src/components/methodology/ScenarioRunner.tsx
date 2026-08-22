@@ -183,6 +183,12 @@ export function ScenarioRunner({
   const [award, setAward] = useState<GamificationAward | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const [apiSource, setApiSource] = useState(false)
+  const [gradingValidation, setGradingValidation] = useState<{
+    human_validated: boolean
+    scope: "validated" | "formative_only"
+    message_fr: string
+    message_ar: string
+  } | null>(null)
   const [requestingHint, setRequestingHint] = useState(false)
   const [hints, setHints] = useState<Record<string, {
     hint_ar: string
@@ -239,6 +245,7 @@ export function ScenarioRunner({
         })),
       }
       const resp = await apiClient.evaluateDaAnswersV2(payload)
+      setGradingValidation(resp.grading_validation ?? null)
 
       const evaluations = questionsToSubmit.map((question) => {
         const evalData = resp.evaluations.find((e) => e.verb_slug === question.verbSlug)
@@ -294,6 +301,12 @@ export function ScenarioRunner({
       setAward(contract.mayAwardXp ? awardXP("مهمة استغلال وثيقة", 60) : null)
     } catch {
       setApiSource(false)
+      setGradingValidation({
+        human_validated: false,
+        scope: "formative_only",
+        message_fr: "Évaluation locale formative, non certificative.",
+        message_ar: "تقييم محلي تكويني وليس علامة رسمية.",
+      })
       const evaluations = questionsToSubmit.map((question) => ({
         question,
         answer: answers[question.id] || "",
@@ -357,6 +370,7 @@ export function ScenarioRunner({
     setSaved(false)
     setAward(null)
     setApiSource(false)
+    setGradingValidation(null)
     setHints({})
     setGatesReady({})
   }
@@ -634,6 +648,12 @@ export function ScenarioRunner({
                 <h3 className="text-white font-bold">النتيجة الإجمالية</h3>
                 <span className="text-3xl font-bold text-white">{result.readiness}%</span>
               </div>
+              {gradingValidation && !gradingValidation.human_validated && (
+                <div className="rounded-xl border border-amber-400/30 bg-amber-400/10 p-3">
+                  <p className="text-amber-200 text-xs font-bold">{gradingValidation.message_ar}</p>
+                  <p className="text-amber-100/60 text-[10px] mt-1" dir="ltr">{gradingValidation.message_fr}</p>
+                </div>
+              )}
 
               {/* Contrat Kunz — outcome honnête post-tentative */}
               <div
@@ -690,6 +710,7 @@ export function ScenarioRunner({
                     lessonId: `${lessonBase}:${e.question.verbSlug}`,
                     verbSlug: e.question.verbSlug,
                     source: "document" as const,
+                    code: e.evaluation.dominantErrorCode,
                     createdAt: new Date().toISOString(),
                   }))
                 return (

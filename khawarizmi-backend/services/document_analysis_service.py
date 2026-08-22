@@ -56,6 +56,36 @@ SCHEMATISATION_MARKERS = ["رسم", "تسمية", "سهم", "عنوان"]
 EXTRACT_MARKERS = ["نستخلص", "المستخلص", "يتضح من", "النص", "يظهر"]
 PROVE_EXPERIMENTALLY_MARKERS = ["نثبت تجريبياً", "من خلال التجربة", "يثبت أن", "تظهر النتائج", "الملاحظة", "النتيجة"]
 
+CODE_MARKERS = {
+    "doc_ref": DOCUMENT_MARKERS,
+    "variation": VARIATION_MARKERS,
+    "causal": CAUSAL_MARKERS,
+    "deduction": DEDUCTION_MARKERS,
+    "hypothesis": HYPOTHESIS_MARKERS,
+    "comparison": COMPARISON_MARKERS,
+    "relation": RELATION_MARKERS,
+    "synthesis": SCIENTIFIC_TEXT_MARKERS,
+    "explication": EXPLICATION_MARKERS,
+    "critique": CRITIQUE_MARKERS,
+    "determination": DETERMINATION_MARKERS,
+    "exploitation": EXPLOIT_DOC_MARKERS,
+    "problem": PROBLEM_MARKERS,
+    "proof": PROOF_MARKERS,
+    "comment": COMMENT_MARKERS,
+    "nomination": NOMINATION_MARKERS,
+    "definition": DEFINITION_MARKERS,
+    "description": DESCRIPTION_MARKERS,
+    "citation": CITATION_MARKERS,
+    "enumeration": ENUMERATION_MARKERS,
+    "classification": CLASSIFICATION_MARKERS,
+    "distinction": DISTINCTION_MARKERS,
+    "schematisation": SCHEMATISATION_MARKERS,
+    "extraction": EXTRACT_MARKERS,
+    "experiment_ref": PROVE_EXPERIMENTALLY_MARKERS,
+    "observation": DESCRIPTION_MARKERS,
+    "conclusion": DEDUCTION_MARKERS,
+}
+
 
 # ── Règles de scoring par verbe ────────────────────
 
@@ -421,7 +451,10 @@ def evaluate_answer(
     forbidden = rules_def["forbidden"]
     scoring_rules = rules_def["rules"]
 
-    missing = [m for m in required if normalize_arabic(m) not in normalize_arabic(answer)]
+    # Les listes ``required`` regroupent des synonymes : ne jamais présenter
+    # chaque synonyme absent comme un manque. Les manques sont dérivés des
+    # critères de barème réellement échoués ci-dessous.
+    missing: list[str] = []
     forbidden_found = [m for m in forbidden if normalize_arabic(m) in normalize_arabic(answer)]
 
     score = 0
@@ -440,7 +473,7 @@ def evaluate_answer(
 
         if check_type == "keyword":
             keyword_field = rule.get("keywordField", "required_markers")
-            markers = rules_def.get(keyword_field, required)
+            markers = CODE_MARKERS.get(code, rules_def.get(keyword_field, required))
             passed = includes_any(answer, markers)
         elif check_type == "forbidden_absence":
             passed = len(forbidden_found) == 0
@@ -455,6 +488,8 @@ def evaluate_answer(
             success.append(f"✅ {label} (+{points})")
         else:
             errors.append(f"❌ {label} (0/{points})")
+            if check_type == "keyword" and label not in missing:
+                missing.append(label)
 
     if forbidden_found:
         penalty = min(len(forbidden_found) * 2, score)

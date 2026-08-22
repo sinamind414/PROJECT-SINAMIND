@@ -144,6 +144,9 @@ FROZEN_ENDPOINTS: set[str] = {
     "/api/streaks/me/freeze",
     "/api/flashcards/methodology/",
     "/api/document-analysis/review",
+    # Correcteur v1 regex : doublon incohérent, stockage copie en clair.
+    # Le frontend utilise exclusivement /evaluate-v2.
+    "/api/document-analysis/evaluate",
     "/api/session/random",
 }
 

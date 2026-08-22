@@ -27,11 +27,12 @@ from services.hashing import hash_answer
 # ── Versionnage (invalidation passive — aucune purge manuelle) ───────
 # Bump manuel à chaque changement qui rend les entrées cachées obsolètes.
 CORRECTION_CACHE_VERSION = "c1"   # format du payload / champs
-CORRECTION_PROMPT_VERSION = "p1"  # texte des prompts correction_prompt*.py
+CORRECTION_PROMPT_VERSION = "p2"  # question+référence+données+barème, system séparé
 
 # TTL : 7 jours (audit C2). Une correction figée par (question, réponse
 # exacte, prompt version, modèle, barème) est stable tant que ces 5
-# dimensions ne changent pas — et la clé les porte toutes.
+# dimensions ne changent pas — et la clé porte aussi un hash du contexte
+# pédagogique (question, référence, documents, focus).
 CORRECTION_CACHE_TTL = 7 * 24 * 3600
 
 
@@ -55,6 +56,7 @@ def build_correction_key(
     answer: str,
     model_id: str,
     prompt_variant: str = "v2",
+    context_hash: str = "",
 ) -> str:
     """Clé du cache de correction exact.
 
@@ -76,5 +78,6 @@ def build_correction_key(
         f":q:{question_id}"
         f":verb:{verb_slug}"
         f":smax:{score_max}"
+        f":ctx:{context_hash or 'none'}"
         f":ans:{digest}"
     )

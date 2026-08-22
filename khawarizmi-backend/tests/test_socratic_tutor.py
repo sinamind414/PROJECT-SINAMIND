@@ -35,11 +35,23 @@ class TestEvaluateRequestSchema:
 
 
 class TestGetSocraticHint:
+    def test_local_hint_is_specific_to_interpretation(self):
+        from services.socratic_tutor import build_local_socratic_hint
+
+        result = build_local_socratic_hint(
+            verb_slug="interpret",
+            student_answer="نلاحظ ارتفاع القيمة",
+            question_prompt="فسر ارتفاع القيمة",
+            documents=[{"title": "منحنى"}],
+        )
+        assert "السبب" in result["hint_ar"] or "لأن" in result["hint_ar"]
+        assert result["methodology_step"] == "الربط السببي"
+
     @pytest.mark.asyncio
     async def test_fallback_on_llm_error(self):
         from services.socratic_tutor import get_socratic_hint
 
-        with patch.object(
+        with patch("services.socratic_tutor.is_llm_enabled", return_value=True), patch.object(
             __import__("services.socratic_tutor", fromlist=["_call_with_fallback"]),
             "_call_with_fallback",
             side_effect=Exception("LLM down"),
@@ -55,17 +67,18 @@ class TestGetSocraticHint:
                 student_answer="إجابة التلميذ",
             )
         assert "hint_ar" in result
-        assert result["focus_area"] == "Documents"
+        assert result["focus_area"] in {"Document", "Methodology"}
+        assert "الإجابة النموذجية" not in result["hint_ar"]
 
     @pytest.mark.asyncio
     async def test_fallback_on_empty_response(self):
-        from services.socratic_tutor import DEFAULT_HINT, get_socratic_hint
+        from services.socratic_tutor import get_socratic_hint
 
         mock_response = MagicMock()
         mock_response.choices = [MagicMock()]
         mock_response.choices[0].message.content = ""
 
-        with patch.object(
+        with patch("services.socratic_tutor.is_llm_enabled", return_value=True), patch.object(
             __import__("services.socratic_tutor", fromlist=["_call_with_fallback"]),
             "_call_with_fallback",
             return_value=mock_response,
@@ -80,7 +93,8 @@ class TestGetSocraticHint:
                 learning_focus=None,
                 student_answer="إجابة التلميذ",
             )
-        assert result["hint_ar"] == DEFAULT_HINT["hint_ar"]
+        assert result["hint_ar"]
+        assert result["methodology_step"] != "Analyse"
 
     @pytest.mark.asyncio
     async def test_returns_hint_on_success(self):
@@ -94,7 +108,7 @@ class TestGetSocraticHint:
             '"methodology_step": "Definition"}\n```'
         )
 
-        with patch.object(
+        with patch("services.socratic_tutor.is_llm_enabled", return_value=True), patch.object(
             __import__("services.socratic_tutor", fromlist=["_call_with_fallback"]),
             "_call_with_fallback",
             return_value=mock_response,
@@ -123,7 +137,7 @@ class TestGetSocraticHint:
             '{"hint_ar": "test", "focus_area": "Doc", "methodology_step": "Step"}'
         )
 
-        with patch.object(
+        with patch("services.socratic_tutor.is_llm_enabled", return_value=True), patch.object(
             __import__("services.socratic_tutor", fromlist=["_call_with_fallback"]),
             "_call_with_fallback",
             return_value=mock_response,

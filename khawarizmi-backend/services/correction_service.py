@@ -1,59 +1,38 @@
-import json
+"""Correction locale des exercices — même référentiel scientifique que le Bac blanc."""
+from __future__ import annotations
+
 from typing import Any
 
-from openai import AsyncOpenAI
-
-from config import get_settings
-
-CORRECTION_PROMPT = """
-Tu es un correcteur expert du Bac Algérien (SVT).
-
-Corrige la réponse de l'élève de manière pédagogique et bienveillante.
-
-Question : {question}
-Réponse de l'élève : {student_answer}
-Barème : {points} points
-
-Retourne UNIQUEMENT ce JSON valide :
-{{
-  "score": nombre,
-  "max_score": {points},
-  "points_forts": ["..."],
-  "erreurs": ["..."],
-  "reponse_correcte": "Réponse académique complète en arabe",
-  "explication": "Explication claire",
-  "conseils": "Conseils d'amélioration"
-}}
-"""
+from services.savoir_corrector import deterministic_correct
 
 
 async def correct_student_answer(
-    question: str, student_answer: str, points: int = 4, language: str = "ar"
+    question: str,
+    student_answer: str,
+    points: int = 4,
+    language: str = "ar",
+    model_answer: str = "",
 ) -> dict[str, Any]:
-    try:
-        prompt = CORRECTION_PROMPT.format(question=question, student_answer=student_answer, points=points)
+    """Corrige sans appel direct à un provider externe.
 
-        client = AsyncOpenAI(api_key=get_settings().OPENAI_API_KEY)
-        response = await client.chat.completions.create(
-            model="gpt-4o",
-            messages=[
-                {"role": "system", "content": "Correcteur Bac Algérie rigoureux."},
-                {"role": "user", "content": prompt},
-            ],
-            temperature=0.2,
-            response_format={"type": "json_object"},
-        )
-
-        result = json.loads(response.choices[0].message.content)
-        return result
-
-    except Exception as e:
-        return {
-            "score": 0,
-            "max_score": points,
-            "points_forts": [],
-            "erreurs": [str(e)],
-            "reponse_correcte": "Erreur technique",
-            "explication": "",
-            "conseils": "Réessaie plus tard",
-        }
+    Le résultat conserve le contrat historique de la route exercices tout en
+    utilisant la question, la correction de référence et le barème réel.
+    """
+    result = deterministic_correct(
+        question=question,
+        student_answer=student_answer,
+        points=points,
+        language=language,
+        model_answer=model_answer,
+    )
+    score = max(0.0, min(float(points), float(result.get("score", 0.0))))
+    return {
+        "score": score,
+        "max_score": points,
+        "points_forts": list(result.get("points_forts", [])),
+        "erreurs": list(result.get("erreurs", [])),
+        "reponse_correcte": model_answer or result.get("reponse_correcte", ""),
+        "explication": result.get("explication", ""),
+        "conseils": result.get("conseils", ""),
+        "source": "deterministic-savoir",
+    }

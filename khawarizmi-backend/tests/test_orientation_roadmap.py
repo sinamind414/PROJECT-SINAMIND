@@ -11,6 +11,9 @@ Vérifie :
 
 from __future__ import annotations
 
+import json
+from pathlib import Path
+
 import pytest
 from dataclasses import dataclass
 
@@ -45,12 +48,18 @@ async def _roadmap(items: list[FakeItem]):
         mod.get_user_memory = original
 
 
-def test_parcours_5_unites_ordonnees():
-    assert len(PARCOURS) == 5
-    assert [u["num"] for u in PARCOURS] == [1, 2, 3, 4, 5]
+def test_parcours_11_unites_ordonnees():
+    assert len(PARCOURS) == 11
+    assert [u["num"] for u in PARCOURS] == list(range(1, 12))
     # toutes les unités ont des chapitres du programme
     for u in PARCOURS:
         assert u["chapitres"], f"unité {u['id']} sans chapitres"
+
+
+def test_all_roadmap_lesson_links_exist():
+    lessons_path = Path(__file__).parents[2] / "scripts" / "experimental_lessons.json"
+    lesson_slugs = {item["slug"] for item in json.loads(lessons_path.read_text(encoding="utf-8"))}
+    assert {unit["lecon_slug"] for unit in PARCOURS} <= lesson_slugs
 
 
 def test_chapter_alias_resolution():
@@ -94,9 +103,8 @@ def _concepts(chapitre: str, stability: float) -> list[FakeItem]:
 async def test_unite_1_maitrisee_debloque_unite_2():
     """U1 à 100 % (tous les concepts stability ≥ 10) → U1 done, U2 active."""
     items = []
-    # respiration : 7 concepts, photosynthèse : 4, bilan : 4 → 15 concepts
-    for ch in ("ch_respiration", "ch_photosynthese", "ch_bilan_energetique"):
-        items.extend(_concepts(ch, 10.0))
+    # U1 officielle : synthèse des protéines (8 micro-concepts)
+    items.extend(_concepts("ch1_proteines", 10.0))
     r = await _roadmap(items)
     unites = r["unites"]
     assert unites[0]["statut"] == "done"
@@ -111,8 +119,8 @@ async def test_unite_1_maitrisee_debloque_unite_2():
 @pytest.mark.asyncio
 async def test_unite_1_partielle_reste_active():
     """U1 à 50 % → U1 active (pas done), U2 locked (verrouillage strict)."""
-    # respiration à moitié : stability 10 sur la moitié des concepts ≈ 50 %
-    items = _concepts("ch_respiration", 10.0) + _concepts("ch_respiration", 0.0)
+    # synthèse des protéines à moitié : stabilité cumulée ≈ 50 %
+    items = _concepts("ch1_proteines", 5.0)
     r = await _roadmap(items)
     unites = r["unites"]
     assert unites[0]["statut"] == "active"
@@ -124,11 +132,8 @@ async def test_unite_1_partielle_reste_active():
 @pytest.mark.asyncio
 async def test_chapitre_faible_identifie():
     """Dans l'unité active, le chapitre le plus faible est renvoyé."""
-    # U2 (protéines) : ch1_proteines 8 concepts, ch_structure 5, ch2_enzymes 5
-    items = _concepts("ch1_proteines", 10.0) + _concepts("ch_structure_proteines", 0.0)
-    # U1 done pour débloquer U2
-    for ch in ("ch_respiration", "ch_photosynthese", "ch_bilan_energetique"):
-        items.extend(_concepts(ch, 10.0))
+    # U1 done pour débloquer U2 ; U2 reste à 0 %.
+    items = _concepts("ch1_proteines", 10.0)
     r = await _roadmap(items)
     assert r["unite_active"] == "u2"
     faible = r["prochain_objectif"]["chapitre_faible"]
@@ -153,11 +158,11 @@ async def test_tout_maitrise_coach_felicitation():
 
 @pytest.mark.asyncio
 async def test_route_roadmap_http(client, auth_headers):
-    """La route HTTP renvoie le parcours (5 unités) avec auth valide."""
+    """La route HTTP renvoie les 11 unités avec auth valide."""
     resp = await client.get("/api/orientation/roadmap", headers=auth_headers)
     assert resp.status_code == 200, resp.text[:200]
     data = resp.json()
-    assert len(data["unites"]) == 5
-    assert data["unite_active"] in ["u1", "u2", "u3", "u4", "u5", None]
+    assert len(data["unites"]) == 11
+    assert data["unite_active"] in [f"u{i}" for i in range(1, 12)] + [None]
     assert "coach" in data
     assert "prochain_objectif" in data

@@ -1,7 +1,9 @@
 import type { OutcomeCoachItem } from "../lesson/coachService"
 import type { MethodErrorCode } from "./methodChecklistTypes"
 
-export const METHOD_ERROR_DICT: Record<MethodErrorCode, Omit<OutcomeCoachItem, "id" | "conceptId" | "sourceErrorId">> = {
+type MethodCoachCore = Omit<OutcomeCoachItem, "id" | "conceptId" | "sourceErrorId" | "route">
+
+export const METHOD_ERROR_DICT: Record<MethodErrorCode, MethodCoachCore> = {
   ORDER_SKIPPED: {
     title: "Étape sautée",
     action: "Revois la checklist en respectant strictement l'ordre.",
@@ -53,7 +55,7 @@ export function buildMethodErrorInputs(
 
 export function mapMethodErrorToCoachItem(
   error: { id: string; source: string; code?: string }
-): OutcomeCoachItem | null {
+): Omit<OutcomeCoachItem, "route"> | null {
   if (error.source !== "method" || !error.code) return null
 
   const dict = METHOD_ERROR_DICT[error.code as MethodErrorCode]

@@ -171,7 +171,11 @@ async def correct_exercise(
     question = exercise.get_question(request.language)
 
     result = await correct_student_answer(
-        question=question, student_answer=request.answer, points=exercise.points, language=request.language
+        question=question,
+        student_answer=request.answer,
+        points=exercise.points,
+        language=request.language,
+        model_answer=exercise.get_corrige(request.language),
     )
 
     user_response = UserExerciseResponse(

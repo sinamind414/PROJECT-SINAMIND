@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import React, { useState, useRef, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
@@ -564,7 +564,8 @@ export function VerbLessonFlow({
                   id: `verb:${enriched.slug}`,
                   lessonId: `verb:${enriched.slug}`,
                   verbSlug: enriched.slug,
-                  source: "document" as const,
+                  source: "method" as const,
+                  code: evaluation.dominant_error_code,
                   createdAt: new Date().toISOString(),
                 }] : []}
                 percentage={Number(evaluation.percentage) || 0}

@@ -75,7 +75,7 @@ def map_v2_to_v1(
     # Score : v2 retourne 0-100 → normalisé vers 0-score_max
     raw_score = parsed.get("score", 0)
     if isinstance(raw_score, (int, float)):
-        score = _clamp(int(raw_score * score_max / 100), 0, score_max)
+        score = _clamp(int(round(raw_score * score_max / 100)), 0, score_max)
     else:
         score = 0
 

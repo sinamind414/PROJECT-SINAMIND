@@ -27,6 +27,7 @@ from grading import cache as grading_cache
 from grading import cache_key as grading_cache_key
 from grading.cache import (
     CACHE_PARSE_ALLOWED,
+    build_grading_context_hash,
     evaluate_with_cache,
     is_cacheable,
     to_cache_payload,
@@ -100,6 +101,13 @@ ANS = "نلاحظ من الوثيقة أن نسبة الغلوكوز تزداد 
 QID = 42
 VERB = "analyse"
 SMAX = 7
+CACHE_CONTEXT = {
+    "scenario_context": "ctx",
+    "documents": None,
+    "question_prompt": "حلل",
+    "model_answer": "modèle",
+    "learning_focus": None,
+}
 
 
 def _llm_result(score: int = 5, highlights=None, source: str = "llm") -> dict:
@@ -232,6 +240,7 @@ class TestBuildCorrectionKey:
             ("score_max", 8),
             ("model_id", "other-model"),
             ("prompt_variant", "v1"),
+            ("context_hash", "question-v2"),
         ]:
             other = build_correction_key(**{**base, field: value})
             assert other != k, f"{field} devrait isoler la clé"
@@ -416,7 +425,7 @@ class TestCorrectionCache:
         entrée ignorée (invalidation passive, clé différente)."""
         evaluate_fn = _make_evaluate_fn(return_result=_llm_result(score=5))
         await _call(evaluate_fn, ANS)
-        monkeypatch.setattr(grading_cache_key, "CORRECTION_PROMPT_VERSION", "p2")
+        monkeypatch.setattr(grading_cache_key, "CORRECTION_PROMPT_VERSION", "p3")
         r = await _call(evaluate_fn, ANS)
         assert r["source"] == "llm"  # miss — pas de résidu de l'ancienne version
         assert not r.get("from_cache", False)
@@ -443,6 +452,7 @@ class TestCorrectionCache:
         key = build_correction_key(
             question_id=QID, verb_slug=VERB, score_max=SMAX, answer=ANS,
             model_id="gpt-4o-mini", prompt_variant="v2",
+            context_hash=build_grading_context_hash(CACHE_CONTEXT),
         )
         payload = await get_cache(key)
         assert payload is not None

@@ -2,7 +2,19 @@ from datetime import UTC, datetime, timedelta
 
 import pytest
 
-from services.orientation_service import _find_chapter_meta, calculer_orientation
+from services.orientation_service import (
+    _course_action,
+    _document_action,
+    _find_chapter_meta,
+    calculer_orientation,
+)
+
+
+def test_current_navigation_routes_are_concrete():
+    course = _course_action("ch_respiration")
+    document = _document_action("ch_respiration")
+    assert course.startswith("/cours/d2/u2/d2-u2-c1-")
+    assert document.startswith("/document-analysis/chapters/d2-u2-c1-")
 
 
 class FakeRow:
@@ -173,7 +185,7 @@ class TestCalculerOrientation:
         assert top["type"] == "cours"
         assert top["chapitre_slug"] == "genetique_humaine"
         assert top["chapitre_ar"] == "الوراثة البشرية"
-        assert top["action"] == "/cours/genetique_humaine"
+        assert top["action"] == "/cours"  # alias inconnu → hub sûr, jamais une route morte
         assert "chapitre critique" in top["raison"]
         assert "analyse" in top["raison"]
         assert top["niveau_urgence"] == "critique"
@@ -241,7 +253,7 @@ class TestCalculerOrientation:
         assert rec["type"] == "document_analysis"
         assert rec["chapitre_slug"] == "immunologie"
         assert "analyse" in rec["raison"]
-        assert rec["action"] == "/document-analysis/chapters/immunologie"
+        assert rec["action"] == "/document-analysis"  # alias inconnu → hub sûr
         assert rec["niveau_urgence"] == "normale"
         assert rec["nature_besoin"] == "bac"
         assert rec["moteur_source_principal"] == "document_analysis"

@@ -2,7 +2,7 @@
 
 Répond au besoin : « l'élève n'a pas de boussole, il est désorienté ».
 Transforme le programme SVT Bac Algérie (3AS) en un parcours ORDONNÉ de
-5 unités, calcule la maîtrise réelle de l'élève par unité (depuis la
+11 unités, calcule la maîtrise réelle de l'élève par unité (depuis la
 mémoire FSRS unifiée) et détermine :
 
   - le statut de chaque unité : done / active / locked
@@ -40,59 +40,81 @@ logger = logging.getLogger("khawarizmi.orientation_roadmap")
 
 PARCOURS: list[dict[str, Any]] = [
     {
-        "id": "u1",
-        "num": 1,
-        "titre_fr": "Consommation de la matière organique et flux d'énergie",
-        "titre_ar": "استهلاك المادة العضوية وتدفق الطاقة",
-        "emoji": "⚡",
-        "objectif_fr": "Respiration, fermentation, photosynthèse : comment la matière organique libère et stocke l'énergie.",
-        "objectif_ar": "التنفس والتخمر والتركيب الضوئي: كيف تحرر المادة العضوية الطاقة وتخزنها",
-        "chapitres": ["ch_respiration", "ch_photosynthese", "ch_bilan_energetique"],
-        "lecon_slug": "phase_respiration_photosynthese",
+        "id": "u1", "num": 1,
+        "titre_fr": "Synthèse des protéines", "titre_ar": "تركيب البروتين",
+        "emoji": "🧬", "objectif_fr": "Transcription, traduction et expression de l'information génétique.",
+        "objectif_ar": "فهم الاستنساخ والترجمة والتعبير عن المعلومة الوراثية.",
+        "chapitres": ["ch1_proteines"], "lecon_slug": "phase1_chapitres_1_2",
     },
     {
-        "id": "u2",
-        "num": 2,
-        "titre_fr": "Spécialisation fonctionnelle des protéines",
-        "titre_ar": "التخصص الوظيفي للبروتينات",
-        "emoji": "🧬",
-        "objectif_fr": "Synthèse des protéines, structure et fonction, activité enzymatique : le lien gène → protéine → fonction.",
-        "objectif_ar": "تركيب البروتينات وبنيتها ووظيفتها والنشاط الإنزيمي: العلاقة بين الجين والبروتين والوظيفة",
-        "chapitres": ["ch1_proteines", "ch_structure_proteines", "ch2_enzymes"],
-        "lecon_slug": "phase_synthese_proteines",
+        "id": "u2", "num": 2,
+        "titre_fr": "Structure et fonction des protéines", "titre_ar": "العلاقة بين بنية ووظيفة البروتين",
+        "emoji": "🔬", "objectif_fr": "Relier la structure spatiale d'une protéine à sa fonction.",
+        "objectif_ar": "ربط البنية الفراغية للبروتين بوظيفته.",
+        "chapitres": ["ch_structure_proteines"], "lecon_slug": "phase2_chapitres_3_4-part-2",
     },
     {
-        "id": "u3",
-        "num": 3,
-        "titre_fr": "La communication nerveuse",
-        "titre_ar": "التواصل العصبي",
-        "emoji": "🧠",
-        "objectif_fr": "Neurone, message nerveux, synapse : comment l'information circule dans le système nerveux.",
-        "objectif_ar": "العصبون والرسالة العصبية والمشبك: كيف تنتقل المعلومة في الجهاز العصبي",
-        "chapitres": ["ch4_nerveux"],
-        "lecon_slug": "phase_communication_nerveuse",
+        "id": "u3", "num": 3,
+        "titre_fr": "Activité enzymatique", "titre_ar": "النشاط الإنزيمي للبروتينات",
+        "emoji": "🧪", "objectif_fr": "Comprendre la spécificité enzymatique et les facteurs d'activité.",
+        "objectif_ar": "فهم النوعية الإنزيمية والعوامل المؤثرة في النشاط.",
+        "chapitres": ["ch2_enzymes"], "lecon_slug": "phase3_chapitres_5_6-part-2",
     },
     {
-        "id": "u4",
-        "num": 4,
-        "titre_fr": "L'immunité",
-        "titre_ar": "المناعة",
-        "emoji": "🛡️",
-        "objectif_fr": "Réactions immunitaires innées et adaptatives : comment l'organisme se défend.",
-        "objectif_ar": "الاستجابات المناعية الفطرية والتكيفية: كيف يدافع الجسم عن نفسه",
-        "chapitres": ["ch3_immunite"],
-        "lecon_slug": "phase_immunite",
+        "id": "u4", "num": 4,
+        "titre_fr": "Défense de soi", "titre_ar": "دور البروتينات في الدفاع عن الذات",
+        "emoji": "🛡️", "objectif_fr": "Distinguer réponses immunitaires humorale et cellulaire.",
+        "objectif_ar": "التمييز بين الاستجابة المناعية الخلطية والخلوية.",
+        "chapitres": ["ch3_immunite"], "lecon_slug": "phase5_chapitres_9_10",
     },
     {
-        "id": "u5",
-        "num": 5,
-        "titre_fr": "Tectonique globale (Géologie)",
-        "titre_ar": "التكتونية العامة (جيولوجيا)",
-        "emoji": "🌍",
-        "objectif_fr": "Plaques, structure du globe, structures associées : la dynamique de la lithosphère.",
-        "objectif_ar": "الصفائح وبنية الكرة الأرضية والتراكيب المرافقة: ديناميكية الغلاف الصخري",
-        "chapitres": ["ch_tectonique_plaques", "ch_structure_terre", "ch_banies_geologiques"],
-        "lecon_slug": "phase_tectonique",
+        "id": "u5", "num": 5,
+        "titre_fr": "Communication nerveuse", "titre_ar": "دور البروتينات في الاتصال العصبي",
+        "emoji": "🧠", "objectif_fr": "Comprendre potentiels membranaires, synapse et intégration nerveuse.",
+        "objectif_ar": "فهم الكمونات الغشائية والنقل المشبكي والإدماج العصبي.",
+        "chapitres": ["ch4_nerveux"], "lecon_slug": "phase8_chapitres_15_16",
+    },
+    {
+        "id": "u6", "num": 6,
+        "titre_fr": "Photosynthèse", "titre_ar": "تحويل الطاقة الضوئية إلى طاقة كيميائية",
+        "emoji": "☀️", "objectif_fr": "Étudier les phases photochimique et chimique de la photosynthèse.",
+        "objectif_ar": "دراسة المرحلتين الكيموضوئية والكيموحيوية للتركيب الضوئي.",
+        "chapitres": ["ch_photosynthese"], "lecon_slug": "phase10_chapitres_19_20-part-2",
+    },
+    {
+        "id": "u7", "num": 7,
+        "titre_fr": "Respiration et fermentation", "titre_ar": "تحويل الطاقة الكيميائية إلى ATP",
+        "emoji": "⚡", "objectif_fr": "Étudier glycolyse, Krebs, phosphorylation oxydative et fermentation.",
+        "objectif_ar": "دراسة التحلل السكري وكريبس والفسفرة التأكسدية والتخمر.",
+        "chapitres": ["ch_respiration"], "lecon_slug": "phase13_chapitres_25_26",
+    },
+    {
+        "id": "u8", "num": 8,
+        "titre_fr": "Bilan énergétique cellulaire", "titre_ar": "التحولات الطاقوية على المستوى الخلوي",
+        "emoji": "🔋", "objectif_fr": "Comparer chloroplaste et mitochondrie au niveau ultrastructural.",
+        "objectif_ar": "مقارنة الصانعة الخضراء والميتوكندري على المستوى ما فوق البنيوي.",
+        "chapitres": ["ch_bilan_energetique"], "lecon_slug": "phase15_chapitres_29_30",
+    },
+    {
+        "id": "u9", "num": 9,
+        "titre_fr": "Activité tectonique des plaques", "titre_ar": "النشاط التكتوني للصفائح",
+        "emoji": "🌋", "objectif_fr": "Identifier les plaques et expliquer leurs mouvements.",
+        "objectif_ar": "تحديد الصفائح التكتونية وتفسير حركاتها.",
+        "chapitres": ["ch_tectonique_plaques"], "lecon_slug": "phase16_chapitres_31_32",
+    },
+    {
+        "id": "u10", "num": 10,
+        "titre_fr": "Structure interne du globe", "titre_ar": "بنية الكرة الأرضية",
+        "emoji": "🌍", "objectif_fr": "Exploiter les ondes sismiques pour modéliser la structure terrestre.",
+        "objectif_ar": "استغلال الموجات الزلزالية لنمذجة بنية الكرة الأرضية.",
+        "chapitres": ["ch_structure_terre"], "lecon_slug": "phase19_chapitres_37_38",
+    },
+    {
+        "id": "u11", "num": 11,
+        "titre_fr": "Structures géologiques associées", "titre_ar": "النشاط التكتوني والبنيات الجيولوجية المرتبطة به",
+        "emoji": "🏔️", "objectif_fr": "Relier dorsale, subduction, collision et témoins d'un ancien océan.",
+        "objectif_ar": "ربط الظهرة والغوص والتصادم وشواهد المحيط القديم.",
+        "chapitres": ["ch_banies_geologiques"], "lecon_slug": "phase20_chapitres_39_40-part-2",
     },
 ]
 
@@ -287,9 +309,9 @@ def _message_coach(
     """Message du coach (FR/AR) selon l'avancement — ton professeur."""
     if tout_done:
         return {
-            "fr": "Félicitations ! Tu maîtrises les 5 unités du programme. "
+            "fr": "Félicitations ! Tu maîtrises les 11 unités du programme. "
                   "Passe aux annales du BAC et aux révisions ciblées — garde tes révisions FSRS à jour.",
-            "ar": "مبروك! لقد أتقنت الوحدات الخمس كلها. انتقل إلى مواضيع البكالوريا والمراجعة الموجهة، "
+            "ar": "مبروك! لقد أتقنت الوحدات الإحدى عشرة كلها. انتقل إلى مواضيع البكالوريا والمراجعة الموجهة، "
                   "وواصل مراجعاتك لتبقى المعلومات راسخة.",
             "tone": "success",
         }

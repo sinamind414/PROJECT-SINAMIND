@@ -302,6 +302,23 @@ async def _single_flight(key: str, ttl: int = 30):
 
 # ── Point d'entrée : wrapper du correcteur ───────────────────────────
 
+def build_grading_context_hash(kwargs: dict[str, Any]) -> str:
+    """Hash des éléments pédagogiques qui rendent une correction unique."""
+    context_payload = json.dumps(
+        {
+            "question": kwargs.get("question_prompt", ""),
+            "reference": kwargs.get("model_answer", ""),
+            "documents": kwargs.get("documents") or [],
+            "focus": kwargs.get("learning_focus", ""),
+            "scenario": kwargs.get("scenario_context", ""),
+        },
+        ensure_ascii=False,
+        sort_keys=True,
+        default=str,
+    )
+    return hash_answer(context_payload)[:16]
+
+
 async def evaluate_with_cache(
     *,
     question_id: int | str,
@@ -346,6 +363,7 @@ async def evaluate_with_cache(
         answer=canonical,
         model_id=model_id,
         prompt_variant=prompt_variant,
+        context_hash=build_grading_context_hash(kwargs),
     )
 
     # Étape 0.5 — hit direct (chemin chaud — pas de lock)

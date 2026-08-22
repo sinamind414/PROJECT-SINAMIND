@@ -16,6 +16,7 @@ from openai import AsyncOpenAI
 from config import get_settings
 from prompts.correction_prompt import MANHADJIYA_RUBRICS
 from services.llm import _call_with_fallback
+from services.llm_guard import is_llm_enabled
 
 logger = logging.getLogger("khawarizmi.socratic_tutor")
 
@@ -73,6 +74,53 @@ DEFAULT_HINT = {
 }
 
 
+def build_local_socratic_hint(
+    *,
+    verb_slug: str,
+    student_answer: str,
+    question_prompt: str,
+    documents: list[dict[str, Any]] | None,
+) -> dict[str, str]:
+    """Indice déterministe spécifique au verbe, sans révéler la réponse."""
+    answer = (student_answer or "").strip()
+    has_document = any(marker in answer for marker in ("الوثيقة", "الشكل", "الجدول", "المنحنى", "نلاحظ"))
+    has_cause = any(marker in answer for marker in ("لأن", "بسبب", "يعود", "يفسر"))
+    has_deduction = any(marker in answer for marker in ("نستنتج", "ومنه", "يدل", "نستخلص"))
+    has_comparison = any(marker in answer for marker in ("بينما", "يتشابه", "يختلف", "مقارنة"))
+
+    if verb_slug == "analyse":
+        if has_cause:
+            return {"hint_ar": "أنت تفسّر باستعمال سبب. أعد الجملة بوصف ما يتغير في الوثيقة فقط، مع قيمة أو اتجاه إن وُجد.", "focus_area": "Methodology", "methodology_step": "وصف المعطيات دون تفسير"}
+        if not has_document:
+            return {"hint_ar": "ابدأ بتحديد الوثيقة والعناصر المقاسة، ثم اذكر اتجاه التغير أو القيم البارزة.", "focus_area": "Document", "methodology_step": "تعريف الوثيقة واستخراج المعطيات"}
+        return {"hint_ar": "ما العلاقة الوصفية بين العنصرين؟ عبّر عنها دون استعمال «لأن» أو «بسبب».", "focus_area": "Document", "methodology_step": "ربط الملاحظات"}
+    if verb_slug in {"interpret", "justify", "explain"}:
+        if not has_cause:
+            return {"hint_ar": "ما المعرفة العلمية التي تفسر الملاحظة؟ اربط النتيجة بسبب باستعمال «لأن» أو «يعود ذلك إلى».", "focus_area": "Methodology", "methodology_step": "الربط السببي"}
+        return {"hint_ar": "تحقق الآن: هل السبب الذي كتبته يفسر المعطى المحدد في الوثيقة، أم هو معلومة عامة؟", "focus_area": "Conclusion", "methodology_step": "التحقق من السببية"}
+    if verb_slug in {"deduce", "extract"}:
+        if not has_deduction:
+            return {"hint_ar": "حوّل الملاحظات إلى نتيجة واحدة قصيرة تبدأ بـ «نستنتج أن…» دون إضافة معلومات غير موجودة.", "focus_area": "Conclusion", "methodology_step": "صياغة الاستنتاج"}
+        return {"hint_ar": "هل استنتاجك يجيب مباشرة عن المطلوب ويمكن إثباته بالوثيقة؟ احذف كل تفصيل لا يخدم النتيجة.", "focus_area": "Conclusion", "methodology_step": "التحقق من الاستنتاج"}
+    if verb_slug == "compare":
+        if not has_comparison:
+            return {"hint_ar": "اختر معيارا مشتركا واحدا، ثم اكتب حالة العنصر الأول وحالة العنصر الثاني في الجملة نفسها.", "focus_area": "Methodology", "methodology_step": "تحديد معيار المقارنة"}
+        return {"hint_ar": "بعد أوجه الاختلاف، هل ذكرت وجها للتشابه إن كان موجودا في الوثيقة؟", "focus_area": "Document", "methodology_step": "التشابه والاختلاف"}
+    if verb_slug in {"hypothesis", "validate-hypothesis"}:
+        return {"hint_ar": "صغ فرضية قابلة للاختبار، ثم حدّد النتيجة التي تتوقع ملاحظتها إذا كانت صحيحة.", "focus_area": "Methodology", "methodology_step": "فرضية ثم توقع"}
+    if verb_slug == "scientific-text":
+        return {"hint_ar": "رتّب جوابك: طرح المشكل، عرض مترابط للمعلومات، ثم خلاصة تجيب عن المشكل.", "focus_area": "Methodology", "methodology_step": "مقدمة، عرض، خاتمة"}
+
+    methodology = MANHADJIYA_RUBRICS.get(verb_slug) or MANHADJIYA_RUBRICS["analyse"]
+    first_step = (methodology.get("steps") or ["قراءة التعليمة"])[0]
+    doc_note = " اعتمادا على الوثيقة." if documents else ""
+    return {
+        "hint_ar": f"ابدأ بالخطوة التالية: {first_step}.{doc_note}",
+        "focus_area": "Methodology",
+        "methodology_step": str(first_step),
+    }
+
+
 async def get_socratic_hint(
     scenario_context: str,
     documents: list[dict[str, Any]] | None,
@@ -91,6 +139,15 @@ async def get_socratic_hint(
     Returns:
         dict avec hint_ar, focus_area, methodology_step.
     """
+    local_hint = build_local_socratic_hint(
+        verb_slug=verb_slug,
+        student_answer=student_answer,
+        question_prompt=question_prompt,
+        documents=documents,
+    )
+    if not is_llm_enabled():
+        return local_hint
+
     doc_block = ""
     if documents:
         for i, doc in enumerate(documents[:3]):
@@ -123,7 +180,7 @@ async def get_socratic_hint(
         )
     except Exception as e:
         logger.warning(f"socratic_hint_fallback | client_init_error={e}")
-        return dict(DEFAULT_HINT)
+        return local_hint
 
     try:
         response = await _call_with_fallback(
@@ -150,4 +207,4 @@ async def get_socratic_hint(
         }
     except Exception as e:
         logger.warning(f"socratic_hint_fallback | error={e}")
-        return dict(DEFAULT_HINT)
+        return local_hint

@@ -8,6 +8,7 @@ from fastapi import APIRouter
 from sqlalchemy import text
 
 from config import get_settings
+from services.pedagogical_validation import grading_validation_status
 
 logger = logging.getLogger("khawarizmi.health")
 
@@ -70,6 +71,7 @@ async def health_check():
         # Budget LLM journalier + kill-switch (G0-3) : coût du jour, plafond,
         # et état de coupure (auto budget / manuel).
         "llm_budget": _llm_budget_status(),
+        "grading_validation": grading_validation_status(),
     }
 
     # rag_chunks count (si DB disponible)
