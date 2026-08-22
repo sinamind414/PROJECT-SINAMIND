@@ -5,6 +5,7 @@ import { methodologyChapterLinks, UNITS_CONFIG } from "@/lib/methodology-chapter
 import { EXPERIMENTAL_LESSONS, EXPERIMENTAL_SLUGS } from "@/lib/experimental-lessons-data"
 import chapterFicheMap from "../../data/chapitres-fiches-map.json"
 import fichesData from "../../data/fiches-resume.json"
+import learningContractsData from "../../data/chapter-learning-contracts.json"
 
 const EXPECTED_COUNTS: Record<string, number> = {
   "1-1": 5,
@@ -50,6 +51,24 @@ describe("alignement pédagogique du catalogue 3AS", () => {
     const frontend = readFileSync(resolve(process.cwd(), "data/referentiel-interne-svt-3as.json"), "utf8")
     const backend = readFileSync(resolve(process.cwd(), "../khawarizmi-backend/data/programmes/svt_sciences_experimentales.json"), "utf8")
     expect(frontend).toBe(backend)
+  })
+
+  it("fournit un contrat d’apprentissage et six réflexes aux 55 chapitres", () => {
+    const chapterSlugs = new Set(methodologyChapterLinks.map((chapter) => chapter.slug))
+    const contracts = learningContractsData.contracts
+    expect(learningContractsData.metadata.count).toBe(55)
+    expect(contracts).toHaveLength(55)
+    expect(new Set(contracts.map((contract) => contract.chapterSlug))).toEqual(chapterSlugs)
+    for (const contract of contracts) {
+      expect(contract.checklistAr, contract.chapterSlug).toHaveLength(6)
+      expect(contract.objectiveAr.length).toBeGreaterThan(30)
+      expect(contract.recommendedVerbs.length).toBeGreaterThan(0)
+      expect(contract.ficheIds.length).toBeGreaterThan(0)
+      expect(contract.courseHref).toContain(contract.chapterSlug)
+      expect(contract.practiceHref).toContain(contract.chapterSlug)
+      expect(contract.exerciseHref).toContain(contract.chapterSlug)
+      expect(contract.validationStatus).toBe("internal_pending_teacher")
+    }
   })
 
   it("fournit une fiche de révision complète à chacun des 55 chapitres", () => {

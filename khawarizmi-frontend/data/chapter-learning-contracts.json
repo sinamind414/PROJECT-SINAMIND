@@ -1,0 +1,1766 @@
+{
+  "metadata": {
+    "version": "2026-08-22.1",
+    "source": "referentiel-interne-svt-3as",
+    "validationStatus": "internal_pending_teacher",
+    "count": 55,
+    "checklistLength": 6
+  },
+  "contracts": [
+    {
+      "chapterSlug": "d1-u1-c1-rappel-des-acquis",
+      "domainNumero": 1,
+      "unitNumero": 1,
+      "chapterNumero": 1,
+      "titleAr": "تذكير بالمكتسبات",
+      "titleFr": "Rappel des acquis",
+      "type": "rappel",
+      "importance": "moyenne",
+      "validationStatus": "internal_pending_teacher",
+      "objectiveAr": "أن يتمكن التلميذ من معالجة «تذكير بالمكتسبات» بدقة علمية ووفق فعل التعليمة في وضعية بكالوريا.",
+      "recommendedVerbs": [
+        "analyse",
+        "justify"
+      ],
+      "checklistAr": [
+        "أحدد فعل التعليمة والمطلوب بدقة.",
+        "أسترجع التعاريف والمكتسبات الضرورية فقط.",
+        "أستعمل المصطلحات العلمية الصحيحة بالعربية والفرنسية.",
+        "أربط المكتسب السابق بموضوع الوحدة الحالية.",
+        "أجيب بجمل قصيرة ومنظمة دون حشو.",
+        "أتحقق أن كل جملة تجيب عن المطلوب ولا تخرج عن الموضوع."
+      ],
+      "ficheIds": [
+        "phase1_chapitres_1_2#1"
+      ],
+      "courseHref": "/cours/d1/u1/d1-u1-c1-rappel-des-acquis",
+      "practiceHref": "/document-analysis/chapters/d1-u1-c1-rappel-des-acquis",
+      "exerciseHref": "/exercices/d1-u1-c1-rappel-des-acquis"
+    },
+    {
+      "chapterSlug": "d1-u1-c2-siege-de-la-synthese-des-proteines",
+      "domainNumero": 1,
+      "unitNumero": 1,
+      "chapterNumero": 2,
+      "titleAr": "مقر تركيب البروتين",
+      "titleFr": "Siege de la synthese des proteines",
+      "type": "concept",
+      "importance": "haute",
+      "validationStatus": "internal_pending_teacher",
+      "objectiveAr": "أن يتمكن التلميذ من معالجة «مقر تركيب البروتين» بدقة علمية ووفق فعل التعليمة في وضعية بكالوريا.",
+      "recommendedVerbs": [
+        "analyse",
+        "interpret",
+        "compare",
+        "relationship"
+      ],
+      "checklistAr": [
+        "أحدد فعل التعليمة والمهمة المطلوبة.",
+        "أعرّف المفهوم العلمي بعبارة دقيقة.",
+        "أحدد عناصر المفهوم أو خصائصه الأساسية.",
+        "أقيم العلاقة بين العناصر دون خلط السبب بالنتيجة.",
+        "أستشهد بمعطى أو قيمة من الوثيقة عند وجودها.",
+        "أختم بخلاصة قصيرة تستعمل المصطلحات العلمية الصحيحة."
+      ],
+      "ficheIds": [
+        "phase1_chapitres_1_2#1"
+      ],
+      "courseHref": "/cours/d1/u1/d1-u1-c2-siege-de-la-synthese-des-proteines",
+      "practiceHref": "/document-analysis/chapters/d1-u1-c2-siege-de-la-synthese-des-proteines",
+      "exerciseHref": "/exercices/d1-u1-c2-siege-de-la-synthese-des-proteines"
+    },
+    {
+      "chapterSlug": "d1-u1-c3-transcription-de-l-information-genetique-au-niveau-de-l-adn",
+      "domainNumero": 1,
+      "unitNumero": 1,
+      "chapterNumero": 3,
+      "titleAr": "استنساخ المعلومات الوراثية الموجودة على مستوى ADN",
+      "titleFr": "Transcription de l'information genetique au niveau de l'ADN",
+      "type": "processus",
+      "importance": "critique",
+      "validationStatus": "internal_pending_teacher",
+      "objectiveAr": "أن يتمكن التلميذ من معالجة «استنساخ المعلومات الوراثية الموجودة على مستوى ADN» بدقة علمية ووفق فعل التعليمة في وضعية بكالوريا.",
+      "recommendedVerbs": [
+        "analyse",
+        "interpret",
+        "deduce",
+        "scientific-text"
+      ],
+      "checklistAr": [
+        "أحدد فعل التعليمة وبداية العملية ونهايتها.",
+        "أرتب المراحل زمنيا أو وظيفيا دون قفز.",
+        "أسمي البنيات والجزيئات المتدخلة في كل مرحلة.",
+        "أشرح الانتقال من مرحلة إلى التالية برابط سببي صحيح.",
+        "أحترم المقر والاتجاه والأسهم والحصيلة.",
+        "أراجع التسلسل وأكتب النتيجة النهائية للعملية."
+      ],
+      "ficheIds": [
+        "lecon_transcription#1"
+      ],
+      "courseHref": "/cours/d1/u1/d1-u1-c3-transcription-de-l-information-genetique-au-niveau-de-l-adn",
+      "practiceHref": "/document-analysis/chapters/d1-u1-c3-transcription-de-l-information-genetique-au-niveau-de-l-adn",
+      "exerciseHref": "/exercices/d1-u1-c3-transcription-de-l-information-genetique-au-niveau-de-l-adn"
+    },
+    {
+      "chapterSlug": "d1-u1-c4-la-traduction",
+      "domainNumero": 1,
+      "unitNumero": 1,
+      "chapterNumero": 4,
+      "titleAr": "الترجمة",
+      "titleFr": "La traduction",
+      "type": "processus",
+      "importance": "critique",
+      "validationStatus": "internal_pending_teacher",
+      "objectiveAr": "أن يتمكن التلميذ من معالجة «الترجمة» بدقة علمية ووفق فعل التعليمة في وضعية بكالوريا.",
+      "recommendedVerbs": [
+        "analyse",
+        "interpret",
+        "deduce",
+        "scientific-text"
+      ],
+      "checklistAr": [
+        "أحدد فعل التعليمة وبداية العملية ونهايتها.",
+        "أرتب المراحل زمنيا أو وظيفيا دون قفز.",
+        "أسمي البنيات والجزيئات المتدخلة في كل مرحلة.",
+        "أشرح الانتقال من مرحلة إلى التالية برابط سببي صحيح.",
+        "أحترم المقر والاتجاه والأسهم والحصيلة.",
+        "أراجع التسلسل وأكتب النتيجة النهائية للعملية."
+      ],
+      "ficheIds": [
+        "phase2_chapitres_3_4#1"
+      ],
+      "courseHref": "/cours/d1/u1/d1-u1-c4-la-traduction",
+      "practiceHref": "/document-analysis/chapters/d1-u1-c4-la-traduction",
+      "exerciseHref": "/exercices/d1-u1-c4-la-traduction"
+    },
+    {
+      "chapterSlug": "d1-u1-c5-les-etapes-de-la-traduction",
+      "domainNumero": 1,
+      "unitNumero": 1,
+      "chapterNumero": 5,
+      "titleAr": "مراحل الترجمة",
+      "titleFr": "Les etapes de la traduction",
+      "type": "processus",
+      "importance": "critique",
+      "validationStatus": "internal_pending_teacher",
+      "objectiveAr": "أن يتمكن التلميذ من معالجة «مراحل الترجمة» بدقة علمية ووفق فعل التعليمة في وضعية بكالوريا.",
+      "recommendedVerbs": [
+        "analyse",
+        "interpret",
+        "deduce",
+        "scientific-text"
+      ],
+      "checklistAr": [
+        "أحدد فعل التعليمة وبداية العملية ونهايتها.",
+        "أرتب المراحل زمنيا أو وظيفيا دون قفز.",
+        "أسمي البنيات والجزيئات المتدخلة في كل مرحلة.",
+        "أشرح الانتقال من مرحلة إلى التالية برابط سببي صحيح.",
+        "أحترم المقر والاتجاه والأسهم والحصيلة.",
+        "أراجع التسلسل وأكتب النتيجة النهائية للعملية."
+      ],
+      "ficheIds": [
+        "phase2_chapitres_3_4#1"
+      ],
+      "courseHref": "/cours/d1/u1/d1-u1-c5-les-etapes-de-la-traduction",
+      "practiceHref": "/document-analysis/chapters/d1-u1-c5-les-etapes-de-la-traduction",
+      "exerciseHref": "/exercices/d1-u1-c5-les-etapes-de-la-traduction"
+    },
+    {
+      "chapterSlug": "d1-u2-c1-representation-de-la-structure-tridimensionnelle-de-la-proteine",
+      "domainNumero": 1,
+      "unitNumero": 2,
+      "chapterNumero": 1,
+      "titleAr": "تمثيل البنية الفراغية للبروتين",
+      "titleFr": "Representation de la structure tridimensionnelle de la proteine",
+      "type": "concept",
+      "importance": "haute",
+      "validationStatus": "internal_pending_teacher",
+      "objectiveAr": "أن يتمكن التلميذ من معالجة «تمثيل البنية الفراغية للبروتين» بدقة علمية ووفق فعل التعليمة في وضعية بكالوريا.",
+      "recommendedVerbs": [
+        "analyse",
+        "interpret",
+        "compare",
+        "relationship"
+      ],
+      "checklistAr": [
+        "أحدد فعل التعليمة والمهمة المطلوبة.",
+        "أعرّف المفهوم العلمي بعبارة دقيقة.",
+        "أحدد عناصر المفهوم أو خصائصه الأساسية.",
+        "أقيم العلاقة بين العناصر دون خلط السبب بالنتيجة.",
+        "أستشهد بمعطى أو قيمة من الوثيقة عند وجودها.",
+        "أختم بخلاصة قصيرة تستعمل المصطلحات العلمية الصحيحة."
+      ],
+      "ficheIds": [
+        "phase2_chapitres_3_4#2"
+      ],
+      "courseHref": "/cours/d1/u2/d1-u2-c1-representation-de-la-structure-tridimensionnelle-de-la-proteine",
+      "practiceHref": "/document-analysis/chapters/d1-u2-c1-representation-de-la-structure-tridimensionnelle-de-la-proteine",
+      "exerciseHref": "/exercices/d1-u2-c1-representation-de-la-structure-tridimensionnelle-de-la-proteine"
+    },
+    {
+      "chapterSlug": "d1-u2-c2-niveaux-de-la-structure-spatiale-des-proteines",
+      "domainNumero": 1,
+      "unitNumero": 2,
+      "chapterNumero": 2,
+      "titleAr": "مستويات البنية الفراغية للبروتينات",
+      "titleFr": "Niveaux de la structure spatiale des proteines",
+      "type": "concept",
+      "importance": "critique",
+      "validationStatus": "internal_pending_teacher",
+      "objectiveAr": "أن يتمكن التلميذ من معالجة «مستويات البنية الفراغية للبروتينات» بدقة علمية ووفق فعل التعليمة في وضعية بكالوريا.",
+      "recommendedVerbs": [
+        "analyse",
+        "interpret",
+        "compare",
+        "relationship"
+      ],
+      "checklistAr": [
+        "أحدد فعل التعليمة والمهمة المطلوبة.",
+        "أعرّف المفهوم العلمي بعبارة دقيقة.",
+        "أحدد عناصر المفهوم أو خصائصه الأساسية.",
+        "أقيم العلاقة بين العناصر دون خلط السبب بالنتيجة.",
+        "أستشهد بمعطى أو قيمة من الوثيقة عند وجودها.",
+        "أختم بخلاصة قصيرة تستعمل المصطلحات العلمية الصحيحة."
+      ],
+      "ficheIds": [
+        "phase2_chapitres_3_4#2"
+      ],
+      "courseHref": "/cours/d1/u2/d1-u2-c2-niveaux-de-la-structure-spatiale-des-proteines",
+      "practiceHref": "/document-analysis/chapters/d1-u2-c2-niveaux-de-la-structure-spatiale-des-proteines",
+      "exerciseHref": "/exercices/d1-u2-c2-niveaux-de-la-structure-spatiale-des-proteines"
+    },
+    {
+      "chapterSlug": "d1-u2-c3-relation-entre-structure-et-fonction-de-la-proteine",
+      "domainNumero": 1,
+      "unitNumero": 2,
+      "chapterNumero": 3,
+      "titleAr": "العلاقة بين بنية ووظيفة البروتين",
+      "titleFr": "Relation entre structure et fonction de la proteine",
+      "type": "concept",
+      "importance": "critique",
+      "validationStatus": "internal_pending_teacher",
+      "objectiveAr": "أن يتمكن التلميذ من معالجة «العلاقة بين بنية ووظيفة البروتين» بدقة علمية ووفق فعل التعليمة في وضعية بكالوريا.",
+      "recommendedVerbs": [
+        "analyse",
+        "interpret",
+        "compare",
+        "relationship"
+      ],
+      "checklistAr": [
+        "أحدد فعل التعليمة والمهمة المطلوبة.",
+        "أعرّف المفهوم العلمي بعبارة دقيقة.",
+        "أحدد عناصر المفهوم أو خصائصه الأساسية.",
+        "أقيم العلاقة بين العناصر دون خلط السبب بالنتيجة.",
+        "أستشهد بمعطى أو قيمة من الوثيقة عند وجودها.",
+        "أختم بخلاصة قصيرة تستعمل المصطلحات العلمية الصحيحة."
+      ],
+      "ficheIds": [
+        "phase3_chapitres_5_6#1"
+      ],
+      "courseHref": "/cours/d1/u2/d1-u2-c3-relation-entre-structure-et-fonction-de-la-proteine",
+      "practiceHref": "/document-analysis/chapters/d1-u2-c3-relation-entre-structure-et-fonction-de-la-proteine",
+      "exerciseHref": "/exercices/d1-u2-c3-relation-entre-structure-et-fonction-de-la-proteine"
+    },
+    {
+      "chapterSlug": "d1-u3-c1-notion-d-enzyme-et-son-importance",
+      "domainNumero": 1,
+      "unitNumero": 3,
+      "chapterNumero": 1,
+      "titleAr": "مفهوم الإنزيم وأهميته",
+      "titleFr": "Notion d'enzyme et son importance",
+      "type": "concept",
+      "importance": "haute",
+      "validationStatus": "internal_pending_teacher",
+      "objectiveAr": "أن يتمكن التلميذ من معالجة «مفهوم الإنزيم وأهميته» بدقة علمية ووفق فعل التعليمة في وضعية بكالوريا.",
+      "recommendedVerbs": [
+        "analyse",
+        "interpret",
+        "compare",
+        "relationship"
+      ],
+      "checklistAr": [
+        "أحدد فعل التعليمة والمهمة المطلوبة.",
+        "أعرّف المفهوم العلمي بعبارة دقيقة.",
+        "أحدد عناصر المفهوم أو خصائصه الأساسية.",
+        "أقيم العلاقة بين العناصر دون خلط السبب بالنتيجة.",
+        "أستشهد بمعطى أو قيمة من الوثيقة عند وجودها.",
+        "أختم بخلاصة قصيرة تستعمل المصطلحات العلمية الصحيحة."
+      ],
+      "ficheIds": [
+        "phase3_chapitres_5_6#2"
+      ],
+      "courseHref": "/cours/d1/u3/d1-u3-c1-notion-d-enzyme-et-son-importance",
+      "practiceHref": "/document-analysis/chapters/d1-u3-c1-notion-d-enzyme-et-son-importance",
+      "exerciseHref": "/exercices/d1-u3-c1-notion-d-enzyme-et-son-importance"
+    },
+    {
+      "chapterSlug": "d1-u3-c2-l-activite-enzymatique-et-sa-relation-avec-la-structure-de-l-enzyme",
+      "domainNumero": 1,
+      "unitNumero": 3,
+      "chapterNumero": 2,
+      "titleAr": "النشاط الإنزيمي وعلاقته ببنية الإنزيم",
+      "titleFr": "L'activite enzymatique et sa relation avec la structure de l'enzyme",
+      "type": "concept",
+      "importance": "critique",
+      "validationStatus": "internal_pending_teacher",
+      "objectiveAr": "أن يتمكن التلميذ من معالجة «النشاط الإنزيمي وعلاقته ببنية الإنزيم» بدقة علمية ووفق فعل التعليمة في وضعية بكالوريا.",
+      "recommendedVerbs": [
+        "analyse",
+        "interpret",
+        "compare",
+        "relationship"
+      ],
+      "checklistAr": [
+        "أحدد فعل التعليمة والمهمة المطلوبة.",
+        "أعرّف المفهوم العلمي بعبارة دقيقة.",
+        "أحدد عناصر المفهوم أو خصائصه الأساسية.",
+        "أقيم العلاقة بين العناصر دون خلط السبب بالنتيجة.",
+        "أستشهد بمعطى أو قيمة من الوثيقة عند وجودها.",
+        "أختم بخلاصة قصيرة تستعمل المصطلحات العلمية الصحيحة."
+      ],
+      "ficheIds": [
+        "phase3_chapitres_5_6#2"
+      ],
+      "courseHref": "/cours/d1/u3/d1-u3-c2-l-activite-enzymatique-et-sa-relation-avec-la-structure-de-l-enzyme",
+      "practiceHref": "/document-analysis/chapters/d1-u3-c2-l-activite-enzymatique-et-sa-relation-avec-la-structure-de-l-enzyme",
+      "exerciseHref": "/exercices/d1-u3-c2-l-activite-enzymatique-et-sa-relation-avec-la-structure-de-l-enzyme"
+    },
+    {
+      "chapterSlug": "d1-u3-c3-etude-de-l-influence-du-ph-du-milieu-sur-l-activite-enzymatique",
+      "domainNumero": 1,
+      "unitNumero": 3,
+      "chapterNumero": 3,
+      "titleAr": "دراسة تأثير تغير درجة pH الوسط على نشاط الإنزيم",
+      "titleFr": "Etude de l'influence du pH du milieu sur l'activite enzymatique",
+      "type": "experience",
+      "importance": "haute",
+      "validationStatus": "internal_pending_teacher",
+      "objectiveAr": "أن يتمكن التلميذ من معالجة «دراسة تأثير تغير درجة pH الوسط على نشاط الإنزيم» بدقة علمية ووفق فعل التعليمة في وضعية بكالوريا.",
+      "recommendedVerbs": [
+        "analyse",
+        "interpret",
+        "justify",
+        "deduce"
+      ],
+      "checklistAr": [
+        "أحدد المشكلة العلمية والمتغير المدروس.",
+        "أميز الشاهد عن التجربة وأثبت ثبات باقي الشروط.",
+        "أستخرج الملاحظات والقيم دون تفسير مسبق.",
+        "أقارن النتائج باستعمال معيار مشترك.",
+        "أفسر النتائج بمعرفة علمية مرتبطة بالوثيقة.",
+        "أصوغ استنتاجا يجيب مباشرة عن المشكلة العلمية."
+      ],
+      "ficheIds": [
+        "phase4_chapitres_7_8#1"
+      ],
+      "courseHref": "/cours/d1/u3/d1-u3-c3-etude-de-l-influence-du-ph-du-milieu-sur-l-activite-enzymatique",
+      "practiceHref": "/document-analysis/chapters/d1-u3-c3-etude-de-l-influence-du-ph-du-milieu-sur-l-activite-enzymatique",
+      "exerciseHref": "/exercices/d1-u3-c3-etude-de-l-influence-du-ph-du-milieu-sur-l-activite-enzymatique"
+    },
+    {
+      "chapterSlug": "d1-u3-c4-etude-de-l-influence-de-la-temperature-sur-l-activite-enzymatique",
+      "domainNumero": 1,
+      "unitNumero": 3,
+      "chapterNumero": 4,
+      "titleAr": "دراسة تأثير تغيرات درجة الحرارة على نشاط الإنزيم",
+      "titleFr": "Etude de l'influence de la temperature sur l'activite enzymatique",
+      "type": "experience",
+      "importance": "haute",
+      "validationStatus": "internal_pending_teacher",
+      "objectiveAr": "أن يتمكن التلميذ من معالجة «دراسة تأثير تغيرات درجة الحرارة على نشاط الإنزيم» بدقة علمية ووفق فعل التعليمة في وضعية بكالوريا.",
+      "recommendedVerbs": [
+        "analyse",
+        "interpret",
+        "justify",
+        "deduce"
+      ],
+      "checklistAr": [
+        "أحدد المشكلة العلمية والمتغير المدروس.",
+        "أميز الشاهد عن التجربة وأثبت ثبات باقي الشروط.",
+        "أستخرج الملاحظات والقيم دون تفسير مسبق.",
+        "أقارن النتائج باستعمال معيار مشترك.",
+        "أفسر النتائج بمعرفة علمية مرتبطة بالوثيقة.",
+        "أصوغ استنتاجا يجيب مباشرة عن المشكلة العلمية."
+      ],
+      "ficheIds": [
+        "phase4_chapitres_7_8#2"
+      ],
+      "courseHref": "/cours/d1/u3/d1-u3-c4-etude-de-l-influence-de-la-temperature-sur-l-activite-enzymatique",
+      "practiceHref": "/document-analysis/chapters/d1-u3-c4-etude-de-l-influence-de-la-temperature-sur-l-activite-enzymatique",
+      "exerciseHref": "/exercices/d1-u3-c4-etude-de-l-influence-de-la-temperature-sur-l-activite-enzymatique"
+    },
+    {
+      "chapterSlug": "d1-u4-c1-rappel-des-acquis",
+      "domainNumero": 1,
+      "unitNumero": 4,
+      "chapterNumero": 1,
+      "titleAr": "تذكير بالمكتسبات",
+      "titleFr": "Rappel des acquis",
+      "type": "rappel",
+      "importance": "moyenne",
+      "validationStatus": "internal_pending_teacher",
+      "objectiveAr": "أن يتمكن التلميذ من معالجة «تذكير بالمكتسبات» بدقة علمية ووفق فعل التعليمة في وضعية بكالوريا.",
+      "recommendedVerbs": [
+        "analyse",
+        "justify"
+      ],
+      "checklistAr": [
+        "أحدد فعل التعليمة والمطلوب بدقة.",
+        "أسترجع التعاريف والمكتسبات الضرورية فقط.",
+        "أستعمل المصطلحات العلمية الصحيحة بالعربية والفرنسية.",
+        "أربط المكتسب السابق بموضوع الوحدة الحالية.",
+        "أجيب بجمل قصيرة ومنظمة دون حشو.",
+        "أتحقق أن كل جملة تجيب عن المطلوب ولا تخرج عن الموضوع."
+      ],
+      "ficheIds": [
+        "phase5_chapitres_9_10#1"
+      ],
+      "courseHref": "/cours/d1/u4/d1-u4-c1-rappel-des-acquis",
+      "practiceHref": "/document-analysis/chapters/d1-u4-c1-rappel-des-acquis",
+      "exerciseHref": "/exercices/d1-u4-c1-rappel-des-acquis"
+    },
+    {
+      "chapterSlug": "d1-u4-c2-le-soi-et-le-non-soi",
+      "domainNumero": 1,
+      "unitNumero": 4,
+      "chapterNumero": 2,
+      "titleAr": "الذات واللاذات",
+      "titleFr": "Le soi et le non-soi",
+      "type": "concept",
+      "importance": "critique",
+      "validationStatus": "internal_pending_teacher",
+      "objectiveAr": "أن يتمكن التلميذ من معالجة «الذات واللاذات» بدقة علمية ووفق فعل التعليمة في وضعية بكالوريا.",
+      "recommendedVerbs": [
+        "analyse",
+        "interpret",
+        "compare",
+        "relationship"
+      ],
+      "checklistAr": [
+        "أحدد فعل التعليمة والمهمة المطلوبة.",
+        "أعرّف المفهوم العلمي بعبارة دقيقة.",
+        "أحدد عناصر المفهوم أو خصائصه الأساسية.",
+        "أقيم العلاقة بين العناصر دون خلط السبب بالنتيجة.",
+        "أستشهد بمعطى أو قيمة من الوثيقة عند وجودها.",
+        "أختم بخلاصة قصيرة تستعمل المصطلحات العلمية الصحيحة."
+      ],
+      "ficheIds": [
+        "phase5_chapitres_9_10#1"
+      ],
+      "courseHref": "/cours/d1/u4/d1-u4-c2-le-soi-et-le-non-soi",
+      "practiceHref": "/document-analysis/chapters/d1-u4-c2-le-soi-et-le-non-soi",
+      "exerciseHref": "/exercices/d1-u4-c2-le-soi-et-le-non-soi"
+    },
+    {
+      "chapterSlug": "d1-u4-c3-les-molecules-de-defense-dans-le-premier-cas-immunite-non-specifique",
+      "domainNumero": 1,
+      "unitNumero": 4,
+      "chapterNumero": 3,
+      "titleAr": "الحزينات الدفاعية في الحالة الأولى",
+      "titleFr": "Les molecules de defense dans le premier cas (immunite non specifique)",
+      "type": "concept",
+      "importance": "haute",
+      "validationStatus": "internal_pending_teacher",
+      "objectiveAr": "أن يتمكن التلميذ من معالجة «الحزينات الدفاعية في الحالة الأولى» بدقة علمية ووفق فعل التعليمة في وضعية بكالوريا.",
+      "recommendedVerbs": [
+        "analyse",
+        "interpret",
+        "compare",
+        "relationship"
+      ],
+      "checklistAr": [
+        "أحدد فعل التعليمة والمهمة المطلوبة.",
+        "أعرّف المفهوم العلمي بعبارة دقيقة.",
+        "أحدد عناصر المفهوم أو خصائصه الأساسية.",
+        "أقيم العلاقة بين العناصر دون خلط السبب بالنتيجة.",
+        "أستشهد بمعطى أو قيمة من الوثيقة عند وجودها.",
+        "أختم بخلاصة قصيرة تستعمل المصطلحات العلمية الصحيحة."
+      ],
+      "ficheIds": [
+        "phase6_chapitres_11_12#2"
+      ],
+      "courseHref": "/cours/d1/u4/d1-u4-c3-les-molecules-de-defense-dans-le-premier-cas-immunite-non-specifique",
+      "practiceHref": "/document-analysis/chapters/d1-u4-c3-les-molecules-de-defense-dans-le-premier-cas-immunite-non-specifique",
+      "exerciseHref": "/exercices/d1-u4-c3-les-molecules-de-defense-dans-le-premier-cas-immunite-non-specifique"
+    },
+    {
+      "chapterSlug": "d1-u4-c4-le-complexe-immun",
+      "domainNumero": 1,
+      "unitNumero": 4,
+      "chapterNumero": 4,
+      "titleAr": "المعقد المناعي",
+      "titleFr": "Le complexe immun",
+      "type": "concept",
+      "importance": "critique",
+      "validationStatus": "internal_pending_teacher",
+      "objectiveAr": "أن يتمكن التلميذ من معالجة «المعقد المناعي» بدقة علمية ووفق فعل التعليمة في وضعية بكالوريا.",
+      "recommendedVerbs": [
+        "analyse",
+        "interpret",
+        "compare",
+        "relationship"
+      ],
+      "checklistAr": [
+        "أحدد فعل التعليمة والمهمة المطلوبة.",
+        "أعرّف المفهوم العلمي بعبارة دقيقة.",
+        "أحدد عناصر المفهوم أو خصائصه الأساسية.",
+        "أقيم العلاقة بين العناصر دون خلط السبب بالنتيجة.",
+        "أستشهد بمعطى أو قيمة من الوثيقة عند وجودها.",
+        "أختم بخلاصة قصيرة تستعمل المصطلحات العلمية الصحيحة."
+      ],
+      "ficheIds": [
+        "phase6_chapitres_11_12#2"
+      ],
+      "courseHref": "/cours/d1/u4/d1-u4-c4-le-complexe-immun",
+      "practiceHref": "/document-analysis/chapters/d1-u4-c4-le-complexe-immun",
+      "exerciseHref": "/exercices/d1-u4-c4-le-complexe-immun"
+    },
+    {
+      "chapterSlug": "d1-u4-c5-origine-des-anticorps",
+      "domainNumero": 1,
+      "unitNumero": 4,
+      "chapterNumero": 5,
+      "titleAr": "مصدر الأجسام المضادة",
+      "titleFr": "Origine des anticorps",
+      "type": "processus",
+      "importance": "critique",
+      "validationStatus": "internal_pending_teacher",
+      "objectiveAr": "أن يتمكن التلميذ من معالجة «مصدر الأجسام المضادة» بدقة علمية ووفق فعل التعليمة في وضعية بكالوريا.",
+      "recommendedVerbs": [
+        "analyse",
+        "interpret",
+        "deduce",
+        "scientific-text"
+      ],
+      "checklistAr": [
+        "أحدد فعل التعليمة وبداية العملية ونهايتها.",
+        "أرتب المراحل زمنيا أو وظيفيا دون قفز.",
+        "أسمي البنيات والجزيئات المتدخلة في كل مرحلة.",
+        "أشرح الانتقال من مرحلة إلى التالية برابط سببي صحيح.",
+        "أحترم المقر والاتجاه والأسهم والحصيلة.",
+        "أراجع التسلسل وأكتب النتيجة النهائية للعملية."
+      ],
+      "ficheIds": [
+        "phase6_chapitres_11_12#1"
+      ],
+      "courseHref": "/cours/d1/u4/d1-u4-c5-origine-des-anticorps",
+      "practiceHref": "/document-analysis/chapters/d1-u4-c5-origine-des-anticorps",
+      "exerciseHref": "/exercices/d1-u4-c5-origine-des-anticorps"
+    },
+    {
+      "chapterSlug": "d1-u4-c6-les-elements-de-defense-dans-le-deuxieme-cas-immunite-specifique",
+      "domainNumero": 1,
+      "unitNumero": 4,
+      "chapterNumero": 6,
+      "titleAr": "العناصر الدفاعية في الحالة الثانية",
+      "titleFr": "Les elements de defense dans le deuxieme cas (immunite specifique)",
+      "type": "concept",
+      "importance": "critique",
+      "validationStatus": "internal_pending_teacher",
+      "objectiveAr": "أن يتمكن التلميذ من معالجة «العناصر الدفاعية في الحالة الثانية» بدقة علمية ووفق فعل التعليمة في وضعية بكالوريا.",
+      "recommendedVerbs": [
+        "analyse",
+        "interpret",
+        "compare",
+        "relationship"
+      ],
+      "checklistAr": [
+        "أحدد فعل التعليمة والمهمة المطلوبة.",
+        "أعرّف المفهوم العلمي بعبارة دقيقة.",
+        "أحدد عناصر المفهوم أو خصائصه الأساسية.",
+        "أقيم العلاقة بين العناصر دون خلط السبب بالنتيجة.",
+        "أستشهد بمعطى أو قيمة من الوثيقة عند وجودها.",
+        "أختم بخلاصة قصيرة تستعمل المصطلحات العلمية الصحيحة."
+      ],
+      "ficheIds": [
+        "phase6_chapitres_11_12#1"
+      ],
+      "courseHref": "/cours/d1/u4/d1-u4-c6-les-elements-de-defense-dans-le-deuxieme-cas-immunite-specifique",
+      "practiceHref": "/document-analysis/chapters/d1-u4-c6-les-elements-de-defense-dans-le-deuxieme-cas-immunite-specifique",
+      "exerciseHref": "/exercices/d1-u4-c6-les-elements-de-defense-dans-le-deuxieme-cas-immunite-specifique"
+    },
+    {
+      "chapterSlug": "d1-u4-c7-modes-d-action-des-lymphocytes-ltc",
+      "domainNumero": 1,
+      "unitNumero": 4,
+      "chapterNumero": 7,
+      "titleAr": "طرق تأثير اللمفاويات LTc",
+      "titleFr": "Modes d'action des lymphocytes LTc",
+      "type": "processus",
+      "importance": "critique",
+      "validationStatus": "internal_pending_teacher",
+      "objectiveAr": "أن يتمكن التلميذ من معالجة «طرق تأثير اللمفاويات LTc» بدقة علمية ووفق فعل التعليمة في وضعية بكالوريا.",
+      "recommendedVerbs": [
+        "analyse",
+        "interpret",
+        "deduce",
+        "scientific-text"
+      ],
+      "checklistAr": [
+        "أحدد فعل التعليمة وبداية العملية ونهايتها.",
+        "أرتب المراحل زمنيا أو وظيفيا دون قفز.",
+        "أسمي البنيات والجزيئات المتدخلة في كل مرحلة.",
+        "أشرح الانتقال من مرحلة إلى التالية برابط سببي صحيح.",
+        "أحترم المقر والاتجاه والأسهم والحصيلة.",
+        "أراجع التسلسل وأكتب النتيجة النهائية للعملية."
+      ],
+      "ficheIds": [
+        "phase7_chapitres_13_14#1"
+      ],
+      "courseHref": "/cours/d1/u4/d1-u4-c7-modes-d-action-des-lymphocytes-ltc",
+      "practiceHref": "/document-analysis/chapters/d1-u4-c7-modes-d-action-des-lymphocytes-ltc",
+      "exerciseHref": "/exercices/d1-u4-c7-modes-d-action-des-lymphocytes-ltc"
+    },
+    {
+      "chapterSlug": "d1-u4-c8-origine-des-lymphocytes-ltc",
+      "domainNumero": 1,
+      "unitNumero": 4,
+      "chapterNumero": 8,
+      "titleAr": "مصدر اللمفاويات LTc",
+      "titleFr": "Origine des lymphocytes LTc",
+      "type": "processus",
+      "importance": "haute",
+      "validationStatus": "internal_pending_teacher",
+      "objectiveAr": "أن يتمكن التلميذ من معالجة «مصدر اللمفاويات LTc» بدقة علمية ووفق فعل التعليمة في وضعية بكالوريا.",
+      "recommendedVerbs": [
+        "analyse",
+        "interpret",
+        "deduce",
+        "scientific-text"
+      ],
+      "checklistAr": [
+        "أحدد فعل التعليمة وبداية العملية ونهايتها.",
+        "أرتب المراحل زمنيا أو وظيفيا دون قفز.",
+        "أسمي البنيات والجزيئات المتدخلة في كل مرحلة.",
+        "أشرح الانتقال من مرحلة إلى التالية برابط سببي صحيح.",
+        "أحترم المقر والاتجاه والأسهم والحصيلة.",
+        "أراجع التسلسل وأكتب النتيجة النهائية للعملية."
+      ],
+      "ficheIds": [
+        "phase7_chapitres_13_14#1"
+      ],
+      "courseHref": "/cours/d1/u4/d1-u4-c8-origine-des-lymphocytes-ltc",
+      "practiceHref": "/document-analysis/chapters/d1-u4-c8-origine-des-lymphocytes-ltc",
+      "exerciseHref": "/exercices/d1-u4-c8-origine-des-lymphocytes-ltc"
+    },
+    {
+      "chapterSlug": "d1-u4-c9-activation-des-cellules-lb-et-lt",
+      "domainNumero": 1,
+      "unitNumero": 4,
+      "chapterNumero": 9,
+      "titleAr": "تحفيز الخلايا LB و LT",
+      "titleFr": "Activation des cellules LB et LT",
+      "type": "processus",
+      "importance": "critique",
+      "validationStatus": "internal_pending_teacher",
+      "objectiveAr": "أن يتمكن التلميذ من معالجة «تحفيز الخلايا LB و LT» بدقة علمية ووفق فعل التعليمة في وضعية بكالوريا.",
+      "recommendedVerbs": [
+        "analyse",
+        "interpret",
+        "deduce",
+        "scientific-text"
+      ],
+      "checklistAr": [
+        "أحدد فعل التعليمة وبداية العملية ونهايتها.",
+        "أرتب المراحل زمنيا أو وظيفيا دون قفز.",
+        "أسمي البنيات والجزيئات المتدخلة في كل مرحلة.",
+        "أشرح الانتقال من مرحلة إلى التالية برابط سببي صحيح.",
+        "أحترم المقر والاتجاه والأسهم والحصيلة.",
+        "أراجع التسلسل وأكتب النتيجة النهائية للعملية."
+      ],
+      "ficheIds": [
+        "phase7_chapitres_13_14#2"
+      ],
+      "courseHref": "/cours/d1/u4/d1-u4-c9-activation-des-cellules-lb-et-lt",
+      "practiceHref": "/document-analysis/chapters/d1-u4-c9-activation-des-cellules-lb-et-lt",
+      "exerciseHref": "/exercices/d1-u4-c9-activation-des-cellules-lb-et-lt"
+    },
+    {
+      "chapterSlug": "d1-u4-c10-choix-du-type-de-reponse-immunitaire",
+      "domainNumero": 1,
+      "unitNumero": 4,
+      "chapterNumero": 10,
+      "titleAr": "اختيار نمط الاستجابة المناعية",
+      "titleFr": "Choix du type de reponse immunitaire",
+      "type": "concept",
+      "importance": "haute",
+      "validationStatus": "internal_pending_teacher",
+      "objectiveAr": "أن يتمكن التلميذ من معالجة «اختيار نمط الاستجابة المناعية» بدقة علمية ووفق فعل التعليمة في وضعية بكالوريا.",
+      "recommendedVerbs": [
+        "analyse",
+        "interpret",
+        "compare",
+        "relationship"
+      ],
+      "checklistAr": [
+        "أحدد فعل التعليمة والمهمة المطلوبة.",
+        "أعرّف المفهوم العلمي بعبارة دقيقة.",
+        "أحدد عناصر المفهوم أو خصائصه الأساسية.",
+        "أقيم العلاقة بين العناصر دون خلط السبب بالنتيجة.",
+        "أستشهد بمعطى أو قيمة من الوثيقة عند وجودها.",
+        "أختم بخلاصة قصيرة تستعمل المصطلحات العلمية الصحيحة."
+      ],
+      "ficheIds": [
+        "phase7_chapitres_13_14#2"
+      ],
+      "courseHref": "/cours/d1/u4/d1-u4-c10-choix-du-type-de-reponse-immunitaire",
+      "practiceHref": "/document-analysis/chapters/d1-u4-c10-choix-du-type-de-reponse-immunitaire",
+      "exerciseHref": "/exercices/d1-u4-c10-choix-du-type-de-reponse-immunitaire"
+    },
+    {
+      "chapterSlug": "d1-u4-c11-cause-de-la-perte-de-l-immunite-acquise-sida",
+      "domainNumero": 1,
+      "unitNumero": 4,
+      "chapterNumero": 11,
+      "titleAr": "سبب فقدان المناعة المكتسبة",
+      "titleFr": "Cause de la perte de l'immunite acquise (SIDA)",
+      "type": "concept",
+      "importance": "critique",
+      "validationStatus": "internal_pending_teacher",
+      "objectiveAr": "أن يتمكن التلميذ من معالجة «سبب فقدان المناعة المكتسبة» بدقة علمية ووفق فعل التعليمة في وضعية بكالوريا.",
+      "recommendedVerbs": [
+        "analyse",
+        "interpret",
+        "compare",
+        "relationship"
+      ],
+      "checklistAr": [
+        "أحدد فعل التعليمة والمهمة المطلوبة.",
+        "أعرّف المفهوم العلمي بعبارة دقيقة.",
+        "أحدد عناصر المفهوم أو خصائصه الأساسية.",
+        "أقيم العلاقة بين العناصر دون خلط السبب بالنتيجة.",
+        "أستشهد بمعطى أو قيمة من الوثيقة عند وجودها.",
+        "أختم بخلاصة قصيرة تستعمل المصطلحات العلمية الصحيحة."
+      ],
+      "ficheIds": [
+        "phase7_chapitres_13_14#2"
+      ],
+      "courseHref": "/cours/d1/u4/d1-u4-c11-cause-de-la-perte-de-l-immunite-acquise-sida",
+      "practiceHref": "/document-analysis/chapters/d1-u4-c11-cause-de-la-perte-de-l-immunite-acquise-sida",
+      "exerciseHref": "/exercices/d1-u4-c11-cause-de-la-perte-de-l-immunite-acquise-sida"
+    },
+    {
+      "chapterSlug": "d1-u5-c1-rappel-des-acquis",
+      "domainNumero": 1,
+      "unitNumero": 5,
+      "chapterNumero": 1,
+      "titleAr": "تذكير بالمكتسبات",
+      "titleFr": "Rappel des acquis",
+      "type": "rappel",
+      "importance": "moyenne",
+      "validationStatus": "internal_pending_teacher",
+      "objectiveAr": "أن يتمكن التلميذ من معالجة «تذكير بالمكتسبات» بدقة علمية ووفق فعل التعليمة في وضعية بكالوريا.",
+      "recommendedVerbs": [
+        "analyse",
+        "justify"
+      ],
+      "checklistAr": [
+        "أحدد فعل التعليمة والمطلوب بدقة.",
+        "أسترجع التعاريف والمكتسبات الضرورية فقط.",
+        "أستعمل المصطلحات العلمية الصحيحة بالعربية والفرنسية.",
+        "أربط المكتسب السابق بموضوع الوحدة الحالية.",
+        "أجيب بجمل قصيرة ومنظمة دون حشو.",
+        "أتحقق أن كل جملة تجيب عن المطلوب ولا تخرج عن الموضوع."
+      ],
+      "ficheIds": [
+        "phase8_chapitres_15_16#1"
+      ],
+      "courseHref": "/cours/d1/u5/d1-u5-c1-rappel-des-acquis",
+      "practiceHref": "/document-analysis/chapters/d1-u5-c1-rappel-des-acquis",
+      "exerciseHref": "/exercices/d1-u5-c1-rappel-des-acquis"
+    },
+    {
+      "chapterSlug": "d1-u5-c2-la-transmission-synaptique-potentiel-membranaire",
+      "domainNumero": 1,
+      "unitNumero": 5,
+      "chapterNumero": 2,
+      "titleAr": "النقل المشبكي (الكمون الغشائي)",
+      "titleFr": "La transmission synaptique (potentiel membranaire)",
+      "type": "concept",
+      "importance": "critique",
+      "validationStatus": "internal_pending_teacher",
+      "objectiveAr": "أن يتمكن التلميذ من معالجة «النقل المشبكي (الكمون الغشائي)» بدقة علمية ووفق فعل التعليمة في وضعية بكالوريا.",
+      "recommendedVerbs": [
+        "analyse",
+        "interpret",
+        "compare",
+        "relationship"
+      ],
+      "checklistAr": [
+        "أحدد فعل التعليمة والمهمة المطلوبة.",
+        "أعرّف المفهوم العلمي بعبارة دقيقة.",
+        "أحدد عناصر المفهوم أو خصائصه الأساسية.",
+        "أقيم العلاقة بين العناصر دون خلط السبب بالنتيجة.",
+        "أستشهد بمعطى أو قيمة من الوثيقة عند وجودها.",
+        "أختم بخلاصة قصيرة تستعمل المصطلحات العلمية الصحيحة."
+      ],
+      "ficheIds": [
+        "phase8_chapitres_15_16#2"
+      ],
+      "courseHref": "/cours/d1/u5/d1-u5-c2-la-transmission-synaptique-potentiel-membranaire",
+      "practiceHref": "/document-analysis/chapters/d1-u5-c2-la-transmission-synaptique-potentiel-membranaire",
+      "exerciseHref": "/exercices/d1-u5-c2-la-transmission-synaptique-potentiel-membranaire"
+    },
+    {
+      "chapterSlug": "d1-u5-c3-mecanisme-de-la-transmission-synaptique",
+      "domainNumero": 1,
+      "unitNumero": 5,
+      "chapterNumero": 3,
+      "titleAr": "آلية النقل المشبكي",
+      "titleFr": "Mecanisme de la transmission synaptique",
+      "type": "processus",
+      "importance": "critique",
+      "validationStatus": "internal_pending_teacher",
+      "objectiveAr": "أن يتمكن التلميذ من معالجة «آلية النقل المشبكي» بدقة علمية ووفق فعل التعليمة في وضعية بكالوريا.",
+      "recommendedVerbs": [
+        "analyse",
+        "interpret",
+        "deduce",
+        "scientific-text"
+      ],
+      "checklistAr": [
+        "أحدد فعل التعليمة وبداية العملية ونهايتها.",
+        "أرتب المراحل زمنيا أو وظيفيا دون قفز.",
+        "أسمي البنيات والجزيئات المتدخلة في كل مرحلة.",
+        "أشرح الانتقال من مرحلة إلى التالية برابط سببي صحيح.",
+        "أحترم المقر والاتجاه والأسهم والحصيلة.",
+        "أراجع التسلسل وأكتب النتيجة النهائية للعملية."
+      ],
+      "ficheIds": [
+        "phase9_chapitres_17_18#1"
+      ],
+      "courseHref": "/cours/d1/u5/d1-u5-c3-mecanisme-de-la-transmission-synaptique",
+      "practiceHref": "/document-analysis/chapters/d1-u5-c3-mecanisme-de-la-transmission-synaptique",
+      "exerciseHref": "/exercices/d1-u5-c3-mecanisme-de-la-transmission-synaptique"
+    },
+    {
+      "chapterSlug": "d1-u5-c4-le-potentiel-de-repos",
+      "domainNumero": 1,
+      "unitNumero": 5,
+      "chapterNumero": 4,
+      "titleAr": "كمون الراحة",
+      "titleFr": "Le potentiel de repos",
+      "type": "concept",
+      "importance": "critique",
+      "validationStatus": "internal_pending_teacher",
+      "objectiveAr": "أن يتمكن التلميذ من معالجة «كمون الراحة» بدقة علمية ووفق فعل التعليمة في وضعية بكالوريا.",
+      "recommendedVerbs": [
+        "analyse",
+        "interpret",
+        "compare",
+        "relationship"
+      ],
+      "checklistAr": [
+        "أحدد فعل التعليمة والمهمة المطلوبة.",
+        "أعرّف المفهوم العلمي بعبارة دقيقة.",
+        "أحدد عناصر المفهوم أو خصائصه الأساسية.",
+        "أقيم العلاقة بين العناصر دون خلط السبب بالنتيجة.",
+        "أستشهد بمعطى أو قيمة من الوثيقة عند وجودها.",
+        "أختم بخلاصة قصيرة تستعمل المصطلحات العلمية الصحيحة."
+      ],
+      "ficheIds": [
+        "phase8_chapitres_15_16#1"
+      ],
+      "courseHref": "/cours/d1/u5/d1-u5-c4-le-potentiel-de-repos",
+      "practiceHref": "/document-analysis/chapters/d1-u5-c4-le-potentiel-de-repos",
+      "exerciseHref": "/exercices/d1-u5-c4-le-potentiel-de-repos"
+    },
+    {
+      "chapterSlug": "d1-u5-c5-le-potentiel-d-action",
+      "domainNumero": 1,
+      "unitNumero": 5,
+      "chapterNumero": 5,
+      "titleAr": "كمون العمل",
+      "titleFr": "Le potentiel d'action",
+      "type": "concept",
+      "importance": "critique",
+      "validationStatus": "internal_pending_teacher",
+      "objectiveAr": "أن يتمكن التلميذ من معالجة «كمون العمل» بدقة علمية ووفق فعل التعليمة في وضعية بكالوريا.",
+      "recommendedVerbs": [
+        "analyse",
+        "interpret",
+        "compare",
+        "relationship"
+      ],
+      "checklistAr": [
+        "أحدد فعل التعليمة والمهمة المطلوبة.",
+        "أعرّف المفهوم العلمي بعبارة دقيقة.",
+        "أحدد عناصر المفهوم أو خصائصه الأساسية.",
+        "أقيم العلاقة بين العناصر دون خلط السبب بالنتيجة.",
+        "أستشهد بمعطى أو قيمة من الوثيقة عند وجودها.",
+        "أختم بخلاصة قصيرة تستعمل المصطلحات العلمية الصحيحة."
+      ],
+      "ficheIds": [
+        "phase8_chapitres_15_16#2"
+      ],
+      "courseHref": "/cours/d1/u5/d1-u5-c5-le-potentiel-d-action",
+      "practiceHref": "/document-analysis/chapters/d1-u5-c5-le-potentiel-d-action",
+      "exerciseHref": "/exercices/d1-u5-c5-le-potentiel-d-action"
+    },
+    {
+      "chapterSlug": "d1-u5-c6-mecanisme-de-l-integration-nerveuse",
+      "domainNumero": 1,
+      "unitNumero": 5,
+      "chapterNumero": 6,
+      "titleAr": "آلية الإدماج العصبي",
+      "titleFr": "Mecanisme de l'integration nerveuse",
+      "type": "processus",
+      "importance": "haute",
+      "validationStatus": "internal_pending_teacher",
+      "objectiveAr": "أن يتمكن التلميذ من معالجة «آلية الإدماج العصبي» بدقة علمية ووفق فعل التعليمة في وضعية بكالوريا.",
+      "recommendedVerbs": [
+        "analyse",
+        "interpret",
+        "deduce",
+        "scientific-text"
+      ],
+      "checklistAr": [
+        "أحدد فعل التعليمة وبداية العملية ونهايتها.",
+        "أرتب المراحل زمنيا أو وظيفيا دون قفز.",
+        "أسمي البنيات والجزيئات المتدخلة في كل مرحلة.",
+        "أشرح الانتقال من مرحلة إلى التالية برابط سببي صحيح.",
+        "أحترم المقر والاتجاه والأسهم والحصيلة.",
+        "أراجع التسلسل وأكتب النتيجة النهائية للعملية."
+      ],
+      "ficheIds": [
+        "phase9_chapitres_17_18#2"
+      ],
+      "courseHref": "/cours/d1/u5/d1-u5-c6-mecanisme-de-l-integration-nerveuse",
+      "practiceHref": "/document-analysis/chapters/d1-u5-c6-mecanisme-de-l-integration-nerveuse",
+      "exerciseHref": "/exercices/d1-u5-c6-mecanisme-de-l-integration-nerveuse"
+    },
+    {
+      "chapterSlug": "d1-u5-c7-effet-des-drogues-au-niveau-des-synapses",
+      "domainNumero": 1,
+      "unitNumero": 5,
+      "chapterNumero": 7,
+      "titleAr": "تأثير المخدرات على مستوى المشابك",
+      "titleFr": "Effet des drogues au niveau des synapses",
+      "type": "concept",
+      "importance": "haute",
+      "validationStatus": "internal_pending_teacher",
+      "objectiveAr": "أن يتمكن التلميذ من معالجة «تأثير المخدرات على مستوى المشابك» بدقة علمية ووفق فعل التعليمة في وضعية بكالوريا.",
+      "recommendedVerbs": [
+        "analyse",
+        "interpret",
+        "compare",
+        "relationship"
+      ],
+      "checklistAr": [
+        "أحدد فعل التعليمة والمهمة المطلوبة.",
+        "أعرّف المفهوم العلمي بعبارة دقيقة.",
+        "أحدد عناصر المفهوم أو خصائصه الأساسية.",
+        "أقيم العلاقة بين العناصر دون خلط السبب بالنتيجة.",
+        "أستشهد بمعطى أو قيمة من الوثيقة عند وجودها.",
+        "أختم بخلاصة قصيرة تستعمل المصطلحات العلمية الصحيحة."
+      ],
+      "ficheIds": [
+        "phase10_chapitres_19_20#1"
+      ],
+      "courseHref": "/cours/d1/u5/d1-u5-c7-effet-des-drogues-au-niveau-des-synapses",
+      "practiceHref": "/document-analysis/chapters/d1-u5-c7-effet-des-drogues-au-niveau-des-synapses",
+      "exerciseHref": "/exercices/d1-u5-c7-effet-des-drogues-au-niveau-des-synapses"
+    },
+    {
+      "chapterSlug": "d2-u1-c1-rappel-des-acquis-conditions-et-manifestations-de-la-photosynthese",
+      "domainNumero": 2,
+      "unitNumero": 1,
+      "chapterNumero": 1,
+      "titleAr": "تذكير بالمكتسبات",
+      "titleFr": "Rappel des acquis (conditions et manifestations de la photosynthese)",
+      "type": "rappel",
+      "importance": "moyenne",
+      "validationStatus": "internal_pending_teacher",
+      "objectiveAr": "أن يتمكن التلميذ من معالجة «تذكير بالمكتسبات» بدقة علمية ووفق فعل التعليمة في وضعية بكالوريا.",
+      "recommendedVerbs": [
+        "analyse",
+        "justify"
+      ],
+      "checklistAr": [
+        "أحدد فعل التعليمة والمطلوب بدقة.",
+        "أسترجع التعاريف والمكتسبات الضرورية فقط.",
+        "أستعمل المصطلحات العلمية الصحيحة بالعربية والفرنسية.",
+        "أربط المكتسب السابق بموضوع الوحدة الحالية.",
+        "أجيب بجمل قصيرة ومنظمة دون حشو.",
+        "أتحقق أن كل جملة تجيب عن المطلوب ولا تخرج عن الموضوع."
+      ],
+      "ficheIds": [
+        "phase10_chapitres_19_20#2"
+      ],
+      "courseHref": "/cours/d2/u1/d2-u1-c1-rappel-des-acquis-conditions-et-manifestations-de-la-photosynthese",
+      "practiceHref": "/document-analysis/chapters/d2-u1-c1-rappel-des-acquis-conditions-et-manifestations-de-la-photosynthese",
+      "exerciseHref": "/exercices/d2-u1-c1-rappel-des-acquis-conditions-et-manifestations-de-la-photosynthese"
+    },
+    {
+      "chapterSlug": "d2-u1-c2-siege-de-la-photosynthese-ultrastructure-du-chloroplaste",
+      "domainNumero": 2,
+      "unitNumero": 1,
+      "chapterNumero": 2,
+      "titleAr": "مقر عملية التركيب الضوئي - ما فوق البنية الخلوية للصانعة الخضراء",
+      "titleFr": "Siege de la photosynthese - Ultrastructure du chloroplaste",
+      "type": "concept",
+      "importance": "critique",
+      "validationStatus": "internal_pending_teacher",
+      "objectiveAr": "أن يتمكن التلميذ من معالجة «مقر عملية التركيب الضوئي - ما فوق البنية الخلوية للصانعة الخضراء» بدقة علمية ووفق فعل التعليمة في وضعية بكالوريا.",
+      "recommendedVerbs": [
+        "analyse",
+        "interpret",
+        "compare",
+        "relationship"
+      ],
+      "checklistAr": [
+        "أحدد فعل التعليمة والمهمة المطلوبة.",
+        "أعرّف المفهوم العلمي بعبارة دقيقة.",
+        "أحدد عناصر المفهوم أو خصائصه الأساسية.",
+        "أقيم العلاقة بين العناصر دون خلط السبب بالنتيجة.",
+        "أستشهد بمعطى أو قيمة من الوثيقة عند وجودها.",
+        "أختم بخلاصة قصيرة تستعمل المصطلحات العلمية الصحيحة."
+      ],
+      "ficheIds": [
+        "phase10_chapitres_19_20#2"
+      ],
+      "courseHref": "/cours/d2/u1/d2-u1-c2-siege-de-la-photosynthese-ultrastructure-du-chloroplaste",
+      "practiceHref": "/document-analysis/chapters/d2-u1-c2-siege-de-la-photosynthese-ultrastructure-du-chloroplaste",
+      "exerciseHref": "/exercices/d2-u1-c2-siege-de-la-photosynthese-ultrastructure-du-chloroplaste"
+    },
+    {
+      "chapterSlug": "d2-u1-c3-reactions-de-la-phase-photochimique-phase-claire",
+      "domainNumero": 2,
+      "unitNumero": 1,
+      "chapterNumero": 3,
+      "titleAr": "تفاعلات المرحلة الكيموضوئية",
+      "titleFr": "Reactions de la phase photochimique (phase claire)",
+      "type": "processus",
+      "importance": "critique",
+      "validationStatus": "internal_pending_teacher",
+      "objectiveAr": "أن يتمكن التلميذ من معالجة «تفاعلات المرحلة الكيموضوئية» بدقة علمية ووفق فعل التعليمة في وضعية بكالوريا.",
+      "recommendedVerbs": [
+        "analyse",
+        "interpret",
+        "deduce",
+        "scientific-text"
+      ],
+      "checklistAr": [
+        "أحدد فعل التعليمة وبداية العملية ونهايتها.",
+        "أرتب المراحل زمنيا أو وظيفيا دون قفز.",
+        "أسمي البنيات والجزيئات المتدخلة في كل مرحلة.",
+        "أشرح الانتقال من مرحلة إلى التالية برابط سببي صحيح.",
+        "أحترم المقر والاتجاه والأسهم والحصيلة.",
+        "أراجع التسلسل وأكتب النتيجة النهائية للعملية."
+      ],
+      "ficheIds": [
+        "phase11_chapitres_21_22#1",
+        "phase11_chapitres_21_22#2"
+      ],
+      "courseHref": "/cours/d2/u1/d2-u1-c3-reactions-de-la-phase-photochimique-phase-claire",
+      "practiceHref": "/document-analysis/chapters/d2-u1-c3-reactions-de-la-phase-photochimique-phase-claire",
+      "exerciseHref": "/exercices/d2-u1-c3-reactions-de-la-phase-photochimique-phase-claire"
+    },
+    {
+      "chapterSlug": "d2-u1-c4-reactions-de-la-phase-chimique-cycle-de-calvin-phase-sombre",
+      "domainNumero": 2,
+      "unitNumero": 1,
+      "chapterNumero": 4,
+      "titleAr": "تفاعلات المرحلة الكيموحيوية",
+      "titleFr": "Reactions de la phase chimique (cycle de Calvin - phase sombre)",
+      "type": "processus",
+      "importance": "critique",
+      "validationStatus": "internal_pending_teacher",
+      "objectiveAr": "أن يتمكن التلميذ من معالجة «تفاعلات المرحلة الكيموحيوية» بدقة علمية ووفق فعل التعليمة في وضعية بكالوريا.",
+      "recommendedVerbs": [
+        "analyse",
+        "interpret",
+        "deduce",
+        "scientific-text"
+      ],
+      "checklistAr": [
+        "أحدد فعل التعليمة وبداية العملية ونهايتها.",
+        "أرتب المراحل زمنيا أو وظيفيا دون قفز.",
+        "أسمي البنيات والجزيئات المتدخلة في كل مرحلة.",
+        "أشرح الانتقال من مرحلة إلى التالية برابط سببي صحيح.",
+        "أحترم المقر والاتجاه والأسهم والحصيلة.",
+        "أراجع التسلسل وأكتب النتيجة النهائية للعملية."
+      ],
+      "ficheIds": [
+        "phase12_chapitres_23_24#1",
+        "phase12_chapitres_23_24#2"
+      ],
+      "courseHref": "/cours/d2/u1/d2-u1-c4-reactions-de-la-phase-chimique-cycle-de-calvin-phase-sombre",
+      "practiceHref": "/document-analysis/chapters/d2-u1-c4-reactions-de-la-phase-chimique-cycle-de-calvin-phase-sombre",
+      "exerciseHref": "/exercices/d2-u1-c4-reactions-de-la-phase-chimique-cycle-de-calvin-phase-sombre"
+    },
+    {
+      "chapterSlug": "d2-u2-c1-rappel-des-acquis",
+      "domainNumero": 2,
+      "unitNumero": 2,
+      "chapterNumero": 1,
+      "titleAr": "تذكير بالمكتسبات",
+      "titleFr": "Rappel des acquis",
+      "type": "rappel",
+      "importance": "moyenne",
+      "validationStatus": "internal_pending_teacher",
+      "objectiveAr": "أن يتمكن التلميذ من معالجة «تذكير بالمكتسبات» بدقة علمية ووفق فعل التعليمة في وضعية بكالوريا.",
+      "recommendedVerbs": [
+        "analyse",
+        "justify"
+      ],
+      "checklistAr": [
+        "أحدد فعل التعليمة والمطلوب بدقة.",
+        "أسترجع التعاريف والمكتسبات الضرورية فقط.",
+        "أستعمل المصطلحات العلمية الصحيحة بالعربية والفرنسية.",
+        "أربط المكتسب السابق بموضوع الوحدة الحالية.",
+        "أجيب بجمل قصيرة ومنظمة دون حشو.",
+        "أتحقق أن كل جملة تجيب عن المطلوب ولا تخرج عن الموضوع."
+      ],
+      "ficheIds": [
+        "phase13_chapitres_25_26#1"
+      ],
+      "courseHref": "/cours/d2/u2/d2-u2-c1-rappel-des-acquis",
+      "practiceHref": "/document-analysis/chapters/d2-u2-c1-rappel-des-acquis",
+      "exerciseHref": "/exercices/d2-u2-c1-rappel-des-acquis"
+    },
+    {
+      "chapterSlug": "d2-u2-c2-siege-de-l-oxydation-respiratoire",
+      "domainNumero": 2,
+      "unitNumero": 2,
+      "chapterNumero": 2,
+      "titleAr": "مقر الأكسدة التنفسية",
+      "titleFr": "Siege de l'oxydation respiratoire",
+      "type": "concept",
+      "importance": "critique",
+      "validationStatus": "internal_pending_teacher",
+      "objectiveAr": "أن يتمكن التلميذ من معالجة «مقر الأكسدة التنفسية» بدقة علمية ووفق فعل التعليمة في وضعية بكالوريا.",
+      "recommendedVerbs": [
+        "analyse",
+        "interpret",
+        "compare",
+        "relationship"
+      ],
+      "checklistAr": [
+        "أحدد فعل التعليمة والمهمة المطلوبة.",
+        "أعرّف المفهوم العلمي بعبارة دقيقة.",
+        "أحدد عناصر المفهوم أو خصائصه الأساسية.",
+        "أقيم العلاقة بين العناصر دون خلط السبب بالنتيجة.",
+        "أستشهد بمعطى أو قيمة من الوثيقة عند وجودها.",
+        "أختم بخلاصة قصيرة تستعمل المصطلحات العلمية الصحيحة."
+      ],
+      "ficheIds": [
+        "phase13_chapitres_25_26#2"
+      ],
+      "courseHref": "/cours/d2/u2/d2-u2-c2-siege-de-l-oxydation-respiratoire",
+      "practiceHref": "/document-analysis/chapters/d2-u2-c2-siege-de-l-oxydation-respiratoire",
+      "exerciseHref": "/exercices/d2-u2-c2-siege-de-l-oxydation-respiratoire"
+    },
+    {
+      "chapterSlug": "d2-u2-c3-la-glycolyse",
+      "domainNumero": 2,
+      "unitNumero": 2,
+      "chapterNumero": 3,
+      "titleAr": "التحلل السكري",
+      "titleFr": "La glycolyse",
+      "type": "processus",
+      "importance": "critique",
+      "validationStatus": "internal_pending_teacher",
+      "objectiveAr": "أن يتمكن التلميذ من معالجة «التحلل السكري» بدقة علمية ووفق فعل التعليمة في وضعية بكالوريا.",
+      "recommendedVerbs": [
+        "analyse",
+        "interpret",
+        "deduce",
+        "scientific-text"
+      ],
+      "checklistAr": [
+        "أحدد فعل التعليمة وبداية العملية ونهايتها.",
+        "أرتب المراحل زمنيا أو وظيفيا دون قفز.",
+        "أسمي البنيات والجزيئات المتدخلة في كل مرحلة.",
+        "أشرح الانتقال من مرحلة إلى التالية برابط سببي صحيح.",
+        "أحترم المقر والاتجاه والأسهم والحصيلة.",
+        "أراجع التسلسل وأكتب النتيجة النهائية للعملية."
+      ],
+      "ficheIds": [
+        "phase13_chapitres_25_26#1"
+      ],
+      "courseHref": "/cours/d2/u2/d2-u2-c3-la-glycolyse",
+      "practiceHref": "/document-analysis/chapters/d2-u2-c3-la-glycolyse",
+      "exerciseHref": "/exercices/d2-u2-c3-la-glycolyse"
+    },
+    {
+      "chapterSlug": "d2-u2-c4-etapes-de-degradation-de-l-acide-pyruvique-reactions-du-cycle-de-krebs",
+      "domainNumero": 2,
+      "unitNumero": 2,
+      "chapterNumero": 4,
+      "titleAr": "مراحل تفكك حمض البيروفيك",
+      "titleFr": "Etapes de degradation de l'acide pyruvique (reactions du cycle de Krebs)",
+      "type": "processus",
+      "importance": "critique",
+      "validationStatus": "internal_pending_teacher",
+      "objectiveAr": "أن يتمكن التلميذ من معالجة «مراحل تفكك حمض البيروفيك» بدقة علمية ووفق فعل التعليمة في وضعية بكالوريا.",
+      "recommendedVerbs": [
+        "analyse",
+        "interpret",
+        "deduce",
+        "scientific-text"
+      ],
+      "checklistAr": [
+        "أحدد فعل التعليمة وبداية العملية ونهايتها.",
+        "أرتب المراحل زمنيا أو وظيفيا دون قفز.",
+        "أسمي البنيات والجزيئات المتدخلة في كل مرحلة.",
+        "أشرح الانتقال من مرحلة إلى التالية برابط سببي صحيح.",
+        "أحترم المقر والاتجاه والأسهم والحصيلة.",
+        "أراجع التسلسل وأكتب النتيجة النهائية للعملية."
+      ],
+      "ficheIds": [
+        "phase13_chapitres_25_26#2"
+      ],
+      "courseHref": "/cours/d2/u2/d2-u2-c4-etapes-de-degradation-de-l-acide-pyruvique-reactions-du-cycle-de-krebs",
+      "practiceHref": "/document-analysis/chapters/d2-u2-c4-etapes-de-degradation-de-l-acide-pyruvique-reactions-du-cycle-de-krebs",
+      "exerciseHref": "/exercices/d2-u2-c4-etapes-de-degradation-de-l-acide-pyruvique-reactions-du-cycle-de-krebs"
+    },
+    {
+      "chapterSlug": "d2-u2-c5-la-phosphorylation-oxydative",
+      "domainNumero": 2,
+      "unitNumero": 2,
+      "chapterNumero": 5,
+      "titleAr": "الفسفرة التأكسدية",
+      "titleFr": "La phosphorylation oxydative",
+      "type": "processus",
+      "importance": "critique",
+      "validationStatus": "internal_pending_teacher",
+      "objectiveAr": "أن يتمكن التلميذ من معالجة «الفسفرة التأكسدية» بدقة علمية ووفق فعل التعليمة في وضعية بكالوريا.",
+      "recommendedVerbs": [
+        "analyse",
+        "interpret",
+        "deduce",
+        "scientific-text"
+      ],
+      "checklistAr": [
+        "أحدد فعل التعليمة وبداية العملية ونهايتها.",
+        "أرتب المراحل زمنيا أو وظيفيا دون قفز.",
+        "أسمي البنيات والجزيئات المتدخلة في كل مرحلة.",
+        "أشرح الانتقال من مرحلة إلى التالية برابط سببي صحيح.",
+        "أحترم المقر والاتجاه والأسهم والحصيلة.",
+        "أراجع التسلسل وأكتب النتيجة النهائية للعملية."
+      ],
+      "ficheIds": [
+        "phase14_chapitres_27_28#1"
+      ],
+      "courseHref": "/cours/d2/u2/d2-u2-c5-la-phosphorylation-oxydative",
+      "practiceHref": "/document-analysis/chapters/d2-u2-c5-la-phosphorylation-oxydative",
+      "exerciseHref": "/exercices/d2-u2-c5-la-phosphorylation-oxydative"
+    },
+    {
+      "chapterSlug": "d2-u2-c6-mecanismes-de-conversion-en-milieu-anaerobie-fermentation",
+      "domainNumero": 2,
+      "unitNumero": 2,
+      "chapterNumero": 6,
+      "titleAr": "آليات تحويل الطاقة الكيميائية الكامنة في وسط لا هوائي",
+      "titleFr": "Mecanismes de conversion en milieu anaerobie (fermentation)",
+      "type": "processus",
+      "importance": "haute",
+      "validationStatus": "internal_pending_teacher",
+      "objectiveAr": "أن يتمكن التلميذ من معالجة «آليات تحويل الطاقة الكيميائية الكامنة في وسط لا هوائي» بدقة علمية ووفق فعل التعليمة في وضعية بكالوريا.",
+      "recommendedVerbs": [
+        "analyse",
+        "interpret",
+        "deduce",
+        "scientific-text"
+      ],
+      "checklistAr": [
+        "أحدد فعل التعليمة وبداية العملية ونهايتها.",
+        "أرتب المراحل زمنيا أو وظيفيا دون قفز.",
+        "أسمي البنيات والجزيئات المتدخلة في كل مرحلة.",
+        "أشرح الانتقال من مرحلة إلى التالية برابط سببي صحيح.",
+        "أحترم المقر والاتجاه والأسهم والحصيلة.",
+        "أراجع التسلسل وأكتب النتيجة النهائية للعملية."
+      ],
+      "ficheIds": [
+        "phase14_chapitres_27_28#2"
+      ],
+      "courseHref": "/cours/d2/u2/d2-u2-c6-mecanismes-de-conversion-en-milieu-anaerobie-fermentation",
+      "practiceHref": "/document-analysis/chapters/d2-u2-c6-mecanismes-de-conversion-en-milieu-anaerobie-fermentation",
+      "exerciseHref": "/exercices/d2-u2-c6-mecanismes-de-conversion-en-milieu-anaerobie-fermentation"
+    },
+    {
+      "chapterSlug": "d2-u3-c1-les-transformations-energetiques-au-niveau-cellulaire",
+      "domainNumero": 2,
+      "unitNumero": 3,
+      "chapterNumero": 1,
+      "titleAr": "التحولات الطاقوية على المستوى الخلوي",
+      "titleFr": "Les transformations energetiques au niveau cellulaire",
+      "type": "synthese",
+      "importance": "critique",
+      "validationStatus": "internal_pending_teacher",
+      "objectiveAr": "أن يتمكن التلميذ من معالجة «التحولات الطاقوية على المستوى الخلوي» بدقة علمية ووفق فعل التعليمة في وضعية بكالوريا.",
+      "recommendedVerbs": [
+        "scientific-text",
+        "compare",
+        "relationship",
+        "deduce"
+      ],
+      "checklistAr": [
+        "أحدد المشكلة وفعل التعليمة قبل الكتابة.",
+        "أبني مخططا: مقدمة، عرض، خاتمة.",
+        "أستغل جميع الوثائق المطلوبة دون نسخها.",
+        "أدمج المعارف العلمية بروابط منطقية وسببية.",
+        "أستعمل المصطلحات والاتجاهات والحصائل بدقة.",
+        "أراجع أن الخاتمة تجيب عن المشكلة وأن النص خال من التناقض."
+      ],
+      "ficheIds": [
+        "phase15_chapitres_29_30#1"
+      ],
+      "courseHref": "/cours/d2/u3/d2-u3-c1-les-transformations-energetiques-au-niveau-cellulaire",
+      "practiceHref": "/document-analysis/chapters/d2-u3-c1-les-transformations-energetiques-au-niveau-cellulaire",
+      "exerciseHref": "/exercices/d2-u3-c1-les-transformations-energetiques-au-niveau-cellulaire"
+    },
+    {
+      "chapterSlug": "d3-u1-c1-identification-des-plaques-tectoniques",
+      "domainNumero": 3,
+      "unitNumero": 1,
+      "chapterNumero": 1,
+      "titleAr": "تحديد الصفائح التكتونية",
+      "titleFr": "Identification des plaques tectoniques",
+      "type": "concept",
+      "importance": "critique",
+      "validationStatus": "internal_pending_teacher",
+      "objectiveAr": "أن يتمكن التلميذ من معالجة «تحديد الصفائح التكتونية» بدقة علمية ووفق فعل التعليمة في وضعية بكالوريا.",
+      "recommendedVerbs": [
+        "analyse",
+        "interpret",
+        "compare",
+        "relationship"
+      ],
+      "checklistAr": [
+        "أحدد فعل التعليمة والمهمة المطلوبة.",
+        "أعرّف المفهوم العلمي بعبارة دقيقة.",
+        "أحدد عناصر المفهوم أو خصائصه الأساسية.",
+        "أقيم العلاقة بين العناصر دون خلط السبب بالنتيجة.",
+        "أستشهد بمعطى أو قيمة من الوثيقة عند وجودها.",
+        "أختم بخلاصة قصيرة تستعمل المصطلحات العلمية الصحيحة."
+      ],
+      "ficheIds": [
+        "phase16_chapitres_31_32#1"
+      ],
+      "courseHref": "/cours/d3/u1/d3-u1-c1-identification-des-plaques-tectoniques",
+      "practiceHref": "/document-analysis/chapters/d3-u1-c1-identification-des-plaques-tectoniques",
+      "exerciseHref": "/exercices/d3-u1-c1-identification-des-plaques-tectoniques"
+    },
+    {
+      "chapterSlug": "d3-u1-c2-mouvements-des-plaques-tectoniques",
+      "domainNumero": 3,
+      "unitNumero": 1,
+      "chapterNumero": 2,
+      "titleAr": "حركات الصفائح التكتونية",
+      "titleFr": "Mouvements des plaques tectoniques",
+      "type": "concept",
+      "importance": "critique",
+      "validationStatus": "internal_pending_teacher",
+      "objectiveAr": "أن يتمكن التلميذ من معالجة «حركات الصفائح التكتونية» بدقة علمية ووفق فعل التعليمة في وضعية بكالوريا.",
+      "recommendedVerbs": [
+        "analyse",
+        "interpret",
+        "compare",
+        "relationship"
+      ],
+      "checklistAr": [
+        "أحدد فعل التعليمة والمهمة المطلوبة.",
+        "أعرّف المفهوم العلمي بعبارة دقيقة.",
+        "أحدد عناصر المفهوم أو خصائصه الأساسية.",
+        "أقيم العلاقة بين العناصر دون خلط السبب بالنتيجة.",
+        "أستشهد بمعطى أو قيمة من الوثيقة عند وجودها.",
+        "أختم بخلاصة قصيرة تستعمل المصطلحات العلمية الصحيحة."
+      ],
+      "ficheIds": [
+        "phase16_chapitres_31_32#2",
+        "phase17_chapitres_33_34#1"
+      ],
+      "courseHref": "/cours/d3/u1/d3-u1-c2-mouvements-des-plaques-tectoniques",
+      "practiceHref": "/document-analysis/chapters/d3-u1-c2-mouvements-des-plaques-tectoniques",
+      "exerciseHref": "/exercices/d3-u1-c2-mouvements-des-plaques-tectoniques"
+    },
+    {
+      "chapterSlug": "d3-u1-c3-l-energie-interne-du-globe-terrestre",
+      "domainNumero": 3,
+      "unitNumero": 1,
+      "chapterNumero": 3,
+      "titleAr": "الطاقة الداخلية للكرة الأرضية",
+      "titleFr": "L'energie interne du globe terrestre",
+      "type": "concept",
+      "importance": "haute",
+      "validationStatus": "internal_pending_teacher",
+      "objectiveAr": "أن يتمكن التلميذ من معالجة «الطاقة الداخلية للكرة الأرضية» بدقة علمية ووفق فعل التعليمة في وضعية بكالوريا.",
+      "recommendedVerbs": [
+        "analyse",
+        "interpret",
+        "compare",
+        "relationship"
+      ],
+      "checklistAr": [
+        "أحدد فعل التعليمة والمهمة المطلوبة.",
+        "أعرّف المفهوم العلمي بعبارة دقيقة.",
+        "أحدد عناصر المفهوم أو خصائصه الأساسية.",
+        "أقيم العلاقة بين العناصر دون خلط السبب بالنتيجة.",
+        "أستشهد بمعطى أو قيمة من الوثيقة عند وجودها.",
+        "أختم بخلاصة قصيرة تستعمل المصطلحات العلمية الصحيحة."
+      ],
+      "ficheIds": [
+        "phase18_chapitres_35_36#1",
+        "phase18_chapitres_35_36#2"
+      ],
+      "courseHref": "/cours/d3/u1/d3-u1-c3-l-energie-interne-du-globe-terrestre",
+      "practiceHref": "/document-analysis/chapters/d3-u1-c3-l-energie-interne-du-globe-terrestre",
+      "exerciseHref": "/exercices/d3-u1-c3-l-energie-interne-du-globe-terrestre"
+    },
+    {
+      "chapterSlug": "d3-u2-c1-les-ondes-sismiques",
+      "domainNumero": 3,
+      "unitNumero": 2,
+      "chapterNumero": 1,
+      "titleAr": "الموجات الزلزالية",
+      "titleFr": "Les ondes sismiques",
+      "type": "concept",
+      "importance": "critique",
+      "validationStatus": "internal_pending_teacher",
+      "objectiveAr": "أن يتمكن التلميذ من معالجة «الموجات الزلزالية» بدقة علمية ووفق فعل التعليمة في وضعية بكالوريا.",
+      "recommendedVerbs": [
+        "analyse",
+        "interpret",
+        "compare",
+        "relationship"
+      ],
+      "checklistAr": [
+        "أحدد فعل التعليمة والمهمة المطلوبة.",
+        "أعرّف المفهوم العلمي بعبارة دقيقة.",
+        "أحدد عناصر المفهوم أو خصائصه الأساسية.",
+        "أقيم العلاقة بين العناصر دون خلط السبب بالنتيجة.",
+        "أستشهد بمعطى أو قيمة من الوثيقة عند وجودها.",
+        "أختم بخلاصة قصيرة تستعمل المصطلحات العلمية الصحيحة."
+      ],
+      "ficheIds": [
+        "phase19_chapitres_37_38#1"
+      ],
+      "courseHref": "/cours/d3/u2/d3-u2-c1-les-ondes-sismiques",
+      "practiceHref": "/document-analysis/chapters/d3-u2-c1-les-ondes-sismiques",
+      "exerciseHref": "/exercices/d3-u2-c1-les-ondes-sismiques"
+    },
+    {
+      "chapterSlug": "d3-u2-c2-composition-chimique-des-roches-de-la-croute-terrestre-et-du-manteau",
+      "domainNumero": 3,
+      "unitNumero": 2,
+      "chapterNumero": 2,
+      "titleAr": "التركيب الكيميائي لصخور القشرة الأرضية والمعطف",
+      "titleFr": "Composition chimique des roches de la croute terrestre et du manteau",
+      "type": "concept",
+      "importance": "haute",
+      "validationStatus": "internal_pending_teacher",
+      "objectiveAr": "أن يتمكن التلميذ من معالجة «التركيب الكيميائي لصخور القشرة الأرضية والمعطف» بدقة علمية ووفق فعل التعليمة في وضعية بكالوريا.",
+      "recommendedVerbs": [
+        "analyse",
+        "interpret",
+        "compare",
+        "relationship"
+      ],
+      "checklistAr": [
+        "أحدد فعل التعليمة والمهمة المطلوبة.",
+        "أعرّف المفهوم العلمي بعبارة دقيقة.",
+        "أحدد عناصر المفهوم أو خصائصه الأساسية.",
+        "أقيم العلاقة بين العناصر دون خلط السبب بالنتيجة.",
+        "أستشهد بمعطى أو قيمة من الوثيقة عند وجودها.",
+        "أختم بخلاصة قصيرة تستعمل المصطلحات العلمية الصحيحة."
+      ],
+      "ficheIds": [
+        "phase19_chapitres_37_38#2"
+      ],
+      "courseHref": "/cours/d3/u2/d3-u2-c2-composition-chimique-des-roches-de-la-croute-terrestre-et-du-manteau",
+      "practiceHref": "/document-analysis/chapters/d3-u2-c2-composition-chimique-des-roches-de-la-croute-terrestre-et-du-manteau",
+      "exerciseHref": "/exercices/d3-u2-c2-composition-chimique-des-roches-de-la-croute-terrestre-et-du-manteau"
+    },
+    {
+      "chapterSlug": "d3-u2-c3-modelisation-de-la-structure-interne-du-globe-terrestre",
+      "domainNumero": 3,
+      "unitNumero": 2,
+      "chapterNumero": 3,
+      "titleAr": "نمذجة البنية الداخلية للكرة الأرضية",
+      "titleFr": "Modelisation de la structure interne du globe terrestre",
+      "type": "concept",
+      "importance": "critique",
+      "validationStatus": "internal_pending_teacher",
+      "objectiveAr": "أن يتمكن التلميذ من معالجة «نمذجة البنية الداخلية للكرة الأرضية» بدقة علمية ووفق فعل التعليمة في وضعية بكالوريا.",
+      "recommendedVerbs": [
+        "analyse",
+        "interpret",
+        "compare",
+        "relationship"
+      ],
+      "checklistAr": [
+        "أحدد فعل التعليمة والمهمة المطلوبة.",
+        "أعرّف المفهوم العلمي بعبارة دقيقة.",
+        "أحدد عناصر المفهوم أو خصائصه الأساسية.",
+        "أقيم العلاقة بين العناصر دون خلط السبب بالنتيجة.",
+        "أستشهد بمعطى أو قيمة من الوثيقة عند وجودها.",
+        "أختم بخلاصة قصيرة تستعمل المصطلحات العلمية الصحيحة."
+      ],
+      "ficheIds": [
+        "phase20_chapitres_39_40#1"
+      ],
+      "courseHref": "/cours/d3/u2/d3-u2-c3-modelisation-de-la-structure-interne-du-globe-terrestre",
+      "practiceHref": "/document-analysis/chapters/d3-u2-c3-modelisation-de-la-structure-interne-du-globe-terrestre",
+      "exerciseHref": "/exercices/d3-u2-c3-modelisation-de-la-structure-interne-du-globe-terrestre"
+    },
+    {
+      "chapterSlug": "d3-u3-c1-caracteristiques-des-dorsales-medio-oceaniques",
+      "domainNumero": 3,
+      "unitNumero": 3,
+      "chapterNumero": 1,
+      "titleAr": "الظواهر المرتبطة بالبناء",
+      "titleFr": "Caracteristiques des dorsales medio-oceaniques",
+      "type": "concept",
+      "importance": "critique",
+      "validationStatus": "internal_pending_teacher",
+      "objectiveAr": "أن يتمكن التلميذ من معالجة «الظواهر المرتبطة بالبناء» بدقة علمية ووفق فعل التعليمة في وضعية بكالوريا.",
+      "recommendedVerbs": [
+        "analyse",
+        "interpret",
+        "compare",
+        "relationship"
+      ],
+      "checklistAr": [
+        "أحدد فعل التعليمة والمهمة المطلوبة.",
+        "أعرّف المفهوم العلمي بعبارة دقيقة.",
+        "أحدد عناصر المفهوم أو خصائصه الأساسية.",
+        "أقيم العلاقة بين العناصر دون خلط السبب بالنتيجة.",
+        "أستشهد بمعطى أو قيمة من الوثيقة عند وجودها.",
+        "أختم بخلاصة قصيرة تستعمل المصطلحات العلمية الصحيحة."
+      ],
+      "ficheIds": [
+        "phase21_chapitres_41_42#1"
+      ],
+      "courseHref": "/cours/d3/u3/d3-u3-c1-caracteristiques-des-dorsales-medio-oceaniques",
+      "practiceHref": "/document-analysis/chapters/d3-u3-c1-caracteristiques-des-dorsales-medio-oceaniques",
+      "exerciseHref": "/exercices/d3-u3-c1-caracteristiques-des-dorsales-medio-oceaniques"
+    },
+    {
+      "chapterSlug": "d3-u3-c2-le-magmatisme-et-la-formation-de-la-plaque-oceanique",
+      "domainNumero": 3,
+      "unitNumero": 3,
+      "chapterNumero": 2,
+      "titleAr": "المغماتية وتشكل اللوح المحيطي",
+      "titleFr": "Le magmatisme et la formation de la plaque oceanique",
+      "type": "processus",
+      "importance": "critique",
+      "validationStatus": "internal_pending_teacher",
+      "objectiveAr": "أن يتمكن التلميذ من معالجة «المغماتية وتشكل اللوح المحيطي» بدقة علمية ووفق فعل التعليمة في وضعية بكالوريا.",
+      "recommendedVerbs": [
+        "analyse",
+        "interpret",
+        "deduce",
+        "scientific-text"
+      ],
+      "checklistAr": [
+        "أحدد فعل التعليمة وبداية العملية ونهايتها.",
+        "أرتب المراحل زمنيا أو وظيفيا دون قفز.",
+        "أسمي البنيات والجزيئات المتدخلة في كل مرحلة.",
+        "أشرح الانتقال من مرحلة إلى التالية برابط سببي صحيح.",
+        "أحترم المقر والاتجاه والأسهم والحصيلة.",
+        "أراجع التسلسل وأكتب النتيجة النهائية للعملية."
+      ],
+      "ficheIds": [
+        "phase21_chapitres_41_42#1"
+      ],
+      "courseHref": "/cours/d3/u3/d3-u3-c2-le-magmatisme-et-la-formation-de-la-plaque-oceanique",
+      "practiceHref": "/document-analysis/chapters/d3-u3-c2-le-magmatisme-et-la-formation-de-la-plaque-oceanique",
+      "exerciseHref": "/exercices/d3-u3-c2-le-magmatisme-et-la-formation-de-la-plaque-oceanique"
+    },
+    {
+      "chapterSlug": "d3-u3-c3-formation-des-roches-caracteristiques-de-la-dorsale-medio-oceanique",
+      "domainNumero": 3,
+      "unitNumero": 3,
+      "chapterNumero": 3,
+      "titleAr": "تشكل الصخور المميزة للظهرة وسط محيطية",
+      "titleFr": "Formation des roches caracteristiques de la dorsale medio-oceanique",
+      "type": "processus",
+      "importance": "haute",
+      "validationStatus": "internal_pending_teacher",
+      "objectiveAr": "أن يتمكن التلميذ من معالجة «تشكل الصخور المميزة للظهرة وسط محيطية» بدقة علمية ووفق فعل التعليمة في وضعية بكالوريا.",
+      "recommendedVerbs": [
+        "analyse",
+        "interpret",
+        "deduce",
+        "scientific-text"
+      ],
+      "checklistAr": [
+        "أحدد فعل التعليمة وبداية العملية ونهايتها.",
+        "أرتب المراحل زمنيا أو وظيفيا دون قفز.",
+        "أسمي البنيات والجزيئات المتدخلة في كل مرحلة.",
+        "أشرح الانتقال من مرحلة إلى التالية برابط سببي صحيح.",
+        "أحترم المقر والاتجاه والأسهم والحصيلة.",
+        "أراجع التسلسل وأكتب النتيجة النهائية للعملية."
+      ],
+      "ficheIds": [
+        "phase21_chapitres_41_42#1"
+      ],
+      "courseHref": "/cours/d3/u3/d3-u3-c3-formation-des-roches-caracteristiques-de-la-dorsale-medio-oceanique",
+      "practiceHref": "/document-analysis/chapters/d3-u3-c3-formation-des-roches-caracteristiques-de-la-dorsale-medio-oceanique",
+      "exerciseHref": "/exercices/d3-u3-c3-formation-des-roches-caracteristiques-de-la-dorsale-medio-oceanique"
+    },
+    {
+      "chapterSlug": "d3-u3-c4-phenomenes-lies-a-la-subduction",
+      "domainNumero": 3,
+      "unitNumero": 3,
+      "chapterNumero": 4,
+      "titleAr": "الظواهر المرتبطة بالغوص",
+      "titleFr": "Phenomenes lies a la subduction",
+      "type": "concept",
+      "importance": "critique",
+      "validationStatus": "internal_pending_teacher",
+      "objectiveAr": "أن يتمكن التلميذ من معالجة «الظواهر المرتبطة بالغوص» بدقة علمية ووفق فعل التعليمة في وضعية بكالوريا.",
+      "recommendedVerbs": [
+        "analyse",
+        "interpret",
+        "compare",
+        "relationship"
+      ],
+      "checklistAr": [
+        "أحدد فعل التعليمة والمهمة المطلوبة.",
+        "أعرّف المفهوم العلمي بعبارة دقيقة.",
+        "أحدد عناصر المفهوم أو خصائصه الأساسية.",
+        "أقيم العلاقة بين العناصر دون خلط السبب بالنتيجة.",
+        "أستشهد بمعطى أو قيمة من الوثيقة عند وجودها.",
+        "أختم بخلاصة قصيرة تستعمل المصطلحات العلمية الصحيحة."
+      ],
+      "ficheIds": [
+        "phase17_chapitres_33_34#1"
+      ],
+      "courseHref": "/cours/d3/u3/d3-u3-c4-phenomenes-lies-a-la-subduction",
+      "practiceHref": "/document-analysis/chapters/d3-u3-c4-phenomenes-lies-a-la-subduction",
+      "exerciseHref": "/exercices/d3-u3-c4-phenomenes-lies-a-la-subduction"
+    },
+    {
+      "chapterSlug": "d3-u3-c5-disparition-de-la-plaque-oceanique-et-phenomenes-lies-a-la-subduction",
+      "domainNumero": 3,
+      "unitNumero": 3,
+      "chapterNumero": 5,
+      "titleAr": "اختفاء اللوح المحيطي والظواهر المرتبطة بالغوص",
+      "titleFr": "Disparition de la plaque oceanique et phenomenes lies a la subduction",
+      "type": "processus",
+      "importance": "critique",
+      "validationStatus": "internal_pending_teacher",
+      "objectiveAr": "أن يتمكن التلميذ من معالجة «اختفاء اللوح المحيطي والظواهر المرتبطة بالغوص» بدقة علمية ووفق فعل التعليمة في وضعية بكالوريا.",
+      "recommendedVerbs": [
+        "analyse",
+        "interpret",
+        "deduce",
+        "scientific-text"
+      ],
+      "checklistAr": [
+        "أحدد فعل التعليمة وبداية العملية ونهايتها.",
+        "أرتب المراحل زمنيا أو وظيفيا دون قفز.",
+        "أسمي البنيات والجزيئات المتدخلة في كل مرحلة.",
+        "أشرح الانتقال من مرحلة إلى التالية برابط سببي صحيح.",
+        "أحترم المقر والاتجاه والأسهم والحصيلة.",
+        "أراجع التسلسل وأكتب النتيجة النهائية للعملية."
+      ],
+      "ficheIds": [
+        "phase17_chapitres_33_34#2"
+      ],
+      "courseHref": "/cours/d3/u3/d3-u3-c5-disparition-de-la-plaque-oceanique-et-phenomenes-lies-a-la-subduction",
+      "practiceHref": "/document-analysis/chapters/d3-u3-c5-disparition-de-la-plaque-oceanique-et-phenomenes-lies-a-la-subduction",
+      "exerciseHref": "/exercices/d3-u3-c5-disparition-de-la-plaque-oceanique-et-phenomenes-lies-a-la-subduction"
+    },
+    {
+      "chapterSlug": "d3-u3-c6-reliefs-resultant-de-la-collision",
+      "domainNumero": 3,
+      "unitNumero": 3,
+      "chapterNumero": 6,
+      "titleAr": "التضاريس الناجمة عن التصادم",
+      "titleFr": "Reliefs resultant de la collision",
+      "type": "concept",
+      "importance": "haute",
+      "validationStatus": "internal_pending_teacher",
+      "objectiveAr": "أن يتمكن التلميذ من معالجة «التضاريس الناجمة عن التصادم» بدقة علمية ووفق فعل التعليمة في وضعية بكالوريا.",
+      "recommendedVerbs": [
+        "analyse",
+        "interpret",
+        "compare",
+        "relationship"
+      ],
+      "checklistAr": [
+        "أحدد فعل التعليمة والمهمة المطلوبة.",
+        "أعرّف المفهوم العلمي بعبارة دقيقة.",
+        "أحدد عناصر المفهوم أو خصائصه الأساسية.",
+        "أقيم العلاقة بين العناصر دون خلط السبب بالنتيجة.",
+        "أستشهد بمعطى أو قيمة من الوثيقة عند وجودها.",
+        "أختم بخلاصة قصيرة تستعمل المصطلحات العلمية الصحيحة."
+      ],
+      "ficheIds": [
+        "phase21_chapitres_41_42#2"
+      ],
+      "courseHref": "/cours/d3/u3/d3-u3-c6-reliefs-resultant-de-la-collision",
+      "practiceHref": "/document-analysis/chapters/d3-u3-c6-reliefs-resultant-de-la-collision",
+      "exerciseHref": "/exercices/d3-u3-c6-reliefs-resultant-de-la-collision"
+    },
+    {
+      "chapterSlug": "d3-u3-c7-indices-du-raccourcissement",
+      "domainNumero": 3,
+      "unitNumero": 3,
+      "chapterNumero": 7,
+      "titleAr": "شواهد التقلص",
+      "titleFr": "Indices du raccourcissement",
+      "type": "concept",
+      "importance": "haute",
+      "validationStatus": "internal_pending_teacher",
+      "objectiveAr": "أن يتمكن التلميذ من معالجة «شواهد التقلص» بدقة علمية ووفق فعل التعليمة في وضعية بكالوريا.",
+      "recommendedVerbs": [
+        "analyse",
+        "interpret",
+        "compare",
+        "relationship"
+      ],
+      "checklistAr": [
+        "أحدد فعل التعليمة والمهمة المطلوبة.",
+        "أعرّف المفهوم العلمي بعبارة دقيقة.",
+        "أحدد عناصر المفهوم أو خصائصه الأساسية.",
+        "أقيم العلاقة بين العناصر دون خلط السبب بالنتيجة.",
+        "أستشهد بمعطى أو قيمة من الوثيقة عند وجودها.",
+        "أختم بخلاصة قصيرة تستعمل المصطلحات العلمية الصحيحة."
+      ],
+      "ficheIds": [
+        "phase20_chapitres_39_40#2",
+        "phase21_chapitres_41_42#2"
+      ],
+      "courseHref": "/cours/d3/u3/d3-u3-c7-indices-du-raccourcissement",
+      "practiceHref": "/document-analysis/chapters/d3-u3-c7-indices-du-raccourcissement",
+      "exerciseHref": "/exercices/d3-u3-c7-indices-du-raccourcissement"
+    },
+    {
+      "chapterSlug": "d3-u3-c8-indices-d-un-ancien-ocean-ophiolites",
+      "domainNumero": 3,
+      "unitNumero": 3,
+      "chapterNumero": 8,
+      "titleAr": "شواهد محيط قديم",
+      "titleFr": "Indices d'un ancien ocean (ophiolites)",
+      "type": "concept",
+      "importance": "haute",
+      "validationStatus": "internal_pending_teacher",
+      "objectiveAr": "أن يتمكن التلميذ من معالجة «شواهد محيط قديم» بدقة علمية ووفق فعل التعليمة في وضعية بكالوريا.",
+      "recommendedVerbs": [
+        "analyse",
+        "interpret",
+        "compare",
+        "relationship"
+      ],
+      "checklistAr": [
+        "أحدد فعل التعليمة والمهمة المطلوبة.",
+        "أعرّف المفهوم العلمي بعبارة دقيقة.",
+        "أحدد عناصر المفهوم أو خصائصه الأساسية.",
+        "أقيم العلاقة بين العناصر دون خلط السبب بالنتيجة.",
+        "أستشهد بمعطى أو قيمة من الوثيقة عند وجودها.",
+        "أختم بخلاصة قصيرة تستعمل المصطلحات العلمية الصحيحة."
+      ],
+      "ficheIds": [
+        "fiche-cours-d3-u3-c8-ophiolites"
+      ],
+      "courseHref": "/cours/d3/u3/d3-u3-c8-indices-d-un-ancien-ocean-ophiolites",
+      "practiceHref": "/document-analysis/chapters/d3-u3-c8-indices-d-un-ancien-ocean-ophiolites",
+      "exerciseHref": "/exercices/d3-u3-c8-indices-d-un-ancien-ocean-ophiolites"
+    }
+  ]
+}

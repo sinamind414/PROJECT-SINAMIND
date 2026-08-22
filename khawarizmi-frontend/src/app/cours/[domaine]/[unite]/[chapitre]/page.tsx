@@ -8,9 +8,11 @@ import remarkGfm from "remark-gfm"
 import { AuthGuard } from "@/components/auth/AuthGuard"
 import { AppShell } from "@/components/layout/AppShell"
 import { Breadcrumb } from "@/components/cours/Breadcrumb"
+import { ChapterBacChecklist } from "@/components/cours/ChapterBacChecklist"
 import { VideosWidget } from "@/components/videos/VideosWidget"
 import FicheResume from "@/components/lessons/FicheResume"
 import chapitresFichesMap from "../../../../../../data/chapitres-fiches-map.json"
+import learningContractsData from "../../../../../../data/chapter-learning-contracts.json"
 import {
   getDomainBySlug,
   getUnitBySlug,
@@ -19,6 +21,15 @@ import {
 } from "@/lib/cours-data"
 import { apiClient } from "@/lib/api-client"
 import type { CoursResponse } from "@/lib/types"
+
+type ChapterLearningContract = {
+  chapterSlug: string
+  objectiveAr: string
+  checklistAr: string[]
+  validationStatus: string
+}
+
+const LEARNING_CONTRACTS = learningContractsData.contracts as ChapterLearningContract[]
 
 function CourseMarkdown({
   chapterTitle,
@@ -117,8 +128,9 @@ export default function ChapitrePage() {
   const chapter = getChapterBySlug(chapitreSlug)
   const nav = getChapterNavigation(chapitreSlug)
   const fiche = chapitresFichesMap.find((item) => item.chapterSlug === chapitreSlug)
+  const learningContract = LEARNING_CONTRACTS.find((item) => item.chapterSlug === chapitreSlug)
 
-  if (!domain || !unit || !chapter || chapter.domainNumero !== domain.numero || chapter.unitNumero !== unit.unitNumero) {
+  if (!domain || !unit || !chapter || !learningContract || chapter.domainNumero !== domain.numero || chapter.unitNumero !== unit.unitNumero) {
     return (
       <AuthGuard>
         <AppShell>
@@ -155,6 +167,12 @@ export default function ChapitrePage() {
             </header>
 
             {fiche && <FicheResume ficheIds={fiche.ficheIds} />}
+            <ChapterBacChecklist
+              chapterSlug={learningContract.chapterSlug}
+              objectiveAr={learningContract.objectiveAr}
+              checklistAr={learningContract.checklistAr}
+              validationStatus={learningContract.validationStatus}
+            />
             <CourseMarkdown chapterTitle={chapter.chapterFr} domainNumero={domain.numero} unitNumero={unit.unitNumero} />
             <VideosWidget chapitre={chapter.chapterFr} />
 
