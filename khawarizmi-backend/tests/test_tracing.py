@@ -31,11 +31,8 @@ class TestNoOp:
 
 
 # ── Tracer OTel mocké (module-scope) ────────────────────────────────
-# NB : on NE configure PAS le provider global (OTel interdit de le remplacer
-# une fois défini — et d'autres modules l'initialisent en premier avec le
-# ConsoleSpanExporter). On mocke grading.tracing.get_tracer pour retourner
-# un tracer lié à un exporter in_memory : isolation totale, aucun effet de
-# bord sur les autres tests.
+# On ne configure pas le provider global : get_tracer est mocké avec un
+# exporter mémoire, isolé et sans thread/log de console.
 
 @pytest.fixture(scope="module")
 def otel_exporter():

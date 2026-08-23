@@ -10,7 +10,9 @@ n'ajoute pas de dépendances lourdes (instrumentation-*).
 
 Configuration par env (standards OTel) :
     OTEL_SERVICE_NAME  (défaut "khawarizmi-backend")
-    OTEL_EXPORTER_OTLP_ENDPOINT — si absent, ConsoleSpanExporter (logs)
+    OTEL_EXPORTER_OTLP_ENDPOINT — export OTLP explicite
+    OTEL_CONSOLE_EXPORTER=true — console explicite en développement
+Sans exporter configuré, le tracer reste silencieux (aucun thread/log tardif).
 
 Usage :
     with trace_step("grading.llm", {"verb": "analyse"}):
@@ -60,16 +62,21 @@ def get_tracer():
     try:
         service_name = os.environ.get("OTEL_SERVICE_NAME", "khawarizmi-backend")
         provider = TracerProvider(resource=Resource.create({"service.name": service_name}))
-        # Exporter : OTLP si endpoint configuré, sinon console (logs)
         endpoint = os.environ.get("OTEL_EXPORTER_OTLP_ENDPOINT")
+        console_enabled = os.environ.get("OTEL_CONSOLE_EXPORTER", "").lower() in {"1", "true", "yes"}
         if endpoint:
             from opentelemetry.exporter.otlp.proto.http.trace_exporter import (
                 OTLPSpanExporter,
             )
 
             provider.add_span_processor(BatchSpanProcessor(OTLPSpanExporter(endpoint=endpoint)))
-        else:
+        elif console_enabled:
             provider.add_span_processor(BatchSpanProcessor(ConsoleSpanExporter()))
+        else:
+            # Aucun exporter = aucun thread de fond et aucun contenu de span
+            # écrit dans les logs. Les tests injectent leur exporter mémoire.
+            _tracer = _otel_trace.get_tracer("khawarizmi")
+            return _tracer
         _otel_trace.set_tracer_provider(provider)
         _tracer = _otel_trace.get_tracer("khawarizmi")
     except Exception as e:

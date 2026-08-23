@@ -8,13 +8,7 @@ exemples pratiques, fonctions remediation enrichie.
 
 from __future__ import annotations
 
-import pytest
 from httpx import AsyncClient
-
-# ─── Fixtures ─────────────────────────────────────────────────────
-
-pytestmark = pytest.mark.asyncio
-
 
 # ─── Tests : GET /api/manhadjiya/revision-tips ────────────────────
 

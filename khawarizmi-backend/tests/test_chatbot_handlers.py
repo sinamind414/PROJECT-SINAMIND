@@ -32,7 +32,12 @@ from services.chatbot_orchestrator import handle_chatbot_message
 
 @pytest.fixture
 def db():
-    return AsyncMock()
+    session = AsyncMock()
+    result = MagicMock()
+    result.fetchall.return_value = []
+    result.fetchone.return_value = None
+    session.execute.return_value = result
+    return session
 
 
 @pytest.fixture
@@ -116,6 +121,8 @@ class TestOrientation:
             r = await handle_orientation(db, 1, {}, is_init=True)
         assert r["type"] == "orientation"
         assert "65" in r["reponse"]
+        assert "مؤشر الذاكرة" in r["reponse"]
+        assert "ليس تنبؤا" in r["reponse"]
 
     @pytest.mark.asyncio
     async def test_orientation_with_due_push(self, db):

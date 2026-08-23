@@ -194,13 +194,26 @@ async def handle_orientation(
         from services.orientation_roadmap import calculer_roadmap
 
         roadmap = await calculer_roadmap(db, user_id)
-        objective = roadmap["prochain_objectif"]
+        roadmap_objective = roadmap["prochain_objectif"]
         coach_text = roadmap["coach"]["ar"]
-        if objective.get("chapitre_faible") and objective["chapitre_faible"].get("nom_ar"):
+        weak_chapter = roadmap_objective.get("chapitre_faible")
+        if weak_chapter and weak_chapter.get("nom_ar"):
             coach_text += (
-                f"\n📚 ابدأ بـ: {objective['chapitre_faible']['nom_ar']} "
-                f"(إتقان {objective['chapitre_faible']['maitrise']}%)."
+                f"\n📚 ابدأ بـ: {weak_chapter['nom_ar']} "
+                f"(إتقان {weak_chapter['maitrise']}%)."
             )
+        objective = {
+            "kind": "lesson",
+            "title_ar": roadmap_objective.get("titre_ar") or "المراجعة التالية",
+            "reason_ar": coach_text,
+            "unlock_condition_ar": (
+                f"أتقن الوحدة بنسبة {roadmap['seuils']['done']}٪ لفتح الوحدة الموالية."
+                if roadmap_objective.get("unite_id") else
+                "حافظ على مراجعات FSRS المبرمجة."
+            ),
+            "href": roadmap_objective.get("href") or "/cours",
+            "cta_ar": "ابدأ",
+        }
     except Exception as exc:
         logger.warning("Chatbot boussole indisponible : %s", exc)
         objective = {
@@ -228,7 +241,10 @@ async def handle_orientation(
     response_text = greeting + orientation["message"]
     prediction = orientation.get("prediction_bac")
     if prediction is not None:
-        response_text += f"\n🎯 فرصة النجاح المتوقعة: {prediction}%"
+        response_text += (
+            f"\n🧠 مؤشر الذاكرة التقريبي: {prediction}% "
+            "(ليس تنبؤا بعلامة البكالوريا)."
+        )
     response_text += "\n\n🧭 " + coach_text
     if due_concept and is_init:
         # Le rappel dû reste une information du coach, mais l'unique carte
