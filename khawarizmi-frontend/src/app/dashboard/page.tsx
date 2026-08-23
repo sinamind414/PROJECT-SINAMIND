@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useCallback, useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
 import { AuthGuard } from "@/components/auth/AuthGuard"
 import { AppShell } from "@/components/layout/AppShell"
 
@@ -19,6 +20,7 @@ import type { Mission } from "@/components/drive-design/api-types"
 import type { RoadmapResponse } from "@/lib/types"
 
 export default function GenZDashboardPage() {
+  const router = useRouter()
   const state = useDriveDashboard()
   const [showMore, setShowMore] = useState(false)
   const [roadmap, setRoadmap] = useState<RoadmapResponse | null>(null)
@@ -63,7 +65,7 @@ export default function GenZDashboardPage() {
   const userName = String(profile.name || "خليل")
 
   const handleStartMission = () => {
-    window.location.href = missionHref
+    router.push(missionHref)
   }
 
   // Pertes urgentes = erreurs réelles (progress + contrat), pas de fake hardcodé

@@ -152,6 +152,8 @@ class KhawarizmiApiClient {
         if (!currentPath.startsWith("/auth/")) {
           // Garde la page demandée en mémoire pour rediriger après login
           try { sessionStorage.setItem("kh_login_redirect", window.location.pathname + window.location.search) } catch { /* empty */ }
+          // Redirection d'auth globale hors composant : aucun useRouter disponible ici.
+          // eslint-disable-next-line @next/next/no-location-assign-relative-destination
           window.location.href = "/auth/login"
         }
       }

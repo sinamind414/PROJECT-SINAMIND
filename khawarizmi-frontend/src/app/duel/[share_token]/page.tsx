@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useParams } from "next/navigation"
+import { useParams, useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import { AuthGuard } from "@/components/auth/AuthGuard"
 import { AppShell } from "@/components/layout/AppShell"
@@ -15,6 +15,7 @@ interface DuelInfo {
 }
 
 export default function DuelJoinPage() {
+  const router = useRouter()
   const params = useParams()
   const token = params?.share_token as string
   const [duel, setDuel] = useState<DuelInfo | null>(null)
@@ -38,7 +39,7 @@ export default function DuelJoinPage() {
     try {
       const res = await fetch(`/api/duels/${duel.duel_id}/accept`, { method: "POST" })
       if (res.ok) {
-        window.location.href = `/action-verbs/${duel.verb_slug}`
+        router.push(`/action-verbs/${duel.verb_slug}`)
       }
     } catch {
       setError("خطأ في قبول التحدي")

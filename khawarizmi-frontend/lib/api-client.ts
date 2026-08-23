@@ -99,7 +99,9 @@ class KhawarizmiApiClient {
     if (response.status === 401) {
       this.clearToken()
       if (typeof window !== "undefined") {
-        window.location.href = "/login"
+        // Client historique sans contexte React : redirection d'auth globale.
+        // eslint-disable-next-line @next/next/no-location-assign-relative-destination
+        window.location.href = "/auth/login"
       }
       throw new Error("Session expire. Reconnecte-toi.")
     }
