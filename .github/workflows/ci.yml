@@ -33,22 +33,16 @@ jobs:
           pip install -r requirements.txt
 
       - name: Run backend smoke test
-        run: |
-          cd khawarizmi-backend
-          python -c "
-import os
-os.environ['SECRET_KEY'] = 'ci-test-key-for-smoke-tests-only'
-os.environ['DATABASE_URL'] = 'postgresql+asyncpg://postgres:test@localhost/khawarizmi_test'
-os.environ['ENVIRONMENT'] = 'ci'
-os.environ['REDIS_URL'] = 'redis://localhost:6379/0'
-os.environ['GEMINI_API_KEY'] = 'test'
-os.environ['OPENAI_API_KEY'] = 'test'
-from config import get_settings
-cfg = get_settings()
-print(f'  Settings OK - SECRET_KEY: {bool(cfg.SECRET_KEY)}')
-print(f'  DATABASE_URL: {cfg.DATABASE_URL}')
-print(f'  ENVIRONMENT: {cfg.ENVIRONMENT}')
-"
+        env:
+          SECRET_KEY: ci-test-key-for-smoke-tests-only
+          DATABASE_URL: postgresql+asyncpg://postgres:test@localhost/khawarizmi_test
+          ENVIRONMENT: ci
+          REDIS_URL: redis://localhost:6379/0
+          GEMINI_API_KEY: test
+          OPENAI_API_KEY: test
+          run: |
+            cd khawarizmi-backend
+            python -c "from config import get_settings; cfg = get_settings(); print(f'  Settings OK - SECRET_KEY: {bool(cfg.SECRET_KEY)}'); print(f'  DATABASE_URL: {cfg.DATABASE_URL}'); print(f'  ENVIRONMENT: {cfg.ENVIRONMENT}')"
 
       - name: Run Methodology tests
         run: |

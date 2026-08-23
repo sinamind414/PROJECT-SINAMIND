@@ -69,3 +69,4 @@ khawarizmi-backend/data/
 
 # Playwright MCP artifacts.playwright-mcp/
 cost_log.jsonl
+khawarizmi-backend/tests/cost_log_test.jsonl
