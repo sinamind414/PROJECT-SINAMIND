@@ -40,9 +40,9 @@ jobs:
           REDIS_URL: redis://localhost:6379/0
           GEMINI_API_KEY: test
           OPENAI_API_KEY: test
-          run: |
-            cd khawarizmi-backend
-            python -c "from config import get_settings; cfg = get_settings(); print(f'  Settings OK - SECRET_KEY: {bool(cfg.SECRET_KEY)}'); print(f'  DATABASE_URL: {cfg.DATABASE_URL}'); print(f'  ENVIRONMENT: {cfg.ENVIRONMENT}')"
+        run: |
+          cd khawarizmi-backend
+          python -c "from config import get_settings; cfg = get_settings(); print(f'  Settings OK - SECRET_KEY: {bool(cfg.SECRET_KEY)}'); print(f'  DATABASE_URL: {cfg.DATABASE_URL}'); print(f'  ENVIRONMENT: {cfg.ENVIRONMENT}')"
 
       - name: Run Methodology tests
         run: |
