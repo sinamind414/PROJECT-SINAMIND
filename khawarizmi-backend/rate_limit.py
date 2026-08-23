@@ -1,5 +1,5 @@
 from fastapi import Request
-from jose import jwt
+import jwt
 from slowapi import Limiter
 from slowapi.util import get_remote_address
 
@@ -17,8 +17,8 @@ def _get_user_plan(request: Request):
     try:
         cfg = _get_cfg()
         # verify_sub=False : les tokens portent sub en INT (pattern aligné sur
-        # deps.get_current_user — python-jose exigerait une chaîne sinon
-        # JWTClaimsError et la clé rate-limit retombait sur l'IP : tous les
+        # deps.get_current_user — PyJWT exigerait une chaîne sinon
+        # InvalidSubjectError et la clé rate-limit retomberait sur l'IP : tous les
         # élèves derrière la même IP/NAT partageaient un seul compteur free,
         # et le tier pro (80/h) n'était jamais appliqué. Bug corrigé 2026-08-21,
         # tests : tests/test_rate_limit.py.)

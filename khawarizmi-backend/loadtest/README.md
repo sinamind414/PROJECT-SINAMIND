@@ -22,7 +22,7 @@ Un backend démarré avec une base seeded (les 11 scénarios) :
 ```bash
 # 1) serveur local (SQLite, mode déterministe — 0 LLM externe)
 cd khawarizmi-backend
-DATABASE_URL="sqlite+aiosqlite:///./lt.db" SECRET_KEY=lt-secret GEMINI_API_KEY=test \
+DATABASE_URL="sqlite+aiosqlite:///./lt.db" SECRET_KEY=loadtest-secret-key-at-least-32-bytes GEMINI_API_KEY=test \
   ENVIRONMENT=ci .venv/bin/uvicorn main:app --port 8100
 
 # 2) seed des scénarios (PYTHONPATH requis — le seed passe par l'état de l'app)

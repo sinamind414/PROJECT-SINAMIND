@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Any
 
 from fastapi import Depends, HTTPException, Request, status
-from jose import JWTError, jwt
+import jwt
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -74,8 +74,8 @@ async def get_current_user(
         raise credentials_exception
 
     try:
-        # verify_sub=False : les tokens existants portent sub en int (python-jose
-        # exigerait une chaîne). La validation de sub est faite manuellement ci-dessous.
+        # verify_sub=False : les tokens historiques portent sub en int (PyJWT
+        # exige sinon une chaîne). La validation est faite manuellement ci-dessous.
         payload = jwt.decode(token, cfg.SECRET_KEY, algorithms=[cfg.JWT_ALGORITHM], options={"verify_sub": False})
         raw_sub = payload.get("sub")
         # sub absent, non-numérique ou nul → 401 propre (pas de 500 TypeError)
@@ -84,7 +84,7 @@ async def get_current_user(
         user_id = int(raw_sub)
         if not user_id:
             raise credentials_exception
-    except (JWTError, TypeError, ValueError):
+    except (jwt.exceptions.PyJWTError, TypeError, ValueError):
         raise credentials_exception
 
     result = await db.execute(

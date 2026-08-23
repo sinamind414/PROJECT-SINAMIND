@@ -21,7 +21,7 @@ import sys
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
 
-os.environ.setdefault("SECRET_KEY", "smoke-test-secret-key-16chars")
+os.environ.setdefault("SECRET_KEY", "smoke-test-secret-key-at-least-32-bytes")
 os.environ["DATABASE_URL"] = "sqlite+aiosqlite:///./smoke_api_all.db"
 os.environ["ENVIRONMENT"] = "development"
 

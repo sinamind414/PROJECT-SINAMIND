@@ -12,7 +12,7 @@ from httpx import ASGITransport, AsyncClient
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-os.environ.setdefault("SECRET_KEY", "test-secret-key-khawarizmi-2026")
+os.environ.setdefault("SECRET_KEY", "test-secret-key-khawarizmi-2026!!")
 os.environ.setdefault("DATABASE_URL", "postgresql+asyncpg://postgres:testpass@localhost/khawarizmi_test")
 os.environ.setdefault("REDIS_URL", "redis://localhost:6379/1")
 os.environ.setdefault("GEMINI_API_KEY", "test-gemini-key")

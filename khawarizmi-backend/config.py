@@ -121,8 +121,8 @@ class Settings(BaseSettings):
             return v or "ci-test-key-for-smoke-tests-only"
         if not v or v.startswith("ci-fallback"):
             raise ValueError("SECRET_KEY non défini. Arrêt du serveur pour sécurité.")
-        if len(str(v)) < 16:
-            raise ValueError("SECRET_KEY trop court. Minimum 16 caractères requis.")
+        if len(str(v).encode("utf-8")) < 32:
+            raise ValueError("SECRET_KEY trop court. Minimum 32 octets requis pour HS256.")
         return v
 
     model_config = SettingsConfigDict(

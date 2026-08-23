@@ -74,7 +74,7 @@ class EleveUser(HttpUser):
             raise RuntimeError(f"register {r.status_code} — serveur injoignable ?")
         self.token = r.json()["access_token"]
         if os.environ.get("LT_PLAN") == "pro":
-            from jose import jwt
+            import jwt
 
             secret = os.environ.get("LT_SECRET")
             if not secret:

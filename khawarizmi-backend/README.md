@@ -8,7 +8,7 @@ API REST de la plateforme IA Khawarizmi Pro — Bac SVT Algérie.
 - **Base de données** : PostgreSQL 16 + pgvector
 - **Cache** : Redis 7
 - **IA** : Gemini 2.5 Flash / OpenAI GPT (fallback)
-- **Auth** : JWT (python-jose + bcrypt)
+- **Auth** : JWT (PyJWT + bcrypt)
 - **Répétition** : FSRS Graph
 - **Deploy** : Railway (Docker)
 

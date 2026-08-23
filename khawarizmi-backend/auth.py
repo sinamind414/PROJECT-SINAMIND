@@ -1,6 +1,6 @@
 from datetime import UTC, datetime, timedelta
 
-from jose import jwt
+import jwt
 from passlib.context import CryptContext
 
 from config import get_settings
