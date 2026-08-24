@@ -2,9 +2,9 @@ name: CI/CD Khawarizmi Pro
 
 on:
   push:
-    branches: [main, fabuleux/*]
+    branches: [master, "arena/**"]
   pull_request:
-    branches: [main]
+    branches: [master]
 
 jobs:
   backend-tests:
@@ -33,28 +33,22 @@ jobs:
           pip install -r requirements.txt
 
       - name: Run backend smoke test
+        env:
+          SECRET_KEY: ci-test-key-for-smoke-tests-only
+          DATABASE_URL: postgresql+asyncpg://postgres:test@localhost/khawarizmi_test
+          ENVIRONMENT: ci
+          REDIS_URL: redis://localhost:6379/0
+          GEMINI_API_KEY: test
+          OPENAI_API_KEY: test
         run: |
           cd khawarizmi-backend
-          python -c "
-import os
-os.environ['SECRET_KEY'] = 'ci-test-key-for-smoke-tests-only'
-os.environ['DATABASE_URL'] = 'postgresql+asyncpg://postgres:test@localhost/khawarizmi_test'
-os.environ['ENVIRONMENT'] = 'ci'
-os.environ['REDIS_URL'] = 'redis://localhost:6379/0'
-os.environ['GEMINI_API_KEY'] = 'test'
-os.environ['OPENAI_API_KEY'] = 'test'
-from config import get_settings
-cfg = get_settings()
-print(f'  Settings OK - SECRET_KEY: {bool(cfg.SECRET_KEY)}')
-print(f'  DATABASE_URL: {cfg.DATABASE_URL}')
-print(f'  ENVIRONMENT: {cfg.ENVIRONMENT}')
-"
+          python -c "from config import get_settings; cfg = get_settings(); print(f'Settings OK: {bool(cfg.SECRET_KEY)}'); print(cfg.DATABASE_URL); print(cfg.ENVIRONMENT)"
 
-      - name: Run Methodology tests
+      - name: Run backend tests
         run: |
           cd khawarizmi-backend
           pip install pytest pytest-asyncio httpx
-          pytest tests/test_methodology*.py tests/test_diagnostic.py tests/test_couche3.py tests/test_tutor.py tests/test_bac_blanc_intelligent.py tests/test_mindmap_methodology.py -v --tb=short
+          pytest -q
 
   frontend-tests:
     runs-on: ubuntu-latest
@@ -75,7 +69,10 @@ print(f'  ENVIRONMENT: {cfg.ENVIRONMENT}')
       - name: Lint
         run: npm run lint
         working-directory: khawarizmi-frontend
-        continue-on-error: true
+
+      - name: TypeScript check
+        run: npx tsc --noEmit
+        working-directory: khawarizmi-frontend
 
       - name: Tests
         run: npm run test
@@ -88,7 +85,7 @@ print(f'  ENVIRONMENT: {cfg.ENVIRONMENT}')
           NEXT_TELEMETRY_DISABLED: "1"
 
   deploy-railway:
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/master'
     needs: [backend-tests, frontend-tests]
     runs-on: ubuntu-latest
     steps:
