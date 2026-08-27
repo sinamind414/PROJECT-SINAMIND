@@ -13,6 +13,20 @@ sys.path.insert(0, str(BACKEND))
 
 from services.local_grader import grade  # noqa: E402
 from services.rubric_store import list_question_ids, load  # noqa: E402
+from services.savoir_corrector import _SYNONYMS  # noqa: E402
+
+
+def _unknown_lex(r) -> list[str]:
+    unknown: list[str] = []
+    blobs: list[str] = list(r.theme_variants)
+    for c in r.criteria:
+        blobs.extend(c.variants)
+    for v in blobs:
+        if v.startswith("$lex:"):
+            key = v[5:].strip()
+            if key not in _SYNONYMS:
+                unknown.append(v)
+    return unknown
 
 
 def main() -> int:

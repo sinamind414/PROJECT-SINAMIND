@@ -9,6 +9,8 @@ N'importe ni n'appelle aucun client génératif.
 from __future__ import annotations
 
 import re
+from functools import lru_cache
+
 from schemas.document_model import DocumentModel
 from schemas.rubric import (
     Criterion,
@@ -20,7 +22,7 @@ from schemas.rubric import (
 from services.answer_sanity import check_answer_sanity
 from services.arabic import normalize_arabic
 
-GRADER_VERSION = "1.1.0"
+GRADER_VERSION = "1.1.2"
 SCIENCE_CAP_DEFAULT = 40
 TRAINING_BANNER_AR = "ملاحظة تدريبية — منهج + محتوى. ليست علامة بكالوريا رسمية."
 
@@ -121,6 +123,13 @@ def _unigram_forms(needle: str) -> list[str]:
     return out
 
 
+@lru_cache(maxsize=1024)
+def _word_re(form: str) -> re.Pattern[str]:
+    return re.compile(
+        rf"(?<!{_WORD_BOUND})" + re.escape(form) + rf"(?!{_WORD_BOUND})"
+    )
+
+
 def _hit_pos(text: str, needle: str) -> int | None:
     """Position du 1er match.
 
@@ -135,10 +144,7 @@ def _hit_pos(text: str, needle: str) -> int | None:
         return idx if idx >= 0 else None
     best: int | None = None
     for form in _unigram_forms(needle):
-        pat = re.compile(
-            rf"(?<!{_WORD_BOUND})" + re.escape(form) + rf"(?!{_WORD_BOUND})"
-        )
-        m = pat.search(text)
+        m = _word_re(form).search(text)
         if m is None:
             continue
         if best is None or m.start() < best:
@@ -166,16 +172,12 @@ def _count_hits(text: str, variants_norm: list[str]) -> int:
 
 
 def _occurrence_count(text: str, variants_norm: list[str]) -> int:
+    """Compte les occurrences avec les MÊMES règles que _hit_pos (frontières + proclitiques)."""
     total = 0
     for v in variants_norm:
         if not v:
             continue
-        if len(v) <= 2:
-            pat = re.compile(
-                r"(?<![a-z0-9\u0600-\u06ff])" + re.escape(v) + r"(?![a-z0-9\u0600-\u06ff])"
-            )
-            total += len(pat.findall(text))
-        else:
+        if " " in v.strip():
             start = 0
             while True:
                 i = text.find(v, start)
@@ -183,6 +185,11 @@ def _occurrence_count(text: str, variants_norm: list[str]) -> int:
                     break
                 total += 1
                 start = i + max(1, len(v))
+            continue
+        best = 0
+        for form in _unigram_forms(v):
+            best = max(best, len(_word_re(form).findall(text)))
+        total += best
     return total
 
 
@@ -716,6 +723,11 @@ def grade(
         next_step = "الإجابة خارج الموضوع"
     if diag.code == "science.erratum" and science_flags:
         next_step = science_flags[0]
+    elif any("تصويب الدليل" in f for f in science_flags):
+        # ne pas masquer le jaune 10⁴ derrière un autre diagnostic
+        extra = next((f for f in science_flags if "تصويب الدليل" in f), "")
+        if extra and extra not in next_step:
+            next_step = (next_step + " " + extra).strip()
 
     phrase_parts = [p for p in (praise_ar, next_step) if p]
     phrase_ar = " ".join(phrase_parts[:2])
