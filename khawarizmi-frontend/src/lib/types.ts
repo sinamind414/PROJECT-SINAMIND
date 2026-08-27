@@ -439,6 +439,10 @@ export interface VerbEvaluateResponse {
   advice: string
   dominant_error_code?: string
   allow_second_attempt: boolean
+  ungraded?: boolean
+  source?: string
+  banner_ar?: string
+  method_label_ar?: string
 }
 
 export interface VerbProgressItem {

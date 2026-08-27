@@ -71,6 +71,7 @@ class ExerciseScore(BaseModel):
     score_max: int
     percentage: int
     skipped: bool = False
+    ungraded: bool = False
 
 
 class VerbScore(BaseModel):
@@ -88,6 +89,8 @@ class SubmitBacResponse(BaseModel):
     scores_by_verb: list[VerbScore] = []
     exercises_skipped: int = 0
     debrief_message: str = ""
+    ungraded_count: int = 0
+    banner_ar: str = ""
 
 
 class CorrectionAnswer(BaseModel):

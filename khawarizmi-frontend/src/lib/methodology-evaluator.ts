@@ -309,6 +309,7 @@ function evaluateGeneric(verb: ActionVerbRule, answer: string): MethodologyEvalu
   return finalizeEvaluation(evaluation)
 }
 
+/** MORT chemin de note (S3). Ne pas importer dans les pages. */
 export function evaluateMethodologyAnswer(input: EvaluateMethodologyInput): MethodologyEvaluation {
   try {
     const verb = getActionVerb(input.verbSlug)

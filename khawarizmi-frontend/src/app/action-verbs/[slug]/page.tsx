@@ -73,6 +73,10 @@ export default function ActionVerbDetailPage() {
       })
       setEvaluation(result)
 
+      if (result.ungraded) {
+        return
+      }
+
       // Contrat Kunz : preuve / erreur uniquement post-tentative (pas de fausse maîtrise)
       applyVerbPracticeOutcome({
         lessonId: `verb:${slug}`,
@@ -413,8 +417,8 @@ export default function ActionVerbDetailPage() {
                   {evaluation && (
                     <div className="mt-5 space-y-4">
                       <div className="flex items-center gap-4">
-                        <div className={`text-4xl font-bold ${evaluation.percentage >= 75 ? "text-emerald-400" : evaluation.percentage >= 50 ? "text-amber-400" : "text-red-400"}`}>
-                          {evaluation.percentage}%
+                        <div className={`text-4xl font-bold ${evaluation.ungraded ? "text-amber-300" : evaluation.percentage >= 75 ? "text-emerald-400" : evaluation.percentage >= 50 ? "text-amber-400" : "text-red-400"}`}>
+                          {evaluation.ungraded ? "—" : `${evaluation.percentage}%`}
                         </div>
                         <div>
                           <p className="text-white font-bold">{evaluation.score}/{evaluation.score_max} نقطة</p>

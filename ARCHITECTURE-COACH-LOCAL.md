@@ -1,7 +1,7 @@
 # Architecture cible — Coach local « comme le livre »
 
 **Date :** 2026-08-26 · **révisé** 2026-08-27 (C1 clé cache, contrat sanity, politique lexique, table d’état)  
-**Statut :** S1 **implémenté** — `local_grader.grade()` + 10 grilles L0 + tests. API `/api/grade` **pas** branchée (S2). Flag `LOCAL_RUBRIC_GRADER` défaut `false`.  
+**Statut :** S1–S3 **implémentés** — `grade()` + 10 L0 + `/api/grade` + ScenarioRunner / verb / bac / DA v1 / diagnostic sans 2ᵉ cerveau. Flag `LOCAL_RUBRIC_GRADER` défaut `false`.  
 **S0 (T1–T3) :** **pas fait** — gate S0→S1 **contourné volontairement** (moteur testable, flag off, **pas** une publication). Voir table §14.1.  
 **Public :** revue humaine / audit par IA  
 **Produit :** Khawarizmi / IA Khawarizmi Pro — Bac SVT Algérie 3AS  
@@ -716,9 +716,9 @@ S5  mixins chapitre + $lex: extrait fichier  (condition de survie L1)
 | S0 T3 `points`/`xp` query | **NON** | publication |
 | S1 `grade()` + 10 L0 + G1–G8, G12–G16 | **OUI** | — flag `false`, 0 HTTP |
 | S2 `POST /api/grade` + ScenarioRunner | **NON** | l’élève du site |
-| S3 verb + bac → `grade()` | **NON** | les 5 cerveaux prod |
-| S4 hash persist + GET `/correction` | **NON** | RGPD / fuite model_answer |
-| S5 mixins + `$lex:` fichier | **NON** | survie L1 (pas L0) |
+| S3 verb + bac → `grade()` | **OUI** | 422 ungraded si pas de grille. VERB_RULES hors routes. diagnostic/global → `/api/grade`. « جاهز للبكالوريا » tué. |
+| S4 hash persist + GET `/correction` | **OUI** | G11 : 404 sans da_answers de CET élève. DA v1 + bac submit = `hash_answer`. GET bac `student_answer=""`. FSRS via `may_write_fsrs`. |
+| S5 mixins + `$lex:` fichier | **OUI** | `data/lexicons/svt_terms.v1.json` (clés L0). Mixin `{chapter_slug}.json` union au `load()`. Pas de lactose inventé. |
 
 **Gates :**
 - S0 → S1 : G9, G10 verts (même sans grader) — **contourné volontairement** le 2026-08-27 : S1 = moteur **testable hors prod**, pas une mise en ligne. Le gate redevient bloquant le jour où `LOCAL_RUBRIC_GRADER=true`.

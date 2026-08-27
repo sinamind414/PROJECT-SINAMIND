@@ -101,4 +101,4 @@ Les 4 passes répètent souvent les **mêmes** 3 vrais (S0 prod, N1 digits, N2 `
 
 ---
 
-*S0 T1–T3 fermés. N1 dump = 0. N2 `٢٫٥` OK. Reste **S2** : brancher `grade()` **et** tuer le JS le même jour.*
+*S0–S5 : T1–T3, N1–N2, `/api/grade`, adaptateurs, G11, hash, mixins + `$lex:` fichier. Reste DA v2 L2 gelé (hors chemin ScenarioRunner).*

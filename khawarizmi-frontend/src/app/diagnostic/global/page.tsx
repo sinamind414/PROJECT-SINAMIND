@@ -6,7 +6,8 @@ import { AuthGuard } from "@/components/auth/AuthGuard"
 import { AppShell } from "@/components/layout/AppShell"
 import { DocumentSetRenderer } from "@/components/methodology/DocumentRenderer"
 import { diagnosticScenario, type MethodologyQuestion } from "@/lib/methodology-documents"
-import { evaluateMethodologyAnswer, type MethodologyEvaluation } from "@/lib/methodology-evaluator"
+import type { MethodologyEvaluation } from "@/lib/methodology-evaluator"
+import { apiClient } from "@/lib/api-client"
 import { awardXP, claimBadge, saveMethodologyEvaluations, type GamificationAward } from "@/lib/progress-store"
 import {
   applyDocumentScenarioOutcome,
@@ -52,12 +53,58 @@ function buildPriorityFixes(evaluations: DiagnosticResult["evaluations"]) {
   return Array.from(new Set(fixes)).slice(0, 4)
 }
 
-function buildDiagnosticResult(answers: Record<string, string>): DiagnosticResult {
-  const evaluations = QUESTIONS.map((question) => ({
-    question,
-    answer: answers[question.id] || "",
-    evaluation: evaluateMethodologyAnswer({ verbSlug: question.verbSlug, answer: answers[question.id] || "" }),
-  }))
+function ungradedEvaluation(verbSlug: string, banner?: string): MethodologyEvaluation {
+  return {
+    verbSlug,
+    score: 0,
+    scoreMax: 1,
+    percentage: 0,
+    success: [],
+    errors: ["لا شبكة تقييم لهذه السؤال."],
+    missingMarkers: [],
+    forbiddenMarkersFound: [],
+    criteria: [],
+    advice: banner || "تعذر التصحيح — ليست علامة بكالوريا رسمية.",
+    allowSecondAttempt: false,
+    source: "ungraded",
+    ungraded: true,
+    bannerAr: banner,
+  }
+}
+
+function gradeToEvaluation(
+  verbSlug: string,
+  g: Exclude<Awaited<ReturnType<typeof apiClient.grade>>, { ungraded: true }>,
+): MethodologyEvaluation {
+  return {
+    verbSlug: g.verb_slug || verbSlug,
+    score: g.method_points,
+    scoreMax: g.method_points_max,
+    percentage: g.overall_training_percent,
+    success: g.criteria.filter((c) => c.status === "full").map((c) => c.label_ar),
+    errors: [...g.science_flags, ...(g.next_step_ar ? [g.next_step_ar] : [])],
+    missingMarkers: [],
+    forbiddenMarkersFound: [],
+    criteria: g.criteria.map((c) => ({
+      code: c.id,
+      labelAr: c.label_ar,
+      points: c.points_max,
+      earned: c.points_earned,
+      passed: c.status === "full",
+      feedbackAr: c.label_ar,
+    })),
+    advice: g.phrase_ar || g.banner_ar,
+    allowSecondAttempt: g.overall_training_percent < 85,
+    source: "local_rubric",
+    methodLabelAr: g.method_label_ar,
+    scienceStatus: g.science_status,
+    scienceFlags: g.science_flags,
+    bannerAr: g.banner_ar,
+    dominantErrorCode: g.diagnosis?.code,
+  }
+}
+
+function assembleDiagnostic(evaluations: DiagnosticResult["evaluations"]): DiagnosticResult {
 
   const readiness = Math.round(evaluations.reduce((sum, item) => sum + item.evaluation.percentage, 0) / evaluations.length)
   const weak = evaluations.filter((item) => item.evaluation.percentage < 60)
@@ -68,7 +115,9 @@ function buildDiagnosticResult(answers: Record<string, string>): DiagnosticResul
     .filter(Boolean) as string[]
 
   let profileAr = "ملفك غير واضح بعد: تحتاج إجابات أطول وأكثر جدية."
-  if (readiness >= 75) profileAr = "منهجيتك مقبولة، لكن ما زالت تحتاج تدريبا على وضعيات بكالوريا بوثائق متعددة."
+  if (evaluations.every((item) => item.evaluation.ungraded)) {
+    profileAr = "تعذر التصحيح — لا شبكة تقييم محلية لهذه الوضعية. ليست علامة بكالوريا رسمية."
+  } else if (readiness >= 75) profileAr = "منهجيتك مقبولة، لكن ما زالت تحتاج تدريبا على وضعيات بكالوريا بوثائق متعددة."
   else if (weak.some((item) => item.question.id === "analyse")) profileAr = "مشكلتك الأساسية أنك لا تستغل الوثائق كما يجب، وهذا سيكلفك نقاطا مباشرة."
   else if (weak.some((item) => item.question.id === "hypothesis")) profileAr = "مشكلتك الكبرى في المسعى العلمي: الفرضيات غير مرتبطة بما يكفي بالوثائق."
   else if (weak.some((item) => item.question.id === "scientific-text")) profileAr = "معارفك قد تكون موجودة، لكنك لا تركبها في نص علمي يستغل الوثائق."
@@ -107,7 +156,9 @@ function CorrectionCard({ item }: { item: DiagnosticResult["evaluations"][number
         </div>
         <div className={`px-3 py-2 rounded-xl border ${status.bg}`}>
           <p className={`text-sm font-bold ${status.color}`}>{status.label}</p>
-          <p className="text-white text-lg font-bold text-center">{item.evaluation.percentage}%</p>
+          <p className="text-white text-lg font-bold text-center">
+            {item.evaluation.ungraded ? "—" : `${item.evaluation.percentage}%`}
+          </p>
         </div>
       </div>
 
@@ -184,18 +235,52 @@ export default function DiagnosticGlobalPage() {
     setSaved(false)
   }
 
-  function submitDiagnostic() {
-    const next = buildDiagnosticResult(answers)
+  async function submitDiagnostic() {
+    let next: DiagnosticResult
+    try {
+      const graded = await Promise.all(
+        QUESTIONS.map(async (question) => {
+          const g = await apiClient.grade({
+            question_id: `${diagnosticScenario.id}:${question.id}`,
+            answer: answers[question.id] || "",
+            surface: "da",
+          })
+          if ("ungraded" in g && g.ungraded) {
+            return {
+              question,
+              answer: answers[question.id] || "",
+              evaluation: ungradedEvaluation(question.verbSlug, g.banner_ar),
+            }
+          }
+          return {
+            question,
+            answer: answers[question.id] || "",
+            evaluation: gradeToEvaluation(question.verbSlug, g),
+          }
+        }),
+      )
+      next = assembleDiagnostic(graded)
+    } catch {
+      next = assembleDiagnostic(
+        QUESTIONS.map((question) => ({
+          question,
+          answer: answers[question.id] || "",
+          evaluation: ungradedEvaluation(question.verbSlug, "تعذر التصحيح"),
+        })),
+      )
+    }
     setResult(next)
-    saveMethodologyEvaluations(next.evaluations.map((item) => ({
-      source: "diagnostic",
-      verbSlug: item.question.verbSlug,
-      answer: item.answer,
-      evaluation: item.evaluation,
-    })))
-    setSaved(true)
-    // XP + badge seulement si contrat honnête (pas de fausse maîtrise)
-    if (next.contract.mayAwardXp) {
+    const allUngraded = next.evaluations.every((item) => item.evaluation.ungraded)
+    if (!allUngraded) {
+      saveMethodologyEvaluations(next.evaluations.map((item) => ({
+        source: "diagnostic",
+        verbSlug: item.question.verbSlug,
+        answer: item.answer,
+        evaluation: item.evaluation,
+      })))
+    }
+    setSaved(!allUngraded)
+    if (!allUngraded && next.contract.mayAwardXp) {
       const xp = awardXP("تشخيص منهجي كامل", 150)
       claimBadge("first_diagnostic")
       setAward(xp)
@@ -285,7 +370,9 @@ export default function DiagnosticGlobalPage() {
                   <div className="rounded-3xl p-5 glass border border-mint/10 space-y-5">
                     <div className="flex items-center justify-between">
                       <h3 className="text-white font-bold">نتيجة التشخيص</h3>
-                      <span className="text-3xl font-bold text-white">{result.readiness}%</span>
+                      <span className="text-3xl font-bold text-white">
+                        {result.evaluations.every((item) => item.evaluation.ungraded) ? "—" : `${result.readiness}%`}
+                      </span>
                     </div>
                     <div className={`rounded-2xl border p-3 ${outcomeBannerClass(result.contract.outcome)}`}>
                       <p className="text-[10px] font-black uppercase opacity-70">

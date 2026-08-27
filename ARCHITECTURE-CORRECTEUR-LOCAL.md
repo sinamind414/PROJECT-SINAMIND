@@ -1,7 +1,7 @@
 # Architecture détaillée — Correcteur local Khawarizmi
 
 **Version moteur :** `GRADER_VERSION = 1.1.4`  
-**Statut :** **S1 implémenté, testable, 0 LLM.** **Pas** branché sur le site (`LOCAL_RUBRIC_GRADER=false`).  
+**Statut :** **S1–S5.** `grade()` 0 LLM. Adaptateurs + G11 + hash + mixins/`$lex:` fichier. Sans grille → 422 ungraded. Flag `LOCAL_RUBRIC_GRADER` encore `false` (la route ne le gate pas).  
 **Promesse :** noter **méthode (Manhadjiya) + science (manuel / دليل)** sans mentir sur le %.  
 **Bannière élève :** `ملاحظة تدريبية — منهج + محتوى. ليست علامة بكالوريا رسمية.`
 
@@ -26,19 +26,19 @@
 ## 1. Deux mondes (ne pas confondre)
 
 ```
-SITE AUJOURD’HUI (prod, flag off)
-  ScenarioRunner  → evaluate-v2 → sanity → Savoir OFF → LLM bloqué → L2
-  Bac blanc       → VERB_RULES regex
-  action-verbs    → autre regex
-  Front si 5xx    → methodology-evaluator.ts   ← 2ᵉ cerveau INTERDIT en cible
+S3 (as-built)
+  ScenarioRunner / diagnostic/global / verb / bac / DA v1  → grade()
+  Sans Rubric → 422 ungraded (jamais VERB_RULES / JS)
+  document_analysis_v2 (L2) encore monté si on l’appelle — hors ScenarioRunner
+  evaluateMethodologyAnswer() mort sur les pages note (fichier encore là)
 
-CORRECTEUR CIBLE / S1 (ce document)
+CORRECTEUR
   grade(copy, rubric, document)  ← SEUL JUGE
   CLI : scripts/grade_copy.py
   Tests : pytest --noconftest
 ```
 
-Tant que le flag est **false**, l’élève du site **n’est pas** noté par `grade()`.
+Sans grille L0, l’élève voit **تعذر التصحيح**, pas un %. C’est honnête.
 
 ---
 
@@ -284,7 +284,9 @@ PYTHONPATH=. python scripts/grade_copy.py manhadjiya-yeast-analyse   # stdin = c
 S0  T2 IDOR ← FAIT · T3 whitelist action ← FAIT · T1 PDF « غير متاح » ← FAIT
 S1  grade() + 10 L0 + tests                           ← FAIT
 S2  POST /api/grade + ScenarioRunner only + tuer JS   ← FAIT (1.1.4). 422 ungraded. Pas de fallback methodology-evaluator.ts
-S3  verb + bac_blanc → grade() ; mort VERB_RULES
+S3  verb + bac_blanc + DA v1 → grade() ; mort VERB_RULES / جاهز / JS diagnostic  ← FAIT
+S4  GET /correction G11 + hash persist + FSRS science/<10                       ← FAIT
+S5  mixins chapitre au load + $lex: fichier git                                 ← FAIT
 ```
 
 **Brancher S2 sans tuer le fallback front = deux notes. Interdit.**

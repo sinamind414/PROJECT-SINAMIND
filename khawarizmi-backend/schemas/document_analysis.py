@@ -91,6 +91,7 @@ class AnswerEvaluation(BaseModel):
     forbidden_found: list[str] = []
     advice: str = ""
     dominant_error_code: str | None = None
+    ungraded: bool = False
 
 
 class EvaluateResponse(BaseModel):

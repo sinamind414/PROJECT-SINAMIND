@@ -12,6 +12,7 @@ from schemas.rubric import Rubric, RubricIntegrityError
 _BACKEND_DIR = Path(__file__).resolve().parent.parent
 _DATA_DIR = _BACKEND_DIR / "data"
 _INDEX_PATH = _DATA_DIR / "rubrics" / "index.json"
+_MIXINS_DIR = _DATA_DIR / "rubrics" / "mixins"
 
 _index_cache: dict | None = None
 _rubric_cache: dict[str, "PackedRubric"] = {}
@@ -51,6 +52,48 @@ def reset_caches() -> None:
     global _index_cache
     _index_cache = None
     _rubric_cache.clear()
+    try:
+        from services.lexicon import reset_lexicon_cache
+
+        reset_lexicon_cache()
+    except Exception:
+        pass
+
+
+def _dedup_str(items: list[str]) -> list[str]:
+    seen: set[str] = set()
+    out: list[str] = []
+    for x in items:
+        if x and x not in seen:
+            seen.add(x)
+            out.append(x)
+    return out
+
+
+def _merge_mixin(payload: dict) -> dict:
+    """Union theme/distractors/grave depuis mixins/{chapter_slug}.json.
+
+    N'écrase pas les criteria / points. `numeric` du mixin (تصويب 10⁴)
+    n'est PAS converti en grave — déjà dans detect_textbook_errata.
+    """
+    chapter = payload.get("chapter_slug")
+    if not chapter or not isinstance(chapter, str):
+        return payload
+    path = _MIXINS_DIR / f"{chapter}.json"
+    if not path.is_file():
+        return payload
+    mixin = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(mixin, dict):
+        raise RubricStoreError(f"mixin invalide: {path}")
+    payload = dict(payload)
+    payload["theme_variants"] = _dedup_str(
+        list(payload.get("theme_variants") or []) + list(mixin.get("theme_variants") or [])
+    )
+    payload["distractors"] = list(payload.get("distractors") or []) + list(
+        mixin.get("distractors") or []
+    )
+    payload["grave"] = list(payload.get("grave") or []) + list(mixin.get("grave") or [])
+    return payload
 
 
 def list_question_ids() -> list[str]:
@@ -79,6 +122,9 @@ def load(question_id: str) -> PackedRubric | None:
     if not rubric_path.is_file():
         raise RubricStoreError(f"rubric manquante: {rubric_path}")
     payload = json.loads(rubric_path.read_text(encoding="utf-8"))
+    if not isinstance(payload, dict):
+        raise RubricStoreError(f"rubric invalide: {rubric_path}")
+    payload = _merge_mixin(payload)
     try:
         rubric = Rubric.model_validate(payload)
     except RubricIntegrityError:

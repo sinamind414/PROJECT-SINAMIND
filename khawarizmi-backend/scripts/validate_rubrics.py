@@ -13,7 +13,7 @@ sys.path.insert(0, str(BACKEND))
 
 from services.local_grader import grade  # noqa: E402
 from services.rubric_store import list_question_ids, load  # noqa: E402
-from services.savoir_corrector import _SYNONYMS  # noqa: E402
+from services.lexicon import in_file  # noqa: E402
 
 
 def _unknown_lex(r) -> list[str]:
@@ -24,7 +24,7 @@ def _unknown_lex(r) -> list[str]:
     for v in blobs:
         if v.startswith("$lex:"):
             key = v[5:].strip()
-            if key not in _SYNONYMS:
+            if not in_file(key):
                 unknown.append(v)
     return unknown
 
@@ -42,6 +42,10 @@ def main() -> int:
             errors += 1
             continue
         r = packed.rubric
+        unknown = _unknown_lex(r)
+        if unknown:
+            print(f"FAIL {qid}: $lex: hors fichier {unknown}")
+            errors += 1
         if r.verb_slug == "analyse" and packed.document is None:
             print(f"FAIL {qid}: analyse sans DocumentModel")
             errors += 1

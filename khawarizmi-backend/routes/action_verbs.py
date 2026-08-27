@@ -10,6 +10,7 @@ from datetime import UTC, datetime, timedelta
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.responses import JSONResponse
 from fsrs import Card
 from fsrs import Rating as FsrsRating
 from sqlalchemy import text
@@ -25,7 +26,14 @@ from schemas.action_verb import (
     VerbProgressResponse,
     VerbReviewRequest,
 )
-from services.action_verbs_service import evaluate_answer, score_to_fsrs_rating
+from services.action_verbs_service import score_to_fsrs_rating
+from services.grade_adapter import (
+    grade_or_none,
+    may_write_fsrs,
+    resolve_question_id,
+    to_verb_eval,
+    ungraded_http,
+)
 
 logger = logging.getLogger("khawarizmi.api")
 router = APIRouter(prefix="/api/action-verbs", tags=["Action Verbs"])
@@ -131,18 +139,27 @@ async def evaluer_reponse(
     if not row:
         raise HTTPException(404, f"Verbe introuvable : {body.verb_slug}")
 
-    verb = dict(row._mapping)
-    evaluation = evaluate_answer(verb, body.answer)
+    qid = resolve_question_id(body.exercise_id, f"verb:{body.verb_slug}")
+    result = grade_or_none(qid, body.answer)
+    if result is None:
+        return JSONResponse(
+            status_code=422,
+            content=ungraded_http(body.exercise_id or f"verb:{body.verb_slug}"),
+        )
 
-    # Enregistrer la tentative (mastery verb_action — migration 034)
-    await _enregistrer_tentative(
-        db=db,
-        user_id=current_user["id"],
-        verb_slug=body.verb_slug,
-        percentage=evaluation["percentage"],
+    evaluation = to_verb_eval(result)
+    if may_write_fsrs(result):
+        await _enregistrer_tentative(
+            db=db,
+            user_id=current_user["id"],
+            verb_slug=body.verb_slug,
+            percentage=evaluation["percentage"],
+        )
+
+    logger.info(
+        f"Action verb eval : user={current_user['id']} verb={body.verb_slug} "
+        f"score={evaluation['percentage']}% source=local_rubric"
     )
-
-    logger.info(f"Action verb eval : user={current_user['id']} verb={body.verb_slug} score={evaluation['percentage']}%")
 
     return EvaluateResponse(**evaluation)
 

@@ -79,15 +79,14 @@ def _extract_numbers(text: str) -> list[tuple[float, int]]:
 
 
 def _expand_variants(variants: list[str]) -> list[str]:
-    """$lex:id → synonymes Savoir ; sinon littéral. Puis normalize."""
-    from services.savoir_corrector import _SYNONYMS
+    """$lex:id → lexique git (S5) puis Savoir ; sinon littéral. Puis normalize."""
+    from services.lexicon import synonyms as lex_synonyms
 
     raw: list[str] = []
     for v in variants:
         if v.startswith("$lex:"):
             key = v[5:].strip()
-            syns = _SYNONYMS.get(key) or []
-            raw.extend(syns)
+            raw.extend(lex_synonyms(key))
         else:
             raw.append(v)
     seen: set[str] = set()

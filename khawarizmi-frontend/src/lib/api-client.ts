@@ -1101,11 +1101,38 @@ class KhawarizmiApiClient {
     )
   }
 
-  async evaluateVerbAnswer(payload: { verb_slug: string; answer: string }): Promise<VerbEvaluateResponse> {
-    return this.request<VerbEvaluateResponse>(
-      "/api/action-verbs/evaluate",
-      { method: "POST", body: JSON.stringify(payload) }
-    )
+  async evaluateVerbAnswer(payload: { verb_slug: string; answer: string; exercise_id?: string }): Promise<VerbEvaluateResponse> {
+    const resp = await fetch(`${API_BASE_URL}/api/action-verbs/evaluate`, {
+      method: "POST",
+      headers: this._rawHeaders(),
+      credentials: "include",
+      body: JSON.stringify(payload),
+    })
+    const data = (await resp.json().catch(() => ({}))) as Record<string, unknown>
+    if (resp.status === 422 && (data.code === "ungraded" || data.erreur === "ungraded")) {
+      return {
+        verb_slug: payload.verb_slug,
+        score: 0,
+        score_max: 1,
+        percentage: 0,
+        success: [],
+        errors: ["لا شبكة تقييم لهذه السؤال."],
+        missing_markers: [],
+        forbidden_found: [],
+        advice: typeof data.banner_ar === "string" ? data.banner_ar : "تعذر التصحيح — ليست علامة بكالوريا رسمية.",
+        allow_second_attempt: false,
+        ungraded: true,
+        source: "ungraded",
+        banner_ar: typeof data.banner_ar === "string" ? data.banner_ar : undefined,
+      }
+    }
+    if (!resp.ok) {
+      throw new Error(
+        (typeof data.detail === "string" && data.detail) ||
+          `${UI_AR.erreur_http_prefix} ${resp.status}`,
+      )
+    }
+    return data as VerbEvaluateResponse
   }
 
   async reviewVerb(slug: string, rating: 1 | 2 | 3 | 4, percentage?: number) {

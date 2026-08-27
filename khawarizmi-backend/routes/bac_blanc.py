@@ -17,7 +17,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from database import get_db
 from deps import get_current_user
-from methodology.evaluator import evaluate_methodology
 from schemas.bac_blanc import (
     BacExercise,
     BacSubjectDetail,
@@ -34,7 +33,9 @@ from schemas.bac_blanc import (
     SubmitBacResponse,
     VerbScore,
 )
-from services.document_analysis_service import evaluate_answer
+from services.grade_adapter import UNGRADED_AR, grade_or_none, resolve_question_id
+from services.hashing import hash_answer
+from services.local_grader import TRAINING_BANNER_AR
 
 logger = logging.getLogger("khawarizmi.api")
 router = APIRouter(prefix="/api/bac-blanc", tags=["Bac Blanc"])
@@ -273,10 +274,11 @@ async def submit_bac(
 
     exercise_scores: list[ExerciseScore] = []
     verb_scores_map: dict[str, list[int]] = {}
-    total_score = 0
-    total_max = 0
     skipped_count = 0
+    ungraded_count = 0
+    graded_percents: list[int] = []
     corrections: list[CorrectionAnswer] = []
+    annale = sm["annale_slug"]
 
     for ex in exercises_data:
         ex_id = ex["exercise_id"]
@@ -284,6 +286,8 @@ async def submit_bac(
         ans = answers_map.get(ex_id, {"answer_text": "", "skipped": True})
         answer_text = ans["answer_text"]
         is_skipped = ans["skipped"] or not answer_text.strip()
+        score_max = ex.get("points", 5)
+        is_ungraded = False
 
         if is_skipped:
             skipped_count += 1
@@ -291,28 +295,24 @@ async def submit_bac(
             percentage = 0
             feedback = "تم تخطي هذا التمرين"
         else:
-            evaluation = evaluate_answer(verb, answer_text, ex.get("model_answer_ar"))
-            score = evaluation["score"]
-            percentage = evaluation["percentage"]
-            feedback = evaluation["advice"]
-
-            try:
-                methodo = await evaluate_methodology(
-                    context=ex.get("context_ar", ""),
-                    instruction=ex.get("instruction_ar", ex.get("title_ar", "")),
-                    student_answer=answer_text,
-                    documents=ex.get("documents", []),
-                )
-                methodo_feedback = methodo.get("feedback", {})
-                methodo_note = methodo_feedback.get("message", "")
-                if methodo_note:
-                    feedback += f" | Méthodo: {methodo_note}"
-            except Exception:
-                pass
-
-        score_max = ex.get("points", 5)
-        total_score += score
-        total_max += score_max
+            qid = resolve_question_id(
+                ex_id,
+                f"bac:{annale}:{ex_id}",
+            )
+            graded = grade_or_none(qid, answer_text)
+            if graded is None:
+                is_ungraded = True
+                ungraded_count += 1
+                score = 0
+                percentage = 0
+                feedback = f"{UNGRADED_AR} {TRAINING_BANNER_AR}"
+            else:
+                percentage = int(graded.overall_training_percent)
+                score = round(percentage / 100 * score_max)
+                feedback = graded.phrase_ar or TRAINING_BANNER_AR
+                if graded.science_flags:
+                    feedback = (feedback + " | " + " · ".join(graded.science_flags)).strip(" |")
+                graded_percents.append(percentage)
 
         exercise_scores.append(
             ExerciseScore(
@@ -322,6 +322,7 @@ async def submit_bac(
                 score_max=score_max,
                 percentage=percentage,
                 skipped=is_skipped,
+                ungraded=is_ungraded,
             )
         )
 
@@ -342,16 +343,23 @@ async def submit_bac(
                 percentage=percentage,
                 feedback=feedback,
                 skipped=is_skipped,
+                ungraded=is_ungraded,
             )
         )
 
         await db.execute(
             text("""
                 UPDATE bac_answers
-                SET score = :score, feedback = :feedback
+                SET score = :score, feedback = :feedback, answer_text = :hashed
                 WHERE session_id = :sid AND exercise_id = :eid
             """),
-            {"score": score, "feedback": feedback, "sid": body.session_id, "eid": ex_id},
+            {
+                "score": score,
+                "feedback": feedback,
+                "hashed": hash_answer(answer_text) if answer_text else "",
+                "sid": body.session_id,
+                "eid": ex_id,
+            },
         )
 
     verb_scores = [
@@ -359,14 +367,12 @@ async def submit_bac(
         for v, s in verb_scores_map.items()
     ]
 
-    score_global = round(total_score / max(total_max, 1) * 100)
+    score_global = round(sum(graded_percents) / len(graded_percents)) if graded_percents else 0
 
-    if score_global >= 75:
-        debrief = f"أحسنت! نتيجتك {score_global}%. أنت جاهز للبكالوريا. ركز على المراجعة الدورية."
-    elif score_global >= 50:
-        debrief = f"نتيجتك {score_global}%. تحتاج إلى مراجعة بعض النقاط. راجع التمارين التي تخطيتها."
+    if ungraded_count and not graded_percents:
+        debrief = f"{TRAINING_BANNER_AR} {UNGRADED_AR}"
     else:
-        debrief = f"نتيجتك {score_global}%. لا تقلق، لديك وقت. ابدأ بمراجعة الدروس الأساسية."
+        debrief = f"درجة التدريب {score_global}%. {TRAINING_BANNER_AR}"
 
     await db.execute(
         text("""
@@ -383,7 +389,15 @@ async def submit_bac(
             "score": score_global,
             "ex_scores": json.dumps([s.model_dump() for s in exercise_scores], ensure_ascii=False),
             "verb_scores": json.dumps([v.model_dump() for v in verb_scores], ensure_ascii=False),
-            "debrief": json.dumps({"message": debrief, "skipped": skipped_count}, ensure_ascii=False),
+            "debrief": json.dumps(
+                {
+                    "message": debrief,
+                    "skipped": skipped_count,
+                    "ungraded": ungraded_count,
+                    "banner_ar": TRAINING_BANNER_AR,
+                },
+                ensure_ascii=False,
+            ),
             "sid": body.session_id,
             "uid": current_user["id"],
         },
@@ -403,6 +417,8 @@ async def submit_bac(
         scores_by_verb=verb_scores,
         exercises_skipped=skipped_count,
         debrief_message=debrief,
+        ungraded_count=ungraded_count,
+        banner_ar=TRAINING_BANNER_AR,
     )
 
 
@@ -446,7 +462,7 @@ async def get_correction(
                 question_id=ex_id,
                 title_ar=ex["title_ar"],
                 verb_slug=ex.get("verb_slug", ""),
-                student_answer=ans.get("answer_text", ""),
+                student_answer="",
                 model_answer=ex.get("model_answer_ar", ""),
                 score=ans.get("score", 0),
                 score_max=ex.get("points", 5),

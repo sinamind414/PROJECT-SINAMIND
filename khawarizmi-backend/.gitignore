@@ -4,6 +4,8 @@ data/*
 !data/rubrics/**
 !data/documents/
 !data/documents/**
+!data/lexicons/
+!data/lexicons/**
 models/*.onnx
 models/*.zip
 models/*.bin
