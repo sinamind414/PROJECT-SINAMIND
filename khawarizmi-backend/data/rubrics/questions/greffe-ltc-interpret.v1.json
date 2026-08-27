@@ -1,0 +1,67 @@
+{
+  "rubric_id": "greffe-ltc-interpret",
+  "version": "1.0.0",
+  "verb_slug": "interpret",
+  "chapter_slug": "immunite-cellulaire",
+  "language": "ar",
+  "total_points": 4.0,
+  "document_id": "greffe-ltc",
+  "theme_variants": ["طعم", "رفض", "LTc", "ltc", "ذاكرة", "لمفاوية"],
+  "theme_min_hits": 1,
+  "method_graph": {
+    "steps": ["rappel", "cause", "cours", "conclusion"],
+    "require_order": true
+  },
+  "criteria": [
+    {
+      "id": "rappel",
+      "label_ar": "رقم من الوثيقة (10/5 أو 4,8/2,5)",
+      "points": 1.0,
+      "check": "cites_keypoint",
+      "required": true
+    },
+    {
+      "id": "cause",
+      "label_ar": "رابط سببي لأن / يرجع",
+      "points": 1.0,
+      "check": "any_of",
+      "variants": ["لأن", "راجع", "يرجع", "بسبب"],
+      "required": true
+    },
+    {
+      "id": "cours",
+      "label_ar": "آلية الذاكرة / LTc",
+      "points": 1.0,
+      "check": "any_of",
+      "variants": ["ذاكرة", "الذاكرة", "LTc", "ltc", "خلايا قاتلة", "الخلايا القاتلة"],
+      "required": true
+    },
+    {
+      "id": "conclusion",
+      "label_ar": "الاستجابة الثانوية أسرع وأشد",
+      "points": 1.0,
+      "check": "any_of",
+      "variants": ["ثانوية", "أسرع", "أشد", "تسارع", "جاهزة"],
+      "required": true
+    }
+  ],
+  "distractors": [
+    {
+      "id": "anticorps",
+      "variants": ["أجسام مضادة", "الأجسام المضادة"],
+      "message_ar": "الوثيقتان فيهوم LTc ما فيهومش أجسام مضادة"
+    }
+  ],
+  "advice_by_gap": {
+    "verb_slip.analyse": "فسّر: رقم + آلية + لأن. ليس كلما وحدها.",
+    "unanchored": "علّق 5 أيام أو 4,8 بآلية.",
+    "cause": "أكتب لأن أو يرجع إلى.",
+    "cours": "الآلية: ذاكرة / LTc."
+  },
+  "advice_praise": {
+    "cours": "أحسنت: ربطت الرقم بالذاكرة."
+  },
+  "model_answer": "رُفض الطعم الثاني في 5 أيام بدل 10 لأن الذاكرة المناعية جعلت الـ LTc المتخصصة جاهزة فتتكاثر بسرعة. وهذا يفسر 4,8 مقابل 2,5: الاستجابة الثانوية أسرع وأشد.",
+  "source": "teacher_authored",
+  "grader_min_version": "1.0.0"
+}

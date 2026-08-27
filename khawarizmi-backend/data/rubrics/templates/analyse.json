@@ -1,0 +1,6 @@
+{
+  "verb_slug": "analyse",
+  "cases": ["object", "keypoint", "relation", "no_cause", "conclusion"],
+  "forbidden": ["لأن", "بسبب", "يفسر", "هذا يدل"],
+  "notes_ar": "حلّل: وثيقة + رقم حقيقي + كلما بدون سبب + استنتاج من هدف السياق."
+}

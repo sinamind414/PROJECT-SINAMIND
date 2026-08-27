@@ -1,0 +1,41 @@
+{
+  "manhadjiya-yeast-analyse": {
+    "rubric": "rubrics/questions/manhadjiya-yeast-analyse.v1.json",
+    "document": "documents/yeast-glucose-curve.v1.json"
+  },
+  "greffe-ltc-analyse": {
+    "rubric": "rubrics/questions/greffe-ltc-analyse.v1.json",
+    "document": "documents/greffe-ltc.v1.json"
+  },
+  "enzyme-temp-analyse": {
+    "rubric": "rubrics/questions/enzyme-temp-analyse.v1.json",
+    "document": "documents/enzyme-temp.v1.json"
+  },
+  "photo-o2-analyse": {
+    "rubric": "rubrics/questions/photo-o2-analyse.v1.json",
+    "document": "documents/photo-o2.v1.json"
+  },
+  "greffe-ltc-interpret": {
+    "rubric": "rubrics/questions/greffe-ltc-interpret.v1.json",
+    "document": "documents/greffe-ltc.v1.json"
+  },
+  "yeast-glucose-interpret": {
+    "rubric": "rubrics/questions/yeast-glucose-interpret.v1.json",
+    "document": "documents/yeast-glucose-curve.v1.json"
+  },
+  "enzyme-temp-interpret": {
+    "rubric": "rubrics/questions/enzyme-temp-interpret.v1.json",
+    "document": "documents/enzyme-temp.v1.json"
+  },
+  "greffe-ltc-deduce": {
+    "rubric": "rubrics/questions/greffe-ltc-deduce.v1.json",
+    "document": "documents/greffe-ltc.v1.json"
+  },
+  "synapse-curare-deduce": {
+    "rubric": "rubrics/questions/synapse-curare-deduce.v1.json",
+    "document": "documents/synapse-curare.v1.json"
+  },
+  "proteine-adn-scientific-text": {
+    "rubric": "rubrics/questions/proteine-adn-scientific-text.v1.json"
+  }
+}

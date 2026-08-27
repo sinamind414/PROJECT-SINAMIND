@@ -1,0 +1,13 @@
+{
+  "doc_id": "enzyme-temp",
+  "version": "1.0.0",
+  "kind": "curve",
+  "keypoints": [
+    {"id": "t_opt", "value": 37, "unit": "°م", "tolerance": 0, "aliases": ["المثلى"], "label_ar": "درجة الحرارة المثلى"},
+    {"id": "vmax", "value": 100, "unit": "%", "tolerance": 0, "aliases": [], "label_ar": "النشاط عند 37°م"},
+    {"id": "denat", "value": 80, "unit": "°م", "tolerance": 0, "aliases": [], "label_ar": "درجة انعدام النشاط"}
+  ],
+  "trend": "bell",
+  "trend_variants": ["يزداد", "ينقص", "ينعدم", "قصوى"],
+  "objects": ["الوثيقة", "المنحنى", "الجدول"]
+}

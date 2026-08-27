@@ -1,0 +1,65 @@
+{
+  "rubric_id": "yeast-glucose-interpret",
+  "version": "1.0.0",
+  "verb_slug": "interpret",
+  "chapter_slug": "respiration-levure",
+  "language": "ar",
+  "total_points": 4.0,
+  "document_id": "yeast-glucose-curve",
+  "theme_variants": ["خميرة", "غلوكوز", "الغلوكوز", "تكاثر", "$lex:glucose"],
+  "theme_min_hits": 1,
+  "method_graph": {
+    "steps": ["rappel", "cause", "cours", "conclusion"],
+    "require_order": true
+  },
+  "criteria": [
+    {
+      "id": "rappel",
+      "label_ar": "18 مقابل 6",
+      "points": 1.0,
+      "check": "cites_keypoint",
+      "required": true
+    },
+    {
+      "id": "cause",
+      "label_ar": "لأن / يرجع",
+      "points": 1.0,
+      "check": "any_of",
+      "variants": ["لأن", "راجع", "يرجع", "بسبب"],
+      "required": true
+    },
+    {
+      "id": "cours",
+      "label_ar": "الغلوكوز مادة أيض / طاقة",
+      "points": 1.0,
+      "check": "any_of",
+      "variants": ["مادة أيض", "مادة الايض", "طاقة", "تنفس", "تخمر", "أيض"],
+      "required": true
+    },
+    {
+      "id": "conclusion",
+      "label_ar": "النمو مرتبط بتوفر الغلوكوز",
+      "points": 1.0,
+      "check": "any_of",
+      "variants": ["نمو", "تكاثر", "يزداد العدد", "تتكاثر"],
+      "required": true
+    }
+  ],
+  "distractors": [
+    {
+      "id": "photosynth",
+      "variants": ["تركيب ضوئي", "صانعة"],
+      "message_ar": "الخميرة لا تقوم بالتركيب الضوئي هنا"
+    }
+  ],
+  "advice_by_gap": {
+    "verb_slip.analyse": "فسّر بـ لأن لا بـ كلما وحدها.",
+    "cours": "اربط الغلوكوز بالمادة الأيضية كمصدر طاقة."
+  },
+  "advice_praise": {
+    "cause": "أحسنت: استعملت لأن."
+  },
+  "model_answer": "يبلغ عدد الخلايا 18 مع الغلوكوز مقابل 6 بدونه لأن الغلوكوز مادة أيض توفر طاقة للتنفس فتتكاثر الخميرة. لذلك يرتبط النمو بتوفر الغلوكوز.",
+  "source": "teacher_authored",
+  "grader_min_version": "1.0.0"
+}

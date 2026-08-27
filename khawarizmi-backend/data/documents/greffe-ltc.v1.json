@@ -1,0 +1,14 @@
+{
+  "doc_id": "greffe-ltc",
+  "version": "1.0.0",
+  "kind": "table",
+  "keypoints": [
+    {"id": "reject1", "value": 10, "unit": "يوم", "tolerance": 0, "aliases": [], "label_ar": "رفض الطعم الأول"},
+    {"id": "reject2", "value": 5, "unit": "يوم", "tolerance": 0, "aliases": [], "label_ar": "رفض الطعم الثاني"},
+    {"id": "pic1", "value": 2.5, "unit": null, "tolerance": 0.05, "aliases": ["الذروة"], "label_ar": "ذروة LTc الأولى"},
+    {"id": "pic2", "value": 4.8, "unit": null, "tolerance": 0.05, "aliases": ["الذروة"], "label_ar": "ذروة LTc الثانية"}
+  ],
+  "trend": "increase",
+  "trend_variants": ["أسرع", "أبكر", "ارتفع", "يرتفع"],
+  "objects": ["الوثيقة", "الجدول", "المنحنى"]
+}

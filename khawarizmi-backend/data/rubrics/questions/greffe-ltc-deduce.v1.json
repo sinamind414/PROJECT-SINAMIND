@@ -1,0 +1,59 @@
+{
+  "rubric_id": "greffe-ltc-deduce",
+  "version": "1.0.0",
+  "verb_slug": "deduce",
+  "chapter_slug": "immunite-cellulaire",
+  "language": "ar",
+  "total_points": 3.0,
+  "document_id": "greffe-ltc",
+  "theme_variants": ["طعم", "رفض", "LTc", "ltc", "خلوية", "مناعة"],
+  "theme_min_hits": 1,
+  "method_graph": {
+    "steps": ["connector", "content", "evidence"],
+    "require_order": true
+  },
+  "criteria": [
+    {
+      "id": "connector",
+      "label_ar": "أداة استنتاج",
+      "points": 0.75,
+      "check": "any_of",
+      "variants": ["نستنتج", "ومنه", "إذن", "استنتاج"],
+      "required": true
+    },
+    {
+      "id": "content",
+      "label_ar": "الاستجابة خلوية",
+      "points": 1.25,
+      "check": "any_of",
+      "variants": ["خلوية", "خلوي", "مناعة خلوية", "استجابة خلوية"],
+      "required": true
+    },
+    {
+      "id": "evidence",
+      "label_ar": "دليل LTc / تماس / تخريب",
+      "points": 1.0,
+      "check": "any_of",
+      "variants": ["LTc", "ltc", "خلايا قاتلة", "قاتلة", "تماس", "تخريب", "تخرب"],
+      "required": true
+    }
+  ],
+  "distractors": [
+    {
+      "id": "humorale",
+      "variants": ["خلطية", "أجسام مضادة"],
+      "message_ar": "الوثيقتان ما فيهومش أجسام مضادة. الدليل: LTc."
+    }
+  ],
+  "advice_by_gap": {
+    "content": "النمط: خلوية.",
+    "evidence": "وين الدليل من الوثيقة؟ LTc أو تخريب خلايا الطعم.",
+    "connector": "ابدأ بـ نستنتج / إذن."
+  },
+  "advice_praise": {
+    "content": "أحسنت: النمط خلوي."
+  },
+  "model_answer": "نستنتج أن الاستجابة المتدخلة خلوية. الدليل: ارتفاع الـ LTc يواكب الرفض، والرفض يمس خلايا الطعم.",
+  "source": "teacher_authored",
+  "grader_min_version": "1.0.0"
+}

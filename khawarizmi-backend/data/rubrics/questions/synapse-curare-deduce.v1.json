@@ -1,0 +1,60 @@
+{
+  "rubric_id": "synapse-curare-deduce",
+  "version": "1.0.0",
+  "verb_slug": "deduce",
+  "chapter_slug": "neurophysiologie",
+  "language": "ar",
+  "total_points": 3.0,
+  "document_id": "synapse-curare",
+  "theme_variants": ["كورار", "مشبك", "أستيل كولين", "استيل كولين", "Ach", "ach", "$lex:ach", "$lex:synapse"],
+  "theme_min_hits": 1,
+  "method_graph": {
+    "steps": ["connector", "content", "evidence"],
+    "require_order": true
+  },
+  "criteria": [
+    {
+      "id": "connector",
+      "label_ar": "أداة استنتاج",
+      "points": 0.75,
+      "check": "any_of",
+      "variants": ["نستنتج", "ومنه", "إذن", "استنتاج"],
+      "required": true
+    },
+    {
+      "id": "content",
+      "label_ar": "الكورار على مستقبلات Ach",
+      "points": 1.5,
+      "check": "any_of",
+      "variants": [
+        "مستقبلات",
+        "المستقبلات",
+        "يثبت على المستقبلات",
+        "يحتل مكان",
+        "أستيل كولين",
+        "استيل كولين",
+        "ach"
+      ],
+      "required": true
+    },
+    {
+      "id": "evidence",
+      "label_ar": "يمنع انتقال الرسالة",
+      "points": 0.75,
+      "check": "any_of",
+      "variants": ["تنعدم الاستجابة", "لا تنتقل", "يمنع", "انعدام كمون", "لا كمون"],
+      "required": true
+    }
+  ],
+  "distractors": [],
+  "advice_by_gap": {
+    "content": "الكورار يثبت على مستقبلات الأستيل كولين.",
+    "evidence": "النتيجة: لا تنتقل الرسالة العصبية."
+  },
+  "advice_praise": {
+    "content": "أحسنت: موقع تأثير الكورار صحيح."
+  },
+  "model_answer": "ومنه نستنتج أن مادة الكورار تثبت على المستقبلات الغشائية النوعية للأستيل كولين في الخلية بعد المشبكية فتحتل مكان الوسيط وتمنع ارتباطه، فتنعدم الاستجابة ولا تنتقل الرسالة العصبية.",
+  "source": "teacher_authored",
+  "grader_min_version": "1.0.0"
+}

@@ -1,4 +1,9 @@
-﻿data/
+# dumps / benchmarks — grilles L0 versionnées
+data/*
+!data/rubrics/
+!data/rubrics/**
+!data/documents/
+!data/documents/**
 models/*.onnx
 models/*.zip
 models/*.bin

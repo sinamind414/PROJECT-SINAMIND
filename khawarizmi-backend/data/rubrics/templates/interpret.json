@@ -1,0 +1,6 @@
+{
+  "verb_slug": "interpret",
+  "cases": ["rappel", "cause", "cours", "conclusion"],
+  "required_connectors": ["لأن", "راجع", "يرجع"],
+  "notes_ar": "فسّر: رقم + آلية الدرس + لأن."
+}

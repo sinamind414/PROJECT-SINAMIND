@@ -1,0 +1,72 @@
+{
+  "rubric_id": "photo-o2-analyse",
+  "version": "1.0.0",
+  "verb_slug": "analyse",
+  "chapter_slug": "photosynthese",
+  "language": "ar",
+  "total_points": 4.0,
+  "document_id": "photo-o2",
+  "theme_variants": ["أكسجين", "الاكسجين", "o2", "ضوء", "تركيب ضوئي", "التركيب الضوئي", "$lex:oxygene", "$lex:lumieres"],
+  "theme_min_hits": 1,
+  "method_graph": {
+    "steps": ["object", "keypoint", "relation", "conclusion"],
+    "require_order": true
+  },
+  "criteria": [
+    {
+      "id": "object",
+      "label_ar": "تقديم الوثيقة",
+      "points": 0.75,
+      "check": "cites_object",
+      "required": true
+    },
+    {
+      "id": "keypoint",
+      "label_ar": "هضبة 6 مل",
+      "points": 1.0,
+      "check": "cites_keypoint",
+      "required": true
+    },
+    {
+      "id": "relation",
+      "label_ar": "علاقة كلما دون سببية",
+      "points": 0.75,
+      "check": "any_of",
+      "variants": ["كلما", "ثم يثبت", "يزداد ثم"],
+      "required": true
+    },
+    {
+      "id": "no_cause",
+      "label_ar": "بدون لأن / هذا يدل",
+      "points": 0.5,
+      "check": "forbidden_abs",
+      "variants": ["لأن", "بسبب", "يفسر", "تفسير", "هذا يدل"],
+      "required": true
+    },
+    {
+      "id": "conclusion",
+      "label_ar": "الضوء ضروري لانطلاق O2",
+      "points": 1.0,
+      "check": "any_of",
+      "variants": ["الضوء ضروري", "ينطلق الاكسجين", "انطلاق الأكسجين", "التركيب الضوئي"],
+      "required": true
+    }
+  ],
+  "distractors": [
+    {
+      "id": "yeast",
+      "variants": ["خميرة", "الخميرة"],
+      "message_ar": "حشو: الخميرة ليست هذه الوثيقة"
+    }
+  ],
+  "advice_by_gap": {
+    "unanchored": "اذكر 6 مل من المنحنى.",
+    "verb_slip.interpret": "حلّل بلا لأن."
+  },
+  "advice_praise": {
+    "keypoint": "أحسنت: ذكرت 6 مل."
+  },
+  "model_answer": "تمثل الوثيقة منحنى تغيرات حجم الأكسجين بدلالة الزمن. ينطلق O2 حتى 6 مل ثم يثبت. كلما توفر الضوء ازداد حجم الأكسجين ثم يثبت. نستنتج أن الضوء ضروري لانطلاق الأكسجين.",
+  "source": "teacher_authored",
+  "grader_min_version": "1.0.0"
+}

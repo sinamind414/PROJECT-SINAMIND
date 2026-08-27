@@ -1,0 +1,11 @@
+{
+  "doc_id": "photo-o2",
+  "version": "1.0.0",
+  "kind": "curve",
+  "keypoints": [
+    {"id": "plateau", "value": 6, "unit": "مل", "tolerance": 0, "aliases": ["يثبت"], "label_ar": "حجم O2 عند الهضبة"}
+  ],
+  "trend": "increase_then_plateau",
+  "trend_variants": ["يزداد", "ينطلق", "يثبت", "هضبة"],
+  "objects": ["الوثيقة", "المنحنى", "الجدول"]
+}

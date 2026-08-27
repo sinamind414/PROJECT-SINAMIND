@@ -57,8 +57,12 @@ logs/
 # Archive sinamind
 ARCHIVE_SINAMIND/
 
-# Benchmark results
-khawarizmi-backend/data/
+# Benchmark dumps under data/ — grilles L0 versionnées (git)
+khawarizmi-backend/data/*
+!khawarizmi-backend/data/rubrics/
+!khawarizmi-backend/data/rubrics/**
+!khawarizmi-backend/data/documents/
+!khawarizmi-backend/data/documents/**
 
 # Local Netlify folder
 .netlify

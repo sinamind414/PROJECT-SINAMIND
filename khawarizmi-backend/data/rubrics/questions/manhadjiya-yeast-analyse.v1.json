@@ -1,0 +1,81 @@
+{
+  "rubric_id": "manhadjiya-yeast-analyse",
+  "version": "1.0.0",
+  "verb_slug": "analyse",
+  "chapter_slug": "respiration-levure",
+  "language": "ar",
+  "total_points": 4.0,
+  "document_id": "yeast-glucose-curve",
+  "theme_variants": ["خميرة", "الخميرة", "غلوكوز", "الغلوكوز", "جلوكوز", "تكاثر", "نمو", "$lex:glucose"],
+  "theme_min_hits": 1,
+  "method_graph": {
+    "steps": ["object", "keypoint", "relation", "conclusion"],
+    "require_order": true
+  },
+  "criteria": [
+    {
+      "id": "object",
+      "label_ar": "تقديم الوثيقة",
+      "points": 0.75,
+      "check": "cites_object",
+      "required": true
+    },
+    {
+      "id": "keypoint",
+      "label_ar": "تغير + رقم من الجدول",
+      "points": 1.0,
+      "check": "cites_keypoint",
+      "required": true
+    },
+    {
+      "id": "relation",
+      "label_ar": "علاقة كلما دون سببية",
+      "points": 0.75,
+      "check": "any_of",
+      "variants": ["كلما", "علاقة طردية", "العلاقة طردية"],
+      "required": true
+    },
+    {
+      "id": "no_cause",
+      "label_ar": "بدون لأن / هذا يدل",
+      "points": 0.5,
+      "check": "forbidden_abs",
+      "variants": ["لأن", "بسبب", "يفسر", "تفسير", "هذا يدل"],
+      "required": true
+    },
+    {
+      "id": "conclusion",
+      "label_ar": "استنتاج = دور الغلوكوز في نمو الخميرة",
+      "points": 1.0,
+      "check": "any_of",
+      "variants": ["غلوكوز عنصر ضروري", "الغلوكوز ضروري", "الغلوكوز عنصر ضروري", "ضروري لنمو", "ضروري لتكاثر", "الغلوكوز لازم"],
+      "required": true
+    }
+  ],
+  "distractors": [
+    {
+      "id": "photosynth",
+      "variants": ["تركيب ضوئي", "التركيب الضوئي", "صانعة", "يخضور"],
+      "message_ar": "حشو: التركيب الضوئي ليس موضوع هذه الوثيقة"
+    }
+  ],
+  "advice_by_gap": {
+    "verb_slip.interpret": "حلّلت لكن فسّرت مبكراً (لأن). اربط بـ كلما دون لأن.",
+    "unanchored": "اذكر رقما من الجدول: 9 أو 18 أو 6.",
+    "off_topic": "الإجابة خارج الموضوع.",
+    "stuffing": "لا تكتب درسا محفوظا. اقرأ الوثيقة.",
+    "object": "قدّم الوثيقة (جدول / منحنى).",
+    "keypoint": "اذكر قيمة حقيقية من الجدول.",
+    "relation": "صغ علاقة كلما … زاد/نقص …",
+    "no_cause": "حلّل دون لأن — التفسير درس آخر.",
+    "conclusion": "اربط الاستنتاج بهدف السياق: دور الغلوكوز."
+  },
+  "advice_praise": {
+    "object": "أحسنت: قدّمت الوثيقة.",
+    "keypoint": "ذكرت رقما من الجدول.",
+    "relation": "صغت علاقة كلما دون تفسير."
+  },
+  "model_answer": "تمثل الوثيقة جدولا يوضح تغيرات عدد خلايا الخميرة بدلالة الزمن في الوسط الذي يحتوي على الغلوكوز والوسط الذي يخلو منه. في الوسط مع الغلوكوز يزداد العدد من 9 إلى 18 خلية. في الوسط بدون غلوكوز يتناقص من 9 إلى 6 ثم يثبت. فكلما تواجد الغلوكوز تزايد عدد الخلايا والعكس صحيح. نستنتج أن الغلوكوز عنصر ضروري لنمو وتكاثر فطر الخميرة.",
+  "source": "teacher_authored",
+  "grader_min_version": "1.0.0"
+}
