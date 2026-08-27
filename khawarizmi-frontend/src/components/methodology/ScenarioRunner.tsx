@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { DocumentSetRenderer } from "@/components/methodology/DocumentRenderer"
 import { HighlightedAnswer } from "@/components/methodology/HighlightedAnswer"
-import { evaluateMethodologyAnswer, type MethodologyEvaluation } from "@/lib/methodology-evaluator"
+import type { MethodologyEvaluation } from "@/lib/methodology-evaluator"
 import { awardXP, saveMethodologyEvaluations, type GamificationAward } from "@/lib/progress-store"
 import { apiClient } from "@/lib/api-client"
 import type { MethodologyScenario, MethodologyQuestion } from "@/lib/methodology-documents"
@@ -51,11 +51,41 @@ type ScenarioResult = {
   contract: DocumentScenarioOutcomeResult
 }
 
-function getSeverityLabel(percentage: number) {
+function getSeverityLabel(percentage: number, labelAr?: string) {
+  if (labelAr) {
+    const color =
+      labelAr === "متقن" ? "text-emerald-300" :
+      labelAr === "مقبول" ? "text-blue-300" :
+      labelAr === "جزئي" ? "text-amber-300" : "text-red-300"
+    const bg =
+      labelAr === "متقن" ? "bg-emerald-500/10 border-emerald-500/20" :
+      labelAr === "مقبول" ? "bg-blue-500/10 border-blue-500/20" :
+      labelAr === "جزئي" ? "bg-amber-500/10 border-amber-500/20" : "bg-red-500/10 border-red-500/20"
+    return { label: labelAr, color, bg }
+  }
   if (percentage >= 85) return { label: "متقن", color: "text-emerald-300", bg: "bg-emerald-500/10 border-emerald-500/20" }
   if (percentage >= 70) return { label: "مقبول", color: "text-blue-300", bg: "bg-blue-500/10 border-blue-500/20" }
-  if (percentage >= 50) return { label: "متوسط", color: "text-amber-300", bg: "bg-amber-500/10 border-amber-500/20" }
-  return { label: "ضعيف", color: "text-red-300", bg: "bg-red-500/10 border-red-500/20" }
+  if (percentage >= 40) return { label: "جزئي", color: "text-amber-300", bg: "bg-amber-500/10 border-amber-500/20" }
+  return { label: "غير كاف", color: "text-red-300", bg: "bg-red-500/10 border-red-500/20" }
+}
+
+function ungradedEvaluation(verbSlug: string, banner?: string): MethodologyEvaluation {
+  return {
+    verbSlug,
+    score: 0,
+    scoreMax: 1,
+    percentage: 0,
+    success: [],
+    errors: ["لا شبكة تقييم لهذه السؤال."],
+    missingMarkers: [],
+    forbiddenMarkersFound: [],
+    criteria: [],
+    advice: "تعذر التصحيح — ليست علامة بكالوريا رسمية.",
+    allowSecondAttempt: false,
+    source: "ungraded",
+    ungraded: true,
+    bannerAr: banner,
+  }
 }
 
 function CorrectionCard({
@@ -63,7 +93,7 @@ function CorrectionCard({
 }: {
   item: ScenarioResult["evaluations"][number]
 }) {
-  const status = getSeverityLabel(item.evaluation.percentage)
+  const status = getSeverityLabel(item.evaluation.percentage, item.evaluation.methodLabelAr)
 
   return (
     <div className="rounded-3xl p-5 bg-[#182730] border border-white/[0.06] space-y-4">
@@ -74,7 +104,9 @@ function CorrectionCard({
         </div>
         <div className={`px-3 py-2 rounded-xl border ${status.bg}`}>
           <p className={`text-sm font-bold ${status.color}`}>{status.label}</p>
-          <p className="text-white text-lg font-bold text-center">{item.evaluation.percentage}%</p>
+          <p className="text-white text-lg font-bold text-center">
+            {item.evaluation.ungraded ? "—" : `${item.evaluation.percentage}%`}
+          </p>
         </div>
       </div>
 
@@ -230,40 +262,54 @@ export function ScenarioRunner({
     const questionsToSubmit = activeQuestions
 
     try {
-      const payload = {
-        scenario_id: scenario.id,
-        chapter_slug: chapterSlug,
-        answers: questionsToSubmit.map((q) => ({
-          verb_slug: q.verbSlug,
-          answer: answers[q.id] || "",
-        })),
-      }
-      const resp = await apiClient.evaluateDaAnswersV2(payload)
-
-      const evaluations = questionsToSubmit.map((question) => {
-        const evalData = resp.evaluations.find((e) => e.verb_slug === question.verbSlug)
-        const evaluation: MethodologyEvaluation = evalData
-          ? {
-              verbSlug: evalData.verb_slug,
-              score: evalData.score,
-              scoreMax: evalData.score_max,
-              percentage: evalData.percentage,
-              success: evalData.matched_criteria,
-              errors: evalData.unmatched_criteria.map((u) => u.why_ar),
-              missingMarkers: [],
-              forbiddenMarkersFound: [],
-              criteria: [],
-              advice: evalData.advice_ar,
-              allowSecondAttempt: evalData.percentage < 85,
-              highlights: evalData.highlights,
-              source: evalData.source,
-              dominantErrorCode: evalData.dominant_error_code,
-              remediation: evalData.remediation,
+      const graded = await Promise.all(
+        questionsToSubmit.map(async (question) => {
+          const questionId = `${scenario.id}:${question.id}`
+          const g = await apiClient.grade({
+            question_id: questionId,
+            answer: answers[question.id] || "",
+            surface: "da",
+          })
+          if ("ungraded" in g && g.ungraded) {
+            return {
+              question,
+              answer: answers[question.id] || "",
+              evaluation: ungradedEvaluation(question.verbSlug, g.banner_ar),
             }
-          : evaluateMethodologyAnswer({ verbSlug: question.verbSlug, answer: answers[question.id] || "" })
-
-        return { question, answer: answers[question.id] || "", evaluation }
-      })
+          }
+          const evaluation: MethodologyEvaluation = {
+            verbSlug: g.verb_slug,
+            score: g.method_points,
+            scoreMax: g.method_points_max,
+            percentage: g.overall_training_percent,
+            success: g.criteria.filter((c) => c.status === "full").map((c) => c.label_ar),
+            errors: [
+              ...g.science_flags,
+              ...(g.next_step_ar ? [g.next_step_ar] : []),
+            ],
+            missingMarkers: [],
+            forbiddenMarkersFound: [],
+            criteria: g.criteria.map((c) => ({
+              code: c.id,
+              labelAr: c.label_ar,
+              points: c.points_max,
+              earned: c.points_earned,
+              passed: c.status === "full",
+              feedbackAr: c.label_ar,
+            })),
+            advice: g.phrase_ar || g.banner_ar,
+            allowSecondAttempt: g.overall_training_percent < 85,
+            source: "local_rubric",
+            methodLabelAr: g.method_label_ar,
+            scienceStatus: g.science_status,
+            scienceFlags: g.science_flags,
+            bannerAr: g.banner_ar,
+            dominantErrorCode: g.diagnosis?.code,
+          }
+          return { question, answer: answers[question.id] || "", evaluation }
+        }),
+      )
+      const evaluations = graded
 
       const readiness = Math.round(
         evaluations.reduce((sum, item) => sum + item.evaluation.percentage, 0) / evaluations.length,
@@ -280,7 +326,7 @@ export function ScenarioRunner({
       })
 
       setResult({ evaluations, readiness, contract })
-      setApiSource(true)
+      setApiSource(evaluations.some((e) => e.evaluation.source === "local_rubric"))
       saveMethodologyEvaluations(
         evaluations.map((item) => ({
           source: "document-analysis" as const,
@@ -297,58 +343,37 @@ export function ScenarioRunner({
       const evaluations = questionsToSubmit.map((question) => ({
         question,
         answer: answers[question.id] || "",
-        evaluation: evaluateMethodologyAnswer({ verbSlug: question.verbSlug, answer: answers[question.id] || "" }),
+        evaluation: ungradedEvaluation(question.verbSlug, "تعذر التصحيح"),
       }))
-
-      const readiness = Math.round(
-        evaluations.reduce((sum, item) => sum + item.evaluation.percentage, 0) / evaluations.length,
-      )
-
-      const contract = applyDocumentScenarioOutcome({
-        scenarioId: scenario.id,
-        chapterSlug,
-        items: evaluations.map((item) => ({
-          verbSlug: item.question.verbSlug,
-          percentage: item.evaluation.percentage,
-          passed: item.evaluation.percentage >= 70,
-        })),
+      setResult({
+        evaluations,
+        readiness: 0,
+        contract: applyDocumentScenarioOutcome({
+          scenarioId: scenario.id,
+          chapterSlug,
+          items: evaluations.map((item) => ({
+            verbSlug: item.question.verbSlug,
+            percentage: 0,
+            passed: false,
+          })),
+        }),
       })
-
-      setResult({ evaluations, readiness, contract })
-      saveMethodologyEvaluations(
-        evaluations.map((item) => ({
-          source: "document-analysis" as const,
-          verbSlug: item.question.verbSlug,
-          answer: item.answer,
-          evaluation: item.evaluation,
-        })),
-      )
-      setSaved(true)
-      setAward(contract.mayAwardXp ? awardXP("مهمة استغلال وثيقة", 60) : null)
+      setSaved(false)
+      setAward(null)
     } finally {
       setSubmitting(false)
     }
   }
 
   async function requestHint(question: MethodologyQuestion) {
-    setRequestingHint(true)
-    try {
-      const payload = {
-        scenario_id: scenario.id,
-        chapter_slug: chapterLink?.slug ?? null,
-        answers: [{ verb_slug: question.verbSlug, answer: answers[question.id] || "" }],
-        request_hint: true,
-      }
-      const resp = await apiClient.evaluateDaAnswersV2(payload)
-      const evalData = resp.evaluations[0]
-      if (evalData?.remediation?.hint) {
-        setHints((prev) => ({ ...prev, [question.id]: evalData.remediation!.hint! }))
-      }
-    } catch {
-      // fallback local silencieux
-    } finally {
-      setRequestingHint(false)
-    }
+    setHints((prev) => ({
+      ...prev,
+      [question.id]: {
+        hint_ar: "أرسل الإجابة للتصحيح المحلي — لا تلميح توليدي.",
+        focus_area: "منهج",
+        methodology_step: "إرسال",
+      },
+    }))
   }
 
   function reset() {
@@ -705,7 +730,7 @@ export function ScenarioRunner({
               <div className="space-y-2">
                 <p className="text-white font-bold mb-2">تفصيل سريع</p>
                 {result.evaluations.map((item) => {
-                  const status = getSeverityLabel(item.evaluation.percentage)
+                  const status = getSeverityLabel(item.evaluation.percentage, item.evaluation.methodLabelAr)
                   return (
                     <a
                       key={item.question.id}

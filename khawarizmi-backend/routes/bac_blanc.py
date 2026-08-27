@@ -40,6 +40,30 @@ logger = logging.getLogger("khawarizmi.api")
 router = APIRouter(prefix="/api/bac-blanc", tags=["Bac Blanc"])
 
 
+async def _require_own_session(db: AsyncSession, session_id: str, user_id: int):
+    """Session de CET élève. 404 si absente, 403 si elle appartient à un autre (G9)."""
+    owned = await db.execute(
+        text(
+            """
+            SELECT id, user_id, subject_choice, status, started_at, annale_slug
+            FROM bac_sessions
+            WHERE id = :sid AND user_id = :uid
+            """
+        ),
+        {"sid": session_id, "uid": user_id},
+    )
+    row = owned.fetchone()
+    if row:
+        return row._mapping
+    exists = await db.execute(
+        text("SELECT 1 FROM bac_sessions WHERE id = :sid"),
+        {"sid": session_id},
+    )
+    if exists.fetchone():
+        raise HTTPException(status_code=403, detail="Session d'un autre élève")
+    raise HTTPException(status_code=404, detail="Session introuvable")
+
+
 @router.post("/start", response_model=StartBacResponse)
 async def start_bac(
     body: StartBacRequest,
@@ -102,34 +126,33 @@ async def choose_subject(
     db: AsyncSession = Depends(get_db),
 ):
     """Verrouille le choix du sujet et retourne le détail."""
-    sess = await db.execute(
-        text("SELECT id, subject_choice, status FROM bac_sessions WHERE id = :sid"),
-        {"sid": body.session_id},
-    )
-    sess_row = sess.fetchone()
-    if not sess_row:
-        raise HTTPException(404, "Session introuvable")
+    sess_map = await _require_own_session(db, body.session_id, current_user["id"])
 
-    if sess_row._mapping["subject_choice"] is not None:
+    if sess_map["subject_choice"] is not None:
         raise HTTPException(400, "Le choix est déjà verrouillé")
 
     result = await db.execute(
         text("""
             SELECT subject_number, title_ar, themes_ar, estimated_minutes, exercises
             FROM bac_subjects
-            WHERE annale_slug = (
-                SELECT annale_slug FROM bac_sessions WHERE id = :sid
-            ) AND subject_number = :num
+            WHERE annale_slug = :slug AND subject_number = :num
         """),
-        {"sid": body.session_id, "num": body.subject_choice},
+        {"slug": sess_map["annale_slug"], "num": body.subject_choice},
     )
     row = result.fetchone()
     if not row:
         raise HTTPException(404, "Sujet introuvable")
 
     await db.execute(
-        text("UPDATE bac_sessions SET subject_choice = :choice WHERE id = :sid"),
-        {"choice": body.subject_choice, "sid": body.session_id},
+        text(
+            "UPDATE bac_sessions SET subject_choice = :choice "
+            "WHERE id = :sid AND user_id = :uid"
+        ),
+        {
+            "choice": body.subject_choice,
+            "sid": body.session_id,
+            "uid": current_user["id"],
+        },
     )
     await db.commit()
 
@@ -165,11 +188,8 @@ async def save_answer(
     db: AsyncSession = Depends(get_db),
 ):
     """Sauvegarde automatique d'une réponse pendant l'épreuve."""
-    sess = await db.execute(
-        text("SELECT id FROM bac_sessions WHERE id = :sid AND status = 'in_progress'"),
-        {"sid": body.session_id},
-    )
-    if not sess.fetchone():
+    sess_map = await _require_own_session(db, body.session_id, current_user["id"])
+    if sess_map["status"] != "in_progress":
         raise HTTPException(400, "Session non active")
 
     existing = await db.execute(
@@ -216,21 +236,10 @@ async def submit_bac(
     db: AsyncSession = Depends(get_db),
 ):
     """Soumet définitivement le bac blanc + évalue les réponses."""
-    sess = await db.execute(
-        text("""
-            SELECT id, started_at, subject_choice, annale_slug, status
-            FROM bac_sessions WHERE id = :sid
-        """),
-        {"sid": body.session_id},
-    )
-    sess_row = sess.fetchone()
-    if not sess_row:
-        raise HTTPException(404, "Session introuvable")
+    sm = await _require_own_session(db, body.session_id, current_user["id"])
 
-    if sess_row._mapping["status"] == "submitted":
+    if sm["status"] == "submitted":
         raise HTTPException(400, "Déjà soumis")
-
-    sm = sess_row._mapping
     now = datetime.now(UTC)
     started = sm["started_at"]
     time_used = int((now - started).total_seconds()) if started else 0
@@ -367,7 +376,7 @@ async def submit_bac(
                 scores_by_exercise = :ex_scores,
                 scores_by_verb = :verb_scores,
                 debrief = :debrief
-            WHERE id = :sid
+            WHERE id = :sid AND user_id = :uid
         """),
         {
             "time": time_used,
@@ -376,6 +385,7 @@ async def submit_bac(
             "verb_scores": json.dumps([v.model_dump() for v in verb_scores], ensure_ascii=False),
             "debrief": json.dumps({"message": debrief, "skipped": skipped_count}, ensure_ascii=False),
             "sid": body.session_id,
+            "uid": current_user["id"],
         },
     )
     await db.commit()
@@ -403,18 +413,11 @@ async def get_correction(
     db: AsyncSession = Depends(get_db),
 ):
     """Retourne la correction détaillée après soumission."""
-    sess = await db.execute(
-        text("SELECT status, annale_slug, subject_choice FROM bac_sessions WHERE id = :sid"),
-        {"sid": session_id},
-    )
-    sess_row = sess.fetchone()
-    if not sess_row:
-        raise HTTPException(404, "Session introuvable")
+    sm = await _require_own_session(db, session_id, current_user["id"])
 
-    if sess_row._mapping["status"] != "submitted":
+    if sm["status"] != "submitted":
         raise HTTPException(400, "Session non soumise")
 
-    sm = sess_row._mapping
     subj_result = await db.execute(
         text("SELECT exercises FROM bac_subjects WHERE annale_slug = :slug AND subject_number = :num"),
         {"slug": sm["annale_slug"], "num": sm["subject_choice"]},

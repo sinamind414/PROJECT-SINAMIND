@@ -22,7 +22,7 @@ from schemas.rubric import (
 from services.answer_sanity import check_answer_sanity
 from services.arabic import normalize_arabic
 
-GRADER_VERSION = "1.1.2"
+GRADER_VERSION = "1.1.3"
 SCIENCE_CAP_DEFAULT = 40
 TRAINING_BANNER_AR = "ملاحظة تدريبية — منهج + محتوى. ليست علامة بكالوريا رسمية."
 
@@ -31,7 +31,6 @@ _CHEM_TOKEN_RE = re.compile(
     r"(?:atp|adp|nadh|fadh2?|co2|o2|h2o|p/o|ph|ca2\+?|na\+|k\+|°|→|->)",
     re.IGNORECASE,
 )
-_DIGIT_RE = re.compile(r"\d")
 _USEFUL_RE = re.compile(
     r"[\u0600-\u06FF0-9A-Za-z°+\-→/]|ATP|CO2|O2",
     re.IGNORECASE,
@@ -194,7 +193,8 @@ def _occurrence_count(text: str, variants_norm: list[str]) -> int:
 
 
 def _chemistry_signal_count(text: str) -> int:
-    return len(_CHEM_TOKEN_RE.findall(text)) + min(3, len(_DIGIT_RE.findall(text)))
+    """Tokens chimie FERMÉS. Digits seuls ≠ chimie (sinon dump numérique → defer)."""
+    return len(_CHEM_TOKEN_RE.findall(text))
 
 
 def _useful_len(text: str) -> int:

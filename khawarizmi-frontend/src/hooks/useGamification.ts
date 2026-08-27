@@ -13,17 +13,17 @@ export async function getStreak() {
   );
 }
 
-export async function addPoints(points: number) {
+export async function addPoints(action: string) {
   return apiClient.request<{ total_points: number }>(
-    `/api/gamification/points/add?points=${points}`,
-    { method: 'POST' }
+    '/api/gamification/points/add',
+    { method: 'POST', body: JSON.stringify({ action }) }
   );
 }
 
-export async function addXp(xp: number) {
+export async function addXp(action: string) {
   return apiClient.request<{ level: number; xp: number; leveled_up: boolean }>(
-    `/api/avatar/add-xp?xp=${xp}`,
-    { method: 'POST' }
+    '/api/avatar/add-xp',
+    { method: 'POST', body: JSON.stringify({ action }) }
   );
 }
 

@@ -19,6 +19,7 @@ from . import (
     diagnostic,
     document_analysis,
     document_analysis_v2,
+    grade,
     dual_coding,
     duels,
     exercices,
@@ -96,6 +97,7 @@ ALL_ROUTERS = [
     # ── Document Analysis (v1 : scenarios/progress/weak-spots + v2 : evaluate) ──
     document_analysis.router,
     document_analysis_v2.router,
+    grade.router,
     # ── Action Verbs ──
     action_verbs.router,
     # ── Gamification Sprint 1 ──

@@ -85,6 +85,8 @@ def ar_normalize(text: str) -> str:
     t = _AR_WAW_HAMZA.sub("و", t)  # N6
     t = _AR_TEH_MARBUTA.sub("ه", t)  # N7
     t = t.translate(_DIGIT_TRANS)  # N8
+    # N8b — séparateurs arabes (clavier DZ) : ٫ décimal, ٬ milliers, ٪ pourcent
+    t = t.replace("\u066b", ".").replace("\u066c", "").replace("\u066a", "%")
     t = t.lower()
     # N9 — CO₂ / co₂ / CO2 déjà unifiés par N8+lower → co2. Rien d'autre.
     t = _MULTIPLE_SPACES.sub(" ", t).strip()  # N10

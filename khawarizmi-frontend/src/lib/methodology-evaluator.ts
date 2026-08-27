@@ -25,7 +25,12 @@ export type MethodologyEvaluation = {
   dominantErrorCode?: string
 
   highlights?: Highlight[]
-  source?: "sanity" | "llm" | "llm_recovered" | "llm_error" | "socratic"
+  source?: "sanity" | "llm" | "llm_recovered" | "llm_error" | "socratic" | "local_rubric" | "ungraded"
+  ungraded?: boolean
+  methodLabelAr?: string
+  scienceStatus?: string
+  scienceFlags?: string[]
+  bannerAr?: string
 
   remediation?: {
     page?: number

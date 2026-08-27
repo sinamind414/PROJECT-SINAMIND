@@ -87,15 +87,14 @@ function DetailContent() {
 
           {/* 3 modes */}
           <div className="grid gap-4 sm:grid-cols-3">
-            <Link
-              href={`/annales/${sujet.slug}/read`}
-              className="bg-slate-900/60 border border-slate-800 hover:border-mint/50 rounded-2xl p-5 space-y-3 card-hover group"
+            <div
+              className="bg-slate-900/60 border border-slate-800 rounded-2xl p-5 space-y-3 opacity-80"
+              dir="rtl"
             >
               <p className="text-3xl">📖</p>
-              <h3 className="text-white font-bold text-base group-hover:text-mint transition-colors">قراءة</h3>
-              <p className="text-sm text-slate-400">تصفح الموضوع وتحميله</p>
-              <span className="inline-block text-xs text-mint font-semibold group-hover:underline">فتح ←</span>
-            </Link>
+              <h3 className="text-white font-bold text-base">قراءة</h3>
+              <p className="text-sm text-amber-300/90">الموضوع غير متاح (ملف ناقص)</p>
+            </div>
             <Link
               href={`/annales/${sujet.slug}/exam`}
               className="bg-slate-900/60 border border-slate-800 hover:border-amber-500/50 rounded-2xl p-5 space-y-3 card-hover group"

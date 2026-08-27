@@ -37,6 +37,11 @@ class TestContractN1ToN10:
         assert "38" in normalize_arabic("٣٨ ATP")
         assert "38" in normalize_arabic("۳۸")
 
+    def test_n8b_arabic_decimal_and_percent(self):
+        assert "2.5" in normalize_arabic("٢٫٥")
+        assert "," not in normalize_arabic("٢٫٥")
+        assert "36%" in normalize_arabic("٣٦٪") or "36" in normalize_arabic("٣٦٪")
+
     def test_n9_chemistry_co2(self):
         assert "co2" in normalize_arabic("CO₂")
         assert "co2" in normalize_arabic("CO2")

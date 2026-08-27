@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import { useEffect, useMemo, useRef, useState } from "react"
 import { useParams } from "next/navigation"
@@ -6,6 +6,7 @@ import Link from "next/link"
 import { AuthGuard } from "@/components/auth/AuthGuard"
 import { AppShell } from "@/components/layout/AppShell"
 import { getSujetBySlug } from "@/lib/annales-bac"
+import { PDF_MISSING_AR, isAnnalePdfAvailable } from "@/lib/pdf-available"
 
 function PdfViewer({ src, title }: { src: string; title: string }) {
   const [loading, setLoading] = useState(true)
@@ -82,6 +83,7 @@ function ReadContent() {
 
   const pdfSrc = showCorrection && sujet.url_corrige ? sujet.url_corrige : sujet.url_pdf
   const pdfTitle = showCorrection && sujet.url_corrige ? "تصحيح الموضوع" : "الموضوع"
+  const pdfOk = isAnnalePdfAvailable(pdfSrc)
 
   return (
     <AppShell>
@@ -95,7 +97,7 @@ function ReadContent() {
             <span className="text-xs text-slate-300">قراءة</span>
           </div>
           <div className="flex items-center gap-2">
-            {sujet.url_corrige && (
+            {pdfOk && sujet.url_corrige && (
               <button
                 onClick={() => setShowCorrection((v) => !v)}
                 className="px-3 py-1.5 bg-emerald-500 text-white rounded-lg text-xs font-semibold hover:bg-emerald-600 transition"
@@ -103,18 +105,30 @@ function ReadContent() {
                 {showCorrection ? "عرض الموضوع" : "عرض التصحيح"}
               </button>
             )}
-            <a
-              href={pdfSrc}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-3 py-1.5 bg-[#2dd4bf] text-slate-900 rounded-lg text-xs font-semibold hover:bg-[#5eead4] transition"
-            >
-              تحميل
-            </a>
+            {pdfOk ? (
+              <a
+                href={pdfSrc}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-3 py-1.5 bg-[#2dd4bf] text-slate-900 rounded-lg text-xs font-semibold hover:bg-[#5eead4] transition"
+              >
+                تحميل
+              </a>
+            ) : (
+              <span className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-amber-500/15 text-amber-300 border border-amber-400/30">
+                {PDF_MISSING_AR}
+              </span>
+            )}
           </div>
         </header>
         <div className="flex-1 overflow-hidden">
-          <PdfViewer src={pdfSrc} title={pdfTitle} />
+          {pdfOk ? (
+            <PdfViewer src={pdfSrc} title={pdfTitle} />
+          ) : (
+            <div className="flex items-center justify-center h-full px-6" dir="rtl">
+              <p className="text-amber-200 text-sm text-center max-w-md">{PDF_MISSING_AR}</p>
+            </div>
+          )}
         </div>
       </main>
     </AppShell>

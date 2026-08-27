@@ -120,6 +120,46 @@ class TestG7DeferChemistry:
         assert r.cacheable is False
 
 
+class TestN1NumericDumpStops:
+    """Hotfix N1 : digits ≠ chimie. Dump sans arabe → 0, pas 38 %."""
+
+    DUMP = "1 2 3 4 5 6 7 8 9 10 20 37 80 100 0 2,5 4,8 18 6 10 5"
+
+    @pytest.mark.parametrize(
+        "qid",
+        [
+            "enzyme-temp-analyse",
+            "manhadjiya-yeast-analyse",
+            "greffe-ltc-analyse",
+            "photo-o2-analyse",
+        ],
+    )
+    def test_number_salad_is_not_arabic_zero(self, qid: str):
+        r = grade_question(qid, self.DUMP)
+        assert r.sanity_code == "not_arabic"
+        assert r.method_percent == 0
+        assert r.method_points == 0
+        assert r.overall_training_percent == 0
+        assert r.science_status == "not_applicable"
+        assert r.cacheable is False
+
+    def test_digits_alone_do_not_count_as_chemistry(self):
+        from services.local_grader import _chemistry_signal_count
+
+        assert _chemistry_signal_count(self.DUMP) == 0
+        assert _chemistry_signal_count("38 ATP · P/O=3") >= 2
+
+
+class TestN2ArabicDecimalKeypoint:
+    def test_arabic_decimal_matches_greffe_25(self):
+        packed = load("greffe-ltc-analyse")
+        assert packed is not None
+        copy = "تمثل الوثيقة منحنى رفض الطعم. القيمة ٢٫٥ بعد أيام."
+        r = grade(student_answer=copy, rubric=packed.rubric, document=packed.document)
+        kp = next(h for h in r.criteria if h.id == "keypoint")
+        assert kp.status == "full"
+
+
 class TestG8Ungraded:
     def test_unknown_question_raises(self):
         with pytest.raises(UngradedError) as ei:

@@ -917,6 +917,70 @@ class KhawarizmiApiClient {
     )
   }
 
+  // ── Grade local 0 LLM (S2) ─────────────────────
+
+  async grade(payload: {
+    question_id: string
+    answer: string
+    surface?: "da" | "verb" | "bac"
+  }): Promise<
+    | { ungraded: true; question_id: string; banner_ar?: string }
+    | {
+        ungraded?: false
+        rubric_id: string
+        verb_slug: string
+        method_points: number
+        method_points_max: number
+        method_percent: number
+        method_label_ar: string
+        order_ok: boolean | null
+        science_status: "ok" | "error" | "not_applicable"
+        science_flags: string[]
+        science_capped: boolean
+        overall_training_percent: number
+        phrase_ar: string
+        praise_ar: string
+        next_step_ar: string
+        banner_ar: string
+        source: "local_rubric"
+        diagnosis: { code: string; label_ar: string } | null
+        criteria: Array<{
+          id: string
+          status: "full" | "partial" | "absent"
+          points_earned: number
+          points_max: number
+          label_ar: string
+        }>
+      }
+  > {
+    const resp = await fetch(`${API_BASE_URL}/api/grade`, {
+      method: "POST",
+      headers: this._rawHeaders(),
+      credentials: "include",
+      body: JSON.stringify({
+        question_id: payload.question_id,
+        answer: payload.answer,
+        surface: payload.surface || "da",
+      }),
+    })
+    const data = (await resp.json().catch(() => ({}))) as Record<string, unknown>
+    if (resp.status === 422 && (data.code === "ungraded" || data.erreur === "ungraded")) {
+      return {
+        ungraded: true,
+        question_id: String(data.question_id || payload.question_id),
+        banner_ar: typeof data.banner_ar === "string" ? data.banner_ar : undefined,
+      }
+    }
+    if (!resp.ok) {
+      throw new Error(
+        (typeof data.erreur === "string" && data.erreur) ||
+          (typeof data.detail === "string" && data.detail) ||
+          `${UI_AR.erreur_http_prefix} ${resp.status}`,
+      )
+    }
+    return data as Exclude<Awaited<ReturnType<KhawarizmiApiClient["grade"]>>, { ungraded: true }>
+  }
+
   // ── Document Analysis ─────────────────────────
 
   async evaluateDaAnswers(payload: {
@@ -1066,10 +1130,10 @@ class KhawarizmiApiClient {
     )
   }
 
-  async addPoints(points: number) {
+  async addPoints(action: string) {
     return this.request<{ total_points: number }>(
-      `/api/gamification/points/add?points=${points}`,
-      { method: "POST" }
+      "/api/gamification/points/add",
+      { method: "POST", body: JSON.stringify({ action }) }
     )
   }
 
@@ -1079,10 +1143,10 @@ class KhawarizmiApiClient {
     )
   }
 
-  async addAvatarXp(xp: number) {
+  async addAvatarXp(action: string) {
     return this.request<{ level: number; xp: number; leveled_up: boolean }>(
-      `/api/avatar/add-xp?xp=${xp}`,
-      { method: "POST" }
+      "/api/avatar/add-xp",
+      { method: "POST", body: JSON.stringify({ action }) }
     )
   }
 

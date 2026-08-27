@@ -21,10 +21,22 @@ class TestGamification:
         assert "longest_streak" in data
 
     async def test_add_points(self, client: AsyncClient, auth_headers: dict):
-        response = await client.post("/api/gamification/points/add?points=50", headers=auth_headers)
+        response = await client.post(
+            "/api/gamification/points/add",
+            headers=auth_headers,
+            json={"action": "start"},
+        )
         assert response.status_code == 200
         data = response.json()
         assert "total_points" in data
+
+    async def test_add_points_query_delta_rejected(self, client: AsyncClient, auth_headers: dict):
+        response = await client.post(
+            "/api/gamification/points/add?points=99999",
+            headers=auth_headers,
+            json={"action": "start"},
+        )
+        assert response.status_code == 400
 
     async def test_open_mystery_box_requires_auth(self, client: AsyncClient):
         response = await client.post("/api/mystery-box/open", json={"box_id": "test"})
@@ -60,7 +72,11 @@ class TestGamification:
         assert "value" in reward
 
     async def test_avatar_add_xp(self, client: AsyncClient, auth_headers: dict):
-        response = await client.post("/api/avatar/add-xp?xp=100", headers=auth_headers)
+        response = await client.post(
+            "/api/avatar/add-xp",
+            headers=auth_headers,
+            json={"action": "exercise"},
+        )
         assert response.status_code == 200
         data = response.json()
         assert "level" in data
