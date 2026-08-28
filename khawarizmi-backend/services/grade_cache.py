@@ -1,7 +1,8 @@
-"""S14/S16/S19 — cache route /api/grade. Hors grade() (P7). Pas de user_id (équité).
+"""S14/S16/S19/S23 — cache route /api/grade. Hors grade() (P7). Pas de user_id (équité).
 
 Mémoire toujours (preview / tests). Redis SETEX 7 j si state.redis — jamais
 dans local_grader. Copie jamais en clair. sha16 = ceinture si bump de version oublié.
+filet_sha16 = ceinture si Savoir / $lex changent sans bump GRADER_VERSION (B2).
 """
 
 from __future__ import annotations
@@ -9,6 +10,7 @@ from __future__ import annotations
 import hashlib
 import json
 import time
+from functools import lru_cache
 from threading import Lock
 
 from schemas.rubric import GradeResult
@@ -38,6 +40,7 @@ def reset() -> None:
     with _lock:
         _mem.clear()
     _bound_redis = _AUTO
+    filet_sha16.cache_clear()
 
 
 def _redis_client():
@@ -64,6 +67,40 @@ def _digest(answer: str) -> str:
     return hashlib.sha256(stripped.encode("utf-8")).hexdigest()
 
 
+@lru_cache(maxsize=1)
+def filet_sha16() -> str:
+    """Empreinte filet science + $lex. Hors grade(). 0 copie, 0 user_id.
+
+    `_SYNONYMS` / `_GRAVE_ERRORS` / lexique fichier ne sont pas dans
+    `canon_sha16(Rubric)`. Sans ça, éditer Savoir sans bump moteur sert
+    un GradeResult périmé (B2).
+    """
+    from services.lexicon import _load_file
+    from services.savoir_corrector import (
+        _CTX_ARNR,
+        _CTX_ARNT,
+        _EXP_10_4,
+        _EXP_10_6,
+        _GRAVE_ERRORS,
+        _NUMERIC_RULES,
+        _SYNONYMS,
+    )
+
+    blob = json.dumps(
+        {
+            "errata": [_EXP_10_6, _EXP_10_4, _CTX_ARNR, _CTX_ARNT],
+            "grave": [[pat, msg] for pat, msg, *_ in _GRAVE_ERRORS],
+            "lex": _load_file(),
+            "numeric": _NUMERIC_RULES,
+            "syn": _SYNONYMS,
+        },
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    )
+    return hashlib.sha256(blob.encode("utf-8")).hexdigest()[:16]
+
+
 def canon_sha16(packed) -> str:
     """sha16 JSON canonique Rubric+Document. 0 copie élève, 0 user_id.
 
@@ -83,14 +120,15 @@ def canon_sha16(packed) -> str:
 
 
 def make_key(packed, answer: str) -> str:
-    """C1 + sha16 : rubric_id + doc_id + contenu. 0 user_id."""
+    """C1 + sha16 + filet_sha16. 0 user_id."""
     r = packed.rubric
     d = packed.document
     doc_id = d.doc_id if d is not None else "none"
     doc_ver = d.version if d is not None else "none"
     return (
         f"grade:{GRADER_VERSION}:{r.rubric_id}:{r.version}:"
-        f"{doc_id}:{doc_ver}:{r.verb_slug}:{canon_sha16(packed)}:{_digest(answer)}"
+        f"{doc_id}:{doc_ver}:{r.verb_slug}:{canon_sha16(packed)}:"
+        f"{filet_sha16()}:{_digest(answer)}"
     )
 
 
