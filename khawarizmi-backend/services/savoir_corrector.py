@@ -299,8 +299,10 @@ _GRAVE_ERRORS = [
 _NUMERIC_RULES = {
     "atp_resp":  {"patterns": [r"bilan.{0,20}atp", r"atp.{0,20}respir", r"atp.{0,20}تنفس"], "expected": 38},
     "atp_ferm":  {"patterns": [r"atp.{0,20}ferment", r"atp.{0,20}تخم"], "expected": 2},
-    "po_nadh":   {"patterns": [r"p/o.{0,15}nadh", r"nadh.{0,20}atp", r"p/o"], "expected": 3},
-    "po_fadh":   {"patterns": [r"p/o.{0,15}fadh", r"fadh.{0,20}atp"], "expected": 2},
+    # S26 : pas de `p/o` nu (FADH2=2 était capé comme NADH). Pas de `nadh…atp`
+    # (38 ATP à côté de NADH ≠ P/O).
+    "po_nadh":   {"patterns": [r"p/o.{0,15}nadh", r"nadh.{0,15}p/o"], "expected": 3},
+    "po_fadh":   {"patterns": [r"p/o.{0,15}fadh", r"fadh.{0,15}p/o"], "expected": 2},
 }
 
 # دليل الأستاذ ONPS 2007 p.25 — coquille livre 10⁶, vérité 10⁴.

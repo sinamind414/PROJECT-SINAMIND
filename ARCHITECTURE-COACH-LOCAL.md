@@ -1,7 +1,7 @@
 # Architecture cible — Coach local « comme le livre »
 
 **Date :** 2026-08-26 · **révisé** 2026-08-27 (C1 clé cache, contrat sanity, politique lexique, table d’état)  
-**Statut :** S0–S25 **implémentés** — `grade()` 1.1.5 + 10 L0 + `/api/grade` + adaptateurs + UI 2 axes + `caps_applied` visible (حشو 50 / science 40) + cache C1+sha16+filet_sha16 + `counter_examples` + caps hors méthode + defer consomme le quota + métriques. Flag `LOCAL_RUBRIC_GRADER` défaut `false` (**lu nulle part** — la route note déjà).  
+**Statut :** S0–S26 **implémentés** — `grade()` 1.1.5 + 10 L0 + `/api/grade` + adaptateurs + UI 2 axes + caps visibles + cache C1+sha16+filet_sha16 + P/O contextualisé (NADH 3 / FADH 2). Flag `LOCAL_RUBRIC_GRADER` défaut `false` (**lu nulle part**).  
 **S0 (T1–T3) :** **fait** (T1 UI PDF, T2 IDOR, T3 whitelist). Flag prod encore `false`. Voir table §14.1.  
 **Public :** revue humaine / audit par IA  
 **Produit :** Khawarizmi / IA Khawarizmi Pro — Bac SVT Algérie 3AS  
@@ -741,6 +741,7 @@ S5  mixins chapitre + $lex: extrait fichier  (condition de survie L1)
 | S23 filet_sha16 cache (B2) | **OUI** | clé + `filet_sha16` (graves, numériques, `$lex`, `_SYNONYMS`, errata). `model_answer` hors. 0 `user_id`. Hors `grade()`. `1.1.5` inchangé. |
 | S24 métriques `caps_applied` | **OUI** | `GET /api/grade/metrics` : compteurs `stuffing` / `science`. 0 copie. Hors `grade()`. `1.1.5` inchangé. |
 | S25 UI caps | **OUI** | `GradeResultCard` : سقف 50 · حشو / سقف 40. Écart منهج vs درجة expliqué. Hors `grade()`. `1.1.5` inchangé. |
+| S26 P/O contextualisé | **OUI** | plus de `p/o` nu ni `nadh…atp`. FADH2=2 n’est pas capé. 38 ATP juste, 36 cap. `filet_sha16` invalide le cache. `1.1.5` inchangé. |
 
 **Gates :**
 - S0 → S1 : G9, G10 verts (même sans grader) — **contourné volontairement** le 2026-08-27 : S1 = moteur **testable hors prod**, pas une mise en ligne. Le gate redevient bloquant le jour où `LOCAL_RUBRIC_GRADER=true`.

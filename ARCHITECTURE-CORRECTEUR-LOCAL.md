@@ -1,7 +1,7 @@
 # Architecture détaillée — Correcteur local Khawarizmi
 
 **Version moteur :** `GRADER_VERSION = 1.1.5`  
-**Statut :** **S0–S25.** `grade()` 0 LLM, `GRADER_VERSION=1.1.5`. Adaptateurs + G11 + hash + mixins/`$lex:` + v2/methodology/JS gelés. UI 2 axes + G12 + caps visibles. Drill/exercices copies → grade()/ungraded. Schéma dessiné = 0 auto. Observabilité `/api/grade/metrics` + `caps_applied`. Colonnes 035. Cache C1 + sha16 + filet_sha16 hors `grade()`. Chatbot copies gelées. Quota `ok` **ou** `defer` (S22). FSRS `may_write_fsrs`. `validate_rubrics` G5+négatifs. Sans grille → ungraded.  
+**Statut :** **S0–S26.** `grade()` 0 LLM, `GRADER_VERSION=1.1.5`. Adaptateurs + G11 + hash + mixins/`$lex:` + v2/methodology/JS gelés. UI 2 axes + caps visibles. P/O NADH 3 / FADH 2 (pas `p/o` nu). Cache C1 + sha16 + filet_sha16. Quota `ok` **ou** `defer`. Sans grille → ungraded.  
 **Promesse :** noter **méthode (Manhadjiya) + science (manuel / دليل)** sans mentir sur le %.  
 **Bannière élève :** `ملاحظة تدريبية — منهج + محتوى. ليست علامة بكالوريا رسمية.`
 
@@ -306,6 +306,7 @@ S22 defer consomme evaluate_limit (B4) ; G7 reste defer ; FSRS non ; 1.1.5 incha
 S23 filet_sha16 (Savoir+$lex) dans clé cache — B2 ; hors grade() ; 1.1.5 inchangé        ← FAIT
 S24 métriques caps_applied (stuffing/science) ; hors grade() ; 1.1.5 inchangé           ← FAIT
 S25 UI GradeResultCard : سقف 50 حشو / سقف 40 ; hors grade() ; 1.1.5 inchangé            ← FAIT
+S26 P/O contextualisé (FADH2=2 juste ; NADH P/O=2 cap) ; filet_sha16 ; 1.1.5            ← FAIT
 ```
 
 **Brancher S2 sans tuer le fallback front = deux notes. Interdit.**
