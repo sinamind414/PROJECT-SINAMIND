@@ -458,6 +458,10 @@ def _sqlite_extra_ddl() -> list[str]:
             occurrences INTEGER DEFAULT 0, scientific_terms_score REAL DEFAULT 0,
             clarity_score REAL DEFAULT 0, structure_score REAL DEFAULT 0,
             total_score REAL DEFAULT 0, answer TEXT,
+            rubric_version TEXT, grader_version TEXT,
+            grading_engine TEXT, science_status TEXT,
+            stuffing_suspected INTEGER DEFAULT 0, method_percent INTEGER DEFAULT 0,
+            order_ok INTEGER, diagnosis_code TEXT,
             created_at {ts}
         )""",
         f"""CREATE TABLE IF NOT EXISTS da_fsrs (

@@ -105,6 +105,7 @@ class CorrectionAnswer(BaseModel):
     percentage: int
     feedback: str = ""
     skipped: bool = False
+    ungraded: bool = False
 
 
 class CorrectionResponse(BaseModel):

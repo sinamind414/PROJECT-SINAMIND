@@ -16,6 +16,12 @@ import {
 import { CoachPanel } from "@/components/methodology/CoachPanel"
 import { MethodPracticeGate } from "@/components/methodology/MethodPracticeGate"
 import { SessionExitButton } from "@/components/methodology/SessionExitButton"
+import {
+  GradeResultCard,
+  TRAINING_BANNER_AR,
+  formatTrainingPercent,
+  methodologyToCard,
+} from "@/components/methodology/GradeResultCard"
 
 const VERB_LABELS: Record<string, string> = {
   analyse: "حلّل",
@@ -51,24 +57,6 @@ type ScenarioResult = {
   contract: DocumentScenarioOutcomeResult
 }
 
-function getSeverityLabel(percentage: number, labelAr?: string) {
-  if (labelAr) {
-    const color =
-      labelAr === "متقن" ? "text-emerald-300" :
-      labelAr === "مقبول" ? "text-blue-300" :
-      labelAr === "جزئي" ? "text-amber-300" : "text-red-300"
-    const bg =
-      labelAr === "متقن" ? "bg-emerald-500/10 border-emerald-500/20" :
-      labelAr === "مقبول" ? "bg-blue-500/10 border-blue-500/20" :
-      labelAr === "جزئي" ? "bg-amber-500/10 border-amber-500/20" : "bg-red-500/10 border-red-500/20"
-    return { label: labelAr, color, bg }
-  }
-  if (percentage >= 85) return { label: "متقن", color: "text-emerald-300", bg: "bg-emerald-500/10 border-emerald-500/20" }
-  if (percentage >= 70) return { label: "مقبول", color: "text-blue-300", bg: "bg-blue-500/10 border-blue-500/20" }
-  if (percentage >= 40) return { label: "جزئي", color: "text-amber-300", bg: "bg-amber-500/10 border-amber-500/20" }
-  return { label: "غير كاف", color: "text-red-300", bg: "bg-red-500/10 border-red-500/20" }
-}
-
 function ungradedEvaluation(verbSlug: string, banner?: string): MethodologyEvaluation {
   return {
     verbSlug,
@@ -80,11 +68,11 @@ function ungradedEvaluation(verbSlug: string, banner?: string): MethodologyEvalu
     missingMarkers: [],
     forbiddenMarkersFound: [],
     criteria: [],
-    advice: "تعذر التصحيح — ليست علامة بكالوريا رسمية.",
+    advice: banner || TRAINING_BANNER_AR,
     allowSecondAttempt: false,
     source: "ungraded",
     ungraded: true,
-    bannerAr: banner,
+    bannerAr: banner || TRAINING_BANNER_AR,
   }
 }
 
@@ -93,22 +81,13 @@ function CorrectionCard({
 }: {
   item: ScenarioResult["evaluations"][number]
 }) {
-  const status = getSeverityLabel(item.evaluation.percentage, item.evaluation.methodLabelAr)
-
   return (
     <div className="rounded-3xl p-5 bg-[#182730] border border-white/[0.06] space-y-4">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h3 className="text-white font-bold text-lg">{item.question.n}. تصحيح: {item.question.title}</h3>
-          <p className="text-gray-500 text-xs mt-1">المهارة: {item.question.skill} · السند: {item.question.docRef}</p>
-        </div>
-        <div className={`px-3 py-2 rounded-xl border ${status.bg}`}>
-          <p className={`text-sm font-bold ${status.color}`}>{status.label}</p>
-          <p className="text-white text-lg font-bold text-center">
-            {item.evaluation.ungraded ? "—" : `${item.evaluation.percentage}%`}
-          </p>
-        </div>
+      <div>
+        <h3 className="text-white font-bold text-lg">{item.question.n}. تصحيح: {item.question.title}</h3>
+        <p className="text-gray-500 text-xs mt-1">المهارة: {item.question.skill} · السند: {item.question.docRef}</p>
       </div>
+      <GradeResultCard model={methodologyToCard(item.evaluation)} />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div className="rounded-2xl p-4 bg-white/[0.03] border border-white/[0.05]">
@@ -119,36 +98,18 @@ function CorrectionCard({
             emptyLabel="إجابة فارغة"
           />
         </div>
-        <div className="rounded-2xl p-4 bg-emerald-500/10 border border-emerald-500/20">
-          <p className="text-emerald-300 text-xs font-bold mb-2">تصحيح نموذجي مرتبط بالوثائق</p>
-          <p className="text-gray-100 text-sm leading-relaxed whitespace-pre-wrap">{item.question.modelAnswer}</p>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <div>
-          <p className="text-emerald-300 font-bold text-sm mb-2">ما نجحت فيه</p>
-          {item.evaluation.success.length ? item.evaluation.success.map((s) => <p key={s} className="text-gray-300 text-sm">✓ {s}</p>) : <p className="text-gray-500 text-sm">لا توجد نقطة قوية واضحة في هذه الإجابة.</p>}
-        </div>
-        <div>
-          <p className="text-red-300 font-bold text-sm mb-2">lacunes / ما يجب إصلاحه</p>
-          {item.evaluation.errors.length ? item.evaluation.errors.map((e) => <p key={e} className="text-gray-300 text-sm">✗ {e}</p>) : <p className="text-gray-500 text-sm">لا توجد أخطاء منهجية واضحة.</p>}
-        </div>
-      </div>
-
-      {item.evaluation.criteria.length > 0 && (
-        <div>
-          <p className="text-mint-soft font-bold text-sm mb-2">تفصيل النقاط</p>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-            {item.evaluation.criteria.map((criterion) => (
-              <div key={criterion.code} className="flex items-center justify-between gap-3 rounded-xl bg-white/[0.03] px-3 py-2">
-                <span className="text-gray-300 text-xs">{criterion.passed ? "✓" : "✗"} {criterion.labelAr}</span>
-                <span className="text-white text-xs font-bold">{criterion.earned} / {criterion.points}</span>
-              </div>
-            ))}
+        {item.evaluation.ungraded ? (
+          <div className="rounded-2xl p-4 bg-amber-500/10 border border-amber-500/20">
+            <p className="text-amber-200 text-xs font-bold mb-2">لا تصحيح نموذجي</p>
+            <p className="text-gray-300 text-sm leading-relaxed">تعذر التصحيح — لا شبكة تقييم محلية لهذه السؤال.</p>
           </div>
-        </div>
-      )}
+        ) : (
+          <div className="rounded-2xl p-4 bg-emerald-500/10 border border-emerald-500/20">
+            <p className="text-emerald-300 text-xs font-bold mb-2">تصحيح نموذجي مرتبط بالوثائق</p>
+            <p className="text-gray-100 text-sm leading-relaxed whitespace-pre-wrap">{item.question.modelAnswer}</p>
+          </div>
+        )}
+      </div>
 
       {(item.evaluation.forbiddenMarkersFound.length > 0 || item.evaluation.missingMarkers.length > 0) && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
@@ -301,24 +262,31 @@ export function ScenarioRunner({
             allowSecondAttempt: g.overall_training_percent < 85,
             source: "local_rubric",
             methodLabelAr: g.method_label_ar,
+            methodPercent: g.method_percent,
             scienceStatus: g.science_status,
             scienceFlags: g.science_flags,
+            scienceCapped: g.science_capped,
+            orderOk: g.order_ok,
             bannerAr: g.banner_ar,
+            praiseAr: g.praise_ar,
+            nextStepAr: g.next_step_ar,
             dominantErrorCode: g.diagnosis?.code,
           }
           return { question, answer: answers[question.id] || "", evaluation }
         }),
       )
       const evaluations = graded
-
-      const readiness = Math.round(
-        evaluations.reduce((sum, item) => sum + item.evaluation.percentage, 0) / evaluations.length,
-      )
+      const gradedOnly = evaluations.filter((item) => !item.evaluation.ungraded)
+      const readiness = gradedOnly.length
+        ? Math.round(
+            gradedOnly.reduce((sum, item) => sum + item.evaluation.percentage, 0) / gradedOnly.length,
+          )
+        : 0
 
       const contract = applyDocumentScenarioOutcome({
         scenarioId: scenario.id,
         chapterSlug,
-        items: evaluations.map((item) => ({
+        items: gradedOnly.map((item) => ({
           verbSlug: item.question.verbSlug,
           percentage: item.evaluation.percentage,
           passed: item.evaluation.percentage >= 70,
@@ -326,16 +294,20 @@ export function ScenarioRunner({
       })
 
       setResult({ evaluations, readiness, contract })
-      setApiSource(evaluations.some((e) => e.evaluation.source === "local_rubric"))
-      saveMethodologyEvaluations(
-        evaluations.map((item) => ({
-          source: "document-analysis" as const,
-          verbSlug: item.question.verbSlug,
-          answer: item.answer,
-          evaluation: item.evaluation,
-        })),
-      )
-      setSaved(true)
+      setApiSource(gradedOnly.length > 0)
+      if (gradedOnly.length > 0) {
+        saveMethodologyEvaluations(
+          evaluations.map((item) => ({
+            source: "document-analysis" as const,
+            verbSlug: item.question.verbSlug,
+            answer: item.answer,
+            evaluation: item.evaluation,
+          })),
+        )
+        setSaved(true)
+      } else {
+        setSaved(false)
+      }
       // XP seulement si outcome honnête (pas de fausse maîtrise)
       setAward(contract.mayAwardXp ? awardXP("مهمة استغلال وثيقة", 60) : null)
     } catch {
@@ -351,11 +323,7 @@ export function ScenarioRunner({
         contract: applyDocumentScenarioOutcome({
           scenarioId: scenario.id,
           chapterSlug,
-          items: evaluations.map((item) => ({
-            verbSlug: item.question.verbSlug,
-            percentage: 0,
-            passed: false,
-          })),
+          items: [],
         }),
       })
       setSaved(false)
@@ -655,12 +623,18 @@ export function ScenarioRunner({
           )}
           {result && (
             <div className="rounded-3xl p-5 bg-[#182730] border border-white/[0.06] space-y-5">
-              <div className="flex items-center justify-between">
-                <h3 className="text-white font-bold">النتيجة الإجمالية</h3>
-                <span className="text-3xl font-bold text-white">{result.readiness}%</span>
+              <div className="flex items-center justify-between gap-3">
+                <h3 className="text-white font-bold">درجة التدريب</h3>
+                <span className="text-3xl font-bold text-white">
+                  {formatTrainingPercent(
+                    result.evaluations.every((item) => item.evaluation.ungraded),
+                    result.readiness,
+                  )}
+                </span>
               </div>
+              <p className="text-amber-200/80 text-[11px] leading-relaxed">{TRAINING_BANNER_AR}</p>
 
-              {/* Contrat Kunz — outcome honnête post-tentative */}
+              {!result.evaluations.every((item) => item.evaluation.ungraded) && (
               <div
                 className={`rounded-2xl border p-3 space-y-1 ${outcomeBannerClass(result.contract.outcome)}`}
               >
@@ -680,19 +654,17 @@ export function ScenarioRunner({
                     ? ` · ${result.contract.errorsCreated} خطأ مسجّل`
                     : ""}
                 </p>
-                {!result.contract.mayShowMasteryBadge && (
-                  <p className="text-[10px] opacity-70">
-                    لا شارة إتقان منهجية BAC (يتطلب تحدي BAC ناجح)
-                  </p>
-                )}
               </div>
+              )}
 
               {saved && (
                 <p className="text-emerald-300 text-xs font-bold">✓ تم تسجيل الأخطاء في التقدم</p>
               )}
               {saved && (
                 <p className={`text-xs ${apiSource ? "text-mint-soft" : "text-amber-300"}`}>
-                  {apiSource ? "✓ FSRS mis à jour (backend)" : "⚠ Évaluation locale (backend indisponible)"}
+                  {apiSource
+                    ? "✓ تصحيح محلي — منهج + محتوى"
+                    : "تعذر التصحيح — لا شبكة تقييم محلية."}
                 </p>
               )}
               {award && (
@@ -729,19 +701,16 @@ export function ScenarioRunner({
 
               <div className="space-y-2">
                 <p className="text-white font-bold mb-2">تفصيل سريع</p>
-                {result.evaluations.map((item) => {
-                  const status = getSeverityLabel(item.evaluation.percentage, item.evaluation.methodLabelAr)
-                  return (
+                {result.evaluations.map((item) => (
                     <a
                       key={item.question.id}
                       href={`#scenario-correction-${item.question.id}`}
                       className="rounded-xl bg-white/[0.03] p-3 flex items-center justify-between gap-3 hover:bg-white/[0.06] transition"
                     >
                       <span className="text-gray-300 text-xs">{item.question.title}</span>
-                      <span className={`text-sm font-bold ${status.color}`}>{item.evaluation.percentage}%</span>
+                      <GradeResultCard compact model={methodologyToCard(item.evaluation)} />
                     </a>
-                  )
-                })}
+                ))}
               </div>
             </div>
           )}

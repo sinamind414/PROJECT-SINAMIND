@@ -6,10 +6,24 @@
   "language": "ar",
   "total_points": 4.0,
   "document_id": "photo-o2",
-  "theme_variants": ["أكسجين", "الاكسجين", "o2", "ضوء", "تركيب ضوئي", "التركيب الضوئي", "$lex:oxygene", "$lex:lumieres"],
+  "theme_variants": [
+    "أكسجين",
+    "الاكسجين",
+    "o2",
+    "ضوء",
+    "تركيب ضوئي",
+    "التركيب الضوئي",
+    "$lex:oxygene",
+    "$lex:lumieres"
+  ],
   "theme_min_hits": 1,
   "method_graph": {
-    "steps": ["object", "keypoint", "relation", "conclusion"],
+    "steps": [
+      "object",
+      "keypoint",
+      "relation",
+      "conclusion"
+    ],
     "require_order": true
   },
   "criteria": [
@@ -32,7 +46,11 @@
       "label_ar": "علاقة كلما دون سببية",
       "points": 0.75,
       "check": "any_of",
-      "variants": ["كلما", "ثم يثبت", "يزداد ثم"],
+      "variants": [
+        "كلما",
+        "ثم يثبت",
+        "يزداد ثم"
+      ],
       "required": true
     },
     {
@@ -40,7 +58,13 @@
       "label_ar": "بدون لأن / هذا يدل",
       "points": 0.5,
       "check": "forbidden_abs",
-      "variants": ["لأن", "بسبب", "يفسر", "تفسير", "هذا يدل"],
+      "variants": [
+        "لأن",
+        "بسبب",
+        "يفسر",
+        "تفسير",
+        "هذا يدل"
+      ],
       "required": true
     },
     {
@@ -48,14 +72,22 @@
       "label_ar": "الضوء ضروري لانطلاق O2",
       "points": 1.0,
       "check": "any_of",
-      "variants": ["الضوء ضروري", "ينطلق الاكسجين", "انطلاق الأكسجين", "التركيب الضوئي"],
+      "variants": [
+        "الضوء ضروري",
+        "ينطلق الاكسجين",
+        "انطلاق الأكسجين",
+        "التركيب الضوئي"
+      ],
       "required": true
     }
   ],
   "distractors": [
     {
       "id": "yeast",
-      "variants": ["خميرة", "الخميرة"],
+      "variants": [
+        "خميرة",
+        "الخميرة"
+      ],
       "message_ar": "حشو: الخميرة ليست هذه الوثيقة"
     }
   ],
@@ -68,5 +100,21 @@
   },
   "model_answer": "تمثل الوثيقة منحنى تغيرات حجم الأكسجين بدلالة الزمن. ينطلق O2 حتى 6 مل ثم يثبت. كلما توفر الضوء ازداد حجم الأكسجين ثم يثبت. نستنتج أن الضوء ضروري لانطلاق الأكسجين.",
   "source": "teacher_authored",
-  "grader_min_version": "1.0.0"
+  "grader_min_version": "1.0.0",
+  "counter_examples": [
+    {
+      "id": "off_topic",
+      "text_ar": "تمثل الوثيقة منحنى تباعد الصفائح عند الأعراف المحيطية. كلما ابتعدت الصفيحة ازداد الخندق المحيطي. نستنتج غوص اللوح في الاندساس.",
+      "max_percent": 40,
+      "axis": "overall",
+      "why": "bonne langue, tectonique ≠ chapitre de la grille"
+    },
+    {
+      "id": "atp36",
+      "use": "model+atp36",
+      "max_percent": 40,
+      "axis": "overall",
+      "why": "36 ATP grave ONEC — cap overall 40"
+    }
+  ]
 }

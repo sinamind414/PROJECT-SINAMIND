@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import React, { useState, useRef, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
@@ -15,6 +15,7 @@ import {
 } from "@/lib/lesson/practiceOutcome"
 import { CoachPanel } from "@/components/methodology/CoachPanel"
 import { SessionExitButton } from "@/components/methodology/SessionExitButton"
+import { GradeResultCard, verbEvalToCard } from "@/components/methodology/GradeResultCard"
 
 type Step = "word" | "definition" | "recognition" | "method" | "dos_donts" | "practice"
 
@@ -269,7 +270,7 @@ export function VerbLessonFlow({
   }
 
   useEffect(() => {
-    if (evaluation && evaluation.percentage >= 75) {
+    if (evaluation && !evaluation.ungraded && evaluation.percentage >= 75) {
       setConfettiKey(prev => prev + 1)
       setShowConfetti(true)
       const timer = setTimeout(() => setShowConfetti(false), 2200)
@@ -538,23 +539,20 @@ export function VerbLessonFlow({
         )}
         {evaluation && (() => {
           const outcomeUi = describeVerbPracticeOutcome(Number(evaluation.percentage) || 0)
+          const ungraded = Boolean(evaluation.ungraded)
           return (
           <div className="mt-6 p-6 rounded-3xl glass border border-mint/20 relative overflow-visible">
-            {Number(evaluation.percentage) >= 70 && <ConfettiBurst keyProp={confettiKey} />}
-            <div className="flex justify-between items-baseline mb-4">
-              <div><span className="text-5xl font-black text-white">{evaluation.percentage}</span><span className="text-2xl text-gray-400">%</span></div>
-              <div className="text-right text-sm"><div className="text-emerald-400 font-bold">{evaluation.score}/{evaluation.score_max}</div></div>
-            </div>
-            <div className={`mb-4 rounded-2xl border p-3 ${outcomeBannerClass(outcomeUi.outcome)}`}>
+            {!ungraded && Number(evaluation.percentage) >= 70 && <ConfettiBurst keyProp={confettiKey} />}
+            <GradeResultCard model={verbEvalToCard(evaluation)} />
+            {!ungraded && (
+            <div className={`mb-4 mt-4 rounded-2xl border p-3 ${outcomeBannerClass(outcomeUi.outcome)}`}>
               <p className="text-[10px] font-black uppercase opacity-70">Outcome · {outcomeUi.outcome}</p>
               <p className="text-sm font-bold mt-0.5">{outcomeUi.labelAr}</p>
               <p className="text-[11px] opacity-70 mt-0.5" dir="ltr">{outcomeUi.labelFr}</p>
-              {!outcomeUi.mayShowMasteryBadge && (
-                <p className="text-[10px] opacity-70 mt-1">لا شارة إتقان منهجية BAC على تدريب الفعل وحده</p>
-              )}
             </div>
-            {renderVisualFeedback()}
-            {evaluation.advice && <div className="text-mint text-sm mt-4 bg-mint/10 p-3 rounded-2xl">💡 {evaluation.advice}</div>}
+            )}
+            {!ungraded && renderVisualFeedback()}
+            {!ungraded && (
             <div className="mt-4">
               <CoachPanel
                 outcome={outcomeUi.outcome}
@@ -571,6 +569,7 @@ export function VerbLessonFlow({
                 onlyIfFailed
               />
             </div>
+            )}
             <button onClick={speakModelAnswer} className="mt-4 w-full flex items-center justify-center gap-2 py-3 text-sm font-semibold border border-mint/30 bg-mint/10 hover:bg-mint/20 text-mint rounded-2xl transition">
               🔊 استمع إلى الإجابة النموذجية
             </button>

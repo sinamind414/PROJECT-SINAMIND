@@ -15,6 +15,12 @@ import {
   type DocumentScenarioOutcomeResult,
 } from "@/lib/lesson/practiceOutcome"
 import { CoachPanel } from "@/components/methodology/CoachPanel"
+import {
+  GradeResultCard,
+  TRAINING_BANNER_AR,
+  formatTrainingPercent,
+  methodologyToCard,
+} from "@/components/methodology/GradeResultCard"
 
 const QUESTIONS = diagnosticScenario.questions
 
@@ -33,17 +39,12 @@ type DiagnosticResult = {
   contract: DocumentScenarioOutcomeResult
 }
 
-function getSeverityLabel(percentage: number) {
-  if (percentage >= 85) return { label: "متقن", color: "text-emerald-300", bg: "bg-emerald-500/10 border-emerald-500/20" }
-  if (percentage >= 70) return { label: "مقبول", color: "text-mint", bg: "bg-mint/10 border-mint/20" }
-  if (percentage >= 50) return { label: "متوسط", color: "text-amber-300", bg: "bg-amber-500/10 border-amber-500/20" }
-  return { label: "ضعيف", color: "text-red-300", bg: "bg-red-500/10 border-red-500/20" }
-}
+
 
 function buildPriorityFixes(evaluations: DiagnosticResult["evaluations"]) {
   const fixes: string[] = []
   evaluations.forEach((item) => {
-    if (item.evaluation.percentage >= 75) return
+    if (item.evaluation.ungraded || item.evaluation.percentage >= 75) return
     if (item.question.verbSlug === "analyse") fixes.push("تدرّب على تحليل وثيقة دون استعمال لأن/بسبب، مع ذكر القيم العددية.")
     if (item.question.verbSlug === "interpret") fixes.push("اربط كل تفسير بملاحظة ثم بسبب علمي واضح من الوثيقة والدرس.")
     if (item.question.verbSlug === "deduce") fixes.push("اكتب الاستنتاج في جملة واحدة تبدأ بـ نستنتج أن.")
@@ -64,11 +65,11 @@ function ungradedEvaluation(verbSlug: string, banner?: string): MethodologyEvalu
     missingMarkers: [],
     forbiddenMarkersFound: [],
     criteria: [],
-    advice: banner || "تعذر التصحيح — ليست علامة بكالوريا رسمية.",
+    advice: banner || TRAINING_BANNER_AR,
     allowSecondAttempt: false,
     source: "ungraded",
     ungraded: true,
-    bannerAr: banner,
+    bannerAr: banner || TRAINING_BANNER_AR,
   }
 }
 
@@ -97,9 +98,14 @@ function gradeToEvaluation(
     allowSecondAttempt: g.overall_training_percent < 85,
     source: "local_rubric",
     methodLabelAr: g.method_label_ar,
+    methodPercent: g.method_percent,
     scienceStatus: g.science_status,
     scienceFlags: g.science_flags,
+    scienceCapped: g.science_capped,
+    orderOk: g.order_ok,
     bannerAr: g.banner_ar,
+    praiseAr: g.praise_ar,
+    nextStepAr: g.next_step_ar,
     dominantErrorCode: g.diagnosis?.code,
   }
 }
@@ -125,7 +131,7 @@ function assembleDiagnostic(evaluations: DiagnosticResult["evaluations"]): Diagn
 
   const contract = applyDocumentScenarioOutcome({
     scenarioId: diagnosticScenario.id || "diagnostic-global",
-    items: evaluations.map((item) => ({
+    items: gradedOnly.map((item) => ({
       verbSlug: item.question.verbSlug,
       percentage: item.evaluation.percentage,
       passed: item.evaluation.percentage >= 70,
@@ -145,32 +151,30 @@ function assembleDiagnostic(evaluations: DiagnosticResult["evaluations"]): Diagn
 }
 
 function CorrectionCard({ item }: { item: DiagnosticResult["evaluations"][number] }) {
-  const status = getSeverityLabel(item.evaluation.percentage)
-
   return (
     <div className="rounded-3xl p-5 glass border border-mint/10 space-y-4">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h3 className="text-white font-bold text-lg">{item.question.n}. تصحيح: {item.question.title}</h3>
-          <p className="text-gray-500 text-xs mt-1">المهارة: {item.question.skill} · السند: {item.question.docRef}</p>
-        </div>
-        <div className={`px-3 py-2 rounded-xl border ${status.bg}`}>
-          <p className={`text-sm font-bold ${status.color}`}>{status.label}</p>
-          <p className="text-white text-lg font-bold text-center">
-            {item.evaluation.ungraded ? "—" : `${item.evaluation.percentage}%`}
-          </p>
-        </div>
+      <div>
+        <h3 className="text-white font-bold text-lg">{item.question.n}. تصحيح: {item.question.title}</h3>
+        <p className="text-gray-500 text-xs mt-1">المهارة: {item.question.skill} · السند: {item.question.docRef}</p>
       </div>
+      <GradeResultCard model={methodologyToCard(item.evaluation)} />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div className="rounded-2xl p-4 bg-white/[0.03] border border-white/[0.05]">
           <p className="text-gray-400 text-xs font-bold mb-2">إجابتك</p>
           <p className="text-gray-200 text-sm leading-relaxed whitespace-pre-wrap">{item.answer || "إجابة فارغة"}</p>
         </div>
+        {item.evaluation.ungraded ? (
+          <div className="rounded-2xl p-4 bg-amber-500/10 border border-amber-500/20">
+            <p className="text-amber-200 text-xs font-bold mb-2">لا تصحيح نموذجي</p>
+            <p className="text-gray-300 text-sm">تعذر التصحيح — لا شبكة تقييم محلية لهذه السؤال.</p>
+          </div>
+        ) : (
         <div className="rounded-2xl p-4 bg-emerald-500/10 border border-emerald-500/20">
           <p className="text-emerald-300 text-xs font-bold mb-2">تصحيح نموذجي مرتبط بالوثائق</p>
           <p className="text-gray-100 text-sm leading-relaxed whitespace-pre-wrap">{item.question.modelAnswer}</p>
         </div>
+        )}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -369,11 +373,15 @@ export default function DiagnosticGlobalPage() {
                 {result ? (
                   <div className="rounded-3xl p-5 glass border border-mint/10 space-y-5">
                     <div className="flex items-center justify-between">
-                      <h3 className="text-white font-bold">نتيجة التشخيص</h3>
+                      <h3 className="text-white font-bold">درجة التدريب</h3>
                       <span className="text-3xl font-bold text-white">
-                        {result.evaluations.every((item) => item.evaluation.ungraded) ? "—" : `${result.readiness}%`}
+                        {formatTrainingPercent(
+                          result.evaluations.every((item) => item.evaluation.ungraded),
+                          result.readiness,
+                        )}
                       </span>
                     </div>
+                    <p className="text-amber-200/80 text-[11px] leading-relaxed">{TRAINING_BANNER_AR}</p>
                     <div className={`rounded-2xl border p-3 ${outcomeBannerClass(result.contract.outcome)}`}>
                       <p className="text-[10px] font-black uppercase opacity-70">
                         Outcome · {result.contract.outcome}

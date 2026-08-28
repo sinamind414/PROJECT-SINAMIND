@@ -16,6 +16,7 @@ import type { VerbEvaluateResponse, ActionVerbExercise } from "@/lib/types"
 import { VerbLessonFlow } from "@/components/methodology/VerbLessonFlow"
 import { applyVerbPracticeOutcome } from "@/lib/lesson/practiceOutcome"
 import { canScheduleRecallForVerb } from "@/lib/lesson/evidenceService"
+import { GradeResultCard, verbEvalToCard } from "@/components/methodology/GradeResultCard"
 
 export default function ActionVerbDetailPage() {
   const params = useParams()
@@ -416,17 +417,10 @@ export default function ActionVerbDetailPage() {
 
                   {evaluation && (
                     <div className="mt-5 space-y-4">
-                      <div className="flex items-center gap-4">
-                        <div className={`text-4xl font-bold ${evaluation.ungraded ? "text-amber-300" : evaluation.percentage >= 75 ? "text-emerald-400" : evaluation.percentage >= 50 ? "text-amber-400" : "text-red-400"}`}>
-                          {evaluation.ungraded ? "—" : `${evaluation.percentage}%`}
-                        </div>
-                        <div>
-                          <p className="text-white font-bold">{evaluation.score}/{evaluation.score_max} نقطة</p>
-                          {evaluation.allow_second_attempt && (
-                            <p className="text-amber-400 text-xs">يمكنك إعادة المحاولة</p>
-                          )}
-                        </div>
-                      </div>
+                      <GradeResultCard model={verbEvalToCard(evaluation)} />
+                      {!evaluation.ungraded && evaluation.allow_second_attempt && (
+                        <p className="text-amber-400 text-xs">يمكنك إعادة المحاولة</p>
+                      )}
 
                       {evaluation.success.length > 0 && (
                         <div className="space-y-1">

@@ -6,10 +6,23 @@
   "language": "ar",
   "total_points": 4.0,
   "document_id": "greffe-ltc",
-  "theme_variants": ["طعم", "الطعم", "رفض", "LTc", "ltc", "لمفاوية", "طعم جلدي"],
+  "theme_variants": [
+    "طعم",
+    "الطعم",
+    "رفض",
+    "LTc",
+    "ltc",
+    "لمفاوية",
+    "طعم جلدي"
+  ],
   "theme_min_hits": 1,
   "method_graph": {
-    "steps": ["object", "keypoint", "relation", "conclusion"],
+    "steps": [
+      "object",
+      "keypoint",
+      "relation",
+      "conclusion"
+    ],
     "require_order": true
   },
   "criteria": [
@@ -32,7 +45,12 @@
       "label_ar": "علاقة كلما دون سببية",
       "points": 0.75,
       "check": "any_of",
-      "variants": ["كلما", "علاقة طردية", "أسرع من", "أبكر"],
+      "variants": [
+        "كلما",
+        "علاقة طردية",
+        "أسرع من",
+        "أبكر"
+      ],
       "required": true
     },
     {
@@ -40,7 +58,13 @@
       "label_ar": "بدون لأن / هذا يدل",
       "points": 0.5,
       "check": "forbidden_abs",
-      "variants": ["لأن", "بسبب", "يفسر", "تفسير", "هذا يدل"],
+      "variants": [
+        "لأن",
+        "بسبب",
+        "يفسر",
+        "تفسير",
+        "هذا يدل"
+      ],
       "required": true
     },
     {
@@ -48,14 +72,24 @@
       "label_ar": "الرفض الثاني أسرع / الذروة أبكر وأعلى",
       "points": 1.0,
       "check": "any_of",
-      "variants": ["الرفض الثاني أسرع", "رفض أسرع", "أبكر وأعلى", "تسارع الرفض", "الذروة أبكر"],
+      "variants": [
+        "الرفض الثاني أسرع",
+        "رفض أسرع",
+        "أبكر وأعلى",
+        "تسارع الرفض",
+        "الذروة أبكر"
+      ],
       "required": true
     }
   ],
   "distractors": [
     {
       "id": "anticorps",
-      "variants": ["أجسام مضادة", "الأجسام المضادة", "استجابة خلطية"],
+      "variants": [
+        "أجسام مضادة",
+        "الأجسام المضادة",
+        "استجابة خلطية"
+      ],
       "message_ar": "الوثيقتان فيهما LTc لا أجسام مضادة"
     }
   ],
@@ -73,5 +107,21 @@
   },
   "model_answer": "تمثل الوثيقة جدولا ومنحنى لتغيرات رفض الطعم وعدد LTc. يُرفض الطعم الأول في 10 أيام بذروة 2,5 بينما يُرفض الطعم الثاني في 5 أيام بذروة 4,8. كلما تكرر تماس نفس المعطي كان الرفض أسرع والذروة أعلى. نستنتج تسارع الرفض الثاني.",
   "source": "teacher_authored",
-  "grader_min_version": "1.0.0"
+  "grader_min_version": "1.0.0",
+  "counter_examples": [
+    {
+      "id": "off_topic",
+      "text_ar": "تمثل الوثيقة منحنى تباعد الصفائح عند الأعراف المحيطية. كلما ابتعدت الصفيحة ازداد الخندق المحيطي. نستنتج غوص اللوح في الاندساس.",
+      "max_percent": 40,
+      "axis": "overall",
+      "why": "bonne langue, tectonique ≠ chapitre de la grille"
+    },
+    {
+      "id": "atp36",
+      "use": "model+atp36",
+      "max_percent": 40,
+      "axis": "overall",
+      "why": "36 ATP grave ONEC — cap overall 40"
+    }
+  ]
 }

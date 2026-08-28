@@ -6,10 +6,21 @@
   "language": "ar",
   "total_points": 4.0,
   "document_id": "yeast-glucose-curve",
-  "theme_variants": ["خميرة", "غلوكوز", "الغلوكوز", "تكاثر", "$lex:glucose"],
+  "theme_variants": [
+    "خميرة",
+    "غلوكوز",
+    "الغلوكوز",
+    "تكاثر",
+    "$lex:glucose"
+  ],
   "theme_min_hits": 1,
   "method_graph": {
-    "steps": ["rappel", "cause", "cours", "conclusion"],
+    "steps": [
+      "rappel",
+      "cause",
+      "cours",
+      "conclusion"
+    ],
     "require_order": true
   },
   "criteria": [
@@ -25,7 +36,12 @@
       "label_ar": "لأن / يرجع",
       "points": 1.0,
       "check": "any_of",
-      "variants": ["لأن", "راجع", "يرجع", "بسبب"],
+      "variants": [
+        "لأن",
+        "راجع",
+        "يرجع",
+        "بسبب"
+      ],
       "required": true
     },
     {
@@ -33,7 +49,14 @@
       "label_ar": "الغلوكوز مادة أيض / طاقة",
       "points": 1.0,
       "check": "any_of",
-      "variants": ["مادة أيض", "مادة الايض", "طاقة", "تنفس", "تخمر", "أيض"],
+      "variants": [
+        "مادة أيض",
+        "مادة الايض",
+        "طاقة",
+        "تنفس",
+        "تخمر",
+        "أيض"
+      ],
       "required": true
     },
     {
@@ -41,14 +64,22 @@
       "label_ar": "النمو مرتبط بتوفر الغلوكوز",
       "points": 1.0,
       "check": "any_of",
-      "variants": ["نمو", "تكاثر", "يزداد العدد", "تتكاثر"],
+      "variants": [
+        "نمو",
+        "تكاثر",
+        "يزداد العدد",
+        "تتكاثر"
+      ],
       "required": true
     }
   ],
   "distractors": [
     {
       "id": "photosynth",
-      "variants": ["تركيب ضوئي", "صانعة"],
+      "variants": [
+        "تركيب ضوئي",
+        "صانعة"
+      ],
       "message_ar": "الخميرة لا تقوم بالتركيب الضوئي هنا"
     }
   ],
@@ -61,5 +92,21 @@
   },
   "model_answer": "يبلغ عدد الخلايا 18 مع الغلوكوز مقابل 6 بدونه لأن الغلوكوز مادة أيض توفر طاقة للتنفس فتتكاثر الخميرة. لذلك يرتبط النمو بتوفر الغلوكوز.",
   "source": "teacher_authored",
-  "grader_min_version": "1.0.0"
+  "grader_min_version": "1.0.0",
+  "counter_examples": [
+    {
+      "id": "off_topic",
+      "text_ar": "تمثل الوثيقة منحنى تباعد الصفائح عند الأعراف المحيطية. كلما ابتعدت الصفيحة ازداد الخندق المحيطي. نستنتج غوص اللوح في الاندساس.",
+      "max_percent": 40,
+      "axis": "overall",
+      "why": "bonne langue, tectonique ≠ chapitre de la grille"
+    },
+    {
+      "id": "atp36",
+      "use": "model+atp36",
+      "max_percent": 40,
+      "axis": "overall",
+      "why": "36 ATP grave ONEC — cap overall 40"
+    }
+  ]
 }

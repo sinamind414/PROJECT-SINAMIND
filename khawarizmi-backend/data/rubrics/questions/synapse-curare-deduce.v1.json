@@ -6,10 +6,23 @@
   "language": "ar",
   "total_points": 3.0,
   "document_id": "synapse-curare",
-  "theme_variants": ["كورار", "مشبك", "أستيل كولين", "استيل كولين", "Ach", "ach", "$lex:ach", "$lex:synapse"],
+  "theme_variants": [
+    "كورار",
+    "مشبك",
+    "أستيل كولين",
+    "استيل كولين",
+    "Ach",
+    "ach",
+    "$lex:ach",
+    "$lex:synapse"
+  ],
   "theme_min_hits": 1,
   "method_graph": {
-    "steps": ["connector", "content", "evidence"],
+    "steps": [
+      "connector",
+      "content",
+      "evidence"
+    ],
     "require_order": true
   },
   "criteria": [
@@ -18,7 +31,12 @@
       "label_ar": "أداة استنتاج",
       "points": 0.75,
       "check": "any_of",
-      "variants": ["نستنتج", "ومنه", "إذن", "استنتاج"],
+      "variants": [
+        "نستنتج",
+        "ومنه",
+        "إذن",
+        "استنتاج"
+      ],
       "required": true
     },
     {
@@ -42,7 +60,13 @@
       "label_ar": "يمنع انتقال الرسالة",
       "points": 0.75,
       "check": "any_of",
-      "variants": ["تنعدم الاستجابة", "لا تنتقل", "يمنع", "انعدام كمون", "لا كمون"],
+      "variants": [
+        "تنعدم الاستجابة",
+        "لا تنتقل",
+        "يمنع",
+        "انعدام كمون",
+        "لا كمون"
+      ],
       "required": true
     }
   ],
@@ -56,5 +80,21 @@
   },
   "model_answer": "ومنه نستنتج أن مادة الكورار تثبت على المستقبلات الغشائية النوعية للأستيل كولين في الخلية بعد المشبكية فتحتل مكان الوسيط وتمنع ارتباطه، فتنعدم الاستجابة ولا تنتقل الرسالة العصبية.",
   "source": "teacher_authored",
-  "grader_min_version": "1.0.0"
+  "grader_min_version": "1.0.0",
+  "counter_examples": [
+    {
+      "id": "off_topic",
+      "text_ar": "تمثل الوثيقة منحنى تباعد الصفائح عند الأعراف المحيطية. كلما ابتعدت الصفيحة ازداد الخندق المحيطي. نستنتج غوص اللوح في الاندساس.",
+      "max_percent": 40,
+      "axis": "overall",
+      "why": "bonne langue, tectonique ≠ chapitre de la grille"
+    },
+    {
+      "id": "atp36",
+      "use": "model+atp36",
+      "max_percent": 40,
+      "axis": "overall",
+      "why": "36 ATP grave ONEC — cap overall 40"
+    }
+  ]
 }

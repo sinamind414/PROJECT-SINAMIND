@@ -1,132 +1,73 @@
-import logging
-from datetime import UTC, datetime
+"""S11 — plus de GPT/L2 ici. grade() ou ungraded. Route /api/ai/evaluate hors registre."""
 
-from sqlalchemy import text as sa_text
+from __future__ import annotations
+
+import logging
+
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from services.fsrs_graph import QuestionConceptMapping, update_concept_graph
-from services.fsrs_persistence import get_concept_states, save_concept_updates
-from services.questions import get_question
+from services.grade_adapter import (
+    UNGRADED_AR,
+    grade_or_none,
+    may_write_fsrs,
+    resolve_question_id,
+    to_verb_eval,
+)
+from services.local_grader import TRAINING_BANNER_AR
 
 logger = logging.getLogger("khawarizmi.evaluation_mode")
 
 
 async def handle_evaluation(req, user: dict, db: AsyncSession, openai_client):
-    # NOTE : route /api/ai/evaluate — moteur LEGACY (score/10, seuils 0.85/0.35).
-    # Le correcteur actif est evaluate_answer_v2 (via /api/document-analysis/evaluate-v2).
-    # Route non appelée par le frontend actuel ; conservée pour compatibilité API.
-    from routes.evaluate import evaluate_with_fallback, normalize_result
-
-    user_id = user["id"]
-    question = get_question(req.question_id)
-    if not question:
-        from fastapi import HTTPException
-        raise HTTPException(404, f"Question {req.question_id} introuvable")
-
-    eval_result = await evaluate_with_fallback(question, req, openai_client, user_id, db)
-
-    next_review_date = None
-
-    if eval_result["source"] in ("GPT4O", "FALLBACK_L2"):
-        res = await db.execute(
-            sa_text("""
-                SELECT micro_concept AS concept_id, weight
-                FROM question_concept_map
-                WHERE question_id = :qid
-            """),
-            {"qid": req.question_id},
+    """0 LLM. ENABLE_EXTERNAL_LLM ignoré. Sans Rubric L0 → ungraded."""
+    _ = openai_client
+    qid = resolve_question_id(getattr(req, "question_id", None))
+    answer = getattr(req, "reponse_eleve", "") or ""
+    graded = grade_or_none(qid, answer)
+    if graded is None:
+        logger.info(
+            "eval_mode ungraded | user=%s q=%s",
+            user.get("id"),
+            getattr(req, "question_id", None),
         )
-        rows = res.fetchall()
+        return {
+            "mode": "evaluation",
+            "score": 0,
+            "statut": "ungraded",
+            "feedback": f"{UNGRADED_AR} {TRAINING_BANNER_AR}",
+            "manquant": [],
+            "next_review_date": None,
+            "source": "ungraded",
+            "ungraded": True,
+            "banner_ar": TRAINING_BANNER_AR,
+            "methodology": None,
+        }
 
-        if not rows:
-            concept_cle = question.get("concept_cle", "concept_general")
-            concepts_dict = {concept_cle: 1.0}
-        else:
-            concepts_dict = {r[0]: r[1] for r in rows}
+    mapped = to_verb_eval(graded)
+    if may_write_fsrs(graded):
+        from services.fsrs_unified import update_memory
 
-        from services.fsrs_graph import load_concept_graph
-
-        concept_ids = list(concepts_dict.keys())
-        concept_graph = await load_concept_graph(db)
-
-        for c_id in list(concept_ids):
-            for prereq in concept_graph.get(c_id, []):
-                if prereq not in concept_ids:
-                    concept_ids.append(prereq)
-            for dep, prereqs in concept_graph.items():
-                if c_id in prereqs and dep not in concept_ids:
-                    concept_ids.append(dep)
-
-        concept_states = await get_concept_states(db, user_id, concept_ids)
-
-        res_cfg = await db.execute(
-            sa_text("SELECT fsrs_config FROM users WHERE id = :uid"),
-            {"uid": user_id},
-        )
-        cfg_row = res_cfg.fetchone()
-        user_fsrs_config = cfg_row[0] if cfg_row else None
-
-        mapping = QuestionConceptMapping(question_id=req.question_id, concepts=concepts_dict)
-        updates = update_concept_graph(
-            user_id=user_id,
-            question_id=req.question_id,
-            evaluation_result=eval_result,
-            mapping=mapping,
-            concept_states=concept_states,
-            now=datetime.now(UTC),
-            user_fsrs_config=user_fsrs_config,
-            graph=concept_graph,
-        )
-
-        next_review_date = await save_concept_updates(db, user_id, question, updates, eval_result)
-
-        if eval_result.get("needs_l1_review"):
-            from services.reconciliation_queue import PendingReview, enque_for_l1_review
-            await enque_for_l1_review(PendingReview(
-                student_id=str(user_id),
-                question_id=req.question_id,
-                answer=req.reponse_eleve,
-                l2_score=float(eval_result["score"]) / 10.0,
-                session_id="",
-                timestamp=datetime.now(UTC),
-            ))
-
-    else:
-        # S3b : pending tag via le service FSRS unifié (même upsert qu'avant)
-        from services.fsrs_unified import tag_pending_concept
-
-        await tag_pending_concept(
-            db, user_id, req.question_id,
-            chapter=question.get("chapitre_id", "ch_inconnu"),
+        await update_memory(
+            db,
+            user["id"],
+            "verb_chapter",
+            item_id=str(qid),
+            last_score=mapped["percentage"],
+            attempts_delta=1,
         )
         await db.commit()
 
-    eval_result = normalize_result(eval_result)
-
-    if req.lang == "ar":
-        from services.feedback_translator import translate_feedback
-        eval_result["feedback"] = translate_feedback(eval_result.get("feedback", ""))
-
-    methodology_result = None
-    if req.include_methodology:
-        try:
-            from methodology.evaluator import evaluate_methodology
-            question_texte = question.get("texte", "") or question.get("texte_ar", "")
-            methodo = await evaluate_methodology(
-                instruction=question_texte,
-                student_answer=req.reponse_eleve,
-            )
-            methodology_result = methodo
-        except Exception as e:
-            logger.warning(f"Methodology skipped: {e}")
-
     return {
         "mode": "evaluation",
-        "score": eval_result["score"],
-        "statut": eval_result["statut"],
-        "feedback": eval_result["feedback"],
-        "manquant": eval_result["manquant"],
-        "next_review_date": next_review_date,
-        "source": eval_result["source"],
-        "methodology": methodology_result,
+        "score": mapped["percentage"],
+        "statut": mapped["method_label_ar"],
+        "feedback": mapped["advice"],
+        "manquant": [],
+        "next_review_date": None,
+        "source": "local_rubric",
+        "ungraded": False,
+        "banner_ar": TRAINING_BANNER_AR,
+        "methodology": None,
+        "method_percent": mapped["method_percent"],
+        "science_status": mapped["science_status"],
     }

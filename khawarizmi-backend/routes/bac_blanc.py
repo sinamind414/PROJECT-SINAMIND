@@ -456,6 +456,11 @@ async def get_correction(
     for ex in exercises_data:
         ex_id = ex["exercise_id"]
         ans = answers_map.get(ex_id, {})
+        feedback = ans.get("feedback", "") or ""
+        is_ungraded = UNGRADED_AR in feedback
+        score_max = ex.get("points", 5)
+        score = ans.get("score", 0) or 0
+        percentage = 0 if is_ungraded else round((score / max(score_max, 1)) * 100)
         corrections.append(
             CorrectionAnswer(
                 exercise_id=ex_id,
@@ -463,12 +468,13 @@ async def get_correction(
                 title_ar=ex["title_ar"],
                 verb_slug=ex.get("verb_slug", ""),
                 student_answer="",
-                model_answer=ex.get("model_answer_ar", ""),
-                score=ans.get("score", 0),
-                score_max=ex.get("points", 5),
-                percentage=round((ans.get("score", 0) / max(ex.get("points", 5), 1)) * 100),
-                feedback=ans.get("feedback", ""),
+                model_answer="" if is_ungraded else ex.get("model_answer_ar", ""),
+                score=score,
+                score_max=score_max,
+                percentage=percentage,
+                feedback=feedback,
                 skipped=ans.get("skipped", False),
+                ungraded=is_ungraded,
             )
         )
 

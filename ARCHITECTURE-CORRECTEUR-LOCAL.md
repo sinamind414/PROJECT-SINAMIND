@@ -1,7 +1,7 @@
 # Architecture détaillée — Correcteur local Khawarizmi
 
 **Version moteur :** `GRADER_VERSION = 1.1.4`  
-**Statut :** **S1–S5.** `grade()` 0 LLM. Adaptateurs + G11 + hash + mixins/`$lex:` fichier. Sans grille → 422 ungraded. Flag `LOCAL_RUBRIC_GRADER` encore `false` (la route ne le gate pas).  
+**Statut :** **S0–S20.** `grade()` 0 LLM, `GRADER_VERSION=1.1.4`. Adaptateurs + G11 + hash + mixins/`$lex:` + v2/methodology/JS gelés. UI 2 axes + G12. Drill/exercices copies → grade()/ungraded. Schéma dessiné = 0 auto. Observabilité `/api/grade/metrics`. Colonnes 035. Cache C1 + sha16 hors `grade()`. Chatbot copies gelées. Quota sanity==ok. FSRS `may_write_fsrs`. `validate_rubrics` G5+négatifs. Sans grille → ungraded.  
 **Promesse :** noter **méthode (Manhadjiya) + science (manuel / دليل)** sans mentir sur le %.  
 **Bannière élève :** `ملاحظة تدريبية — منهج + محتوى. ليست علامة بكالوريا رسمية.`
 
@@ -27,9 +27,8 @@
 
 ```
 S3 (as-built)
-  ScenarioRunner / diagnostic/global / verb / bac / DA v1  → grade()
-  Sans Rubric → 422 ungraded (jamais VERB_RULES / JS)
-  document_analysis_v2 (L2) encore monté si on l’appelle — hors ScenarioRunner
+  ScenarioRunner / diagnostic/global / verb / bac / DA v1 / evaluate-v2  → grade()
+  Sans Rubric → 422 ungraded (jamais VERB_RULES / JS / L2 / LLM)
   evaluateMethodologyAnswer() mort sur les pages note (fichier encore là)
 
 CORRECTEUR
@@ -241,7 +240,7 @@ sanity.*  >  off_topic  >  science.grave  >  verb_slip.*
 | `proteine-adn-scientific-text` | نص | intro / نسخ / ترجمة / خاتمة | 5 |
 
 Invariant load : `sum(criteria.points) == total_points`.  
-`validate_rubrics.py` : copie `model_answer` → method **≥ 85 %** sinon merge refusé.
+`validate_rubrics.py` : `model_answer` ≥ 85 % **et** hors-sujet / 36 ATP overall ≤ 40, vide = 0, **et** ≥2 `counter_examples` (dont `off_topic`) — sinon merge refusé. Jamais exposés par GET.
 
 ---
 
@@ -287,6 +286,21 @@ S2  POST /api/grade + ScenarioRunner only + tuer JS   ← FAIT (1.1.4). 422 ungr
 S3  verb + bac_blanc + DA v1 → grade() ; mort VERB_RULES / جاهز / JS diagnostic  ← FAIT
 S4  GET /correction G11 + hash persist + FSRS science/<10                       ← FAIT
 S5  mixins chapitre au load + $lex: fichier git                                 ← FAIT
+S6  evaluate-v2 gelé → grade() (0 L2 / 0 LLM)                                   ← FAIT
+S7  POST /api/evaluate/methodology gelé → grade()/ungraded                      ← FAIT
+S8  JS evaluateMethodologyAnswer = ungraded ; evaluate.py hors registre ; 1.1.4 ← FAIT
+S9  UI 2 axes (منهج / محتوى) + درجة التدريب + G12 ; ungraded = — pas 0 %     ← FAIT
+S10 drill/submit + exercices/correct → grade()/ungraded (QCM local intact)   ← FAIT
+S11 schéma Vision gelé (0 auto) ; evaluation_mode → grade()/ungraded         ← FAIT
+S12 observabilité §7.1 GET /api/grade/metrics (0 copie, cache_hits=0)        ← FAIT
+S13 colonnes 035 da_answers (engine/science/method_percent/diagnosis)        ← FAIT
+S14 cache C1 hors grade() (rubric_id+doc_id, 0 user_id, TTL 7 j, sanity=ok) ← FAIT
+S15 chatbot explain-back + boss-fight → ungraded (0 overlap, 0 model_answer) ← FAIT
+S16 Redis optionnel SETEX 7 j sur cache C1 (mémoire si pas Redis ; 0 Redis dans grade()) ← FAIT
+S17 quota evaluate_limit (sanity==ok only) + FSRS may_write_fsrs sur POST /api/grade     ← FAIT
+S18 validate_rubrics goldens négatifs (hors-sujet / 36 ATP / vide → plafond)            ← FAIT
+S19 cache sha16 (Rubric+Document) si bump oublié — 0 user_id, hors grade()               ← FAIT
+S20 counter_examples L0 (≥2 dont off_topic, axis overall, hors GET)                     ← FAIT
 ```
 
 **Brancher S2 sans tuer le fallback front = deux notes. Interdit.**

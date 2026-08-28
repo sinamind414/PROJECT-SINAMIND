@@ -531,8 +531,7 @@ class KhawarizmiApiClient {
     })
   }
 
-  // Phase 2 — drill branché sur l'évaluation réelle ( remplace le self-rating ).
-  // L'élève tape sa réponse → /api/drill/submit → score IA + FSRS mis à jour.
+  // S10 — drill copie libre → grade() / 422 ungraded. 0 IA.
   async submitDrillAnswer(payload: {
     question_id: string
     reponse_eleve: string
@@ -545,9 +544,13 @@ class KhawarizmiApiClient {
     manquant: string[]
     next_review_date: string | null
     source: string
+    ungraded?: boolean
+    banner_ar?: string
   }> {
-    return this.request("/api/drill/submit", {
+    const resp = await fetch(`${API_BASE_URL}/api/drill/submit`, {
       method: "POST",
+      headers: this._rawHeaders(),
+      credentials: "include",
       body: JSON.stringify({
         question_id: payload.question_id,
         reponse_eleve: payload.reponse_eleve,
@@ -555,6 +558,35 @@ class KhawarizmiApiClient {
         lang: payload.lang ?? "ar",
       }),
     })
+    const data = (await resp.json().catch(() => ({}))) as Record<string, unknown>
+    if (resp.status === 422 && (data.code === "ungraded" || data.erreur === "ungraded")) {
+      return {
+        score: 0,
+        statut: "ungraded",
+        feedback: typeof data.banner_ar === "string" ? data.banner_ar : "تعذر التصحيح — ليست علامة بكالوريا رسمية.",
+        manquant: [],
+        next_review_date: null,
+        source: "ungraded",
+        ungraded: true,
+        banner_ar: typeof data.banner_ar === "string" ? data.banner_ar : undefined,
+      }
+    }
+    if (!resp.ok) {
+      throw new Error(
+        (typeof data.detail === "string" && data.detail) ||
+          `${UI_AR.erreur_http_prefix} ${resp.status}`,
+      )
+    }
+    return data as {
+      score: number
+      statut: string
+      feedback: string
+      manquant: string[]
+      next_review_date: string | null
+      source: string
+      ungraded?: boolean
+      banner_ar?: string
+    }
   }
 
   // Phase 3 — drill QCM : correction locale instantanée ( zéro IA ).
@@ -828,6 +860,7 @@ class KhawarizmiApiClient {
   async explainBack(concept: string, answer: string): Promise<{
     clarity_score: number; scientific_terms_score: number; structure_score: number
     total_score: number; feedback: string
+    ungraded?: boolean; banner_ar?: string; source?: string
   }> {
     return this.request("/api/chatbot/explain-back", {
       method: "POST",
@@ -837,6 +870,7 @@ class KhawarizmiApiClient {
 
   async startBossFight(chapter: string): Promise<{
     boss_fight_id: string; chapter: string; status: string; questions: Array<Record<string, unknown>>
+    ungraded?: boolean; banner_ar?: string
   }> {
     return this.request("/api/chatbot/boss-fight/start", {
       method: "POST",
@@ -846,6 +880,7 @@ class KhawarizmiApiClient {
 
   async submitBossFight(bossFightId: string, answers: Record<string, string>): Promise<{
     status: string; score: number; passed: boolean; details: Array<Record<string, unknown>>
+    ungraded?: boolean; banner_ar?: string; source?: string
   }> {
     return this.request(`/api/chatbot/boss-fight/${bossFightId}/submit`, {
       method: "POST",
@@ -1425,10 +1460,29 @@ class KhawarizmiApiClient {
   // ── Exercices ────────────────────────────────────
 
   async correctExercise(exerciseId: number, answer: string, language: string = "ar"): Promise<Record<string, unknown>> {
-    return this.request<Record<string, unknown>>(`/api/exercices/${exerciseId}/correct`, {
+    const resp = await fetch(`${API_BASE_URL}/api/exercices/${exerciseId}/correct`, {
       method: "POST",
+      headers: this._rawHeaders(),
+      credentials: "include",
       body: JSON.stringify({ answer, language }),
     })
+    const data = (await resp.json().catch(() => ({}))) as Record<string, unknown>
+    if (resp.status === 422 && (data.code === "ungraded" || data.erreur === "ungraded")) {
+      return {
+        ungraded: true,
+        score: 0,
+        source: "ungraded",
+        banner_ar: typeof data.banner_ar === "string" ? data.banner_ar : undefined,
+        explication: typeof data.banner_ar === "string" ? data.banner_ar : "تعذر التصحيح — ليست علامة بكالوريا رسمية.",
+      }
+    }
+    if (!resp.ok) {
+      throw new Error(
+        (typeof data.detail === "string" && data.detail) ||
+          `${UI_AR.erreur_http_prefix} ${resp.status}`,
+      )
+    }
+    return data
   }
 
   async ensureExerciseArabic(exerciseId: number): Promise<{ generated_arabic: boolean }> {

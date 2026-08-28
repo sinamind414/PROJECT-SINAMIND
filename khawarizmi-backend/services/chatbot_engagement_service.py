@@ -290,6 +290,24 @@ async def detect_confusion(
 
 
 # ── Fonction 2 — Explain-back Mode ────────────────
+# S15 : plus un juge. Heuristique longueur/connecteurs ≠ Manhadjiya.
+# Sans Rubric L0 → ungraded. 0 copie en clair. Pas d'alias vers une grille.
+
+
+def _ungraded_explain_payload() -> dict:
+    from services.grade_adapter import UNGRADED_AR
+    from services.local_grader import TRAINING_BANNER_AR
+
+    return {
+        "clarity_score": 0,
+        "scientific_terms_score": 0,
+        "structure_score": 0,
+        "total_score": 0,
+        "feedback": f"{UNGRADED_AR} {TRAINING_BANNER_AR}",
+        "ungraded": True,
+        "banner_ar": TRAINING_BANNER_AR,
+        "source": "ungraded",
+    }
 
 
 async def evaluate_explain_back(
@@ -298,102 +316,12 @@ async def evaluate_explain_back(
     concept: str,
     answer: str,
 ) -> dict:
-    """Évalue la réponse d'un élève en mode explain-back."""
-    clarity_score = _score_clarity(answer)
-    scientific_terms_score = _score_scientific_terms(answer)
-    structure_score = _score_structure(answer)
-    total_score = round((clarity_score + scientific_terms_score + structure_score) / 3, 2)
-
-    feedback_parts = []
-    if clarity_score < 0.5:
-        feedback_parts.append("حاول تنظيم أفكارك قبل البدء في الشرح.")
-    if scientific_terms_score < 0.5:
-        feedback_parts.append("استخدم المصطلحات العلمية المناسبة.")
-    if structure_score < 0.5:
-        feedback_parts.append("قسّم إجابتك إلى خطوات أو نقاط واضحة.")
-
-    feedback = " ".join(feedback_parts) if feedback_parts else "شرح جيد! واصل بهذا المستوى."
-
-    try:
-        await db.execute(
-            text("""
-                INSERT INTO chatbot_explain_back_attempts
-                    (user_id, concept, answer, clarity_score, scientific_terms_score, structure_score, total_score, feedback)
-                VALUES (:uid, :concept, :answer, :clarity, :scientific, :structure, :total, :feedback)
-            """),
-            {
-                "uid": user_id,
-                "concept": concept,
-                "answer": answer[:1000],
-                "clarity": clarity_score,
-                "scientific": scientific_terms_score,
-                "structure": structure_score,
-                "total": total_score,
-                "feedback": feedback,
-            },
-        )
-        await db.commit()
-    except Exception as e:
-        logger.warning(f"Erreur save explain-back: {e}")
-        await db.rollback()
-
-    if total_score < 0.4:
-        try:
-            await db.execute(
-                text("""
-                    INSERT INTO chatbot_weak_concepts (user_id, concept, weakness_score, occurrences, updated_at)
-                    VALUES (:uid, :concept, 1.0, 1, :now)
-                    ON CONFLICT (id) DO UPDATE SET
-                        weakness_score = LEAST(chatbot_weak_concepts.weakness_score + 0.3, 3.0),
-                        occurrences = chatbot_weak_concepts.occurrences + 1,
-                        updated_at = :now
-                """),
-                {"uid": user_id, "concept": concept, "now": datetime.now(UTC)},
-            )
-            await db.commit()
-        except Exception as e:
-            logger.warning(f"Erreur weak_concept from explain-back: {e}")
-            await db.rollback()
-
-    return {
-        "clarity_score": clarity_score,
-        "scientific_terms_score": scientific_terms_score,
-        "structure_score": structure_score,
-        "total_score": total_score,
-        "feedback": feedback,
-    }
-
-
-def _score_clarity(text: str) -> float:
-    """Score de clarté basé sur la longueur et la présence de connecteurs."""
-    words = text.split()
-    if len(words) < 5:
-        return 0.2
-    connectors = ["لأن", "حيث", "بعد", "قبل", "ثم", "أولاً", "ثانياً", "أخيراً", "أيضاً", "لكن"]
-    connector_count = sum(1 for c in connectors if c in text)
-    length_score = min(len(words) / 50, 1.0)
-    connector_score = min(connector_count / 3, 1.0)
-    return round((length_score + connector_score) / 2, 2)
-
-
-def _score_scientific_terms(text: str) -> float:
-    """Score d'utilisation de termes scientifiques."""
-    terms = ["بروتين", "حمض", "خلية", "نواة", "ريبوزوم", "جين", "صبغي", "إنزيم",
-             "غشاء", "هيولى", "متقدرة", "بوغ", "تلقيح", "انقسام", "هضم", "تركيب"]
-    found = sum(1 for t in terms if t in text)
-    return round(min(found / 3, 1.0), 2)
-
-
-def _score_structure(text: str) -> float:
-    """Score de structure logique (points, numéros, sauts de ligne)."""
-    score = 0.0
-    if "•" in text or "- " in text:
-        score += 0.4
-    if any(c.isdigit() and text[i + 1:i + 2] in (".", "-", ")") for i, c in enumerate(text)):
-        score += 0.3
-    if "\n" in text.strip():
-        score += 0.3
-    return round(min(score, 1.0), 2)
+    """S15 — pas de note. ENABLE_EXTERNAL_LLM ignoré. Pas de copie persistée."""
+    _ = db
+    _ = user_id
+    _ = concept
+    _ = answer
+    return _ungraded_explain_payload()
 
 
 # ── Fonction 3 — Boss Fight Bac ───────────────────
@@ -408,6 +336,7 @@ async def start_boss_fight(
     import uuid
     boss_fight_id = f"bf_{uuid.uuid4().hex[:12]}"
     questions = _generate_boss_questions(chapter)
+    public_questions = _public_boss_questions(questions)
 
     try:
         await db.execute(
@@ -415,7 +344,7 @@ async def start_boss_fight(
                 INSERT INTO chatbot_boss_fights (user_id, boss_fight_id, chapter, status, questions)
                 VALUES (:uid, :bfid, :chapter, 'started', :questions)
             """),
-            {"uid": user_id, "bfid": boss_fight_id, "chapter": chapter, "questions": questions},
+            {"uid": user_id, "bfid": boss_fight_id, "chapter": chapter, "questions": public_questions},
         )
         await db.commit()
     except Exception as e:
@@ -427,7 +356,9 @@ async def start_boss_fight(
         "boss_fight_id": boss_fight_id,
         "chapter": chapter,
         "status": "started",
-        "questions": questions,
+        "questions": public_questions,
+        "ungraded": True,
+        "banner_ar": _training_banner(),
     }
 
 
@@ -437,7 +368,8 @@ async def submit_boss_fight(
     boss_fight_id: str,
     answers: dict[str, str],
 ) -> dict:
-    """Soumet les réponses d'un boss fight et calcule le score."""
+    """S15 — pas de juge overlap. Sans Rubric L0 → ungraded. 0 copie, 0 model_answer."""
+    _ = answers
     result = await db.execute(
         text("""
             SELECT id, questions, status
@@ -452,28 +384,6 @@ async def submit_boss_fight(
     if row._mapping["status"] != "started":
         return {"error": "Boss fight déjà terminé"}
 
-    questions = row._mapping["questions"]
-    total = len(questions)
-    correct = 0
-    details = []
-
-    for i, q in enumerate(questions):
-        q_key = f"q{i + 1}"
-        student_answer = answers.get(q_key, "")
-        model = q.get("model_answer", "")
-        score = _score_boss_answer(student_answer, model)
-        if score >= 0.5:
-            correct += 1
-        details.append({
-            "question": q.get("question_ar", ""),
-            "student_answer": student_answer[:200],
-            "model_answer": model[:200],
-            "score": score,
-        })
-
-    score_pct = round((correct / total) * 100, 1) if total > 0 else 0
-    passed = score_pct >= 60
-
     now = datetime.now(UTC)
     try:
         await db.execute(
@@ -481,14 +391,15 @@ async def submit_boss_fight(
                 UPDATE chatbot_boss_fights
                 SET status = 'completed', answers = :answers, score = :score,
                     passed = :passed, details = :details, completed_at = :now
-                WHERE boss_fight_id = :bfid
+                WHERE boss_fight_id = :bfid AND user_id = :uid
             """),
             {
                 "bfid": boss_fight_id,
-                "answers": answers,
-                "score": score_pct,
-                "passed": passed,
-                "details": details,
+                "uid": user_id,
+                "answers": {},
+                "score": 0,
+                "passed": False,
+                "details": [],
                 "now": now,
             },
         )
@@ -497,44 +408,51 @@ async def submit_boss_fight(
         logger.warning(f"Erreur submit_boss_fight: {e}")
         await db.rollback()
 
+    banner = _training_banner()
     return {
         "status": "completed",
-        "score": score_pct,
-        "passed": passed,
-        "details": details,
+        "score": 0,
+        "passed": False,
+        "details": [],
+        "ungraded": True,
+        "banner_ar": banner,
+        "source": "ungraded",
     }
 
 
+def _training_banner() -> str:
+    from services.local_grader import TRAINING_BANNER_AR
+
+    return TRAINING_BANNER_AR
+
+
+def _public_boss_questions(questions: list[dict]) -> list[dict]:
+    """Jamais model_answer / variants côté client."""
+    out: list[dict] = []
+    for q in questions:
+        out.append({
+            "question_ar": q.get("question_ar", ""),
+            "type": q.get("type", ""),
+        })
+    return out
+
+
 def _generate_boss_questions(chapter: str) -> list[dict]:
-    """Génère des questions boss fight pour un chapitre."""
-    templates = [
+    """Prompts de révision — pas un سلم, pas un juge."""
+    return [
         {
             "question_ar": f"ما هي المراحل الأساسية في {chapter}؟ اذكرها بالترتيب.",
-            "model_answer": f"المراحل الأساسية في {chapter} تشمل: المرحلة الأولى، المرحلة الثانية، والمرحلة الثالثة.",
             "type": "recall",
         },
         {
             "question_ar": f"كيف تفسر العلاقة بين بنية ووظيفة العناصر المشاركة في {chapter}؟",
-            "model_answer": f"ترتبط بنية العناصر في {chapter} ارتباطاً وثيقاً بوظيفتها حيث أن كل تركيب يخدم دوراً محدداً.",
             "type": "analysis",
         },
         {
             "question_ar": f"ما هي النتائج المترتبة على خلل في {chapter}؟",
-            "model_answer": f"يؤدي خلل في {chapter} إلى اضطرابات وظيفية قد تظهر على المستوى العضوي.",
             "type": "synthesis",
         },
     ]
-    return templates
-
-
-def _score_boss_answer(student: str, model: str) -> float:
-    """Calcule un score de similarité entre la réponse élève et le modèle."""
-    s_words = set(student.split())
-    m_words = set(model.split())
-    if not m_words:
-        return 0.0
-    overlap = len(s_words & m_words)
-    return round(overlap / len(m_words), 2)
 
 
 # ── Fonction 4 — Chatbot Mystery Box ──────────────

@@ -36,6 +36,8 @@ class EvaluateSchemaResponse(BaseModel):
     feedback: str = ""
     question_socratique: str = ""
     erreur: str | None = None
+    ungraded: bool = True
+    banner_ar: str = ""
 
 
 @router.get("/schemas", response_model=list[SchemaSummary])
@@ -63,31 +65,22 @@ async def evaluate_schema(
     request: Request,
     body: EvaluateSchemaRequest,
     current_user: dict = Depends(get_current_user),
-    svc=Depends(get_dual_coding),
 ):
-    """Évalue la photo d'un schéma manuscrit par Vision IA."""
-    result = await svc.evaluer_schema_photo(
-        image_base64=body.image_base64,
-        schema_id=body.schema_id,
+    """S11 — pas de note auto pour un dessin (schematiser_manual). 0 Vision."""
+    from services.local_grader import TRAINING_BANNER_AR
+
+    _ = request
+    _ = body
+    _ = current_user
+    return EvaluateSchemaResponse(
+        score=0,
+        fleches_correctes=None,
+        vocabulaire_exact=None,
+        ordre_correct=None,
+        elements_manquants=[],
+        feedback="لا تصحيح آلي للرسم. ليست علامة بكالوريا رسمية.",
+        question_socratique="",
+        erreur="ungraded",
+        ungraded=True,
+        banner_ar=TRAINING_BANNER_AR,
     )
-
-    if isinstance(result, dict) and result.get("erreur"):
-        return EvaluateSchemaResponse(
-            score=0,
-            erreur=result["erreur"],
-            feedback=result.get("feedback", ""),
-        )
-
-    import json
-
-    if isinstance(result, str):
-        try:
-            result = json.loads(result)
-        except json.JSONDecodeError:
-            return EvaluateSchemaResponse(
-                score=0,
-                erreur="Réponse IA illisible",
-                feedback="Une erreur technique est survenue. Réessaie.",
-            )
-
-    return EvaluateSchemaResponse(**result)

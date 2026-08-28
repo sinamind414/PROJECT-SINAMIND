@@ -52,12 +52,41 @@ def may_write_fsrs(result) -> bool:
     return True
 
 
+def persist_grade_columns(result) -> dict:
+    """Colonnes 035 — métadonnées de note, jamais la copie."""
+    if result is None:
+        return {
+            "rubric_version": "",
+            "grader_version": "",
+            "grading_engine": "ungraded",
+            "science_status": "not_applicable",
+            "stuffing_suspected": False,
+            "method_percent": 0,
+            "order_ok": None,
+            "diagnosis_code": "ungraded",
+        }
+    diag = result.diagnosis
+    return {
+        "rubric_version": result.rubric_version,
+        "grader_version": result.grader_version,
+        "grading_engine": "local_rubric",
+        "science_status": result.science_status,
+        "stuffing_suspected": bool(result.stuffing_suspected),
+        "method_percent": int(result.method_percent),
+        "order_ok": result.order_ok,
+        "diagnosis_code": diag.code if diag else None,
+    }
+
+
 def to_verb_eval(result) -> dict:
+    """percentage = overall (cap science). method_percent reste l'axe منهج."""
     return {
         "verb_slug": result.verb_slug,
         "score": int(round(result.method_points)),
         "score_max": int(round(result.method_points_max)) or 1,
         "percentage": int(result.overall_training_percent),
+        "method_percent": int(result.method_percent),
+        "overall_training_percent": int(result.overall_training_percent),
         "success": [c.label_ar for c in result.criteria if c.status == "full"],
         "errors": list(result.science_flags)
         + ([result.next_step_ar] if result.next_step_ar else []),
@@ -70,4 +99,10 @@ def to_verb_eval(result) -> dict:
         "banner_ar": TRAINING_BANNER_AR,
         "ungraded": False,
         "method_label_ar": result.method_label_ar,
+        "science_status": result.science_status,
+        "science_capped": bool(result.science_capped),
+        "science_flags": list(result.science_flags),
+        "order_ok": result.order_ok,
+        "praise_ar": result.praise_ar,
+        "next_step_ar": result.next_step_ar,
     }

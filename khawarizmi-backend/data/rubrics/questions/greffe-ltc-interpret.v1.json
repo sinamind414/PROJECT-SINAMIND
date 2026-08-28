@@ -6,10 +6,22 @@
   "language": "ar",
   "total_points": 4.0,
   "document_id": "greffe-ltc",
-  "theme_variants": ["طعم", "رفض", "LTc", "ltc", "ذاكرة", "لمفاوية"],
+  "theme_variants": [
+    "طعم",
+    "رفض",
+    "LTc",
+    "ltc",
+    "ذاكرة",
+    "لمفاوية"
+  ],
   "theme_min_hits": 1,
   "method_graph": {
-    "steps": ["rappel", "cause", "cours", "conclusion"],
+    "steps": [
+      "rappel",
+      "cause",
+      "cours",
+      "conclusion"
+    ],
     "require_order": true
   },
   "criteria": [
@@ -25,7 +37,12 @@
       "label_ar": "رابط سببي لأن / يرجع",
       "points": 1.0,
       "check": "any_of",
-      "variants": ["لأن", "راجع", "يرجع", "بسبب"],
+      "variants": [
+        "لأن",
+        "راجع",
+        "يرجع",
+        "بسبب"
+      ],
       "required": true
     },
     {
@@ -33,7 +50,14 @@
       "label_ar": "آلية الذاكرة / LTc",
       "points": 1.0,
       "check": "any_of",
-      "variants": ["ذاكرة", "الذاكرة", "LTc", "ltc", "خلايا قاتلة", "الخلايا القاتلة"],
+      "variants": [
+        "ذاكرة",
+        "الذاكرة",
+        "LTc",
+        "ltc",
+        "خلايا قاتلة",
+        "الخلايا القاتلة"
+      ],
       "required": true
     },
     {
@@ -41,14 +65,23 @@
       "label_ar": "الاستجابة الثانوية أسرع وأشد",
       "points": 1.0,
       "check": "any_of",
-      "variants": ["ثانوية", "أسرع", "أشد", "تسارع", "جاهزة"],
+      "variants": [
+        "ثانوية",
+        "أسرع",
+        "أشد",
+        "تسارع",
+        "جاهزة"
+      ],
       "required": true
     }
   ],
   "distractors": [
     {
       "id": "anticorps",
-      "variants": ["أجسام مضادة", "الأجسام المضادة"],
+      "variants": [
+        "أجسام مضادة",
+        "الأجسام المضادة"
+      ],
       "message_ar": "الوثيقتان فيهوم LTc ما فيهومش أجسام مضادة"
     }
   ],
@@ -63,5 +96,21 @@
   },
   "model_answer": "رُفض الطعم الثاني في 5 أيام بدل 10 لأن الذاكرة المناعية جعلت الـ LTc المتخصصة جاهزة فتتكاثر بسرعة. وهذا يفسر 4,8 مقابل 2,5: الاستجابة الثانوية أسرع وأشد.",
   "source": "teacher_authored",
-  "grader_min_version": "1.0.0"
+  "grader_min_version": "1.0.0",
+  "counter_examples": [
+    {
+      "id": "off_topic",
+      "text_ar": "تمثل الوثيقة منحنى تباعد الصفائح عند الأعراف المحيطية. كلما ابتعدت الصفيحة ازداد الخندق المحيطي. نستنتج غوص اللوح في الاندساس.",
+      "max_percent": 40,
+      "axis": "overall",
+      "why": "bonne langue, tectonique ≠ chapitre de la grille"
+    },
+    {
+      "id": "atp36",
+      "use": "model+atp36",
+      "max_percent": 40,
+      "axis": "overall",
+      "why": "36 ATP grave ONEC — cap overall 40"
+    }
+  ]
 }

@@ -32,6 +32,7 @@ from services.grade_adapter import (
     UNGRADED_AR,
     grade_or_none,
     may_write_fsrs,
+    persist_grade_columns,
     resolve_question_id,
     to_verb_eval,
 )
@@ -243,16 +244,23 @@ async def evaluer_reponses(
                 "ungraded": False,
             }
 
+        meta = persist_grade_columns(graded)
         await db.execute(
             text("""
                 INSERT INTO da_answers
                     (session_id, question_id, verb_slug, chapter_slug,
                      answer_text, score, score_max, percentage, feedback_ar,
-                     success, errors, missing_markers, forbidden_found)
+                     success, errors, missing_markers, forbidden_found,
+                     rubric_version, grader_version, grading_engine,
+                     science_status, stuffing_suspected, method_percent,
+                     order_ok, diagnosis_code)
                 VALUES
                     (:session_id, :question_id, :verb_slug, :chapter_slug,
                      :answer_text, :score, :score_max, :percentage, :feedback_ar,
-                     :success, :errors, :missing_markers, :forbidden_found)
+                     :success, :errors, :missing_markers, :forbidden_found,
+                     :rubric_version, :grader_version, :grading_engine,
+                     :science_status, :stuffing_suspected, :method_percent,
+                     :order_ok, :diagnosis_code)
             """),
             {
                 "session_id": session_id,
@@ -268,6 +276,7 @@ async def evaluer_reponses(
                 "errors": json.dumps(evaluation["errors"], ensure_ascii=False),
                 "missing_markers": json.dumps(evaluation["missing_markers"], ensure_ascii=False),
                 "forbidden_found": json.dumps(evaluation["forbidden_found"], ensure_ascii=False),
+                **meta,
             },
         )
 

@@ -38,8 +38,8 @@
 
 | # | Bug | Preuve | Pourquoi pas FORT |
 |---|---|---|---|
-| **UI %** | `method=100 متقن` + `overall=40` si 36 ATP | Mesuré | **Aucun écran** n’affiche `GradeResult`. Risque **S2** si le front prend `method_percent` seul |
-| **Validate narcissique** | `model_answer ≥ 85` seulement | script | Pytest a déjà G6/G13/G14. Manque : dump, relation inversée, `٢٫٥` |
+| **UI %** | `method=100 متقن` + `overall=40` si 36 ATP | **FERMÉ S9** : `GradeResultCard` sépare منهج / محتوى ; درجة التدريب = overall ; ungraded = — |
+| **Validate narcissique** | `model_answer ≥ 85` seulement | **FERMÉ S18** : `validate_rubrics` refuse aussi hors-sujet / 36 ATP overall > 40, vide ≠ 0 |
 | **N2 exposant** | `3.6e6` → errata **silence** | mesuré | `10^6` / `×10^6` **jaune OK**. Trou étroit |
 | **Keypoint = n’importe quel chiffre du doc** | yeast : `4` (heures) ancre autant que `18` | JSON | Case L0 = « un vrai chiffre », pas l’association 18↔glucose |
 | **`$lex:glucose` trop large** | contient `سكر`, `مادة عضوية` | lexique | `سكر` ⊄ `السكريات` (frontière OK). Risque auteur L1 |
@@ -71,7 +71,7 @@
 | Clé cache collision live | Pas de cache dans `grade()` | **Spec S2**, déjà corrigée sur le papier |
 | G1–G16 « absents » | `test_local_grader.py` + golden L0 | **Faux** (l’auditeur n’avait pas les tests) |
 | praise/next = LLM caché | Templates **JSON** `advice_*` | **Faux** |
-| A2 « un seul moteur » sur le **site** | `grade()` existe ; **5 cerveaux** encore prod | Promesse **cible**, pas as-built — déjà dit |
+| A2 « un seul moteur » sur le **site** | **S0–S20** : `grade()` + cache C1+sha16 + chatbot gelé + quota + `counter_examples` | **Fermé** sur le chemin de note |
 
 ---
 
@@ -101,4 +101,4 @@ Les 4 passes répètent souvent les **mêmes** 3 vrais (S0 prod, N1 digits, N2 `
 
 ---
 
-*S0–S5 : T1–T3, N1–N2, `/api/grade`, adaptateurs, G11, hash, mixins + `$lex:` fichier. Reste DA v2 L2 gelé (hors chemin ScenarioRunner).*
+*S0–S19 : T1–T3, N1–N2, `/api/grade`, adaptateurs, G11, hash, mixins + `$lex:`, v2/methodology/JS gelés, UI 2 axes, drill/exercices/schéma gelés, métriques, colonnes 035, cache C1+sha16 hors `grade()`, chatbot copies ungraded, quota sanity==ok + FSRS, `validate_rubrics` G5+négatifs, `evaluate.py` hors registre, `GRADER_VERSION=1.1.4`.*

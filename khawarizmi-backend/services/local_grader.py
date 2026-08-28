@@ -22,7 +22,7 @@ from schemas.rubric import (
 from services.answer_sanity import check_answer_sanity
 from services.arabic import normalize_arabic
 
-GRADER_VERSION = "1.1.3"
+GRADER_VERSION = "1.1.4"
 SCIENCE_CAP_DEFAULT = 40
 TRAINING_BANNER_AR = "ملاحظة تدريبية — منهج + محتوى. ليست علامة بكالوريا رسمية."
 

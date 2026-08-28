@@ -6,10 +6,25 @@
   "language": "ar",
   "total_points": 5.0,
   "document_id": null,
-  "theme_variants": ["adn", "ADN", "نسخ", "ترجمة", "بروتين", "نواة", "$lex:adn", "$lex:transcription", "$lex:traduction"],
+  "theme_variants": [
+    "adn",
+    "ADN",
+    "نسخ",
+    "ترجمة",
+    "بروتين",
+    "نواة",
+    "$lex:adn",
+    "$lex:transcription",
+    "$lex:traduction"
+  ],
   "theme_min_hits": 1,
   "method_graph": {
-    "steps": ["intro", "body_transcription", "body_translation", "conclusion"],
+    "steps": [
+      "intro",
+      "body_transcription",
+      "body_translation",
+      "conclusion"
+    ],
     "require_order": true
   },
   "criteria": [
@@ -18,7 +33,13 @@
       "label_ar": "مقدمة + مشكل",
       "points": 1.0,
       "check": "any_of",
-      "variants": ["المشكل", "مشكل", "تساؤل", "كيف", "يتمثل"],
+      "variants": [
+        "المشكل",
+        "مشكل",
+        "تساؤل",
+        "كيف",
+        "يتمثل"
+      ],
       "required": true
     },
     {
@@ -26,7 +47,14 @@
       "label_ar": "عرض: النسخ",
       "points": 1.25,
       "check": "any_of",
-      "variants": ["نسخ", "النسخ", "ARN", "arn", "رنا", "$lex:transcription"],
+      "variants": [
+        "نسخ",
+        "النسخ",
+        "ARN",
+        "arn",
+        "رنا",
+        "$lex:transcription"
+      ],
       "required": true
     },
     {
@@ -34,7 +62,13 @@
       "label_ar": "عرض: الترجمة",
       "points": 1.25,
       "check": "any_of",
-      "variants": ["ترجمة", "الترجمة", "ريبوزوم", "حمض أميني", "$lex:traduction"],
+      "variants": [
+        "ترجمة",
+        "الترجمة",
+        "ريبوزوم",
+        "حمض أميني",
+        "$lex:traduction"
+      ],
       "required": true
     },
     {
@@ -42,7 +76,13 @@
       "label_ar": "خاتمة",
       "points": 0.75,
       "check": "any_of",
-      "variants": ["خاتمة", "مما سبق", "وعليه", "في الختام", "إذن"],
+      "variants": [
+        "خاتمة",
+        "مما سبق",
+        "وعليه",
+        "في الختام",
+        "إذن"
+      ],
       "required": true
     },
     {
@@ -60,7 +100,10 @@
       "pattern": "adn.{0,40}(يخرج|ينتقل).{0,20}(هيول|cytoplasme)",
       "message_ar": "الـ ADN لا يخرج من النواة — فقط ARNm يخرج إلى الهيولى",
       "cap_science": 40,
-      "context_any": ["adn", "ADN"]
+      "context_any": [
+        "adn",
+        "ADN"
+      ]
     }
   ],
   "distractors": [],
@@ -77,5 +120,21 @@
   },
   "model_answer": "يتمثل المشكل في كيف يتم تركيب بروتين انطلاقا من معلومة الـ ADN النووي عن بعد. يتم النسخ في النواة فينتج ARN رسول ينتقل إلى الهيولى. ثم تتم الترجمة على الريبوزوم حيث تُرتب الأحماض الأمينية حسب الرسالة. مما سبق فإن الـ ADN لا يغادر النواة والبروتين يُركب في الهيولى.",
   "source": "teacher_authored",
-  "grader_min_version": "1.0.0"
+  "grader_min_version": "1.0.0",
+  "counter_examples": [
+    {
+      "id": "off_topic",
+      "text_ar": "تمثل الوثيقة منحنى تباعد الصفائح عند الأعراف المحيطية. كلما ابتعدت الصفيحة ازداد الخندق المحيطي. نستنتج غوص اللوح في الاندساس.",
+      "max_percent": 40,
+      "axis": "overall",
+      "why": "bonne langue, tectonique ≠ chapitre de la grille"
+    },
+    {
+      "id": "atp36",
+      "use": "model+atp36",
+      "max_percent": 40,
+      "axis": "overall",
+      "why": "36 ATP grave ONEC — cap overall 40"
+    }
+  ]
 }

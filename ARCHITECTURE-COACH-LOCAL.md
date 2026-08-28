@@ -1,8 +1,8 @@
 # Architecture cible — Coach local « comme le livre »
 
 **Date :** 2026-08-26 · **révisé** 2026-08-27 (C1 clé cache, contrat sanity, politique lexique, table d’état)  
-**Statut :** S1–S3 **implémentés** — `grade()` + 10 L0 + `/api/grade` + ScenarioRunner / verb / bac / DA v1 / diagnostic sans 2ᵉ cerveau. Flag `LOCAL_RUBRIC_GRADER` défaut `false`.  
-**S0 (T1–T3) :** **pas fait** — gate S0→S1 **contourné volontairement** (moteur testable, flag off, **pas** une publication). Voir table §14.1.  
+**Statut :** S0–S19 **implémentés** — `grade()` + 10 L0 + `/api/grade` + adaptateurs + UI 2 axes + drill/exercices + schéma 0 auto + métriques + colonnes 035 + cache C1 + sha16 ceinture + chatbot gelé + quota + FSRS + `validate_rubrics` G5+négatifs. Flag `LOCAL_RUBRIC_GRADER` défaut `false`.  
+**S0 (T1–T3) :** **fait** (T1 UI PDF, T2 IDOR, T3 whitelist). Flag prod encore `false`. Voir table §14.1.  
 **Public :** revue humaine / audit par IA  
 **Produit :** Khawarizmi / IA Khawarizmi Pro — Bac SVT Algérie 3AS  
 
@@ -78,16 +78,14 @@ Aligné sur :
 
 ```
 Écran                    Moteur actuel                         Fichier
-DA ScenarioRunner        evaluate-v2 → sanity → (savoir OFF)   routes/document_analysis_v2.py
-                         → LLM bloqué → L2
-Bac blanc                evaluate_answer() regex VERB_RULES    document_analysis_service.py
-Action-verbs             evaluate_answer() autre regex         action_verbs_service.py
-Front si API down        evaluateMethodologyAnswer()           methodology-evaluator.ts
+DA ScenarioRunner        grade() / 422 ungraded                local_grader + GradeResultCard
+Bac blanc                grade() / 422 ungraded                bac_blanc.py + GradeResultCard
+Action-verbs             grade() / 422 ungraded                action_verbs.py + GradeResultCard
+Front si API down        evaluateMethodologyAnswer = ungraded  methodology-evaluator.ts (stub)
 evaluate.py / ai_eval    GPT-4o → L2                           NON montés — NE PAS monter
 ```
 
-**Runtime local aujourd’hui :** sanity → L2 (sac de mots).  
-**Cible :** sanity → normalize → structure/ordre → ancrage document → match Rubric → veto Savoir + hors-sujet → stuffing → diagnostic.
+**Runtime local aujourd’hui :** sanity → normalize → structure/ordre → ancrage document → match Rubric → veto Savoir + hors-sujet → stuffing → diagnostic. UI : `GradeResultCard` (2 axes).
 
 `verb_database.json` : **حلّل ajouté** (id 11). Templates L0 dans `data/rubrics/templates/`.
 
@@ -146,12 +144,12 @@ evaluate.py / ai_eval    GPT-4o → L2                           NON montés —
 **Cache** (équité : **pas** de `user_id`) — **S2, pas dans `grade()`** (P7 : 0 Redis dans le grader) :
 
 ```
-grade:{GRADER_VERSION}:{rubric_id}:{rubric.version}:{doc_id|none}:{doc.version|none}:{verb}:{hash_answer(lstrip+rstrip)}
+grade:{GRADER_VERSION}:{rubric_id}:{rubric.version}:{doc_id|none}:{doc.version|none}:{verb}:{sha16}:{hash_answer(lstrip+rstrip)}
 ```
 
 **Pourquoi `rubric_id` + `doc_id` :** les semver ne sont pas uniques. Dix grilles L0 partagent `version=1.0.0` et plusieurs partagent le verbe `analyse`. Sans identité, la même copie générique collée sur Q1 puis Q2 servirait le `GradeResult` de Q1 — mensonge silencieux sur le %. Test **G17**.
 
-Option S2 (ceinture) : suffixe `:{sha16(json canonique Rubric+Document)}` si l’auteur oublie le bump de version.
+Ceinture S19 : suffixe `:{sha16(json canonique Rubric+Document)}` si l’auteur oublie le bump de version. `model_answer` hors hash (n’affecte pas `grade(copy)`).
 
 TTL 7 j. Cachable seulement si `sanity_code=ok` (pas `empty`, pas `defer`).  
 `hash_answer` = HMAC-SHA256 pepper `SECRET_KEY`, hex 64 chars — **déjà** `services/hashing.py`.  
@@ -711,14 +709,29 @@ S5  mixins chapitre + $lex: extrait fichier  (condition de survie L1)
 
 | Étape | Statut | Bloque quoi |
 |---|---|---|
-| S0 T1 PDF LFS | **NON** | publication (UI honnête « غير متاح ») |
-| S0 T2 IDOR `bac_blanc` | **NON** | publication (toutes routes session, pas seulement 4) |
-| S0 T3 `points`/`xp` query | **NON** | publication |
-| S1 `grade()` + 10 L0 + G1–G8, G12–G16 | **OUI** | — flag `false`, 0 HTTP |
-| S2 `POST /api/grade` + ScenarioRunner | **NON** | l’élève du site |
+| S0 T1 PDF LFS | **OUI** | UI « غير متاح », pas de bouton فتح |
+| S0 T2 IDOR `bac_blanc` | **OUI** | `_require_own_session` 403/404 |
+| S0 T3 `points`/`xp` query | **OUI** | whitelist `action` |
+| S1 `grade()` + 10 L0 + G1–G8, G12–G16 | **OUI** | flag `false` |
+| S2 `POST /api/grade` + ScenarioRunner | **OUI** | 422 ungraded, 0 JS |
 | S3 verb + bac → `grade()` | **OUI** | 422 ungraded si pas de grille. VERB_RULES hors routes. diagnostic/global → `/api/grade`. « جاهز للبكالوريا » tué. |
 | S4 hash persist + GET `/correction` | **OUI** | G11 : 404 sans da_answers de CET élève. DA v1 + bac submit = `hash_answer`. GET bac `student_answer=""`. FSRS via `may_write_fsrs`. |
 | S5 mixins + `$lex:` fichier | **OUI** | `data/lexicons/svt_terms.v1.json` (clés L0). Mixin `{chapter_slug}.json` union au `load()`. Pas de lactose inventé. |
+| S6 evaluate-v2 → `grade()` | **OUI** | 0 L2 / 0 LLM |
+| S7 `/api/evaluate/methodology` | **OUI** | 422 ungraded si pas L0 |
+| S8 JS stub + `evaluate.py` hors registre | **OUI** | `GRADER_VERSION=1.1.4` |
+| S9 UI 2 axes + G12 | **OUI** | `GradeResultCard` : درجة التدريب, منهج ≠ محتوى, ungraded = —, pas de بكالوريا collé au % |
+| S10 drill + exercices copies | **OUI** | `/api/drill/submit` et `/api/exercices/{id}/correct` → `grade()` / 422. QCM local intact. 0 GPT-4o. |
+| S11 schéma + evaluation_mode | **OUI** | Dual-coding evaluate = 0 (pas Vision). `evaluation_mode` → `grade()` / ungraded. |
+| S12 observabilité §7.1 | **OUI** | `GET /api/grade/metrics` : ungraded par qid, sanity, stuffing, science, diagnosis, latence. Cache = 0 (pas dans `grade()`). |
+| S13 colonnes 035 | **OUI** | `da_answers` : `grading_engine`, `method_percent`, `science_status`, `diagnosis_code`, hash. Pas de copie. |
+| S14 cache C1 | **OUI** | clé `grade:{version}:{rubric_id}:{rubric.ver}:{doc}:{doc.ver}:{verb}:{hash}` — 0 `user_id`. Hors `grade()`. |
+| S15 chatbot explain-back / boss-fight | **OUI** | Plus de % overlap / longueur. `ungraded`, 0 copie, 0 `model_answer`. Pas d’alias L0. `GRADER_VERSION` reste `1.1.4`. |
+| S16 cache Redis optionnel | **OUI** | `grade_cache` SETEX 7 j via `state.redis` si dispo ; mémoire sinon. 0 Redis dans `grade()`. 0 `user_id`. 0 copie. |
+| S17 quota + FSRS sur `/api/grade` | **OUI** | `evaluate_limit` seulement si `sanity==ok` (vide/cache/defer/422 = 0). FSRS `may_write_fsrs`, 0 copie, 0 `da_answers` sur cette route. |
+| S18 goldens négatifs `validate_rubrics` | **OUI** | Merge bloqué si hors-sujet ou 36 ATP overall > 40, ou vide ≠ 0. Mêmes copies que golden L0. `GRADER_VERSION` 1.1.4. |
+| S19 cache sha16 | **OUI** | clé C1 + `sha16` Rubric+Document. Éditer un critère sans bump de version → nouvelle clé. 0 `user_id`. Hors `grade()`. |
+| S20 `counter_examples` L0 | **OUI** | ≥2 par grille dont `off_topic`, `axis` overall/method, `use` fermé `model+atp36`. Hors GET rubric. `GRADER_VERSION` 1.1.4. |
 
 **Gates :**
 - S0 → S1 : G9, G10 verts (même sans grader) — **contourné volontairement** le 2026-08-27 : S1 = moteur **testable hors prod**, pas une mise en ligne. Le gate redevient bloquant le jour où `LOCAL_RUBRIC_GRADER=true`.

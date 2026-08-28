@@ -8,7 +8,9 @@ from fsrs import Rating as FsrsRating
 from fsrs import Scheduler as CardScheduler
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from deps import get_current_user, get_db, get_openai, get_scheduler
+from fastapi.responses import JSONResponse
+
+from deps import get_current_user, get_db, get_scheduler
 from schemas.flashcard import (
     DrillRequest,
     DrillSubmitRequest,
@@ -164,10 +166,8 @@ async def soumettre_resultat_drill(
     }
 
 
-# ── Phase 2 : drill branché sur l'évaluation réelle ───────────────
-# Remplace le self-rating. L'élève tape sa réponse → évaluation IA
-# ( réutilise evaluate_with_fallback ) → FSRS mis à jour via le MÊME
-# chemin que /api/evaluate ( apply_evaluation_to_fsrs ). Pas de 3e chemin FSRS.
+# ── Phase 2 : drill copie libre → grade() (S10). 0 GPT / 0 L2.
+# Sans Rubric L0 → 422 ungraded. QCM local inchangé.
 
 
 @router.post("/api/drill/submit", tags=["Drill"])
@@ -175,65 +175,59 @@ async def soumettre_reponse_drill(
     body: DrillSubmitRequest,
     current_user: dict = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-    openai_client=Depends(get_openai),
 ):
-    """Évalue la réponse de l'élève au drill et met à jour FSRS.
-
-    Réutilise le moteur d'évaluation complet ( GPT4O → L2 → L3 ) au lieu du
-    self-rating non fiable. FSRS planifie sur le score RÉEL.
-    """
-    from routes.evaluate import EvaluateRequest, evaluate_with_fallback
-    from services.evaluation_fsrs import apply_evaluation_to_fsrs
-    from services.evaluation_utils import normalize_result
-    from services.questions import get_question
+    """Note une copie drill via grade(). ENABLE_EXTERNAL_LLM ignoré."""
+    from services.grade_adapter import (
+        grade_or_none,
+        may_write_fsrs,
+        resolve_question_id,
+        to_verb_eval,
+        ungraded_http,
+    )
+    from services.local_grader import TRAINING_BANNER_AR
 
     user_id = current_user["id"]
+    qid = resolve_question_id(body.question_id)
+    graded = grade_or_none(qid, body.reponse_eleve)
+    if graded is None:
+        return JSONResponse(
+            status_code=422,
+            content=ungraded_http(body.question_id),
+        )
 
-    question = get_question(body.question_id)
-    if not question:
-        raise HTTPException(status_code=404, detail=f"Question {body.question_id} introuvable")
+    mapped = to_verb_eval(graded)
+    next_review_date = None
+    if may_write_fsrs(graded):
+        from services.fsrs_unified import update_memory
 
-    # Construire une EvaluateRequest pour réutiliser evaluate_with_fallback tel quel
-    eval_req = EvaluateRequest(
-        question_id=body.question_id,
-        reponse_eleve=body.reponse_eleve,
-        tentative=body.tentative,
-        lang=body.lang,
-        include_methodology=False,  # le drill n'a pas besoin de l'éval méthodo lourde
-    )
-
-    eval_result = await evaluate_with_fallback(question, eval_req, openai_client, user_id, db)
-
-    # FSRS mis à jour via le MÊME chemin que /api/evaluate
-    next_review_date = await apply_evaluation_to_fsrs(
-        db=db,
-        user_id=user_id,
-        question_id=body.question_id,
-        reponse_eleve=body.reponse_eleve,
-        question=question,
-        eval_result=eval_result,
-    )
-
-    eval_result = normalize_result(eval_result)
-
-    # Traduire le feedback si arabe
-    if body.lang == "ar":
-        from services.feedback_translator import translate_feedback
-        eval_result["feedback"] = translate_feedback(eval_result.get("feedback", ""))
+        await update_memory(
+            db,
+            user_id,
+            "verb_chapter",
+            item_id=body.question_id,
+            last_score=mapped["percentage"],
+            attempts_delta=1,
+        )
+        await db.commit()
 
     logger.info(
-        f"DRILL_SUBMIT | user={user_id} | q={body.question_id} | "
-        f"score={eval_result['score']} | source={eval_result['source']} | "
-        f"next_review={next_review_date}"
+        "DRILL_SUBMIT | user=%s | q=%s | score=%s | source=local_rubric",
+        user_id,
+        body.question_id,
+        mapped["percentage"],
     )
-
     return {
-        "score": eval_result["score"],
-        "statut": eval_result["statut"],
-        "feedback": eval_result["feedback"],
-        "manquant": eval_result["manquant"],
+        "score": mapped["percentage"],
+        "statut": mapped["method_label_ar"],
+        "feedback": mapped["advice"],
+        "manquant": [],
         "next_review_date": next_review_date,
-        "source": eval_result["source"],
+        "source": "local_rubric",
+        "ungraded": False,
+        "banner_ar": TRAINING_BANNER_AR,
+        "method_percent": mapped["method_percent"],
+        "overall_training_percent": mapped["overall_training_percent"],
+        "science_status": mapped["science_status"],
     }
 
 

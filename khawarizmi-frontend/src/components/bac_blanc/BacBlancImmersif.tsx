@@ -8,6 +8,7 @@ import type {
   BacSubjectSummary,
   BacSubjectDetail,
 } from "@/lib/types"
+import { TRAINING_BANNER_AR, formatTrainingPercent } from "@/components/methodology/GradeResultCard"
 
 type Phase = "intro" | "choix" | "epreuve" | "soumission" | "debrief"
 
@@ -283,13 +284,20 @@ export function BacBlancImmersif({ annaleSlug }: { annaleSlug: string }) {
   }
 
   if (phase === "debrief" && submitResult) {
-    const scoreColor = submitResult.score_global >= 75 ? "#2DD4BF" : submitResult.score_global >= 50 ? "#F59E0B" : "#EF4444"
+    const allUngraded = (submitResult.ungraded_count || 0) > 0 && submitResult.scores_by_exercise.every((ex) => ex.ungraded || ex.skipped)
+    const scoreColor = allUngraded ? "#F59E0B" : submitResult.score_global >= 75 ? "#2DD4BF" : submitResult.score_global >= 50 ? "#F59E0B" : "#EF4444"
     return (
       <div dir="rtl" className="space-y-6 max-w-3xl mx-auto">
         <div className="rounded-3xl p-8 text-center space-y-4" style={{ background: "linear-gradient(135deg, rgba(45,212,191,0.12), rgba(251,191,36,0.06))" }}>
-          <p className="text-4xl">🎉</p>
+          <p className="text-4xl">{allUngraded ? "📋" : "🎉"}</p>
           <h1 className="text-2xl font-bold text-white">انتهى الامتحان</h1>
-          <p className="text-6xl font-bold" style={{ color: scoreColor }}>{submitResult.score_global}%</p>
+          <p className="text-gray-400 text-xs">درجة التدريب</p>
+          <p className="text-6xl font-bold" style={{ color: scoreColor }}>
+            {formatTrainingPercent(allUngraded, submitResult.score_global)}
+          </p>
+          <p className="text-amber-200/90 text-xs leading-relaxed max-w-lg mx-auto">
+            {submitResult.banner_ar || TRAINING_BANNER_AR}
+          </p>
           <p className="text-gray-400 text-sm">الزمن المستخدم: {formatTime(submitResult.time_used_sec)}</p>
           <p className="text-gray-300 text-sm leading-relaxed max-w-lg mx-auto">{submitResult.debrief_message}</p>
         </div>
