@@ -24,6 +24,7 @@ export type GradeCardModel = {
   scienceStatus?: string
   scienceFlags?: string[]
   scienceCapped?: boolean
+  capsApplied?: string[]
   praiseAr?: string
   nextStepAr?: string
   phraseAr?: string
@@ -77,6 +78,14 @@ export function formatTrainingPercent(ungraded: boolean, overall: number): strin
   return ungraded ? "—" : `${overall}%`
 }
 
+function capHints(model: GradeCardModel): string[] {
+  const caps = model.capsApplied || []
+  const bits: string[] = []
+  if (caps.includes("stuffing")) bits.push("سقف 50 · حشو")
+  if (caps.includes("science") || model.scienceCapped) bits.push("سقف 40")
+  return bits
+}
+
 export function GradeResultCard({
   model,
   compact = false,
@@ -102,6 +111,7 @@ export function GradeResultCard({
           <p className={`text-[11px] ${methodLabelClass(model.methodLabelAr)}`}>
             منهج: {model.methodLabelAr}
             {model.scienceStatus === "error" ? " · محتوى: خطأ" : ""}
+            {capHints(model).length ? ` · ${capHints(model).join(" · ")}` : ""}
           </p>
         ) : null}
       </div>
@@ -115,6 +125,9 @@ export function GradeResultCard({
         <div>
           <p className="text-gray-400 text-xs">درجة التدريب</p>
           <p className="text-4xl font-black text-white">{overall}</p>
+          {!ungraded && capHints(model).length ? (
+            <p className="text-amber-200/90 text-[11px] mt-1">{capHints(model).join(" · ")}</p>
+          ) : null}
         </div>
         {!ungraded ? (
           <div className="text-sm text-gray-300 space-y-1">
@@ -126,7 +139,7 @@ export function GradeResultCard({
             </p>
             <p className={sci.className}>
               محتوى: {sci.label}
-              {model.scienceCapped ? " · سقف 40" : ""}
+              {(model.capsApplied || []).includes("science") || model.scienceCapped ? " · سقف 40" : ""}
             </p>
           </div>
         ) : null}
@@ -182,6 +195,7 @@ export function methodologyToCard(e: {
   scienceStatus?: string
   scienceFlags?: string[]
   scienceCapped?: boolean
+  capsApplied?: string[]
   orderOk?: boolean | null
   bannerAr?: string
   advice?: string
@@ -206,6 +220,7 @@ export function methodologyToCard(e: {
     scienceStatus: e.scienceStatus,
     scienceFlags: e.scienceFlags,
     scienceCapped: e.scienceCapped,
+    capsApplied: e.capsApplied,
     praiseAr: e.praiseAr,
     nextStepAr: e.nextStepAr,
     phraseAr: e.advice,
@@ -230,6 +245,7 @@ export function verbEvalToCard(e: {
   science_status?: string
   science_flags?: string[]
   science_capped?: boolean
+  caps_applied?: string[]
   order_ok?: boolean | null
   banner_ar?: string
   advice?: string
@@ -245,6 +261,7 @@ export function verbEvalToCard(e: {
     scienceStatus: e.science_status,
     scienceFlags: e.science_flags,
     scienceCapped: e.science_capped,
+    capsApplied: e.caps_applied,
     phraseAr: e.advice,
     bannerAr: e.banner_ar || TRAINING_BANNER_AR,
   }

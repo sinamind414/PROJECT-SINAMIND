@@ -972,6 +972,7 @@ class KhawarizmiApiClient {
         science_status: "ok" | "error" | "not_applicable"
         science_flags: string[]
         science_capped: boolean
+        caps_applied?: string[]
         overall_training_percent: number
         phrase_ar: string
         praise_ar: string

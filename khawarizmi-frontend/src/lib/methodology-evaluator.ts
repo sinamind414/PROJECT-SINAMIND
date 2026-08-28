@@ -31,6 +31,7 @@ export type MethodologyEvaluation = {
   scienceStatus?: string
   scienceFlags?: string[]
   scienceCapped?: boolean
+  capsApplied?: string[]
   orderOk?: boolean | null
   bannerAr?: string
   praiseAr?: string

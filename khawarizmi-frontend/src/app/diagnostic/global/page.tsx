@@ -102,6 +102,7 @@ function gradeToEvaluation(
     scienceStatus: g.science_status,
     scienceFlags: g.science_flags,
     scienceCapped: g.science_capped,
+    capsApplied: Array.isArray(g.caps_applied) ? g.caps_applied : [],
     orderOk: g.order_ok,
     bannerAr: g.banner_ar,
     praiseAr: g.praise_ar,

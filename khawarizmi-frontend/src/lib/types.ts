@@ -447,6 +447,7 @@ export interface VerbEvaluateResponse {
   overall_training_percent?: number
   science_status?: string
   science_capped?: boolean
+  caps_applied?: string[]
   science_flags?: string[]
   order_ok?: boolean | null
   praise_ar?: string
