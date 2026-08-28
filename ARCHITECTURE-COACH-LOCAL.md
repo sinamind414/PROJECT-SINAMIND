@@ -1,7 +1,7 @@
 # Architecture cible — Coach local « comme le livre »
 
 **Date :** 2026-08-26 · **révisé** 2026-08-27 (C1 clé cache, contrat sanity, politique lexique, table d’état)  
-**Statut :** S0–S21 **implémentés** — `grade()` 1.1.5 + 10 L0 + `/api/grade` + adaptateurs + UI 2 axes + cache C1+sha16 + `counter_examples` + caps hors méthode. Flag `LOCAL_RUBRIC_GRADER` défaut `false`.  
+**Statut :** S0–S22 **implémentés** — `grade()` 1.1.5 + 10 L0 + `/api/grade` + adaptateurs + UI 2 axes + cache C1+sha16 + `counter_examples` + caps hors méthode + defer consomme le quota. Flag `LOCAL_RUBRIC_GRADER` défaut `false`.  
 **S0 (T1–T3) :** **fait** (T1 UI PDF, T2 IDOR, T3 whitelist). Flag prod encore `false`. Voir table §14.1.  
 **Public :** revue humaine / audit par IA  
 **Produit :** Khawarizmi / IA Khawarizmi Pro — Bac SVT Algérie 3AS  
@@ -381,8 +381,8 @@ def grade(
         sinon                              → method=0, STOP
     Caractères utiles = arabe + digits + latin + CO2/ATP/°/+/-/→
     defer = GradeResult COMPLET + sanity_code=defer (monitoring), method calculée.
-    Quota S2 : compter UNIQUEMENT sanity==ok (vide/cache/defer ne consomment pas).
-    DoS mineure assumée : defer = compute regex gratuit ; grade() est cheap.
+    Quota : compter sanity==ok **et** defer (S22/B4). Vide / cache / 422 / stop sanity = 0.
+    G7 reste defer ≠ 0. FSRS **pas** écrit sur defer (`may_write_fsrs` exige sanity==ok).
 
     Français / code-switching :
       les tokens FR du $lex (ATP, enzyme, glucose) NE baissent PAS le seuil 0.30.
@@ -509,8 +509,8 @@ On **réutilise** : `arabic.py` (étendu), `_GRAVE_ERRORS`, `_NUMERIC_RULES`, `_
 POST /api/grade
   body: { question_id, answer, surface: da|verb|bac }
   auth: get_current_user
-  quota evaluate_limit : compter UNIQUEMENT si sanity==ok
-        (vide/cache ne consomment pas)
+  quota evaluate_limit : compter si sanity==ok **ou** defer (S22)
+        (vide / cache / 422 / stop sanity ne consomment pas)
 
 GET  /api/grade/rubric/{question_id}
   → verb, criteria[].id + label_ar, total_points, method_graph.steps
@@ -730,11 +730,12 @@ S5  mixins chapitre + $lex: extrait fichier  (condition de survie L1)
 | S14 cache C1 | **OUI** | clé `grade:{version}:{rubric_id}:{rubric.ver}:{doc}:{doc.ver}:{verb}:{hash}` — 0 `user_id`. Hors `grade()`. |
 | S15 chatbot explain-back / boss-fight | **OUI** | Plus de % overlap / longueur. `ungraded`, 0 copie, 0 `model_answer`. Pas d’alias L0. `GRADER_VERSION` reste `1.1.4`. |
 | S16 cache Redis optionnel | **OUI** | `grade_cache` SETEX 7 j via `state.redis` si dispo ; mémoire sinon. 0 Redis dans `grade()`. 0 `user_id`. 0 copie. |
-| S17 quota + FSRS sur `/api/grade` | **OUI** | `evaluate_limit` seulement si `sanity==ok` (vide/cache/defer/422 = 0). FSRS `may_write_fsrs`, 0 copie, 0 `da_answers` sur cette route. |
+| S17 quota + FSRS sur `/api/grade` | **OUI** | S17 : `evaluate_limit` si `sanity==ok`. **S22** : defer aussi. Vide/cache/422/stop = 0. FSRS `may_write_fsrs`, 0 copie, 0 `da_answers` sur cette route. |
 | S18 goldens négatifs `validate_rubrics` | **OUI** | Merge bloqué si hors-sujet ou 36 ATP overall > 40, ou vide ≠ 0. Mêmes copies que golden L0. `GRADER_VERSION` 1.1.4. |
 | S19 cache sha16 | **OUI** | clé C1 + `sha16` Rubric+Document. Éditer un critère sans bump de version → nouvelle clé. 0 `user_id`. Hors `grade()`. |
 | S20 `counter_examples` L0 | **OUI** | ≥2 par grille dont `off_topic`, `axis` overall/method, `use` fermé `model+atp36`. Hors GET rubric. |
 | S21 caps hors méthode | **OUI** | stuffing/science → `overall` + `caps_applied`. `method_percent` pur. متقن interdit si stuffing. `GRADER_VERSION=1.1.5`. |
+| S22 defer consomme le quota (B4) | **OUI** | `should_count_quota` : `ok` **ou** `defer`. G7 reste `defer` ≠ 0. FSRS non. Cache non. Pas de compteur 50/jour. `GRADER_VERSION` inchangé `1.1.5`. |
 
 **Gates :**
 - S0 → S1 : G9, G10 verts (même sans grader) — **contourné volontairement** le 2026-08-27 : S1 = moteur **testable hors prod**, pas une mise en ligne. Le gate redevient bloquant le jour où `LOCAL_RUBRIC_GRADER=true`.

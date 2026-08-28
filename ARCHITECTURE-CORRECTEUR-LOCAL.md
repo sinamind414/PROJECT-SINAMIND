@@ -1,7 +1,7 @@
 # Architecture détaillée — Correcteur local Khawarizmi
 
 **Version moteur :** `GRADER_VERSION = 1.1.5`  
-**Statut :** **S0–S21.** `grade()` 0 LLM, `GRADER_VERSION=1.1.5`. Adaptateurs + G11 + hash + mixins/`$lex:` + v2/methodology/JS gelés. UI 2 axes + G12. Drill/exercices copies → grade()/ungraded. Schéma dessiné = 0 auto. Observabilité `/api/grade/metrics`. Colonnes 035. Cache C1 + sha16 hors `grade()`. Chatbot copies gelées. Quota sanity==ok. FSRS `may_write_fsrs`. `validate_rubrics` G5+négatifs. Sans grille → ungraded.  
+**Statut :** **S0–S22.** `grade()` 0 LLM, `GRADER_VERSION=1.1.5`. Adaptateurs + G11 + hash + mixins/`$lex:` + v2/methodology/JS gelés. UI 2 axes + G12. Drill/exercices copies → grade()/ungraded. Schéma dessiné = 0 auto. Observabilité `/api/grade/metrics`. Colonnes 035. Cache C1 + sha16 hors `grade()`. Chatbot copies gelées. Quota `ok` **ou** `defer` (S22). FSRS `may_write_fsrs`. `validate_rubrics` G5+négatifs. Sans grille → ungraded.  
 **Promesse :** noter **méthode (Manhadjiya) + science (manuel / دليل)** sans mentir sur le %.  
 **Bannière élève :** `ملاحظة تدريبية — منهج + محتوى. ليست علامة بكالوريا رسمية.`
 
@@ -210,7 +210,7 @@ Graves photosynthèse **ignorées** hors thème (évite « الخميرة تنت
 Si tokens < 20 : **jamais**.  
 Sinon : ratio (hits thème + variants) / tokens > **0.60** et **pas** de keypoint/objet  
 **ou** distractor hit.  
-→ `stuffing_suspected`, `method_percent = min(%, 50)`.
+→ `stuffing_suspected`, overall ≤ 50, `caps_applied+=stuffing`. `method_percent` pur (S21).
 
 ### [7] Diagnosis (un seul code, priorité code actuel)
 
@@ -297,11 +297,12 @@ S13 colonnes 035 da_answers (engine/science/method_percent/diagnosis)        ←
 S14 cache C1 hors grade() (rubric_id+doc_id, 0 user_id, TTL 7 j, sanity=ok) ← FAIT
 S15 chatbot explain-back + boss-fight → ungraded (0 overlap, 0 model_answer) ← FAIT
 S16 Redis optionnel SETEX 7 j sur cache C1 (mémoire si pas Redis ; 0 Redis dans grade()) ← FAIT
-S17 quota evaluate_limit (sanity==ok only) + FSRS may_write_fsrs sur POST /api/grade     ← FAIT
+S17 quota evaluate_limit + FSRS may_write_fsrs sur POST /api/grade                      ← FAIT
 S18 validate_rubrics goldens négatifs (hors-sujet / 36 ATP / vide → plafond)            ← FAIT
 S19 cache sha16 (Rubric+Document) si bump oublié — 0 user_id, hors grade()               ← FAIT
 S20 counter_examples L0 (≥2 dont off_topic, axis overall, hors GET)                     ← FAIT
 S21 stuffing/science hors method_percent ; caps_applied ; متقن interdit si stuffing ; 1.1.5 ← FAIT
+S22 defer consomme evaluate_limit (B4) ; G7 reste defer ; FSRS non ; 1.1.5 inchangé      ← FAIT
 ```
 
 **Brancher S2 sans tuer le fallback front = deux notes. Interdit.**

@@ -1,4 +1,4 @@
-"""S17 — quota /api/grade : sanity==ok seulement. Cache/vide/defer/422 ne consomment pas."""
+"""S17 — quota /api/grade. Cache/vide/stop/422 = 0. defer : S22 (compte)."""
 
 from __future__ import annotations
 
@@ -18,14 +18,14 @@ QUOTA = (BACKEND / "services" / "grade_quota.py").read_text(encoding="utf-8")
 INIT = (BACKEND / "routes" / "__init__.py").read_text(encoding="utf-8")
 
 
-def test_quota_only_sanity_ok_not_cache():
+def test_quota_ok_and_stops_not_cache():
     assert should_count_quota(sanity_code="ok", from_cache=False) is True
     assert should_count_quota(sanity_code="ok", from_cache=True) is False
     assert should_count_quota(sanity_code="empty", from_cache=False) is False
     assert should_count_quota(sanity_code="too_short", from_cache=False) is False
     assert should_count_quota(sanity_code="not_arabic", from_cache=False) is False
     assert should_count_quota(sanity_code="gibberish", from_cache=False) is False
-    assert should_count_quota(sanity_code="defer", from_cache=False) is False
+    assert should_count_quota(sanity_code="defer", from_cache=False) is True  # S22 / B4
 
 
 def test_empty_copy_does_not_count():
