@@ -93,7 +93,7 @@ def test_evaluate_still_not_mounted():
 
 
 def test_grader_version_unchanged():
-    assert GRADER_VERSION == "1.1.5"
+    assert GRADER_VERSION == "1.1.6"
     assert "openai" not in GRADER
     assert "from services.chatbot_engagement_service" not in GRADER
     assert TRAINING_BANNER_AR.startswith("ملاحظة تدريبية")

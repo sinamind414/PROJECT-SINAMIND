@@ -88,7 +88,7 @@ def test_model_answer_change_does_not_bust_key():
 def test_grader_untouched():
     assert "canon_sha16" not in GRADER
     assert "grade_cache" not in GRADER
-    assert GRADER_VERSION == "1.1.5"
+    assert GRADER_VERSION == "1.1.6"
     assert "openai" not in GRADER
 
 

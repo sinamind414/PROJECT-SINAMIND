@@ -22,7 +22,7 @@ from schemas.rubric import (
 from services.answer_sanity import check_answer_sanity
 from services.arabic import normalize_arabic
 
-GRADER_VERSION = "1.1.5"
+GRADER_VERSION = "1.1.6"
 SCIENCE_CAP_DEFAULT = 40
 TRAINING_BANNER_AR = "ملاحظة تدريبية — منهج + محتوى. ليست علامة بكالوريا رسمية."
 
@@ -35,6 +35,10 @@ _USEFUL_RE = re.compile(
     r"[\u0600-\u06FF0-9A-Za-z°+\-→/]|ATP|CO2|O2",
     re.IGNORECASE,
 )
+
+# N8 chiffres orientaux — filet science seulement (S27). Pas une fusion normalize.
+_INDIC_DIGITS = str.maketrans("٠١٢٣٤٥٦٧٨٩۰۱۲۳۴۵۶۷۸۹", "01234567890123456789")
+_HAS_38_ATP = re.compile(r"38\s+atp", re.IGNORECASE)
 
 _CAUSE_MARKERS = ("لان", "بسبب", "يفسر", "تفسير", "هذا يدل", "راجع")
 _ANALYSE_SLIP = ("لان", "بسبب", "يفسر", "تفسير", "هذا يدل")
@@ -450,7 +454,7 @@ def _science_veto(
     hard: list[str] = []
     warn: list[str] = []
     cap = SCIENCE_CAP_DEFAULT
-    sav = _normalize(student_raw or "")
+    sav = _normalize((student_raw or "").translate(_INDIC_DIGITS))
 
     # Hors-sujet
     theme = _expand_variants(rubric.theme_variants)
@@ -465,6 +469,9 @@ def _science_veto(
         if any(h in msg_ar for h in _PS_GRAVE_HINTS) and not ps_ctx:
             continue
         if re.search(pattern, sav, re.IGNORECASE):
+            # 38 ATP présent → l'élève a corrigé 36/32. Pas un parseur de نفي.
+            if _HAS_38_ATP.search(sav) and re.search(r"36\\s|32\\s", pattern):
+                continue
             hard.append(msg_ar)
             break
 

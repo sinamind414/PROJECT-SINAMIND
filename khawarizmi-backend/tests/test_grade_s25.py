@@ -34,7 +34,7 @@ def test_adapters_forward_caps():
 
 
 def test_grader_untouched_no_version_bump():
-    assert GRADER_VERSION == "1.1.5"
+    assert GRADER_VERSION == "1.1.6"
     assert "GradeResultCard" not in GRADER
     assert "evaluate.router" not in INIT
     assert "ai_evaluate.router" not in INIT
