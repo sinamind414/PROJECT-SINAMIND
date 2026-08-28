@@ -1,7 +1,7 @@
 # Architecture cible — Coach local « comme le livre »
 
 **Date :** 2026-08-26 · **révisé** 2026-08-27 (C1 clé cache, contrat sanity, politique lexique, table d’état)  
-**Statut :** S0–S22 **implémentés** — `grade()` 1.1.5 + 10 L0 + `/api/grade` + adaptateurs + UI 2 axes + cache C1+sha16 + `counter_examples` + caps hors méthode + defer consomme le quota. Flag `LOCAL_RUBRIC_GRADER` défaut `false`.  
+**Statut :** S0–S24 **implémentés** — `grade()` 1.1.5 + 10 L0 + `/api/grade` + adaptateurs + UI 2 axes + cache C1+sha16+filet_sha16 + `counter_examples` + caps hors méthode + defer consomme le quota + métriques `caps_applied`. Flag `LOCAL_RUBRIC_GRADER` défaut `false` (**lu nulle part** — la route note déjà).  
 **S0 (T1–T3) :** **fait** (T1 UI PDF, T2 IDOR, T3 whitelist). Flag prod encore `false`. Voir table §14.1.  
 **Public :** revue humaine / audit par IA  
 **Produit :** Khawarizmi / IA Khawarizmi Pro — Bac SVT Algérie 3AS  
@@ -144,12 +144,13 @@ evaluate.py / ai_eval    GPT-4o → L2                           NON montés —
 **Cache** (équité : **pas** de `user_id`) — **S2, pas dans `grade()`** (P7 : 0 Redis dans le grader) :
 
 ```
-grade:{GRADER_VERSION}:{rubric_id}:{rubric.version}:{doc_id|none}:{doc.version|none}:{verb}:{sha16}:{hash_answer(lstrip+rstrip)}
+grade:{GRADER_VERSION}:{rubric_id}:{rubric.version}:{doc_id|none}:{doc.version|none}:{verb}:{sha16}:{filet_sha16}:{hash_answer(lstrip+rstrip)}
 ```
 
 **Pourquoi `rubric_id` + `doc_id` :** les semver ne sont pas uniques. Dix grilles L0 partagent `version=1.0.0` et plusieurs partagent le verbe `analyse`. Sans identité, la même copie générique collée sur Q1 puis Q2 servirait le `GradeResult` de Q1 — mensonge silencieux sur le %. Test **G17**.
 
-Ceinture S19 : suffixe `:{sha16(json canonique Rubric+Document)}` si l’auteur oublie le bump de version. `model_answer` hors hash (n’affecte pas `grade(copy)`).
+Ceinture S19 : suffixe `:{sha16(json canonique Rubric+Document)}` si l’auteur oublie le bump de version. `model_answer` hors hash (n’affecte pas `grade(copy)`).  
+Ceinture S23 / B2 : `:{filet_sha16}` = graves + numériques + `$lex` fichier + `_SYNONYMS` + regex errata. Éditer Savoir sans bump `GRADER_VERSION` → nouvelle clé. Hors `grade()`.
 
 TTL 7 j. Cachable seulement si `sanity_code=ok` (pas `empty`, pas `defer`).  
 `hash_answer` = HMAC-SHA256 pepper `SECRET_KEY`, hex 64 chars — **déjà** `services/hashing.py`.  
@@ -538,6 +539,7 @@ Compteurs (pas de copie en clair) :
 - taux `422 ungraded` par `question_id`
 - taux `sanity=defer` / `not_arabic` / `too_short`
 - taux `stuffing_suspected`
+- distribution `caps_applied` (`stuffing` / `science`) — S24
 - taux `science_status=error` et `diagnosis_code` par grille
 - hit-rate cache (après C1)
 - latence `grade()` (doit rester cheap : regex)
@@ -659,7 +661,7 @@ grading/pipeline.py · services/fallback_v2.py   # hors chemin grade
 | `SAVOIR_VETO` | `true` dès LOCAL on | filet science |
 | `ENABLE_EXTERNAL_LLM` | ignoré par `grade()` | même à 1, **aucun** appel |
 
-Rollback : `LOCAL_RUBRIC_GRADER=false` → ancien v2/L2 (dégradé mais connu).
+Le flag **n’est lu par aucune route**. `false` **ne** remonte **pas** `evaluate.py` / L2 (`evaluate.py` hors registre). Ne pas l’activer comme « rollback LLM ».
 
 ---
 
@@ -736,6 +738,8 @@ S5  mixins chapitre + $lex: extrait fichier  (condition de survie L1)
 | S20 `counter_examples` L0 | **OUI** | ≥2 par grille dont `off_topic`, `axis` overall/method, `use` fermé `model+atp36`. Hors GET rubric. |
 | S21 caps hors méthode | **OUI** | stuffing/science → `overall` + `caps_applied`. `method_percent` pur. متقن interdit si stuffing. `GRADER_VERSION=1.1.5`. |
 | S22 defer consomme le quota (B4) | **OUI** | `should_count_quota` : `ok` **ou** `defer`. G7 reste `defer` ≠ 0. FSRS non. Cache non. Pas de compteur 50/jour. `GRADER_VERSION` inchangé `1.1.5`. |
+| S23 filet_sha16 cache (B2) | **OUI** | clé + `filet_sha16` (graves, numériques, `$lex`, `_SYNONYMS`, errata). `model_answer` hors. 0 `user_id`. Hors `grade()`. `1.1.5` inchangé. |
+| S24 métriques `caps_applied` | **OUI** | `GET /api/grade/metrics` : compteurs `stuffing` / `science`. 0 copie. Hors `grade()`. `1.1.5` inchangé. |
 
 **Gates :**
 - S0 → S1 : G9, G10 verts (même sans grader) — **contourné volontairement** le 2026-08-27 : S1 = moteur **testable hors prod**, pas une mise en ligne. Le gate redevient bloquant le jour où `LOCAL_RUBRIC_GRADER=true`.

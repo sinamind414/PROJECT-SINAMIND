@@ -1,7 +1,7 @@
 # Architecture détaillée — Correcteur local Khawarizmi
 
 **Version moteur :** `GRADER_VERSION = 1.1.5`  
-**Statut :** **S0–S22.** `grade()` 0 LLM, `GRADER_VERSION=1.1.5`. Adaptateurs + G11 + hash + mixins/`$lex:` + v2/methodology/JS gelés. UI 2 axes + G12. Drill/exercices copies → grade()/ungraded. Schéma dessiné = 0 auto. Observabilité `/api/grade/metrics`. Colonnes 035. Cache C1 + sha16 hors `grade()`. Chatbot copies gelées. Quota `ok` **ou** `defer` (S22). FSRS `may_write_fsrs`. `validate_rubrics` G5+négatifs. Sans grille → ungraded.  
+**Statut :** **S0–S24.** `grade()` 0 LLM, `GRADER_VERSION=1.1.5`. Adaptateurs + G11 + hash + mixins/`$lex:` + v2/methodology/JS gelés. UI 2 axes + G12. Drill/exercices copies → grade()/ungraded. Schéma dessiné = 0 auto. Observabilité `/api/grade/metrics` + `caps_applied`. Colonnes 035. Cache C1 + sha16 + filet_sha16 hors `grade()`. Chatbot copies gelées. Quota `ok` **ou** `defer` (S22). FSRS `may_write_fsrs`. `validate_rubrics` G5+négatifs. Sans grille → ungraded.  
 **Promesse :** noter **méthode (Manhadjiya) + science (manuel / دليل)** sans mentir sur le %.  
 **Bannière élève :** `ملاحظة تدريبية — منهج + محتوى. ليست علامة بكالوريا رسمية.`
 
@@ -248,7 +248,7 @@ Invariant load : `sum(criteria.points) == total_points`.
 
 | Variable | Défaut | Effet |
 |---|---|---|
-| `LOCAL_RUBRIC_GRADER` | **false** | S2 : `/api/grade` + adaptateurs — **pas encore** |
+| `LOCAL_RUBRIC_GRADER` | **false** | **Lu nulle part.** `/api/grade` note déjà. `false` ≠ rollback L2. |
 | `SAVOIR_VETO` | true | filet science (code actuel : toujours on dans `grade()`) |
 | `ENABLE_EXTERNAL_LLM` | ignoré par `grade()` | même à 1, **aucun** appel |
 | `savoir_enabled_verbs` | `[]` | ancien étage Savoir **score** — **hors** `grade()` |
@@ -303,6 +303,8 @@ S19 cache sha16 (Rubric+Document) si bump oublié — 0 user_id, hors grade()   
 S20 counter_examples L0 (≥2 dont off_topic, axis overall, hors GET)                     ← FAIT
 S21 stuffing/science hors method_percent ; caps_applied ; متقن interdit si stuffing ; 1.1.5 ← FAIT
 S22 defer consomme evaluate_limit (B4) ; G7 reste defer ; FSRS non ; 1.1.5 inchangé      ← FAIT
+S23 filet_sha16 (Savoir+$lex) dans clé cache — B2 ; hors grade() ; 1.1.5 inchangé        ← FAIT
+S24 métriques caps_applied (stuffing/science) ; hors grade() ; 1.1.5 inchangé           ← FAIT
 ```
 
 **Brancher S2 sans tuer le fallback front = deux notes. Interdit.**
@@ -324,4 +326,4 @@ Détail C1–C5 : `AUDIT-ARCHI-INDEPENDANT.md`.
 
 ---
 
-*SoT code : `local_grader.py` 1.1.2. SoT cible produit : `ARCHITECTURE-COACH-LOCAL.md`. Audit écarts : `AUDIT-GRADER-LOCAL.md`.*
+*SoT code : `local_grader.py` 1.1.5. SoT cible produit : `ARCHITECTURE-COACH-LOCAL.md`. Audit écarts : `AUDIT-GRADER-LOCAL.md`.*

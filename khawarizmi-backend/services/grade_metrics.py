@@ -13,6 +13,7 @@ _sanity: dict[str, int] = defaultdict(int)
 _science: dict[str, int] = defaultdict(int)
 _diagnosis: dict[str, int] = defaultdict(int)
 _stuffing = 0
+_caps: dict[str, int] = defaultdict(int)
 _graded = 0
 _ungraded = 0
 _latency_ms_sum = 0.0
@@ -30,6 +31,7 @@ def reset() -> None:
         _sanity.clear()
         _science.clear()
         _diagnosis.clear()
+        _caps.clear()
         _stuffing = 0
         _graded = 0
         _ungraded = 0
@@ -72,6 +74,10 @@ def record_result(result, latency_ms: float = 0.0) -> None:
         _bump(_diagnosis, str(code or "none"))
         if getattr(result, "stuffing_suspected", False):
             _stuffing += 1
+        for cap in getattr(result, "caps_applied", None) or []:
+            name = str(cap).strip()[:32]
+            if name:
+                _bump(_caps, name)
         if latency_ms >= 0:
             _latency_ms_sum += latency_ms
             _latency_n += 1
@@ -111,6 +117,7 @@ def snapshot() -> dict:
             "science_status": dict(_science),
             "diagnosis": dict(_diagnosis),
             "stuffing_suspected": _stuffing,
+            "caps_applied": dict(_caps),
             "cache_enabled": True,
             "cache_redis": redis_on,
             "cache_hits": _cache_hits,
