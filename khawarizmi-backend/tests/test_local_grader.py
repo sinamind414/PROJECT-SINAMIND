@@ -99,7 +99,8 @@ class TestG6Stuffing:
         copy = " ".join(["خميرة", "غلوكوز", "تكاثر"] * 12)
         r = grade(student_answer=copy, rubric=p.rubric, document=p.document)
         assert r.stuffing_suspected
-        assert r.method_percent <= 50
+        assert r.overall_training_percent <= 50
+        assert "stuffing" in r.caps_applied
 
     def test_g6b_short_correct_not_stuffing(self):
         p = _yeast()

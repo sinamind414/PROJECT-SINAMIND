@@ -1,7 +1,7 @@
 # Architecture cible — Coach local « comme le livre »
 
 **Date :** 2026-08-26 · **révisé** 2026-08-27 (C1 clé cache, contrat sanity, politique lexique, table d’état)  
-**Statut :** S0–S19 **implémentés** — `grade()` + 10 L0 + `/api/grade` + adaptateurs + UI 2 axes + drill/exercices + schéma 0 auto + métriques + colonnes 035 + cache C1 + sha16 ceinture + chatbot gelé + quota + FSRS + `validate_rubrics` G5+négatifs. Flag `LOCAL_RUBRIC_GRADER` défaut `false`.  
+**Statut :** S0–S21 **implémentés** — `grade()` 1.1.5 + 10 L0 + `/api/grade` + adaptateurs + UI 2 axes + cache C1+sha16 + `counter_examples` + caps hors méthode. Flag `LOCAL_RUBRIC_GRADER` défaut `false`.  
 **S0 (T1–T3) :** **fait** (T1 UI PDF, T2 IDOR, T3 whitelist). Flag prod encore `false`. Voir table §14.1.  
 **Public :** revue humaine / audit par IA  
 **Produit :** Khawarizmi / IA Khawarizmi Pro — Bac SVT Algérie 3AS  
@@ -429,7 +429,8 @@ def grade(
       ratio = (# theme hits + # criterion-variant hits) / tokens
       stuffing si (ratio > 0.60) ET (pas de cites_keypoint si DA) ET (pas de cites_object)
       OU distractors hit
-    Si stuffing : stuffing_suspected=True ; method_percent = min(method_percent, 50)
+    Si stuffing : stuffing_suspected=True ; overall = min(overall, 50) ; caps_applied+=stuffing.
+    method_percent RESTE pur (S21). متقن interdit si stuffing.
     Un « 1 » bidon NE désarme PAS le garde-fou (on ne teste plus number_present ici).
 
 [7] DIAGNOSIS  — UN seul code, priorité :
@@ -479,11 +480,12 @@ class GradeResult(BaseModel):
 | 0–39 | غير كاف | |
 | 40–69 | جزئي | |
 | 70–84 | مقبول | |
-| 85–100 | متقن | **interdit** si `order_ok is False` → rétrogradé `مقبول` |
+| 85–100 | متقن | **interdit** si `order_ok is False` **ou** stuffing → rétrogradé `مقبول` |
 
-`overall_training_percent` :
-- `science_status=error` → `min(method_percent, cap)` (défaut 40)
-- sinon → `method_percent` (déjà plafonné stuffing 50 si besoin)
+`overall_training_percent` (S21) :
+- part de `method_percent` **pur**
+- stuffing → `min(overall, 50)` + `caps_applied`
+- science error → `min(overall, 40)` + `caps_applied`
 
 Libellé UI : **« درجة التدريب »**.
 
@@ -672,7 +674,7 @@ Rollback : `LOCAL_RUBRIC_GRADER=false` → ancien v2/L2 (dégradé mais connu).
 | G3 | Analyse avec لأن | `forbidden_abs` absent + diagnosis `verb_slip.interpret` |
 | G4 | « 36 ATP » + bonne méthode | `science_status=error`, overall capped |
 | G5 | Copie = `model_answer` | method ≥ 85 **sinon corriger la Rubric** |
-| G6 | Bourrage lexique, 0 keypoint, 0 doc | stuffing, method ≤ 50 |
+| G6 | Bourrage lexique, 0 keypoint, 0 doc | stuffing, **overall ≤ 50**, method pur, `caps_applied` |
 | G6b | Réponse courte correcte (< 20 tokens, vrais keypoints) | **pas** stuffing |
 | G7 | `38 ATP · P/O=3` sans arabe | `defer`, **pas** 0 `not_arabic` |
 | G8 | `question_id` sans rubric | HTTP 422 `ungraded` |
@@ -731,7 +733,8 @@ S5  mixins chapitre + $lex: extrait fichier  (condition de survie L1)
 | S17 quota + FSRS sur `/api/grade` | **OUI** | `evaluate_limit` seulement si `sanity==ok` (vide/cache/defer/422 = 0). FSRS `may_write_fsrs`, 0 copie, 0 `da_answers` sur cette route. |
 | S18 goldens négatifs `validate_rubrics` | **OUI** | Merge bloqué si hors-sujet ou 36 ATP overall > 40, ou vide ≠ 0. Mêmes copies que golden L0. `GRADER_VERSION` 1.1.4. |
 | S19 cache sha16 | **OUI** | clé C1 + `sha16` Rubric+Document. Éditer un critère sans bump de version → nouvelle clé. 0 `user_id`. Hors `grade()`. |
-| S20 `counter_examples` L0 | **OUI** | ≥2 par grille dont `off_topic`, `axis` overall/method, `use` fermé `model+atp36`. Hors GET rubric. `GRADER_VERSION` 1.1.4. |
+| S20 `counter_examples` L0 | **OUI** | ≥2 par grille dont `off_topic`, `axis` overall/method, `use` fermé `model+atp36`. Hors GET rubric. |
+| S21 caps hors méthode | **OUI** | stuffing/science → `overall` + `caps_applied`. `method_percent` pur. متقن interdit si stuffing. `GRADER_VERSION=1.1.5`. |
 
 **Gates :**
 - S0 → S1 : G9, G10 verts (même sans grader) — **contourné volontairement** le 2026-08-27 : S1 = moteur **testable hors prod**, pas une mise en ligne. Le gate redevient bloquant le jour où `LOCAL_RUBRIC_GRADER=true`.

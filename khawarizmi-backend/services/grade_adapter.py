@@ -101,6 +101,7 @@ def to_verb_eval(result) -> dict:
         "method_label_ar": result.method_label_ar,
         "science_status": result.science_status,
         "science_capped": bool(result.science_capped),
+        "caps_applied": list(getattr(result, "caps_applied", []) or []),
         "science_flags": list(result.science_flags),
         "order_ok": result.order_ok,
         "praise_ar": result.praise_ar,

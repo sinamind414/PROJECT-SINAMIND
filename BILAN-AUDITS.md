@@ -71,7 +71,7 @@
 | Clé cache collision live | Pas de cache dans `grade()` | **Spec S2**, déjà corrigée sur le papier |
 | G1–G16 « absents » | `test_local_grader.py` + golden L0 | **Faux** (l’auditeur n’avait pas les tests) |
 | praise/next = LLM caché | Templates **JSON** `advice_*` | **Faux** |
-| A2 « un seul moteur » sur le **site** | **S0–S20** : `grade()` + cache C1+sha16 + chatbot gelé + quota + `counter_examples` | **Fermé** sur le chemin de note |
+| A2 « un seul moteur » sur le **site** | **S0–S21** : `grade()` + cache C1+sha16 + chatbot gelé + quota + `counter_examples` + caps hors méthode | **Fermé** sur le chemin de note |
 
 ---
 
@@ -101,4 +101,4 @@ Les 4 passes répètent souvent les **mêmes** 3 vrais (S0 prod, N1 digits, N2 `
 
 ---
 
-*S0–S19 : T1–T3, N1–N2, `/api/grade`, adaptateurs, G11, hash, mixins + `$lex:`, v2/methodology/JS gelés, UI 2 axes, drill/exercices/schéma gelés, métriques, colonnes 035, cache C1+sha16 hors `grade()`, chatbot copies ungraded, quota sanity==ok + FSRS, `validate_rubrics` G5+négatifs, `evaluate.py` hors registre, `GRADER_VERSION=1.1.4`.*
+*S0–S21 : T1–T3, N1–N2, `/api/grade`, adaptateurs, G11, hash, mixins + `$lex:`, v2/methodology/JS gelés, UI 2 axes, drill/exercices/schéma gelés, métriques, colonnes 035, cache C1+sha16, chatbot ungraded, quota sanity==ok + FSRS, `validate_rubrics` G5+négatifs+`counter_examples`, stuffing/science hors `method_percent` (`GRADER_VERSION=1.1.5`), `evaluate.py` hors registre.*

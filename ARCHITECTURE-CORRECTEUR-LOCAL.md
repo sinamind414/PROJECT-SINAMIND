@@ -1,7 +1,7 @@
 # Architecture détaillée — Correcteur local Khawarizmi
 
-**Version moteur :** `GRADER_VERSION = 1.1.4`  
-**Statut :** **S0–S20.** `grade()` 0 LLM, `GRADER_VERSION=1.1.4`. Adaptateurs + G11 + hash + mixins/`$lex:` + v2/methodology/JS gelés. UI 2 axes + G12. Drill/exercices copies → grade()/ungraded. Schéma dessiné = 0 auto. Observabilité `/api/grade/metrics`. Colonnes 035. Cache C1 + sha16 hors `grade()`. Chatbot copies gelées. Quota sanity==ok. FSRS `may_write_fsrs`. `validate_rubrics` G5+négatifs. Sans grille → ungraded.  
+**Version moteur :** `GRADER_VERSION = 1.1.5`  
+**Statut :** **S0–S21.** `grade()` 0 LLM, `GRADER_VERSION=1.1.5`. Adaptateurs + G11 + hash + mixins/`$lex:` + v2/methodology/JS gelés. UI 2 axes + G12. Drill/exercices copies → grade()/ungraded. Schéma dessiné = 0 auto. Observabilité `/api/grade/metrics`. Colonnes 035. Cache C1 + sha16 hors `grade()`. Chatbot copies gelées. Quota sanity==ok. FSRS `may_write_fsrs`. `validate_rubrics` G5+négatifs. Sans grille → ungraded.  
 **Promesse :** noter **méthode (Manhadjiya) + science (manuel / دليل)** sans mentir sur le %.  
 **Bannière élève :** `ملاحظة تدريبية — منهج + محتوى. ليست علامة بكالوريا رسمية.`
 
@@ -106,7 +106,7 @@ def grade_question(question_id: str, student_answer: str) -> GradeResult
 | 70–84 | مقبول | |
 | 85–100 | متقن | interdit si `order_ok is False` **ou** case `required` absente → **مقبول** |
 
-`overall_training_percent` = `min(method_percent, 40)` si science error ; sinon `method_percent` (déjà plafonné stuffing 50).
+`overall_training_percent` = `method_percent`, puis cap stuffing 50, puis cap science 40. `method_percent` **pur** (S21). `caps_applied` liste les caps. متقن interdit si stuffing.
 
 ---
 
@@ -301,6 +301,7 @@ S17 quota evaluate_limit (sanity==ok only) + FSRS may_write_fsrs sur POST /api/g
 S18 validate_rubrics goldens négatifs (hors-sujet / 36 ATP / vide → plafond)            ← FAIT
 S19 cache sha16 (Rubric+Document) si bump oublié — 0 user_id, hors grade()               ← FAIT
 S20 counter_examples L0 (≥2 dont off_topic, axis overall, hors GET)                     ← FAIT
+S21 stuffing/science hors method_percent ; caps_applied ; متقن interdit si stuffing ; 1.1.5 ← FAIT
 ```
 
 **Brancher S2 sans tuer le fallback front = deux notes. Interdit.**

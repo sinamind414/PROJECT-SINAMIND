@@ -43,6 +43,7 @@ def _public_grade_dict(result) -> dict:
         "science_status": result.science_status,
         "science_flags": result.science_flags,
         "science_capped": result.science_capped,
+        "caps_applied": list(getattr(result, "caps_applied", []) or []),
         "sanity_code": result.sanity_code,
         "stuffing_suspected": result.stuffing_suspected,
         "diagnosis": {"code": diag.code, "label_ar": diag.label_ar} if diag else None,

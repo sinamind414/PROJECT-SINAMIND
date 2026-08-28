@@ -97,6 +97,7 @@ class GradeResult(BaseModel):
     science_status: Literal["ok", "error", "not_applicable"]
     science_flags: list[str] = Field(default_factory=list)
     science_capped: bool = False
+    caps_applied: list[str] = Field(default_factory=list)
 
     sanity_code: str
     stuffing_suspected: bool = False

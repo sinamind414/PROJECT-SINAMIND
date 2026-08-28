@@ -22,7 +22,7 @@ from schemas.rubric import (
 from services.answer_sanity import check_answer_sanity
 from services.arabic import normalize_arabic
 
-GRADER_VERSION = "1.1.4"
+GRADER_VERSION = "1.1.5"
 SCIENCE_CAP_DEFAULT = 40
 TRAINING_BANNER_AR = "ملاحظة تدريبية — منهج + محتوى. ليست علامة بكالوريا رسمية."
 
@@ -412,7 +412,12 @@ def _order_ok(
     return all(positions[i] <= positions[i + 1] for i in range(len(positions) - 1))
 
 
-def _label_ar(percent: int, order_ok: bool | None, required_missing: bool) -> str:
+def _label_ar(
+    percent: int,
+    order_ok: bool | None,
+    required_missing: bool,
+    stuffing: bool = False,
+) -> str:
     if percent <= 39:
         base = "غير كاف"
     elif percent <= 69:
@@ -421,7 +426,7 @@ def _label_ar(percent: int, order_ok: bool | None, required_missing: bool) -> st
         base = "مقبول"
     else:
         base = "متقن"
-    if base == "متقن" and (order_ok is False or required_missing):
+    if base == "متقن" and (order_ok is False or required_missing or stuffing):
         return "مقبول"
     return base
 
@@ -623,6 +628,7 @@ def _stopped_result(
         criteria=hits,
         overall_training_percent=0,
         cacheable=False,
+        caps_applied=[],
     )
 
 
@@ -670,17 +676,19 @@ def grade(
     science_status, science_flags, cap = _science_veto(raw, text, rubric)
 
     stuffing = _stuffing(text, rubric, hits, document)
+    caps_applied: list[str] = []
+    overall = method_percent
     if stuffing:
-        method_percent = min(method_percent, 50)
-
+        overall = min(overall, 50)
+        caps_applied.append("stuffing")
     if science_status == "error":
-        overall = min(method_percent, cap)
+        overall = min(overall, cap)
+        caps_applied.append("science")
         capped = True
     else:
-        overall = method_percent
         capped = False
 
-    label = _label_ar(method_percent, order, required_missing)
+    label = _label_ar(method_percent, order, required_missing, stuffing)
 
     slip = _verb_slip(rubric.verb_slug, text)
     unanchored = False
@@ -755,6 +763,7 @@ def grade(
         criteria=hits,
         overall_training_percent=int(overall),
         cacheable=cacheable,
+        caps_applied=caps_applied,
     )
 
 
