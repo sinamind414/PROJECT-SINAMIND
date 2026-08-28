@@ -101,4 +101,4 @@ Les 4 passes répètent souvent les **mêmes** 3 vrais (S0 prod, N1 digits, N2 `
 
 ---
 
-*S0–S26 : T1–T3, N1–N2, `/api/grade`, adaptateurs, G11, hash, mixins + `$lex:`, v2/methodology/JS gelés, UI 2 axes + caps visibles, drill/exercices/schéma gelés, métriques + `caps_applied`, colonnes 035, cache C1+sha16+filet_sha16, P/O NADH/FADH contextualisé, chatbot ungraded, quota `ok`+`defer` (S22) + FSRS, `validate_rubrics` G5+négatifs+`counter_examples`, stuffing/science hors `method_percent` (`GRADER_VERSION=1.1.5`), `evaluate.py` hors registre.*
+*S0–S28 : T1–T3, N1–N2, `/api/grade`, adaptateurs, G11, hash, mixins + `$lex:`, v2/methodology/JS gelés, UI 2 axes + caps, métriques, cache C1+sha16+filet_sha16, P/O NADH/FADH, filet ATP ٣٦ + 38-annule-36 (`1.1.6`), FSRS pas sur cache hit, quota `ok`+`defer`, `evaluate.py` hors registre.*

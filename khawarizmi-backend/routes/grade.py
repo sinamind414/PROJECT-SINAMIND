@@ -143,7 +143,7 @@ async def post_grade(
     if hit is not None:
         record_cache(True)
         record_result(hit, (time.perf_counter() - t0) * 1000)
-        await _maybe_write_fsrs(current_user, hit, chapter)
+        # S28 : cache ≠ nouvelle tentative FSRS
         return _public_grade_dict(hit)
     result = grade(
         student_answer=body.answer,

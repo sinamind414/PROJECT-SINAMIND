@@ -43,6 +43,9 @@ def ungraded_http(question_id: str) -> dict:
 
 
 def may_write_fsrs(result) -> bool:
+    """S28 : pas d'écriture si from_cache (2ᵉ clic ≠ +1 attempt)."""
+    if getattr(result, "from_cache", False):
+        return False
     if result.sanity_code != "ok":
         return False
     if result.method_percent < 10:

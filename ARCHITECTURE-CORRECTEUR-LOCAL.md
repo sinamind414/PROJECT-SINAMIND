@@ -1,7 +1,7 @@
 # Architecture détaillée — Correcteur local Khawarizmi
 
-**Version moteur :** `GRADER_VERSION = 1.1.5`  
-**Statut :** **S0–S26.** `grade()` 0 LLM, `GRADER_VERSION=1.1.5`. Adaptateurs + G11 + hash + mixins/`$lex:` + v2/methodology/JS gelés. UI 2 axes + caps visibles. P/O NADH 3 / FADH 2 (pas `p/o` nu). Cache C1 + sha16 + filet_sha16. Quota `ok` **ou** `defer`. Sans grille → ungraded.  
+**Version moteur :** `GRADER_VERSION = 1.1.6`  
+**Statut :** **S0–S28.** `grade()` 0 LLM, `GRADER_VERSION=1.1.6`. Filet ATP ٣٦ + 38 annule 36. FSRS pas sur cache hit. P/O NADH/FADH. UI 2 axes + caps. Cache C1+sha16+filet_sha16. Quota `ok` **ou** `defer`. Sans grille → ungraded.  
 **Promesse :** noter **méthode (Manhadjiya) + science (manuel / دليل)** sans mentir sur le %.  
 **Bannière élève :** `ملاحظة تدريبية — منهج + محتوى. ليست علامة بكالوريا رسمية.`
 
@@ -307,6 +307,8 @@ S23 filet_sha16 (Savoir+$lex) dans clé cache — B2 ; hors grade() ; 1.1.5 inch
 S24 métriques caps_applied (stuffing/science) ; hors grade() ; 1.1.5 inchangé           ← FAIT
 S25 UI GradeResultCard : سقف 50 حشو / سقف 40 ; hors grade() ; 1.1.5 inchangé            ← FAIT
 S26 P/O contextualisé (FADH2=2 juste ; NADH P/O=2 cap) ; filet_sha16 ; 1.1.5            ← FAIT
+S27 filet ATP ٣٦ + ليس 36 بل 38 ; GRADER_VERSION=1.1.6 ; pas fusion normalize           ← FAIT
+S28 FSRS pas sur cache hit (idempotence) ; hors grade() ; 1.1.6                         ← FAIT
 ```
 
 **Brancher S2 sans tuer le fallback front = deux notes. Interdit.**
@@ -328,4 +330,4 @@ Détail C1–C5 : `AUDIT-ARCHI-INDEPENDANT.md`.
 
 ---
 
-*SoT code : `local_grader.py` 1.1.5. SoT cible produit : `ARCHITECTURE-COACH-LOCAL.md`. Audit écarts : `AUDIT-GRADER-LOCAL.md`.*
+*SoT code : `local_grader.py` 1.1.6. SoT cible produit : `ARCHITECTURE-COACH-LOCAL.md`. Audit écarts : `AUDIT-GRADER-LOCAL.md`.*
