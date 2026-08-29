@@ -238,6 +238,9 @@ sanity.*  >  off_topic  >  science.grave  >  verb_slip.*
 | `greffe-ltc-deduce` | استنتج | خلوية + LTc | 3 |
 | `synapse-curare-deduce` | استنتج | كورار / Ach | 3 |
 | `proteine-adn-scientific-text` | نص | intro / نسخ / ترجمة / خاتمة | 5 |
+| `bac2023-s1-ex2-analyse-traduction` | حلّل **L1** | ML901 : 100 / 1,5 / 5 — يثبط الترجمة | 4 |
+
+L1 = **une** question 2023, chiffres **السلم** seulement (pas le sujet entier, pas /20). `كلما` non exigé.
 
 Invariant load : `sum(criteria.points) == total_points`.  
 `validate_rubrics.py` : `model_answer` ≥ 85 % **et** hors-sujet / 36 ATP overall ≤ 40, vide = 0, **et** ≥2 `counter_examples` (dont `off_topic`) — sinon merge refusé. Jamais exposés par GET.

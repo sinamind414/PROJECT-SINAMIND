@@ -37,5 +37,9 @@
   },
   "proteine-adn-scientific-text": {
     "rubric": "rubrics/questions/proteine-adn-scientific-text.v1.json"
+  },
+  "bac2023-s1-ex2-analyse-traduction": {
+    "rubric": "rubrics/questions/bac2023-s1-ex2-analyse-traduction.v1.json",
+    "document": "documents/bac2023-ml901-translation.v1.json"
   }
 }
