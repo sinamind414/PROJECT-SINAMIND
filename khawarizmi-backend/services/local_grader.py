@@ -22,7 +22,7 @@ from schemas.rubric import (
 from services.answer_sanity import check_answer_sanity
 from services.arabic import normalize_arabic
 
-GRADER_VERSION = "1.1.6"
+GRADER_VERSION = "1.1.7"
 SCIENCE_CAP_DEFAULT = 40
 TRAINING_BANNER_AR = "ملاحظة تدريبية — منهج + محتوى. ليست علامة بكالوريا رسمية."
 
@@ -104,8 +104,9 @@ def _expand_variants(variants: list[str]) -> list[str]:
 
 
 _WORD_BOUND = r"[a-z0-9\u0600-\u06ff]"
-# Liste FERMÉE — pas de stemming. تقبل «فكلما» / «النمو».
-_PROCLITICS = ("وال", "فال", "بال", "لل", "ال", "و", "ف", "ب", "ك", "ل")
+# Liste FERMÉE — pas de stemming. تقبل «فكلما» / «النمو» / «كالخميرة».
+# كال = ك+ال (comme فال/بال/وال). Sans ça, خميرة ⊄ كالخميرة (ك already, ال already, pas le composé).
+_PROCLITICS = ("وال", "فال", "بال", "لل", "كال", "ال", "و", "ف", "ب", "ك", "ل")
 
 
 def _unigram_forms(needle: str) -> list[str]:

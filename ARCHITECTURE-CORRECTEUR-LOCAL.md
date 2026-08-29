@@ -1,7 +1,7 @@
 # Architecture détaillée — Correcteur local Khawarizmi
 
-**Version moteur :** `GRADER_VERSION = 1.1.6`  
-**Statut :** **S0–S28.** `grade()` 0 LLM, `GRADER_VERSION=1.1.6`. Filet ATP ٣٦ + 38 annule 36. FSRS pas sur cache hit. P/O NADH/FADH. UI 2 axes + caps. Cache C1+sha16+filet_sha16. Quota `ok` **ou** `defer`. Sans grille → ungraded.  
+**Version moteur :** `GRADER_VERSION = 1.1.7`  
+**Statut :** **S0–S29.** `grade()` 0 LLM, `GRADER_VERSION=1.1.7`. Proclitique `كال`. Filet ATP ٣٦ + 38 annule 36. FSRS pas sur cache hit. P/O NADH/FADH. UI 2 axes + caps. Cache C1+sha16+filet_sha16. Quota `ok` **ou** `defer`. Sans grille → ungraded.  
 **Promesse :** noter **méthode (Manhadjiya) + science (manuel / دليل)** sans mentir sur le %.  
 **Bannière élève :** `ملاحظة تدريبية — منهج + محتوى. ليست علامة بكالوريا رسمية.`
 
@@ -154,7 +154,7 @@ Appelle `check_answer_sanity`, puis :
 | N10 | espaces + `.lower()` |
 
 **Pas** Levenshtein, **pas** stemming scientifique.  
-Proclitiques **fermés** au match seulement : `و ف ب ك ل ال وال فال بال لل` (فكلما، النمو).
+Proclitiques **fermés** au match seulement : `و ف ب ك ل ال وال فال بال لل كال` (فكلما، النمو، كالخميرة). Pas `فل`.
 
 **Dette :** `savoir_corrector._normalize` est **un autre** normaliseur (graves Savoir). Ne pas fusionner sans rejouer le golden Savoir.
 
@@ -309,6 +309,7 @@ S25 UI GradeResultCard : سقف 50 حشو / سقف 40 ; hors grade() ; 1.1.5 inc
 S26 P/O contextualisé (FADH2=2 juste ; NADH P/O=2 cap) ; filet_sha16 ; 1.1.5            ← FAIT
 S27 filet ATP ٣٦ + ليس 36 بل 38 ; GRADER_VERSION=1.1.6 ; pas fusion normalize           ← FAIT
 S28 FSRS pas sur cache hit (idempotence) ; hors grade() ; 1.1.6                         ← FAIT
+S29 proclitique كال (كالخميرة) ; liste fermée ; 1.1.7 ; pas فل / pas stemming            ← FAIT
 ```
 
 **Brancher S2 sans tuer le fallback front = deux notes. Interdit.**

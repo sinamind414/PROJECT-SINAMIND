@@ -62,7 +62,7 @@ def test_grave_edit_without_version_bump_changes_key():
         k2 = make_key(yeast, copy)
         assert k1 != k2
         assert filet_sha16() in k2
-        assert ver == "1.1.6"
+        assert ver == "1.1.7"
     finally:
         _GRAVE_ERRORS.pop()
         filet_sha16.cache_clear()
@@ -90,7 +90,7 @@ def test_synonyms_edit_changes_key_not_canon_sha():
 
 
 def test_grader_untouched_no_version_bump():
-    assert GRADER_VERSION == "1.1.6"
+    assert GRADER_VERSION == "1.1.7"
     assert "filet_sha16" not in GRADER
     assert "grade_cache" not in GRADER
     assert "openai" not in GRADER

@@ -101,4 +101,4 @@ Les 4 passes répètent souvent les **mêmes** 3 vrais (S0 prod, N1 digits, N2 `
 
 ---
 
-*S0–S28 : T1–T3, N1–N2, `/api/grade`, adaptateurs, G11, hash, mixins + `$lex:`, v2/methodology/JS gelés, UI 2 axes + caps, métriques, cache C1+sha16+filet_sha16, P/O NADH/FADH, filet ATP ٣٦ + 38-annule-36 (`1.1.6`), FSRS pas sur cache hit, quota `ok`+`defer`, `evaluate.py` hors registre.*
+*S0–S29 : T1–T3, N1–N2, `/api/grade`, adaptateurs, G11, hash, mixins + `$lex:`, v2/methodology/JS gelés, UI 2 axes + caps, métriques, cache C1+sha16+filet_sha16, P/O NADH/FADH, filet ATP ٣٦ + 38-annule-36, FSRS pas sur cache hit, quota `ok`+`defer`, proclitique `كال` (`1.1.7`), `evaluate.py` hors registre.*

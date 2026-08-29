@@ -71,7 +71,7 @@ def test_missing_caps_attr_does_not_crash():
 
 
 def test_grader_untouched_no_version_bump():
-    assert GRADER_VERSION == "1.1.6"
+    assert GRADER_VERSION == "1.1.7"
     assert "grade_metrics" not in GRADER
     assert "caps_applied" in METRICS
     assert "evaluate.router" not in INIT

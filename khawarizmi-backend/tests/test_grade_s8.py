@@ -35,4 +35,4 @@ def test_js_evaluator_always_ungraded():
 
 
 def test_grader_version_1_1_4():
-    assert 'GRADER_VERSION = "1.1.6"' in GRADER
+    assert 'GRADER_VERSION = "1.1.7"' in GRADER

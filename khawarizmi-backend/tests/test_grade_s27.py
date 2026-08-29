@@ -69,8 +69,8 @@ def test_36_alone_still_caps_38_alone_ok():
 
 
 def test_no_fusion_no_llm_version_bumped():
-    assert GRADER_VERSION == "1.1.6"
-    assert 'GRADER_VERSION = "1.1.6"' in GRADER
+    assert GRADER_VERSION == "1.1.7"
+    assert 'GRADER_VERSION = "1.1.7"' in GRADER
     assert "savoir_corrector._normalize" not in GRADER or "_normalize" in GRADER
     assert "openai" not in GRADER
     assert "evaluate.router" not in INIT
