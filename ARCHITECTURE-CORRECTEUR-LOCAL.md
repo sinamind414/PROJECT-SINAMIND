@@ -313,6 +313,7 @@ S26 P/O contextualisé (FADH2=2 juste ; NADH P/O=2 cap) ; filet_sha16 ; 1.1.5   
 S27 filet ATP ٣٦ + ليس 36 بل 38 ; GRADER_VERSION=1.1.6 ; pas fusion normalize           ← FAIT
 S28 FSRS pas sur cache hit (idempotence) ; hors grade() ; 1.1.6                         ← FAIT
 S29 proclitique كال (كالخميرة) ; liste fermée ; 1.1.7 ; pas فل / pas stemming            ← FAIT
+L1 UI  gradeQuestionId → bac2023-s1-ex2-analyse-traduction (ScenarioRunner)            ← FAIT
 ```
 
 **Brancher S2 sans tuer le fallback front = deux notes. Interdit.**

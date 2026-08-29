@@ -1,4 +1,4 @@
-﻿import type { MethodologyDocument } from "@/components/methodology/DocumentRenderer"
+import type { MethodologyDocument } from "@/components/methodology/DocumentRenderer"
 
 export type MethodologyVerbSlug =
   | "analyse"
@@ -25,6 +25,8 @@ export type MethodologyQuestion = {
   learningFocus: string
   /** true = obligatoire (toujours corrigee), false = optionnelle */
   mandatory: boolean
+  /** Id Rubric git (index.json). Sinon `${scenario.id}:${question.id}` → 422. */
+  gradeQuestionId?: string
 }
 
 export type MethodologyScenario = {
@@ -1781,7 +1783,57 @@ const subductionCollisionRidgeScenario: MethodologyScenario = {
   ],
 }
 
+/** L1 — Bac 2023 S1 ex.2 Q2 حلّل. Tableau = أرقام السلم فقط. Pas de courbe inventée. */
+export const bac2023Ml901Scenario: MethodologyScenario = {
+  id: "bac2023-s1-ex2-analyse-traduction",
+  unitKey: "بكالوريا 2023 · تدريب محلي",
+  title: "حلّل منحنيي ML901 (ترجمة / استنساخ)",
+  subtitle: "تدريب محلي — درجة تدريب، ليست علامة بكالوريا رسمية",
+  contextAr:
+    "سؤال واحد من Bac 2023 (الموضوع 1، التمرين 2، السؤال 2). الأرقام من السلم فقط: الاستنساخ 100% مهما كان التركيز؛ الترجمة 100% تحت 1.5 ثم تنعدم عند 5. المصحح المحلي يحاكم حلّل (كتفي) لا الـ 1,25 نقطة الرسمية.",
+  dominantSkills: ["analyse"],
+  documents: [
+    {
+      type: "table",
+      id: "doc-salam-ml901-b",
+      title: "الشكل (ب) — ما يثبته السلم (لا منحنى مخترع)",
+      caption:
+        "ليست إعادة رسم للموضوع. ثلاث قيم مكتوبة في الإجابة النموذجية ONEC 2023.",
+      columns: ["الملاحظة (السلم)", "القيمة"],
+      rows: [
+        { cells: ["نسبة الاستنساخ مهما كان تركيز ML901", "100 %"] },
+        { tone: "success", cells: ["الترجمة إذا التركيز < 1.5 (أو غياب الدواء)", "100 %"] },
+        { tone: "danger", cells: ["الترجمة عند التركيز 5 (تنعدم)", "0"] },
+      ],
+    },
+  ],
+  questions: [
+    {
+      id: "q2",
+      gradeQuestionId: "bac2023-s1-ex2-analyse-traduction",
+      verbSlug: "analyse",
+      n: 1,
+      title: "تحليل الشكل (ب)",
+      skill: "حلّل",
+      docRef: "الشكل ب · سلم 2023",
+      prompt:
+        "حلّل منحنيي الشكل (ب) من الوثيقة 1 (نسبة حدوث الاستنساخ والترجمة عند الطفيلي بدلالة تركيز ML901).",
+      placeholder: "تمثل الوثيقة منحنيين… الاستنساخ… الترجمة… نستنتج أن…",
+      modelAnswer:
+        "تمثل الوثيقة منحنيين لنسبة حدوث الاستنساخ والترجمة عند الطفيلي بدلالة تركيز ML901. نسبة الاستنساخ عند 100 مهما كان التركيز فهي ثابتة. نسبة الترجمة عند 1.5 تساوي 100 ثم تتناقص حتى تنعدم عند 5. نستنتج أن الدواء يثبط الترجمة.",
+      learningFocus:
+        "حلّل دون لأن. اذكر 100 أو 1.5 أو 5. الاستنتاج من السلم: يثبط الترجمة لا الاستنساخ. ليست علامة بكالوريا /20.",
+      mandatory: true,
+    },
+  ],
+}
+
+export function resolveGradeQuestionId(scenarioId: string, question: MethodologyQuestion): string {
+  return question.gradeQuestionId || `${scenarioId}:${question.id}`
+}
+
 export const methodologyScenarios: MethodologyScenario[] = [
+  bac2023Ml901Scenario,
   diagnosticScenario,
   proteinStructureFunctionScenario,
   enzymeActivityScenario,

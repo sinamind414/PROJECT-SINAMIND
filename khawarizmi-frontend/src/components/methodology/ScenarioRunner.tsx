@@ -225,7 +225,7 @@ export function ScenarioRunner({
     try {
       const graded = await Promise.all(
         questionsToSubmit.map(async (question) => {
-          const questionId = `${scenario.id}:${question.id}`
+          const questionId = question.gradeQuestionId || `${scenario.id}:${question.id}`
           const g = await apiClient.grade({
             question_id: questionId,
             answer: answers[question.id] || "",

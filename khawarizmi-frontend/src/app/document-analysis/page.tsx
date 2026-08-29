@@ -23,6 +23,7 @@ const UNIT_EMOJIS: Record<string, string> = {
   "بنية الكرة الأرضية": "🌍",
   "النشاط التكتوني للصفائح": "🌋",
   "النشاط التكتوني والبنيات الجيولوجية المرتبطة به": "🏔️",
+  "بكالوريا 2023 · تدريب محلي": "📝",
 }
 
 const IMPORTANCE_COLORS: Record<string, string> = {
@@ -138,6 +139,9 @@ export default function DocumentAnalysisHubPage() {
                 <span>❓ {scenario.questions.length} أسئلة</span>
                 {isDiagnostic && (
                   <PillChip label="تشخيص" color="#5EEAD4" bg="rgba(45,212,191,0.12)" />
+                )}
+                {scenario.id === "bac2023-s1-ex2-analyse-traduction" && (
+                  <PillChip label="مصحح محلي" color="#FBBF24" bg="rgba(251,191,36,0.12)" />
                 )}
               </div>
             </Link>

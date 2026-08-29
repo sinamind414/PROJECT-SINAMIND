@@ -246,7 +246,7 @@ export default function DiagnosticGlobalPage() {
       const graded = await Promise.all(
         QUESTIONS.map(async (question) => {
           const g = await apiClient.grade({
-            question_id: `${diagnosticScenario.id}:${question.id}`,
+            question_id: question.gradeQuestionId || `${diagnosticScenario.id}:${question.id}`,
             answer: answers[question.id] || "",
             surface: "da",
           })
