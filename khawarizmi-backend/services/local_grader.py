@@ -22,7 +22,7 @@ from schemas.rubric import (
 from services.answer_sanity import check_answer_sanity
 from services.arabic import normalize_arabic
 
-GRADER_VERSION = "1.1.7"
+GRADER_VERSION = "1.1.8"
 SCIENCE_CAP_DEFAULT = 40
 TRAINING_BANNER_AR = "ملاحظة تدريبية — منهج + محتوى. ليست علامة بكالوريا رسمية."
 
@@ -107,37 +107,41 @@ _WORD_BOUND = r"[a-z0-9\u0600-\u06ff]"
 # Liste FERMÉE — pas de stemming. تقبل «فكلما» / «النمو» / «كالخميرة».
 # كال = ك+ال (comme فال/بال/وال). Sans ça, خميرة ⊄ كالخميرة (ك already, ال already, pas le composé).
 _PROCLITICS = ("وال", "فال", "بال", "لل", "كال", "ال", "و", "ف", "ب", "ك", "ل")
-
-
-def _unigram_forms(needle: str) -> list[str]:
-    forms = [needle]
-    for p in _PROCLITICS:
-        if not needle.startswith(p):
-            forms.append(p + needle)
-    if needle.startswith("ال") and len(needle) > 3:
-        forms.append(needle[2:])
-    # déduplique en gardant l'ordre (plus long d'abord pour un match plus propre)
-    seen: set[str] = set()
-    out: list[str] = []
-    for f in sorted(forms, key=len, reverse=True):
-        if f not in seen:
-            seen.add(f)
-            out.append(f)
-    return out
+# S30 — enclitiques suffixaux COLLÉS (pronoms) : لأنها = لأن + ها،
+# ولاننا = و + لأن + نا. Symétrique de _PROCLITICS : liste fermée, testée.
+# Pas «ات» (pluriel ≠ pronom), pas de stemming.
+_ENCLITICS = ("ها", "هم", "هن", "هما", "كم", "نا", "ه", "ك", "ي")
 
 
 @lru_cache(maxsize=1024)
-def _word_re(form: str) -> re.Pattern[str]:
-    return re.compile(
-        rf"(?<!{_WORD_BOUND})" + re.escape(form) + rf"(?!{_WORD_BOUND})"
+def _needle_res(needle: str) -> tuple[re.Pattern[str], ...]:
+    """1–2 regex du needle : proclitique optionnel + base + enclitique optionnel.
+
+    Même sémantique que l'ancienne énumération de formes (frontières de mot,
+    proclitiques fermés, radical sans ال en 2ᵉ pattern) — et les combos
+    proclitique×enclitique (ولأنها) matchent sans énumérer le produit cartésien.
+    Enclitiques refusés sur needle < 3 chars (garde anti-collision).
+    """
+    pro = "(?:" + "|".join(re.escape(p) for p in _PROCLITICS) + ")?"
+    enc = (
+        "(?:" + "|".join(re.escape(e) for e in _ENCLITICS) + ")?"
+        if len(needle) >= 3
+        else ""
     )
+    head = rf"(?<!{_WORD_BOUND})"
+    tail = rf"(?!{_WORD_BOUND})"
+    pats = [re.compile(head + pro + re.escape(needle) + enc + tail)]
+    if needle.startswith("ال") and len(needle) > 3:
+        # radical sans ال : frontières + enclitiques, sans proclitique
+        pats.append(re.compile(head + re.escape(needle[2:]) + enc + tail))
+    return tuple(pats)
 
 
 def _hit_pos(text: str, needle: str) -> int | None:
     """Position du 1er match.
 
     Unigramme → frontières de mot (évite لان ⊂ الانزيم / لانطلاق)
-    + proclitiques fermés (فكلما، النمو).
+    + proclitiques/enclitiques fermés (فكلما، النمو، كالخميرة، لأنها).
     Locution (espace) → sous-chaîne.
     """
     if not needle:
@@ -146,8 +150,8 @@ def _hit_pos(text: str, needle: str) -> int | None:
         idx = text.find(needle)
         return idx if idx >= 0 else None
     best: int | None = None
-    for form in _unigram_forms(needle):
-        m = _word_re(form).search(text)
+    for pat in _needle_res(needle):
+        m = pat.search(text)
         if m is None:
             continue
         if best is None or m.start() < best:
@@ -190,8 +194,8 @@ def _occurrence_count(text: str, variants_norm: list[str]) -> int:
                 start = i + max(1, len(v))
             continue
         best = 0
-        for form in _unigram_forms(v):
-            best = max(best, len(_word_re(form).findall(text)))
+        for pat in _needle_res(v):
+            best = max(best, len(pat.findall(text)))
         total += best
     return total
 

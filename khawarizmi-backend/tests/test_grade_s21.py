@@ -14,8 +14,8 @@ INIT = (BACKEND / "routes" / "__init__.py").read_text(encoding="utf-8")
 
 
 def test_version_bumped():
-    assert GRADER_VERSION == "1.1.7"
-    assert 'GRADER_VERSION = "1.1.7"' in GRADER
+    assert GRADER_VERSION == "1.1.8"
+    assert 'GRADER_VERSION = "1.1.8"' in GRADER
     assert "caps_applied" in GRADER
     assert "evaluate.router" not in INIT
 

@@ -35,7 +35,16 @@ et `grade_or_none` branché sur `bac_blanc`, `exercices`, `methodology`, `flashc
 
 ## 2. Findings
 
-### F1 — BUG (haut) : enclitiques suffixaux non matchés → points perdus
+### F1 — BUG (haut) : enclitiques suffixaux non matchés → points perdus — **CORRIGÉ en 1.1.8 (S30)**
+
+> **Fix appliqué :** liste fermée `_ENCLITICS = (ها هم هن هما كم نا ه ك ي)` symétrique
+> de `_PROCLITICS`, implémentée comme une regex unique par needle
+> (proclitique optionnel + base + enclitique optionnel) — les combos
+> `ولأنها` matchent aussi, sans énumérer le produit cartésien. Garde ≥ 3 chars.
+> Non-gérés volontairement : `ات` (pluriel ≠ pronom), ة→ت (`خميرتها`).
+> `GRADER_VERSION=1.1.8` (clé cache auto-invalidée), 12 tests `tests/test_grade_s30.py`,
+> pins s8/s15–s29 mis à jour. Effet mesuré : copie modèle avec «لأنها/لأنه» 75 % → **100 %**.
+> Bonus perf : copie 20k chars ~280 ms → **~75 ms**.
 `_unigram_forms` (`local_grader.py`) génère les formes **préfixées** (proclitiques
 وال/فال/بال/لل/كال/ال/و/ف/ب/ك/ل) mais **aucune forme suffixée**. Or l'arabe écrit
 colle les pronoms suffixés :
@@ -162,7 +171,7 @@ contrat quota. Ajouter l'auth + le quota, ou assumer et documenter.
 
 | # | Action | Coût | Effet |
 |---|---|---|---|
-| 1 | F1 enclitiques fermés + bump 1.1.8 + goldens | faible | rend 25 % à des copies correctes |
+| 1 | F1 enclitiques fermés + bump 1.1.8 + goldens — **CORRIGÉ (S30, v1.1.8, commit du 2026-08-30)** | faible | rend 25 % à des copies correctes |
 | 2 | F6 gate CI (`grade suite` + `validate_rubrics`) | faible | protège tout le reste |
 | 3 | F5 trancher mur vs carte, puis verdir S3/S9/S25 | décision | suite vert, contrat clair |
 | 4 | F2 fenêtre _near sur l'exemption 38 ATP | faible | ferme l'exploit notation |

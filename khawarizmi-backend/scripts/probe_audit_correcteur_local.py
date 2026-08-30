@@ -44,10 +44,10 @@ def main() -> int:
         )
         return r
 
-    head("F1 — enclitiques : لانه/لانها/بسببها ne matchent pas «لان/بسبب»")
+    head("F1 — enclitiques : لانه/لانها/بسببها (corrigé en 1.1.8)")
     for w in ("لأنها", "لانه"):
-        r = res(f"{KO}{w}", MODEL.replace("لأن", w))
-        assert next(c for c in r.criteria if c.id == "cause").status == "absent"
+        r = res(f"{OK}{w}", MODEL.replace("لأن", w))
+        assert next(c for c in r.criteria if c.id == "cause").status == "full"
     res(f"{OK}لأن (réf)", MODEL)
 
     head("F2 — 36 ATP neutralisé par un «38 ATP» ajouté n'importe où")

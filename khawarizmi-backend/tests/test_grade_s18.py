@@ -56,7 +56,7 @@ def test_all_l0_pass_negatives():
 def test_grader_untouched():
     assert "validate_rubrics" not in GRADER
     assert "GEOLOGY" not in GRADER
-    assert GRADER_VERSION == "1.1.7"
+    assert GRADER_VERSION == "1.1.8"
     assert "openai" not in GRADER
 
 

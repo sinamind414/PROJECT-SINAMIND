@@ -1,7 +1,7 @@
 # Architecture cible — Coach local « comme le livre »
 
 **Date :** 2026-08-26 · **révisé** 2026-08-27 (C1 clé cache, contrat sanity, politique lexique, table d’état)  
-**Statut :** S0–S29 **implémentés** — `grade()` **1.1.7** + proclitique `كال` + filet ATP ٣٦ / 38-annule-36 + FSRS pas sur cache hit. Flag `LOCAL_RUBRIC_GRADER` défaut `false` (**lu nulle part**).  
+**Statut :** S0–S30 **implémentés** — `grade()` **1.1.8** + proclitique `كال` + enclitiques `لأنها` + filet ATP ٣٦ / 38-annule-36 + FSRS pas sur cache hit. Flag `LOCAL_RUBRIC_GRADER` défaut `false` (**lu nulle part**).  
 **S0 (T1–T3) :** **fait** (T1 UI PDF, T2 IDOR, T3 whitelist). Flag prod encore `false`. Voir table §14.1.  
 **Public :** revue humaine / audit par IA  
 **Produit :** Khawarizmi / IA Khawarizmi Pro — Bac SVT Algérie 3AS  
@@ -745,6 +745,7 @@ S5  mixins chapitre + $lex: extrait fichier  (condition de survie L1)
 | S27 filet ATP clavier DZ | **OUI** | ٣٦ ATP cap 40. `ليس 36 بل 38` pas capé. 36 seul cap. `GRADER_VERSION=1.1.6`. Pas de fusion normalize. |
 | S28 FSRS idempotent | **OUI** | cache hit → 0 quota (déjà) **et** 0 `update_memory`. `may_write_fsrs` refuse `from_cache`. Hors `grade()`. `1.1.6`. |
 | S29 proclitique `كال` | **OUI** | `كالخميرة` matche `خميرة`. Liste fermée. Pas `فل`. Expansion needle. `1.1.7`. |
+| S30 enclitiques suffixaux | **OUI** | `لأنها/لأنه/لاننا/لانكم` matchent `لأن` ; combos `ولأنها`. Liste fermée `ها هم هن هما كم نا ه ك ي`. Pas `ات`, pas ة→ت (`خميرتها` refusé à but). Regex unique par needle (perf ÷3). Fix audit 2026-08-30 F1 (75 % → 100 %). `1.1.8`. |
 | L0 UI hub `gradeQuestionId` | **OUI** | 10/10 ids visibles (6 cartes). Tableaux = keypoints git. **Pas** d’alias `enzyme-activity-v1` → `enzyme-temp`. Moteur `1.1.7` inchangé. |
 | Honnêteté chemin élève | **OUI** | Pas de `modelAnswer` après note. Hub : cartes locales vs « بدون شبكة ». 24 verbes : 0 `قيّم` (lien L0, pas 422). Yeast `4 سا` **hors** keypoints (`1.0.1`). Ateliers restent 0 % + CTA juge. |
 | HON-2 tuer théâtre | **OUI** | Hub = cartes `gradeQuestionId` seulement. Diagnostic / bac blanc / DA sans grille = mur تعذر. Checklist **ne bloque plus** `grade()`. Moteur `1.1.7`. |
