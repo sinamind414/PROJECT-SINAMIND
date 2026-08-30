@@ -25,12 +25,17 @@ F1–F11, moteur **1.2.0**).
 > `ScenarioRunner → POST /api/grade`. Tout le reste est soit muré (honnête), soit vivant mais
 > structurellement non-noté, soit mort.** Trois défauts réels trouvés côté site : **F14 (haut)**
 > le quota de correction était clé par **IP** et non par compte — derrière le proxy, les 15
-> corrections/h étaient **partagées par tous les élèves du site** et le plan `pro` n'était jamais
+> corrections/h étaient **partagés par tous les élèves du site** et le plan `pro` n'était jamais
 > reconnu ; **F12 (moyen)** le 429 de quota sortait hors contrat d'erreur et **écrasait toutes les
 > notes du scénario** dans l'UI (crash 500 latent) ; **F15 (moyen)** le bac blanc appelle le
 > correcteur local avec des ids qui ne peuvent **jamais** rencontrer une grille. F13 reste dû :
 > trois surfaces de correction backend sans appelant frontend. **F12/F14/F15 corrigés (S38/S39),
 > gardes ajoutées.**
+>
+> Et **F18** : la CI ne se déclenchait **jamais** (filers sur `main`, branche inexistante ; base
+> réelle `master`) et la suite `grade` n'était dans aucun gate — la PR #17 a été fusionnée sans
+> un seul test exécuté. Correctif livré en patch (`patches/F18-ci-gate-fix.patch`), la permission
+> `workflows` manquant au token de session.
 
 ---
 
@@ -184,6 +189,39 @@ répondent `ungraded` pour les exercices DB (aucune grille `exercice-{id}` n'exi
 tel quel n'apporterait aucune note. **Décision produit** : soit alimenter les grilles et brancher,
 soit supprimer les routes et les méthodes mortes. Le rapport ne tranche pas.
 
+### F18 — PROCESSUS (haut, silencieusement le plus coûteux) : la CI ne se déclenche jamais, et le suite grade n'était dans aucun gate — **CORRIGÉ (S39)**
+
+**Fait.** `.github/workflows/ci.yml` se déclenche sur `push: [main, fabuleux/*]` et
+`pull_request: [main]`. Or `origin/HEAD → origin/master` et **`main` n'existe pas** dans le dépôt
+(unique branche distante : `master`). Aucune des trois conditions n'est jamais remplie :
+`backend-tests`, `frontend-tests` **ne tournent pas**, et `deploy-railway` (gardé
+`if: github.ref == 'refs/heads/main'`) non plus. La PR #17 — qui a livré le moteur 1.2.0 — a donc
+été fusionnée **sans aucun test exécuté**. Le compte rendu d'audit précédent indiquait
+« gate CI actif » : c'était faux (le gate ne pouvait pas se déclencher).
+
+**Second trou.** Même quand elle tourne, l'étape backend ne sélectionnait que
+`test_methodology*.py`, `test_diagnostic.py`, `test_couche3.py`, `test_tutor.py`,
+`test_bac_blanc_intelligent.py`, `test_mindmap_methodology.py` — **pas `tests/test_grade_s*.py`**,
+alors que `grade()` est le seul chemin qui note des copies d'élèves sur le site, et pas
+`scripts/validate_rubrics.py` (le gate auteur des 13 grilles). Les 16 gardes de ce correctif
+seraient restées hors CI.
+
+**Fix proposé — livré en patch, pas en commit.** `pull_request.branches` reçoit `master`
+(+ garde `main` conservée) ; deux étapes supplémentaires : `pytest tests/test_grade_s*.py
+tests/test_local_grader.py tests/test_grading_sanity.py tests/test_answer_sanity.py`
+(**278 ✓ en 1 s**, 0 DB, 0 Redis) et `python scripts/validate_rubrics.py`.
+Le token de la session d'agent **n'a pas la permission `workflows`** (`! remote rejecting:
+refusing to allow a GitHub App to create or update workflow … without 'workflows' permission`),
+donc le correctif est applicable par un humain :
+
+```bash
+git apply patches/F18-ci-gate-fix.patch     # dry-run vérifié : git apply --check → OK
+```
+
+**Le déclencheur `push` est volontairement laissé tel quel** : l'y élargir à `master` activerait
+`deploy-railway` en production sur chaque push — décision d'exploitation à prendre séparément,
+pas par effet de bord d'un audit.
+
 ### F17 — OBSERVATION (faible) : le quota ne couvre qu'un tiers des corrections
 
 `enforce_evaluate_quota` n'est appelé que par `/api/grade` et `/api/evaluate/methodology` (morte).
@@ -220,6 +258,7 @@ branchement, il faudra étendre l'appel (une ligne par route).
 | `tsc --noEmit` | **9 erreurs, avant = après** (préexistantes : `manhadjia-*.test.ts`, un cast `api-client.ts`) — **0 introduite** |
 | `eslint` (fichiers touchés) | propre (1 warning préexistant `setRequestingHint`, non lié) |
 | `scripts/probe_audit_surfaces_site.py` | **54 OK · 0 échec** |
+| sélection exacte du nouveau gate CI | **278 ✓ en 1 s** (0 DB, 0 Redis) + `validate_rubrics.py` **13 ✓** |
 
 **Rejouer la sonde** (aucun service requis) :
 
@@ -244,3 +283,4 @@ python scripts/probe_audit_surfaces_site.py
 | `khawarizmi-frontend/src/components/methodology/ScenarioRunner.tsx` | `Promise.all` → `Promise.allSettled` : une question en échec ne jette pas le scénario |
 | `khawarizmi-frontend/src/app/annales/[slug]/exam/correction/page.tsx` | ligne d'exercice : `—` au lieu de `0 %` sur un non-noté (**F16**) |
 | tests | `tests/test_grade_s38.py` (12), `tests/test_grade_s39.py` (8), `src/lib/api-client.grade-quota.test.ts` (5), sonde 54 assertions |
+| `patches/F18-ci-gate-fix.patch` | à appliquer par un humain : `pull_request` élargi à `master` (la CI ne se déclenchait **jamais**) + suite `grade` et `validate_rubrics.py` dans le gate ; `push` **non touché** (déploiement Railway) |
