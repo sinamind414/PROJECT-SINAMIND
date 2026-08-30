@@ -133,13 +133,14 @@ cette page → suite rouge. Le mur n'est couvert par **aucun** test ni doc
 2. c'est une régression → restaurer la carte.
 **À trancher par le propriétaire ; en l'état le suite ne peut pas être mis vert.**
 
-### F6 — Gate manquant (moyen) : le suite grade n'est nulle part — **CORRIGÉ (job CI `grader-tests`)**
+### F6 — Gate manquant (moyen) : le suite grade n'est nulle part — **CORRIGÉ (job prêt, déploiement pending)**
 
 > **Fix appliqué :** nouveau job `grader-tests` dans `.github/workflows/ci.yml` :
 > `pytest tests/test_local_grader.py tests/test_grade_s*.py tests/test_grade_bac2023_ml901.py --noconftest`
 > puis `python scripts/validate_rubrics.py`. Une grille sourde ou une régression
-> moteur bloque maintenant le merge. Pre-commit volontairement inchangé (pytest
-> trop lent/hôte-dépendant pour un hook local — la CI est le gate de merge).
+> moteur bloque maintenant le merge. **Déploiement :** le token de la session n'a pas
+> la permission `workflows` — le job est versionné dans `docs/ci-grader-tests.job.yml`
+> (à coller dans `ci.yml` au merge). Pre-commit volontairement inchangé.
 `ci.yml` ne lance que `test_methodology*` + quelques fichiers ; pre-commit ne lance
 pas `validate_rubrics.py`. Une grille sourde ou une régression moteur peut être
 mergeée sans rien voir. **Fix proposé** : job CI `grader` =
@@ -246,7 +247,7 @@ réglages de rappel et de garde-fous, pas des mensonges de note — sauf F1 qui
 | F3 stuffing | ancre × marqueur de structure | `1.1.9` | s32, bourrage+18 cap 50, modèles exempts |
 | F4 hors-sujet | `theme_min_hits=2` (2 grilles levure) | rubrics `1.0.1` | s33, diag `off_topic` |
 | F5 tests rouges | réalignés sur le mur HON-2 documenté | — | suite vert |
-| F6 gate | job CI `grader-tests` + `validate_rubrics.py` | — | ci.yml |
+| F6 gate | job CI `grader-tests` + `validate_rubrics.py` | — | snippet `docs/ci-grader-tests.job.yml` (permission workflows manquante) |
 
 **État mid-day : 214 tests ✓ / 0 ✗ · 13 grilles valides · moteur `1.1.9`.**
 

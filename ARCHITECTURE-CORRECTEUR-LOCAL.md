@@ -1,7 +1,7 @@
 # Architecture détaillée — Correcteur local Khawarizmi
 
 **Version moteur :** `GRADER_VERSION = 1.2.0`  
-**Statut :** **S0–S37.** `grade()` 0 LLM. Proclitique `كال` + enclitiques (لأنها). Filet ATP ٣٦ + 38 annule 36 à ≤ 90 chars. Stuffing ancre×marqueur. Grilles levure `theme_min_hits=2`. Diagnostics : stuffing avant unanchored ; defer+hors-sujet → `sanity.defer`. Docs trend hygiène validateur. `/api/evaluate/methodology` auth + quota partagé (`rate_limit.enforce_evaluate_quota`). Cache digest bruyant sans pepper. CI `grader-tests`.  
+**Statut :** **S0–S37.** `grade()` 0 LLM. Proclitique `كال` + enclitiques (لأنها). Filet ATP ٣٦ + 38 annule 36 à ≤ 90 chars. Stuffing ancre×marqueur. Grilles levure `theme_min_hits=2`. Diagnostics : stuffing avant unanchored ; defer+hors-sujet → `sanity.defer`. Docs trend hygiène validateur. `/api/evaluate/methodology` auth + quota partagé (`rate_limit.enforce_evaluate_quota`). Cache digest bruyant sans pepper. CI `grader-tests` : snippet prêt (docs/ci-grader-tests.job.yml), à coller dans ci.yml.  
 **Promesse :** noter **méthode (Manhadjiya) + science (manuel / دليل)** sans mentir sur le %.  
 **Bannière élève :** `ملاحظة تدريبية — منهج + محتوى. ليست علامة بكالوريا رسمية.`
 
@@ -320,7 +320,7 @@ S30 enclitiques suffixaux (لأنها/لأنه/لاننا + combos ولأنها)
 S31 38 n'annule 36 qu'à ≤ 90 chars (_has_38_near) ; «ليس 36 بل 38» intact ; GRADER_VERSION=1.1.9   ← FAIT
 S32 stuffing : ancre (kp/objet) exige un marqueur de structure (liste fermée) ; bourrage+chiffre magique re-capé 50   ← FAIT
 S33 grilles levure theme_min_hits=2 (v1.0.1) ; 1 mention unique du thème ≠ assez ; modèles ≥ 2 variantes   ← FAIT
-S31-F6 CI job grader-tests : suite grade --noconftest + validate_rubrics bloquent le merge   ← FAIT
+S31-F6 CI job grader-tests : suite grade --noconftest + validate_rubrics bloquent le merge   ← PRÊT (docs/ci-grader-tests.job.yml ; déploiement bloqué : token App sans permission workflows)
 S34 hygiène trend docs (directions fermées) + validate_rubrics._doc_trend_fails ; yeast doc v1.0.2 (يتناقص sorti du trend)   ← FAIT
 S35 digest cache sans pepper → WARNING une fois (plus de SHA-256 silencieux)   ← FAIT
 S36 /api/evaluate/methodology : auth + quota partagé via rate_limit.enforce_evaluate_quota ; tests methodology réalignés (contrats LLM morts)   ← FAIT
