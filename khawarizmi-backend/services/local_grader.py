@@ -22,7 +22,7 @@ from schemas.rubric import (
 from services.answer_sanity import check_answer_sanity
 from services.arabic import normalize_arabic
 
-GRADER_VERSION = "1.1.8"
+GRADER_VERSION = "1.1.9"
 SCIENCE_CAP_DEFAULT = 40
 TRAINING_BANNER_AR = "ملاحظة تدريبية — منهج + محتوى. ليست علامة بكالوريا رسمية."
 
@@ -40,9 +40,38 @@ _USEFUL_RE = re.compile(
 _INDIC_DIGITS = str.maketrans("٠١٢٣٤٥٦٧٨٩۰۱۲۳۴۵۶۷۸۹", "01234567890123456789")
 _HAS_38_ATP = re.compile(r"38\s+atp", re.IGNORECASE)
 
+_ATP_38_WINDOW = 90  # ~ _near(savoir) ; «ليس 36 بل 38» est adjacent (S31)
+
+
+def _has_38_near(sav: str, pos: int) -> bool:
+    """Vrai si un «38 atp» est à ≤ _ATP_38_WINDOW chars du 36/32 (S31).
+
+    Loin du 36, le 38 ne lave plus la faute : «36 affirmé + 38 ailleurs»
+    redevient une erreur grave (cap 40).
+    """
+    return any(
+        abs(m.start() - pos) <= _ATP_38_WINDOW for m in _HAS_38_ATP.finditer(sav)
+    )
+
+
 _CAUSE_MARKERS = ("لان", "بسبب", "يفسر", "تفسير", "هذا يدل", "راجع")
 _ANALYSE_SLIP = ("لان", "بسبب", "يفسر", "تفسير", "هذا يدل")
 _KULLAMA = "كلما"
+
+# S32 — marqueurs de structure pour l'exemption stuffing ancrée. Liste fermée,
+# même philosophie que _CAUSE_MARKERS / _ANALYSE_SLip : pas de parsing.
+_STRUCTURE_MARKERS = (
+    "لان",
+    "بسبب",
+    "لذلك",
+    "نستنتج",
+    "نلاحظ",
+    "كلما",
+    "يرجع",
+    "راجع",
+    "مما",
+    "بالتالي",
+)
 
 # Graves photosynthèse (faux positifs hors ce thème) — messages Savoir.
 _PS_GRAVE_HINTS = ("التركيب الضوئي", "صانعات", "chloroplaste")
@@ -473,12 +502,16 @@ def _science_veto(
     for pattern, msg_ar, _pen in _GRAVE_ERRORS:
         if any(h in msg_ar for h in _PS_GRAVE_HINTS) and not ps_ctx:
             continue
-        if re.search(pattern, sav, re.IGNORECASE):
-            # 38 ATP présent → l'élève a corrigé 36/32. Pas un parseur de نفي.
-            if _HAS_38_ATP.search(sav) and re.search(r"36\\s|32\\s", pattern):
-                continue
-            hard.append(msg_ar)
-            break
+        m = re.search(pattern, sav, re.IGNORECASE)
+        if m is None:
+            continue
+        # 38 ATP À CÔTÉ du 36/32 → l'élève a corrigé (ليس 36 بل 38).
+        # Pas un parseur de نفي, mais fenêtre fermée (S31) : loin du 36,
+        # le 38 n'annule plus la faute.
+        if re.search(r"36\\s|32\\s", pattern) and _has_38_near(sav, m.start()):
+            continue
+        hard.append(msg_ar)
+        break
 
     for grave in rubric.grave:
         if grave.context_any:
@@ -549,7 +582,13 @@ def _stuffing(
         if c.check == "cites_object"
     )
     if kp_full or obj_full:
-        return False
+        # S32 — l'ancre (chiffre/objet du doc) n'exempte plus aveuglément :
+        # il faut AUSSI un marqueur de structure (liste fermée). Un bourrage
+        # + le chiffre magique du doc reste détecté ; une vraie copie courte
+        # (enzyme-temp-interpret : ratio 1.0 mais «لأن») reste exempte.
+        if any(_hit_pos(text, m) is not None for m in _STRUCTURE_MARKERS):
+            return False
+        # sans marqueur → on retombe sur le ratio (pas d'exemption)
     return ratio > 0.60
 
 

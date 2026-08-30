@@ -77,7 +77,7 @@ def test_route_still_gates_on_should_count():
 
 
 def test_grader_untouched_no_version_bump():
-    assert GRADER_VERSION == "1.1.8"
+    assert GRADER_VERSION == "1.1.9"
     assert "grade_quota" not in GRADER
     assert "evaluate_limit" not in GRADER
     assert "should_count_quota" not in GRADER

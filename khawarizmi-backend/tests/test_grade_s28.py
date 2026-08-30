@@ -54,7 +54,7 @@ def test_route_skips_fsrs_on_hit():
 
 
 def test_grader_untouched():
-    assert GRADER_VERSION == "1.1.8"
+    assert GRADER_VERSION == "1.1.9"
     assert "may_write_fsrs" not in GRADER
     assert "openai" not in GRADER
     assert "evaluate.router" not in INIT

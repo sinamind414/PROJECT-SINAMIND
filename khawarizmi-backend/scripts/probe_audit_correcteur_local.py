@@ -50,21 +50,27 @@ def main() -> int:
         assert next(c for c in r.criteria if c.id == "cause").status == "full"
     res(f"{OK}لأن (réf)", MODEL)
 
-    head("F2 — 36 ATP neutralisé par un «38 ATP» ajouté n'importe où")
-    res(f"{KO}modèle + 36 ATP (réf cap 40)", MODEL + " وتنتج 36 ATP.")
-    res(f"{KO}modèle + 36 ATP + 38 ATP", MODEL + " وتنتج 36 ATP لكن 38 ATP صحيح.")
+    head("F2 — 36 ATP : 38 n'annule plus qu'à ≤ 90 chars (corrigé en 1.1.9)")
+    res(f"{OK}modèle + 36 ATP (réf cap 40)", MODEL + " وتنتج 36 ATP.")
+    res(f"{OK}modèle + 36 ATP + 38 ATP adjacents (correction S27)", MODEL + " وتنتج 36 ATP لكن 38 ATP صحيح.")
+    far = MODEL + " وتنتج الخلية 36 ATP في التنفس. " + "حشو غير علمي هنا بين الجملتين لعزل الرقمين تماما عن بعضيهما " * 3 + " بينما يعطي التنفس 38 ATP."
+    r = res(f"{OK}modèle + 36 ATP ... [>90 chars] ... 38 ATP", far)
+    assert r.science_status == "error" and r.overall_training_percent <= 40
 
-    head("F3 — stuffing neutralisé par un chiffre du document (exemption kp_full)")
+    head("F3 — stuffing : l'ancre exige un marqueur de structure (corrigé en 1.1.9)")
     stuff = " ".join(["الغلوكوز غلوكوز الخميرة خميرة تنفس تخمر طاقة مادة أيض نمو تكاثر"] * 3)
     res(f"{OK}bourrage sans chiffre (cap 50)", stuff)
-    res(f"{KO}bourrage + «18»", stuff + " العدد يصل 18 ")
+    r = res(f"{OK}bourrage + «18» sans marqueur (cap 50)", stuff + " العدد يصل 18 ")
+    assert r.stuffing_suspected and r.overall_training_percent <= 50
+    res(f"{OK}bourrage + «18» + «لأن» (vraie copie, exempt)", stuff + " العدد يصل 18 لأن الغلوكوز أيض ")
 
-    head("F4 — hors-sujet avec 1 mot de thème : note 0 mais diagnostic faussé")
+    head("F4 — hors-sujet : 1 mention unique du thème ne passe plus (grilles 1.0.1)")
     off = (
         "تمثل الوثيقة منحنى تباعد الصفائح عند الأعراف المحيطية مثل الخميرة لا علاقة. "
         "كلما ابتعدت الصفيحة ازداد الخندق المحيطي. نستنتج غوص اللوح في الاندساس."
     )
-    res(f"{KO}tectonique + «الخميرة» x1", off)
+    r = res(f"{OK}tectonique + «الخميرة» x1", off)
+    assert r.diagnosis is not None and r.diagnosis.code == "off_topic"
 
     head("F5 — autres comportements (référence saine)")
     res(f"{OK}modèle", MODEL)

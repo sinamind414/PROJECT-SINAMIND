@@ -1,7 +1,7 @@
 # Architecture détaillée — Correcteur local Khawarizmi
 
-**Version moteur :** `GRADER_VERSION = 1.1.8`  
-**Statut :** **S0–S30.** `grade()` 0 LLM, `GRADER_VERSION=1.1.8`. Proclitique `كال`. Enclitiques suffixaux (لأنها/لأنه/لاننا). Filet ATP ٣٦ + 38 annule 36. FSRS pas sur cache hit. P/O NADH/FADH. UI 2 axes + caps. Cache C1+sha16+filet_sha16. Quota `ok` **ou** `defer`. Sans grille → ungraded.  
+**Version moteur :** `GRADER_VERSION = 1.1.9`  
+**Statut :** **S0–S33.** `grade()` 0 LLM, `GRADER_VERSION=1.1.9`. Proclitique `كال`. Enclitiques suffixaux (لأنها/لأنه/لاننا). Filet ATP ٣٦ + 38 annule 36 **à ≤ 90 chars** (S31). Stuffing : l'ancre exige un marqueur de structure (S32). Grilles levure `theme_min_hits=2` (S33). FSRS pas sur cache hit. P/O NADH/FADH. UI 2 axes + caps. Cache C1+sha16+filet_sha16. Quota `ok` **ou** `defer`. Sans grille → ungraded. CI : job `grader-tests` (suite + validate_rubrics).  
 **Promesse :** noter **méthode (Manhadjiya) + science (manuel / دليل)** sans mentir sur le %.  
 **Bannière élève :** `ملاحظة تدريبية — منهج + محتوى. ليست علامة بكالوريا رسمية.`
 
@@ -317,6 +317,10 @@ S27 filet ATP ٣٦ + ليس 36 بل 38 ; GRADER_VERSION=1.1.6 ; pas fusion norma
 S28 FSRS pas sur cache hit (idempotence) ; hors grade() ; 1.1.6                         ← FAIT
 S29 proclitique كال (كالخميرة) ; liste fermée ; 1.1.7 ; pas فل / pas stemming            ← FAIT
 S30 enclitiques suffixaux (لأنها/لأنه/لاننا + combos ولأنها) ; liste fermée ; GRADER_VERSION=1.1.8 ; regex unique par needle ; pas ة→ت   ← FAIT
+S31 38 n'annule 36 qu'à ≤ 90 chars (_has_38_near) ; «ليس 36 بل 38» intact ; GRADER_VERSION=1.1.9   ← FAIT
+S32 stuffing : ancre (kp/objet) exige un marqueur de structure (liste fermée) ; bourrage+chiffre magique re-capé 50   ← FAIT
+S33 grilles levure theme_min_hits=2 (v1.0.1) ; 1 mention unique du thème ≠ assez ; modèles ≥ 2 variantes   ← FAIT
+S31-F6 CI job grader-tests : suite grade --noconftest + validate_rubrics bloquent le merge   ← FAIT
 L1 UI  gradeQuestionId → bac2023-s1-ex2-analyse-traduction (ScenarioRunner)            ← FAIT
 L0 UI  10/10 ids sur le hub DA (6 cartes, keypoints JSON, 0 alias enzyme-pH)          ← FAIT
 HON UI modèle masqué après note ; hub local vs théâtre ; verbes → cartes L0 ; yeast 4 hors keypoints ← FAIT

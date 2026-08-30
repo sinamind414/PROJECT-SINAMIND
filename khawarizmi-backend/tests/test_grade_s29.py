@@ -1,4 +1,4 @@
-"""S29 — proclitique كال (كالخميرة = خميرة). 1.1.8. Pas de stemming, pas فل."""
+"""S29 — proclitique كال (كالخميرة = خميرة). 1.1.9. Pas de stemming, pas فل."""
 
 from __future__ import annotations
 
@@ -58,8 +58,8 @@ def test_yeast_theme_hits_with_kal():
 
 
 def test_no_stemming_no_fal_rare_version():
-    assert GRADER_VERSION == "1.1.8"
-    assert 'GRADER_VERSION = "1.1.8"' in GRADER
+    assert GRADER_VERSION == "1.1.9"
+    assert 'GRADER_VERSION = "1.1.9"' in GRADER
     assert "كال" in _PROCLITICS
     assert "فل" not in _PROCLITICS
     assert "openai" not in GRADER

@@ -43,8 +43,9 @@ def test_g12_no_bac_glued_to_percent_on_grade_surfaces():
 def test_surfaces_use_grade_result_card():
     assert "GradeResultCard" in SCENARIO.read_text(encoding="utf-8")
     assert "GradeResultCard" in VERB_FLOW.read_text(encoding="utf-8")
-    assert "GradeResultCard" in DIAG.read_text(encoding="utf-8")
-    assert "GradeResultCard" in ACTION.read_text(encoding="utf-8")
+    # HON-2 : diagnostic global et verbe sans grille L0 = mur تعذر (pas de carte).
+    assert "NoLocalGradeWall" in DIAG.read_text(encoding="utf-8")
+    assert "NoLocalGradeWall" in ACTION.read_text(encoding="utf-8")
     assert "formatTrainingPercent" in BAC.read_text(encoding="utf-8")
     assert "formatTrainingPercent" in CORR.read_text(encoding="utf-8")
 

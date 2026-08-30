@@ -1,7 +1,7 @@
 # Architecture cible — Coach local « comme le livre »
 
 **Date :** 2026-08-26 · **révisé** 2026-08-27 (C1 clé cache, contrat sanity, politique lexique, table d’état)  
-**Statut :** S0–S30 **implémentés** — `grade()` **1.1.8** + proclitique `كال` + enclitiques `لأنها` + filet ATP ٣٦ / 38-annule-36 + FSRS pas sur cache hit. Flag `LOCAL_RUBRIC_GRADER` défaut `false` (**lu nulle part**).  
+**Statut :** S0–S33 **implémentés** — `grade()` **1.1.9** + proclitique `كال` + enclitiques `لأنها` + filet ATP ٣٦ / 38-annule-36-à-≤90-chars + stuffing ancre×marqueur + grilles levure `theme_min_hits=2` + FSRS pas sur cache hit + CI `grader-tests`. Flag `LOCAL_RUBRIC_GRADER` défaut `false` (**lu nulle part**).  
 **S0 (T1–T3) :** **fait** (T1 UI PDF, T2 IDOR, T3 whitelist). Flag prod encore `false`. Voir table §14.1.  
 **Public :** revue humaine / audit par IA  
 **Produit :** Khawarizmi / IA Khawarizmi Pro — Bac SVT Algérie 3AS  
@@ -746,6 +746,10 @@ S5  mixins chapitre + $lex: extrait fichier  (condition de survie L1)
 | S28 FSRS idempotent | **OUI** | cache hit → 0 quota (déjà) **et** 0 `update_memory`. `may_write_fsrs` refuse `from_cache`. Hors `grade()`. `1.1.6`. |
 | S29 proclitique `كال` | **OUI** | `كالخميرة` matche `خميرة`. Liste fermée. Pas `فل`. Expansion needle. `1.1.7`. |
 | S30 enclitiques suffixaux | **OUI** | `لأنها/لأنه/لاننا/لانكم` matchent `لأن` ; combos `ولأنها`. Liste fermée `ها هم هن هما كم نا ه ك ي`. Pas `ات`, pas ة→ت (`خميرتها` refusé à but). Regex unique par needle (perf ÷3). Fix audit 2026-08-30 F1 (75 % → 100 %). `1.1.8`. |
+| S31 fenêtre 38 ATP | **OUI** | 38 n'annule 36 qu'à ≤ 90 chars (`_has_38_near`). «ليس 36 بل 38» adjacent = correction intacte. 36 affirmé + 38 loin = cap 40. Fix audit F2. `1.1.9`. |
+| S32 stuffing ancré | **OUI** | kp/objet du doc n'exempte le bourrage qu'avec ≥ 1 marqueur de structure (liste fermée لان/لذلك/نستنتج/…). Bourrage+chiffre magique re-capé 50 ; modèle enzyme (ratio 1.0, «لأن») exempt. Fix audit F3. `1.1.9`. |
+| S33 theme_min_hits=2 levure | **OUI** | `yeast-glucose-interpret` + `manhadjiya-yeast-analyse` v1.0.1. Tectonique + «الخميرة»×1 = off_topic cap 40 (avant : diag verb_slip). Modèles ≥ 2 variantes distinctes. Fix audit F4. |
+| CI grader-tests | **OUI** | Job dédié : `pytest tests/test_local_grader.py tests/test_grade_s*.py …tests/test_grade_bac2023_ml901.py --noconftest` + `validate_rubrics.py`. Fix audit F6 (suite 214 ✓ / 0 ✗, tests S3/S9/S25 réalignés sur le mur HON-2). |
 | L0 UI hub `gradeQuestionId` | **OUI** | 10/10 ids visibles (6 cartes). Tableaux = keypoints git. **Pas** d’alias `enzyme-activity-v1` → `enzyme-temp`. Moteur `1.1.7` inchangé. |
 | Honnêteté chemin élève | **OUI** | Pas de `modelAnswer` après note. Hub : cartes locales vs « بدون شبكة ». 24 verbes : 0 `قيّم` (lien L0, pas 422). Yeast `4 سا` **hors** keypoints (`1.0.1`). Ateliers restent 0 % + CTA juge. |
 | HON-2 tuer théâtre | **OUI** | Hub = cartes `gradeQuestionId` seulement. Diagnostic / bac blanc / DA sans grille = mur تعذر. Checklist **ne bloque plus** `grade()`. Moteur `1.1.7`. |

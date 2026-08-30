@@ -75,7 +75,7 @@ def test_validate_runs_counters():
 def test_grader_and_schema_untouched():
     assert "counter_examples" not in GRADER
     assert "counter_examples" not in SCHEMA
-    assert GRADER_VERSION == "1.1.8"
+    assert GRADER_VERSION == "1.1.9"
     assert "openai" not in GRADER
     assert "evaluate.router" not in INIT
     assert "ai_evaluate.router" not in INIT

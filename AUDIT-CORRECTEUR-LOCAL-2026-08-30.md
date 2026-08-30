@@ -14,6 +14,8 @@
 > **2 neutralisations jouables** (36 ATP + « 38 ATP » ; bourrage + 1 chiffre du doc),
 > **3 tests rouges** (mur `NoLocalGradeWall` vs contrats S3/S9/S25 non tranchés),
 > et le **suite grade n'est dans aucun gate** (CI ni pre-commit).
+>
+> **Post-fix (même jour) : F1–F6 corrigés, moteur 1.1.9, suite 214 ✓ / 0 ✗, gate CI actif.** Détail en §5.
 
 ---
 
@@ -64,7 +66,12 @@ avec critère cause-type (`yeast-glucose-interpret`, `enzyme-temp-interpret`,
 fermée d'enclitiques (ها هم هن كم نا ه) symétrique de `_PROCLITICS` — ce n'est pas
 du stemming, c'est le même contrat. Bump `GRADER_VERSION` → 1.1.8 + goldens.
 
-### F2 — Neutralisation (moyen) : « 36 ATP » lavé par un « 38 ATP » placé n'importe où
+### F2 — Neutralisation (moyen) : « 36 ATP » lavé par un « 38 ATP » placé n'importe où — **CORRIGÉ en 1.1.9 (S31)**
+
+> **Fix appliqué :** l'exemption exige maintenant un « 38 atp » à **≤ 90 chars** du
+> 36/32 (`_has_38_near`, même fenêtre que `_near` Savoir). «ليس 36 ATP بل 38 ATP»
+> (adjacent) reste exempté — intent S27 intact, golden re-joué. « 36 affirmé …
+> [>90 chars] … 38 » → `science=error`, cap 40. Golden : `tests/test_grade_s31.py`.
 Le filet saute si `38 atp` apparaît **où que ce soit** dans la copie :
 
 ```
@@ -78,7 +85,13 @@ l'élève qui *affirme* 36 puis ajoute « 38 ATP » en bout de phrase est noté 
 **Fix proposé** : borner l'exemption à une fenêtre ~80 caractères autour du « 36 »
 (réutiliser `_near` de `savoir_corrector`), ou la supprimer si aucun golden ne le justifie.
 
-### F3 — Neutralisation (moyen) : bourrage + 1 chiffre du doc = exemption totale de stuffing
+### F3 — Neutralisation (moyen) : bourrage + 1 chiffre du doc = exemption totale de stuffing — **CORRIGÉ en 1.1.9 (S32)**
+
+> **Fix appliqué :** l'exemption ancrée (kp_full/obj_full) exige maintenant **au moins
+> un marqueur de structure** d'une liste fermée (`لان/بسبب/لذلك/نستنتج/نلاحظ/كلما/يرجع/راجع/مما/بالتالي`).
+> Bourrage + «18» sans marqueur → re-détecté, cap 50. Les modèles restent exemptés —
+> y compris `enzyme-temp-interpret` (13 tokens, ratio 1.0, sauvé par «لأن»).
+> Golden : `tests/test_grade_s32.py`.
 `_stuffing` retourne False dès qu'un `cites_keypoint` est full (`kp_full or obj_full`) :
 
 ```
@@ -90,14 +103,26 @@ Le chiffre magique du document désactive tout le garde-fou. **Fix proposé** :
 l'exemption devrait exiger kp_full **et** un signal syntaxique minimal
 (ex. ≥ 1 marqueur de cause/structure), ou ne porter que sur le critère concerné.
 
-### F4 — Diagnostic faussé (bas-moyen) : hors-sujet maquillé par 1 mot de thème
+### F4 — Diagnostic faussé (bas-moyen) : hors-sujet maquillé par 1 mot de thème — **CORRIGÉ (S33, grilles v1.0.1)**
+
+> **Fix appliqué :** `theme_min_hits=2` sur `yeast-glucose-interpret` et
+> `manhadjiya-yeast-analyse` (bump rubric 1.0.1). Tectonique + «الخميرة»×1 →
+> `off_topic` cap 40 (avant : `verb_slip`). Les 2 modèles gardent ≥ 2 variantes
+> distinctes ; les 11 autres grilles restent à 1 en attendant des copies réelles.
+> Golden : `tests/test_grade_s33.py`.
 `theme_min_hits=1` sur la grille levure : une copie 100 % tectonique qui glisse
 « الخميرة » une fois passe le filet hors-sujet. La **note reste 0** (aucun critère
 touché) mais l'élève reçoit `verb_slip.analyse` (« فسّر بـ لأن ») au lieu de
 `off_topic` — feedback pédagogiquement faux. **Fix proposé** : `theme_min_hits ≥ 2`
 sur les grilles à lexique riche, ou test de densité (hits thème / tokens).
 
-### F5 — Contrat non tranché (à décider) : mur `NoLocalGradeWall` vs tests S3/S9/S25
+### F5 — Contrat non tranché (à décider) : mur `NoLocalGradeWall` vs tests S3/S9/S25 — **RÉSOLU (le mur était la décision documentée)**
+
+> **Résolution :** `ARCHITECTURE-COACH-LOCAL.md` §14.1 (HON-2, déjà marqué FAIT
+> avant cet audit) documente le mur تعذر sur diagnostic/bac blanc/DA sans grille.
+> Les 3 tests étaient des contrats périmés antérieurs au mur : réalignés
+> (S3 → `NoLocalGradeWall` in diagnostic, S9 → mur sur DIAG/ACTION, S25 → mur sur
+> DIAG, caps toujours sur SCENARIO/CARD/API). Suite vert sans toucher au frontend.
 `khawarizmi-frontend/src/app/diagnostic/global/page.tsx` (et `action-verbs/[slug]`)
 affichent désormais un mur honnête « لا شبكة تقييم محلية » — **mais** 3 tests
 backend exigent encore `apiClient.grade` + `GradeResultCard` + `capsApplied` sur
@@ -108,7 +133,13 @@ cette page → suite rouge. Le mur n'est couvert par **aucun** test ni doc
 2. c'est une régression → restaurer la carte.
 **À trancher par le propriétaire ; en l'état le suite ne peut pas être mis vert.**
 
-### F6 — Gate manquant (moyen) : le suite grade n'est nulle part
+### F6 — Gate manquant (moyen) : le suite grade n'est nulle part — **CORRIGÉ (job CI `grader-tests`)**
+
+> **Fix appliqué :** nouveau job `grader-tests` dans `.github/workflows/ci.yml` :
+> `pytest tests/test_local_grader.py tests/test_grade_s*.py tests/test_grade_bac2023_ml901.py --noconftest`
+> puis `python scripts/validate_rubrics.py`. Une grille sourde ou une régression
+> moteur bloque maintenant le merge. Pre-commit volontairement inchangé (pytest
+> trop lent/hôte-dépendant pour un hook local — la CI est le gate de merge).
 `ci.yml` ne lance que `test_methodology*` + quelques fichiers ; pre-commit ne lance
 pas `validate_rubrics.py`. Une grille sourde ou une régression moteur peut être
 mergeée sans rien voir. **Fix proposé** : job CI `grader` =
@@ -172,11 +203,11 @@ contrat quota. Ajouter l'auth + le quota, ou assumer et documenter.
 | # | Action | Coût | Effet |
 |---|---|---|---|
 | 1 | F1 enclitiques fermés + bump 1.1.8 + goldens — **CORRIGÉ (S30, v1.1.8, commit du 2026-08-30)** | faible | rend 25 % à des copies correctes |
-| 2 | F6 gate CI (`grade suite` + `validate_rubrics`) | faible | protège tout le reste |
-| 3 | F5 trancher mur vs carte, puis verdir S3/S9/S25 | décision | suite vert, contrat clair |
-| 4 | F2 fenêtre _near sur l'exemption 38 ATP | faible | ferme l'exploit notation |
-| 5 | F3 conditionner l'exemption stuffing | faible | bourrage re-détecté |
-| 6 | F4 theme_min_hits ≥ 2 (grilles concernées) | grille | diagnostics justes |
+| 2 | F6 gate CI (`grade suite` + `validate_rubrics`) — **CORRIGÉ** | faible | protège tout le reste |
+| 3 | F5 trancher mur vs carte, puis verdir S3/S9/S25 — **RÉSOLU (mur HON-2)** | décision | suite vert, contrat clair |
+| 4 | F2 fenêtre _near sur l'exemption 38 ATP — **CORRIGÉ (S31)** | faible | ferme l'exploit notation |
+| 5 | F3 conditionner l'exemption stuffing — **CORRIGÉ (S32)** | faible | bourrage re-détecté |
+| 6 | F4 theme_min_hits ≥ 2 (grilles concernées) — **CORRIGÉ (S33)** | grille | diagnostics justes |
 | 7 | F7/F8/F9/F10 nettoyages | faible | hygiene |
 
 Le moteur est **sain dans sa structure et ses limites** ; les écarts sont des
@@ -184,3 +215,22 @@ réglages de rappel et de garde-fous, pas des mensonges de note — sauf F1 qui
 **sous-note** des copies correctes et doit passer en premier.
 
 **Reproduction :** `cd khawarizmi-backend && python scripts/probe_audit_correcteur_local.py`
+
+---
+
+## 5. Post-scriptum — fixes appliqués le jour même (branche `arena/01a053f2-project-sinamind`)
+
+| Finding | Fix | Version | Preuve |
+|---|---|---|---|
+| F1 enclitiques | `_ENCLITICS` fermée, regex unique/needle | `1.1.8` | s30, copie «لأنها» 75→100 % |
+| F2 38 ATP | fenêtre ≤ 90 chars (`_has_38_near`) | `1.1.9` | s31, far-38 cap 40, near-38 exempt |
+| F3 stuffing | ancre × marqueur de structure | `1.1.9` | s32, bourrage+18 cap 50, modèles exempts |
+| F4 hors-sujet | `theme_min_hits=2` (2 grilles levure) | rubrics `1.0.1` | s33, diag `off_topic` |
+| F5 tests rouges | réalignés sur le mur HON-2 documenté | — | suite vert |
+| F6 gate | job CI `grader-tests` + `validate_rubrics.py` | — | ci.yml |
+
+**État final : 214 tests ✓ / 0 ✗ · 13 grilles valides · moteur `1.1.9` · perf 20k ≈ 75 ms.**
+
+Restent ouverts (non bloquants) : F7 (`cites_trend` dormant + variantes contradictoires),
+F8 (`/api/evaluate/methodology` sans auth/quota), F9 (digest cache non pepperé si
+`SECRET_KEY` absent), F10 (messages `unanchored` vs cap stuffing ; defer anglais → off_topic).

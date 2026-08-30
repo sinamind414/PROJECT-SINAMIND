@@ -1,4 +1,4 @@
-"""S30 — enclitiques suffixaux (لأنها = لأن + ها). 1.1.8. Pas de stemming, pas ة→ت."""
+"""S30 — enclitiques suffixaux (لأنها = لأن + ها). 1.1.9. Pas de stemming, pas ة→ت."""
 
 from __future__ import annotations
 
@@ -97,8 +97,8 @@ class TestGradeEnclitiques:
 
 class TestContratFerme:
     def test_version_et_listes(self):
-        assert GRADER_VERSION == "1.1.8"
-        assert 'GRADER_VERSION = "1.1.8"' in GRADER
+        assert GRADER_VERSION == "1.1.9"
+        assert 'GRADER_VERSION = "1.1.9"' in GRADER
         assert "ها" in _ENCLITICS and "ه" in _ENCLITICS and "ي" in _ENCLITICS
         assert "ات" not in _ENCLITICS  # pluriel ≠ pronom
         assert "كال" in _PROCLITICS  # S29 intact
