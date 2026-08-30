@@ -22,7 +22,7 @@ from schemas.rubric import (
 from services.answer_sanity import check_answer_sanity
 from services.arabic import normalize_arabic
 
-GRADER_VERSION = "1.1.7"
+GRADER_VERSION = "1.2.0"
 SCIENCE_CAP_DEFAULT = 40
 TRAINING_BANNER_AR = "ملاحظة تدريبية — منهج + محتوى. ليست علامة بكالوريا رسمية."
 
@@ -40,9 +40,38 @@ _USEFUL_RE = re.compile(
 _INDIC_DIGITS = str.maketrans("٠١٢٣٤٥٦٧٨٩۰۱۲۳۴۵۶۷۸۹", "01234567890123456789")
 _HAS_38_ATP = re.compile(r"38\s+atp", re.IGNORECASE)
 
+_ATP_38_WINDOW = 90  # ~ _near(savoir) ; «ليس 36 بل 38» est adjacent (S31)
+
+
+def _has_38_near(sav: str, pos: int) -> bool:
+    """Vrai si un «38 atp» est à ≤ _ATP_38_WINDOW chars du 36/32 (S31).
+
+    Loin du 36, le 38 ne lave plus la faute : «36 affirmé + 38 ailleurs»
+    redevient une erreur grave (cap 40).
+    """
+    return any(
+        abs(m.start() - pos) <= _ATP_38_WINDOW for m in _HAS_38_ATP.finditer(sav)
+    )
+
+
 _CAUSE_MARKERS = ("لان", "بسبب", "يفسر", "تفسير", "هذا يدل", "راجع")
 _ANALYSE_SLIP = ("لان", "بسبب", "يفسر", "تفسير", "هذا يدل")
 _KULLAMA = "كلما"
+
+# S32 — marqueurs de structure pour l'exemption stuffing ancrée. Liste fermée,
+# même philosophie que _CAUSE_MARKERS / _ANALYSE_SLip : pas de parsing.
+_STRUCTURE_MARKERS = (
+    "لان",
+    "بسبب",
+    "لذلك",
+    "نستنتج",
+    "نلاحظ",
+    "كلما",
+    "يرجع",
+    "راجع",
+    "مما",
+    "بالتالي",
+)
 
 # Graves photosynthèse (faux positifs hors ce thème) — messages Savoir.
 _PS_GRAVE_HINTS = ("التركيب الضوئي", "صانعات", "chloroplaste")
@@ -107,37 +136,41 @@ _WORD_BOUND = r"[a-z0-9\u0600-\u06ff]"
 # Liste FERMÉE — pas de stemming. تقبل «فكلما» / «النمو» / «كالخميرة».
 # كال = ك+ال (comme فال/بال/وال). Sans ça, خميرة ⊄ كالخميرة (ك already, ال already, pas le composé).
 _PROCLITICS = ("وال", "فال", "بال", "لل", "كال", "ال", "و", "ف", "ب", "ك", "ل")
-
-
-def _unigram_forms(needle: str) -> list[str]:
-    forms = [needle]
-    for p in _PROCLITICS:
-        if not needle.startswith(p):
-            forms.append(p + needle)
-    if needle.startswith("ال") and len(needle) > 3:
-        forms.append(needle[2:])
-    # déduplique en gardant l'ordre (plus long d'abord pour un match plus propre)
-    seen: set[str] = set()
-    out: list[str] = []
-    for f in sorted(forms, key=len, reverse=True):
-        if f not in seen:
-            seen.add(f)
-            out.append(f)
-    return out
+# S30 — enclitiques suffixaux COLLÉS (pronoms) : لأنها = لأن + ها،
+# ولاننا = و + لأن + نا. Symétrique de _PROCLITICS : liste fermée, testée.
+# Pas «ات» (pluriel ≠ pronom), pas de stemming.
+_ENCLITICS = ("ها", "هم", "هن", "هما", "كم", "نا", "ه", "ك", "ي")
 
 
 @lru_cache(maxsize=1024)
-def _word_re(form: str) -> re.Pattern[str]:
-    return re.compile(
-        rf"(?<!{_WORD_BOUND})" + re.escape(form) + rf"(?!{_WORD_BOUND})"
+def _needle_res(needle: str) -> tuple[re.Pattern[str], ...]:
+    """1–2 regex du needle : proclitique optionnel + base + enclitique optionnel.
+
+    Même sémantique que l'ancienne énumération de formes (frontières de mot,
+    proclitiques fermés, radical sans ال en 2ᵉ pattern) — et les combos
+    proclitique×enclitique (ولأنها) matchent sans énumérer le produit cartésien.
+    Enclitiques refusés sur needle < 3 chars (garde anti-collision).
+    """
+    pro = "(?:" + "|".join(re.escape(p) for p in _PROCLITICS) + ")?"
+    enc = (
+        "(?:" + "|".join(re.escape(e) for e in _ENCLITICS) + ")?"
+        if len(needle) >= 3
+        else ""
     )
+    head = rf"(?<!{_WORD_BOUND})"
+    tail = rf"(?!{_WORD_BOUND})"
+    pats = [re.compile(head + pro + re.escape(needle) + enc + tail)]
+    if needle.startswith("ال") and len(needle) > 3:
+        # radical sans ال : frontières + enclitiques, sans proclitique
+        pats.append(re.compile(head + re.escape(needle[2:]) + enc + tail))
+    return tuple(pats)
 
 
 def _hit_pos(text: str, needle: str) -> int | None:
     """Position du 1er match.
 
     Unigramme → frontières de mot (évite لان ⊂ الانزيم / لانطلاق)
-    + proclitiques fermés (فكلما، النمو).
+    + proclitiques/enclitiques fermés (فكلما، النمو، كالخميرة، لأنها).
     Locution (espace) → sous-chaîne.
     """
     if not needle:
@@ -146,8 +179,8 @@ def _hit_pos(text: str, needle: str) -> int | None:
         idx = text.find(needle)
         return idx if idx >= 0 else None
     best: int | None = None
-    for form in _unigram_forms(needle):
-        m = _word_re(form).search(text)
+    for pat in _needle_res(needle):
+        m = pat.search(text)
         if m is None:
             continue
         if best is None or m.start() < best:
@@ -190,8 +223,8 @@ def _occurrence_count(text: str, variants_norm: list[str]) -> int:
                 start = i + max(1, len(v))
             continue
         best = 0
-        for form in _unigram_forms(v):
-            best = max(best, len(_word_re(form).findall(text)))
+        for pat in _needle_res(v):
+            best = max(best, len(pat.findall(text)))
         total += best
     return total
 
@@ -469,12 +502,16 @@ def _science_veto(
     for pattern, msg_ar, _pen in _GRAVE_ERRORS:
         if any(h in msg_ar for h in _PS_GRAVE_HINTS) and not ps_ctx:
             continue
-        if re.search(pattern, sav, re.IGNORECASE):
-            # 38 ATP présent → l'élève a corrigé 36/32. Pas un parseur de نفي.
-            if _HAS_38_ATP.search(sav) and re.search(r"36\\s|32\\s", pattern):
-                continue
-            hard.append(msg_ar)
-            break
+        m = re.search(pattern, sav, re.IGNORECASE)
+        if m is None:
+            continue
+        # 38 ATP À CÔTÉ du 36/32 → l'élève a corrigé (ليس 36 بل 38).
+        # Pas un parseur de نفي, mais fenêtre fermée (S31) : loin du 36,
+        # le 38 n'annule plus la faute.
+        if re.search(r"36\\s|32\\s", pattern) and _has_38_near(sav, m.start()):
+            continue
+        hard.append(msg_ar)
+        break
 
     for grave in rubric.grave:
         if grave.context_any:
@@ -545,7 +582,13 @@ def _stuffing(
         if c.check == "cites_object"
     )
     if kp_full or obj_full:
-        return False
+        # S32 — l'ancre (chiffre/objet du doc) n'exempte plus aveuglément :
+        # il faut AUSSI un marqueur de structure (liste fermée). Un bourrage
+        # + le chiffre magique du doc reste détecté ; une vraie copie courte
+        # (enzyme-temp-interpret : ratio 1.0 mais «لأن») reste exempte.
+        if any(_hit_pos(text, m) is not None for m in _STRUCTURE_MARKERS):
+            return False
+        # sans marqueur → on retombe sur le ratio (pas d'exemption)
     return ratio > 0.60
 
 
@@ -575,6 +618,14 @@ def _diagnosis(
     if sanity_code not in ("ok", "defer"):
         return Diagnosis(code=f"sanity.{sanity_code}", label_ar="إجابة غير صالحة")
     if science_status == "error" and any("خارج" in f for f in science_flags):
+        # S37 — defer + hors-sujet = d'abord un problème de LANGUE, pas de
+        # thème : une copie non-arabe n'est pas « hors sujet », elle est
+        # illisible pour la grille (audit F10).
+        if sanity_code == "defer":
+            return Diagnosis(
+                code="sanity.defer",
+                label_ar="إجابة غير مكتوبة بالعربية — لا يمكن تصحيح الموضوع",
+            )
         return Diagnosis(code="off_topic", label_ar="الإجابة خارج الموضوع")
     if science_status == "error":
         return Diagnosis(code="science.grave", label_ar="خطأ علمي")
@@ -585,10 +636,12 @@ def _diagnosis(
             else "فسّرت بأسلوب حلّل (كلما دون سبب)"
         )
         return Diagnosis(code=slip, label_ar=label)
-    if unanchored:
-        return Diagnosis(code="unanchored", label_ar="لا رقم من الوثيقة")
+    # S37 — stuffing AVANT unanchored : quand les deux tirent, le cap appliqué
+    # est stuffing (50) → le diagnostic doit nommer le cap (audit F10).
     if stuffing:
         return Diagnosis(code="stuffing", label_ar="حشو معجمي")
+    if unanchored:
+        return Diagnosis(code="unanchored", label_ar="لا رقم من الوثيقة")
     for h, c in zip(hits, rubric.criteria):
         if c.required and h.status != "full":
             return Diagnosis(code=f"first_required_gap.{c.id}", label_ar=c.label_ar)
@@ -736,6 +789,8 @@ def grade(
         next_step = science_flags[0] + ((" " + next_step) if next_step else "")
     if diag.code == "off_topic" and not next_step:
         next_step = "الإجابة خارج الموضوع"
+    if diag.code == "sanity.defer":
+        next_step = "أعد كتابة الإجابة باللغة العربية ثم أرسلها مرة أخرى."
     if diag.code == "science.erratum" and science_flags:
         next_step = science_flags[0]
     elif any("تصويب الدليل" in f for f in science_flags):

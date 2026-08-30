@@ -1,6 +1,6 @@
 {
   "rubric_id": "manhadjiya-yeast-analyse",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "verb_slug": "analyse",
   "chapter_slug": "respiration-levure",
   "language": "ar",
@@ -16,7 +16,7 @@
     "نمو",
     "$lex:glucose"
   ],
-  "theme_min_hits": 1,
+  "theme_min_hits": 2,
   "method_graph": {
     "steps": [
       "object",
@@ -129,5 +129,8 @@
       "axis": "overall",
       "why": "36 ATP grave ONEC — cap overall 40"
     }
+  ],
+  "notes": [
+    "theme_min_hits=2 (S33) : 1 mention unique du thème ne passe plus le filet hors-sujet. Modèle ≥ 2 variantes distinctes."
   ]
 }

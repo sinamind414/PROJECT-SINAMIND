@@ -73,7 +73,9 @@ def test_diagnostic_page_does_not_import_js_grader():
         / "page.tsx"
     ).read_text(encoding="utf-8")
     assert "evaluateMethodologyAnswer" not in src
-    assert "apiClient.grade" in src
+    # HON-2 (ARCHITECTURE-COACH-LOCAL §14.1) : le diagnostic sans grille L0
+    # est un MUR تعذر — pas de carte, pas d'appel note locale.
+    assert "NoLocalGradeWall" in src
 
 
 def test_unknown_verb_id_is_ungraded():

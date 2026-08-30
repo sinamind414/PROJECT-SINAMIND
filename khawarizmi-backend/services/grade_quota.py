@@ -1,7 +1,8 @@
-"""S17/S22 — quota /api/grade. Hors grade() (P7).
+"""S17/S22 — décision quota (PURE, 0 I/O). Hors grade() (P7).
 
 Vide / cache / stop sanity / 422 ne consomment pas.
 defer consomme (B4) : le pipeline a tourné. G7 reste defer ≠ 0.
+L'application du quota (limiter, HTTP 429) vit dans rate_limit.enforce_evaluate_quota.
 """
 
 from __future__ import annotations

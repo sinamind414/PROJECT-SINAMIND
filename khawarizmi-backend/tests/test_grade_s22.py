@@ -71,13 +71,14 @@ def test_no_invented_defer_daily_counter():
 
 def test_route_still_gates_on_should_count():
     assert "should_count_quota" in ROUTE
-    assert "_enforce_evaluate_quota" in ROUTE
+    # S36 : helper partagé rate_limit.enforce_evaluate_quota (plus de wrapper local)
+    assert "enforce_evaluate_quota" in ROUTE
     assert "evaluate.router" not in INIT
     assert "ai_evaluate.router" not in INIT
 
 
 def test_grader_untouched_no_version_bump():
-    assert GRADER_VERSION == "1.1.7"
+    assert GRADER_VERSION == "1.2.0"
     assert "grade_quota" not in GRADER
     assert "evaluate_limit" not in GRADER
     assert "should_count_quota" not in GRADER

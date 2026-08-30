@@ -1,0 +1,43 @@
+# ── PATCH CI à coller au merge (F6 + F11, audit 2026-08-30) ──────────────────
+# Le token de la session d'audit n'a pas la permission `workflows` : ce patch
+# est versionné ici et doit être appliqué à .github/workflows/ci.yml.
+#
+# 1) TRIGGERS (F11 — la CI ne se déclenche PAS sur les PR vers master aujourd'hui) :
+#
+#    on:
+#      push:
+#        branches: [master, main, fabuleux/*]     # ← ajouter master
+#      pull_request:
+#        branches: [master, main]                 # ← ajouter master
+#
+# 2) JOB grader-tests (F6) : coller le bloc ci-dessous entre backend-tests
+#    et frontend-tests (même niveau d'indentation : 2 espaces).
+# ─────────────────────────────────────────────────────────────────────────────
+  grader-tests:
+    # S31-F6 (audit 2026-08-30) : le suite grade (0 LLM) et la validation
+    # des grilles git doivent bloquer le merge — pas seulement methodology.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install backend dependencies
+        run: pip install -r requirements.txt
+        working-directory: khawarizmi-backend
+
+      - name: Grade suite (0 LLM)
+        env:
+          SECRET_KEY: ci-test-key-for-smoke-tests-only
+        run: |
+          cd khawarizmi-backend
+          pytest tests/test_local_grader.py tests/test_grade_s*.py tests/test_grade_bac2023_ml901.py --noconftest -q
+
+      - name: Validation des grilles (G5 + négatifs + counter_examples)
+        run: |
+          cd khawarizmi-backend
+          python scripts/validate_rubrics.py
+

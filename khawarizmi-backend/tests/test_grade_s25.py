@@ -28,13 +28,14 @@ def test_card_shows_stuffing_and_science_caps():
 
 def test_adapters_forward_caps():
     assert "capsApplied" in SCENARIO.read_text(encoding="utf-8")
-    assert "capsApplied" in DIAG.read_text(encoding="utf-8")
+    # HON-2 : diagnostic global = mur تعذر — les caps vivent sur SCENARIO/CARD/API.
+    assert "NoLocalGradeWall" in DIAG.read_text(encoding="utf-8")
     assert "caps_applied" in API.read_text(encoding="utf-8")
     assert "caps_applied" in CARD.read_text(encoding="utf-8")
 
 
 def test_grader_untouched_no_version_bump():
-    assert GRADER_VERSION == "1.1.7"
+    assert GRADER_VERSION == "1.2.0"
     assert "GradeResultCard" not in GRADER
     assert "evaluate.router" not in INIT
     assert "ai_evaluate.router" not in INIT

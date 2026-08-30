@@ -1,53 +1,68 @@
-"""Tests complets Methodology Evaluator V2 — Semaine 8"""
+"""Tests complets Methodology Evaluator V2 — Semaine 8
+
+Évaluateur LLM GELÉ : /api/evaluate/methodology = grade_or_none (0 LLM),
+auth requise + 422 ungraded sans Rubric L0 (réaligné S36, audit 2026-08-30 F8).
+"""
 
 from fastapi.testclient import TestClient
 
+from deps import get_current_user
 from main import app
+from services.rubric_store import load
 
 client = TestClient(app)
 
 
-def test_methodology_evaluator_complex_verb():
-    """Test verbe complexe : وضّح"""
-    payload = {
-        "context": "Document sur la photosynthese",
-        "instruction": "وضّح في نص علمي كيف يتم التركيب الضوئي",
-        "student_answer": "مقدمة: التركيب الضوئي هو... عرض: يتم ذلك عبر... خاتمة: إذن...",
-        "documents": []
+def _auth_on():
+    app.dependency_overrides[get_current_user] = lambda: {
+        "id": 1, "email": "test@khawarizmi.dz", "plan": "free",
     }
-    response = client.post("/api/evaluate/methodology", json=payload)
-    assert response.status_code == 200
-    data = response.json()
-    assert data["verb"] == "وضّح في نص علمي"
-    assert data["task_type"] == "complex"
+
+
+def _auth_off():
+    app.dependency_overrides.pop(get_current_user, None)
+
+
+def test_methodology_evaluator_complex_verb():
+    """GEL : sans Rubric L0 → 422 ungraded (avant : 200 + task_type complex)."""
+    _auth_on()
+    try:
+        payload = {
+            "instruction": "وضّح في نص علمي كيف يتم التركيب الضوئي",
+            "student_answer": "مقدمة: التركيب الضوئي هو... عرض: خاتمة:",
+            "documents": [],
+        }
+        response = client.post("/api/evaluate/methodology", json=payload)
+        assert response.status_code == 422
+        assert response.json()["code"] == "ungraded"
+    finally:
+        _auth_off()
 
 
 def test_methodology_evaluator_simple_verb():
-    """Test verbe simple : صف"""
-    payload = {
-        "context": "",
-        "instruction": "صف خصائص الخلية النباتية",
-        "student_answer": "الخلية النباتية تحتوي على جدار خلوي",
-        "documents": []
-    }
-    response = client.post("/api/evaluate/methodology", json=payload)
-    assert response.status_code == 200
-    data = response.json()
-    assert data["verb"] == "صف"
-    assert data["task_type"] == "simple"
+    """GEL : avec Rubric L0 → 200 to_verb_eval, 0 LLM (avant : 200 + verb صف)."""
+    _auth_on()
+    try:
+        packed = load("manhadjiya-yeast-analyse")
+        assert packed is not None
+        payload = {
+            "question_id": "manhadjiya-yeast-analyse",
+            "student_answer": packed.rubric.model_answer,
+        }
+        response = client.post("/api/evaluate/methodology", json=payload)
+        assert response.status_code == 200
+        data = response.json()
+        assert data["source"] == "local_rubric"
+        assert data["verb_slug"] == "analyse"
+        assert data["method_percent"] == 100
+    finally:
+        _auth_off()
 
 
 def test_methodology_evaluator_missing_verb():
-    """Test verbe inconnu"""
-    payload = {
-        "context": "",
-        "instruction": "Fais quelque chose",
-        "student_answer": "Reponse",
-        "documents": []
-    }
-    response = client.post("/api/evaluate/methodology", json=payload)
-    assert response.status_code == 200
-    assert response.json()["verb"] == "unknown"
+    """GEL : sans token → 401 (avant : 200 + verb unknown). S36 auth."""
+    response = client.post("/api/evaluate/methodology", json={"student_answer": "x"})
+    assert response.status_code == 401
 
 
 def test_diagnostic_report():
@@ -135,16 +150,20 @@ def test_mindmap_static():
 
 
 def test_full_methodology_pipeline():
-    """Pipeline complet : evaluate (vivant) -> bac-blanc (GEL 404) -> action-plan (GEL 404)."""
+    """Pipeline complet : evaluate (vivant, 0 LLM) -> bac-blanc (GEL 404) -> action-plan (GEL 404)."""
+    packed = load("manhadjiya-yeast-analyse")
+    assert packed is not None
     eval_payload = {
-        "context": "Test pipeline",
-        "instruction": "وضّح في نص علمي",
-        "student_answer": "مقدمة: probleme... عرض: explication... خاتمة: synthese...",
-        "documents": []
+        "question_id": "manhadjiya-yeast-analyse",
+        "student_answer": packed.rubric.model_answer,
     }
-    r = client.post("/api/evaluate/methodology", json=eval_payload)
+    _auth_on()
+    try:
+        r = client.post("/api/evaluate/methodology", json=eval_payload)
+    finally:
+        _auth_off()
     assert r.status_code == 200
-    assert r.json()["task_type"] == "complex"
+    assert r.json()["source"] == "local_rubric"
 
     # GEL 2026-08-17 : bac_blanc_intelligent retiré du registre → 404
     r2 = client.post("/api/bac-blanc/feedback", json=eval_payload)

@@ -59,3 +59,34 @@ def configure_limiter_storage(redis) -> None:
 
 
 limiter = Limiter(key_func=get_user_key)
+
+
+def enforce_evaluate_quota(request) -> None:
+    """S36 (audit 2026-08-30 F8) — application du quota de correction.
+
+    15/h free, 80/h pro (evaluate_limit). Fail-open si limiter down.
+    Partagé par /api/grade et /api/evaluate/methodology : même budget,
+    même équité. La DÉCISION de compter reste dans services/grade_quota
+    (module pur) — ici, seul l'I/O du limiter.
+    """
+    from fastapi import HTTPException
+
+    key = get_user_key(request)
+    limit_str = evaluate_limit(key)
+    try:
+        inner = getattr(limiter, "limiter", None)
+        if inner is None:
+            return
+        from limits import parse
+
+        item = parse(limit_str)
+        allowed = inner.hit(item, key)
+        if allowed is False:
+            raise HTTPException(
+                status_code=429,
+                detail="تم بلوغ حد التصحيح. ليست علامة بكالوريا رسمية.",
+            )
+    except HTTPException:
+        raise
+    except Exception:
+        return

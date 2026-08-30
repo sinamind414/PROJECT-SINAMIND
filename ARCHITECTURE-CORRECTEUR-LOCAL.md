@@ -1,7 +1,7 @@
 # Architecture détaillée — Correcteur local Khawarizmi
 
-**Version moteur :** `GRADER_VERSION = 1.1.7`  
-**Statut :** **S0–S29.** `grade()` 0 LLM, `GRADER_VERSION=1.1.7`. Proclitique `كال`. Filet ATP ٣٦ + 38 annule 36. FSRS pas sur cache hit. P/O NADH/FADH. UI 2 axes + caps. Cache C1+sha16+filet_sha16. Quota `ok` **ou** `defer`. Sans grille → ungraded.  
+**Version moteur :** `GRADER_VERSION = 1.2.0`  
+**Statut :** **S0–S37.** `grade()` 0 LLM. Proclitique `كال` + enclitiques (لأنها). Filet ATP ٣٦ + 38 annule 36 à ≤ 90 chars. Stuffing ancre×marqueur. Grilles levure `theme_min_hits=2`. Diagnostics : stuffing avant unanchored ; defer+hors-sujet → `sanity.defer`. Docs trend hygiène validateur. `/api/evaluate/methodology` auth + quota partagé (`rate_limit.enforce_evaluate_quota`). Cache digest bruyant sans pepper. CI `grader-tests` : snippet prêt (docs/ci-grader-tests.job.yml), à coller dans ci.yml.  
 **Promesse :** noter **méthode (Manhadjiya) + science (manuel / دليل)** sans mentir sur le %.  
 **Bannière élève :** `ملاحظة تدريبية — منهج + محتوى. ليست علامة بكالوريا رسمية.`
 
@@ -154,7 +154,8 @@ Appelle `check_answer_sanity`, puis :
 | N10 | espaces + `.lower()` |
 
 **Pas** Levenshtein, **pas** stemming scientifique.  
-Proclitiques **fermés** au match seulement : `و ف ب ك ل ال وال فال بال لل كال` (فكلما، النمو، كالخميرة). Pas `فل`.
+Proclitiques **fermés** au match seulement : `و ف ب ك ل ال وال فال بال لل كال` (فكلما، النمو، كالخميرة). Pas `فل`.  
+Enclitiques suffixaux **fermés** (S30) : `ها هم هن هما كم نا ه ك ي` (لأنها، لاننا، ولأنها = proclitique×enclitique). Garde ≥ 3 chars. Pas `ات` (pluriel ≠ pronom), pas ة→ت (خميرتها — morphologie, pas une liste fermée). Une seule regex par needle au lieu de l'énumération des formes (perf ÷3 sur copie 20k).
 
 **Dette :** `savoir_corrector._normalize` est **un autre** normaliseur (graves Savoir). Ne pas fusionner sans rejouer le golden Savoir.
 
@@ -315,6 +316,15 @@ S26 P/O contextualisé (FADH2=2 juste ; NADH P/O=2 cap) ; filet_sha16 ; 1.1.5   
 S27 filet ATP ٣٦ + ليس 36 بل 38 ; GRADER_VERSION=1.1.6 ; pas fusion normalize           ← FAIT
 S28 FSRS pas sur cache hit (idempotence) ; hors grade() ; 1.1.6                         ← FAIT
 S29 proclitique كال (كالخميرة) ; liste fermée ; 1.1.7 ; pas فل / pas stemming            ← FAIT
+S30 enclitiques suffixaux (لأنها/لأنه/لاننا + combos ولأنها) ; liste fermée ; GRADER_VERSION=1.1.8 ; regex unique par needle ; pas ة→ت   ← FAIT
+S31 38 n'annule 36 qu'à ≤ 90 chars (_has_38_near) ; «ليس 36 بل 38» intact ; GRADER_VERSION=1.1.9   ← FAIT
+S32 stuffing : ancre (kp/objet) exige un marqueur de structure (liste fermée) ; bourrage+chiffre magique re-capé 50   ← FAIT
+S33 grilles levure theme_min_hits=2 (v1.0.1) ; 1 mention unique du thème ≠ assez ; modèles ≥ 2 variantes   ← FAIT
+S31-F6 CI job grader-tests : suite grade --noconftest + validate_rubrics bloquent le merge   ← PRÊT (docs/ci-grader-tests.job.yml ; déploiement bloqué : token App sans permission workflows)
+S34 hygiène trend docs (directions fermées) + validate_rubrics._doc_trend_fails ; yeast doc v1.0.2 (يتناقص sorti du trend)   ← FAIT
+S35 digest cache sans pepper → WARNING une fois (plus de SHA-256 silencieux)   ← FAIT
+S36 /api/evaluate/methodology : auth + quota partagé via rate_limit.enforce_evaluate_quota ; tests methodology réalignés (contrats LLM morts)   ← FAIT
+S37 diagnostics : stuffing AVANT unanchored (le diag nomme le cap) ; defer+hors-sujet → sanity.defer (langue ≠ thème) ; GRADER_VERSION=1.2.0   ← FAIT
 L1 UI  gradeQuestionId → bac2023-s1-ex2-analyse-traduction (ScenarioRunner)            ← FAIT
 L0 UI  10/10 ids sur le hub DA (6 cartes, keypoints JSON, 0 alias enzyme-pH)          ← FAIT
 HON UI modèle masqué après note ; hub local vs théâtre ; verbes → cartes L0 ; yeast 4 hors keypoints ← FAIT
@@ -341,4 +351,4 @@ Détail C1–C5 : `AUDIT-ARCHI-INDEPENDANT.md`.
 
 ---
 
-*SoT code : `local_grader.py` 1.1.7. SoT cible produit : `ARCHITECTURE-COACH-LOCAL.md`. Audit écarts : `AUDIT-GRADER-LOCAL.md`.*
+*SoT code : `local_grader.py` 1.1.8. SoT cible produit : `ARCHITECTURE-COACH-LOCAL.md`. Audit écarts : `AUDIT-GRADER-LOCAL.md` + `AUDIT-CORRECTEUR-LOCAL-2026-08-30.md`.*
