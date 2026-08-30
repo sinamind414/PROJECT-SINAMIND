@@ -1,0 +1,127 @@
+{
+  "rubric_id": "greffe-ltc-analyse",
+  "version": "1.0.0",
+  "verb_slug": "analyse",
+  "chapter_slug": "immunite-cellulaire",
+  "language": "ar",
+  "total_points": 4.0,
+  "document_id": "greffe-ltc",
+  "theme_variants": [
+    "طعم",
+    "الطعم",
+    "رفض",
+    "LTc",
+    "ltc",
+    "لمفاوية",
+    "طعم جلدي"
+  ],
+  "theme_min_hits": 1,
+  "method_graph": {
+    "steps": [
+      "object",
+      "keypoint",
+      "relation",
+      "conclusion"
+    ],
+    "require_order": true
+  },
+  "criteria": [
+    {
+      "id": "object",
+      "label_ar": "تقديم الوثيقة",
+      "points": 0.75,
+      "check": "cites_object",
+      "required": true
+    },
+    {
+      "id": "keypoint",
+      "label_ar": "أرقام الرفض أو ذروة LTc",
+      "points": 1.0,
+      "check": "cites_keypoint",
+      "required": true
+    },
+    {
+      "id": "relation",
+      "label_ar": "علاقة كلما دون سببية",
+      "points": 0.75,
+      "check": "any_of",
+      "variants": [
+        "كلما",
+        "علاقة طردية",
+        "أسرع من",
+        "أبكر"
+      ],
+      "required": true
+    },
+    {
+      "id": "no_cause",
+      "label_ar": "بدون لأن / هذا يدل",
+      "points": 0.5,
+      "check": "forbidden_abs",
+      "variants": [
+        "لأن",
+        "بسبب",
+        "يفسر",
+        "تفسير",
+        "هذا يدل"
+      ],
+      "required": true
+    },
+    {
+      "id": "conclusion",
+      "label_ar": "الرفض الثاني أسرع / الذروة أبكر وأعلى",
+      "points": 1.0,
+      "check": "any_of",
+      "variants": [
+        "الرفض الثاني أسرع",
+        "رفض أسرع",
+        "أبكر وأعلى",
+        "تسارع الرفض",
+        "الذروة أبكر"
+      ],
+      "required": true
+    }
+  ],
+  "distractors": [
+    {
+      "id": "anticorps",
+      "variants": [
+        "أجسام مضادة",
+        "الأجسام المضادة",
+        "استجابة خلطية"
+      ],
+      "message_ar": "الوثيقتان فيهما LTc لا أجسام مضادة"
+    }
+  ],
+  "advice_by_gap": {
+    "verb_slip.interpret": "اليوم حلّل: 10 مقابل 5 بلا لأن.",
+    "unanchored": "اذكر 10 أيام أو 5 أيام أو 4,8 أو 2,5.",
+    "object": "قدّم الجدول أو المنحنى.",
+    "keypoint": "اقرأ رقما حقيقيا من الوثيقة.",
+    "relation": "اربط كلما / أسرع دون تفسير الذاكرة.",
+    "conclusion": "اختتم بأن الرفض الثاني أسرع."
+  },
+  "advice_praise": {
+    "object": "أحسنت: قدّمت الوثيقة.",
+    "keypoint": "ذكرت 10 أو 5 أو 4,8."
+  },
+  "model_answer": "تمثل الوثيقة جدولا ومنحنى لتغيرات رفض الطعم وعدد LTc. يُرفض الطعم الأول في 10 أيام بذروة 2,5 بينما يُرفض الطعم الثاني في 5 أيام بذروة 4,8. كلما تكرر تماس نفس المعطي كان الرفض أسرع والذروة أعلى. نستنتج تسارع الرفض الثاني.",
+  "source": "teacher_authored",
+  "grader_min_version": "1.0.0",
+  "counter_examples": [
+    {
+      "id": "off_topic",
+      "text_ar": "تمثل الوثيقة منحنى تباعد الصفائح عند الأعراف المحيطية. كلما ابتعدت الصفيحة ازداد الخندق المحيطي. نستنتج غوص اللوح في الاندساس.",
+      "max_percent": 40,
+      "axis": "overall",
+      "why": "bonne langue, tectonique ≠ chapitre de la grille"
+    },
+    {
+      "id": "atp36",
+      "use": "model+atp36",
+      "max_percent": 40,
+      "axis": "overall",
+      "why": "36 ATP grave ONEC — cap overall 40"
+    }
+  ]
+}

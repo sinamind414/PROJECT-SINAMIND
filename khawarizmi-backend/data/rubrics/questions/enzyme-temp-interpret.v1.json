@@ -1,0 +1,103 @@
+{
+  "rubric_id": "enzyme-temp-interpret",
+  "version": "1.0.0",
+  "verb_slug": "interpret",
+  "chapter_slug": "enzymologie",
+  "language": "ar",
+  "total_points": 4.0,
+  "document_id": "enzyme-temp",
+  "theme_variants": [
+    "إنزيم",
+    "الانزيم",
+    "حرارة",
+    "تمسخ",
+    "$lex:enzyme",
+    "$lex:denaturation"
+  ],
+  "theme_min_hits": 1,
+  "method_graph": {
+    "steps": [
+      "rappel",
+      "cause",
+      "cours",
+      "conclusion"
+    ],
+    "require_order": true
+  },
+  "criteria": [
+    {
+      "id": "rappel",
+      "label_ar": "بعد 37°م / عند 80°م",
+      "points": 1.0,
+      "check": "cites_keypoint",
+      "required": true
+    },
+    {
+      "id": "cause",
+      "label_ar": "لأن / يرجع",
+      "points": 1.0,
+      "check": "any_of",
+      "variants": [
+        "لأن",
+        "راجع",
+        "يرجع",
+        "بسبب"
+      ],
+      "required": true
+    },
+    {
+      "id": "cours",
+      "label_ar": "تمسخ الإنزيم",
+      "points": 1.0,
+      "check": "any_of",
+      "variants": [
+        "تمسخ",
+        "التمسخ",
+        "يفقد بنيته",
+        "تغير البنية",
+        "$lex:denaturation"
+      ],
+      "required": true
+    },
+    {
+      "id": "conclusion",
+      "label_ar": "فقدان النشاط بعد المثلى",
+      "points": 1.0,
+      "check": "any_of",
+      "variants": [
+        "ينعدم",
+        "يفقد نشاط",
+        "فقدان النشاط",
+        "لا يعمل"
+      ],
+      "required": true
+    }
+  ],
+  "distractors": [],
+  "advice_by_gap": {
+    "cours": "الآلية: تمسخ البنية الفراغية.",
+    "verb_slip.analyse": "فسّر بـ لأن تمسخ."
+  },
+  "advice_praise": {
+    "cours": "أحسنت: ذكرت التمسخ."
+  },
+  "model_answer": "عند 80°م يفقد الإنزيم نشاطه لأن الحرارة المرتفعة تسبب تمسخ الإنزيم فينعدم النشاط.",
+  "source": "teacher_authored",
+  "grader_min_version": "1.0.0",
+  "counter_examples": [
+    {
+      "id": "off_topic",
+      "text_ar": "تمثل الوثيقة منحنى تباعد الصفائح عند الأعراف المحيطية. كلما ابتعدت الصفيحة ازداد الخندق المحيطي. نستنتج غوص اللوح في الاندساس.",
+      "max_percent": 40,
+      "axis": "overall",
+      "why": "bonne langue, tectonique ≠ chapitre de la grille"
+    },
+    {
+      "id": "atp36",
+      "use": "model+atp36",
+      "max_percent": 40,
+      "axis": "overall",
+      "why": "36 ATP grave ONEC — cap overall 40"
+    }
+  ]
+}

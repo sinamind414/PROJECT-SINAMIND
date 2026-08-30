@@ -17,7 +17,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from database import get_db
 from deps import get_current_user
-from methodology.evaluator import evaluate_methodology
 from schemas.bac_blanc import (
     BacExercise,
     BacSubjectDetail,
@@ -34,10 +33,36 @@ from schemas.bac_blanc import (
     SubmitBacResponse,
     VerbScore,
 )
-from services.document_analysis_service import evaluate_answer
+from services.grade_adapter import UNGRADED_AR, grade_or_none, resolve_question_id
+from services.hashing import hash_answer
+from services.local_grader import TRAINING_BANNER_AR
 
 logger = logging.getLogger("khawarizmi.api")
 router = APIRouter(prefix="/api/bac-blanc", tags=["Bac Blanc"])
+
+
+async def _require_own_session(db: AsyncSession, session_id: str, user_id: int):
+    """Session de CET élève. 404 si absente, 403 si elle appartient à un autre (G9)."""
+    owned = await db.execute(
+        text(
+            """
+            SELECT id, user_id, subject_choice, status, started_at, annale_slug
+            FROM bac_sessions
+            WHERE id = :sid AND user_id = :uid
+            """
+        ),
+        {"sid": session_id, "uid": user_id},
+    )
+    row = owned.fetchone()
+    if row:
+        return row._mapping
+    exists = await db.execute(
+        text("SELECT 1 FROM bac_sessions WHERE id = :sid"),
+        {"sid": session_id},
+    )
+    if exists.fetchone():
+        raise HTTPException(status_code=403, detail="Session d'un autre élève")
+    raise HTTPException(status_code=404, detail="Session introuvable")
 
 
 @router.post("/start", response_model=StartBacResponse)
@@ -102,34 +127,33 @@ async def choose_subject(
     db: AsyncSession = Depends(get_db),
 ):
     """Verrouille le choix du sujet et retourne le détail."""
-    sess = await db.execute(
-        text("SELECT id, subject_choice, status FROM bac_sessions WHERE id = :sid"),
-        {"sid": body.session_id},
-    )
-    sess_row = sess.fetchone()
-    if not sess_row:
-        raise HTTPException(404, "Session introuvable")
+    sess_map = await _require_own_session(db, body.session_id, current_user["id"])
 
-    if sess_row._mapping["subject_choice"] is not None:
+    if sess_map["subject_choice"] is not None:
         raise HTTPException(400, "Le choix est déjà verrouillé")
 
     result = await db.execute(
         text("""
             SELECT subject_number, title_ar, themes_ar, estimated_minutes, exercises
             FROM bac_subjects
-            WHERE annale_slug = (
-                SELECT annale_slug FROM bac_sessions WHERE id = :sid
-            ) AND subject_number = :num
+            WHERE annale_slug = :slug AND subject_number = :num
         """),
-        {"sid": body.session_id, "num": body.subject_choice},
+        {"slug": sess_map["annale_slug"], "num": body.subject_choice},
     )
     row = result.fetchone()
     if not row:
         raise HTTPException(404, "Sujet introuvable")
 
     await db.execute(
-        text("UPDATE bac_sessions SET subject_choice = :choice WHERE id = :sid"),
-        {"choice": body.subject_choice, "sid": body.session_id},
+        text(
+            "UPDATE bac_sessions SET subject_choice = :choice "
+            "WHERE id = :sid AND user_id = :uid"
+        ),
+        {
+            "choice": body.subject_choice,
+            "sid": body.session_id,
+            "uid": current_user["id"],
+        },
     )
     await db.commit()
 
@@ -165,11 +189,8 @@ async def save_answer(
     db: AsyncSession = Depends(get_db),
 ):
     """Sauvegarde automatique d'une réponse pendant l'épreuve."""
-    sess = await db.execute(
-        text("SELECT id FROM bac_sessions WHERE id = :sid AND status = 'in_progress'"),
-        {"sid": body.session_id},
-    )
-    if not sess.fetchone():
+    sess_map = await _require_own_session(db, body.session_id, current_user["id"])
+    if sess_map["status"] != "in_progress":
         raise HTTPException(400, "Session non active")
 
     existing = await db.execute(
@@ -216,21 +237,10 @@ async def submit_bac(
     db: AsyncSession = Depends(get_db),
 ):
     """Soumet définitivement le bac blanc + évalue les réponses."""
-    sess = await db.execute(
-        text("""
-            SELECT id, started_at, subject_choice, annale_slug, status
-            FROM bac_sessions WHERE id = :sid
-        """),
-        {"sid": body.session_id},
-    )
-    sess_row = sess.fetchone()
-    if not sess_row:
-        raise HTTPException(404, "Session introuvable")
+    sm = await _require_own_session(db, body.session_id, current_user["id"])
 
-    if sess_row._mapping["status"] == "submitted":
+    if sm["status"] == "submitted":
         raise HTTPException(400, "Déjà soumis")
-
-    sm = sess_row._mapping
     now = datetime.now(UTC)
     started = sm["started_at"]
     time_used = int((now - started).total_seconds()) if started else 0
@@ -264,10 +274,11 @@ async def submit_bac(
 
     exercise_scores: list[ExerciseScore] = []
     verb_scores_map: dict[str, list[int]] = {}
-    total_score = 0
-    total_max = 0
     skipped_count = 0
+    ungraded_count = 0
+    graded_percents: list[int] = []
     corrections: list[CorrectionAnswer] = []
+    annale = sm["annale_slug"]
 
     for ex in exercises_data:
         ex_id = ex["exercise_id"]
@@ -275,6 +286,8 @@ async def submit_bac(
         ans = answers_map.get(ex_id, {"answer_text": "", "skipped": True})
         answer_text = ans["answer_text"]
         is_skipped = ans["skipped"] or not answer_text.strip()
+        score_max = ex.get("points", 5)
+        is_ungraded = False
 
         if is_skipped:
             skipped_count += 1
@@ -282,28 +295,24 @@ async def submit_bac(
             percentage = 0
             feedback = "تم تخطي هذا التمرين"
         else:
-            evaluation = evaluate_answer(verb, answer_text, ex.get("model_answer_ar"))
-            score = evaluation["score"]
-            percentage = evaluation["percentage"]
-            feedback = evaluation["advice"]
-
-            try:
-                methodo = await evaluate_methodology(
-                    context=ex.get("context_ar", ""),
-                    instruction=ex.get("instruction_ar", ex.get("title_ar", "")),
-                    student_answer=answer_text,
-                    documents=ex.get("documents", []),
-                )
-                methodo_feedback = methodo.get("feedback", {})
-                methodo_note = methodo_feedback.get("message", "")
-                if methodo_note:
-                    feedback += f" | Méthodo: {methodo_note}"
-            except Exception:
-                pass
-
-        score_max = ex.get("points", 5)
-        total_score += score
-        total_max += score_max
+            qid = resolve_question_id(
+                ex_id,
+                f"bac:{annale}:{ex_id}",
+            )
+            graded = grade_or_none(qid, answer_text)
+            if graded is None:
+                is_ungraded = True
+                ungraded_count += 1
+                score = 0
+                percentage = 0
+                feedback = f"{UNGRADED_AR} {TRAINING_BANNER_AR}"
+            else:
+                percentage = int(graded.overall_training_percent)
+                score = round(percentage / 100 * score_max)
+                feedback = graded.phrase_ar or TRAINING_BANNER_AR
+                if graded.science_flags:
+                    feedback = (feedback + " | " + " · ".join(graded.science_flags)).strip(" |")
+                graded_percents.append(percentage)
 
         exercise_scores.append(
             ExerciseScore(
@@ -313,6 +322,7 @@ async def submit_bac(
                 score_max=score_max,
                 percentage=percentage,
                 skipped=is_skipped,
+                ungraded=is_ungraded,
             )
         )
 
@@ -333,16 +343,23 @@ async def submit_bac(
                 percentage=percentage,
                 feedback=feedback,
                 skipped=is_skipped,
+                ungraded=is_ungraded,
             )
         )
 
         await db.execute(
             text("""
                 UPDATE bac_answers
-                SET score = :score, feedback = :feedback
+                SET score = :score, feedback = :feedback, answer_text = :hashed
                 WHERE session_id = :sid AND exercise_id = :eid
             """),
-            {"score": score, "feedback": feedback, "sid": body.session_id, "eid": ex_id},
+            {
+                "score": score,
+                "feedback": feedback,
+                "hashed": hash_answer(answer_text) if answer_text else "",
+                "sid": body.session_id,
+                "eid": ex_id,
+            },
         )
 
     verb_scores = [
@@ -350,14 +367,12 @@ async def submit_bac(
         for v, s in verb_scores_map.items()
     ]
 
-    score_global = round(total_score / max(total_max, 1) * 100)
+    score_global = round(sum(graded_percents) / len(graded_percents)) if graded_percents else 0
 
-    if score_global >= 75:
-        debrief = f"أحسنت! نتيجتك {score_global}%. أنت جاهز للبكالوريا. ركز على المراجعة الدورية."
-    elif score_global >= 50:
-        debrief = f"نتيجتك {score_global}%. تحتاج إلى مراجعة بعض النقاط. راجع التمارين التي تخطيتها."
+    if ungraded_count and not graded_percents:
+        debrief = f"{TRAINING_BANNER_AR} {UNGRADED_AR}"
     else:
-        debrief = f"نتيجتك {score_global}%. لا تقلق، لديك وقت. ابدأ بمراجعة الدروس الأساسية."
+        debrief = f"درجة التدريب {score_global}%. {TRAINING_BANNER_AR}"
 
     await db.execute(
         text("""
@@ -367,15 +382,24 @@ async def submit_bac(
                 scores_by_exercise = :ex_scores,
                 scores_by_verb = :verb_scores,
                 debrief = :debrief
-            WHERE id = :sid
+            WHERE id = :sid AND user_id = :uid
         """),
         {
             "time": time_used,
             "score": score_global,
             "ex_scores": json.dumps([s.model_dump() for s in exercise_scores], ensure_ascii=False),
             "verb_scores": json.dumps([v.model_dump() for v in verb_scores], ensure_ascii=False),
-            "debrief": json.dumps({"message": debrief, "skipped": skipped_count}, ensure_ascii=False),
+            "debrief": json.dumps(
+                {
+                    "message": debrief,
+                    "skipped": skipped_count,
+                    "ungraded": ungraded_count,
+                    "banner_ar": TRAINING_BANNER_AR,
+                },
+                ensure_ascii=False,
+            ),
             "sid": body.session_id,
+            "uid": current_user["id"],
         },
     )
     await db.commit()
@@ -393,6 +417,8 @@ async def submit_bac(
         scores_by_verb=verb_scores,
         exercises_skipped=skipped_count,
         debrief_message=debrief,
+        ungraded_count=ungraded_count,
+        banner_ar=TRAINING_BANNER_AR,
     )
 
 
@@ -403,18 +429,11 @@ async def get_correction(
     db: AsyncSession = Depends(get_db),
 ):
     """Retourne la correction détaillée après soumission."""
-    sess = await db.execute(
-        text("SELECT status, annale_slug, subject_choice FROM bac_sessions WHERE id = :sid"),
-        {"sid": session_id},
-    )
-    sess_row = sess.fetchone()
-    if not sess_row:
-        raise HTTPException(404, "Session introuvable")
+    sm = await _require_own_session(db, session_id, current_user["id"])
 
-    if sess_row._mapping["status"] != "submitted":
+    if sm["status"] != "submitted":
         raise HTTPException(400, "Session non soumise")
 
-    sm = sess_row._mapping
     subj_result = await db.execute(
         text("SELECT exercises FROM bac_subjects WHERE annale_slug = :slug AND subject_number = :num"),
         {"slug": sm["annale_slug"], "num": sm["subject_choice"]},
@@ -437,19 +456,25 @@ async def get_correction(
     for ex in exercises_data:
         ex_id = ex["exercise_id"]
         ans = answers_map.get(ex_id, {})
+        feedback = ans.get("feedback", "") or ""
+        is_ungraded = UNGRADED_AR in feedback
+        score_max = ex.get("points", 5)
+        score = ans.get("score", 0) or 0
+        percentage = 0 if is_ungraded else round((score / max(score_max, 1)) * 100)
         corrections.append(
             CorrectionAnswer(
                 exercise_id=ex_id,
                 question_id=ex_id,
                 title_ar=ex["title_ar"],
                 verb_slug=ex.get("verb_slug", ""),
-                student_answer=ans.get("answer_text", ""),
-                model_answer=ex.get("model_answer_ar", ""),
-                score=ans.get("score", 0),
-                score_max=ex.get("points", 5),
-                percentage=round((ans.get("score", 0) / max(ex.get("points", 5), 1)) * 100),
-                feedback=ans.get("feedback", ""),
+                student_answer="",
+                model_answer="" if is_ungraded else ex.get("model_answer_ar", ""),
+                score=score,
+                score_max=score_max,
+                percentage=percentage,
+                feedback=feedback,
                 skipped=ans.get("skipped", False),
+                ungraded=is_ungraded,
             )
         )
 

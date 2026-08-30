@@ -13,6 +13,7 @@ import {
   type BacExamOutcomeResult,
 } from "@/lib/lesson/practiceOutcome"
 import { CoachPanel } from "@/components/methodology/CoachPanel"
+import { TRAINING_BANNER_AR, formatTrainingPercent } from "@/components/methodology/GradeResultCard"
 
 /* ------------------------------------------------------------------ */
 /*  Page "Correction" — Accessible UNIQUEMENT après l'examen        */
@@ -42,18 +43,22 @@ export default function CorrectionPage() {
           sessionId: sid,
           corrections: resp.corrections,
         })
-        const totalScore = resp.corrections.reduce((sum, item) => sum + Number(item.score || 0), 0)
-        const totalMax = resp.corrections.reduce((sum, item) => sum + Number(item.score_max || 0), 0)
-        const scoreGlobal = Math.round((totalScore / Math.max(totalMax, 1)) * 100)
+        const graded = resp.corrections.filter((c) => !c.ungraded && !c.skipped)
+        const totalScore = graded.reduce((sum, item) => sum + Number(item.score || 0), 0)
+        const totalMax = graded.reduce((sum, item) => sum + Number(item.score_max || 0), 0)
+        const allUngraded = graded.length === 0
+        const scoreGlobal = allUngraded ? 0 : Math.round((totalScore / Math.max(totalMax, 1)) * 100)
         setContract(
-          applyBacExamOutcome({
-            sessionId: sid,
-            overallPercentage: scoreGlobal,
-            items: resp.corrections.map((c) => ({
-              verbSlug: c.verb_slug || "bac_blanc",
-              percentage: Number(c.percentage) || 0,
-            })),
-          })
+          allUngraded
+            ? null
+            : applyBacExamOutcome({
+                sessionId: sid,
+                overallPercentage: scoreGlobal,
+                items: graded.map((c) => ({
+                  verbSlug: c.verb_slug || "bac_blanc",
+                  percentage: Number(c.percentage) || 0,
+                })),
+              }),
         )
         setResult(resp)
       } catch (err: unknown) {
@@ -128,11 +133,13 @@ export default function CorrectionPage() {
   }
 
   /* ---- Afficher la correction ---- */
-  const totalScore = result.corrections.reduce((sum, item) => sum + Number(item.score || 0), 0)
-  const totalMax = result.corrections.reduce((sum, item) => sum + Number(item.score_max || 0), 0)
-  const scoreGlobal = Math.round((totalScore / Math.max(totalMax, 1)) * 100)
+  const graded = result.corrections.filter((item) => !item.ungraded && !item.skipped)
+  const totalScore = graded.reduce((sum, item) => sum + Number(item.score || 0), 0)
+  const totalMax = graded.reduce((sum, item) => sum + Number(item.score_max || 0), 0)
+  const allUngraded = graded.length === 0
+  const scoreGlobal = allUngraded ? 0 : Math.round((totalScore / Math.max(totalMax, 1)) * 100)
   const skippedCount = result.corrections.filter((item) => item.skipped).length
-  const scoreColor = scoreGlobal >= 75 ? "#2DD4BF" : scoreGlobal >= 50 ? "#F59E0B" : "#EF4444"
+  const scoreColor = allUngraded ? "#F59E0B" : scoreGlobal >= 75 ? "#2DD4BF" : scoreGlobal >= 50 ? "#F59E0B" : "#EF4444"
 
   return (
     <AuthGuard>
@@ -146,11 +153,13 @@ export default function CorrectionPage() {
                 background: "linear-gradient(135deg, rgba(45,212,191,0.12), rgba(251,191,36,0.06))",
               }}
             >
-              <p className="text-4xl">{scoreGlobal >= 70 ? "🎉" : "📋"}</p>
+              <p className="text-4xl">{allUngraded ? "📋" : scoreGlobal >= 70 ? "🎉" : "📋"}</p>
               <h1 className="text-2xl font-bold text-white">نتائج الامتحان</h1>
+              <p className="text-gray-400 text-xs">درجة التدريب</p>
               <p className="text-6xl font-bold" style={{ color: scoreColor }}>
-                {scoreGlobal}%
+                {formatTrainingPercent(allUngraded, scoreGlobal)}
               </p>
+              <p className="text-amber-200/90 text-xs leading-relaxed">{TRAINING_BANNER_AR}</p>
               <p className="text-gray-400 text-sm">تمارين متخطاة: {skippedCount}</p>
               {contract && (
                 <div className={`mx-auto max-w-md rounded-2xl border p-3 text-right ${outcomeBannerClass(contract.outcome)}`}>

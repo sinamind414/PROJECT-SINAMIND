@@ -1,0 +1,123 @@
+{
+  "rubric_id": "enzyme-temp-analyse",
+  "version": "1.0.0",
+  "verb_slug": "analyse",
+  "chapter_slug": "enzymologie",
+  "language": "ar",
+  "total_points": 4.0,
+  "document_id": "enzyme-temp",
+  "theme_variants": [
+    "إنزيم",
+    "الانزيم",
+    "أنزيم",
+    "حرارة",
+    "نشاط",
+    "$lex:enzyme",
+    "$lex:temperature"
+  ],
+  "theme_min_hits": 1,
+  "method_graph": {
+    "steps": [
+      "object",
+      "keypoint",
+      "relation",
+      "conclusion"
+    ],
+    "require_order": true
+  },
+  "criteria": [
+    {
+      "id": "object",
+      "label_ar": "تقديم الوثيقة",
+      "points": 0.75,
+      "check": "cites_object",
+      "required": true
+    },
+    {
+      "id": "keypoint",
+      "label_ar": "37°م أو 100% أو 80°م",
+      "points": 1.0,
+      "check": "cites_keypoint",
+      "required": true
+    },
+    {
+      "id": "relation",
+      "label_ar": "علاقة كلما دون سببية",
+      "points": 0.75,
+      "check": "any_of",
+      "variants": [
+        "كلما",
+        "علاقة",
+        "يزداد ثم ينقص"
+      ],
+      "required": true
+    },
+    {
+      "id": "no_cause",
+      "label_ar": "بدون لأن / تمسخ",
+      "points": 0.5,
+      "check": "forbidden_abs",
+      "variants": [
+        "لأن",
+        "بسبب",
+        "يفسر",
+        "تفسير",
+        "هذا يدل",
+        "تمسخ"
+      ],
+      "required": true
+    },
+    {
+      "id": "conclusion",
+      "label_ar": "الحرارة المثلى 37°م",
+      "points": 1.0,
+      "check": "any_of",
+      "variants": [
+        "حرارة مثلى",
+        "الحرارة المثلى",
+        "الدرجة المثلى",
+        "المثلى",
+        "مثلى عند 37",
+        "النشاط أقصى عند 37"
+      ],
+      "required": true
+    }
+  ],
+  "distractors": [
+    {
+      "id": "photosynth",
+      "variants": [
+        "تركيب ضوئي",
+        "صانعة"
+      ],
+      "message_ar": "حشو خارج الموضوع"
+    }
+  ],
+  "advice_by_gap": {
+    "verb_slip.interpret": "لا تكتب تمسخ في حلّل — هذا فسّر.",
+    "unanchored": "اذكر 37 أو 80 أو 100.",
+    "conclusion": "اختتم بالحرارة المثلى 37°م."
+  },
+  "advice_praise": {
+    "keypoint": "أحسنت: ذكرت 37°م."
+  },
+  "model_answer": "تمثل الوثيقة منحنى تغيرات نشاط الإنزيم بدلالة درجة الحرارة. يبلغ النشاط 100% عند 37°م وينعدم عند 80°م. كلما ارتفعت الحرارة حتى 37 ازداد النشاط وكلما تجاوزت ذلك نقص. نستنتج أن الحرارة المثلى لهذا الإنزيم هي 37°م.",
+  "source": "teacher_authored",
+  "grader_min_version": "1.0.0",
+  "counter_examples": [
+    {
+      "id": "off_topic",
+      "text_ar": "تمثل الوثيقة منحنى تباعد الصفائح عند الأعراف المحيطية. كلما ابتعدت الصفيحة ازداد الخندق المحيطي. نستنتج غوص اللوح في الاندساس.",
+      "max_percent": 40,
+      "axis": "overall",
+      "why": "bonne langue, tectonique ≠ chapitre de la grille"
+    },
+    {
+      "id": "atp36",
+      "use": "model+atp36",
+      "max_percent": 40,
+      "axis": "overall",
+      "why": "36 ATP grave ONEC — cap overall 40"
+    }
+  ]
+}

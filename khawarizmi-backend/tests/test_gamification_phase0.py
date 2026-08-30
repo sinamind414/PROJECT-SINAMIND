@@ -8,11 +8,19 @@ class TestGamificationPhase0:
         assert "current_streak" in response.json()
 
     async def test_add_points(self, client: AsyncClient, auth_headers: dict):
-        response = await client.post("/api/gamification/points/add?points=100", headers=auth_headers)
+        response = await client.post(
+            "/api/gamification/points/add",
+            headers=auth_headers,
+            json={"action": "start"},
+        )
         assert response.status_code == 200
 
     async def test_avatar_xp(self, client: AsyncClient, auth_headers: dict):
-        response = await client.post("/api/avatar/add-xp?xp=150", headers=auth_headers)
+        response = await client.post(
+            "/api/avatar/add-xp",
+            headers=auth_headers,
+            json={"action": "exercise"},
+        )
         assert response.status_code == 200
 
     async def test_get_avatar(self, client: AsyncClient, auth_headers: dict):

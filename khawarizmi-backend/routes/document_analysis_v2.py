@@ -1,54 +1,35 @@
-"""
-routes/document_analysis_v2.py
+"""POST /api/document-analysis/evaluate-v2 — GELÉ L2/LLM.
 
-Route v2 du correcteur : appelle evaluate_answer_v2 (voie B — hybride LLM + sanity).
-Coexiste avec routes/document_analysis.py qui reste inchangée.
-
-Route montée : POST /api/document-analysis/evaluate-v2
+Même juge que DA v1 : grade(). Sans Rubric → ungraded. 0 OpenAI, 0 L2.
 """
 
 from __future__ import annotations
 
 import json
 import logging
-import uuid
 
 from fastapi import APIRouter, Depends, HTTPException, Request
-from openai import AsyncOpenAI
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from config import get_settings
-from deps import get_current_user, get_db, get_openai
-from grading.cache import evaluate_with_cache
+from deps import get_current_user, get_db
 from rate_limit import evaluate_limit, limiter
 from schemas.document_analysis import EvaluateRequest
-from services.correction_audit import log_correction_audit
-from services.correction_v2_retry import evaluate_answer_v2_with_retry
+from services.grade_adapter import (
+    UNGRADED_AR,
+    grade_or_none,
+    may_write_fsrs,
+    persist_grade_columns,
+    resolve_question_id,
+    to_verb_eval,
+)
 from services.hashing import hash_answer
-from services.llm import _call_with_fallback
-from services.rag_service import format_rag_context, rag_search
-from services.socratic_tutor import get_socratic_hint
+from services.local_grader import TRAINING_BANNER_AR
 
 logger = logging.getLogger("khawarizmi.document_analysis_v2")
 router = APIRouter(prefix="/api/document-analysis", tags=["Document Analysis V2"])
 
-
-async def _make_rag_provider(db: AsyncSession):
-    """Fabrique un provider RAG filtré par verbe du LIVRE MANHADJIYA.
-
-    Si aucun chunk trouvé (ingestion pas encore faite / verbe non couvert),
-    retourne "" — le correcteur dégrade proprement vers la méthodo hardcode.
-    """
-    async def _provider(*, verb_slug: str, question_prompt: str, student_answer: str) -> str:
-        query = f"{verb_slug} {question_prompt[:200]}"
-        try:
-            chunks = await rag_search(db, message=query, chapter=verb_slug)
-        except Exception:
-            return ""
-        return format_rag_context(chunks[:3])
-
-    return _provider
+_HINT_AR = "أرسل الإجابة للتصحيح المحلي — لا تلميح توليدي."
 
 
 @router.post("/evaluate-v2")
@@ -58,53 +39,54 @@ async def evaluer_reponses_v2(
     body: EvaluateRequest,
     current_user: dict = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-    openai_client: AsyncOpenAI = Depends(get_openai),
 ):
-    """Nouvelle évaluation « comme un prof » : sanity → LLM → validation."""
-    cfg = get_settings()
-
-    # 1. Charger le scénario
+    """Note via grade(). ENABLE_EXTERNAL_LLM ignoré. Jamais L2 / LLM."""
+    _ = request
     scenario = await db.execute(
-        text("""
-            SELECT id, context_ar
-            FROM da_scenarios
-            WHERE slug = :slug
-        """),
+        text("SELECT id FROM da_scenarios WHERE slug = :slug"),
         {"slug": body.scenario_id},
     )
     scenario_row = scenario.fetchone()
     if not scenario_row:
         raise HTTPException(404, f"Scénario introuvable : {body.scenario_id}")
     scenario_id = scenario_row._mapping["id"]
-    scenario_context = scenario_row._mapping["context_ar"]
 
-    # 2. Charger TOUS les documents du scénario (l'élève les a tous vus)
-    docs_result = await db.execute(
-        text("""
-            SELECT title_ar, caption_ar, data, sort_order
-            FROM da_documents
-            WHERE scenario_id = :scenario_id
-            ORDER BY sort_order
-        """),
-        {"scenario_id": scenario_id},
-    )
-    documents = [
-        {
-            "title": row._mapping["title_ar"],
-            "caption": row._mapping["caption_ar"],
-            "data": row._mapping["data"],
+    if body.request_hint:
+        return {
+            "session_id": "",
+            "score_global": 0,
+            "score_max": 0,
+            "percentage": 0,
+            "evaluations": [
+                {
+                    "question_id": ans.question_id or "",
+                    "verb_slug": ans.verb_slug,
+                    "score": 0,
+                    "score_max": 1,
+                    "percentage": 0,
+                    "highlights": [],
+                    "matched_criteria": [],
+                    "unmatched_criteria": [],
+                    "feedback_ar": _HINT_AR,
+                    "advice_ar": _HINT_AR,
+                    "source": "ungraded",
+                    "ungraded": True,
+                    "banner_ar": TRAINING_BANNER_AR,
+                }
+                for ans in body.answers
+            ],
+            "technical_errors": 0,
         }
-        for row in docs_result.fetchall()
-    ]
 
-    # 3. Créer la session d'évaluation (comme routes/document_analysis.py)
     session_result = await db.execute(
-        text("""
+        text(
+            """
             INSERT INTO da_sessions
                 (user_id, scenario_id, chapter_slug, score_global, nb_questions)
             VALUES (:user_id, :scenario_id, :chapter_slug, 0, :nb)
             RETURNING id
-        """),
+            """
+        ),
         {
             "user_id": current_user["id"],
             "scenario_id": scenario_id,
@@ -115,203 +97,134 @@ async def evaluer_reponses_v2(
     session_id = session_result.fetchone()._mapping["id"]
 
     evaluations = []
-    total_score = 0
-    total_max = 0
-
-    rag_provider = await _make_rag_provider(db)
+    total_pct = 0
+    graded_n = 0
 
     for ans in body.answers:
-        # 4. Charger la question ciblée
         if ans.question_id:
             q_result = await db.execute(
-                text("""
-                    SELECT id, verb_slug, prompt_ar, skill_ar,
-                           model_answer_ar, learning_focus_ar
-                    FROM da_questions WHERE id = :qid
-                """),
+                text("SELECT id, verb_slug FROM da_questions WHERE id = :qid"),
                 {"qid": ans.question_id},
             )
         else:
             q_result = await db.execute(
-                text("""
-                    SELECT q.id, q.verb_slug, q.prompt_ar, q.skill_ar,
-                           q.model_answer_ar, q.learning_focus_ar
+                text(
+                    """
+                    SELECT q.id, q.verb_slug
                     FROM da_questions q
                     JOIN da_scenarios s ON q.scenario_id = s.id
                     WHERE s.slug = :scenario_slug AND q.verb_slug = :verb_slug
-                """),
+                    """
+                ),
                 {"scenario_slug": body.scenario_id, "verb_slug": ans.verb_slug},
             )
         q_row = q_result.fetchone()
         if not q_row:
             continue
 
-        q = q_row._mapping
-
-        # 5. Score_max : reprendre les totaux de VERB_RULES existants
-        score_max = _compute_score_max_for_verb(q["verb_slug"])
-
-        # 6. SWITCH : Mode Socratique (indice) vs Mode Évaluation (note)
-        if body.request_hint:
-            hint = await get_socratic_hint(
-                scenario_context=scenario_context,
-                documents=documents,
-                question_prompt=q["prompt_ar"],
-                question_skill=q["skill_ar"],
-                verb_slug=q["verb_slug"],
-                model_answer=q["model_answer_ar"],
-                learning_focus=q["learning_focus_ar"],
-                student_answer=ans.answer,
-            )
-            # Pas de note, pas de persistance, pas de FSRS
-            evaluations.append({
-                "question_id": str(q["id"]),
-                "verb_slug": q["verb_slug"],
+        verb_slug = q_row._mapping["verb_slug"]
+        question_id = str(q_row._mapping["id"])
+        qid = resolve_question_id(
+            ans.question_id,
+            question_id,
+            f"{body.scenario_id}:{ans.question_id}" if ans.question_id else None,
+            f"{body.scenario_id}:{question_id}",
+        )
+        graded = grade_or_none(qid, ans.answer)
+        if graded is None:
+            evaluation = {
+                "question_id": question_id,
+                "verb_slug": verb_slug,
                 "score": 0,
-                "score_max": score_max,
+                "score_max": 1,
                 "percentage": 0,
                 "highlights": [],
                 "matched_criteria": [],
                 "unmatched_criteria": [],
-                "feedback_ar": hint["hint_ar"],
-                "advice_ar": hint["hint_ar"],
-                "source": "socratic",
-                "missing": [],
-                "dominant_error_code": "socratic_hint",
+                "feedback_ar": f"{UNGRADED_AR} {TRAINING_BANNER_AR}",
+                "advice_ar": UNGRADED_AR,
+                "source": "ungraded",
+                "ungraded": True,
                 "success": [],
-                "errors": [],
-                "remediation": {"hint": hint},
-            })
-            continue
-
-        # 6b. Mode Évaluation : appel du correcteur avec cache exact (audit C2)
-        # + pipeline (S2.1c) : sanity → savoir → legacy(retry → LLM/L2).
-        # Le wrapper cache ne fait que cacher ; le pipeline orchestre.
-        # Un hit = 0 appel (ni pipeline, ni LLM), source préservée + from_cache.
-        result = await evaluate_with_cache(
-            question_id=q["id"],
-            verb_slug=q["verb_slug"],
-            score_max=score_max,
-            student_answer=ans.answer,
-            model_id=cfg.openai_model,
-            evaluate_fn=evaluate_answer_v2_with_retry,
-            scenario_context=scenario_context,
-            documents=documents,
-            question_prompt=q["prompt_ar"],
-            question_skill=q["skill_ar"],
-            model_answer=q["model_answer_ar"],
-            learning_focus=q["learning_focus_ar"],
-            llm_call=_call_with_fallback,
-            primary_client=openai_client,
-            primary_model=cfg.openai_model,
-            rag_context_provider=rag_provider,
-            request_id=str(uuid.uuid4()),
-            # Prompt v2 optimisé : -68 % tokens (3742 → ~918) — mapping v2→v1 testé
-            use_v2_prompt=True,
-            # Correcteur local sans clé API : le site n'a pas de clé externe
-            # (llm_guard actif) → évaluation locale L2 au lieu de llm_error.
-            local_fallback=True,
-            local_fallback_db=db,
-        )
-
-        # 7. Persistance MINIMALE dans da_answers (décision validée).
-        #    matched_criteria → success, [u["criterion"] for u in unmatched] → errors
-        #    highlights → NON persisté (renvoyé dans la réponse API uniquement)
-        #    Si source=llm_error (panne serveur), NE PAS insérer pour ne pas
-        #    polluer l'historique pédagogique de l'élève.
-        if result["source"] != "llm_error":
-            await db.execute(
-                text("""
-                    INSERT INTO da_answers
-                        (session_id, question_id, verb_slug, chapter_slug,
-                         answer_text, score, score_max, percentage, feedback_ar,
-                         success, errors, missing_markers, forbidden_found)
-                    VALUES
-                        (:session_id, :question_id, :verb_slug, :chapter_slug,
-                         :answer_text, :score, :score_max, :percentage, :feedback_ar,
-                         :success, :errors, :missing_markers, :forbidden_found)
-                """),
-                {
-                    "session_id": session_id,
-                    "question_id": str(q["id"]),
-                    "verb_slug": q["verb_slug"],
-                    "chapter_slug": body.chapter_slug or "",
-                    # RGPD (AGENTS.md §1.2) : jamais la copie en clair — hash SHA-256 uniquement
-                    "answer_text": hash_answer(ans.answer),
-                    "score": result["score"],
-                    "score_max": result["score_max"],
-                    "percentage": result["percentage"],
-                    "feedback_ar": result["feedback_ar"],
-                    "success": json.dumps(result["matched_criteria"], ensure_ascii=False),
-                    "errors": json.dumps(
-                        [u["criterion"] for u in result["unmatched_criteria"]],
-                        ensure_ascii=False,
-                    ),
-                    "missing_markers": json.dumps([], ensure_ascii=False),
-                    "forbidden_found": json.dumps([], ensure_ascii=False),
-                },
-            )
+                "errors": [UNGRADED_AR],
+                "dominant_error_code": "ungraded",
+                "banner_ar": TRAINING_BANNER_AR,
+            }
         else:
-            logger.warning(
-                f"eval_v2 | source=llm_error pour question_id={q['id']} "
-                f"user={current_user['id']} — insertion da_answers SKIP "
-                f"pour ne pas polluer l'historique élève. "
-                f"error_message={result.get('error_message', '?')[:200]}"
-            )
+            mapped = to_verb_eval(graded)
+            evaluation = {
+                "question_id": question_id,
+                "verb_slug": graded.verb_slug or verb_slug,
+                "score": mapped["score"],
+                "score_max": mapped["score_max"],
+                "percentage": mapped["percentage"],
+                "highlights": [],
+                "matched_criteria": mapped["success"],
+                "unmatched_criteria": [],
+                "feedback_ar": mapped["advice"],
+                "advice_ar": mapped["advice"],
+                "source": "local_rubric",
+                "ungraded": False,
+                "success": mapped["success"],
+                "errors": mapped["errors"],
+                "dominant_error_code": mapped["dominant_error_code"],
+                "banner_ar": TRAINING_BANNER_AR,
+            }
+            if may_write_fsrs(graded):
+                from services.fsrs_unified import update_memory
 
-        # Ne PAS mettre à jour FSRS si source == "llm_error" (échec technique)
-        if result["source"] != "llm_error":
-            await _update_fsrs_v2(
-                db=db,
-                user_id=current_user["id"],
-                verb_slug=q["verb_slug"],
-                chapter_slug=body.chapter_slug or "general",
-                percentage=result["percentage"],
-            )
+                await update_memory(
+                    db,
+                    current_user["id"],
+                    "verb_chapter",
+                    item_id=f"{verb_slug}::{body.chapter_slug or 'general'}",
+                    chapter=body.chapter_slug or "general",
+                    last_score=mapped["percentage"],
+                    attempts_delta=1,
+                )
+            total_pct += mapped["percentage"]
+            graded_n += 1
 
-        # Compter uniquement les évaluations pédagogiques réussies dans le
-        # score de session. Sinon une panne LLM sur une question ferait
-        # chuter le score global de l'élève injustement.
-        if result["source"] != "llm_error":
-            total_score += result["score"]
-            total_max += result["score_max"]
-
-        # 8. Format de réponse enrichi avec highlights
-        evaluations.append({
-            "question_id": str(q["id"]),
-            "verb_slug": q["verb_slug"],
-            "score": result["score"],
-            "score_max": result["score_max"],
-            "percentage": result["percentage"],
-            "highlights": result["highlights"],
-            "matched_criteria": result["matched_criteria"],
-            "unmatched_criteria": result["unmatched_criteria"],
-            "feedback_ar": result["feedback_ar"],
-            "advice_ar": result["advice_ar"],
-            "source": result["source"],
-            # Observabilité C2 : un hit cache garde la source d'origine
-            # (grading_source_total fidèle) + from_cache=True
-            "from_cache": result.get("from_cache", False),
-            # Spec §3.1 — feedback enrichi
-            "missing": result.get("missing", []),
-            "dominant_error_code": result.get("dominant_error_code", "unknown"),
-            "success": result.get("success", []),
-            "errors": result.get("errors", []),
-            "remediation": result.get("remediation"),
-            # Ne PAS exposer llm_raw au frontend en prod
-        })
-
-        # 8b. Audit logging asynchrone (hashes uniquement)
-        await log_correction_audit(
-            db=db,
-            result=result,
-            verb_slug=q["verb_slug"],
-            user_id=current_user["id"],
-            session_id=str(session_id),
+        meta = persist_grade_columns(graded)
+        await db.execute(
+            text(
+                """
+                INSERT INTO da_answers
+                    (session_id, question_id, verb_slug, chapter_slug,
+                     answer_text, score, score_max, percentage, feedback_ar,
+                     success, errors, missing_markers, forbidden_found,
+                     rubric_version, grader_version, grading_engine,
+                     science_status, stuffing_suspected, method_percent,
+                     order_ok, diagnosis_code)
+                VALUES
+                    (:session_id, :question_id, :verb_slug, :chapter_slug,
+                     :answer_text, :score, :score_max, :percentage, :feedback_ar,
+                     :success, :errors, :missing_markers, :forbidden_found,
+                     :rubric_version, :grader_version, :grading_engine,
+                     :science_status, :stuffing_suspected, :method_percent,
+                     :order_ok, :diagnosis_code)
+                """
+            ),
+            {
+                "session_id": session_id,
+                "question_id": question_id,
+                "verb_slug": verb_slug,
+                "chapter_slug": body.chapter_slug or "",
+                "answer_text": hash_answer(ans.answer),
+                "score": evaluation["score"],
+                "score_max": evaluation["score_max"],
+                "percentage": evaluation["percentage"],
+                "feedback_ar": evaluation["feedback_ar"],
+                "success": json.dumps(evaluation.get("success") or [], ensure_ascii=False),
+                "errors": json.dumps(evaluation.get("errors") or [], ensure_ascii=False),
+                "missing_markers": json.dumps([], ensure_ascii=False),
+                "forbidden_found": json.dumps([], ensure_ascii=False),
+                **meta,
+            },
         )
+        evaluations.append(evaluation)
 
-    # 9. Update session
-    global_pct = round((total_score / total_max) * 100) if total_max else 0
+    global_pct = round(total_pct / graded_n) if graded_n else 0
     await db.execute(
         text("UPDATE da_sessions SET score_global = :pct WHERE id = :sid"),
         {"pct": global_pct, "sid": session_id},
@@ -319,59 +232,16 @@ async def evaluer_reponses_v2(
     await db.commit()
 
     logger.info(
-        f"eval_v2 | user={current_user['id']} scenario={body.scenario_id} "
-        f"score={total_score}/{total_max} ({global_pct}%)"
+        "eval_v2 | user=%s scenario=%s source=local_rubric pct=%s",
+        current_user["id"],
+        body.scenario_id,
+        global_pct,
     )
-
-    n_errors = sum(1 for e in evaluations if e["source"] == "llm_error")
-
     return {
         "session_id": str(session_id),
-        "score_global": total_score,
-        "score_max": total_max,
+        "score_global": global_pct,
+        "score_max": 100,
         "percentage": global_pct,
         "evaluations": evaluations,
-        "technical_errors": n_errors,
+        "technical_errors": 0,
     }
-
-
-def _compute_score_max_for_verb(verb_slug: str) -> int:
-    """Score max par verbe. Aligné sur les VERB_RULES existants
-    dans services/document_analysis_service.py pour ne pas
-    perturber les statistiques."""
-    from services.document_analysis_service import VERB_RULES
-
-    rules = VERB_RULES.get(verb_slug)
-    if not rules:
-        logger.warning("score_max_fallback | verbe inconnu de VERB_RULES : %s → 4 pts", verb_slug)
-        return 4  # fallback raisonnable
-    total = sum(r.get("points", 0) for r in rules.get("rules", []))
-    if total <= 0:
-        logger.warning("score_max_fallback | VERB_RULES '%s' sans points → 4 pts", verb_slug)
-        return 4
-    return total
-
-
-async def _update_fsrs_v2(
-    db: AsyncSession,
-    user_id: str,
-    verb_slug: str,
-    chapter_slug: str,
-    percentage: int,
-):
-    """Met à jour le score et le compteur FSRS (identique à document_analysis.py).
-
-    S3 finale : écriture via le service unifié (update_memory verb_chapter) —
-    la table da_fsrs n'est plus écrite directement. Depuis la migration 034,
-    l'upsert MASTERY alimente la vue consolidée (tables héritées supprimées
-    en prod ; tolérance conservée pour les environnements pré-033).
-    """
-    from services.fsrs_unified import update_memory
-
-    await update_memory(
-        db, user_id, "verb_chapter",
-        item_id=f"{verb_slug}::{chapter_slug}",
-        chapter=chapter_slug,
-        last_score=percentage,
-        attempts_delta=1,
-    )

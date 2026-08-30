@@ -409,7 +409,7 @@ export function useChatbot(): UseChatbotReturn {
         })
       } else if (action === "explain") {
         addAssistantMessage({
-          reponse: "اشرح لي المفهوم الذي تعلمته بكلماتك الخاصة:",
+          reponse: "اشرح المفهوم بكلماتك. لا تصحيح آلي هنا — ليست علامة بكالوريا رسمية.",
           type: "socratique",
           cartes: [],
           flashcards_suggerees: [],
@@ -418,8 +418,9 @@ export function useChatbot(): UseChatbotReturn {
       } else if (action === "boss") {
         const result = await apiClient.startBossFight("synthese_proteines")
         const questionsText = result.questions.map((q, i) => `${i + 1}. ${q.question_ar}`).join("\n")
+        const banner = result.banner_ar || "ملاحظة تدريبية — منهج + محتوى. ليست علامة بكالوريا رسمية."
         addAssistantMessage({
-          reponse: `👑 **Boss Bac!** أجب على هذه الأسئلة:\n\n${questionsText}`,
+          reponse: `تمرين مراجعة (بدون علامة).\n${banner}\n\n${questionsText}`,
           type: "orientation",
           cartes: [],
           flashcards_suggerees: [],

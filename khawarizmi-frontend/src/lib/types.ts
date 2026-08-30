@@ -439,6 +439,19 @@ export interface VerbEvaluateResponse {
   advice: string
   dominant_error_code?: string
   allow_second_attempt: boolean
+  ungraded?: boolean
+  source?: string
+  banner_ar?: string
+  method_label_ar?: string
+  method_percent?: number
+  overall_training_percent?: number
+  science_status?: string
+  science_capped?: boolean
+  caps_applied?: string[]
+  science_flags?: string[]
+  order_ok?: boolean | null
+  praise_ar?: string
+  next_step_ar?: string
 }
 
 export interface VerbProgressItem {
@@ -710,6 +723,7 @@ export interface ExerciseScore {
   score_max: number
   percentage: number
   skipped: boolean
+  ungraded?: boolean
 }
 
 export interface VerbScore {
@@ -727,6 +741,8 @@ export interface SubmitBacResponse {
   scores_by_verb: VerbScore[]
   exercises_skipped: number
   debrief_message: string
+  ungraded_count?: number
+  banner_ar?: string
 }
 
 export interface CorrectionAnswer {
@@ -741,6 +757,7 @@ export interface CorrectionAnswer {
   percentage: number
   feedback: string
   skipped: boolean
+  ungraded?: boolean
 }
 
 export interface CorrectionResponse {

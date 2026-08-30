@@ -60,6 +60,13 @@ class Settings(BaseSettings):
     # mesurer le feedback élève avant d'étendre).
     savoir_remediation_enabled: bool = False
 
+    # Coach local 0 LLM (ARCHITECTURE-COACH-LOCAL). Défaut False :
+    # grade() existe pour les tests ; les adaptateurs HTTP ne branchent
+    # que si LOCAL_RUBRIC_GRADER=true (S2). ENABLE_EXTERNAL_LLM est ignoré
+    # par grade() dans tous les cas.
+    local_rubric_grader: bool = False
+    savoir_veto: bool = True
+
     VISION_API_KEY: str = ""
     vision_base_url: str = "https://api.openai.com/v1"
     vision_model: str = "gpt-4o-mini"

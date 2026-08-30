@@ -1,0 +1,43 @@
+{
+  "mixin_id": "synthese-proteines",
+  "version": "1.0.0",
+  "chapter_slug": "synthese-proteines",
+  "source": "دليل الأستاذ ONPS 2007-2008، تصويب الأخطاء ص.25",
+  "theme_variants": [
+    "ARNm",
+    "arnm",
+    "نسخ",
+    "ترجمة",
+    "ريبوزوم",
+    "ARNr",
+    "ARNt",
+    "$lex:arm",
+    "$lex:trn",
+    "$lex:rarn",
+    "$lex:transcription",
+    "$lex:traduction"
+  ],
+  "numeric": [
+    {
+      "id": "arnr_5s",
+      "label_ar": "الوزن الجزيئي ARNr 5S (أو S5 كما في الدليل)",
+      "expected": 36000,
+      "expected_sci": "3.6e4",
+      "wrong_book": "3.6e6",
+      "context_any": ["ARNr", "arnr", "5S", "S5", "ريبوزومي"],
+      "severity": "warn",
+      "message_ar": "تصويب الدليل ص.25: الوزن الجزيئي لـ ARNr 5S هو 3,6×10⁴ وليس 3,6×10⁶ (غلطة الكتاب — ليست صفراً)."
+    },
+    {
+      "id": "arnt",
+      "label_ar": "الوزن الجزيئي ARNt",
+      "expected": 25000,
+      "expected_sci": "2.5e4",
+      "wrong_book": "2.5e6",
+      "context_any": ["ARNt", "arnt", "ناقل"],
+      "severity": "warn",
+      "message_ar": "تصويب الدليل ص.25: الوزن الجزيئي لـ ARNt هو 2,5×10⁴ وليس 2,5×10⁶ (غلطة الكتاب — ليست صفراً)."
+    }
+  ],
+  "notes_ar": "Filet exécuté par detect_textbook_errata() dans savoir_corrector — pas un cap 40%. 5S و S5 مقبولان."
+}

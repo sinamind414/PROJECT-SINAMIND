@@ -262,6 +262,10 @@
     "label": "غدوة: استنتج — جملة تسكّر.",
     "href": "/manhadjia/istintaj"
   },
+  "lien_juge": {
+    "label": "نسخة محكومة: طعم LTc · فسّر (مصحح محلي)",
+    "href": "/document-analysis/l0-greffe-ltc"
+  },
   "verb_ref": {
     "id": 7,
     "arabic": "فسر",

@@ -139,7 +139,7 @@ export const METHOD_MODES: MethodMode[] = [
     sloganFr: "Observer les valeurs — ne pas interpréter encore.",
     verbsAr: ["حلّل", "قدّم تحليلاً"],
     verbsFr: ["Analyser"],
-    verbSlugs: ["analyse", "deduce"],
+    verbSlugs: ["analyse"],
     steps: [
       {
         id: "a1",
@@ -317,6 +317,7 @@ export const METHOD_MODES: MethodMode[] = [
       "schematic-functional",
       "schematic-explanatory",
       "summarize-diagram",
+      "deduce",
     ],
     steps: [
       {

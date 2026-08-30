@@ -76,6 +76,10 @@ class EvaluateResponse(BaseModel):
     advice: str = ""
     dominant_error_code: str | None = None
     allow_second_attempt: bool = True
+    ungraded: bool = False
+    source: str | None = None
+    banner_ar: str | None = None
+    method_label_ar: str | None = None
 
 
 class VerbReviewRequest(BaseModel):

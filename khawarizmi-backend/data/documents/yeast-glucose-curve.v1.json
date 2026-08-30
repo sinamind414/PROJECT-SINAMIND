@@ -1,0 +1,13 @@
+{
+  "doc_id": "yeast-glucose-curve",
+  "version": "1.0.1",
+  "kind": "table",
+  "keypoints": [
+    {"id": "t0", "value": 9, "unit": "خلايا", "tolerance": 0, "aliases": [], "label_ar": "عدد الخلايا عند 0 سا"},
+    {"id": "with_glu", "value": 18, "unit": "خلايا", "tolerance": 0, "aliases": ["الذروة"], "label_ar": "عدد الخلايا مع غلوكوز (الذروة)"},
+    {"id": "without_glu", "value": 6, "unit": "خلايا", "tolerance": 0, "aliases": [], "label_ar": "عدد الخلايا بدون غلوكوز"}
+  ],
+  "trend": "increase_then_plateau",
+  "trend_variants": ["يزداد", "تزايد", "يتناقص", "يثبت"],
+  "objects": ["الوثيقة", "الجدول", "المنحنى"]
+}

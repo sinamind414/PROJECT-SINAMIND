@@ -3,6 +3,7 @@ import logging
 from pathlib import Path
 
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.responses import JSONResponse
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -114,9 +115,10 @@ async def get_exercices(
 
 from pydantic import BaseModel
 
-from models.exercise import Exercise, UserExerciseResponse
-from services.correction_service import correct_student_answer
+from models.exercise import Exercise
+from services.grade_adapter import grade_or_none, resolve_question_id, to_verb_eval, ungraded_http
 from services.language_service import ensure_arabic_version
+from services.local_grader import TRAINING_BANNER_AR
 
 
 class CorrectionRequest(BaseModel):
@@ -131,29 +133,30 @@ async def correct_exercise(
     current_user: dict = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
+    """0 LLM. Sans Rubric L0 → 422 ungraded. Pas de copie en clair."""
+    _ = current_user
     exercise = await db.get(Exercise, exercise_id)
     if not exercise:
         raise HTTPException(status_code=404, detail="Exercice non trouvé")
 
-    question = exercise.get_question(request.language)
+    qid = resolve_question_id(str(exercise_id), f"exercice:{exercise_id}")
+    graded = grade_or_none(qid, request.answer)
+    if graded is None:
+        return JSONResponse(status_code=422, content=ungraded_http(str(exercise_id)))
 
-    result = await correct_student_answer(
-        question=question, student_answer=request.answer, points=exercise.points, language=request.language
-    )
-
-    user_response = UserExerciseResponse(
-        exercise_id=exercise_id,
-        user_id=current_user["id"],
-        answer=request.answer,
-        language=request.language,
-        score=result["score"],
-        feedback=result["explication"],
-        corrected_answer=result["reponse_correcte"],
-    )
-    db.add(user_response)
-    await db.commit()
-
-    return result
+    mapped = to_verb_eval(graded)
+    return {
+        "score": mapped["percentage"],
+        "max_score": mapped["score_max"],
+        "points_forts": mapped["success"],
+        "erreurs": mapped["errors"],
+        "reponse_correcte": "",
+        "explication": mapped["advice"],
+        "conseils": mapped.get("next_step_ar") or TRAINING_BANNER_AR,
+        "source": "local_rubric",
+        "ungraded": False,
+        "banner_ar": TRAINING_BANNER_AR,
+    }
 
 
 @router.post("/{exercise_id}/ensure-arabic")

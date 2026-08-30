@@ -64,7 +64,8 @@ class TestArNormalize:
 
     def test_mixed_arabic_latin(self):
         n = ar_normalize("جزيئة ADN في النواة")
-        assert n == "جزيئه adn في النواه"  # ة→ه (جزيئة→جزيئه, النواة→النواه), lower latin
+        # N6 ئ→ي puis N7 ة→ه : جزيئة → جزييه ; النواة → النواه
+        assert n == "جزييه adn في النواه"
         assert ar_normalize(n) == n  # idempotent
 
     def test_alias_normalize_arabic(self):

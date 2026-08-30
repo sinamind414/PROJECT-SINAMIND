@@ -9,7 +9,7 @@ import { ProgressivePageHeader } from "@/components/ui/ProgressivePageHeader"
 import { ChoiceCardGrid } from "@/components/ui/ChoiceCardGrid"
 import { RevealSection } from "@/components/ui/RevealSection"
 import { UNITS_CONFIG, methodologyChapterLinks } from "@/lib/methodology-chapters"
-import { methodologyScenarios } from "@/lib/methodology-documents"
+import { methodologyScenarios, scenarioHasLocalGrade } from "@/lib/methodology-documents"
 import { getProgressSnapshot } from "@/lib/progress-store"
 import apiClient from "@/lib/api-client"
 import type { CriticalChaptersResponse } from "@/lib/types"
@@ -78,7 +78,9 @@ export default function DiagnosticHubPage() {
     return () => { cancelled = true }
   }, [])
 
-  const totalQuestions = methodologyScenarios.reduce((sum, s) => sum + s.questions.length, 0)
+  const totalQuestions = methodologyScenarios
+    .filter(scenarioHasLocalGrade)
+    .reduce((sum, s) => sum + s.questions.length, 0)
   const attemptedCount = snapshot?.totalAttempts || 0
   const criticalCount = criticalChapters?.total ?? 0
   const totalChaptersDisplay = apiTotalChapters ?? methodologyChapterLinks.length

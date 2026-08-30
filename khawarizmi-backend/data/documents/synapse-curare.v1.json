@@ -1,0 +1,12 @@
+{
+  "doc_id": "synapse-curare",
+  "version": "1.0.0",
+  "kind": "table",
+  "keypoints": [
+    {"id": "exp4", "value": 4, "unit": null, "tolerance": 0, "aliases": [], "label_ar": "تجربة الكورار مع تنبيه أ"},
+    {"id": "exp5", "value": 5, "unit": null, "tolerance": 0, "aliases": [], "label_ar": "تجربة الكورار ثم حقن الوسيط"}
+  ],
+  "trend": "unknown",
+  "trend_variants": [],
+  "objects": ["الوثيقة", "الجدول", "التجربة"]
+}

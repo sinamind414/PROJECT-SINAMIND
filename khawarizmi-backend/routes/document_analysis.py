@@ -1,7 +1,7 @@
 """Routes Document Analysis — 7 endpoints.
 
 Permet à l'élève de pratiquer l'analyse de documents SVT
-avec évaluation regex + répétition espacée FSRS.
+avec grade() local (0 LLM) + répétition espacée FSRS.
 """
 
 import json
@@ -26,7 +26,17 @@ from schemas.document_analysis import (
     WeakSpot,
     WeakSpotsResponse,
 )
-from services.document_analysis_service import evaluate_answer, score_to_fsrs_rating
+from services.document_analysis_service import score_to_fsrs_rating
+from services.hashing import hash_answer
+from services.grade_adapter import (
+    UNGRADED_AR,
+    grade_or_none,
+    may_write_fsrs,
+    persist_grade_columns,
+    resolve_question_id,
+    to_verb_eval,
+)
+from services.local_grader import TRAINING_BANNER_AR
 
 logger = logging.getLogger("khawarizmi.api")
 router = APIRouter(prefix="/api/document-analysis", tags=["Document Analysis"])
@@ -175,7 +185,7 @@ async def evaluer_reponses(
     for ans in body.answers:
         if ans.question_id:
             q_result = await db.execute(
-                text("SELECT id, verb_slug, model_answer_ar FROM da_questions WHERE id = :qid"),
+                text("SELECT id, verb_slug FROM da_questions WHERE id = :qid"),
                 {"qid": ans.question_id},
             )
         else:
@@ -193,29 +203,71 @@ async def evaluer_reponses(
             continue
 
         verb_slug = q_row._mapping["verb_slug"]
-        model_answer = q_row._mapping["model_answer_ar"]
         question_id = str(q_row._mapping["id"])
 
-        evaluation = evaluate_answer(verb_slug, ans.answer, model_answer)
-        evaluation["question_id"] = question_id
+        qid = resolve_question_id(
+            ans.question_id,
+            question_id,
+            f"{body.scenario_id}:{ans.question_id}" if ans.question_id else None,
+            f"{body.scenario_id}:{question_id}",
+        )
+        graded = grade_or_none(qid, ans.answer)
+        if graded is None:
+            evaluation = {
+                "question_id": question_id,
+                "verb_slug": verb_slug,
+                "score": 0,
+                "score_max": 1,
+                "percentage": 0,
+                "success": [],
+                "errors": [UNGRADED_AR],
+                "missing_markers": [],
+                "forbidden_found": [],
+                "advice": f"{UNGRADED_AR} {TRAINING_BANNER_AR}",
+                "dominant_error_code": "ungraded",
+                "ungraded": True,
+            }
+        else:
+            mapped = to_verb_eval(graded)
+            evaluation = {
+                "question_id": question_id,
+                "verb_slug": graded.verb_slug or verb_slug,
+                "score": mapped["score"],
+                "score_max": mapped["score_max"],
+                "percentage": mapped["percentage"],
+                "success": mapped["success"],
+                "errors": mapped["errors"],
+                "missing_markers": [],
+                "forbidden_found": [],
+                "advice": mapped["advice"],
+                "dominant_error_code": mapped["dominant_error_code"],
+                "ungraded": False,
+            }
 
+        meta = persist_grade_columns(graded)
         await db.execute(
             text("""
                 INSERT INTO da_answers
                     (session_id, question_id, verb_slug, chapter_slug,
                      answer_text, score, score_max, percentage, feedback_ar,
-                     success, errors, missing_markers, forbidden_found)
+                     success, errors, missing_markers, forbidden_found,
+                     rubric_version, grader_version, grading_engine,
+                     science_status, stuffing_suspected, method_percent,
+                     order_ok, diagnosis_code)
                 VALUES
                     (:session_id, :question_id, :verb_slug, :chapter_slug,
                      :answer_text, :score, :score_max, :percentage, :feedback_ar,
-                     :success, :errors, :missing_markers, :forbidden_found)
+                     :success, :errors, :missing_markers, :forbidden_found,
+                     :rubric_version, :grader_version, :grading_engine,
+                     :science_status, :stuffing_suspected, :method_percent,
+                     :order_ok, :diagnosis_code)
             """),
             {
                 "session_id": session_id,
                 "question_id": question_id,
                 "verb_slug": verb_slug,
                 "chapter_slug": body.chapter_slug or "",
-                "answer_text": ans.answer,
+                "answer_text": hash_answer(ans.answer),
                 "score": evaluation["score"],
                 "score_max": evaluation["score_max"],
                 "percentage": evaluation["percentage"],
@@ -224,22 +276,26 @@ async def evaluer_reponses(
                 "errors": json.dumps(evaluation["errors"], ensure_ascii=False),
                 "missing_markers": json.dumps(evaluation["missing_markers"], ensure_ascii=False),
                 "forbidden_found": json.dumps(evaluation["forbidden_found"], ensure_ascii=False),
+                **meta,
             },
         )
 
-        await _update_fsrs(
-            db=db,
-            user_id=current_user["id"],
-            verb_slug=verb_slug,
-            chapter_slug=body.chapter_slug or "general",
-            percentage=evaluation["percentage"],
-        )
-        fsrs_count += 1
-        total_score += evaluation["percentage"]
+        if graded is not None and may_write_fsrs(graded):
+            await _update_fsrs(
+                db=db,
+                user_id=current_user["id"],
+                verb_slug=verb_slug,
+                chapter_slug=body.chapter_slug or "general",
+                percentage=evaluation["percentage"],
+            )
+            fsrs_count += 1
+        if not evaluation["ungraded"]:
+            total_score += evaluation["percentage"]
 
         evaluations.append(AnswerEvaluation(**evaluation))
 
-    score_global = round(total_score / max(len(evaluations), 1))
+    graded_n = sum(1 for e in evaluations if not e.ungraded)
+    score_global = round(total_score / graded_n) if graded_n else 0
     await db.execute(
         text("UPDATE da_sessions SET score_global = :score WHERE id = :sid"),
         {"score": score_global, "sid": session_id},
@@ -270,14 +326,29 @@ async def correction_scenario(
     current_user: dict = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    """Retourne les model answers d'un scénario (après évaluation)."""
+    """Model answers seulement après une eval persistée de CET élève (G11)."""
     result = await db.execute(
         text("SELECT id FROM da_scenarios WHERE slug = :slug"),
         {"slug": slug},
     )
     row = result.fetchone()
     if not row:
-        raise HTTPException(404, f"Scénario introuvable : {slug}")
+        raise HTTPException(404, "Correction indisponible")
+
+    proof = await db.execute(
+        text(
+            """
+            SELECT 1
+            FROM da_sessions sess
+            JOIN da_answers a ON a.session_id = sess.id
+            WHERE sess.user_id = :uid AND sess.scenario_id = :sid
+            LIMIT 1
+            """
+        ),
+        {"uid": current_user["id"], "sid": row._mapping["id"]},
+    )
+    if not proof.fetchone():
+        raise HTTPException(404, "Correction indisponible")
 
     q_result = await db.execute(
         text("""

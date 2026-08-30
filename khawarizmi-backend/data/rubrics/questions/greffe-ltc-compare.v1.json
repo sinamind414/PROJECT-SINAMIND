@@ -1,0 +1,87 @@
+{
+  "rubric_id": "greffe-ltc-compare",
+  "version": "1.0.0",
+  "verb_slug": "compare",
+  "chapter_slug": "immunite-cellulaire",
+  "language": "ar",
+  "total_points": 4.0,
+  "document_id": "greffe-ltc",
+  "theme_variants": [
+    "طعم",
+    "رفض",
+    "LTc",
+    "ltc",
+    "لمفاوية"
+  ],
+  "theme_min_hits": 1,
+  "method_graph": {
+    "steps": ["object", "keypoint", "parallel", "conclusion"],
+    "require_order": true
+  },
+  "criteria": [
+    {
+      "id": "object",
+      "label_ar": "تقديم عنصري المقارنة",
+      "points": 0.75,
+      "check": "cites_object",
+      "required": true
+    },
+    {
+      "id": "keypoint",
+      "label_ar": "رقم من الطرفين (10/5 أو 2,5/4,8)",
+      "points": 1.0,
+      "check": "cites_keypoint",
+      "required": true
+    },
+    {
+      "id": "parallel",
+      "label_ar": "ربط بالتوازي: بينما / في حين",
+      "points": 1.25,
+      "check": "any_of",
+      "variants": ["بينما", "في حين", "بالمقابل", "كلاهما"],
+      "required": true
+    },
+    {
+      "id": "conclusion",
+      "label_ar": "خلاصة المقارنة: الرفض الثاني أسرع / الذروة أعلى",
+      "points": 1.0,
+      "check": "any_of",
+      "variants": ["أسرع", "أبكر", "أعلى", "تسارع"],
+      "required": true
+    }
+  ],
+  "distractors": [
+    {
+      "id": "anticorps",
+      "variants": ["أجسام مضادة", "الأجسام المضادة"],
+      "message_ar": "الوثيقتان فيهوم LTc ما فيهومش أجسام مضادة"
+    }
+  ],
+  "advice_by_gap": {
+    "unanchored": "قارن بأرقام الوثيقة: 10 مقابل 5 أو 2,5 مقابل 4,8.",
+    "parallel": "اربط بـ بينما / في حين. ليس فقرتين منفصلتين.",
+    "conclusion": "اختتم: الرفض الثاني أسرع."
+  },
+  "advice_praise": {
+    "parallel": "أحسنت: قارنت بالتوازي."
+  },
+  "model_answer": "تمثل الوثيقة رفض الطعم الأول ورفض الطعم الثاني. يُرفض الأول في 10 أيام بينما يُرفض الثاني في 5 أيام، وذروة LTc 2,5 مقابل 4,8. ومنه الرفض الثاني أسرع والذروة أعلى.",
+  "source": "teacher_authored",
+  "grader_min_version": "1.0.0",
+  "counter_examples": [
+    {
+      "id": "off_topic",
+      "text_ar": "تمثل الوثيقة منحنى تباعد الصفائح عند الأعراف المحيطية. كلما ابتعدت الصفيحة ازداد الخندق المحيطي. نستنتج غوص اللوح في الاندساس.",
+      "max_percent": 40,
+      "axis": "overall",
+      "why": "bonne langue, tectonique ≠ chapitre de la grille"
+    },
+    {
+      "id": "atp36",
+      "use": "model+atp36",
+      "max_percent": 40,
+      "axis": "overall",
+      "why": "36 ATP grave ONEC — cap overall 40"
+    }
+  ]
+}

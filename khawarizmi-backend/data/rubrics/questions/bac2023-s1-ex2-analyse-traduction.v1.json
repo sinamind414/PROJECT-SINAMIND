@@ -1,0 +1,133 @@
+{
+  "rubric_id": "bac2023-s1-ex2-analyse-traduction",
+  "version": "1.0.0",
+  "verb_slug": "analyse",
+  "chapter_slug": "synthese-proteines",
+  "language": "ar",
+  "total_points": 4.0,
+  "document_id": "bac2023-ml901-translation",
+  "theme_variants": [
+    "ترجمة",
+    "الترجمة",
+    "استنساخ",
+    "الاستنساخ",
+    "طفيلي",
+    "الطفيلي",
+    "بلاسموديوم",
+    "ملاريا",
+    "ML901",
+    "ml901",
+    "$lex:traduction",
+    "$lex:transcription"
+  ],
+  "theme_min_hits": 1,
+  "method_graph": {
+    "steps": ["object", "keypoint", "relation", "conclusion"],
+    "require_order": true
+  },
+  "criteria": [
+    {
+      "id": "object",
+      "label_ar": "تقديم الوثيقة / المنحنى",
+      "points": 0.75,
+      "check": "cites_object",
+      "required": true
+    },
+    {
+      "id": "keypoint",
+      "label_ar": "رقم من السلم: 100 أو 1.5 أو 5",
+      "points": 1.0,
+      "check": "cites_keypoint",
+      "required": true
+    },
+    {
+      "id": "relation",
+      "label_ar": "استنساخ ثابت / ترجمة تتناقص (كلما غير مفروض)",
+      "points": 0.75,
+      "check": "any_of",
+      "variants": [
+        "ثابتة",
+        "ثابت",
+        "تتناقص",
+        "تنعدم",
+        "مهما كان",
+        "كلما"
+      ],
+      "required": true
+    },
+    {
+      "id": "no_cause",
+      "label_ar": "بدون لأن / هذا يدل (كتفي حلّل)",
+      "points": 0.5,
+      "check": "forbidden_abs",
+      "variants": ["لأن", "بسبب", "يفسر", "تفسير", "هذا يدل"],
+      "required": true
+    },
+    {
+      "id": "conclusion",
+      "label_ar": "يثبط الترجمة (ليس الاستنساخ)",
+      "points": 1.0,
+      "check": "any_of",
+      "variants": [
+        "يثبط الترجمة",
+        "تثبط الترجمة",
+        "يثبط عملية الترجمة",
+        "كبح الترجمة",
+        "يوقف الترجمة"
+      ],
+      "required": true
+    }
+  ],
+  "grave": [
+    {
+      "id": "inhibits_transcription",
+      "pattern": "يثبط.{0,30}استنساخ|الاستنساخ.{0,30}يثبط",
+      "message_ar": "السلم 2023: ML901 يثبط الترجمة وليس الاستنساخ",
+      "cap_science": 40,
+      "context_any": []
+    }
+  ],
+  "distractors": [
+    {
+      "id": "photosynth",
+      "variants": ["تركيب ضوئي", "التركيب الضوئي", "صانعة", "يخضور"],
+      "message_ar": "حشو: التركيب الضوئي ليس وثيقة ML901"
+    }
+  ],
+  "advice_by_gap": {
+    "verb_slip.interpret": "حلّلت لكن فسّرت مبكراً (لأن). صف الثبات / التناقص دون لأن.",
+    "unanchored": "اذكر رقما من السلم: 100 أو 1.5 أو 5.",
+    "off_topic": "الإجابة خارج الموضوع — طفيلي / ترجمة / ML901.",
+    "stuffing": "لا تكتب درس النسخ محفوظا. اقرأ المنحنيين.",
+    "object": "قدّم الوثيقة (منحنى / شكل ب).",
+    "keypoint": "اذكر 100 أو 1.5 أو 5.",
+    "relation": "الاستنساخ ثابت ؛ الترجمة تتناقص بعد 1.5.",
+    "no_cause": "حلّل دون لأن — التفسير درس آخر.",
+    "conclusion": "الاستنتاج من السلم: يثبط الترجمة.",
+    "science.grave": "الدواء يثبط الترجمة لا الاستنساخ."
+  },
+  "advice_praise": {
+    "object": "أحسنت: قدّمت الوثيقة.",
+    "keypoint": "ذكرت رقما من السلم.",
+    "relation": "فرّقت الثبات عن التناقص دون تفسير مبكر."
+  },
+  "model_answer": "تمثل الوثيقة منحنيين لنسبة حدوث الاستنساخ والترجمة عند الطفيلي بدلالة تركيز ML901. نسبة الاستنساخ عند 100 مهما كان التركيز فهي ثابتة. نسبة الترجمة عند 1.5 تساوي 100 ثم تتناقص حتى تنعدم عند 5. نستنتج أن الدواء يثبط الترجمة.",
+  "source": "teacher_authored",
+  "grader_min_version": "1.1.7",
+  "counter_examples": [
+    {
+      "id": "off_topic",
+      "text_ar": "تمثل الوثيقة منحنى تباعد الصفائح عند الأعراف المحيطية. كلما ابتعدت الصفيحة ازداد الخندق المحيطي. نستنتج غوص اللوح في الاندساس.",
+      "max_percent": 40,
+      "axis": "overall",
+      "why": "tectonique ≠ ML901 / ترجمة"
+    },
+    {
+      "id": "atp36",
+      "use": "model+atp36",
+      "max_percent": 40,
+      "axis": "overall",
+      "why": "36 ATP grave ONEC — cap overall 40"
+    }
+  ]
+}

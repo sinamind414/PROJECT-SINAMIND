@@ -1,0 +1,34 @@
+{
+  "doc_id": "bac2023-ml901-translation",
+  "version": "1.0.0",
+  "kind": "curve",
+  "keypoints": [
+    {
+      "id": "pct_100",
+      "value": 100,
+      "unit": "%",
+      "tolerance": 0,
+      "aliases": [],
+      "label_ar": "نسبة الاستنساخ (ثابتة) أو الترجمة قبل العتبة — سلم 2023"
+    },
+    {
+      "id": "conc_15",
+      "value": 1.5,
+      "unit": "و.ت",
+      "tolerance": 0,
+      "aliases": [],
+      "label_ar": "تركيز ML901 تحتَه الترجمة 100% — سلم 2023"
+    },
+    {
+      "id": "conc_5",
+      "value": 5,
+      "unit": "و.ت",
+      "tolerance": 0,
+      "aliases": [],
+      "label_ar": "تركيز تنعدم عنده الترجمة — سلم 2023 (05 = 5)"
+    }
+  ],
+  "trend": "decrease",
+  "trend_variants": ["تتناقص", "ثابتة", "تنعدم", "مهما كان"],
+  "objects": ["الوثيقة", "المنحنى", "المنحنيين", "الشكل", "شكل ب"]
+}

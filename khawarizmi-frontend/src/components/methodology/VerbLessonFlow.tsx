@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import React, { useState, useRef, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
@@ -15,6 +15,8 @@ import {
 } from "@/lib/lesson/practiceOutcome"
 import { CoachPanel } from "@/components/methodology/CoachPanel"
 import { SessionExitButton } from "@/components/methodology/SessionExitButton"
+import { GradeResultCard, verbEvalToCard } from "@/components/methodology/GradeResultCard"
+import { localGradeLinksForVerb } from "@/lib/methodology-documents"
 
 type Step = "word" | "definition" | "recognition" | "method" | "dos_donts" | "practice"
 
@@ -81,7 +83,6 @@ function buildLesson(verb: EnrichedActionVerbRule) {
 
 export function VerbLessonFlow({ 
   enriched, 
-  onSubmitAnswer, 
   evaluation, 
   loading, 
   answer, 
@@ -149,11 +150,6 @@ export function VerbLessonFlow({
         : `❌ غير صحيح. هذا مثال على خطأ شائع مع هذا الفعل.`
     )
     if (isCorrect) setTimeout(next, 1100)
-  }
-
-  async function handlePracticeSubmit() {
-    if (!answer.trim() || !methodReady) return
-    await onSubmitAnswer(answer)
   }
 
   function computeLiveSegments(text: string) {
@@ -269,7 +265,7 @@ export function VerbLessonFlow({
   }
 
   useEffect(() => {
-    if (evaluation && evaluation.percentage >= 75) {
+    if (evaluation && !evaluation.ungraded && evaluation.percentage >= 75) {
       setConfettiKey(prev => prev + 1)
       setShowConfetti(true)
       const timer = setTimeout(() => setShowConfetti(false), 2200)
@@ -514,17 +510,40 @@ export function VerbLessonFlow({
             <div className="mt-2 text-[10px] text-gray-500">Vert = marqueurs requis détectés • Rouge = mots interdits</div>
           </div>
         )}
+        {localGradeLinksForVerb(enriched.slug).length > 0 ? (
+          <div className="mt-4 rounded-2xl p-4 bg-amber-500/10 border border-amber-500/20 space-y-3">
+            <p className="text-amber-100 text-sm leading-relaxed">
+              هذه الصفحة تعلّم الفعل. لا شبكة تقييم هنا (منع 422 و منع نسخة بلا وثيقة). صحّح على بطاقة مصحح محلي:
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {localGradeLinksForVerb(enriched.slug).map((link) => (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  className="px-3 py-2 rounded-xl bg-mint text-slate-deep text-xs font-bold hover:bg-mint-soft"
+                >
+                  {link.labelAr}
+                </a>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <div className="mt-4 rounded-2xl p-4 bg-amber-500/10 border border-amber-500/20">
+            <p className="text-amber-100 text-sm leading-relaxed">
+              لا شبكة تقييم محلية لهذا الفعل. ليست صفراً — تعذر التصحيح. تمرّن على بطاقة مصحح محلي.
+            </p>
+            <a href="/document-analysis" className="inline-block mt-3 px-3 py-2 rounded-xl bg-mint text-slate-deep text-xs font-bold">
+              بنك المصحح المحلي
+            </a>
+          </div>
+        )}
         <div className="flex gap-3 mt-4 items-center">
           <button
-            onClick={handlePracticeSubmit}
-            disabled={loading || !answer.trim() || !methodReady}
-            className="flex-1 py-4 rounded-2xl bg-mint font-bold text-lg text-slate-deep disabled:opacity-60"
+            type="button"
+            disabled
+            className="flex-1 py-4 rounded-2xl bg-white/10 font-bold text-lg text-gray-400 cursor-not-allowed"
           >
-            {loading
-              ? "جاري التقييم..."
-              : !methodReady
-                ? "أكمل قائمة التحقق أولاً"
-                : "قيّم إجابتي الآن"}
+            لا تقييم على هذه الصفحة
           </button>
           <button onClick={toggleVoice} disabled={loading} className={`px-4 py-4 rounded-2xl border flex items-center justify-center transition ${isListening ? "bg-red-500/20 border-red-400 text-red-400" : "bg-white/5 border-white/20 hover:bg-white/10 text-white"}`} title={isListening ? "Arrêter l'écoute" : "Dicter avec la voix (arabe/français)"}>
             {isListening ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
@@ -538,23 +557,20 @@ export function VerbLessonFlow({
         )}
         {evaluation && (() => {
           const outcomeUi = describeVerbPracticeOutcome(Number(evaluation.percentage) || 0)
+          const ungraded = Boolean(evaluation.ungraded)
           return (
           <div className="mt-6 p-6 rounded-3xl glass border border-mint/20 relative overflow-visible">
-            {Number(evaluation.percentage) >= 70 && <ConfettiBurst keyProp={confettiKey} />}
-            <div className="flex justify-between items-baseline mb-4">
-              <div><span className="text-5xl font-black text-white">{evaluation.percentage}</span><span className="text-2xl text-gray-400">%</span></div>
-              <div className="text-right text-sm"><div className="text-emerald-400 font-bold">{evaluation.score}/{evaluation.score_max}</div></div>
-            </div>
-            <div className={`mb-4 rounded-2xl border p-3 ${outcomeBannerClass(outcomeUi.outcome)}`}>
+            {!ungraded && Number(evaluation.percentage) >= 70 && <ConfettiBurst keyProp={confettiKey} />}
+            <GradeResultCard model={verbEvalToCard(evaluation)} />
+            {!ungraded && (
+            <div className={`mb-4 mt-4 rounded-2xl border p-3 ${outcomeBannerClass(outcomeUi.outcome)}`}>
               <p className="text-[10px] font-black uppercase opacity-70">Outcome · {outcomeUi.outcome}</p>
               <p className="text-sm font-bold mt-0.5">{outcomeUi.labelAr}</p>
               <p className="text-[11px] opacity-70 mt-0.5" dir="ltr">{outcomeUi.labelFr}</p>
-              {!outcomeUi.mayShowMasteryBadge && (
-                <p className="text-[10px] opacity-70 mt-1">لا شارة إتقان منهجية BAC على تدريب الفعل وحده</p>
-              )}
             </div>
-            {renderVisualFeedback()}
-            {evaluation.advice && <div className="text-mint text-sm mt-4 bg-mint/10 p-3 rounded-2xl">💡 {evaluation.advice}</div>}
+            )}
+            {!ungraded && renderVisualFeedback()}
+            {!ungraded && (
             <div className="mt-4">
               <CoachPanel
                 outcome={outcomeUi.outcome}
@@ -571,6 +587,7 @@ export function VerbLessonFlow({
                 onlyIfFailed
               />
             </div>
+            )}
             <button onClick={speakModelAnswer} className="mt-4 w-full flex items-center justify-center gap-2 py-3 text-sm font-semibold border border-mint/30 bg-mint/10 hover:bg-mint/20 text-mint rounded-2xl transition">
               🔊 استمع إلى الإجابة النموذجية
             </button>

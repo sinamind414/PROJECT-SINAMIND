@@ -299,9 +299,59 @@ _GRAVE_ERRORS = [
 _NUMERIC_RULES = {
     "atp_resp":  {"patterns": [r"bilan.{0,20}atp", r"atp.{0,20}respir", r"atp.{0,20}تنفس"], "expected": 38},
     "atp_ferm":  {"patterns": [r"atp.{0,20}ferment", r"atp.{0,20}تخم"], "expected": 2},
-    "po_nadh":   {"patterns": [r"p/o.{0,15}nadh", r"nadh.{0,20}atp", r"p/o"], "expected": 3},
-    "po_fadh":   {"patterns": [r"p/o.{0,15}fadh", r"fadh.{0,20}atp"], "expected": 2},
+    # S26 : pas de `p/o` nu (FADH2=2 était capé comme NADH). Pas de `nadh…atp`
+    # (38 ATP à côté de NADH ≠ P/O).
+    "po_nadh":   {"patterns": [r"p/o.{0,15}nadh", r"nadh.{0,15}p/o"], "expected": 3},
+    "po_fadh":   {"patterns": [r"p/o.{0,15}fadh", r"fadh.{0,15}p/o"], "expected": 2},
 }
+
+# دليل الأستاذ ONPS 2007 p.25 — coquille livre 10⁶, vérité 10⁴.
+# JAUNE pour grade() : ne PAS capper à 40 %, ne PAS 0 brutal.
+_EXP_10_6 = r"(?:10\s*(?:\^\s*|e\s*|\*\*\s*)6|10⁶|10\s*6(?!\d))"
+_EXP_10_4 = r"(?:10\s*(?:\^\s*|e\s*|\*\*\s*)4|10⁴|10\s*4(?!\d)|36000|25000)"
+_CTX_ARNR = r"(?:arnr|arn\s*r|rrna|ريبوزوم|5\s*s|\bs5\b|s5)"
+_CTX_ARNT = r"(?:arnt|arn\s*t|trna|ناقل)"
+
+
+def _fold_sci_notation(text: str) -> str:
+    t = (text or "").lower()
+    t = t.replace("×", "x").replace("⋅", "x").replace("*", "x")
+    t = t.replace("⁶", "6").replace("⁴", "4").replace("⁵", "5")
+    t = t.replace("٣", "3").replace("٦", "6").replace("٤", "4").replace("٢", "2").replace("٥", "5")
+    return t
+
+
+def _near(text: str, pat_a: str, pat_b: str, window: int = 90) -> bool:
+    for ma in re.finditer(pat_a, text, flags=re.IGNORECASE):
+        start = max(0, ma.start() - window)
+        end = min(len(text), ma.end() + window)
+        if re.search(pat_b, text[start:end], flags=re.IGNORECASE):
+            return True
+    return False
+
+
+def detect_textbook_errata(student_answer: str) -> list[str]:
+    """Coquilles du manuel (دليل p.25). Liste de messages — 0 cap.
+
+    10⁴ à côté d'ARNr/ARNt = OK (pas de message).
+    10⁶ à côté d'ARNr/ARNt = jaune.
+    10⁶ sans ARNr/ARNt = silence.
+    """
+    raw = _fold_sci_notation(student_answer or "")
+    if not raw:
+        return []
+    out: list[str] = []
+    if _near(raw, _CTX_ARNR, _EXP_10_6) and not _near(raw, _CTX_ARNR, _EXP_10_4):
+        out.append(
+            "تصويب الدليل ص.25: الوزن الجزيئي لـ ARNr 5S هو 3,6×10⁴ وليس 3,6×10⁶ "
+            "(غلطة الكتاب — ليست صفراً)."
+        )
+    if _near(raw, _CTX_ARNT, _EXP_10_6) and not _near(raw, _CTX_ARNT, _EXP_10_4):
+        out.append(
+            "تصويب الدليل ص.25: الوزن الجزيئي لـ ARNt هو 2,5×10⁴ وليس 2,5×10⁶ "
+            "(غلطة الكتاب — ليست صفراً)."
+        )
+    return out
 
 
 # ──────────────────────────────────────────────────────────────────────

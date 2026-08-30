@@ -1,0 +1,5 @@
+{
+  "verb_slug": "scientific-text",
+  "cases": ["intro", "body", "conclusion"],
+  "notes_ar": "نص علمي: مقدمة+مشكل / عرض / خاتمة. ليس قائمة نقط."
+}

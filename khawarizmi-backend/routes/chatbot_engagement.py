@@ -72,6 +72,7 @@ async def explain_back(
     current_user: dict = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
+    """S15 — pas un juge. Heuristique gelée. Sans Rubric L0 → ungraded."""
     concept = (body.get("concept") or "").strip()
     answer = (body.get("answer") or "").strip()
     if not concept or not answer:
@@ -106,6 +107,7 @@ async def submit_boss_fight_endpoint(
     current_user: dict = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
+    """S15 — overlap gelé. Pas de % Bac. Sans Rubric L0 → ungraded."""
     answers = body.get("answers", {})
     if not answers:
         raise HTTPException(status_code=400, detail="answers requis")

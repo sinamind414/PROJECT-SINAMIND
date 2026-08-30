@@ -57,12 +57,12 @@ export default function GamificationPanel({ profile }: { profile?: { xp?: number
       setComboMessage(comboResult.message);
       const pts = action.points * comboResult.multiplier;
       await apiClient.request("/api/gamification/points/add", {
-        method: "POST", body: JSON.stringify({ points: pts })
+        method: "POST", body: JSON.stringify({ action: action.action || "start" })
       });
       setPoints(prev => prev + pts);
       if (avatar) {
         await apiClient.request("/api/avatar/add-xp", {
-          method: "POST", body: JSON.stringify({ xp: pts })
+          method: "POST", body: JSON.stringify({ action: action.action || "start" })
         });
       }
       const actionsResult = await apiClient.request<{ actions: NextAction[] }>(

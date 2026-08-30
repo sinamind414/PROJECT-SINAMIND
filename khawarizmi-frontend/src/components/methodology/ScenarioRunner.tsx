@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { DocumentSetRenderer } from "@/components/methodology/DocumentRenderer"
 import { HighlightedAnswer } from "@/components/methodology/HighlightedAnswer"
-import { evaluateMethodologyAnswer, type MethodologyEvaluation } from "@/lib/methodology-evaluator"
+import type { MethodologyEvaluation } from "@/lib/methodology-evaluator"
 import { awardXP, saveMethodologyEvaluations, type GamificationAward } from "@/lib/progress-store"
 import { apiClient } from "@/lib/api-client"
 import type { MethodologyScenario, MethodologyQuestion } from "@/lib/methodology-documents"
@@ -14,8 +14,14 @@ import {
   type DocumentScenarioOutcomeResult,
 } from "@/lib/lesson/practiceOutcome"
 import { CoachPanel } from "@/components/methodology/CoachPanel"
-import { MethodPracticeGate } from "@/components/methodology/MethodPracticeGate"
+import { NoLocalGradeWall } from "@/components/methodology/NoLocalGradeWall"
 import { SessionExitButton } from "@/components/methodology/SessionExitButton"
+import {
+  GradeResultCard,
+  TRAINING_BANNER_AR,
+  formatTrainingPercent,
+  methodologyToCard,
+} from "@/components/methodology/GradeResultCard"
 
 const VERB_LABELS: Record<string, string> = {
   analyse: "حلّل",
@@ -51,11 +57,23 @@ type ScenarioResult = {
   contract: DocumentScenarioOutcomeResult
 }
 
-function getSeverityLabel(percentage: number) {
-  if (percentage >= 85) return { label: "متقن", color: "text-emerald-300", bg: "bg-emerald-500/10 border-emerald-500/20" }
-  if (percentage >= 70) return { label: "مقبول", color: "text-blue-300", bg: "bg-blue-500/10 border-blue-500/20" }
-  if (percentage >= 50) return { label: "متوسط", color: "text-amber-300", bg: "bg-amber-500/10 border-amber-500/20" }
-  return { label: "ضعيف", color: "text-red-300", bg: "bg-red-500/10 border-red-500/20" }
+function ungradedEvaluation(verbSlug: string, banner?: string): MethodologyEvaluation {
+  return {
+    verbSlug,
+    score: 0,
+    scoreMax: 1,
+    percentage: 0,
+    success: [],
+    errors: ["لا شبكة تقييم لهذه السؤال."],
+    missingMarkers: [],
+    forbiddenMarkersFound: [],
+    criteria: [],
+    advice: banner || TRAINING_BANNER_AR,
+    allowSecondAttempt: false,
+    source: "ungraded",
+    ungraded: true,
+    bannerAr: banner || TRAINING_BANNER_AR,
+  }
 }
 
 function CorrectionCard({
@@ -63,20 +81,13 @@ function CorrectionCard({
 }: {
   item: ScenarioResult["evaluations"][number]
 }) {
-  const status = getSeverityLabel(item.evaluation.percentage)
-
   return (
     <div className="rounded-3xl p-5 bg-[#182730] border border-white/[0.06] space-y-4">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h3 className="text-white font-bold text-lg">{item.question.n}. تصحيح: {item.question.title}</h3>
-          <p className="text-gray-500 text-xs mt-1">المهارة: {item.question.skill} · السند: {item.question.docRef}</p>
-        </div>
-        <div className={`px-3 py-2 rounded-xl border ${status.bg}`}>
-          <p className={`text-sm font-bold ${status.color}`}>{status.label}</p>
-          <p className="text-white text-lg font-bold text-center">{item.evaluation.percentage}%</p>
-        </div>
+      <div>
+        <h3 className="text-white font-bold text-lg">{item.question.n}. تصحيح: {item.question.title}</h3>
+        <p className="text-gray-500 text-xs mt-1">المهارة: {item.question.skill} · السند: {item.question.docRef}</p>
       </div>
+      <GradeResultCard model={methodologyToCard(item.evaluation)} />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div className="rounded-2xl p-4 bg-white/[0.03] border border-white/[0.05]">
@@ -87,36 +98,20 @@ function CorrectionCard({
             emptyLabel="إجابة فارغة"
           />
         </div>
-        <div className="rounded-2xl p-4 bg-emerald-500/10 border border-emerald-500/20">
-          <p className="text-emerald-300 text-xs font-bold mb-2">تصحيح نموذجي مرتبط بالوثائق</p>
-          <p className="text-gray-100 text-sm leading-relaxed whitespace-pre-wrap">{item.question.modelAnswer}</p>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <div>
-          <p className="text-emerald-300 font-bold text-sm mb-2">ما نجحت فيه</p>
-          {item.evaluation.success.length ? item.evaluation.success.map((s) => <p key={s} className="text-gray-300 text-sm">✓ {s}</p>) : <p className="text-gray-500 text-sm">لا توجد نقطة قوية واضحة في هذه الإجابة.</p>}
-        </div>
-        <div>
-          <p className="text-red-300 font-bold text-sm mb-2">lacunes / ما يجب إصلاحه</p>
-          {item.evaluation.errors.length ? item.evaluation.errors.map((e) => <p key={e} className="text-gray-300 text-sm">✗ {e}</p>) : <p className="text-gray-500 text-sm">لا توجد أخطاء منهجية واضحة.</p>}
-        </div>
-      </div>
-
-      {item.evaluation.criteria.length > 0 && (
-        <div>
-          <p className="text-mint-soft font-bold text-sm mb-2">تفصيل النقاط</p>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-            {item.evaluation.criteria.map((criterion) => (
-              <div key={criterion.code} className="flex items-center justify-between gap-3 rounded-xl bg-white/[0.03] px-3 py-2">
-                <span className="text-gray-300 text-xs">{criterion.passed ? "✓" : "✗"} {criterion.labelAr}</span>
-                <span className="text-white text-xs font-bold">{criterion.earned} / {criterion.points}</span>
-              </div>
-            ))}
+        {item.evaluation.ungraded ? (
+          <div className="rounded-2xl p-4 bg-amber-500/10 border border-amber-500/20">
+            <p className="text-amber-200 text-xs font-bold mb-2">لا تصحيح نموذجي</p>
+            <p className="text-gray-300 text-sm leading-relaxed">تعذر التصحيح — لا شبكة تقييم محلية لهذه السؤال.</p>
           </div>
-        </div>
-      )}
+        ) : (
+          <div className="rounded-2xl p-4 bg-white/[0.03] border border-white/[0.05]">
+            <p className="text-gray-400 text-xs font-bold mb-2">بدون نموذج كامل</p>
+            <p className="text-gray-300 text-sm leading-relaxed">
+              الخانات أعلاه = الحكم. لا نعرض إجابة نموذجية بعد التصحيح (منع النسخ).
+            </p>
+          </div>
+        )}
+      </div>
 
       {(item.evaluation.forbiddenMarkersFound.length > 0 || item.evaluation.missingMarkers.length > 0) && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
@@ -191,10 +186,9 @@ export function ScenarioRunner({
   }>>({})
 
   const [enabledOptional, setEnabledOptional] = useState<Record<string, boolean>>({})
-  /** Checklist prête par question (gate méthodologique) */
-  const [gatesReady, setGatesReady] = useState<Record<string, boolean>>({})
 
   const questions = getActiveQuestions(scenario, chapterLink)
+  const hasLocal = questions.some((q) => Boolean(q.gradeQuestionId))
 
   const mandatoryQuestions = questions.filter((q) => q.mandatory)
   const optionalQuestions = questions.filter((q) => !q.mandatory)
@@ -204,14 +198,6 @@ export function ScenarioRunner({
   )
 
   const completedCount = activeQuestions.filter((q) => (answers[q.id] || "").trim().length > 0).length
-
-  const allGatesReady =
-      activeQuestions.length > 0 &&
-      activeQuestions.every((q) => gatesReady[q.id] === true)
-
-  function setGateReady(qId: string, ready: boolean) {
-    setGatesReady((prev) => (prev[qId] === ready ? prev : { ...prev, [qId]: ready }))
-  }
 
   function toggleOptional(qId: string) {
     setEnabledOptional((prev) => ({ ...prev, [qId]: !prev[qId] }))
@@ -223,56 +209,78 @@ export function ScenarioRunner({
   }
 
   async function submit() {
-    if (!allGatesReady) return
+    if (!hasLocal) return
     setSubmitting(true)
     const chapterSlug: string | null = chapterLink?.slug ?? null
 
     const questionsToSubmit = activeQuestions
 
     try {
-      const payload = {
-        scenario_id: scenario.id,
-        chapter_slug: chapterSlug,
-        answers: questionsToSubmit.map((q) => ({
-          verb_slug: q.verbSlug,
-          answer: answers[q.id] || "",
-        })),
-      }
-      const resp = await apiClient.evaluateDaAnswersV2(payload)
-
-      const evaluations = questionsToSubmit.map((question) => {
-        const evalData = resp.evaluations.find((e) => e.verb_slug === question.verbSlug)
-        const evaluation: MethodologyEvaluation = evalData
-          ? {
-              verbSlug: evalData.verb_slug,
-              score: evalData.score,
-              scoreMax: evalData.score_max,
-              percentage: evalData.percentage,
-              success: evalData.matched_criteria,
-              errors: evalData.unmatched_criteria.map((u) => u.why_ar),
-              missingMarkers: [],
-              forbiddenMarkersFound: [],
-              criteria: [],
-              advice: evalData.advice_ar,
-              allowSecondAttempt: evalData.percentage < 85,
-              highlights: evalData.highlights,
-              source: evalData.source,
-              dominantErrorCode: evalData.dominant_error_code,
-              remediation: evalData.remediation,
+      const graded = await Promise.all(
+        questionsToSubmit.map(async (question) => {
+          const questionId = question.gradeQuestionId || `${scenario.id}:${question.id}`
+          const g = await apiClient.grade({
+            question_id: questionId,
+            answer: answers[question.id] || "",
+            surface: "da",
+          })
+          if ("ungraded" in g && g.ungraded) {
+            return {
+              question,
+              answer: answers[question.id] || "",
+              evaluation: ungradedEvaluation(question.verbSlug, g.banner_ar),
             }
-          : evaluateMethodologyAnswer({ verbSlug: question.verbSlug, answer: answers[question.id] || "" })
-
-        return { question, answer: answers[question.id] || "", evaluation }
-      })
-
-      const readiness = Math.round(
-        evaluations.reduce((sum, item) => sum + item.evaluation.percentage, 0) / evaluations.length,
+          }
+          const evaluation: MethodologyEvaluation = {
+            verbSlug: g.verb_slug,
+            score: g.method_points,
+            scoreMax: g.method_points_max,
+            percentage: g.overall_training_percent,
+            success: g.criteria.filter((c) => c.status === "full").map((c) => c.label_ar),
+            errors: [
+              ...g.science_flags,
+              ...(g.next_step_ar ? [g.next_step_ar] : []),
+            ],
+            missingMarkers: [],
+            forbiddenMarkersFound: [],
+            criteria: g.criteria.map((c) => ({
+              code: c.id,
+              labelAr: c.label_ar,
+              points: c.points_max,
+              earned: c.points_earned,
+              passed: c.status === "full",
+              feedbackAr: c.label_ar,
+            })),
+            advice: g.phrase_ar || g.banner_ar,
+            allowSecondAttempt: g.overall_training_percent < 85,
+            source: "local_rubric",
+            methodLabelAr: g.method_label_ar,
+            methodPercent: g.method_percent,
+            scienceStatus: g.science_status,
+            scienceFlags: g.science_flags,
+            scienceCapped: g.science_capped,
+            capsApplied: Array.isArray(g.caps_applied) ? g.caps_applied : [],
+            orderOk: g.order_ok,
+            bannerAr: g.banner_ar,
+            praiseAr: g.praise_ar,
+            nextStepAr: g.next_step_ar,
+            dominantErrorCode: g.diagnosis?.code,
+          }
+          return { question, answer: answers[question.id] || "", evaluation }
+        }),
       )
+      const evaluations = graded
+      const gradedOnly = evaluations.filter((item) => !item.evaluation.ungraded)
+      const readiness = gradedOnly.length
+        ? Math.round(
+            gradedOnly.reduce((sum, item) => sum + item.evaluation.percentage, 0) / gradedOnly.length,
+          )
+        : 0
 
       const contract = applyDocumentScenarioOutcome({
         scenarioId: scenario.id,
         chapterSlug,
-        items: evaluations.map((item) => ({
+        items: gradedOnly.map((item) => ({
           verbSlug: item.question.verbSlug,
           percentage: item.evaluation.percentage,
           passed: item.evaluation.percentage >= 70,
@@ -280,16 +288,20 @@ export function ScenarioRunner({
       })
 
       setResult({ evaluations, readiness, contract })
-      setApiSource(true)
-      saveMethodologyEvaluations(
-        evaluations.map((item) => ({
-          source: "document-analysis" as const,
-          verbSlug: item.question.verbSlug,
-          answer: item.answer,
-          evaluation: item.evaluation,
-        })),
-      )
-      setSaved(true)
+      setApiSource(gradedOnly.length > 0)
+      if (gradedOnly.length > 0) {
+        saveMethodologyEvaluations(
+          evaluations.map((item) => ({
+            source: "document-analysis" as const,
+            verbSlug: item.question.verbSlug,
+            answer: item.answer,
+            evaluation: item.evaluation,
+          })),
+        )
+        setSaved(true)
+      } else {
+        setSaved(false)
+      }
       // XP seulement si outcome honnête (pas de fausse maîtrise)
       setAward(contract.mayAwardXp ? awardXP("مهمة استغلال وثيقة", 60) : null)
     } catch {
@@ -297,58 +309,33 @@ export function ScenarioRunner({
       const evaluations = questionsToSubmit.map((question) => ({
         question,
         answer: answers[question.id] || "",
-        evaluation: evaluateMethodologyAnswer({ verbSlug: question.verbSlug, answer: answers[question.id] || "" }),
+        evaluation: ungradedEvaluation(question.verbSlug, "تعذر التصحيح"),
       }))
-
-      const readiness = Math.round(
-        evaluations.reduce((sum, item) => sum + item.evaluation.percentage, 0) / evaluations.length,
-      )
-
-      const contract = applyDocumentScenarioOutcome({
-        scenarioId: scenario.id,
-        chapterSlug,
-        items: evaluations.map((item) => ({
-          verbSlug: item.question.verbSlug,
-          percentage: item.evaluation.percentage,
-          passed: item.evaluation.percentage >= 70,
-        })),
+      setResult({
+        evaluations,
+        readiness: 0,
+        contract: applyDocumentScenarioOutcome({
+          scenarioId: scenario.id,
+          chapterSlug,
+          items: [],
+        }),
       })
-
-      setResult({ evaluations, readiness, contract })
-      saveMethodologyEvaluations(
-        evaluations.map((item) => ({
-          source: "document-analysis" as const,
-          verbSlug: item.question.verbSlug,
-          answer: item.answer,
-          evaluation: item.evaluation,
-        })),
-      )
-      setSaved(true)
-      setAward(contract.mayAwardXp ? awardXP("مهمة استغلال وثيقة", 60) : null)
+      setSaved(false)
+      setAward(null)
     } finally {
       setSubmitting(false)
     }
   }
 
   async function requestHint(question: MethodologyQuestion) {
-    setRequestingHint(true)
-    try {
-      const payload = {
-        scenario_id: scenario.id,
-        chapter_slug: chapterLink?.slug ?? null,
-        answers: [{ verb_slug: question.verbSlug, answer: answers[question.id] || "" }],
-        request_hint: true,
-      }
-      const resp = await apiClient.evaluateDaAnswersV2(payload)
-      const evalData = resp.evaluations[0]
-      if (evalData?.remediation?.hint) {
-        setHints((prev) => ({ ...prev, [question.id]: evalData.remediation!.hint! }))
-      }
-    } catch {
-      // fallback local silencieux
-    } finally {
-      setRequestingHint(false)
-    }
+    setHints((prev) => ({
+      ...prev,
+      [question.id]: {
+        hint_ar: "أرسل الإجابة للتصحيح المحلي — لا تلميح توليدي.",
+        focus_area: "منهج",
+        methodology_step: "إرسال",
+      },
+    }))
   }
 
   function reset() {
@@ -358,7 +345,10 @@ export function ScenarioRunner({
     setAward(null)
     setApiSource(false)
     setHints({})
-    setGatesReady({})
+  }
+
+  if (!hasLocal) {
+    return <NoLocalGradeWall titleAr={scenario.title} verbSlug={questions[0]?.verbSlug} />
   }
 
   return (
@@ -393,9 +383,11 @@ export function ScenarioRunner({
         )}
       </header>
 
-      <section className="rounded-3xl p-6 bg-[#182730] border border-white/[0.06] space-y-5">
-        <DocumentSetRenderer documents={scenario.documents} />
-      </section>
+      {scenario.documents.length > 0 && (
+        <section className="rounded-3xl p-6 bg-[#182730] border border-white/[0.06] space-y-5">
+          <DocumentSetRenderer documents={scenario.documents} />
+        </section>
+      )}
 
       <div className="grid grid-cols-1 xl:grid-cols-[1fr_380px] gap-6">
         <section className="rounded-3xl p-6 bg-[#182730] border border-white/[0.06]">
@@ -433,27 +425,17 @@ export function ScenarioRunner({
                       <p className="text-gray-300 text-sm mt-2 leading-relaxed">{q.prompt}</p>
                     </div>
                   </div>
-                  <MethodPracticeGate
-                    verbSlug={q.verbSlug}
-                    compact
-                    onGateChange={(ready) => setGateReady(q.id, ready)}
-                  />
                   <textarea
                     value={answers[q.id] || ""}
                     onChange={(e) => updateAnswer(q.id, e.target.value)}
                     rows={4}
-                    disabled={!gatesReady[q.id]}
-                    className="w-full rounded-xl bg-[#0C151A] border border-white/[0.08] text-white p-4 outline-none focus:border-red-400 disabled:opacity-50 disabled:cursor-not-allowed"
-                    placeholder={
-                      gatesReady[q.id]
-                        ? q.placeholder
-                        : "علّم قائمة التحقق أولاً ثم اكتب..."
-                    }
+                    className="w-full rounded-xl bg-[#0C151A] border border-white/[0.08] text-white p-4 outline-none focus:border-red-400"
+                    placeholder={q.placeholder}
                   />
                   <div className="flex flex-wrap items-center gap-2 mt-2">
                     <button
                       onClick={() => requestHint(q)}
-                      disabled={requestingHint || !gatesReady[q.id]}
+                      disabled={requestingHint}
                       className="px-3 py-1.5 rounded-lg bg-amber-500/20 text-amber-200 border border-amber-500/30 text-xs font-bold hover:bg-amber-500/30 transition disabled:opacity-50"
                     >
                       {requestingHint ? "..." : "طلب تلميح سُقراطي"}
@@ -524,27 +506,17 @@ export function ScenarioRunner({
                     {isEnabled ? (
                       <>
                         <p className="text-gray-300 text-sm mb-3 leading-relaxed">{q.prompt}</p>
-                        <MethodPracticeGate
-                          verbSlug={q.verbSlug}
-                          compact
-                          onGateChange={(ready) => setGateReady(q.id, ready)}
-                        />
                         <textarea
                           value={answers[q.id] || ""}
                           onChange={(e) => updateAnswer(q.id, e.target.value)}
                           rows={4}
-                          disabled={!gatesReady[q.id]}
-                          className="w-full rounded-xl bg-[#0C151A] border border-white/[0.08] text-white p-4 outline-none focus:border-blue-400 disabled:opacity-50 disabled:cursor-not-allowed"
-                          placeholder={
-                            gatesReady[q.id]
-                              ? q.placeholder
-                              : "علّم قائمة التحقق أولاً ثم اكتب..."
-                          }
+                          className="w-full rounded-xl bg-[#0C151A] border border-white/[0.08] text-white p-4 outline-none focus:border-blue-400"
+                          placeholder={q.placeholder}
                         />
                         <div className="flex flex-wrap items-center gap-2 mt-2">
                           <button
                             onClick={() => requestHint(q)}
-                            disabled={requestingHint || !gatesReady[q.id]}
+                            disabled={requestingHint}
                             className="px-3 py-1.5 rounded-lg bg-amber-500/20 text-amber-200 border border-amber-500/30 text-xs font-bold hover:bg-amber-500/30 transition disabled:opacity-50"
                           >
                             {requestingHint ? "..." : "طلب تلميح سُقراطي"}
@@ -570,14 +542,12 @@ export function ScenarioRunner({
           <div className="mt-6 flex flex-wrap gap-3">
             <button
               onClick={submit}
-              disabled={submitting || !allGatesReady}
+              disabled={submitting}
               className="px-5 py-3 rounded-xl bg-mint text-white font-bold hover:bg-mint-soft transition disabled:opacity-50"
             >
               {submitting
                 ? "جاري التقييم..."
-                : !allGatesReady
-                  ? "أكمل قوائم التحقق أولاً"
-                  : `تحقق من المنهجية (${activeQuestions.length} أسئلة) وسجل الخطأ`
+                : `تحقق من المنهجية (${activeQuestions.length} أسئلة) وسجل الخطأ`
               }
             </button>
             <button
@@ -587,12 +557,6 @@ export function ScenarioRunner({
               إعادة من الصفر
             </button>
           </div>
-          {!allGatesReady && activeQuestions.length > 0 && (
-            <p className="mt-2 text-amber-200/80 text-xs">
-              لكل سؤال: علّم قائمة التحقق (Checklist) قبل الكتابة والإرسال.
-            </p>
-          )}
-
           {optionalQuestions.length > 0 && (
             <div className="mt-3 rounded-xl p-3 bg-white/[0.02] border border-white/[0.04] text-xs text-gray-400">
               <span className="text-red-300 font-bold">{mandatoryQuestions.length} إلزامي</span>
@@ -630,12 +594,18 @@ export function ScenarioRunner({
           )}
           {result && (
             <div className="rounded-3xl p-5 bg-[#182730] border border-white/[0.06] space-y-5">
-              <div className="flex items-center justify-between">
-                <h3 className="text-white font-bold">النتيجة الإجمالية</h3>
-                <span className="text-3xl font-bold text-white">{result.readiness}%</span>
+              <div className="flex items-center justify-between gap-3">
+                <h3 className="text-white font-bold">درجة التدريب</h3>
+                <span className="text-3xl font-bold text-white">
+                  {formatTrainingPercent(
+                    result.evaluations.every((item) => item.evaluation.ungraded),
+                    result.readiness,
+                  )}
+                </span>
               </div>
+              <p className="text-amber-200/80 text-[11px] leading-relaxed">{TRAINING_BANNER_AR}</p>
 
-              {/* Contrat Kunz — outcome honnête post-tentative */}
+              {!result.evaluations.every((item) => item.evaluation.ungraded) && (
               <div
                 className={`rounded-2xl border p-3 space-y-1 ${outcomeBannerClass(result.contract.outcome)}`}
               >
@@ -655,19 +625,17 @@ export function ScenarioRunner({
                     ? ` · ${result.contract.errorsCreated} خطأ مسجّل`
                     : ""}
                 </p>
-                {!result.contract.mayShowMasteryBadge && (
-                  <p className="text-[10px] opacity-70">
-                    لا شارة إتقان منهجية BAC (يتطلب تحدي BAC ناجح)
-                  </p>
-                )}
               </div>
+              )}
 
               {saved && (
                 <p className="text-emerald-300 text-xs font-bold">✓ تم تسجيل الأخطاء في التقدم</p>
               )}
               {saved && (
                 <p className={`text-xs ${apiSource ? "text-mint-soft" : "text-amber-300"}`}>
-                  {apiSource ? "✓ FSRS mis à jour (backend)" : "⚠ Évaluation locale (backend indisponible)"}
+                  {apiSource
+                    ? "✓ تصحيح محلي — منهج + محتوى"
+                    : "تعذر التصحيح — لا شبكة تقييم محلية."}
                 </p>
               )}
               {award && (
@@ -704,19 +672,16 @@ export function ScenarioRunner({
 
               <div className="space-y-2">
                 <p className="text-white font-bold mb-2">تفصيل سريع</p>
-                {result.evaluations.map((item) => {
-                  const status = getSeverityLabel(item.evaluation.percentage)
-                  return (
+                {result.evaluations.map((item) => (
                     <a
                       key={item.question.id}
                       href={`#scenario-correction-${item.question.id}`}
                       className="rounded-xl bg-white/[0.03] p-3 flex items-center justify-between gap-3 hover:bg-white/[0.06] transition"
                     >
                       <span className="text-gray-300 text-xs">{item.question.title}</span>
-                      <span className={`text-sm font-bold ${status.color}`}>{item.evaluation.percentage}%</span>
+                      <GradeResultCard compact model={methodologyToCard(item.evaluation)} />
                     </a>
-                  )
-                })}
+                ))}
               </div>
             </div>
           )}

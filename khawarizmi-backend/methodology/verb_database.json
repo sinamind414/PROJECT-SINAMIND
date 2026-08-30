@@ -169,6 +169,24 @@
         "Schéma illisible",
         "Légendes manquantes ou incorrectes"
       ]
+    },
+    {
+      "id": 11,
+      "arabic": "حلّل",
+      "french": "Analyser",
+      "type": "complex",
+      "max_score": 10,
+      "definition": "Présenter le document, extraire les valeurs sans cause, relation autant que, conclure selon l'objectif.",
+      "criteria": [
+        "Présentation du document",
+        "Valeurs réelles du document",
+        "Relation kullama sans parce que",
+        "Conclusion liée à l'objectif"
+      ],
+      "common_mistakes": [
+        "Interpréter trop tôt (parce que)",
+        "Chiffre inventé hors document"
+      ]
     }
   ]
 }
