@@ -210,7 +210,11 @@ export default function CorrectionPage() {
                     <span className={`text-sm ${ex.skipped ? "text-amber-400" : "text-gray-300"}`}>
                       {ex.title_ar} {ex.skipped && "(متخطى)"}
                     </span>
-                    <span className="text-white font-bold text-sm">{ex.percentage}%</span>
+                    {/* S39 (audit surfaces) — une copie « non notée » n'affiche JAMAIS 0 % :
+                        même forme que l'en-tête (— ), sinon l'élève lit un zéro. */}
+                    <span className="text-white font-bold text-sm">
+                      {formatTrainingPercent(Boolean(ex.ungraded), ex.percentage)}
+                    </span>
                   </div>
                   {ex.feedback && <p className="text-gray-500 text-xs leading-relaxed">{ex.feedback}</p>}
                 </div>

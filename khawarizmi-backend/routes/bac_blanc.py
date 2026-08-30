@@ -296,6 +296,10 @@ async def submit_bac(
             feedback = "تم تخطي هذا التمرين"
         else:
             qid = resolve_question_id(
+                # S39 (F15) — premier candidat : l'id de grille posé par l'auteur
+                # dans le sujet. Sans lui, aucun exercice de bac blanc ne peut
+                # matcher une grille git (les ids ne se recouvrent pas).
+                ex.get("grade_question_id"),
                 ex_id,
                 f"bac:{annale}:{ex_id}",
             )

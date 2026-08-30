@@ -216,7 +216,9 @@ export function ScenarioRunner({
     const questionsToSubmit = activeQuestions
 
     try {
-      const graded = await Promise.all(
+      // S39 (audit surfaces) — allSettled, pas all : une seule question qui échoue
+      // (réseau, 5xx) ne doit pas annuler les copies déjà notées du scénario.
+      const settled = await Promise.allSettled(
         questionsToSubmit.map(async (question) => {
           const questionId = question.gradeQuestionId || `${scenario.id}:${question.id}`
           const g = await apiClient.grade({
@@ -268,6 +270,15 @@ export function ScenarioRunner({
           }
           return { question, answer: answers[question.id] || "", evaluation }
         }),
+      )
+      const graded = settled.map((res, i) =>
+        res.status === "fulfilled"
+          ? res.value
+          : {
+              question: questionsToSubmit[i],
+              answer: answers[questionsToSubmit[i].id] || "",
+              evaluation: ungradedEvaluation(questionsToSubmit[i].verbSlug, "تعذر التصحيح"),
+            },
       )
       const evaluations = graded
       const gradedOnly = evaluations.filter((item) => !item.evaluation.ungraded)

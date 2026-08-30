@@ -22,6 +22,12 @@ class BacExercise(BaseModel):
     placeholder_ar: str = ""
     model_answer_ar: str = ""
     points: int = 5
+    # S39 (audit surfaces, F15) — pont vers la grille git. Sans ce champ, un sujet
+    # de bac blanc ne peut JAMAIS être corrigé : l'id de résolution était
+    # ("s1-e2", "bac:bac-svt-2025:s1-e2") alors que la grille s'appelle
+    # "bac2023-s1-ex2-analyse-traduction". L'auteur renseigne ici le `rubric_id`
+    # exact de data/rubrics/index.json ; vide => non noté (mur honnête), jamais 0.
+    grade_question_id: str = ""
 
 
 class BacSubjectDetail(BaseModel):

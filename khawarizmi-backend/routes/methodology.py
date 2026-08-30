@@ -41,7 +41,10 @@ async def evaluate_methodology_endpoint(
         result = grade_or_none(qid, req.student_answer)
         if result is not None:
             if should_count_quota(sanity_code=result.sanity_code, from_cache=False):
-                enforce_evaluate_quota(request)
+                # S38 : réponse 429 directe (jamais une levée → handler → 500).
+                over_quota = enforce_evaluate_quota(request)
+                if over_quota is not None:
+                    return over_quota
             payload = to_verb_eval(result)
             payload["banner_ar"] = TRAINING_BANNER_AR
             return payload

@@ -5,7 +5,7 @@ from __future__ import annotations
 import time
 from typing import Literal
 
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, Request
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
@@ -128,8 +128,12 @@ async def post_grade(
         document=packed.document,
     )
     if should_count_quota(sanity_code=result.sanity_code, from_cache=False):
-        # S36 : application partagée avec /api/evaluate/methodology
-        enforce_evaluate_quota(request)
+        # S36 : application partagée avec /api/evaluate/methodology.
+        # S38 : le quota RÉPOND (429 propre), il ne lève pas — sinon le handler
+        # d'erreur du statut 429 s'en mêle et l'élève en surquota reçoit un 500.
+        over_quota = enforce_evaluate_quota(request)
+        if over_quota is not None:
+            return over_quota
     if result.cacheable:
         await cache_set_async(key, result)
     record_cache(False)

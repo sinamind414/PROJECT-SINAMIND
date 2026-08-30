@@ -959,7 +959,7 @@ class KhawarizmiApiClient {
     answer: string
     surface?: "da" | "verb" | "bac"
   }): Promise<
-    | { ungraded: true; question_id: string; banner_ar?: string }
+    | { ungraded: true; question_id: string; banner_ar?: string; quota?: boolean; retry_after_s?: number }
     | {
         ungraded?: false
         rubric_id: string
@@ -1005,6 +1005,24 @@ class KhawarizmiApiClient {
         ungraded: true,
         question_id: String(data.question_id || payload.question_id),
         banner_ar: typeof data.banner_ar === "string" ? data.banner_ar : undefined,
+      }
+    }
+    if (resp.status === 429) {
+      // S39 (audit surfaces 2026-08-30) — quota de correction dépassé.
+      // Un `throw` ici faisait rejeter le Promise.all du ScenarioRunner : l'élève
+      // perdait TOUTES les notes du scénario (y compris celles déjà calculées) et
+      // voyait « تعذر التصحيح » sans savoir pourquoi. Le quota est un « non noté »
+      // honnête, pas une panne : on rend le message serveur + le délai de reprise.
+      const retry = Number(data.retry_after_s)
+      return {
+        ungraded: true,
+        question_id: String(data.question_id || payload.question_id),
+        banner_ar:
+          (typeof data.banner_ar === "string" && data.banner_ar) ||
+          (typeof data.erreur === "string" && data.erreur) ||
+          "بلغت حدّ التصحيح في هذه الساعة. ليست علامة بكالوريا رسمية.",
+        quota: true,
+        retry_after_s: Number.isFinite(retry) && retry > 0 ? retry : undefined,
       }
     }
     if (!resp.ok) {
