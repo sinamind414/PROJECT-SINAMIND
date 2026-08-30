@@ -16,7 +16,7 @@ import type { VerbEvaluateResponse, ActionVerbExercise } from "@/lib/types"
 import { VerbLessonFlow } from "@/components/methodology/VerbLessonFlow"
 import { applyVerbPracticeOutcome } from "@/lib/lesson/practiceOutcome"
 import { canScheduleRecallForVerb } from "@/lib/lesson/evidenceService"
-import { GradeResultCard, verbEvalToCard } from "@/components/methodology/GradeResultCard"
+import { NoLocalGradeWall } from "@/components/methodology/NoLocalGradeWall"
 
 export default function ActionVerbDetailPage() {
   const params = useParams()
@@ -391,91 +391,10 @@ export default function ActionVerbDetailPage() {
                   </div>
                 )}
 
-                {/* ─── Section pratique — évaluation backend ─── */}
+                {/* ─── Section pratique — pas de 422 ─── */}
                 <div className="rounded-3xl p-6 glass border border-mint/10">
                   <h2 className="text-2xl font-bold text-white mb-4">تدرب على هذا الفعل</h2>
-                  {exercises.length > 0 && (
-                    <div className="mb-4 rounded-2xl p-4 bg-white/[0.03] border border-white/[0.05]">
-                      <p className="text-mint text-xs font-bold mb-1">التمرين المقترح</p>
-                      <p className="text-gray-200 text-sm leading-relaxed">{exercises[0].question_ar}</p>
-                    </div>
-                  )}
-                  <textarea
-                    value={answer}
-                    onChange={(e) => setAnswer(e.target.value)}
-                    placeholder="اكتب إجابتك هنا..."
-                    className="w-full min-h-[120px] rounded-2xl p-4 bg-white/[0.03] border border-white/[0.08] text-white text-sm placeholder:text-gray-600 focus:border-mint/40 focus:outline-none resize-y"
-                    dir="rtl"
-                  />
-                  <button
-                    onClick={submitAnswer}
-                    disabled={loading || !answer.trim()}
-                    className="mt-3 px-6 py-3 rounded-xl bg-mint text-slate-deep font-bold hover:bg-mint-soft transition disabled:opacity-40 disabled:cursor-not-allowed"
-                  >
-                    {loading ? "جاري التقييم..." : "قيّم إجابتي"}
-                  </button>
-
-                  {evaluation && (
-                    <div className="mt-5 space-y-4">
-                      <GradeResultCard model={verbEvalToCard(evaluation)} />
-                      {!evaluation.ungraded && evaluation.allow_second_attempt && (
-                        <p className="text-amber-400 text-xs">يمكنك إعادة المحاولة</p>
-                      )}
-
-                      {evaluation.success.length > 0 && (
-                        <div className="space-y-1">
-                          {evaluation.success.map((s, i) => (
-                            <p key={i} className="text-emerald-300 text-sm">{s}</p>
-                          ))}
-                        </div>
-                      )}
-                      {evaluation.errors.length > 0 && (
-                        <div className="space-y-1">
-                          {evaluation.errors.map((e, i) => (
-                            <p key={i} className="text-red-300 text-sm">{e}</p>
-                          ))}
-                        </div>
-                      )}
-                      {evaluation.missing_markers.length > 0 && (
-                        <div className="rounded-xl p-3 bg-amber-500/10 border border-amber-500/20">
-                          <p className="text-amber-300 text-xs font-bold mb-1">كلمات مفتاحية ناقصة:</p>
-                          <div className="flex flex-wrap gap-1.5">
-                            {evaluation.missing_markers.map((m) => (
-                              <span key={m} className="px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-200 text-xs">{m}</span>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                      {evaluation.forbidden_found.length > 0 && (
-                        <div className="rounded-xl p-3 bg-red-500/10 border border-red-500/20">
-                          <p className="text-red-300 text-xs font-bold mb-1">كلمات ممنوعة مستعملة:</p>
-                          <div className="flex flex-wrap gap-1.5">
-                            {evaluation.forbidden_found.map((m) => (
-                              <span key={m} className="px-2 py-0.5 rounded-full bg-red-500/10 text-red-200 text-xs">{m}</span>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                      {evaluation.advice && (
-                        <div className="rounded-xl p-3 bg-mint/10 border border-mint/20">
-                          <p className="text-mint text-sm">{evaluation.advice}</p>
-                        </div>
-                      )}
-
-                      <div className="flex flex-wrap items-center gap-2 pt-2">
-                        <p className="text-gray-400 text-xs">قيّم صعوبة هذا الفعل:</p>
-                        <button onClick={() => markReviewed(1)} className="px-3 py-1.5 rounded-lg bg-red-500/10 text-red-300 text-xs font-bold hover:bg-red-500/20">صعب جدا</button>
-                        <button onClick={() => markReviewed(2)} className="px-3 py-1.5 rounded-lg bg-amber-500/10 text-amber-300 text-xs font-bold hover:bg-amber-500/20">صعب</button>
-                        <button onClick={() => markReviewed(3)} className="px-3 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-300 text-xs font-bold hover:bg-emerald-500/20">جيد</button>
-                        <button onClick={() => markReviewed(4)} className="px-3 py-1.5 rounded-lg bg-mint/10 text-mint text-xs font-bold hover:bg-mint/20">سهل</button>
-                      </div>
-                      {reviewBlocked && (
-                        <p className="text-amber-200/90 text-xs mt-2">
-                          FSRS مقفول — أجب أولاً بنتيجة ≥ 70٪ لفتح بوابة التكرار المتباعد.
-                        </p>
-                      )}
-                    </div>
-                  )}
+                  <NoLocalGradeWall titleAr={verb.ar} verbSlug={slug} />
                 </div>
               </section>
 

@@ -14,7 +14,7 @@ import {
   type DocumentScenarioOutcomeResult,
 } from "@/lib/lesson/practiceOutcome"
 import { CoachPanel } from "@/components/methodology/CoachPanel"
-import { MethodPracticeGate } from "@/components/methodology/MethodPracticeGate"
+import { NoLocalGradeWall } from "@/components/methodology/NoLocalGradeWall"
 import { SessionExitButton } from "@/components/methodology/SessionExitButton"
 import {
   GradeResultCard,
@@ -186,10 +186,9 @@ export function ScenarioRunner({
   }>>({})
 
   const [enabledOptional, setEnabledOptional] = useState<Record<string, boolean>>({})
-  /** Checklist prête par question (gate méthodologique) */
-  const [gatesReady, setGatesReady] = useState<Record<string, boolean>>({})
 
   const questions = getActiveQuestions(scenario, chapterLink)
+  const hasLocal = questions.some((q) => Boolean(q.gradeQuestionId))
 
   const mandatoryQuestions = questions.filter((q) => q.mandatory)
   const optionalQuestions = questions.filter((q) => !q.mandatory)
@@ -199,14 +198,6 @@ export function ScenarioRunner({
   )
 
   const completedCount = activeQuestions.filter((q) => (answers[q.id] || "").trim().length > 0).length
-
-  const allGatesReady =
-      activeQuestions.length > 0 &&
-      activeQuestions.every((q) => gatesReady[q.id] === true)
-
-  function setGateReady(qId: string, ready: boolean) {
-    setGatesReady((prev) => (prev[qId] === ready ? prev : { ...prev, [qId]: ready }))
-  }
 
   function toggleOptional(qId: string) {
     setEnabledOptional((prev) => ({ ...prev, [qId]: !prev[qId] }))
@@ -218,7 +209,7 @@ export function ScenarioRunner({
   }
 
   async function submit() {
-    if (!allGatesReady) return
+    if (!hasLocal) return
     setSubmitting(true)
     const chapterSlug: string | null = chapterLink?.slug ?? null
 
@@ -354,7 +345,10 @@ export function ScenarioRunner({
     setAward(null)
     setApiSource(false)
     setHints({})
-    setGatesReady({})
+  }
+
+  if (!hasLocal) {
+    return <NoLocalGradeWall titleAr={scenario.title} verbSlug={questions[0]?.verbSlug} />
   }
 
   return (
@@ -431,27 +425,17 @@ export function ScenarioRunner({
                       <p className="text-gray-300 text-sm mt-2 leading-relaxed">{q.prompt}</p>
                     </div>
                   </div>
-                  <MethodPracticeGate
-                    verbSlug={q.verbSlug}
-                    compact
-                    onGateChange={(ready) => setGateReady(q.id, ready)}
-                  />
                   <textarea
                     value={answers[q.id] || ""}
                     onChange={(e) => updateAnswer(q.id, e.target.value)}
                     rows={4}
-                    disabled={!gatesReady[q.id]}
-                    className="w-full rounded-xl bg-[#0C151A] border border-white/[0.08] text-white p-4 outline-none focus:border-red-400 disabled:opacity-50 disabled:cursor-not-allowed"
-                    placeholder={
-                      gatesReady[q.id]
-                        ? q.placeholder
-                        : "علّم قائمة التحقق أولاً ثم اكتب..."
-                    }
+                    className="w-full rounded-xl bg-[#0C151A] border border-white/[0.08] text-white p-4 outline-none focus:border-red-400"
+                    placeholder={q.placeholder}
                   />
                   <div className="flex flex-wrap items-center gap-2 mt-2">
                     <button
                       onClick={() => requestHint(q)}
-                      disabled={requestingHint || !gatesReady[q.id]}
+                      disabled={requestingHint}
                       className="px-3 py-1.5 rounded-lg bg-amber-500/20 text-amber-200 border border-amber-500/30 text-xs font-bold hover:bg-amber-500/30 transition disabled:opacity-50"
                     >
                       {requestingHint ? "..." : "طلب تلميح سُقراطي"}
@@ -522,27 +506,17 @@ export function ScenarioRunner({
                     {isEnabled ? (
                       <>
                         <p className="text-gray-300 text-sm mb-3 leading-relaxed">{q.prompt}</p>
-                        <MethodPracticeGate
-                          verbSlug={q.verbSlug}
-                          compact
-                          onGateChange={(ready) => setGateReady(q.id, ready)}
-                        />
                         <textarea
                           value={answers[q.id] || ""}
                           onChange={(e) => updateAnswer(q.id, e.target.value)}
                           rows={4}
-                          disabled={!gatesReady[q.id]}
-                          className="w-full rounded-xl bg-[#0C151A] border border-white/[0.08] text-white p-4 outline-none focus:border-blue-400 disabled:opacity-50 disabled:cursor-not-allowed"
-                          placeholder={
-                            gatesReady[q.id]
-                              ? q.placeholder
-                              : "علّم قائمة التحقق أولاً ثم اكتب..."
-                          }
+                          className="w-full rounded-xl bg-[#0C151A] border border-white/[0.08] text-white p-4 outline-none focus:border-blue-400"
+                          placeholder={q.placeholder}
                         />
                         <div className="flex flex-wrap items-center gap-2 mt-2">
                           <button
                             onClick={() => requestHint(q)}
-                            disabled={requestingHint || !gatesReady[q.id]}
+                            disabled={requestingHint}
                             className="px-3 py-1.5 rounded-lg bg-amber-500/20 text-amber-200 border border-amber-500/30 text-xs font-bold hover:bg-amber-500/30 transition disabled:opacity-50"
                           >
                             {requestingHint ? "..." : "طلب تلميح سُقراطي"}
@@ -568,14 +542,12 @@ export function ScenarioRunner({
           <div className="mt-6 flex flex-wrap gap-3">
             <button
               onClick={submit}
-              disabled={submitting || !allGatesReady}
+              disabled={submitting}
               className="px-5 py-3 rounded-xl bg-mint text-white font-bold hover:bg-mint-soft transition disabled:opacity-50"
             >
               {submitting
                 ? "جاري التقييم..."
-                : !allGatesReady
-                  ? "أكمل قوائم التحقق أولاً"
-                  : `تحقق من المنهجية (${activeQuestions.length} أسئلة) وسجل الخطأ`
+                : `تحقق من المنهجية (${activeQuestions.length} أسئلة) وسجل الخطأ`
               }
             </button>
             <button
@@ -585,12 +557,6 @@ export function ScenarioRunner({
               إعادة من الصفر
             </button>
           </div>
-          {!allGatesReady && activeQuestions.length > 0 && (
-            <p className="mt-2 text-amber-200/80 text-xs">
-              لكل سؤال: علّم قائمة التحقق (Checklist) قبل الكتابة والإرسال.
-            </p>
-          )}
-
           {optionalQuestions.length > 0 && (
             <div className="mt-3 rounded-xl p-3 bg-white/[0.02] border border-white/[0.04] text-xs text-gray-400">
               <span className="text-red-300 font-bold">{mandatoryQuestions.length} إلزامي</span>

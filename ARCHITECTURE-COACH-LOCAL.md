@@ -747,6 +747,7 @@ S5  mixins chapitre + $lex: extrait fichier  (condition de survie L1)
 | S29 proclitique `كال` | **OUI** | `كالخميرة` matche `خميرة`. Liste fermée. Pas `فل`. Expansion needle. `1.1.7`. |
 | L0 UI hub `gradeQuestionId` | **OUI** | 10/10 ids visibles (6 cartes). Tableaux = keypoints git. **Pas** d’alias `enzyme-activity-v1` → `enzyme-temp`. Moteur `1.1.7` inchangé. |
 | Honnêteté chemin élève | **OUI** | Pas de `modelAnswer` après note. Hub : cartes locales vs « بدون شبكة ». 24 verbes : 0 `قيّم` (lien L0, pas 422). Yeast `4 سا` **hors** keypoints (`1.0.1`). Ateliers restent 0 % + CTA juge. |
+| HON-2 tuer théâtre | **OUI** | Hub = cartes `gradeQuestionId` seulement. Diagnostic / bac blanc / DA sans grille = mur تعذر. Checklist **ne bloque plus** `grade()`. Moteur `1.1.7`. |
 
 **Gates :**
 - S0 → S1 : G9, G10 verts (même sans grader) — **contourné volontairement** le 2026-08-27 : S1 = moteur **testable hors prod**, pas une mise en ligne. Le gate redevient bloquant le jour où `LOCAL_RUBRIC_GRADER=true`.
