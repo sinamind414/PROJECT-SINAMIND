@@ -259,3 +259,9 @@ réglages de rappel et de garde-fous, pas des mensonges de note — sauf F1 qui
 **État final : 229 tests grade ✓ / 0 ✗ · 87 tests methodology ✓ · 13 grilles valides · moteur `1.2.0`.**
 
 Tous les findings F1–F10 de l'audit sont fermés.
+
+**F11 (découvert à l'ouverture de la PR #17) :** les triggers de `ci.yml` ciblent
+`push: [main, fabuleux/*]` et `pull_request: [main]` alors que la branche de prod
+est **master** → la CI ne tourne ni sur les PR vers master, ni sur push master
+(master restait rouge sans le voir). Correctif inclus dans `docs/ci-grader-tests.job.yml`
+(ajouter `master` aux deux triggers + job grader-tests).

@@ -1,3 +1,18 @@
+# ── PATCH CI à coller au merge (F6 + F11, audit 2026-08-30) ──────────────────
+# Le token de la session d'audit n'a pas la permission `workflows` : ce patch
+# est versionné ici et doit être appliqué à .github/workflows/ci.yml.
+#
+# 1) TRIGGERS (F11 — la CI ne se déclenche PAS sur les PR vers master aujourd'hui) :
+#
+#    on:
+#      push:
+#        branches: [master, main, fabuleux/*]     # ← ajouter master
+#      pull_request:
+#        branches: [master, main]                 # ← ajouter master
+#
+# 2) JOB grader-tests (F6) : coller le bloc ci-dessous entre backend-tests
+#    et frontend-tests (même niveau d'indentation : 2 espaces).
+# ─────────────────────────────────────────────────────────────────────────────
   grader-tests:
     # S31-F6 (audit 2026-08-30) : le suite grade (0 LLM) et la validation
     # des grilles git doivent bloquer le merge — pas seulement methodology.
