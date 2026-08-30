@@ -315,6 +315,7 @@ S28 FSRS pas sur cache hit (idempotence) ; hors grade() ; 1.1.6                 
 S29 proclitique كال (كالخميرة) ; liste fermée ; 1.1.7 ; pas فل / pas stemming            ← FAIT
 L1 UI  gradeQuestionId → bac2023-s1-ex2-analyse-traduction (ScenarioRunner)            ← FAIT
 L0 UI  10/10 ids sur le hub DA (6 cartes, keypoints JSON, 0 alias enzyme-pH)          ← FAIT
+HON UI modèle masqué après note ; hub local vs théâtre ; verbes → cartes L0 ; yeast 4 hors keypoints ← FAIT
 ```
 
 **Brancher S2 sans tuer le fallback front = deux notes. Interdit.**

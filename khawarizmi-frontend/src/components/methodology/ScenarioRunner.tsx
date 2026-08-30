@@ -104,9 +104,11 @@ function CorrectionCard({
             <p className="text-gray-300 text-sm leading-relaxed">تعذر التصحيح — لا شبكة تقييم محلية لهذه السؤال.</p>
           </div>
         ) : (
-          <div className="rounded-2xl p-4 bg-emerald-500/10 border border-emerald-500/20">
-            <p className="text-emerald-300 text-xs font-bold mb-2">تصحيح نموذجي مرتبط بالوثائق</p>
-            <p className="text-gray-100 text-sm leading-relaxed whitespace-pre-wrap">{item.question.modelAnswer}</p>
+          <div className="rounded-2xl p-4 bg-white/[0.03] border border-white/[0.05]">
+            <p className="text-gray-400 text-xs font-bold mb-2">بدون نموذج كامل</p>
+            <p className="text-gray-300 text-sm leading-relaxed">
+              الخانات أعلاه = الحكم. لا نعرض إجابة نموذجية بعد التصحيح (منع النسخ).
+            </p>
           </div>
         )}
       </div>

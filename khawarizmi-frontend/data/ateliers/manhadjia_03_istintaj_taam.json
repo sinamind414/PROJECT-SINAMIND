@@ -262,6 +262,7 @@
   ],
   "cta_fin": "خلصنا استنتج.",
   "lien_suivant": { "label": "غدوة: علّل — حجة + لأن + نعلم أن", "href": "/manhadjia/allil" },
+  "lien_juge": { "label": "نسخة محكومة: طعم LTc · استنتج (مصحح محلي)", "href": "/document-analysis/l0-greffe-ltc" },
   "verb_ref": {
     "id": 6,
     "arabic": "استنتج",

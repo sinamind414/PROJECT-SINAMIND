@@ -124,7 +124,34 @@ export default function DocumentAnalysisHubPage() {
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {methodologyScenarios.map((scenario) => {
+        {methodologyScenarios.filter(scenarioHasLocalGrade).map((scenario) => {
+          const href = `/document-analysis/${scenario.id}`
+          const emoji = UNIT_EMOJIS[scenario.unitKey] || "📚"
+
+          return (
+            <Link
+              key={scenario.id}
+              href={href}
+              className="rounded-2xl p-5 transition-all duration-200 hover:-translate-y-0.5"
+              style={{ background: "#131E24" }}
+            >
+              <div className="text-3xl mb-3">{emoji}</div>
+              <h3 className="text-white font-bold text-sm mb-1">{scenario.title}</h3>
+              <p className="text-gray-500 text-xs mb-2">{scenario.unitKey}</p>
+              <p className="text-gray-400 text-xs leading-relaxed line-clamp-2">{scenario.contextAr}</p>
+              <div className="mt-3 flex items-center gap-3 text-xs text-gray-500">
+                <span>📄 {scenario.documents.length} وثائق</span>
+                <span>❓ {scenario.questions.length} أسئلة</span>
+                <PillChip label="مصحح محلي" color="#FBBF24" bg="rgba(251,191,36,0.12)" />
+              </div>
+            </Link>
+          )
+        })}
+      </div>
+
+      <p className="text-gray-500 text-xs mt-8 mb-2">بدون شبكة تقييم — تعذر التصحيح، ليست صفراً.</p>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 opacity-80">
+        {methodologyScenarios.filter((s) => !scenarioHasLocalGrade(s)).map((scenario) => {
           const isDiagnostic = scenario.id === "gene-expression-protein-disorder-v1"
           const href = isDiagnostic ? "/diagnostic/global" : `/document-analysis/${scenario.id}`
           const emoji = UNIT_EMOJIS[scenario.unitKey] || "📚"
@@ -146,9 +173,7 @@ export default function DocumentAnalysisHubPage() {
                 {isDiagnostic && (
                   <PillChip label="تشخيص" color="#5EEAD4" bg="rgba(45,212,191,0.12)" />
                 )}
-                {scenario.id === "bac2023-s1-ex2-analyse-traduction" && (
-                  <PillChip label="مصحح محلي" color="#FBBF24" bg="rgba(251,191,36,0.12)" />
-                )}
+                <PillChip label="بدون شبكة" color="#94A3B8" bg="rgba(148,163,184,0.12)" />
               </div>
             </Link>
           )

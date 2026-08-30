@@ -118,6 +118,20 @@ def test_interpret_verb_slip_kullama_without_cause():
     assert r.diagnosis.code == "verb_slip.analyse"
 
 
+def test_yeast_four_hours_is_not_a_keypoint():
+    packed = load("manhadjiya-yeast-analyse")
+    assert packed is not None
+    assert all(k.value != 4 for k in packed.document.keypoints)
+    copy = (
+        "تمثل الوثيقة جدولا لعدد خلايا الخميرة. "
+        "المدة 4 ساعات. كلما تواجد الغلوكوز تزايد العدد. "
+        "نستنتج أن الغلوكوز عنصر ضروري لنمو وتكاثر فطر الخميرة."
+    )
+    r = grade(student_answer=copy, rubric=packed.rubric, document=packed.document)
+    kp = next(h for h in r.criteria if h.id == "keypoint")
+    assert kp.status != "full"
+
+
 def test_disorder_yeast_not_mastered():
     packed = load("manhadjiya-yeast-analyse")
     assert packed is not None

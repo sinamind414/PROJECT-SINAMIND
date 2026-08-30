@@ -16,6 +16,7 @@ import {
 import { CoachPanel } from "@/components/methodology/CoachPanel"
 import { SessionExitButton } from "@/components/methodology/SessionExitButton"
 import { GradeResultCard, verbEvalToCard } from "@/components/methodology/GradeResultCard"
+import { localGradeLinksForVerb } from "@/lib/methodology-documents"
 
 type Step = "word" | "definition" | "recognition" | "method" | "dos_donts" | "practice"
 
@@ -82,7 +83,6 @@ function buildLesson(verb: EnrichedActionVerbRule) {
 
 export function VerbLessonFlow({ 
   enriched, 
-  onSubmitAnswer, 
   evaluation, 
   loading, 
   answer, 
@@ -150,11 +150,6 @@ export function VerbLessonFlow({
         : `❌ غير صحيح. هذا مثال على خطأ شائع مع هذا الفعل.`
     )
     if (isCorrect) setTimeout(next, 1100)
-  }
-
-  async function handlePracticeSubmit() {
-    if (!answer.trim() || !methodReady) return
-    await onSubmitAnswer(answer)
   }
 
   function computeLiveSegments(text: string) {
@@ -515,17 +510,40 @@ export function VerbLessonFlow({
             <div className="mt-2 text-[10px] text-gray-500">Vert = marqueurs requis détectés • Rouge = mots interdits</div>
           </div>
         )}
+        {localGradeLinksForVerb(enriched.slug).length > 0 ? (
+          <div className="mt-4 rounded-2xl p-4 bg-amber-500/10 border border-amber-500/20 space-y-3">
+            <p className="text-amber-100 text-sm leading-relaxed">
+              هذه الصفحة تعلّم الفعل. لا شبكة تقييم هنا (منع 422 و منع نسخة بلا وثيقة). صحّح على بطاقة مصحح محلي:
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {localGradeLinksForVerb(enriched.slug).map((link) => (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  className="px-3 py-2 rounded-xl bg-mint text-slate-deep text-xs font-bold hover:bg-mint-soft"
+                >
+                  {link.labelAr}
+                </a>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <div className="mt-4 rounded-2xl p-4 bg-amber-500/10 border border-amber-500/20">
+            <p className="text-amber-100 text-sm leading-relaxed">
+              لا شبكة تقييم محلية لهذا الفعل. ليست صفراً — تعذر التصحيح. تمرّن على بطاقة مصحح محلي.
+            </p>
+            <a href="/document-analysis" className="inline-block mt-3 px-3 py-2 rounded-xl bg-mint text-slate-deep text-xs font-bold">
+              بنك المصحح المحلي
+            </a>
+          </div>
+        )}
         <div className="flex gap-3 mt-4 items-center">
           <button
-            onClick={handlePracticeSubmit}
-            disabled={loading || !answer.trim() || !methodReady}
-            className="flex-1 py-4 rounded-2xl bg-mint font-bold text-lg text-slate-deep disabled:opacity-60"
+            type="button"
+            disabled
+            className="flex-1 py-4 rounded-2xl bg-white/10 font-bold text-lg text-gray-400 cursor-not-allowed"
           >
-            {loading
-              ? "جاري التقييم..."
-              : !methodReady
-                ? "أكمل قائمة التحقق أولاً"
-                : "قيّم إجابتي الآن"}
+            لا تقييم على هذه الصفحة
           </button>
           <button onClick={toggleVoice} disabled={loading} className={`px-4 py-4 rounded-2xl border flex items-center justify-center transition ${isListening ? "bg-red-500/20 border-red-400 text-red-400" : "bg-white/5 border-white/20 hover:bg-white/10 text-white"}`} title={isListening ? "Arrêter l'écoute" : "Dicter avec la voix (arabe/français)"}>
             {isListening ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}

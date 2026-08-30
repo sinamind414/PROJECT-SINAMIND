@@ -1804,9 +1804,8 @@ export const l0YeastGlucoseScenario: MethodologyScenario = {
       columns: ["الملاحظة (الوثيقة)", "القيمة"],
       rows: [
         { cells: ["عدد الخلايا عند 0 سا", "9"] },
-        { tone: "success", cells: ["عدد الخلايا مع غلوكوز عند 4 سا", "18"] },
+        { tone: "success", cells: ["عدد الخلايا مع غلوكوز (الذروة)", "18"] },
         { tone: "danger", cells: ["عدد الخلايا بدون غلوكوز", "6"] },
-        { cells: ["المدة", "4 سا"] },
       ],
     },
   ],
@@ -2127,6 +2126,33 @@ export function scenarioHasLocalGrade(scenario: MethodologyScenario): boolean {
   return scenario.questions.some((q) => Boolean(q.gradeQuestionId))
 }
 
+/** Pages verbe / atelier : lien vers une copie jugée. Jamais d’alias DA. */
+export type LocalGradeLink = { href: string; labelAr: string }
+
+const LOCAL_GRADE_LINKS_BY_VERB: Record<string, LocalGradeLink[]> = {
+  analyse: [
+    { href: "/document-analysis/l0-yeast-glucose", labelAr: "خميرة · حلّل" },
+    { href: "/document-analysis/l0-greffe-ltc", labelAr: "طعم LTc · حلّل" },
+    { href: "/document-analysis/l0-enzyme-temp", labelAr: "إنزيم حرارة · حلّل" },
+    { href: "/document-analysis/l0-photo-o2", labelAr: "O₂ · حلّل" },
+    { href: "/document-analysis/bac2023-s1-ex2-analyse-traduction", labelAr: "Bac 2023 ML901 · حلّل" },
+  ],
+  interpret: [
+    { href: "/document-analysis/l0-yeast-glucose", labelAr: "خميرة · فسّر" },
+    { href: "/document-analysis/l0-greffe-ltc", labelAr: "طعم LTc · فسّر" },
+    { href: "/document-analysis/l0-enzyme-temp", labelAr: "إنزيم حرارة · فسّر" },
+  ],
+  deduce: [
+    { href: "/document-analysis/l0-greffe-ltc", labelAr: "طعم LTc · استنتج" },
+    { href: "/document-analysis/l0-synapse-curare", labelAr: "كورار · استنتج" },
+  ],
+  "scientific-text": [{ href: "/document-analysis/l0-proteine-adn", labelAr: "نص علمي · ADN → بروتين" }],
+}
+
+export function localGradeLinksForVerb(verbSlug: string): LocalGradeLink[] {
+  return LOCAL_GRADE_LINKS_BY_VERB[verbSlug] ?? []
+}
+
 export const methodologyScenarios: MethodologyScenario[] = [
   bac2023Ml901Scenario,
   l0YeastGlucoseScenario,
@@ -2149,5 +2175,8 @@ export const methodologyScenarios: MethodologyScenario[] = [
 ]
 
 export function getMethodologyScenario(id: string) {
+  return methodologyScenarios.find((scenario) => scenario.id === id)
+}
+) {
   return methodologyScenarios.find((scenario) => scenario.id === id)
 }

@@ -163,6 +163,9 @@ export function BacBlancImmersif({ annaleSlug }: { annaleSlug: string }) {
             <div className="flex justify-between"><span className="text-gray-400 text-sm">التمارين</span><span className="text-white font-bold">4 لكل موضوع</span></div>
           </div>
           <p className="text-amber-300/70 text-xs">بعد الدخول لا يمكن العودة. اختر الموضوع بعناية.</p>
+          <p className="text-amber-200/80 text-xs leading-relaxed">
+            لا شبكة تقييم محلية لهذا الامتحان — النتيجة ستكون «تعذر التصحيح» وليس صفراً. ليست علامة بكالوريا رسمية.
+          </p>
           <button onClick={enterExam} disabled={loading} className="px-8 py-3 rounded-xl bg-mint text-white font-bold hover:bg-mint-soft transition disabled:opacity-50">
             {loading ? "..." : "ادخل إلى قاعة الامتحان"}
           </button>
@@ -313,7 +316,9 @@ export function BacBlancImmersif({ annaleSlug }: { annaleSlug: string }) {
           {submitResult.scores_by_exercise.map((ex) => (
             <div key={ex.exercise_id} className="flex items-center justify-between">
               <span className={`text-sm ${ex.skipped ? "text-amber-400" : "text-gray-300"}`}>{ex.title_ar} {ex.skipped && "(متخطّى)"}</span>
-              <span className="text-white font-bold text-sm">{ex.percentage}%</span>
+              <span className="text-white font-bold text-sm">
+                {ex.ungraded ? "—" : `${ex.percentage}%`}
+              </span>
             </div>
           ))}
         </div>

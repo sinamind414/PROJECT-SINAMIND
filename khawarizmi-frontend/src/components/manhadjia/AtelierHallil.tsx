@@ -283,6 +283,17 @@ export function AtelierHallil({ data, onReplay }: Props) {
           </button>
 
           {/* Un seul lien, en bas du miroir, après envoi : bootcamp J→J+1 */}
+          {data.lien_juge && (
+            <div className="pt-1 text-center">
+              <Link
+                href={data.lien_juge.href}
+                className="inline-block min-h-12 px-4 py-3 text-sm font-black text-mint underline underline-offset-4 hover:text-mint-soft"
+                dir="rtl"
+              >
+                {data.lien_juge.label}
+              </Link>
+            </div>
+          )}
           {data.lien_suivant && (
             <div className="pt-1 text-center">
               <Link
