@@ -1,0 +1,5 @@
+{
+  "verb_slug": "compare",
+  "cases": ["object", "keypoint", "parallel", "conclusion"],
+  "notes_ar": "قارن: عنصران في جملة + رقم حقيقي + بينما/في حين + خلاصة. ليس فقرتين منفصلتين."
+}

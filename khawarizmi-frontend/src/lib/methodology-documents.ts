@@ -1793,7 +1793,7 @@ export const l0YeastGlucoseScenario: MethodologyScenario = {
   title: "خميرة + غلوكوز (حلّل / فسّر)",
   subtitle: "تدريب محلي L0 — مصحح git",
   contextAr:
-    "وثيقة واحدة. الأرقام من DocumentModel: 9 و 18 و 6 و 4 سا. حلّل بلا لأن. فسّر بـ لأن. ليست علامة بكالوريا رسمية.",
+    "وثيقة واحدة. الأرقام من DocumentModel: 9 و 18 و 6. المدة 4 سا ليست مفتاحا. حلّل بلا لأن. فسّر بـ لأن. ليست علامة بكالوريا رسمية.",
   dominantSkills: ["analyse", "interpret"],
   documents: [
     {
@@ -1846,11 +1846,11 @@ export const l0YeastGlucoseScenario: MethodologyScenario = {
 export const l0GreffeLtcScenario: MethodologyScenario = {
   id: "l0-greffe-ltc",
   unitKey: "المناعة الخلوية · تدريب محلي",
-  title: "رفض الطعم و LTc (حلّل / فسّر / استنتج)",
+  title: "رفض الطعم و LTc (حلّل / فسّر / استنتج / علّل / قارن)",
   subtitle: "تدريب محلي L0 — مصحح git",
   contextAr:
     "وثيقة واحدة. الأرقام: رفض 10 أيام ثم 5 · ذروة LTc 2,5 ثم 4,8. ليست علامة بكالوريا رسمية.",
-  dominantSkills: ["analyse", "interpret", "deduce"],
+  dominantSkills: ["analyse", "interpret", "deduce", "justify", "compare"],
   documents: [
     {
       type: "table",
@@ -1909,6 +1909,34 @@ export const l0GreffeLtcScenario: MethodologyScenario = {
       placeholder: "نستنتج أن… خلوية… الدليل LTc…",
       modelAnswer: "نستنتج أن الاستجابة المتدخلة خلوية. الدليل: ارتفاع الـ LTc يواكب الرفض، والرفض يمس خلايا الطعم.",
       learningFocus: "استنتج جملة قصيرة: خلوية + دليل LTc. ليست علامة بكالوريا /20.",
+      mandatory: true,
+    },
+    {
+      id: "justify",
+      gradeQuestionId: "greffe-ltc-justify",
+      verbSlug: "justify",
+      n: 4,
+      title: "تعليل التسارع",
+      skill: "علّل",
+      docRef: "5 بدل 10",
+      prompt: "علّل تسارع رفض الطعم الثاني انطلاقا من الوثيقة ومكتسباتك.",
+      placeholder: "رُفض في 5 أيام… نعلم أن… لأن…",
+      modelAnswer: "",
+      learningFocus: "علّل: رقم + لأن + نعلم أن. ليست علامة بكالوريا /20.",
+      mandatory: true,
+    },
+    {
+      id: "compare",
+      gradeQuestionId: "greffe-ltc-compare",
+      verbSlug: "compare",
+      n: 5,
+      title: "مقارنة الطعمين",
+      skill: "قارن",
+      docRef: "10 / 5 · 2,5 / 4,8",
+      prompt: "قارن رفض الطعم الأول ورفض الطعم الثاني (الزمن وذروة LTc).",
+      placeholder: "يُرفض الأول في 10 بينما الثاني في 5…",
+      modelAnswer: "",
+      learningFocus: "قارن بالتوازي: بينما / في حين + رقم. ليست علامة بكالوريا /20.",
       mandatory: true,
     },
   ],
@@ -2175,8 +2203,5 @@ export const methodologyScenarios: MethodologyScenario[] = [
 ]
 
 export function getMethodologyScenario(id: string) {
-  return methodologyScenarios.find((scenario) => scenario.id === id)
-}
-) {
   return methodologyScenarios.find((scenario) => scenario.id === id)
 }

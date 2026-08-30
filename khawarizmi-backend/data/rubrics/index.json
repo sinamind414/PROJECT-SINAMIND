@@ -31,6 +31,14 @@
     "rubric": "rubrics/questions/greffe-ltc-deduce.v1.json",
     "document": "documents/greffe-ltc.v1.json"
   },
+  "greffe-ltc-justify": {
+    "rubric": "rubrics/questions/greffe-ltc-justify.v1.json",
+    "document": "documents/greffe-ltc.v1.json"
+  },
+  "greffe-ltc-compare": {
+    "rubric": "rubrics/questions/greffe-ltc-compare.v1.json",
+    "document": "documents/greffe-ltc.v1.json"
+  },
   "synapse-curare-deduce": {
     "rubric": "rubrics/questions/synapse-curare-deduce.v1.json",
     "document": "documents/synapse-curare.v1.json"

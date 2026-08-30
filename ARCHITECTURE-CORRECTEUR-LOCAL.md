@@ -224,7 +224,7 @@ sanity.*  >  off_topic  >  science.grave  >  verb_slip.*
 
 ---
 
-## 5. Données L0 (10 grilles)
+## 5. Données L0 (13 grilles)
 
 | `question_id` | Verbe | Doc | /pts |
 |---|---|---|---|
@@ -236,6 +236,8 @@ sanity.*  >  off_topic  >  science.grave  >  verb_slip.*
 | `yeast-glucose-interpret` | فسّر | 18 vs 6 لأن أيض | 4 |
 | `enzyme-temp-interpret` | فسّر | لأن تمسخ | 4 |
 | `greffe-ltc-deduce` | استنتج | خلوية + LTc | 3 |
+| `greffe-ltc-justify` | علّل | رقم + لأن + نعلم أن (نفس 10/5) | 4 |
+| `greffe-ltc-compare` | قارن | 10 مقابل 5 · بينما | 4 |
 | `synapse-curare-deduce` | استنتج | كورار / Ach | 3 |
 | `proteine-adn-scientific-text` | نص | intro / نسخ / ترجمة / خاتمة | 5 |
 | `bac2023-s1-ex2-analyse-traduction` | حلّل **L1** | ML901 : 100 / 1,5 / 5 — يثبط الترجمة | 4 |
@@ -317,6 +319,7 @@ L1 UI  gradeQuestionId → bac2023-s1-ex2-analyse-traduction (ScenarioRunner)   
 L0 UI  10/10 ids sur le hub DA (6 cartes, keypoints JSON, 0 alias enzyme-pH)          ← FAIT
 HON UI modèle masqué après note ; hub local vs théâtre ; verbes → cartes L0 ; yeast 4 hors keypoints ← FAIT
 HON-2 tuer théâtre chemin élève (hub local only, diagnostic/bac wall, gate hors grade) ← FAIT
+L0+ علّل/قارن sur greffe-ltc (mêmes 10/5/2,5/4,8 — 0 Y)                              ← FAIT
 ```
 
 **Brancher S2 sans tuer le fallback front = deux notes. Interdit.**
