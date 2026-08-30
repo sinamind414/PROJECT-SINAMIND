@@ -1783,6 +1783,297 @@ const subductionCollisionRidgeScenario: MethodologyScenario = {
   ],
 }
 
+/** L0 — tableaux = keypoints DocumentModel seulement. Pas de courbe inventée. Pas d’alias DA. */
+const L0_TABLE_CAPTION =
+  "أرقام DocumentModel فقط. ليست إعادة رسم للمنحنى. درجة تدريب — ليست علامة بكالوريا رسمية."
+
+export const l0YeastGlucoseScenario: MethodologyScenario = {
+  id: "l0-yeast-glucose",
+  unitKey: "تنفس الخميرة · تدريب محلي",
+  title: "خميرة + غلوكوز (حلّل / فسّر)",
+  subtitle: "تدريب محلي L0 — مصحح git",
+  contextAr:
+    "وثيقة واحدة. الأرقام من DocumentModel: 9 و 18 و 6 و 4 سا. حلّل بلا لأن. فسّر بـ لأن. ليست علامة بكالوريا رسمية.",
+  dominantSkills: ["analyse", "interpret"],
+  documents: [
+    {
+      type: "table",
+      id: "doc-yeast-glucose-keypoints",
+      title: "عدد خلايا الخميرة — أرقام الوثيقة",
+      caption: L0_TABLE_CAPTION,
+      columns: ["الملاحظة (الوثيقة)", "القيمة"],
+      rows: [
+        { cells: ["عدد الخلايا عند 0 سا", "9"] },
+        { tone: "success", cells: ["عدد الخلايا مع غلوكوز عند 4 سا", "18"] },
+        { tone: "danger", cells: ["عدد الخلايا بدون غلوكوز", "6"] },
+        { cells: ["المدة", "4 سا"] },
+      ],
+    },
+  ],
+  questions: [
+    {
+      id: "analyse",
+      gradeQuestionId: "manhadjiya-yeast-analyse",
+      verbSlug: "analyse",
+      n: 1,
+      title: "تحليل الجدول",
+      skill: "حلّل",
+      docRef: "الخميرة · 9 / 18 / 6",
+      prompt: "حلّل تغيرات عدد خلايا الخميرة بدلالة الزمن في الوسط الذي يحتوي على الغلوكوز والوسط الذي يخلو منه.",
+      placeholder: "تمثل الوثيقة جدولا… مع الغلوكوز… بدون غلوكوز… كلما… نستنتج…",
+      modelAnswer:
+        "تمثل الوثيقة جدولا يوضح تغيرات عدد خلايا الخميرة بدلالة الزمن في الوسط الذي يحتوي على الغلوكوز والوسط الذي يخلو منه. في الوسط مع الغلوكوز يزداد العدد من 9 إلى 18 خلية. في الوسط بدون غلوكوز يتناقص من 9 إلى 6 ثم يثبت. فكلما تواجد الغلوكوز تزايد عدد الخلايا والعكس صحيح. نستنتج أن الغلوكوز عنصر ضروري لنمو وتكاثر فطر الخميرة.",
+      learningFocus: "حلّل: وثيقة + رقم (9 أو 18 أو 6) + كلما بلا لأن. ليست علامة بكالوريا /20.",
+      mandatory: true,
+    },
+    {
+      id: "interpret",
+      gradeQuestionId: "yeast-glucose-interpret",
+      verbSlug: "interpret",
+      n: 2,
+      title: "تفسير الفرق",
+      skill: "فسّر",
+      docRef: "18 مقابل 6",
+      prompt: "فسّر لماذا يبلغ عدد الخلايا 18 مع الغلوكوز مقابل 6 بدونه.",
+      placeholder: "يبلغ العدد 18 مقابل 6 لأن… مادة أيض…",
+      modelAnswer:
+        "يبلغ عدد الخلايا 18 مع الغلوكوز مقابل 6 بدونه لأن الغلوكوز مادة أيض توفر طاقة للتنفس فتتكاثر الخميرة. لذلك يرتبط النمو بتوفر الغلوكوز.",
+      learningFocus: "فسّر يحتاج لأن + مكتسب (أيض / طاقة / تنفس). ليست علامة بكالوريا /20.",
+      mandatory: true,
+    },
+  ],
+}
+
+export const l0GreffeLtcScenario: MethodologyScenario = {
+  id: "l0-greffe-ltc",
+  unitKey: "المناعة الخلوية · تدريب محلي",
+  title: "رفض الطعم و LTc (حلّل / فسّر / استنتج)",
+  subtitle: "تدريب محلي L0 — مصحح git",
+  contextAr:
+    "وثيقة واحدة. الأرقام: رفض 10 أيام ثم 5 · ذروة LTc 2,5 ثم 4,8. ليست علامة بكالوريا رسمية.",
+  dominantSkills: ["analyse", "interpret", "deduce"],
+  documents: [
+    {
+      type: "table",
+      id: "doc-greffe-ltc-keypoints",
+      title: "رفض الطعم وذروة LTc — أرقام الوثيقة",
+      caption: L0_TABLE_CAPTION,
+      columns: ["الملاحظة (الوثيقة)", "القيمة"],
+      rows: [
+        { cells: ["رفض الطعم الأول", "10 أيام"] },
+        { tone: "warning", cells: ["رفض الطعم الثاني", "5 أيام"] },
+        { cells: ["ذروة LTc الأولى", "2,5"] },
+        { tone: "danger", cells: ["ذروة LTc الثانية", "4,8"] },
+      ],
+    },
+  ],
+  questions: [
+    {
+      id: "analyse",
+      gradeQuestionId: "greffe-ltc-analyse",
+      verbSlug: "analyse",
+      n: 1,
+      title: "تحليل الجدول",
+      skill: "حلّل",
+      docRef: "10 / 5 · 2,5 / 4,8",
+      prompt: "حلّل تغيرات رفض الطعم وعدد LTc (الطعم الأول ثم الثاني).",
+      placeholder: "تمثل الوثيقة… يُرفض الأول في… والثاني في… كلما… نستنتج…",
+      modelAnswer:
+        "تمثل الوثيقة جدولا ومنحنى لتغيرات رفض الطعم وعدد LTc. يُرفض الطعم الأول في 10 أيام بذروة 2,5 بينما يُرفض الطعم الثاني في 5 أيام بذروة 4,8. كلما تكرر تماس نفس المعطي كان الرفض أسرع والذروة أعلى. نستنتج تسارع الرفض الثاني.",
+      learningFocus: "حلّل بلا لأن. اذكر 10 أو 5 أو 2,5 أو 4,8. ليست علامة بكالوريا /20.",
+      mandatory: true,
+    },
+    {
+      id: "interpret",
+      gradeQuestionId: "greffe-ltc-interpret",
+      verbSlug: "interpret",
+      n: 2,
+      title: "تفسير الرفض الثاني",
+      skill: "فسّر",
+      docRef: "5 بدل 10",
+      prompt: "فسّر لماذا رُفض الطعم الثاني في 5 أيام بدل 10.",
+      placeholder: "رُفض في 5 أيام بدل 10 لأن… ذاكرة… LTc…",
+      modelAnswer:
+        "رُفض الطعم الثاني في 5 أيام بدل 10 لأن الذاكرة المناعية جعلت الـ LTc المتخصصة جاهزة فتتكاثر بسرعة. وهذا يفسر 4,8 مقابل 2,5: الاستجابة الثانوية أسرع وأشد.",
+      learningFocus: "فسّر: لأن + ذاكرة / LTc. ليست علامة بكالوريا /20.",
+      mandatory: true,
+    },
+    {
+      id: "deduce",
+      gradeQuestionId: "greffe-ltc-deduce",
+      verbSlug: "deduce",
+      n: 3,
+      title: "استنتاج نوع الاستجابة",
+      skill: "استنتج",
+      docRef: "LTc · الرفض",
+      prompt: "استنتج نوع الاستجابة المتدخلة في رفض الطعم انطلاقا من الوثيقة.",
+      placeholder: "نستنتج أن… خلوية… الدليل LTc…",
+      modelAnswer: "نستنتج أن الاستجابة المتدخلة خلوية. الدليل: ارتفاع الـ LTc يواكب الرفض، والرفض يمس خلايا الطعم.",
+      learningFocus: "استنتج جملة قصيرة: خلوية + دليل LTc. ليست علامة بكالوريا /20.",
+      mandatory: true,
+    },
+  ],
+}
+
+export const l0EnzymeTempScenario: MethodologyScenario = {
+  id: "l0-enzyme-temp",
+  unitKey: "الإنزيمات · تدريب محلي",
+  title: "نشاط الإنزيم والحرارة (حلّل / فسّر)",
+  subtitle: "تدريب محلي L0 — مصحح git",
+  contextAr:
+    "وثيقة حرارة فقط: 37°م → 100 ٪ · 80°م → انعدام. ليست وثيقة pH. ليست علامة بكالوريا رسمية.",
+  dominantSkills: ["analyse", "interpret"],
+  documents: [
+    {
+      type: "table",
+      id: "doc-enzyme-temp-keypoints",
+      title: "نشاط الإنزيم بدلالة الحرارة — أرقام الوثيقة",
+      caption: L0_TABLE_CAPTION,
+      columns: ["الملاحظة (الوثيقة)", "القيمة"],
+      rows: [
+        { tone: "success", cells: ["درجة الحرارة المثلى", "37 °م"] },
+        { cells: ["النشاط عند 37°م", "100 %"] },
+        { tone: "danger", cells: ["درجة انعدام النشاط", "80 °م"] },
+      ],
+    },
+  ],
+  questions: [
+    {
+      id: "analyse",
+      gradeQuestionId: "enzyme-temp-analyse",
+      verbSlug: "analyse",
+      n: 1,
+      title: "تحليل المنحنى",
+      skill: "حلّل",
+      docRef: "37 / 100 / 80",
+      prompt: "حلّل تغيرات نشاط الإنزيم بدلالة درجة الحرارة.",
+      placeholder: "تمثل الوثيقة منحنى… 100% عند 37… ينعدم عند 80… كلما… نستنتج…",
+      modelAnswer:
+        "تمثل الوثيقة منحنى تغيرات نشاط الإنزيم بدلالة درجة الحرارة. يبلغ النشاط 100% عند 37°م وينعدم عند 80°م. كلما ارتفعت الحرارة حتى 37 ازداد النشاط وكلما تجاوزت ذلك نقص. نستنتج أن الحرارة المثلى لهذا الإنزيم هي 37°م.",
+      learningFocus: "حلّل بلا لأن وبلا تمسخ. اذكر 37 أو 100 أو 80. ليست علامة بكالوريا /20.",
+      mandatory: true,
+    },
+    {
+      id: "interpret",
+      gradeQuestionId: "enzyme-temp-interpret",
+      verbSlug: "interpret",
+      n: 2,
+      title: "تفسير الانعدام عند 80",
+      skill: "فسّر",
+      docRef: "80 °م",
+      prompt: "فسّر لماذا يفقد الإنزيم نشاطه عند 80°م.",
+      placeholder: "عند 80°م يفقد الإنزيم نشاطه لأن… تمسخ…",
+      modelAnswer: "عند 80°م يفقد الإنزيم نشاطه لأن الحرارة المرتفعة تسبب تمسخ الإنزيم فينعدم النشاط.",
+      learningFocus: "فسّر: لأن + تمسخ. ليست علامة بكالوريا /20.",
+      mandatory: true,
+    },
+  ],
+}
+
+export const l0PhotoO2Scenario: MethodologyScenario = {
+  id: "l0-photo-o2",
+  unitKey: "التركيب الضوئي · تدريب محلي",
+  title: "انطلاق O₂ (حلّل)",
+  subtitle: "تدريب محلي L0 — مصحح git",
+  contextAr: "رقم واحد من الوثيقة: هضبة O₂ = 6 مل. ليست منحنى إضاءة مخترع. ليست علامة بكالوريا رسمية.",
+  dominantSkills: ["analyse"],
+  documents: [
+    {
+      type: "table",
+      id: "doc-photo-o2-keypoints",
+      title: "حجم O₂ — رقم الوثيقة",
+      caption: L0_TABLE_CAPTION,
+      columns: ["الملاحظة (الوثيقة)", "القيمة"],
+      rows: [{ tone: "success", cells: ["حجم O2 عند الهضبة", "6 مل"] }],
+    },
+  ],
+  questions: [
+    {
+      id: "analyse",
+      gradeQuestionId: "photo-o2-analyse",
+      verbSlug: "analyse",
+      n: 1,
+      title: "تحليل المنحنى",
+      skill: "حلّل",
+      docRef: "6 مل",
+      prompt: "حلّل تغيرات حجم الأكسجين بدلالة الزمن.",
+      placeholder: "تمثل الوثيقة منحنى… ينطلق O2 حتى 6 مل ثم يثبت… كلما… نستنتج…",
+      modelAnswer:
+        "تمثل الوثيقة منحنى تغيرات حجم الأكسجين بدلالة الزمن. ينطلق O2 حتى 6 مل ثم يثبت. كلما توفر الضوء ازداد حجم الأكسجين ثم يثبت. نستنتج أن الضوء ضروري لانطلاق الأكسجين.",
+      learningFocus: "حلّل بلا لأن. اذكر 6. ليست علامة بكالوريا /20.",
+      mandatory: true,
+    },
+  ],
+}
+
+export const l0SynapseCurareScenario: MethodologyScenario = {
+  id: "l0-synapse-curare",
+  unitKey: "المشبك · تدريب محلي",
+  title: "كورار والمشبك (استنتج)",
+  subtitle: "تدريب محلي L0 — مصحح git",
+  contextAr:
+    "رقمان فقط في DocumentModel: التجربة 4 والتجربة 5. لا ميلي فولط مخترع. ليست علامة بكالوريا رسمية.",
+  dominantSkills: ["deduce"],
+  documents: [
+    {
+      type: "table",
+      id: "doc-synapse-curare-keypoints",
+      title: "تجارب الكورار — أرقام الوثيقة",
+      caption: L0_TABLE_CAPTION,
+      columns: ["الملاحظة (الوثيقة)", "القيمة"],
+      rows: [
+        { cells: ["تجربة الكورار مع تنبيه أ", "4"] },
+        { cells: ["تجربة الكورار ثم حقن الوسيط", "5"] },
+      ],
+    },
+  ],
+  questions: [
+    {
+      id: "deduce",
+      gradeQuestionId: "synapse-curare-deduce",
+      verbSlug: "deduce",
+      n: 1,
+      title: "استنتاج دور الكورار",
+      skill: "استنتج",
+      docRef: "التجربتان 4 و 5",
+      prompt: "استنتج كيف تؤثر مادة الكورار على انتقال الرسالة العصبية انطلاقا من الوثيقة (التجربتان 4 و 5).",
+      placeholder: "ومنه نستنتج أن الكورار… مستقبلات… أستيل كولين… تنعدم الاستجابة…",
+      modelAnswer:
+        "ومنه نستنتج أن مادة الكورار تثبت على المستقبلات الغشائية النوعية للأستيل كولين في الخلية بعد المشبكية فتحتل مكان الوسيط وتمنع ارتباطه، فتنعدم الاستجابة ولا تنتقل الرسالة العصبية.",
+      learningFocus: "استنتج: مستقبلات + أستيل كولين + تنعدم الاستجابة. ليست علامة بكالوريا /20.",
+      mandatory: true,
+    },
+  ],
+}
+
+export const l0ProteineAdnScenario: MethodologyScenario = {
+  id: "l0-proteine-adn",
+  unitKey: "تركيب البروتين · تدريب محلي",
+  title: "نص علمي: من ADN إلى بروتين",
+  subtitle: "تدريب محلي L0 — مصحح git",
+  contextAr:
+    "لا وثيقة رقمية. النص يُحاكم على مشكل + نسخ + ترجمة + خاتمة. ليست علامة بكالوريا رسمية.",
+  dominantSkills: ["scientific-text"],
+  documents: [],
+  questions: [
+    {
+      id: "scientific-text",
+      gradeQuestionId: "proteine-adn-scientific-text",
+      verbSlug: "scientific-text",
+      n: 1,
+      title: "نص علمي",
+      skill: "نص علمي",
+      docRef: "بدون وثيقة رقمية",
+      prompt: "اكتب نصا علميا تشرح فيه كيف يتم تركيب بروتين انطلاقا من معلومة الـ ADN النووي عن بعد.",
+      placeholder: "يتمثل المشكل في كيف… النسخ في النواة… الترجمة على الريبوزوم… مما سبق…",
+      modelAnswer:
+        "يتمثل المشكل في كيف يتم تركيب بروتين انطلاقا من معلومة الـ ADN النووي عن بعد. يتم النسخ في النواة فينتج ARN رسول ينتقل إلى الهيولى. ثم تتم الترجمة على الريبوزوم حيث تُرتب الأحماض الأمينية حسب الرسالة. مما سبق فإن الـ ADN لا يغادر النواة والبروتين يُركب في الهيولى.",
+      learningFocus: "نص: مشكل + نسخ + ترجمة + خاتمة. ليست علامة بكالوريا /20.",
+      mandatory: true,
+    },
+  ],
+}
+
 /** L1 — Bac 2023 S1 ex.2 Q2 حلّل. Tableau = أرقام السلم فقط. Pas de courbe inventée. */
 export const bac2023Ml901Scenario: MethodologyScenario = {
   id: "bac2023-s1-ex2-analyse-traduction",
@@ -1832,8 +2123,18 @@ export function resolveGradeQuestionId(scenarioId: string, question: Methodology
   return question.gradeQuestionId || `${scenarioId}:${question.id}`
 }
 
+export function scenarioHasLocalGrade(scenario: MethodologyScenario): boolean {
+  return scenario.questions.some((q) => Boolean(q.gradeQuestionId))
+}
+
 export const methodologyScenarios: MethodologyScenario[] = [
   bac2023Ml901Scenario,
+  l0YeastGlucoseScenario,
+  l0GreffeLtcScenario,
+  l0EnzymeTempScenario,
+  l0PhotoO2Scenario,
+  l0SynapseCurareScenario,
+  l0ProteineAdnScenario,
   diagnosticScenario,
   proteinStructureFunctionScenario,
   enzymeActivityScenario,

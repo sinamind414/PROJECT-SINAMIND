@@ -387,9 +387,11 @@ export function ScenarioRunner({
         )}
       </header>
 
-      <section className="rounded-3xl p-6 bg-[#182730] border border-white/[0.06] space-y-5">
-        <DocumentSetRenderer documents={scenario.documents} />
-      </section>
+      {scenario.documents.length > 0 && (
+        <section className="rounded-3xl p-6 bg-[#182730] border border-white/[0.06] space-y-5">
+          <DocumentSetRenderer documents={scenario.documents} />
+        </section>
+      )}
 
       <div className="grid grid-cols-1 xl:grid-cols-[1fr_380px] gap-6">
         <section className="rounded-3xl p-6 bg-[#182730] border border-white/[0.06]">

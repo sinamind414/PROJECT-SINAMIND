@@ -745,6 +745,7 @@ S5  mixins chapitre + $lex: extrait fichier  (condition de survie L1)
 | S27 filet ATP clavier DZ | **OUI** | ٣٦ ATP cap 40. `ليس 36 بل 38` pas capé. 36 seul cap. `GRADER_VERSION=1.1.6`. Pas de fusion normalize. |
 | S28 FSRS idempotent | **OUI** | cache hit → 0 quota (déjà) **et** 0 `update_memory`. `may_write_fsrs` refuse `from_cache`. Hors `grade()`. `1.1.6`. |
 | S29 proclitique `كال` | **OUI** | `كالخميرة` matche `خميرة`. Liste fermée. Pas `فل`. Expansion needle. `1.1.7`. |
+| L0 UI hub `gradeQuestionId` | **OUI** | 10/10 ids visibles (6 cartes). Tableaux = keypoints git. **Pas** d’alias `enzyme-activity-v1` → `enzyme-temp`. Moteur `1.1.7` inchangé. |
 
 **Gates :**
 - S0 → S1 : G9, G10 verts (même sans grader) — **contourné volontairement** le 2026-08-27 : S1 = moteur **testable hors prod**, pas une mise en ligne. Le gate redevient bloquant le jour où `LOCAL_RUBRIC_GRADER=true`.

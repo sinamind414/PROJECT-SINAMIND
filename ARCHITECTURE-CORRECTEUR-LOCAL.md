@@ -314,6 +314,7 @@ S27 filet ATP ٣٦ + ليس 36 بل 38 ; GRADER_VERSION=1.1.6 ; pas fusion norma
 S28 FSRS pas sur cache hit (idempotence) ; hors grade() ; 1.1.6                         ← FAIT
 S29 proclitique كال (كالخميرة) ; liste fermée ; 1.1.7 ; pas فل / pas stemming            ← FAIT
 L1 UI  gradeQuestionId → bac2023-s1-ex2-analyse-traduction (ScenarioRunner)            ← FAIT
+L0 UI  10/10 ids sur le hub DA (6 cartes, keypoints JSON, 0 alias enzyme-pH)          ← FAIT
 ```
 
 **Brancher S2 sans tuer le fallback front = deux notes. Interdit.**
@@ -335,4 +336,4 @@ Détail C1–C5 : `AUDIT-ARCHI-INDEPENDANT.md`.
 
 ---
 
-*SoT code : `local_grader.py` 1.1.6. SoT cible produit : `ARCHITECTURE-COACH-LOCAL.md`. Audit écarts : `AUDIT-GRADER-LOCAL.md`.*
+*SoT code : `local_grader.py` 1.1.7. SoT cible produit : `ARCHITECTURE-COACH-LOCAL.md`. Audit écarts : `AUDIT-GRADER-LOCAL.md`.*

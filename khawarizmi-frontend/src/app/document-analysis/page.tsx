@@ -8,7 +8,7 @@ import { SurfaceCard } from "@/components/ui/SurfaceCard"
 import { PillChip } from "@/components/ui/PillChip"
 import { apiClient } from "@/lib/api-client"
 import type { DaProgressResponse, DaWeakSpotsResponse } from "@/lib/types"
-import { methodologyScenarios } from "@/lib/methodology-documents"
+import { methodologyScenarios, scenarioHasLocalGrade } from "@/lib/methodology-documents"
 import { methodologyChapterLinks } from "@/lib/methodology-chapters"
 
 const UNIT_EMOJIS: Record<string, string> = {
@@ -24,6 +24,12 @@ const UNIT_EMOJIS: Record<string, string> = {
   "النشاط التكتوني للصفائح": "🌋",
   "النشاط التكتوني والبنيات الجيولوجية المرتبطة به": "🏔️",
   "بكالوريا 2023 · تدريب محلي": "📝",
+  "تنفس الخميرة · تدريب محلي": "🧫",
+  "المناعة الخلوية · تدريب محلي": "🛡️",
+  "الإنزيمات · تدريب محلي": "⚡",
+  "التركيب الضوئي · تدريب محلي": "☀️",
+  "المشبك · تدريب محلي": "🧠",
+  "تركيب البروتين · تدريب محلي": "🧬",
 }
 
 const IMPORTANCE_COLORS: Record<string, string> = {
@@ -94,11 +100,11 @@ export default function DocumentAnalysisHubPage() {
       <PageHero
         title="بنك السيناريوهات المنهجية"
         subtitle="القلب الحقيقي لـ SINAMIND"
-        description="كل وحدة من وحدات SVT الـ 11 لها سيناريو خاص: وثائق + أسئلة منهجية + تصحيح مفصل + تسجيل الأخطاء."
+        description="البطاقات الصفراء مربوطة بالمصحح المحلي. الباقي وضعية تدريب بلا شبكة — تعذر التصحيح وليس صفراً."
       />
 
       <p className="text-gray-400 text-sm">
-        اختر وحدة للبدء. كل سيناريو يحتوي على 4 وثائق و 5 أسئلة منهجية على نمط البكالوريا.
+        بطاقة «مصحح محلي» = شبكة git + درجة تدريب. الباقي بدون شبكة → تعذر التصحيح. ليست علامة بكالوريا رسمية.
       </p>
 
       {(duesCount > 0 || weakCount > 0) && (
