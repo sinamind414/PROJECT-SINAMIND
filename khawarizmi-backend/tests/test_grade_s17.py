@@ -66,8 +66,9 @@ def test_capped_mastery_does_not_write_fsrs():
 
 def test_route_wires_quota_and_fsrs_not_copy():
     assert "should_count_quota" in ROUTE
-    assert "evaluate_limit" in ROUTE
-    assert "_enforce_evaluate_quota" in ROUTE
+    # S36 : application du quota partagée via rate_limit.enforce_evaluate_quota
+    # (avant : logique inline evaluate_limit/_enforce_evaluate_quota dans la route)
+    assert "enforce_evaluate_quota" in ROUTE
     assert "may_write_fsrs" in ROUTE
     assert "_maybe_write_fsrs" in ROUTE
     assert "hash_answer" not in ROUTE
@@ -87,7 +88,7 @@ def test_grader_untouched():
     assert "grade_quota" not in GRADER
     assert "evaluate_limit" not in GRADER
     assert "update_memory" not in GRADER
-    assert GRADER_VERSION == "1.1.9"
+    assert GRADER_VERSION == "1.2.0"
     assert "openai" not in GRADER
 
 

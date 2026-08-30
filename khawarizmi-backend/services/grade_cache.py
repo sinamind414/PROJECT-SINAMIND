@@ -36,10 +36,11 @@ def redis_available() -> bool:
 
 
 def reset() -> None:
-    global _bound_redis
+    global _bound_redis, _sha_fallback_warned
     with _lock:
         _mem.clear()
     _bound_redis = _AUTO
+    _sha_fallback_warned = False
     filet_sha16.cache_clear()
 
 
@@ -54,7 +55,16 @@ def _redis_client():
         return None
 
 
+_sha_fallback_warned = False
+
+
 def _digest(answer: str) -> str:
+    """HMAC(pepper) si possible. Fallback SHA-256 sec : bruyant UNE fois (S35).
+
+    Un pepper absent ne doit pas se taire — le SHA-256 brut est
+    dictionnalisable sur des copies arabes courtes (audit P0-4.2).
+    """
+    global _sha_fallback_warned
     stripped = answer.lstrip().rstrip()
     try:
         from services.hashing import hash_answer
@@ -63,7 +73,14 @@ def _digest(answer: str) -> str:
         if h:
             return h
     except Exception:
-        pass
+        if not _sha_fallback_warned:
+            import logging
+
+            logging.getLogger(__name__).warning(
+                "hash_answer indisponible (SECRET_KEY absent ?) — digest cache "
+                "en SHA-256 NON pepperé (dictionnalisable). Définir SECRET_KEY."
+            )
+            _sha_fallback_warned = True
     return hashlib.sha256(stripped.encode("utf-8")).hexdigest()
 
 

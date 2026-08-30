@@ -133,7 +133,7 @@ def test_metrics_cache_redis_flag_no_identity():
 
 
 def test_grader_version_unchanged():
-    assert GRADER_VERSION == "1.1.9"
+    assert GRADER_VERSION == "1.2.0"
 
 
 def test_evaluate_still_not_mounted():

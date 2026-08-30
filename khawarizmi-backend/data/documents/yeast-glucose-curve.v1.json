@@ -1,13 +1,45 @@
 {
   "doc_id": "yeast-glucose-curve",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "kind": "table",
   "keypoints": [
-    {"id": "t0", "value": 9, "unit": "خلايا", "tolerance": 0, "aliases": [], "label_ar": "عدد الخلايا عند 0 سا"},
-    {"id": "with_glu", "value": 18, "unit": "خلايا", "tolerance": 0, "aliases": ["الذروة"], "label_ar": "عدد الخلايا مع غلوكوز (الذروة)"},
-    {"id": "without_glu", "value": 6, "unit": "خلايا", "tolerance": 0, "aliases": [], "label_ar": "عدد الخلايا بدون غلوكوز"}
+    {
+      "id": "t0",
+      "value": 9,
+      "unit": "خلايا",
+      "tolerance": 0,
+      "aliases": [],
+      "label_ar": "عدد الخلايا عند 0 سا"
+    },
+    {
+      "id": "with_glu",
+      "value": 18,
+      "unit": "خلايا",
+      "tolerance": 0,
+      "aliases": [
+        "الذروة"
+      ],
+      "label_ar": "عدد الخلايا مع غلوكوز (الذروة)"
+    },
+    {
+      "id": "without_glu",
+      "value": 6,
+      "unit": "خلايا",
+      "tolerance": 0,
+      "aliases": [],
+      "label_ar": "عدد الخلايا بدون غلوكوز"
+    }
   ],
   "trend": "increase_then_plateau",
-  "trend_variants": ["يزداد", "تزايد", "يتناقص", "يثبت"],
-  "objects": ["الوثيقة", "الجدول", "المنحنى"]
+  "trend_variants": [
+    "يزداد",
+    "تزايد",
+    "يثبت"
+  ],
+  "objects": [
+    "الوثيقة",
+    "الجدول",
+    "المنحنى"
+  ],
+  "notes": "S34 (audit 2026-08-30 F7): يتناقص retiré de trend_variants (contredit trend=increase_then_plateau). La décroissance 9->6 (sans glucose) vit dans les keypoints, pas dans le trend déclaré."
 }

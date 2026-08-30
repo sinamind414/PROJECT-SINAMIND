@@ -15,7 +15,7 @@
 > **3 tests rouges** (mur `NoLocalGradeWall` vs contrats S3/S9/S25 non tranchés),
 > et le **suite grade n'est dans aucun gate** (CI ni pre-commit).
 >
-> **Post-fix (même jour) : F1–F6 corrigés, moteur 1.1.9, suite 214 ✓ / 0 ✗, gate CI actif.** Détail en §5.
+> **Post-fix (même jour) : F1–F10 tous corrigés, moteur 1.2.0, suite grade 229 ✓ / 0 ✗, lot CI methodology 87 ✓, gate CI actif.** Détail en §5.
 
 ---
 
@@ -146,23 +146,42 @@ mergeée sans rien voir. **Fix proposé** : job CI `grader` =
 `pytest tests/test_local_grader.py tests/test_grade_s*.py --noconftest` +
 `python scripts/validate_rubrics.py`.
 
-### F7 — Piège dormant (bas) : `cites_trend` inutilisé + variantes contradictoires
+### F7 — Piège dormant (bas) : `cites_trend` inutilisé + variantes contradictoires — **CORRIGÉ (S34)**
+
+> **Fix appliqué :** `validate_rubrics.py` gagne `_doc_trend_fails` (directions fermées up/down,
+> trend=unknown ≠ variants, trend sans variants = sourd). Doc levure v1.0.2 : `يتناقص` retiré
+du trend déclaré (la décroissance 9→6 vit dans les keypoints). `cites_trend` reste dormant
+> (0 grille) mais ne peut plus être branché sur un doc contradictoire. Golden : s34.
 Aucune grille n'utilise `cites_trend`, mais `documents/yeast-glucose-curve.v1.json`
 déclare `trend=increase_then_plateau` avec des `trend_variants` contenant
 **«يتناقص»** (décroît). Le premier auteur qui branche `cites_trend` validera une
 tendance inverse. Nettoyer les variantes ou les typer par direction.
 
-### F8 — Surface non authentifiée (bas) : `POST /api/evaluate/methodology`
+### F8 — Surface non authentifiée (bas) : `POST /api/evaluate/methodology` — **CORRIGÉ (S36)**
+
+> **Fix appliqué :** `get_current_user` requis + même budget 15/h que `/api/grade`, via
+> `rate_limit.enforce_evaluate_quota` (la DÉCISION pure reste dans `services/grade_quota`,
+> module sans I/O — contrat S17 respecté). Bonus : les 7 tests methodology morts (ancien
+> évaluateur LLM `verb`/`task_type`) réalignés sur le contrat as-built → lot CI methodology
+> **87 ✓ / 0 ✗** (il était rouge sur master).
 Pas de `Depends(get_current_user)` (contrairement à `/api/grade`, `exercices`,
 `flashcards`) : gradable sans compte, et **bypass du quota 15/h** (qui n'existe que
 sur `/api/grade`). Moteur déterministe = coût faible, mais incohérent avec le
 contrat quota. Ajouter l'auth + le quota, ou assumer et documenter.
 
-### F9 — Fallback silencieux (info) : digest cache non pepperé si `SECRET_KEY` absent
+### F9 — Fallback silencieux (info) : digest cache non pepperé si `SECRET_KEY` absent — **CORRIGÉ (S35)**
+
+> **Fix appliqué :** le fallback SHA-256 sec loggue maintenant un **WARNING (une fois)**.
+> `reset()` réarme le drapeau pour les tests.
 `grade_cache._digest` retombe en silence sur SHA-256 brut (dictionnalisable) si
 `hash_answer` lève (pepper absent). Faire échouer bruyamment ou logger une fois.
 
-### F10 — Messages (info)
+### F10 — Messages (info) — **CORRIGÉ (S37, moteur 1.2.0)**
+
+> **Fix appliqué :** (a) `stuffing` passe AVANT `unanchored` — le diagnostic nomme le cap
+> appliqué (50) ; une vraie copie sans chiffre reste `unanchored`. (b) defer + hors-sujet →
+> `sanity.defer` (« écris en arabe ») au lieu de `off_topic` — une copie non-arabe n'est pas
+> hors-sujet, elle est illisible pour la grille. `GRADER_VERSION=1.2.0` (cache invalidé).
 - Bourrage sans chiffre → diag affiché `unanchored` (« لا رقم من الوثيقة ») alors que
   le cap appliqué est `stuffing` (priorité `_diagnosis` : unanchored avant stuffing).
 - Réponse anglaise à tokens chimie → `sanity=defer` mais diag `off_topic`
@@ -229,8 +248,13 @@ réglages de rappel et de garde-fous, pas des mensonges de note — sauf F1 qui
 | F5 tests rouges | réalignés sur le mur HON-2 documenté | — | suite vert |
 | F6 gate | job CI `grader-tests` + `validate_rubrics.py` | — | ci.yml |
 
-**État final : 214 tests ✓ / 0 ✗ · 13 grilles valides · moteur `1.1.9` · perf 20k ≈ 75 ms.**
+**État mid-day : 214 tests ✓ / 0 ✗ · 13 grilles valides · moteur `1.1.9`.**
 
-Restent ouverts (non bloquants) : F7 (`cites_trend` dormant + variantes contradictoires),
-F8 (`/api/evaluate/methodology` sans auth/quota), F9 (digest cache non pepperé si
-`SECRET_KEY` absent), F10 (messages `unanchored` vs cap stuffing ; defer anglais → off_topic).
+| F7 trend docs | directions fermées + validateur ; yeast v1.0.2 | — | s34, `_doc_trend_fails` |
+| F8 methodology | auth + quota partagé ; 7 tests LLM morts réalignés | — | 87 ✓ lot CI methodology |
+| F9 digest cache | fallback SHA-256 bruyant (warn once) | — | s35 |
+| F10 diagnostics | stuffing avant unanchored ; defer→sanity.defer | `1.2.0` | s35 |
+
+**État final : 229 tests grade ✓ / 0 ✗ · 87 tests methodology ✓ · 13 grilles valides · moteur `1.2.0`.**
+
+Tous les findings F1–F10 de l'audit sont fermés.

@@ -22,7 +22,7 @@ from schemas.rubric import (
 from services.answer_sanity import check_answer_sanity
 from services.arabic import normalize_arabic
 
-GRADER_VERSION = "1.1.9"
+GRADER_VERSION = "1.2.0"
 SCIENCE_CAP_DEFAULT = 40
 TRAINING_BANNER_AR = "ملاحظة تدريبية — منهج + محتوى. ليست علامة بكالوريا رسمية."
 
@@ -618,6 +618,14 @@ def _diagnosis(
     if sanity_code not in ("ok", "defer"):
         return Diagnosis(code=f"sanity.{sanity_code}", label_ar="إجابة غير صالحة")
     if science_status == "error" and any("خارج" in f for f in science_flags):
+        # S37 — defer + hors-sujet = d'abord un problème de LANGUE, pas de
+        # thème : une copie non-arabe n'est pas « hors sujet », elle est
+        # illisible pour la grille (audit F10).
+        if sanity_code == "defer":
+            return Diagnosis(
+                code="sanity.defer",
+                label_ar="إجابة غير مكتوبة بالعربية — لا يمكن تصحيح الموضوع",
+            )
         return Diagnosis(code="off_topic", label_ar="الإجابة خارج الموضوع")
     if science_status == "error":
         return Diagnosis(code="science.grave", label_ar="خطأ علمي")
@@ -628,10 +636,12 @@ def _diagnosis(
             else "فسّرت بأسلوب حلّل (كلما دون سبب)"
         )
         return Diagnosis(code=slip, label_ar=label)
-    if unanchored:
-        return Diagnosis(code="unanchored", label_ar="لا رقم من الوثيقة")
+    # S37 — stuffing AVANT unanchored : quand les deux tirent, le cap appliqué
+    # est stuffing (50) → le diagnostic doit nommer le cap (audit F10).
     if stuffing:
         return Diagnosis(code="stuffing", label_ar="حشو معجمي")
+    if unanchored:
+        return Diagnosis(code="unanchored", label_ar="لا رقم من الوثيقة")
     for h, c in zip(hits, rubric.criteria):
         if c.required and h.status != "full":
             return Diagnosis(code=f"first_required_gap.{c.id}", label_ar=c.label_ar)
@@ -779,6 +789,8 @@ def grade(
         next_step = science_flags[0] + ((" " + next_step) if next_step else "")
     if diag.code == "off_topic" and not next_step:
         next_step = "الإجابة خارج الموضوع"
+    if diag.code == "sanity.defer":
+        next_step = "أعد كتابة الإجابة باللغة العربية ثم أرسلها مرة أخرى."
     if diag.code == "science.erratum" and science_flags:
         next_step = science_flags[0]
     elif any("تصويب الدليل" in f for f in science_flags):

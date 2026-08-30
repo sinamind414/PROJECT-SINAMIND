@@ -1,4 +1,4 @@
-"""S31 — filet ATP : 38 n'annule 36 qu'à ≤ 90 chars. 1.1.9.
+"""S31 — filet ATP : 38 n'annule 36 qu'à ≤ 90 chars. 1.2.0.
 
 F2 (audit 2026-08-30) : l'exemption «38 annule 36» était aveugle à la position —
 un «38 ATP» posé n'importe où lavait un «36 ATP» affirmé comme fait.
@@ -88,8 +88,8 @@ class TestHelper:
         assert _has_38_near(near, near.index("36")) is True
 
     def test_version_bump_et_fenetres_fermees(self):
-        assert GRADER_VERSION == "1.1.9"
-        assert 'GRADER_VERSION = "1.1.9"' in GRADER
+        assert GRADER_VERSION == "1.2.0"
+        assert 'GRADER_VERSION = "1.2.0"' in GRADER
         assert "_has_38_near" in GRADER
         # l'ancienne exemption position-blind est bien morte
         assert "_HAS_38_ATP.search(sav)" not in GRADER

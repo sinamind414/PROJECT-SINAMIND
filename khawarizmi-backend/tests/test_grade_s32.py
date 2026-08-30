@@ -1,4 +1,4 @@
-"""S32 — stuffing : l'ancre du doc exige un marqueur de structure. 1.1.9.
+"""S32 — stuffing : l'ancre du doc exige un marqueur de structure. 1.2.0.
 
 F3 (audit 2026-08-30) : kp_full/obj_full exemptait TOTALEMENT le bourrage —
 un lexique répété + le chiffre magique du document passait à 75 % sans cap.
@@ -98,6 +98,6 @@ class TestContrat:
         assert len(_STRUCTURE_MARKERS) <= 12
 
     def test_version(self):
-        assert GRADER_VERSION == "1.1.9"
-        assert 'GRADER_VERSION = "1.1.9"' in GRADER
+        assert GRADER_VERSION == "1.2.0"
+        assert 'GRADER_VERSION = "1.2.0"' in GRADER
         assert "_STRUCTURE_MARKERS" in GRADER

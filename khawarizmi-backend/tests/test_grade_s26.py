@@ -74,7 +74,7 @@ def test_g7_defer_untouched():
 
 
 def test_bare_po_pattern_removed_version_unchanged():
-    assert GRADER_VERSION == "1.1.9"
+    assert GRADER_VERSION == "1.2.0"
     assert 'r"p/o"' not in SAVOIR.split("po_nadh")[1].split("po_fadh")[0]
     assert "nadh.{0,20}atp" not in SAVOIR
     assert "filet_sha16" not in GRADER

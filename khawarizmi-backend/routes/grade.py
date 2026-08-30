@@ -10,7 +10,7 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
 from deps import get_current_user
-from rate_limit import evaluate_limit, get_user_key, limiter
+from rate_limit import enforce_evaluate_quota
 from services.grade_adapter import may_write_fsrs
 from services.grade_cache import cache_get_async, cache_set_async, make_key
 from services.grade_metrics import record_cache, record_result, record_ungraded, snapshot
@@ -66,29 +66,6 @@ def _public_grade_dict(result) -> dict:
         "ungraded": False,
         "from_cache": bool(getattr(result, "from_cache", False)),
     }
-
-
-def _enforce_evaluate_quota(request: Request) -> None:
-    """15/h free, 80/h pro. Seulement si should_count_quota. Fail-open si limiter down."""
-    key = get_user_key(request)
-    limit_str = evaluate_limit(key)
-    try:
-        inner = getattr(limiter, "limiter", None)
-        if inner is None:
-            return
-        from limits import parse
-
-        item = parse(limit_str)
-        allowed = inner.hit(item, key)
-        if allowed is False:
-            raise HTTPException(
-                status_code=429,
-                detail="تم بلوغ حد التصحيح. ليست علامة بكالوريا رسمية.",
-            )
-    except HTTPException:
-        raise
-    except Exception:
-        return
 
 
 async def _maybe_write_fsrs(user: dict, result, chapter_slug: str) -> None:
@@ -151,7 +128,8 @@ async def post_grade(
         document=packed.document,
     )
     if should_count_quota(sanity_code=result.sanity_code, from_cache=False):
-        _enforce_evaluate_quota(request)
+        # S36 : application partagée avec /api/evaluate/methodology
+        enforce_evaluate_quota(request)
     if result.cacheable:
         await cache_set_async(key, result)
     record_cache(False)

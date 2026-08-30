@@ -1,7 +1,7 @@
 # Architecture cible — Coach local « comme le livre »
 
 **Date :** 2026-08-26 · **révisé** 2026-08-27 (C1 clé cache, contrat sanity, politique lexique, table d’état)  
-**Statut :** S0–S33 **implémentés** — `grade()` **1.1.9** + proclitique `كال` + enclitiques `لأنها` + filet ATP ٣٦ / 38-annule-36-à-≤90-chars + stuffing ancre×marqueur + grilles levure `theme_min_hits=2` + FSRS pas sur cache hit + CI `grader-tests`. Flag `LOCAL_RUBRIC_GRADER` défaut `false` (**lu nulle part**).  
+**Statut :** S0–S37 **implémentés** — `grade()` **1.2.0** + proclitique `كال` + enclitiques `لأنها` + filet ATP ٣٦ / 38-annule-36-à-≤90-chars + stuffing ancre×marqueur + grilles levure `theme_min_hits=2` + diagnostics justes (stuffing/defer) + docs trend hygiène + methodology auth+quota + FSRS pas sur cache hit + CI `grader-tests`. Flag `LOCAL_RUBRIC_GRADER` défaut `false` (**lu nulle part**).  
 **S0 (T1–T3) :** **fait** (T1 UI PDF, T2 IDOR, T3 whitelist). Flag prod encore `false`. Voir table §14.1.  
 **Public :** revue humaine / audit par IA  
 **Produit :** Khawarizmi / IA Khawarizmi Pro — Bac SVT Algérie 3AS  
@@ -750,6 +750,10 @@ S5  mixins chapitre + $lex: extrait fichier  (condition de survie L1)
 | S32 stuffing ancré | **OUI** | kp/objet du doc n'exempte le bourrage qu'avec ≥ 1 marqueur de structure (liste fermée لان/لذلك/نستنتج/…). Bourrage+chiffre magique re-capé 50 ; modèle enzyme (ratio 1.0, «لأن») exempt. Fix audit F3. `1.1.9`. |
 | S33 theme_min_hits=2 levure | **OUI** | `yeast-glucose-interpret` + `manhadjiya-yeast-analyse` v1.0.1. Tectonique + «الخميرة»×1 = off_topic cap 40 (avant : diag verb_slip). Modèles ≥ 2 variantes distinctes. Fix audit F4. |
 | CI grader-tests | **OUI** | Job dédié : `pytest tests/test_local_grader.py tests/test_grade_s*.py …tests/test_grade_bac2023_ml901.py --noconftest` + `validate_rubrics.py`. Fix audit F6 (suite 214 ✓ / 0 ✗, tests S3/S9/S25 réalignés sur le mur HON-2). |
+| S34 hygiène trend docs | **OUI** | `validate_rubrics._doc_trend_fails` : directions fermées (up/down), trend=unknown ≠ variants, trend sans variants = sourd. `cites_trend` toujours dormant (0 grille). Yeast doc v1.0.2 : `يتناقص` hors du trend déclaré. Fix audit F7. |
+| S35 cache digest bruyant | **OUI** | `SECRET_KEY` absent → fallback SHA-256 + **WARNING loggé une fois** (avant : silencieux, dictionnalisable). Fix audit F9. |
+| S36 methodology auth+quota | **OUI** | `/api/evaluate/methodology` : `get_current_user` requis (avant : anonyme) + même budget 15/h que `/api/grade` via `rate_limit.enforce_evaluate_quota` (décision pure restée dans `grade_quota`). 7 tests LLM morts réalignés (lot CI methodology 87 ✓). Fix audit F8. |
+| S37 diagnostics justes | **OUI** | stuffing **avant** unanchored (le diagnostic nomme le cap 50 appliqué) ; defer+hors-sujet → `sanity.defer` « écris en arabe » (une copie non-arabe n'est pas hors-sujet). `GRADER_VERSION=1.2.0`. Fix audit F10. |
 | L0 UI hub `gradeQuestionId` | **OUI** | 10/10 ids visibles (6 cartes). Tableaux = keypoints git. **Pas** d’alias `enzyme-activity-v1` → `enzyme-temp`. Moteur `1.1.7` inchangé. |
 | Honnêteté chemin élève | **OUI** | Pas de `modelAnswer` après note. Hub : cartes locales vs « بدون شبكة ». 24 verbes : 0 `قيّم` (lien L0, pas 422). Yeast `4 سا` **hors** keypoints (`1.0.1`). Ateliers restent 0 % + CTA juge. |
 | HON-2 tuer théâtre | **OUI** | Hub = cartes `gradeQuestionId` seulement. Diagnostic / bac blanc / DA sans grille = mur تعذر. Checklist **ne bloque plus** `grade()`. Moteur `1.1.7`. |

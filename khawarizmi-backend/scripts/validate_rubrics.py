@@ -148,12 +148,61 @@ def check_question(qid: str) -> list[str]:
     return fails
 
 
+# S34 — hygiène trend des Documents (audit 2026-08-30 F7) : cites_trend est
+# dormant ; empêcher d'y brancher un doc dont les variants contredisent le
+# trend déclaré. Listes FERMÉES de direction (pas un dictionnaire arabe).
+_TREND_UP = ("يزداد", "تزايد", "يزيد", "يرتفع", "ارتفع", "أسرع", "ابكر", "أبكر")
+_TREND_DOWN = ("يتناقص", "تتناقص", "ينقص", "تنعدم", "ينعدم", "ينخفض")
+
+
+def _doc_trend_fails(doc) -> list[str]:
+    """Erreurs d'hygiène trend pour UN DocumentModel. Vide = OK."""
+    fails: list[str] = []
+    variants = [str(v) for v in doc.trend_variants]
+    if doc.trend == "unknown":
+        if variants:
+            fails.append(
+                f"doc {doc.doc_id}: trend=unknown mais trend_variants={variants} (données mortes)"
+            )
+        return fails
+    down = [v for v in variants if any(k in v for k in _TREND_DOWN)]
+    up = [v for v in variants if any(k in v for k in _TREND_UP)]
+    if doc.trend in ("increase", "increase_then_plateau") and down:
+        fails.append(f"doc {doc.doc_id}: trend={doc.trend} contredit par variant(s) {down}")
+    if doc.trend == "decrease" and up:
+        fails.append(f"doc {doc.doc_id}: trend=decrease contredit par variant(s) {up}")
+    if not variants:
+        fails.append(
+            f"doc {doc.doc_id}: trend={doc.trend} sans trend_variants (check sourd si branché)"
+        )
+    return fails
+
+
+def _check_documents() -> list[str]:
+    fails: list[str] = []
+    seen: set[str] = set()
+    for qid in list_question_ids():
+        packed = load(qid)
+        if packed is None or packed.document is None:
+            continue
+        d = packed.document
+        if d.doc_id in seen:
+            continue
+        seen.add(d.doc_id)
+        fails.extend(_doc_trend_fails(d))
+    return fails
+
+
 def main() -> int:
     ids = list_question_ids()
     if not ids:
         print("FAIL: aucune rubric dans index.json", file=sys.stderr)
         return 1
     errors = 0
+    doc_fails = _check_documents()
+    for line in doc_fails:
+        print(f"FAIL {line}")
+    errors += len(doc_fails)
     for qid in ids:
         fails = check_question(qid)
         if fails:
