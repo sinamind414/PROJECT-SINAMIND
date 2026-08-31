@@ -997,3 +997,92 @@ ne peux pas faire à ta place : décider **ce qui vaut un point** dans un barèm
 honnêtes : soit tu me donnes les barèmes (texte officiel), soit tu valides des squelettes produits par
 `scripts/gen_rubric_skeletons.py` — dans les deux cas la rédaction reste tenue par toi, et le hub restera
 honnête par construction puisqu'il filtre sur `scenarioHasLocalGrade`.
+
+---
+
+## 17. F30 — afficher les exercices de « استغلال الوثائق » et rendre les graphes justes
+
+Demande : afficher les exercices de la rubrique et les rendre lisibles avec le graphe et les
+tableaux. En mesurant, la demande est tombée sur **deux défauts réels**, dont un qui faisait mentir
+les figures.
+
+### 17.1 Premièrement : l'exercice était caché par le mur de correction
+
+`ScenarioRunner`, ligne de garde :
+
+```tsx
+if (!hasLocal) return <NoLocalGradeWall titleAr={scenario.title} … />
+```
+
+Le mur dit une vérité (aucune grille ⇒ personne ne corrige ici), mais il **remplaçait tout**. Bilan
+mesuré : **11 scénarios sur 18 — 44 documents, 55 consignes, 17 tableaux, 7 graphes, 11 schémas de
+flux, 10 images annotées — étaient invisibles**, y compris par URL directe. Un exercice qu'on ne peut
+pas lire n'est pas protégé de la fausse note : il est perdu.
+
+Réparé par `src/components/methodology/ScenarioReadingMode.tsx` : le mur devient une **bannière** et
+l'exercice est rendu en lecture seule — en-tête + contexte, badges de composition (📊 2 رسم · 📋 1 جدول…),
+documents, puis par question : verbe, `docRef`, consigne, **zone de brouillon locale** (avec le rappel
+« لا تُرسَل، ولا تُصحَّح، ولا تُحتسب في تقدّمك »), et le `modelAnswer` + `learningFocus` dans un
+`<details>` **fermé**, intitulé « افتحه بعد أن تكتب إجابتك » — la règle d'or du site (« لا تصحيح كامل
+قبل محاولة التلميذ ») est tenue par la structure, pas par une promesse.
+
+Sur le hub `/document-analysis`, une seconde section `#lecture-seule` liste ces 11 cartes avec le badge
+« قراءة وتصحيح ذاتي », **sans** le badge `مصحح محلي`, et la ligne de pied dit les deux compteurs
+(« 7 بطاقة بشبكة git · 11 بطاقة قراءة »). Les cartes déjà corrigibles restent filtrées sur
+`scenarioHasLocalGrade` : aucune promesse d'État n'est prêtée à une page sans grille.
+
+### 17.2 Deuxièmement : trois courbes sur sept étaient fausses
+
+`DocumentRenderer` plaçait les points **par index** (`padding + index * stepX`). Sur les 7 graphes
+structurés du dépôt, 3 ont des abscisses inégales — donc dessinées avec des mensonges :
+
+| Document | Abscisses | Pas réels | Effet mesuré sur le rendu |
+|---|---|---|---|
+| `photosynthesis-v1` — كمية O₂ حسب شدة الإضاءة | 0 · 50 · 100 · 200 · 400 · 600 | 50, 50, 100, 200, 200 | **le plateau de saturation disparaissait**, la courbe paraissait linéaire |
+| `enzyme-activity-v1` — تأثير درجة الحرارة | 0 · 20 · 30 · 37 · 50 · 70 | 20, 10, 7, 13, 20 | l'optimum (37) tombait à la mauvaise place |
+| `enzyme-activity-v1` — تأثير pH | 2 · 4 · 6 · 7 · 8 · 10 | 2, 2, 1, 1, 2 | idem, sur un pH échelle 2→10 |
+
+Sur un site dont la compétence enseignée est « حلّل المنحنى », un axe faux n'est pas un détail de style :
+l'élève entraîne son œil sur une figure qui contredit la وثيقة. Ajouté `src/components/methodology/chart-scale.ts` :
+`buildXAxis` (axe **numérique proportionnel** quand toutes les étiquettes portent un nombre croissant,
+catégoriel sinon — et le motif du repli est renvoyé, pas deviné), `niceDomain` (borne 0 seulement si elle
+n'écrase pas la variation : une série 88→100 ne s'écrase plus sous une baseline à zéro ; une série qui
+change de signe garde son zéro), `ticksOf`/`niceNum` (graduations rondes), `formatAxisNumber` (2 décimales
+max, pas de « -0 », « — » si non fini), `chartNumbersTable` (mêmes abscisses, mêmes valeurs, unité reprise
+du document — aucune valeur ajoutée ni arrondie ailleurs).
+
+Et la lisibilité demandée, côté chiffre : **un tableau « أرقام الوثيقة » sous chaque courbe**, construit sur
+les `points` déjà présents. C'est ce qui manquait pour la compétence évaluée : en analyse de document,
+l'élève doit **citer** les valeurs. Rendu vérifié par `react-dom/server` (pas par un 200) :
+`2 → 10 %`, `4 → 40 %`, `6 → 85 %`, `7 → 100 %`, `8 → 70 %`, `10 → 15 %` pour la courbe de pH ;
+`0 · 0 وحدة, 50 · 5 وحدة … 600 · 45 وحدة` pour celle de photosynthèse ; `x` des points à 42 · 80 · 118 · 194 · 346 · 498,
+soit des écarts 38/38/76/152/152 — exactement les proportions des abscisses.
+
+Un bug que j'ai **moi-même introduit puis corrigé** dans la foulée : ma première version du tableau
+passait chaque cellule dans `Number(cell)` pour détecter un NaN — « 5 وحدة » devenait donc « — ».
+L'assertion de rendu l'a attrapé ; la garde est supprimée (`formatAxisNumber` pose déjà le tiret).
+
+### 17.3 Ce qui est verrouillé
+
+`src/components/methodology/chart-scale.test.ts` — **43 tests** :
+proportions d'axe (dont le ratio 4× du segment 400→600), plateau visible, replis catégorielles **nommés**
+(`etiquettes-non-numeriques`, `moins-de-3-points`, `abscisses-non-croissantes`), axe partagé entre séries de
+longueurs différentes, domaines d'ordonnées (ancrage 0 conditionnel, série constante, point unique, tableau
+vide), graduations régulières, formatage, table à une/trois séries avec tiret si une série est plus courte,
+`DocumentRenderer` branché sur `buildXAxis`/`niceDomain`/`ChartNumbersTable` et **sans** `index * stepX` ni
+`computeChartBounds`, garde du mode lecture (documents rendus, corrigé dans `<details>`, **aucun**
+`apiClient`/`awardXP`/`grade(`/`saveMethodologyEvaluations` dans ce composant), garde du hub (deux familles,
+pas de badge « مصحح محلي » sur les cartes de lecture), et complétude de `VERB_LABELS_AR` vs l'union
+`MethodologyVerbSlug` (les libellés de verbe ont été **extraits** dans `src/lib/methodology-verb-labels.ts`
+pour que le mode noté et le mode lecture partagent la même table, typée par l'union).
+
+Morsure vérifiée par mutation : forcer un espagement régulier → `expected 1.0 to be close to 4` ; rétablir
+la garde NaN du tableau → 1 échec ; retirer `<ScenarioReadingMode>` du runner → 1 échec. (Une première
+mutation était **invalide** — `parseAxisNumber` lit le nombre où qu'il soit dans l'étiquette, donc
+`"x0"` restait numérique ; le comportement sur les libellés d'intervalle « 0-50 » est maintenant épinglé
+par un test qui le **choisit** au lieu de le subir.)
+
+Batterie : `vitest` **959 ✓** (916 → +43) · `tsc --noEmit` 0 · `eslint src` 0 erreur / **12 warnings**
+(inchangés ; le 13ᵉ que j'avais créé — `computeChartBounds` devenu mort — a été supprimé, pas consigné) ·
+`next build` ✓. Le rendu visuel des pages gardées par `AuthGuard` reste invérifiable par curl (§16.4) :
+les preuves ci-dessus viennent du rendu `react-dom/server` et des tests, pas d'un code HTTP.

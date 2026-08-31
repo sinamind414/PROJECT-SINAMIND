@@ -1,6 +1,15 @@
 "use client"
 
 import type { ReactNode } from "react"
+import {
+  buildXAxis,
+  chartNumbersTable,
+  formatAxisNumber,
+  niceDomain,
+  ticksOf,
+  type ChartTable,
+  type Domain,
+} from "./chart-scale"
 
 export type ChartPoint = {
   label: string
@@ -111,6 +120,81 @@ function DocumentFrame({ title, caption, children }: { title: string; caption?: 
   )
 }
 
+// ── Échelles communes des graphes ────────────────────────────────────
+// Les coordonnées ne viennent plus de l'index du point mais de sa valeur (voir
+// `chart-scale.ts`) ; le tableau des chiffres sous chaque graphe est la même donnée, relisible.
+
+const CHART_W = 540
+const CHART_H = 250
+const CHART_PAD = 42
+
+function GridAndYAxis({ domain, yOf, unit }: { domain: Domain; yOf: (v: number) => number; unit?: string }) {
+  return (
+    <>
+      {ticksOf(domain).map((tick) => (
+        <g key={tick}>
+          <line
+            x1={CHART_PAD}
+            y1={yOf(tick)}
+            x2={CHART_W - CHART_PAD}
+            y2={yOf(tick)}
+            stroke={tick === 0 ? "rgba(255,255,255,.3)" : "rgba(255,255,255,.08)"}
+            strokeDasharray={tick === 0 ? undefined : "3 4"}
+          />
+          <text x={CHART_PAD - 7} y={yOf(tick) + 4} fill="rgb(148,163,184)" fontSize="11" textAnchor="end">
+            {formatAxisNumber(tick)}
+          </text>
+        </g>
+      ))}
+      <line x1={CHART_PAD} y1={CHART_H - CHART_PAD} x2={CHART_W - CHART_PAD} y2={CHART_H - CHART_PAD} stroke="rgba(255,255,255,.22)" />
+      <line x1={CHART_PAD} y1={CHART_PAD / 2} x2={CHART_PAD} y2={CHART_H - CHART_PAD} stroke="rgba(255,255,255,.22)" />
+      {unit ? (
+        <text x={CHART_PAD - 7} y={CHART_PAD / 2 - 4} fill="rgb(148,163,184)" fontSize="10" textAnchor="end">
+          {unit}
+        </text>
+      ) : null}
+    </>
+  )
+}
+
+/** Étiquettes d'abscisses dégraissées : 6 max, sinon illisibles sur 11 points. */
+function xTickLabels(ticks: Array<{ x: number; label: string }>) {
+  const every = Math.max(1, Math.ceil(ticks.length / 6))
+  return ticks
+    .map((t, i) => ({ ...t, show: i % every === 0 || i === ticks.length - 1 }))
+}
+
+function ChartNumbersTable({ table }: { table: ChartTable }) {
+  if (table.rows.length === 0) return null
+  return (
+    <div className="mt-3 overflow-x-auto" dir="rtl">
+      <table className="w-full text-xs">
+        <caption className="text-right text-gray-500 text-[10px] pb-1.5">أرقام الوثيقة</caption>
+        <thead>
+          <tr className="text-gray-400">
+            {table.columns.map((c) => (
+              <th key={c} className="text-right font-bold border-b border-white/10 py-1.5 px-2 whitespace-nowrap">
+                {c}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {table.rows.map((row, i) => (
+            <tr key={`${row[0]}-${i}`} className={i % 2 ? "bg-white/[0.02]" : undefined}>
+              {row.map((cell, j) => (
+                <td key={j} className={`py-1.5 px-2 whitespace-nowrap ${j === 0 ? "text-gray-300" : "text-white font-bold"}`}>
+                  {cell}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )
+}
+
 function BarChart({ doc }: { doc: BarChartDocument }) {
   const max = Math.max(...doc.points.map((point) => point.value), 1)
 
@@ -141,97 +225,106 @@ function BarChart({ doc }: { doc: BarChartDocument }) {
   )
 }
 
-function computeChartBounds(points: ChartPoint[]) {
-  const values = points.map((p) => p.value)
-  const min = Math.min(...values, 0)
-  const max = Math.max(...values, 1)
-  const range = max - min || 1
-  return { min, max, range }
-}
 
 function LineChart({ doc }: { doc: LineChartDocument }) {
-  const width = 520
-  const height = 220
-  const padding = 34
-  const { min, range } = computeChartBounds(doc.points)
-  const stepX = doc.points.length > 1 ? (width - padding * 2) / (doc.points.length - 1) : 0
+  const axis = buildXAxis([doc.points.map((p) => p.label)], CHART_W, CHART_PAD)
+  const domain = niceDomain(doc.points.map((p) => p.value))
+  const yOf = (v: number) =>
+    CHART_H - CHART_PAD - ((v - domain.min) / (domain.max - domain.min || 1)) * (CHART_H - CHART_PAD * 1.5)
   const coords = doc.points.map((point, index) => ({
-    x: padding + index * stepX,
-    y: height - padding - ((point.value - min) / range) * (height - padding * 2),
+    x: axis.positions[0][index],
+    y: yOf(point.value),
     point,
   }))
-  const path = coords.map((coord, index) => `${index === 0 ? "M" : "L"} ${coord.x} ${coord.y}`).join(" ")
-  const yZero = height - padding - ((-min) / range) * (height - padding * 2)
+  const path = coords.map((c, index) => `${index === 0 ? "M" : "L"} ${c.x} ${c.y}`).join(" ")
+  const showValues = coords.length <= 8
+  const ticks = xTickLabels(axis.ticks)
 
   return (
     <DocumentFrame title={doc.title} caption={doc.caption}>
       <div className="rounded-2xl bg-[#0C151A] border border-white/[0.06] p-4 overflow-x-auto" dir="ltr">
-        <svg viewBox={`0 0 ${width} ${height}`} className="w-full min-w-[420px] h-64">
-          <line x1={padding} y1={height - padding} x2={width - padding} y2={height - padding} stroke="rgba(255,255,255,.22)" />
-          <line x1={padding} y1={padding} x2={padding} y2={height - padding} stroke="rgba(255,255,255,.22)" />
-          {min < 0 && (
-            <line x1={padding} y1={yZero} x2={width - padding} y2={yZero} stroke="rgba(255,255,255,.12)" strokeDasharray="4" />
-          )}
+        <svg viewBox={`0 0 ${CHART_W} ${CHART_H}`} className="w-full min-w-[420px] h-64" role="img" aria-label={doc.title}>
+          <GridAndYAxis domain={domain} yOf={yOf} unit={doc.unit} />
           <path d={path} fill="none" stroke="#5EEAD4" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
-          {coords.map((coord) => (
-            <g key={coord.point.label}>
-              <circle cx={coord.x} cy={coord.y} r="6" fill="#34D399" />
-              <text x={coord.x} y={coord.y - 12} fill="white" fontSize="12" textAnchor="middle">{coord.point.value}</text>
-              <text x={coord.x} y={height - 10} fill="rgb(107,114,128)" fontSize="12" textAnchor="middle">{coord.point.label}</text>
+          {coords.map((c, i) => (
+            <g key={`${c.point.label}-${i}`}>
+              <circle cx={c.x} cy={c.y} r="6" fill="#34D399" />
+              {showValues && (
+                <text x={c.x} y={c.y - 13} fill="white" fontSize="12" fontWeight="bold" textAnchor="middle">
+                  {formatAxisNumber(c.point.value)}
+                </text>
+              )}
             </g>
           ))}
-          <text x={width - padding} y={height - 4} fill="rgb(107,114,128)" fontSize="12" textAnchor="end">{doc.xLabel}</text>
-          <text x={padding + 4} y={18} fill="rgb(107,114,128)" fontSize="12">{doc.yLabel}</text>
+          {ticks.map((t, i) => (
+            <g key={`${t.label}-${i}`}>
+              <line x1={t.x} y1={CHART_H - CHART_PAD} x2={t.x} y2={CHART_H - CHART_PAD + 4} stroke="rgba(255,255,255,.25)" />
+              {t.show && (
+                <text x={t.x} y={CHART_H - 12} fill="rgb(148,163,184)" fontSize="11" textAnchor="middle">
+                  {t.label}
+                </text>
+              )}
+            </g>
+          ))}
+          <text x={CHART_W - CHART_PAD} y={CHART_H - 1} fill="rgb(107,114,128)" fontSize="11" textAnchor="end">
+            {doc.xLabel}
+          </text>
+          <text x={CHART_PAD + 4} y={CHART_PAD / 2 - 4} fill="rgb(107,114,128)" fontSize="11">
+            {doc.yLabel}
+          </text>
         </svg>
       </div>
+      <ChartNumbersTable table={chartNumbersTable([{ label: doc.yLabel || "القيمة", points: doc.points }], { xLabel: doc.xLabel, unit: doc.unit })} />
     </DocumentFrame>
   )
 }
 
 function MultiLineChart({ doc }: { doc: MultiLineChartDocument }) {
-  const width = 520
-  const height = 220
-  const padding = 34
-  const allPoints = doc.series.flatMap((s) => s.points)
-  const { min, range } = computeChartBounds(allPoints)
+  const axis = buildXAxis(doc.series.map((series) => series.points.map((p) => p.label)), CHART_W, CHART_PAD)
+  const domain = niceDomain(doc.series.flatMap((series) => series.points.map((p) => p.value)))
+  const yOf = (v: number) =>
+    CHART_H - CHART_PAD - ((v - domain.min) / (domain.max - domain.min || 1)) * (CHART_H - CHART_PAD * 1.5)
 
-  const seriesPaths = doc.series.map((series) => {
-    const stepX = series.points.length > 1 ? (width - padding * 2) / (series.points.length - 1) : 0
+  const drawn = doc.series.map((series, si) => {
     const coords = series.points.map((point, index) => ({
-      x: padding + index * stepX,
-      y: height - padding - ((point.value - min) / range) * (height - padding * 2),
+      x: axis.positions[si][index],
+      y: yOf(point.value),
       point,
     }))
-    const path = coords.map((coord, index) => `${index === 0 ? "M" : "L"} ${coord.x} ${coord.y}`).join(" ")
+    const path = coords.map((c, index) => `${index === 0 ? "M" : "L"} ${c.x} ${c.y}`).join(" ")
     return { label: series.label, color: series.color, coords, path }
   })
-
-  const yZero = height - padding - ((-min) / range) * (height - padding * 2)
+  const ticks = xTickLabels(axis.ticks)
 
   return (
     <DocumentFrame title={doc.title} caption={doc.caption}>
       <div className="rounded-2xl bg-[#0C151A] border border-white/[0.06] p-4 overflow-x-auto" dir="ltr">
-        <svg viewBox={`0 0 ${width} ${height}`} className="w-full min-w-[420px] h-64">
-          <line x1={padding} y1={height - padding} x2={width - padding} y2={height - padding} stroke="rgba(255,255,255,.22)" />
-          <line x1={padding} y1={padding} x2={padding} y2={height - padding} stroke="rgba(255,255,255,.22)" />
-          {min < 0 && (
-            <line x1={padding} y1={yZero} x2={width - padding} y2={yZero} stroke="rgba(255,255,255,.12)" strokeDasharray="4" />
-          )}
-          {seriesPaths.map((sp) => (
+        <svg viewBox={`0 0 ${CHART_W} ${CHART_H}`} className="w-full min-w-[420px] h-64" role="img" aria-label={doc.title}>
+          <GridAndYAxis domain={domain} yOf={yOf} unit={doc.unit} />
+          {drawn.map((sp) => (
             <g key={sp.label}>
               <path d={sp.path} fill="none" stroke={sp.color} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-              {sp.coords.map((coord) => (
-                <circle key={`${sp.label}-${coord.point.label}`} cx={coord.x} cy={coord.y} r="4" fill={sp.color} />
+              {sp.coords.map((c, i) => (
+                <circle key={`${sp.label}-${c.point.label}-${i}`} cx={c.x} cy={c.y} r="4" fill={sp.color} />
               ))}
             </g>
           ))}
-          {seriesPaths[0]?.coords.map((coord) => (
-            <g key={coord.point.label}>
-              <text x={coord.x} y={height - 10} fill="rgb(107,114,128)" fontSize="12" textAnchor="middle">{coord.point.label}</text>
+          {ticks.map((t, i) => (
+            <g key={`tick-${i}`}>
+              <line x1={t.x} y1={CHART_H - CHART_PAD} x2={t.x} y2={CHART_H - CHART_PAD + 4} stroke="rgba(255,255,255,.25)" />
+              {t.show && (
+                <text x={t.x} y={CHART_H - 12} fill="rgb(148,163,184)" fontSize="11" textAnchor="middle">
+                  {t.label}
+                </text>
+              )}
             </g>
           ))}
-          <text x={width - padding} y={height - 4} fill="rgb(107,114,128)" fontSize="12" textAnchor="end">{doc.xLabel}</text>
-          <text x={padding + 4} y={18} fill="rgb(107,114,128)" fontSize="12">{doc.yLabel}</text>
+          <text x={CHART_W - CHART_PAD} y={CHART_H - 1} fill="rgb(107,114,128)" fontSize="11" textAnchor="end">
+            {doc.xLabel}
+          </text>
+          <text x={CHART_PAD + 4} y={CHART_PAD / 2 - 4} fill="rgb(107,114,128)" fontSize="11">
+            {doc.yLabel}
+          </text>
         </svg>
         <div className="flex flex-wrap gap-4 mt-3 justify-center">
           {doc.series.map((s) => (
@@ -242,6 +335,12 @@ function MultiLineChart({ doc }: { doc: MultiLineChartDocument }) {
           ))}
         </div>
       </div>
+      <ChartNumbersTable
+        table={chartNumbersTable(
+          doc.series.map((s) => ({ label: s.label, points: s.points })),
+          { xLabel: doc.xLabel, yLabel: doc.yLabel, unit: doc.unit }
+        )}
+      />
     </DocumentFrame>
   )
 }
