@@ -25,8 +25,9 @@ doc après modification, je regénère les chiffres au lieu de les supposer.
 │   · correction + quota   · sessions de drill   · chatbot/tuteur               │
 │   · progression synchronisée · XP, gems, streaks, duels, classement           │
 └───────────────────────────────┬───────────────────────────────────────────────┘
-                                │ fetch("/api/…")  ← rewrites Next.js (même origine)
-                                │ API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || ""
+                                │ fetch("/api/…")  ← même origine, TOUJOURS
+                                │ proxy runtime : src/app/api/[...path]/route.ts lit
+                                │ API_ORIGIN || NEXT_PUBLIC_API_URL || localhost:8000, PAR REQUÊTE 
 ┌───────────────────────────────▼───────────────────────────────────────────────┐
 │ BACK — khawarizmi-backend · FastAPI sur python:3.12-slim (Dockerfile)         │
 │ 62 fichiers de routes · 49 routers branchés · 209 endpoints déclarés          │
@@ -150,11 +151,24 @@ khawarizmi-frontend/src/lib/api-client.ts — 1 705 lignes
   → 122 méthodes, 71 chemins /api/… distincts
 ```
 
-- **Deux modes d'adressage, un seul à choisir.** `""` → le front passe par le proxy `rewrites` de
-  `next.config.ts` (`/api/:path*` → `${NEXT_PUBLIC_API_URL || "http://localhost:8000"}/api/:path*`), donc
-  same-origin : pas de CORS, CSP `connect-src 'self'` suffit. URL absolue → cross-origin : l'origine doit
-  être dans `get_allowed_origins()` **et** dans la CSP. Depuis le correctif §11, la CSP est **dérivée de la
-  même variable** (`apiOrigin()`, `next.config.ts` l. 18-27) : une source de vérité, aucun hôte codé en dur.
+- **Un seul mode d'adressage depuis F32 : same-origin.** `API_BASE_URL = NEXT_PUBLIC_API_URL || ""` reste
+  en place pour les clients qui voudraient partir en cross-origin (l'origine doit alors être dans
+  `get_allowed_origins()` **et** dans la CSP, dérivée de la même variable par `apiOrigin()`,
+  `next.config.ts` l. 18-27). Mais le chemin de production est le **proxy runtime**
+  `src/app/api/[...path]/route.ts` : il lit `API_ORIGIN || NEXT_PUBLIC_API_URL || http://localhost:8000`
+  **à chaque requête**, reconstruit `${origine}/api/${path}` avec la query, transmet cookie et
+  `Authorization`, passe le corps et le flux de la réponse (SSE), propage les statuts de l'amont, et renvoie
+  la forme d'erreur du backend (`{erreur, status, path, method, requestId}`, `routes/errors.py`) en **502**
+  si l'amont est injoignable — la cause technique part dans les logs serveur.
+- **Le rewrite `/api/:path*` n'existe plus** (et c'est le correctif, pas un nettoyage) : les rewrites du
+  panier `afterFiles` de Next passent **avant** les routes dynamiques, donc il masquait entièrement le
+  handler. Mesure : `API_ORIGIN` sur un port mort + amont vivant sur :8000 → la requête répondait le JSON
+  de :8000, tests unitaires verts compris (rapport §19.2). `/health` garde son rewrite : c'est l'empreinte
+  qui prouve qu'un domaine sert *ce* dépôt (objet JSON de `routes/health.py`, et 404 au format
+  `{"erreur","status","path","method"}` — jamais `{"message","requestId"}`).
+- **Conséquence opérationnelle** : changer de domaine Railway = éditer `API_ORIGIN` dans Vercel, **zéro
+  rebuild**. L'ancien mécanisme (destination figée au build, CI qui ne re-déploie que Railway,
+  `.github/workflows/ci.yml` l. 92-95) rendait la panne invisible et récurrente.
 - **Erreurs normalisées côté back** : `routes/errors.py` renvoie un message arabe élève + `requestId` ;
   handlers branchés sur 400/401/403/404 (http), 422 (validation), 500 (générique), et sur la **classe**
   `RateLimitExceeded` (pas sur le code 429 — correction S38 : brancher le handler sur le code faisait planter
@@ -318,7 +332,7 @@ d'aucun des deux ; et 42 routes hors navigation dégradent la compréhension du 
 
 | # | Dette | Preuve | Effet tant que c'est là |
 |---|---|---|---|
-| D1 | `NEXT_PUBLIC_API_URL` de prod pointe un domaine qui ne sert pas ce dépôt | rapport §11 | **la moitié interactive du site est morte** (correction, drill, chatbot, progression) |
+| D1 | Origine de l'API figée au build (le front appelle un domaine mort) | rapport §11, §19 | **25 pages sur 81 (31 %) dépendent de l'API** : correction, drill, tuteur, progression. Le proxy runtime (F32) règle la partie « on ne peut pas changer de domaine sans rebuild » ; il reste à poser `API_ORIGIN` + `LOCAL_RUBRIC_GRADER=true` |
 | D2 | 55 leçons de 327 caractères, 0 visuel | `active-lessons.ts` ; `visualHint` 0/160 blocs | l'élève n'assimile pas le cours, il apprend la forme de la fiche |
 | D3 | Grilles de correction : 13 validées sur ~68, 10 brouillons non validés | `data/rubrics/index.json` | le correcteur local ne peut pas noter critère par critère ; la salle reste fermée |
 | D4 | Annales sans التمرين الثالث (8 ن) et intégralement en français | §18.4 : 0 `وضعية`, 80/80 questions | la rubrique « BAC » n'entraîne pas à l'épreuve réelle |
@@ -327,7 +341,7 @@ d'aucun des deux ; et 42 routes hors navigation dégradent la compréhension du 
 | D7 | `duree: 180` min vs 240 min de budget conseillé par le livre | §18.5 | l'élève sort du sujet avec le bloc de 8 ن entamé |
 | D8 | 0 PDF sur 12 pointeurs Git LFS ; `bac_subjects` = 1 sujet | `pdf-availability.ts`, `/api/annales` | aucun énoncé officiel à montrer, donc aucun barème officiel à scorer |
 
-**Ordre de traitement recommandé** : D1 (une variable, débloque D-tout-le-reste interactif) → D2 (extraire du
+**Ordre de traitement recommandé** : D1 (une variable, `API_ORIGIN`, plus deux drapeaux — débloque les 25 pages interactives) → D2 (extraire du
 livre déjà dans le dépôt, 55 chapitres, validation éditoriale par toi) → D3 (valider les 10 brouillons, puis
 générer à partir des vrais barèmes) → D4/D8 (mêmes sources : ONEC) → D5/D6 (une nav et un chemin d'entrée) →
 D7 (un arbitrage de chiffres).
@@ -371,6 +385,19 @@ PY
 ls services/*.py | wc -l                                            # 95 · find tests -name 'test_*.py' | wc -l → 139
 python3 -c "import json;print(len(json.load(open('data/rubrics/index.json'))))"   # 13 grilles validées
 find data/rubrics -type f | wc -l                                   # 32
+
+# CÂBLAGE PROD : vérifier que le proxy runtime n'est pas masqué par un rewrite (rapport §19.4)
+cd ../khawarizmi-frontend && npm run build >/dev/null 2>&1
+python3 -c "
+import json,pathlib
+rm = json.load(open('.next/routes-manifest.json'))
+after = [{k: r[k] for k in ('source','destination')} for r in rm['rewrites']['afterFiles']]
+print('rewrites afterFiles :', after)      # attendu : /health seulement, JAMAIS /api/:path*
+print('route proxy :', '/api/[...path]' in json.load(open('.next/app-path-routes-manifest.json')))
+"                                            # attendu : True
+# puis, en dev : API_ORIGIN=http://127.0.0.1:8999 (port mort) → /api/... doit répondre un 502
+# {"erreur":"Le serveur de correction est injoignable…","requestId":"proxy-…"}. Un JSON d'amont vivant
+# à cette place prouverait qu'un rewrite absorbe encore les appels.
 ```
 
 *Règle de lecture* : ce document décrit **ce qui est**. Ce qui devrait être — la liste des défauts par priorité

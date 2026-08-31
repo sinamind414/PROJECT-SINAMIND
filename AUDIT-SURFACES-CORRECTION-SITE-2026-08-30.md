@@ -1204,3 +1204,83 @@ si ta copie de la هيكلة diffère du livre ; (2) la dette des annales (bloc 
 rubrique reste un entraînement hors format ; (3) le repère de temps (§18.5) ; (4) `API_BASE_URL = ""` en
 production, question sans réponse depuis **treize tours** (§11) — aucun appel API élève n'aboutit en prod
 tant que ce n'est pas tranché.
+
+---
+
+## 19. F32 — le proxy d'API ne servait à rien : le rewrite le masquait (et D1 devient réglable sans rebuild)
+
+### 19.1 Ce que la question de l'utilisateur a révélé
+
+Question posée : « as-tu identifié la nouvelle URL Railway pour mettre à jour `NEXT_PUBLIC_API_URL` ? ».
+Non — et le point n'est plus là. Trois constats : le dépôt ne documente qu'un seul domaine
+(`docs/deploiement-vercel.md:15,35` → `khawarizmi-production.up.railway.app`, précisément celui qui ne répond
+plus), le sandbox n'avait plus d'egress pendant ce tour (contrôle : `api.github.com` → 200, `example.com`,
+`*.vercel.app`, `*.up.railway.app` → **000**), et `gh api …/actions/secrets` → `403 Resource not accessible
+by integration`. **Aucun de ces trois obstacles n'a d'importance si l'origine est lue à la requête.**
+
+Le défaut de fond : `next.config.ts` construit ses `rewrites` **au build**, alors que
+`.github/workflows/ci.yml` ne re-déploie que Railway (job `deploy-railway`, l. 92-95). Un changement de
+domaine côté Railway recasse donc la prod **sans commit, sans CI rouge, sans trace**. C'est la raison pour
+laquelle D1 survit à huit audits : elle se régénère seule.
+
+### 19.2 L'implémentation que j'ai écrite, et la mesure qui l'a invalidée avant d'être livrée
+
+Premier essai : `src/app/api/[...path]/route.ts`, handler Node « force-dynamic » qui lit
+`API_ORIGIN || NEXT_PUBLIC_API_URL || http://localhost:8000` **par requête**, reconstruit
+`${origine}/api/${path}` avec la query, transmet cookie + Authorization + corps, passe le flux HTTP de la
+réponse (SSE de `/api/chatbot/ask/stream`), et en cas d'amont injoignable renvoie la **forme d'erreur du
+backend** (`{erreur, status, path, method, requestId}` — `routes/errors.py`) en 502, la cause technique
+restant dans les logs. **10 tests unitaires, tous verts.**
+
+Puis la mesure qui compte, parce que des tests verts ne prouvent pas le câblage : `API_ORIGIN` pointé sur
+un **port mort** (127.0.0.1:8999) avec un amont vivant sur :8000 → la requête `/api/manhadjiya/verbs`
+répondait **quand même** le JSON de :8000. Autrement dit **mon handler n'était jamais appelé** : la
+documentation de Next place les rewrites du panier `afterFiles` **avant** les routes dynamiques, donc le
+`source: "/api/:path*"` de `next.config.ts` absorbait tout. Un proxy mort + 10 tests verts = exactement le
+type de correctif qui ferait re-chuter la prod dans six semaines.
+
+### 19.3 Correction appliquée
+
+- `next.config.ts` : le rewrite `/api/:path*` est **retiré** (commentaire qui dit pourquoi, avec la mesure).
+  `/health` est conservé — c'est l'empreinte par laquelle on vérifie qu'un domaine sert bien *ce* dépôt.
+- Le handler devient le seul chemin pour `/api/*`. `src/app/api` ne contient que lui (vérifié : aucune autre
+  route à masquer).
+- `deploy-config.test.ts` : la garde qui exigeait « les deux rewrites lisent la même variable » est
+  **remplacée** (le contrat a changé, ce n'est pas un test qu'on effile pour être vert) par deux assertions :
+  aucun `source: "/api/:path*"` dans la config, et le handler partage bien le repli de dev.
+
+### 19.4 Vérification, en dev et dans le manifest de build
+
+| Sonde | Résultat |
+|---|---|
+| `API_ORIGIN=http://127.0.0.1:8999` (mort) → `GET /api/manhadjiya/verbs?page=2` via :3000 | `{"erreur":"Le serveur de correction est injoignable. Réessaie dans un instant.","status":502,"path":"/api/manhadjiya/verbs","method":"GET","requestId":"proxy-…"}` — **c'est bien mon handler** |
+| `API_ORIGIN=http://127.0.0.1:8000` (vivant) → GET avec cookie | amont reçoit `cookie: sid=eleve-9`, `host: 127.0.0.1:8000`, query préservée |
+| POST `/api/grade` avec `authorization: Bearer t` et corps JSON | méthode, corps, en-tête d'autorisation traversent intacts |
+| amont qui renvoie 500 (`/api/boom`) | **500 propagé tel quel**, pas mangé en 500 générique ni réécrit |
+| `GET /health` via :3000 | passe toujours (rewrite conservé) |
+| `/`, `/annales`, `/annales/bac-svt-se-2025`, `/document-analysis`, `/cours` | 200, `err=0` |
+| `.next/routes-manifest.json` (build avec `NEXT_PUBLIC_API_URL` posé) | `afterFiles = [{/health → …}]`, **aucun** `/api/:path*` ; `/api/[...path]` bien présent dans `app-path-routes-manifest.json` |
+
+Batterie : `vitest` **981 ✓** (970 → +11) · `tsc --noEmit` 0 · `eslint src` **0 erreur / 12 warnings**
+(une 13ᵉ que j'avais créée — `NextRequest` importé pour rien — supprimée, pas consignée) · `next build` ✓.
+Remarque de méthode : ma première lecture du manifest (`rm.get("beforeFiles")` au niveau racine) affichait
+« aucun rewrite, nulle part » — **faux**, les rewrites vivent sous `rm["rewrites"]["afterFiles"]`. Le
+« /health a dispari du build » que j'allais consigner n'existe pas ; corrigé avant d'être écrit.
+
+### 19.5 Ce qu'il te reste à faire (une variable, plus deux drapeaux)
+
+1. **Vercel** → Settings → Environment Variables → ajouter `API_ORIGIN` = l'origine du service Railway
+   (sans `/api`). Tu peux garder `NEXT_PUBLIC_API_URL` telle quelle : elle sert encore la CSP et `/health`,
+   et `API_ORIGIN` a la priorité sur elle.
+2. **Railway** → variables du backend : `LOCAL_RUBRIC_GRADER=true` (sinon `/api/grade` retombe sur le LLM,
+   ou échoue si aucun provider n'est configuré) et, si tu assumes les seuils, `SAVOIR_REMEDIATION_ENABLED=true`.
+   Ces deux drapeaux valent `False` par défaut dans `config.py` : une URL correcte sans eux laisse la
+   correction locale éteinte.
+3. **Empreinte de vérification** (à faire depuis ta machine, le sandbox n'ayant pas d'egress ce tour) :
+   `curl https://<domaine-railway>/health` doit renvoyer **un objet JSON de diagnostic** (forme de
+   `routes/health.py`) et `curl https://<domaine-railway>/api/inexistant` doit renvoyer
+   `{"erreur":…,"status":404,"path":…,"method":…}` (forme de `routes/errors.py`). Si tu obtiens `OK` en
+   texte brut ou `{"message","requestId"}`, **ce n'est pas ce dépôt** — c'est exactement comme ça que
+   `khawarizmi-backend.railway.app` a été démasqué.
+4. Un avantage de cette configuration : la CSP reste `connect-src 'self'` (le front n'appelle plus que son
+   propre domaine), donc un changement de domaine ne demande plus de retoucher deux endroits.

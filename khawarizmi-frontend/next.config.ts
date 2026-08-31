@@ -55,10 +55,12 @@ const nextConfig: NextConfig = {
   },
   async rewrites() {
     return [
-      {
-        source: "/api/:path*",
-        destination: `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/api/:path*`,
-      },
+      // ⚠ Le rewrite `/api/:path*` a été RETIRÉ (mesure du 2026-08-31) : la documentation de Next place
+      // les rewrites « afterFiles » **avant** les routes dynamiques — donc tant qu'il existait, il servait
+      // toutes les requêtes `/api/*` et masquait complètement le proxy runtime `src/app/api/[...path]/route.ts`.
+      // Preuve : avec `API_ORIGIN=http://127.0.0.1:8999` (port mort) et l'amont vivant sur :8000, la
+      // requête répondait quand même le JSON de :8000 — c'était le rewrite, figé au build, qui parlait.
+      // L'appel `/api/...` passe donc désormais par le handler, qui lit l'origine **à chaque requête**.
       {
         source: "/health",
         destination: `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/health`,

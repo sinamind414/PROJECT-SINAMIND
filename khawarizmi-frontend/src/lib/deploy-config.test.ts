@@ -14,8 +14,9 @@ import { describe, expect, it } from "vitest"
  * the station » de Railway. Donc (a) l'app production n'atteint aucune API, et (b) corriger l'URL
  * côté env sans retoucher la CSP laisse le site cassé — le navigateur bloquant la nouvelle origine.
  *
- * D'où ces trois assertions : une seule source de vérité pour l'origine, aucun hôte en dur dans la
- * CSP, et le doublet mort du client API reste marqué mort et reste non importé.
+ * D'où ces assertions : une seule source de vérité pour l'origine, aucun hôte en dur dans la CSP,
+ * aucun rewrite `/api/*` susceptible de masquer le proxy runtime, et le doublet mort du client API
+ * reste marqué mort et reste non importé.
  */
 
 const ROOT = new URL("../../", import.meta.url)
@@ -35,11 +36,25 @@ describe("CSP et proxy partagent la même origine d'API", () => {
     expect(code).not.toMatch(/https:\/\/[a-z0-9.-]+\./i)
   })
 
-  it("l'origine est dérivée de la variable utilisée par les rewrites", () => {
+  it("l'origine de la CSP est dérivée de la variable d'environnement, jamais d'un hôte en dur", () => {
     expect(cfg).toContain("apiOrigin(process.env.NEXT_PUBLIC_API_URL)")
-    // Les deux rewrites doivent lire la MÊME variable ; sinon CSP et proxy dérivent séparément.
+    // `connect-src` et le proxy doivent partir de la même variable, sinon changer l'une casse l'autre.
+    expect(cfg).toContain("`connect-src 'self'${origin ? ` ${origin}` : \"\"}`")
+  })
+
+  it("aucun rewrite ne précède le proxy runtime sur /api (faute de quoi il le masque)", () => {
+    // Mesure du 2026-08-31 : avec `API_ORIGIN=http://127.0.0.1:8999` (port mort) et un amont vivant sur
+    // :8000, la requête `/api/...` répondait le JSON de :8000 — le rewrite `afterFiles` servait la
+    // requête AVANT la route dynamique. Le proxy runtime ne servait donc jamais rien en prod, malgré
+    // ses tests unitaires verts. D'où cette garde : le rewrite `/api/:path*` ne doit pas revenir.
     const rewrites = cfg.slice(cfg.indexOf("async rewrites"))
-    expect(rewrites.match(/process\.env\.NEXT_PUBLIC_API_URL/g)?.length).toBeGreaterThanOrEqual(2)
+    expect(rewrites).not.toMatch(/source:\s*"\/api\/:path\*"/)
+    expect(rewrites).toContain('source: "/health"')
+    // `/health` garde le repli de dev ; le handler, lui, lit l'origine par requête.
+    expect(rewrites).toContain('"http://localhost:8000"')
+    const proxy = read("src/app/api/[...path]/route.ts")
+    expect(proxy).toContain("process.env.API_ORIGIN || process.env.NEXT_PUBLIC_API_URL")
+    expect(proxy).toContain('"http://localhost:8000"')
   })
 
   it("une URL invalide ou absente retombe sur null, sans casser la construction de l'en-tête", () => {
