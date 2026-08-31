@@ -613,3 +613,64 @@ applicable : `git apply --check` passe sur l'état courant de cette branche). De
 seulement `Typecheck`, `Lint` (sans `continue-on-error`) et `pdfs:check` au job `frontend-tests`.
 Si tu veux que CI déploie le backend, c'est une décision séparée : secrets `RAILWAY_TOKEN`, stratégie
 de rollback, et surtout un `next build` vert — ce qui, pour le coup, l'est de nouveau.
+
+---
+
+## 11. Panne de production mesurée : le site en ligne n'atteint **aucune** API (2026-08-31)
+
+Trouvé en cherchant à vérifier moi-même ce que je t'avais demandé de regarder dans Netlify.
+Le frontend servi est **`https://khawarizmi-ia-two.vercel.app`** (PR #10 « Deploy Vercel — code actuel »),
+et non Netlify — `netlify.toml` est là, mais c'est Vercel qui répond.
+
+### 11.1 Trois sondes, trois réponses qui se recoupent
+
+| Sonde | Réponse | Lecture |
+|---|---|---|
+| `GET https://khawarizmi-ia-two.vercel.app/health` | page Railway « **The train has not arrived at the station** » (404, `Request ID: …`) | le rewrite `/health` du frontend (destination = `NEXT_PUBLIC_API_URL`) pointe vers un **domaine Railway non provisionné** — `khawarizmi-production.up.railway.app`, le seul que le dépôt documente (`docs/deploiement-vercel.md:15,35`) |
+| `GET https://khawarizmi-ia-two.vercel.app/api/lessons/inexistant` | **même** page Railway | donc **toutes** les routes `/api/*` sont mortes : connexion, correction, quota, rappels. L'application publique ne peut rien appeler |
+| `GET https://khawarizmi-backend.railway.app/health` → `OK` · `GET …/api/bac-blanc/zz/correction` → `{"message":"Not Found","requestId":"…"}` | un **autre** service | ce domaine — celui que la CSP Whitelistait — ne court pas ce dépôt : ici `/health` renvoie un objet de diagnostic (`routes/health.py:28`) et un 404 a la forme `{"erreur","status","path","method"}` (`routes/errors.py`) ; la clé `requestId` **n'existe dans aucun `.py`** du repo |
+
+Cumul : le site servi aujourd'hui ne peut ni authentifier un élève ni corriger une copie. **Tant que
+ce point n'est pas réparé, aucun de mes correctifs n'est visible par un utilisateur** — y compris
+ceux des §8, 9 et 10. Et si Vercel construit depuis `master`, la casse n'est pas double mais triple :
+F21 (build rouge, 30/08 → 31/08) bloquait aussi le déploiement du frontend.
+
+### 11.2 Ce que le dépôt peut absorber tout de suite (fait)
+
+1. **`next.config.ts`** : `connect-src` n'héberge plus d'hôte en dur. L'origine est dérivée de
+   `apiOrigin(process.env.NEXT_PUBLIC_API_URL)`, la **variable déjà utilisée par les rewrites**.
+   Sans ça, le moindre changement d'URL côté env produit un site qui reste cassé pour une autre
+   raison : l'appel cross-origin est bloqué par la CSP, silencieusement, côté navigateur.
+2. **`khawarizmi-frontend/lib/api-client.ts`** (273 lignes, importé par **personne**, URL en dur
+   vers l'hôte fantôme) : bandeau `⚠️ DEAD + DANGEREUX` + mesure des trois faits. Il n'est pas
+   supprimé — la dette de surface se signale — mais il ne peut plus être importé par ignorance.
+3. **`src/lib/deploy-config.test.ts`** (5 gardes) : interdit un domaine en dur dans le bloc CSP,
+   exige que CSP et rewrites lisent la même variable, et vérifie que le client mort reste (a) marqué
+   mort, (b) non importé dans `src/`. Contrôle : ré-infecter la CSP avec l'ancien texte passe **2/5 au rouge**.
+
+### 11.3 Ce qui est à toi, dans l'ordre
+
+1. **Railway** : donner au service backend un domaine provisionné (ou réutiliser celui qui existe),
+   puis vérifier sans rien toucher au code :
+   `curl -i https://<domaine-railway>/health` → doit renvoyer **l'objet JSON** de `routes/health.py`,
+   pas `OK` ; `curl -i https://<domaine-railway>/api/bac-blanc/zz/correction` → doit renvoyer
+   `{"erreur":…}`, pas `{"message":…,"requestId":…}`.
+2. **Vercel** : `NEXT_PUBLIC_API_URL` = exactement ce domaine (sans `/api`). La CSP se régénère
+   depuis ce commit, donc tu n'as plus rien à y déclarer.
+3. Fumer la chaîne en prod après déploiement : `/auth/login` doit passer, et `/api/lessons/x` doit
+   répondre le 404 de **l'app** (plus la page Railway).
+4. Option structurelle que je recommande mais n'ai pas imposée : vider `API_BASE_URL` en production
+   (le client n'utiliserait que le proxy same-origin `/api`) — une origine, zéro CORS, zéro CSP à
+   maintenir. Ce n'est pas un détail cosmétique : c'est ce qui rend la classe de panne de §11
+   impossible au lieu de la rendre vérifiable.
+
+### 11.4 Note de méthode (pour ne pas refaire l'erreur)
+
+Le sandbox a, en cours de tour, **supprimé `node_modules` et ré-initialisé HEAD** au commit de base
+(reflog : `clone: from https://github.com/…`), laissant mes fichiers en *untracked*. Symptôme :
+`next build` échouait sur « Could not find the Next.js package ». Récupération appliquée :
+sauvegarde des deux fichiers en cours d'édition → `git fetch origin <branche>` →
+`git reset --hard FETCH_HEAD` → re-déposition → `npm ci` (17 s, cache npm) → batterie complète
+rejouée. Deux règles en sortir : (a) **toujours vérifier `git log --oneline -1` avant de conclure**
+qu'un commit est perdu ou gagné ; (b) un build qui échoue sur un *paquet manquant* n'est pas un échec
+de code — distinguer les deux avant d'accuser le patch.
