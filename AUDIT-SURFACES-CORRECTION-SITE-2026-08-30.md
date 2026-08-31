@@ -720,3 +720,90 @@ sans le correctif, **3 d'entre eux sont rouges**. Le 404 HTML ne régresse pas :
 `vitest` **22 fichiers / 862 tests ✓** · `tsc --noEmit` **0** · `eslint src` **0 erreur** (12 warnings
 gardés, §10.4) · `npm run pdfs:check` à jour · `next build` **✓ Compiled successfully** · HTTP 200 sans
 marqueur d'erreur sur `/methodology`, `/annales/bac-svt-se-2026/read`, `/bac-blanc`.
+
+---
+
+## 13. F26 — la chaîne technique brute arrivait à l'écran de l'élève (8 pages corrigées)
+
+`setError(e.message)` / `setError(String(e))` était le motif partout : depuis F20, le client
+remonte enfin le message arabe du serveur, donc *quand il y en a un*. Dans les autres cas — panne
+réseau, page HTML d'une porte d'entrée, `SyntaxError` de corps non JSON, vieux repli français —
+l'élève arabe RTL lisait `Failed to fetch`, `Unexpected token 'O'…` ou `Erreur de chargement`.
+Sur un site dont la promesse est « ta copie est corrigée », ce texte se lit comme un verdict sur
+**sa** réponse. Le contre-sens est exactement le type de bug que le reste de ce rapport mesure.
+
+Correctif : `src/lib/ui-error.ts` → `readableError(error, fallback)`, avec un ordre de priorité assumé :
+
+1. **le message du serveur s'il est déjà en arabe** (lui seul sait quoi réparer), amputé du préfixe
+   `Error:` et plafonné à 240 caractères ;
+2. **le statut HTTP s'il est connu** : 401 fin de session, 403 compte, 404 contenu indisponible,
+   429 limite (réutilise `UI_AR.limite_atteinte`), 5xx panne serveur — avec la mention
+   « المشكلة ليست في إجابتك » ;
+3. **les pannes locales reconnaissables** : réseau, délai dépassé, requête interrompue, corps illisible ;
+4. **repli arabe de l'appelant**, sinon `UI_AR.erreur_chargement` — et jamais le texte brut, jamais
+   du HTML, jamais une URL, jamais une chaîne française sur un écran arabe.
+
+Branché sur : `auth/login`, `auth/register`, `drill/[unit_id]`, `annales/[slug]/exam/correction`,
+`programme/ProgrammeView`, `admin/analytics` (la page est `dir="rtl"`, son repli français était donc
+une fuite), `mindmap/chapter` (ses 4 cas sémantiques conservés, le repli délègue au helper),
+`BacBlancImmersif` (×3, sur les chemins morts — cohérence). Dans `api-client`, le tuteur SSE garde
+`message_fr` comme **trace technique** (journaux) et `message_ar` comme écran élève ; les trois autres
+sites `detail`-only (`submitDrillAnswer`, `correctExercise`, `grade`) passent par `apiError`.
+
+Garde : `src/lib/ui-error.test.ts` — 19 tests (table de correspondance + un scan source qui nomme
+n'importe quelle page revenant à `setError(String(…))` ou `e.message`). Vérifié mordant : réinjecter
+`setError(String(err))` dans `auth/login` passe la garde au rouge avec le fichier en cause.
+
+## 14. F27 — le SQL d'écriture de la mémoire était PostgreSQL-only : la répétition n'enregistrait rien sur SQLite
+
+Le plus rentable de cette passe, et il dormait derrière **22 tests rouges depuis des semaines**.
+
+`services/fsrs_unified.py` écrivait les états FSRS avec `NOW()` (28 occurrences). SQLite ne connaît
+pas `NOW()` — et ce dépôt **supporte SQLite** : `_sqlite_compat()`, `ensure_dialect_for_url()` et un
+test dédié (`tests/test_dialect_guard.py`), sans parler des docstrings « preview SQLite » du module.
+Sur SQLite, chaque `INSERT` levait, l'exception était avalée par un `except Exception: … return False`
+qui **ne logguait même pas** (contrairement aux chemins de lecture, eux, loggés), et la progression
+de l'élève ne s'enregistrait pas. Les 22 tests, eux, disaient vrai : le fixture créait bien les
+tables, l'`assert await update_memory(...)` attendait `True`. **Le test n'était pas périmé, le code
+oui.** Correction : `NOW()` → `CURRENT_TIMESTAMP` (SQL standard, strictement équivalent en
+PostgreSQL — `timestamp with time zone`).
+
+`tests/test_evaluate.py` : deux tests enveloppaient l'appel dans
+`patch("services.ai_modes.evaluation_mode.get_question")`, symbole qui n'existe pas dans ce module
+(`get_question` vit dans `services/questions.py`) — vestige du retrait de la route `/api/ai/evaluate`
+(GEL 2026-08-17). L'`AttributeError` du patch partait **avant** toute assertion : rouge pour rien.
+Patch retiré, assertions conservées et renforcées (le 404 doit être du JSON), docstring qui dit la
+portée réelle du test maintenant qu'il ne teste plus la recherche de question.
+
+**Ce que je n'ai PAS fait, et pourquoi** : `NOW()` subsiste dans 13 autres fichiers (`interleaving`,
+`phase3/5/6`, `payment`, `mindmap_service`, `auth`, `bac_blanc`, `lessons`, `lifespan`, `social`,
+`remediation`, `kunz_tunnel`), souvent dans de l'arithmétique de dates (`EXTRACT(EPOCH FROM …)`,
+`NOW() - INTERVAL '7 days'`, casts `::text`) qui ne se traduit pas au mot à mot. Convertir à l'aveugle
+casserait la production — et il n'y a pas de PostgreSQL dans ce sandbox pour vérifier. À la place,
+`tests/test_sql_portability.py` : un module non exempté qui introduit `NOW()`/`ILIKE`/`::jsonb`/
+`date_trunc` dans une chaîne passe la suite au rouge en nommant le fichier ; `fsrs_unified` est
+verrouillé sans marque PG-only ; et une exemption périmée est elle-même une erreur. La dette est
+**inventoriée avec la raison par fichier**, pas niée. 3 tests, vérifiés mordants avec une sonde
+temporaire.
+
+Effet de bord trouvé au passage : `cost_log.jsonl` est **suivi par git à la racine** et `pytest` y
+append → lancer la suite salit l'arbre de travail (mesuré : +2 lignes). Corrigé dans
+`tests/conftest.py` (`COST_LOG_PATH` dévié vers le dossier temporaire, `setdefault` → l'override
+reste possible). Le vrai débat — une journal de coûts illimité versionné dans le dépôt — reste ouvert,
+§14.1.
+
+**Batterie backend après correctif** : `pytest tests` → **1378 passed, 10 skipped, 5 xfailed, 0 failed**
+(après 1344 ✓ / 24 ✗). Bruit résiduel non bloquant : un `ValueError: I/O operation on closed file` du
+`BatchSpanProcessor` OpenTelemetry au shutdown des tests — traceur exporter sur stdout fermé par
+pytest ; cosmétique, exit code 0.
+
+### 14.1 Dettes ouvertes par un choix, pas par oubli
+
+- `cost_log.jsonl` à la racine, suivi, à croissance non bornée : à sortir du versionnement (ou
+  basculer dans `data/` ignoré + rotation). Décision de dépôt, pas un patch de plus.
+- Les 13 fichiers `NOW()` exemptés : à convertir **avec** une base PostgreSQL en CI — donc après
+  l'application de `patches/F24-ci-triggers-master.patch`, qui fournit cette base (`services: postgres:16`).
+- Le `except Exception: return False` silencieux des écritures FSRS : désormais sans effet sur SQLite,
+  mais il avale encore n'importe quelle erreur côté Postgres (migration ratée = plus de répétition,
+  aucun signal). Le rendre bavard (un `logger.warning` comme les lectures) est une ligne ; je ne l'ai
+  pas faite sans test de prod, parce qu'un log d'erreur sur ce chemin peut devenir du bruit en continu.
