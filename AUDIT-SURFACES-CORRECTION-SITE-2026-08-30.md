@@ -524,3 +524,68 @@ carte « قراءة », et verrouillent l'étiquetage honnête de la tuile بو�
 contrat d'erreur, rouges 10/10 avant le correctif) · `tsc --noEmit` **0** (après 9) ·
 `next build` **✓ Compiled successfully** (rouge au commit de base) · HTTP 200 sans marqueur
 d'erreur sur `/annales/{slug}`, `/annales/{slug}/exam`, `/bac-blanc`, `/methodology`.
+
+---
+
+## 10. La chaîne de validation est débranchée — et deux de mes affirmations étaient fausses (2026-08-31)
+
+### 10.1 Le garde-fou ne peut pas se déclencher (bug d'infrastructure, le plus rentable du dossier)
+
+```
+ci.yml (master, 9ffb1ab) :  on: push: branches [main, fabuleux/*] ; pull_request: branches [main]
+git ls-remote --heads origin :  arena/01a03f4f…  arena/01a05476…  master        ← « main » n'existe pas
+gh run list --branch master  :  dernière exécution 7 jours, toutes en « 0s · failure »
+gh run list --branch arena/01a05476-project-sinamind  :  (vide — 5 commits, 0 exécution)
+```
+
+Conséquences mesurées, pas supposées :
+
+1. **aucun push sur `master`, aucune PR vers `master` ne lance les tests ni le build** — c'est
+   exactement la fenêtre par laquelle F21 est passé : `next build` rouge depuis le merge de PR #17
+   (2026-08-30) sur `master`, sans qu'aucune checking ne le signale ;
+2. `deploy-railway` est conditionné à `github.ref == 'refs/heads/main'` → **GitHub Actions n'a
+   jamais déployé le backend**. Le frontend, lui, est bâti par Netlify (`khawarizmi-frontend/netlify.toml`,
+   `command = "npm run build"`) : si Netlify déploie `master`, sa construction **échoue** depuis le
+   2026-08-30 et le site servi est figé à la dernière image valide. À vérifier dans le tableau de
+   bord Netlify — c'est la seule affirmation de ce rapport que le sandbox ne peut pas trancher ;
+3. l'étape Lint portait `continue-on-error: true` : même déclenchée, elle n'aurait rien bloqué.
+
+**Correctif proposé (commit séparé, à valider par toi)** : triggers sur `master` + PR vers `master`,
+étape `Typecheck` (`npm run typecheck`), Lint **sans** `continue-on-error` (il passe : 0 erreur),
+`npm run pdfs:check`. **`deploy-railway` reste inerte volontairement** — activer un déploiement de
+production n'est pas un effet de bord tolérable d'un fix de CI ; c'est une décision à poser à part
+(secrets, stratégie de rollback).
+
+### 10.2 « PDF disponible » n'a jamais été vérifié : 25 des 36 fichiers sont absents, 11 sont des pointeurs LFS
+
+`khawarizmi-frontend/public/pdfs/` contient **12 fichiers de 131-132 octets** dont le préambule est
+`version https://git-lfs.github.com/spec/v1` : ce sont des **pointeurs Git LFS non restaurés**, pas
+des sujets. Le catalogue `src/lib/annales-bac.ts` déclare 30 sujets et **36 URL PDF distinctes :
+11 existent (en pointeur), 25 sont totalement absentes** — y compris `bac-svt-sujet-2022.pdf` et
+tout ce qui précède 2023.
+
+Le codefront rendait un verdict honnête **par accident** : `isAnnalePdfAvailable()` renvoyait `false`
+en dur. Correctif : `scripts/pdf-availability.mjs` régénère `src/lib/pdf-availability.ts`
+(URL utilisables / pointeurs LFS / trop petits) à partir du disque ; la fonction devient un prédicat
+sur cet inventaire ; la raison technique (`pointeur-lfs`, `fichier-absent`, `aucune-url`) est exposée
+en `title` sur les deux surfaces qui affichent « الملف ناقص » — l'élève garde un libellé simple, le
+développeur sait quoi réparer. Garde de fraîcheur `npm run pdfs:check` + 7 tests dont un qui **relève
+un manifeste volontairement menteur (5/7 rouges)**.
+
+Réparation réelle (hors code) : `git lfs install && git lfs pull`, récupérer les 25 fichiers manquants,
+puis `npm run pdfs:gen`.
+
+### 10.3 Rétractations — mes deux affirmations fausses de la session
+
+| Affirmation | Verdict | Ce que la mesure dit |
+|---|---|---|
+| « `npm run lint` est mort (`next lint` supprimé en Next 16) et masque donc ces erreurs » | **FAUX** | le script est `"lint": "eslint"`, il tourne et sort **1** ; ce qui masque, c'est `continue-on-error: true` sur l'étape CI. J'ai failli écrire « sort 0 » à cause d'un `$?` lu après un pipe (`tail`) — le code de sortie du pipeline, pas celui d'eslint. Corrigé dans la méthode : `npx eslint src; echo $?`. |
+| §9 : « la carte قراءة n'affiche « ملف PDF متاح » qu'après `isAnnalePdfAvailable(url_pdf)` (avant : « غير متاح » affiché **à tort** pour les vrais liens) » | **SANS EFFET** | la fonction était constante → le rendu ne changeait pas d'un cheveu, et « les vrais liens » n'existaient pas (11 pointeurs LFS + 25 absents). Le correctif utile est §10.2. |
+
+### 10.4 Warnings eslint laissés exprès (dette de produit, pas de style)
+
+`eslint src` = **0 erreur, 12 warnings**. Neuf sont des identifiants déclarés et jamais utilisés
+(`enterExam`, `markReviewed`, `reviewBlocked`, `exercises`, `canEdit`, `setRequestingHint`,
+`ArrowLeft`, `onRetry`, `proofs`) — dont **6 à occurrence unique** dans leur fichier : la trace
+matérielle de fonctionnalités écrites et non branchées. Les renommer en `_x` ou les supprimer ferait
+disparaître l'indicateur ; la dette est ici, pas dans le lint.

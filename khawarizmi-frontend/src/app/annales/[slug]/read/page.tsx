@@ -6,7 +6,7 @@ import Link from "next/link"
 import { AuthGuard } from "@/components/auth/AuthGuard"
 import { AppShell } from "@/components/layout/AppShell"
 import { getSujetBySlug } from "@/lib/annales-bac"
-import { PDF_MISSING_AR, isAnnalePdfAvailable } from "@/lib/pdf-available"
+import { PDF_MISSING_AR, pdfUnavailabilityReason, isAnnalePdfAvailable } from "@/lib/pdf-available"
 
 function PdfViewer({ src, title }: { src: string; title: string }) {
   const [loading, setLoading] = useState(true)
@@ -115,7 +115,10 @@ function ReadContent() {
                 تحميل
               </a>
             ) : (
-              <span className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-amber-500/15 text-amber-300 border border-amber-400/30">
+              <span
+                className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-amber-500/15 text-amber-300 border border-amber-400/30"
+                title={pdfUnavailabilityReason(pdfSrc)}
+              >
                 {PDF_MISSING_AR}
               </span>
             )}

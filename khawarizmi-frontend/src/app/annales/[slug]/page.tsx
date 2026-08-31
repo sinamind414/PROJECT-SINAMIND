@@ -6,7 +6,7 @@ import Link from "next/link"
 import { AuthGuard } from "@/components/auth/AuthGuard"
 import { AppShell } from "@/components/layout/AppShell"
 import { getSujetBySlug } from "@/lib/annales-bac"
-import { PDF_MISSING_AR, isAnnalePdfAvailable } from "@/lib/pdf-available"
+import { PDF_MISSING_AR, isAnnalePdfAvailable, pdfUnavailabilityReason } from "@/lib/pdf-available"
 
 const DIFFICULTE_COLORS: Record<string, string> = {
   facile: "bg-emerald-500/15 text-emerald-400",
@@ -94,7 +94,7 @@ function DetailContent() {
             >
               <p className="text-3xl">📖</p>
               <h3 className="text-white font-bold text-base">قراءة</h3>
-              <p className="text-sm text-amber-300/90">
+              <p className="text-sm text-amber-300/90" title={pdfUnavailabilityReason(sujet.url_pdf)}>
                 {isAnnalePdfAvailable(sujet.url_pdf) ? "ملف PDF متاح" : PDF_MISSING_AR}
               </p>
             </div>
