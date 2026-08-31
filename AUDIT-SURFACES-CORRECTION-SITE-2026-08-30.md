@@ -674,3 +674,49 @@ sauvegarde des deux fichiers en cours d'édition → `git fetch origin <branche>
 rejouée. Deux règles en sortir : (a) **toujours vérifier `git log --oneline -1` avant de conclure**
 qu'un commit est perdu ou gagné ; (b) un build qui échoue sur un *paquet manquant* n'est pas un échec
 de code — distinguer les deux avant d'accuser le patch.
+
+---
+
+## 12. F25 — le client Avalait n'importe quel 200 comme du JSON (corrigé), et trois faux positifs écartés
+
+### 12.1 Ce que je cherchais, et ce que la mesure a refusé
+
+À la suite de F20, j'ai traqué les autres lectures d'erreur `detail`-only. Quatre sites restaient :
+`submitDrillAnswer` (l.609), `streamChatbotMessage` (l.790), `correctExercise` (l.1552) — et `grade`,
+déjà conforme. Vérification des consommateurs dans `src/` : **zéro appel** pour les trois premiers
+(grep des trois identifiants hors `api-client.ts` : rien). Les corriger n'aurait changé **aucune**
+écran pour un élève : ce sont des méthodes mortes du client, documentées comme dette de surface et
+laissées telles quelles — pas de patch de vitrine.
+
+Contrôle utile sur le patch §10 : les 8 fichiers `pytest` cités par le job `backend-tests` **existent
+tous** (`test_methodology*` ×3, `test_diagnostic`, `test_couche3`, `test_tutor`,
+`test_bac_blanc_intelligent`, `test_mindmap_methodology`) — donc `patches/F24-ci-triggers-master.patch`
+ne peut pas rougir la CI pour une cause triviale du type fichier manquant.
+
+### 12.2 Le défaut vivant : `return response.json()` nu sur le chemin le plus emprunté
+
+`request()` est appelé par **32 sites** du front. Son chemin de succès ne protégeait pas le parsing :
+un `200` dont le corps n'est pas du JSON — page HTML d'une porte d'entrée, maintenance d'un proxy,
+domaine mal routé — remontait `SyntaxError: Unexpected token 'O', "OK" is not valid JSON`, que les pages
+affichent telles quelles (`setError(e.message)`), en pleine interface arabe RTL.
+
+Et ce n'est pas un scénario d'école : **mesuré** dans cette session, l'hôte que la CSP Whitelistait
+répond `200` avec le corps texte `OK` sur `/health` (rapport §11.1). Le front possède exactement l'appel
+correspondant — `getHealth()` → `this.request<HealthCheck>("/health")` (`src/lib/api-client.ts:1611`,
+non consommé aujourd'hui, mais c'est la forme du bug).
+
+Correctif : `readJsonBody()` — corps vide (204/205) → `undefined` sans exception ; corps non parseable →
+`apiError({}, status, UI_AR.reponse_illisible)` avec le texte élève :
+`تعذر قراءة استجابة الخادم — ليست مشكلة في إجابتك. أعد المحاولة بعد قليل.`
+La phrase dit explicitement à l'élève que **ce n'est pas sa réponse** qui est en cause — dans un site
+dont la promesse est de corriger des copies, un « SyntaxError » technique se lit comme un échec scolaire.
+
+Gardes : 4 tests dans `src/lib/api-client.error-contract.test.ts` (200 texte, 204 vide, 200 JSON, 404 HTML) ;
+sans le correctif, **3 d'entre eux sont rouges**. Le 404 HTML ne régresse pas : les branches d'erreur
+étaient déjà protégées par `.catch(() => ({}))`.
+
+### 12.3 Batterie de cette passe
+
+`vitest` **22 fichiers / 862 tests ✓** · `tsc --noEmit` **0** · `eslint src` **0 erreur** (12 warnings
+gardés, §10.4) · `npm run pdfs:check` à jour · `next build` **✓ Compiled successfully** · HTTP 200 sans
+marqueur d'erreur sur `/methodology`, `/annales/bac-svt-se-2026/read`, `/bac-blanc`.

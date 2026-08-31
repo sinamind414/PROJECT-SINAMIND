@@ -26,6 +26,21 @@ afterEach(() => {
   vi.unstubAllGlobals()
 })
 
+/** Réponse au corps NON JSON : c'est ce que rendent les portes d'entrée et les proxies. */
+function rawResp(status: number, body: string, contentType = "text/html; charset=utf-8"): Response {
+  return {
+    ok: status >= 200 && status < 300,
+    status,
+    headers: new Headers({ "content-type": contentType }),
+    text: async () => body,
+    json: async () => {
+      throw new SyntaxError(`Unexpected token '${body.slice(0, 1)}', "${body.slice(0, 20)}" is not valid JSON`)
+    },
+  } as unknown as Response
+}
+
+
+
 describe("httpErrorMessage — contrat backend d'abord, détail FastAPI ensuite", () => {
   it("lit « erreur » (contrat Khawarizmi)", () => {
     expect(httpErrorMessage({ erreur: "الفصل غير موجود في البرنامج الرسمي.", status: 404 }, 404)).toBe(
@@ -144,5 +159,37 @@ describe("evaluateVerbAnswer — payload validé, pas affirmé", () => {
     stub(200, { percentage: 0, source: "ungraded", banner_ar: "لا شبكة تقييم." })
     const r = await apiClient.evaluateVerbAnswer({ verb_slug: "deduce", answer: "x" })
     expect(r).toMatchObject({ ungraded: true, source: "ungraded", banner_ar: "لا شبكة تقييم." })
+  })
+})
+
+describe("request() — un 200 au corps illisible n'est pas un plantage technique", () => {
+  it("200 + corps texte « OK » (le cas mesuré sur le domaine fantôme) → message arabe, pas SyntaxError", async () => {
+    vi.stubGlobal("fetch", vi.fn(async () => rawResp(200, "OK", "text/plain")))
+    const err = (await apiClient.getLesson("ch-1").catch((e: unknown) => e)) as Error & { status?: number }
+    expect(err).toBeInstanceOf(Error)
+    expect(err.name).not.toBe("SyntaxError")
+    expect(err.message).toContain("تعذر قراءة استجابة الخادم")
+    expect(err.status).toBe(200)
+  })
+
+  it("204 / corps vide → aucune donnée, aucune exception", async () => {
+    vi.stubGlobal("fetch", vi.fn(async () => rawResp(204, "", "application/json")))
+    await expect(apiClient.getLesson("ch-1")).resolves.toBeUndefined()
+  })
+
+  it("200 JSON valide → transmis intact", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => rawResp(200, JSON.stringify({ id: 7, titre: "المحاكاة" }), "application/json"))
+    )
+    await expect(apiClient.getLesson("ch-1")).resolves.toMatchObject({ id: 7, titre: "المحاكاة" })
+  })
+
+  it("404 + page HTML (casse de passerelle) → libellé générique arabe, pas le HTML ni « undefined »", async () => {
+    vi.stubGlobal("fetch", vi.fn(async () => rawResp(404, "<!DOCTYPE html><h1>Not Found</h1>")))
+    const err = (await apiClient.getLesson("ch-1").catch((e: unknown) => e)) as Error & { status?: number }
+    expect(err.message).toBe("خطأ 404")
+    expect(err.status).toBe(404)
+    expect(err.message).not.toContain("<")
   })
 })

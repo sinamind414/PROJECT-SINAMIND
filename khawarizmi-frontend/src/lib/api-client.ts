@@ -90,6 +90,26 @@ export function apiError(payload: unknown, status: number, fallback?: string): A
 }
 
 /**
+ * Corps d'une réponse 2xx : on ne suppose plus qu'il est JSON.
+ *
+ * Un `response.json()` nu, sur le chemin le plus emprunté du client (32 appels), transforme
+ * n'importe quelle réponse « 200 + texte » d'une porte d'entrée, d'un proxy ou d'un domaine mal
+ * configuré en `SyntaxError: Unexpected token O…` affichée telle quelle à l'élève. Ce n'est pas
+ * théorique : le domaine que la CSP Whitelistait répond `200` avec le corps `OK` sur `/health`
+ * (mesuré le 2026-08-31, rapport §11). Vide = « pas de contenu » (204) → undefined, pas une panne.
+ */
+async function readJsonBody<T>(response: Response): Promise<T> {
+  const text = await response.text().catch(() => "")
+  const trimmed = text.trim()
+  if (!trimmed) return undefined as T
+  try {
+    return JSON.parse(trimmed) as T
+  } catch {
+    throw apiError({}, response.status, UI_AR.reponse_illisible)
+  }
+}
+
+/**
  * Payload d'évaluation verbe : validé, pas affirmé. `data as VerbEvaluateResponse` sur un
  * `Record<string, unknown>` laissait passer un 200 mal formé, et la page affichait alors un
  * `undefined` dans la case note. Seuls les champs REQUIS sont normalisés ; le reste du
@@ -259,7 +279,8 @@ class KhawarizmiApiClient {
       throw apiError(error, response.status)
     }
 
-    return response.json()
+    // 2xx : le corps peut être vide (204) ou illisible (proxy, porte d'entrée) — voir readJsonBody.
+    return readJsonBody<T>(response)
   }
 
   // ── Méthodes génériques (pages : aujourdhui, dix-minutes, fiche-j1, progress) ──
