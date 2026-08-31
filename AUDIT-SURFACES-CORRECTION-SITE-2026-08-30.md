@@ -807,3 +807,121 @@ pytest ; cosmétique, exit code 0.
   mais il avale encore n'importe quelle erreur côté Postgres (migration ratée = plus de répétition,
   aucun signal). Le rendre bavard (un `logger.warning` comme les lectures) est une ligne ; je ne l'ai
   pas faite sans test de prod, parce qu'un log d'erreur sur ce chemin peut devenir du bruit en continu.
+
+---
+
+## 15. La rubrique Manhadjia passée au crible : quatre soupçons réfutés, un panneau mort réanimé (F28)
+
+Directive : « continue de régler les bugs du site, **surtout la rubrique manhadjia** ». J'ai donc traité
+`/manhadjia/*` comme une surface à mesurer, pas à réputer. Verdict : **le module est structurellement
+sain** — et le seul vrai défaut de la rubrique n'est pas dans la rubrique.
+
+### 15.1 Ce qui tient (mesures, pas impressions)
+
+| Contrôlé | Méthode | Résultat |
+|---|---|---|
+| 23 routes vs 22 jours du lib | extraction mécanique des `slug:`/`href:` de `manhadjia-lib.ts` vs répertoires | 22 ↔ 22, **aucune route orpheline, aucun href mort** |
+| Import des 22 ateliers JSON | chemins `../../../data/ateliers/*.json` résolus sur disque | 22 présents, 0 cassé (piège : `../data/ateliers` n'existe pas) |
+| Liens issus des **données** | `lien_suivant` + `lien_juge` des 22 fichiers contre la table des routes | 22/22 résolvent ; les 3 `lien_juge` visent `l0-greffe-ltc`, la seule page à **5/5 grilles câblées** |
+| Contrat remédiation | `manhadjia-remediation.ts` ↔ `routes/manhadjiya.py:110` ↔ `get_contextual_remediation_data` | enveloppe `data`, clés `verb/units/relevant_errors`, erreurs en chaînes, sans auth — **conforme dans les deux sens** |
+| Moteur de détection local | pavage exact du texte par `highlightSpans` sur 120 motifs réels × 9 textes (tashkīl, tatwīl, hits collés) | **1080 combinaisons, 0 rupture**, 0 index hors bornes ; les 120 regex compilent |
+| Références officielles | `verb_ref` des 11 ateliers vs `methodology/verb_database.json` (arabe, français, définition, critères, erreurs) | **0 dérive sur 11** — les cartes « المرجع الرسمي » sont des copies fidèles |
+| Preuves / progression | grep `evidence\|progress-store\|achievement` sur composants + pages + lib | **0 émission de preuve, 0 écriture de progression** — donc pas de faux badge, pas de jumeau de P3 ici |
+| Rendu | smoke HTTP dev | `/manhadjia`, `/manhadjia/atwal`, 4 pages de verbe → 200 sans marqueur d'erreur |
+
+### 15.2 Quatre hypothèses que j'ai émises, et que la mesure a tuées
+
+1. **« la remédiation est morte »** : `get_contextual_remediation_data("hallil", …)` renvoyait `units: []`.
+   Faux : **le slug de répertoire n'est pas la clé d'API**. Le front envoie `data.verb_slug` (le verbe
+   officiel), et **22/22 ateliers résolvent au moins une unité**. Piège consigné pour ne pas y retomber.
+2. **« `persistSessionSnapshot` n'est jamais appelé → la reprise de session est morte »** : artifact de mon
+   propre grep (l'appel est dans le module lui-même). `reduceSession` émet bien `persistSession` /
+   `clearSession`, `runSessionEffects` les exécute (le `default: never` prouve l'exhaustivité), et
+   `dispatchSessionEvent` — le passage obligé des vues — persiste. **Rien à réparer** ; l'exercice
+   `analyse-gene-expression` reprend bien sa session.
+3. **« un regex `g` + `.test()` en boucle fausse la détection »** : chaque motif est reconstruit à chaque
+   appel (donc `lastIndex` repart de 0), et la seule boucle (`re.exec`) garde la garde `length === 0` →
+   `lastIndex++`. Correct.
+4. **« le hub `hallil` est une route morte »** : `/manhadjia/hallil` renvoie 404 (mesuré), mais ce n'était
+   pas un lien cassé — la page vit sur `/manhadjia` et **zéro lien ne cible `/manhadjia/hallil`**.
+
+Quatre soupçons réfutés, ça veut dire une chose : je n'ai rien « corrigé » dans `src/app/manhadjia` ni dans
+`data/ateliers`, parce qu'il n'y avait rien à y corriger.
+
+### 15.3 Le seul défaut mesuré de la rubrique : une remédiation « contextuelle » aveugle au verbe
+
+Les 22 ateliers produisent **21 verbes officiels distincts**. Branchés sur `VERB_UNIT_MAP`, ils ne donnent
+que **2 jeux d'unités différents** : 18 verbes → les 5 unités du programme, 3 verbes → 1 seule unité. Le
+conseil affiché en phase ب (`أخطاء شائعة — المرجع الرسمي`) est donc **quasi identique d'un atelier à l'autre** :
+la contextualisation est un nom, pas un comportement.
+
+Je ne le corrige pas, et il faut lire pourquoi : rendre la remédiation par-verbe exige de rédiger le
+`VERB_UNIT_MAP` fin — c'est-à-dire **décider quels items du programme pèsent sur chaque verbe**. C'est de
+la pédagogie d'examen, et ce n'est pas ma main qui doit l'écrire (mêmes raisons que §9 et que le refus de
+fabriquer les grilles). Le correctif honnête est un **fichier de données à valider par toi**, pas un patch de
+plus. Ajouté à cela, l'état de la prod (§11) rend le débat académique : l'appel part vers un domaine non
+provisionné, donc le panneau retombe sur son repli silencieux quel que soit son contenu.
+
+Le contrat d'échec silencieux reste, lui, **volontaire** : `RemediationHint` affiche la détection locale
+dans tous les cas, et le composant est propre (debounce 1,2 s, timeout 2,5 s, garde de requête obsolète).
+
+### 15.4 F28 — le panneau de données officielles était orphelin (et faux) : `ManhadjiyaTips`
+
+Le gisement n'était pas dans les ateliers manhadjia mais dans sa voisine immédiade, la rubrique **المنهجية**
+(`/methodology`). `src/components/methodology/ManhadjiyaTips.tsx` : 266 lignes, trois onglets (نصائح المراجعة
+· الأخطاء الشائعة · مستويات بلوم), branchés sur trois endpoints qui répondent **200 avec du contenu arabe
+réel** (`REVISION_TIPS_AR` = 51 conseils, `COMMON_BAC_ERRORS` = 37 erreurs, `VERB_COGNITIVE_LEVELS` = 74 verbes).
+Références dans le dépôt, tous fichiers confondus, hors le fichier lui-même : **0**. Le panneau n'était
+monté par aucune page. Deux bugs le rendaient de toute façon inutilisable :
+
+- **réseau** : trois `fetch` dans un `Promise.all`, **sans contrôle de `resp.ok`**, sans timeout, sans
+  annulation, `catch` → `console.error` seul. Un seul endpoint en panne (le 404 HTML de la prod §11, par
+  exemple) faisait lever `.json()`, rejetait le `Promise.all` **en entier**, et laissait l'élève devant
+  trois onglets à `(0)` — un « pas de donnée » qui se lit comme « rien à apprendre », avec aucun bouton
+  pour réessayer. Une requête pendante figeait l'écran « جاري التحميل... » indéfiniment.
+- **contrat de données** : les tables de libellés, d'icônes et de couleurs étaient indexées sur des **clés
+  arabes** (`"في القسم"`, `"تذكّر"` …) alors que le backend envoie des **clés anglaises** (`in_class`,
+  `remember`, `compare_and_analyse` …). Mesure : **10/10 catégories de conseils perdaient leur icône et
+  affichaient la clé technique en titre**, et **5/5 niveaux de Bloom prenaient la couleur du premier** —
+  l'échelle que ce panneau existe pour enseigner. (Seul l'onglet erreurs était aligné : `methodology`,
+  `knowledge`, `form`.)
+
+Correctif (commit ci-dessous) :
+
+- nouvelle couche **`src/lib/manhadjiya-tips.ts`** : endpoints, timeout 4 s avec `AbortController`, contrôle
+  de statut, `normalizeCategoryMap` (ne garde que les listes de chaînes non vides ; distingue
+  « `data: {}` » = répondu-vide **de** « null » = en panne), et **dégradation par onglet** — la panne d'un
+  endpoint ne vide plus les deux autres ; libelliers indexés sur les clés **réelles** du backend ;
+- `ManhadjiyaTips.tsx` réécrit sur ce lib : plus de `console.error` qui avale, un bandeau
+  « تعذّر تحميل … لم تُخترع بيانات بديلة » + **إعادة المحاولة** par onglet en échec, et `غير متاح` dans
+  l'onglet touché au lieu d'un `(0)` mensonger. Visuel et classes inchangés par ailleurs ;
+- **monté dans `/methodology`** en section `#official-tips` (« 4. المرجع الرسمي »), avant la règle d'or.
+  Cinq libellés d'en-tête sont neufs (`official_recommendations`, `cognitive_levels`, `correction_criteria`
+  + deux icônes) : ce sont des **traductions de clés**, pas du contenu d'examen — mais ce sont les seuls
+  mots que j'ai écrits ici, donc tu peux les reprendre ;
+- **`src/lib/manhadjiya-tips.test.ts` (26 tests)** dont une **garde transversale** : le test relit
+  `khawarizmi-backend/prompts/correction_prompt.py`, en extrait les clés de premier niveau, et interdit
+  toute clé sans libellé côté UI. Si le backend ajoute une catégorie demain, le frontend passe au rouge
+  au lieu d'afficher `new_category_name` à un élève arabophone. Plus une garde anti-orphan : si on détache
+  le panneau, le test le dit.
+
+Morsure vérifiée par trois régressions contrôlées (chaque mutation a fait rougir exactement ce qu'il
+fallait, 1 / 2 / 1 échecs, puis revert) : retirer un libellé de Bloom, réintroduire le rejet global du
+`Promise.all`, détacher `<ManhadjiyaTips />` de la page.
+
+**Batterie après F28** : `vitest run` → **907 passed** (881 → +26) · `tsc --noEmit` → 0 · `eslint src` →
+0 erreur, 12 warnings (les mêmes, gardés à dessein) · `next build` → ✓, `/methodology` prerender ✓ ·
+smoke dev : `/methodology` 200 sans marqueur d'erreur, et `GET /api/manhadjiya/{revision-tips,common-errors,
+cognitive-levels}` via le proxy → 200 sur les clés attendues.
+
+### 15.5 PDF des annales : re-mesure, et la limite du sandbox
+
+Le mécanisme d'honnêteté existe déjà et fonctionne : `scripts/pdf-availability.mjs` génère
+`src/lib/pdf-availability.ts` (`0 utilisable · 12 pointeurs LFS`, et le fichier est à jour au `--check`),
+`src/lib/pdf-available.ts` sert `isAnnalePdfAvailable` + le motif de indisponibilité, et `/annales/[slug]`
+comme `/annales/[slug]/read` le consomment. Mesure : **36 URL déclarées dans `annales-bac.ts`, 12 fichiers
+sur disque — tous des pointeurs de 131/132 octets — et 25 absentes**. Donc le site ne ment pas sur les PDF ;
+il sont simplement **absents du dépôt** (LFS non restauré + avant-2023 jamais rapatriés). Réparation
+impossible ici, et ce n'est pas un choix : le sandbox n'a ni egress (`media.githubusercontent.com`,
+`mena.edu.dz` → `HTTP 000`) ni `git lfs` (`git: 'lfs' is not a git command`). À faire chez toi :
+`git lfs install && git lfs pull`, récupérer les 25 manquants, puis `npm run pdfs:gen`.
