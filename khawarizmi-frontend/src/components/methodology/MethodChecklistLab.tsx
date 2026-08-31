@@ -11,6 +11,15 @@ import {
 import type { MethodChecklist, MethodRunState } from "@/lib/method/methodChecklistTypes"
 import type { SessionEvent } from "@/lib/lesson/tunnelTypes"
 import { buildMethodOutcome } from "@/lib/method/methodVerdict"
+import {
+  checklistUiBucket,
+  clearCheckedSteps,
+  countDoneSteps,
+  isStepDone,
+  loadCheckedSteps,
+  saveCheckedSteps,
+} from "@/lib/method/checklistUiStore"
+import { applyMethodRunOutcome } from "@/lib/lesson/practiceOutcome"
 import { buildMethodErrorInputs } from "@/lib/method/methodErrorsAdapter"
 import { upsertLearningError } from "@/lib/lesson/evidenceService"
 import { Check, ChevronLeft, ListChecks, RotateCcw, Lightbulb, SendHorizonal, ArrowLeft } from "lucide-react"
@@ -68,6 +77,15 @@ export function MethodChecklistLab({
   const levelStyle = METHOD_LEVELS[mode.level]
   const checklistMeta = useMemo(() => modeToChecklist(mode), [mode])
 
+  /** Persistance locale des coches en mode hors session (voir checklistUiStore). */
+  const uiBucket = checklistUiBucket(modeId, (checklist as { id?: string } | undefined)?.id)
+  useEffect(() => {
+    if (isSessionMode) return
+    const stored = loadCheckedSteps(uiBucket)
+    setLocalChecked(Object.fromEntries(stored.map((id) => [id, true])))
+    setLocalStarted(stored.length > 0)
+  }, [isSessionMode, uiBucket])
+
   const displaySteps = useMemo(() => {
     if (checklist) {
       return checklist.steps.map((s: { id: string; title: string; instruction?: string }) => ({
@@ -116,10 +134,14 @@ export function MethodChecklistLab({
 
   const activeStepId = run?.stepIds[currentStepIdx] ?? null
   const isStepCommitted = (id: string) => !!committed[id]
-  const hasSelfCheck = (id: string) => !!selfCheck[id]
 
   const totalSteps = displaySteps.length
-  const doneCount = displaySteps.filter((s) => isStepCommitted(s.id) && hasSelfCheck(s.id)).length
+  const doneCount = countDoneSteps({
+    sessionMode: isSessionMode,
+    steps: displaySteps,
+    committed,
+    selfCheck,
+  })
   const allDone = doneCount === totalSteps && totalSteps > 0
   const progress = Math.round((totalSteps > 0 ? (doneCount / totalSteps) : 0) * 100)
 
@@ -134,6 +156,7 @@ export function MethodChecklistLab({
     setLocalChecked({})
     setLocalStarted(false)
     setProofInput("")
+    if (!isSessionMode) clearCheckedSteps(uiBucket)
     if (isSessionMode && dispatchSessionEvent) {
       dispatchSessionEvent({ type: "METHOD_RUN_CLEAR" })
     }
@@ -219,6 +242,12 @@ export function MethodChecklistLab({
         }
       }
 
+      if (verdict.outcome === "passed") {
+        // Preuve de méthode : uniquement sur ce que le verdict peut vérifier objectivement
+        // (preuve non vide, critères de l'étape, ordre) — jamais sur la seule déclaration.
+        applyMethodRunOutcome({ lessonId: cl.lessonId, verbSlug: null, checklist: cl, state: run })
+      }
+
       onOutcome?.({
         outcome: verdict.outcome,
         codes: verdict.codes,
@@ -231,7 +260,12 @@ export function MethodChecklistLab({
   function toggleStep(id: string) {
     if (isSessionMode) return
     if (!localStarted) setLocalStarted(true)
-    setLocalChecked((prev) => ({ ...prev, [id]: !prev[id] }))
+    const next = { ...localChecked, [id]: !localChecked[id] }
+    setLocalChecked(next)
+    saveCheckedSteps(
+      uiBucket,
+      displaySteps.filter((s) => next[s.id]).map((s) => s.id)
+    )
   }
 
   // ── Rendu ──────────────────────────────────────────────
@@ -328,19 +362,32 @@ export function MethodChecklistLab({
           </div>
         </div>
 
+        {!isSessionMode && (
+          <p className="text-[11px] text-white/40" dir="rtl">
+            اضغط على رقم كل خطوة لتعليمها بعد أن تنفّذها فعليًا — التعليم ليس إنجازًا، التنفيذ هو.
+          </p>
+        )}
+
         {/* Checklist steps */}
         <ol className="space-y-2">
           {displaySteps.map((step: { id: string; title: string; subtitle: string; hint?: string }, idx: number) => {
             const isCommitted = isStepCommitted(step.id)
             const sc = selfCheck[step.id]
             const isActive = activeStepId === step.id
+            // Session : une étape est faite quand la preuve est commitée PUIS auto-vérifiée.
+            // Hors session : le geste rituel est l'objet même de l'exercice — cocher suffit.
             const canEdit = isSessionMode ? isActive && !isCommitted : true
+            const stepDone = isStepDone({
+              sessionMode: isSessionMode,
+              committed: isCommitted,
+              selfChecked: !!sc,
+            })
 
             return (
               <li key={step.id}>
                 <div
                   className={`w-full rounded-xl border p-3 text-right transition ${
-                    isCommitted && sc
+                    stepDone
                       ? "border-mint/40 bg-mint/10"
                       : isActive
                         ? "border-mint/20 bg-mint/5"
@@ -348,22 +395,36 @@ export function MethodChecklistLab({
                   }`}
                 >
                   <div className="flex items-start gap-3">
-                    <span
-                      className={`mt-0.5 w-7 h-7 shrink-0 rounded-lg flex items-center justify-center text-xs font-black ${
-                        isCommitted && sc
-                          ? "bg-mint text-ink"
-                          : isCommitted
-                            ? "bg-amber-500/20 text-amber-300"
-                            : "bg-white/10 text-white/60"
-                      }`}
-                    >
-                      {isCommitted && sc ? <Check className="w-4 h-4" strokeWidth={3} /> : idx + 1}
-                    </span>
+                    {!isSessionMode ? (
+                      <button
+                        type="button"
+                        onClick={() => toggleStep(step.id)}
+                        aria-pressed={stepDone}
+                        aria-label={`تعليم الخطوة ${idx + 1}: ${step.title}`}
+                        className={`mt-0.5 w-7 h-7 shrink-0 rounded-lg border flex items-center justify-center text-xs font-black transition ${
+                          stepDone
+                            ? "bg-mint text-ink border-mint"
+                            : "bg-white/10 text-white/60 border-white/10 hover:bg-white/20"
+                        }`}
+                      >
+                        {stepDone ? <Check className="w-4 h-4" strokeWidth={3} /> : idx + 1}
+                      </button>
+                    ) : (
+                      <span
+                        className={`mt-0.5 w-7 h-7 shrink-0 rounded-lg flex items-center justify-center text-xs font-black ${
+                          stepDone
+                            ? "bg-mint text-ink"
+                            : isCommitted
+                              ? "bg-amber-500/20 text-amber-300"
+                              : "bg-white/10 text-white/60"
+                        }`}
+                      >
+                        {stepDone ? <Check className="w-4 h-4" strokeWidth={3} /> : idx + 1}
+                      </span>
+                    )}
                     <div className="flex-1 min-w-0">
                       <span
-                        className={`block text-sm font-bold ${
-                          isCommitted && sc ? "text-mint" : "text-white"
-                        }`}
+                        className={`block text-sm font-bold ${stepDone ? "text-mint" : "text-white"}`}
                       >
                         {step.title}
                       </span>

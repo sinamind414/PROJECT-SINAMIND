@@ -356,3 +356,89 @@ questions/h seulement.
 Un élève qui reprend la formulation attendue n'a donc aucun exemple à comparer, alors que la
 grille, elle, exige « rappel + لأن + نعلم أن ». Rien de cassé côté moteur ; c'est un contenu à
 rédiger (et la garde ne peut rien contrôler tant que l'exemple est absent — elle le signale).
+
+---
+
+## 8. Deuxième complément (31/08) — `/methodology`, annales, et trois correctifs ciblés
+
+### 8.1 « La rubrique des annales est-elle gérée par notre correcteur ? » — non, et voici où ça casse
+
+Le chemin *existe* : `/annales/[slug]/exam` monte `BacBlancImmersif` → `POST /api/bac-blanc/{sid}/submit`
+→ `grade_or_none()` → `services/local_grader` (0 LLM, `services/grade_adapter.py:26-32`).
+Mais trois verrous le rendent inatteignable :
+
+| Verrou | Mesure |
+|---|---|
+| `bac_subjects` n'est écrit que par `scripts/seed_bac_blanc.py` (unique `INSERT` du repo) | 1 slug seedé `bac-svt-2025` ; **intersection avec les 23 slugs d'annales = ∅** |
+| `/api/bac-blanc/start` | `if not rows: raise HTTPException(404, "Sujets introuvables pour : …")` → **404 pour les 23 sujets**, avant toute saisie d'élève |
+| Le seul sujet seedé | 0/8 exercices avec `grade_question_id` → tout `ungraded` (verrouillé par `tests/test_grade_s40.py`) |
+
+Et les deux boutons `/exam` d'une page de sujet (`src/app/annales/[slug]/page.tsx:80` et `:98`,
+« امتحان كامل مع مؤقت زمني ») ne sont conditionnés par rien. Correction de ma section 7 :
+j'avais écrit « `/annales` n'appelle jamais `/api/grade` » — vrai au sens strict, trompeur :
+le correcteur est bien branché au flux, c'est **l'absence de sujets en base** qui coupe avant
+la note. `GET /{sid}/correction` ne corrige d'ailleurs rien : il rejoue `bac_answers.score`.
+
+### 8.2 F20 — contrat d'erreur front/back rompu (toutes les 4xx)
+
+`http_exception_handler` renvoie le contrat `{"erreur", "status", "path", "method"}`
+(`routes/errors.py:23-32`, enregistré pour 400/401/403/404 dans `main.py:61`) alors que
+`api-client.request()` ne lit que `error.detail` (`src/lib/api-client.ts:175,183`) →
+**tout message du backend est jeté** et l'élève voit « خطأ HTTP 404 ». Les voies `grade()`
+(lignes 562, 1022) lisent bien `data.erreur` : l'incohérence est localement corrigée, jamais
+globalement. Réparation minimale : `error.erreur || error.detail`.
+
+### 8.3 F21 — `next build` est rouge sur l'arbre de base (indépendant de ce travail)
+
+`npx next build` échoue au type-check sur `src/lib/api-client.ts:1189` (TS2352, ligne du
+commit de base `9ffb1ab`, blâmée telle quelle), et `next.config.ts` ne pose aucun
+`typescript.ignoreBuildErrors`. Total `tsc --noEmit` : **9 erreurs**, toutes préexistantes
+(1 dans `api-client.ts`, 8 dans `manhadjia-lib.test.ts` / `manhadjia-remediation.test.ts`).
+Conséquence à trancher par le mainteneur : soit le déploiement ignore les erreurs TS, soit le
+build servi est périmé. Je n'ai pas corrigé : le point 1 est hors du périmètre autorisé et les
+8 autres touchent la stratégie de type-check des tests — décision de repo, pas de session.
+Mes fichiers : 0 erreur ajoutée (9 avant / 9 après).
+
+### 8.4 F22 — le portail `/methodology` ne permettait pas le geste qu'il enseigne (corrigé)
+
+Le laboratoire de méthodologie, hors session, était **décoratif** : `toggleStep` défini mais
+jamais appelé (aucun `onClick`, aucun `<input>`), `localChecked` en `useState` pur (un F5
+effaçait tout), et `doneCount` exigeait une auto-évaluation impossible à obtenir dans ce mode
+→ compteur bloqué à `0/5`, ruban à 0 %, et le bloc « المنهجية جاهزة — يمكنك الكتابة الآن »
+inatteignable. Trois correctifs, tous gardés par tests :
+
+1. `src/lib/method/checklistUiStore.ts` (nouveau) — cochages persistés par bucket
+   `mode[:checklistId]`, SSR-safe (repli mémoire comme `evidenceService`), + helpers purs
+   `isStepDone` / `countDoneSteps` ;
+2. `MethodChecklistLab.tsx` — bouton de cochage `aria-pressed` **uniquement** en mode hors
+   session (le mode session garde la preuve écrite + l'auto-vérification comme seules voies),
+   compteur branché sur les helpers, `reset()` purge le bucket ;
+3. `practiceOutcome.applyMethodRunOutcome()` — une **preuve « méthode »** n'est enregistrée que
+   si le verdict objectif du run est `passed` et que le score (étapes à preuve solide / total)
+   atteint le **seuil ≥ 70 % déjà exigé partout ailleurs** (`src/app/progress/page.tsx:354` :
+   « لا إثبات بعد — أنهِ محاولة ≥ 70٪ »). Idempotent, et **sans ouverture de porte FSRS** : le
+   rappel espacé se mérite sur une copie notée par le moteur, pas sur un exercice de structure.
+
+Ce que je me suis refusé : créer une `evidence` à la fin d'un run de Lab par simple
+auto-déclaration (« هل يتوافق جوابك مع النموذج ؟ »). Le compteur `BAC` était mort, l'inflater
+de preuve fabriquée l'aurait rendu faux — et une `score: 0` serait apparue en « 0 % » dans
+« إثباتات حديثة ». La philosophie du site (l'élève d'abord *fait* la méthodologie) commande le
+geste réel (point 1-2), pas la note décorative.
+
+### 8.5 F23 — la tuile « FSRS » est une jauge monotone (documentée, non corrigée)
+
+`ContractPulse` affiche `openRecallCount = recallGates.filter(g => g.allowed)`
+(`src/lib/lesson/evidenceService.ts:306`) ; `allowed` est posé `true` à l'ouverture
+(l.237) et **aucun chemin ne le repasse à `false`** (grep `allowed: false` dans `src/lib/lesson`
+→ 0). Le chiffre étiqueté « FSRS » ne peut donc que monter : il compte des portes ouvertes, pas
+des révisions dues. Décision de produit nécessaire (le refermer à la révision faite, ou le
+renommer) — hors du périmètre que j'ai reçu.
+
+### 8.6 Suites après ces changements
+
+`npx vitest run` : **828 tests passés** (18 fichiers ; +24 nouveaux dont les gardes de câblage,
+qui sont **8/9 rouges sur le code pré-correctif** — vérifié par `git stash`).
+`npx eslint` sur les 7 fichiers : 0 erreur, 3 warnings préexistants (`proofs`, `canEdit`
+inutilisés avant comme après ; `toggleStep` n'est plus mort). `tsc` : 9 = 9.
+`next dev` : `/methodology` et `/methodology/exercices/analyse-gene-expression` en HTTP 200,
+aucun marqueur d'erreur runtime dans le HTML rendu.

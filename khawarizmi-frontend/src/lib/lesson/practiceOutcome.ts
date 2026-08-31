@@ -4,6 +4,8 @@
  */
 
 import type { SessionOutcome } from "./tunnelTypes"
+import type { MethodRunState, MethodStep } from "@/lib/method/methodChecklistTypes"
+import { evalStepProof, hasMinimalTextProof } from "@/lib/method/methodVerdict"
 import {
   createDocumentEvidence,
   createMethodEvidence,
@@ -240,6 +242,58 @@ export type BacExamOutcomeResult = {
   errorsCreated: number
   labelAr: string
   labelFr: string
+}
+
+export type MethodRunOutcomeResult = {
+  score: number
+  solidSteps: number
+  totalSteps: number
+  threshold: number
+  methodEvidenceCreated: boolean
+}
+
+/**
+ * Run complet du laboratoire de méthodologie → preuve « méthode », au même contrat que
+ * le bac : seuil ≥ 70 %.
+ *
+ * Le score n'est PAS une auto-déclaration de l'élève : il compte les étapes dont la preuve
+ * écrite est objectivement solide (non vide, critères de l'étape satisfaits). Les étapes
+ * manquantes ou faibles restent au compteur mais ne constituent pas une preuve.
+ *
+ * Volontairement, ce chemin n'ouvre PAS de porte FSRS : le rappel espacé se mérite sur une
+ * copie notée par le moteur (`grade()`), pas sur un exercice d'entraînement à la structure.
+ * `createMethodEvidence` est idempotent par (lessonId + kind) : re-render ≠ doublon.
+ */
+export function applyMethodRunOutcome(input: {
+  lessonId: string
+  verbSlug: string | null
+  checklist: { steps: MethodStep[] }
+  state: Pick<MethodRunState, "committed" | "proofs">
+  threshold?: number
+}): MethodRunOutcomeResult {
+  const threshold = input.threshold ?? 70
+  const steps = input.checklist.steps ?? []
+  let solid = 0
+
+  for (const step of steps) {
+    if (!input.state.committed?.[step.id]) continue
+    const proof = input.state.proofs?.[step.id]
+    if (proof == null) continue
+    const raw = Array.isArray(proof) ? proof.join(" ") : String(proof)
+    if (!hasMinimalTextProof(raw)) continue
+    if (evalStepProof(step, proof).length > 0) continue
+    solid += 1
+  }
+
+  const totalSteps = steps.length
+  const score = totalSteps > 0 ? Math.round((solid / totalSteps) * 100) : 0
+  const mayProve = totalSteps > 0 && score >= threshold
+
+  if (mayProve) {
+    createMethodEvidence({ lessonId: input.lessonId, verbSlug: input.verbSlug, bacScore: score })
+  }
+
+  return { score, solidSteps: solid, totalSteps, threshold, methodEvidenceCreated: mayProve }
 }
 
 /**

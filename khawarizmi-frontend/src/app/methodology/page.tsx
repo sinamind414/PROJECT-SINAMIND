@@ -285,7 +285,8 @@ export default function MethodologyPortalPage() {
                     Analyse document — expression génétique
                   </div>
                   <p className="text-sm text-white/65 mt-2">
-                    تمرين كامل مع قائمة التحقق والتصحيح — بيّن أن تنشيط المورثة يزيد تركيب البروتين.
+                    تمرين كامل مع قائمة التحقق وحُكم على المنهجية (الترتيب · دليل مكتوب في كل
+                    خطوة) — لا يصحّح المحتوى العلمي. بيّن أن تنشيط المورثة يزيد تركيب البروتين.
                   </p>
                   <span className="inline-block mt-3 text-mint text-sm font-bold group-hover:underline">
                     ابدأ التمرين ←
