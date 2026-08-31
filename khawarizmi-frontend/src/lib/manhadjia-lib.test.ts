@@ -762,8 +762,9 @@ describe("SATELLITE_DAYS (15 satellites : référentiel + livre)", () => {
     RAWS.forEach((raw, i) => {
       const day = SATELLITE_DAYS[i]
       expect(raw.couleur).toBe("فضي")
-      expect(raw.jour).toBeUndefined()
-      expect(raw.verb_ref?.id ?? null).toBe(day.verbRefId)
+      // champs optionnels selon le satellite : accès typé explicite (même style que lien_suivant)
+      expect((raw as { jour?: unknown }).jour).toBeUndefined()
+      expect((raw as { verb_ref?: { id?: number } }).verb_ref?.id ?? null).toBe(day.verbRefId)
     })
   })
 
@@ -797,14 +798,16 @@ describe("SATELLITE_DAYS (15 satellites : référentiel + livre)", () => {
   })
 
   it("exemples officiels sur أثبت · مشبك · استخرج uniquement", () => {
-    const withExemples = RAWS.filter((raw) => raw.exemples && raw.exemples.length > 0)
+    const exemplesOf = (raw: object) =>
+      (raw as { exemples?: { title: string; content: string }[] }).exemples ?? []
+    const withExemples = RAWS.filter((raw) => exemplesOf(raw).length > 0)
     expect(withExemples.map((r) => r.atelier_id)).toEqual([
       "manhadjia_s03_atbat_taam",
       "manhadjia_s06_synapse_taam",
       "manhadjia_s12_istakhrij_taam",
     ])
     for (const raw of withExemples) {
-      for (const ex of raw.exemples!) {
+      for (const ex of exemplesOf(raw)) {
         expect(ex.title.length).toBeGreaterThan(0)
         expect(ex.content.length).toBeGreaterThan(20)
       }

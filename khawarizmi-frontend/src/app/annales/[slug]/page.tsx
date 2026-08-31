@@ -6,6 +6,7 @@ import Link from "next/link"
 import { AuthGuard } from "@/components/auth/AuthGuard"
 import { AppShell } from "@/components/layout/AppShell"
 import { getSujetBySlug } from "@/lib/annales-bac"
+import { PDF_MISSING_AR, isAnnalePdfAvailable } from "@/lib/pdf-available"
 
 const DIFFICULTE_COLORS: Record<string, string> = {
   facile: "bg-emerald-500/15 text-emerald-400",
@@ -81,7 +82,7 @@ function DetailContent() {
               href={`/annales/${sujet.slug}/exam`}
               className="inline-flex items-center gap-2 px-6 py-3 bg-mint text-slate-deep rounded-xl font-bold text-sm hover:bg-mint-soft transition shadow-lg shadow-mint/20"
             >
-              🎯 ابدأ هذا الموضوع
+              🎯 حالة هذا الموضوع في الموقع
             </Link>
           </div>
 
@@ -93,7 +94,9 @@ function DetailContent() {
             >
               <p className="text-3xl">📖</p>
               <h3 className="text-white font-bold text-base">قراءة</h3>
-              <p className="text-sm text-amber-300/90">الموضوع غير متاح (ملف ناقص)</p>
+              <p className="text-sm text-amber-300/90">
+                {isAnnalePdfAvailable(sujet.url_pdf) ? "ملف PDF متاح" : PDF_MISSING_AR}
+              </p>
             </div>
             <Link
               href={`/annales/${sujet.slug}/exam`}
@@ -101,7 +104,9 @@ function DetailContent() {
             >
               <p className="text-3xl">🎯</p>
               <h3 className="text-white font-bold text-base group-hover:text-amber-300 transition-colors">امتحان</h3>
-              <p className="text-sm text-slate-400">امتحان كامل مع مؤقت زمني</p>
+              <p className="text-sm text-slate-400">
+                قاعة الامتحان غير مفتوحة بعد لهذا الموضوع — لا شبكة تقييم محلية
+              </p>
               <span className="inline-block text-xs text-amber-400 font-semibold group-hover:underline">المحاكاة ←</span>
             </Link>
             <Link

@@ -442,3 +442,44 @@ qui sont **8/9 rouges sur le code pré-correctif** — vérifié par `git stash`
 inutilisés avant comme après ; `toggleStep` n'est plus mort). `tsc` : 9 = 9.
 `next dev` : `/methodology` et `/methodology/exercices/analyse-gene-expression` en HTTP 200,
 aucun marqueur d'erreur runtime dans le HTML rendu.
+
+---
+
+## 9. Pass « corrige les bugs » — ce qui a été touché, et ce qui est resté ouvert (2026-08-31)
+
+**Règle de périmètre appliquée** : seuls les bugs démontrés dans ce rapport sont corrigés ; la
+correction suit la mesure du §8.6 (**0 % de rubriques réellement servies par un moteur** → aucun
+câblage de nouvelle question n'a été ajouté, sous peine de murs « تعذر التصحيح »).
+
+| # | Bug | Correction | Preuve |
+|---|---|---|---|
+| F20 | `api-client` lisait `data.detail` ; le contrat backend est `{"erreur",…}` → **tout** message 4× serveur était jeté (« خطأ HTTP 404 ») | `httpErrorMessage(payload, status, fallback)` lit `erreur` puis `detail` ; `apiError()` attache `status` ; utilisé sur la branche 429, la branche `!ok` et `evaluateVerbAnswer` | 11 tests nouveaux ; **10/10 rouges** sur le code d'avant (contrôle par stash) |
+| F21 | `next build` **rouge au commit de base** (`api-client.ts:1189` TS2352 + 8 erreurs dans deux fichiers de test) | normalisation validée à la place du cast « make-auditable » ; corrections de typage dans `manhadjia-lib.test.ts` / `manhadjia-remediation.test.ts` (sans relâcher le typage par des `any`) | `✓ Compiled successfully in 15.4s`, 65 pages statiques, `tsc --noEmit` = **0** (après 9) |
+| F22 | cases de `MethodChecklistLab` décoratives, ruban bloqué à 0 % | bouton accessible + `checklistUiStore` + règle de cohérence selon le mode | §8.2 (commit `dc05e19`) |
+| P3 | tuile BAC de `/methodology` s'ouvrait sur une auto-déclaration | `applyMethodRunOutcome` : la clé = preuve écrite **jugée ≥ seuil (70 %)** dans le moteur de verdict ; 0 sinon ; idempotent ; aucun effet sur erreurs/rappels | 19 tests (+24 au total sur le store/verdict/câblage) |
+| F23 | tuile « FSRS » = compteurs de portes ouvertes (`allowed` jamais remis à `false`) → jauge monotone | **étiquetée honnêtement** (« بوابات FSRS — أبواب مفتوحة بعد إثبات، ليست مراجعات معلّقة »). Un vrai compteur de révisions dues demanderait un champ `dueRecallCount` **inexistant** : refusé de l'inventer | texte seul |
+| §8.5 | `/annales/[slug]` promettait « ابدأ هذا الموضوع » + « امتحان كامل مع مؤقت زمني » alors qu'aucun sujet annale n'est chargé et qu'aucune grille ne correspond ; `/bac-blanc` promettait « مؤقت حقيقية » | textes alignés sur l'état réel (« حالة هذا الموضوع في الموقع », « قاعة الاختبار بمؤقّت غير مفتوحة بعد — لا موضوع مُدخَل في القاعدة ولا شبكة تقييم محلية مطابِقة ») ; la carte « قراءة » n'affiche « ملف PDF متاح » qu'après `isAnnalePdfAvailable(url_pdf)` (avant : « غير متاح » affiché **à tort** pour les vrais liens) | HTTP 200 + aucune marque d'erreur sur `/annales/el_mojtahid_3as`, `/annales/bac-svt-2025`, `/bac-blanc`, `/methodology` |
+
+**Deux décisions refusées, à connaître si on reprend le dossier :**
+
+1. **Câbler le bouton « ابدأ » de `/bac-blanc`** → non. `enterExam` n'est appelé nulle part
+   (`grep -rn enterExam src` : 1 résultat, sa définition) : le hall, `startBac`, `chooseBacSubject`,
+   `saveBacAnswer`, `submitBac` sont morts. Rendre le bouton actif produirait une salle sans grille
+   de correction — exactement ce que l'intro du site interdit (« لن نفتح قاعة وهمية »).
+2. **Inventer une métrique `dueRecallCount`** pour rendre la tuile FSRS utile → non, c'est un champ
+   qui n'existe nulle part dans `RecallSnapshot`.
+
+**Reste ouvert (non corrigé, par conception ou par manque de données) :**
+
+- **Zéro rubrique réellement servie par un moteur** : 13 câblages existent mais la page verbe (la
+  plus exposée) appelle `/api/verbs/{slug}/evaluate`, endpoint sans réseau de grilles. C'est du
+  contenu-auteur, pas du code.
+- Les 4 défauts methodology §7.7 (dont `BAC_PROOF_SYSTEM_NOT_LIVE`) — le n°3 est traité en P3.
+- `npm run lint` est **mort** (`next lint` supprimé en Next 16) et masque donc ces erreurs ; eslint
+  sur `src` trouve 2 `no-html-link-for-pages` **préexistants** (`BacBlancImmersif.tsx:168`,
+  `VerbLessonFlow.tsx:535`) → hors périmètre, non touchés.
+- `seed_bac_blanc.py` n'est lancé ni par `startup.sh` ni par le `Dockerfile` (§8.5).
+
+**Honnêteté sur ma propre méthode** : une première passe de patch sur `api-client.ts` a avalé la
+signature de `evaluateVerbAnswer` (273 erreurs de typage). Repère utile : c'est `tsc` qui l'a crié,
+pas l'œil — d'où la règle appliquée ici, *patch → tsc → tests → build*, dans cet ordre.

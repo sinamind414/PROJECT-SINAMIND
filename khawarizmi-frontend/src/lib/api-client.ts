@@ -61,6 +61,86 @@ let _khawarizmiToken: string | null = null
 // État du refresh silencieux : une seule promesse de refresh en vol à la fois.
 let _refreshPromise: Promise<boolean> | null = null
 
+/**
+ * Erreur HTTP enrichie. `status` sert aux pages pour distinguer un mur d'indisponibilité
+ * (404 « aucun sujet en base ») d'une panne réseau — sans rejouer le message technique
+ * du backend comme s'il était destiné à l'élève.
+ */
+export type ApiError = Error & { status?: number }
+
+/**
+ * Le contrat du backend est `{"erreur", "status", "path", "method", "details"}`
+ * (khawarizmi-backend/routes/errors.py, handler enregistré pour 400/401/403/404).
+ * Le front ne lisait que `detail` : tout message 4xx produit par le serveur était jeté et
+ * l'élève voyait « خطأ HTTP 404 ». On lit le contrat d'abord, `detail` ensuite (FastAPI
+ * brut / reverse proxy), puis un libellé générique arabe.
+ */
+export function httpErrorMessage(payload: unknown, status: number, fallback?: string): string {
+  const p = (payload ?? {}) as Record<string, unknown>
+  const candidate = [p.erreur, p.detail].find(
+    (v): v is string => typeof v === "string" && v.trim().length > 0
+  )
+  return candidate?.trim() || fallback || `${UI_AR.erreur_http_prefix} ${status}`
+}
+
+export function apiError(payload: unknown, status: number, fallback?: string): ApiError {
+  const err = new Error(httpErrorMessage(payload, status, fallback)) as ApiError
+  err.status = status
+  return err
+}
+
+/**
+ * Payload d'évaluation verbe : validé, pas affirmé. `data as VerbEvaluateResponse` sur un
+ * `Record<string, unknown>` laissait passer un 200 mal formé, et la page affichait alors un
+ * `undefined` dans la case note. Seuls les champs REQUIS sont normalisés ; le reste du
+ * contrat (dominant_error_code, method_percent, science_flags, caps_applied, order_ok…) est
+ * transmis tel quel, parce que les pages le lisent. Format inattendu → l'objet « non noté »
+ * identique à celui de la réponse 422, jamais une note fabriquée.
+ */
+function normalizeVerbEvaluate(data: Record<string, unknown>, verbSlug: string): VerbEvaluateResponse {
+  const num = (v: unknown, fallback: number) => (typeof v === "number" && Number.isFinite(v) ? v : fallback)
+  const list = (v: unknown) => (Array.isArray(v) ? (v.filter((x) => typeof x === "string") as string[]) : [])
+  const isUngraded = data.ungraded === true || data.source === "ungraded"
+  const hasScore = typeof data.percentage === "number" || typeof data.score === "number"
+
+  if (!hasScore) {
+    return {
+      verb_slug: typeof data.verb_slug === "string" ? data.verb_slug : verbSlug,
+      score: 0,
+      score_max: 1,
+      percentage: 0,
+      success: [],
+      errors: list(data.errors).length ? list(data.errors) : ["لا شبكة تقييم لهذه السؤال."],
+      missing_markers: [],
+      forbidden_found: [],
+      advice:
+        typeof data.advice === "string"
+          ? data.advice
+          : "تعذر التصحيح — ليست علامة بكالوريا رسمية.",
+      allow_second_attempt: false,
+      ungraded: true,
+      source: "ungraded",
+      banner_ar: typeof data.banner_ar === "string" ? data.banner_ar : undefined,
+    }
+  }
+
+  return {
+    ...data,
+    verb_slug: typeof data.verb_slug === "string" ? data.verb_slug : verbSlug,
+    score: num(data.score, 0),
+    score_max: num(data.score_max, 1),
+    percentage: num(data.percentage, 0),
+    success: list(data.success),
+    errors: list(data.errors),
+    missing_markers: list(data.missing_markers),
+    forbidden_found: list(data.forbidden_found),
+    advice: typeof data.advice === "string" ? data.advice : "",
+    allow_second_attempt: data.allow_second_attempt === true,
+    ...(isUngraded ? { ungraded: true, source: "ungraded" as const } : {}),
+    ...(typeof data.banner_ar === "string" ? { banner_ar: data.banner_ar } : {}),
+  } as VerbEvaluateResponse
+}
+
 type ApiRequestOptions = RequestInit & {
   skipAuthRedirect?: boolean
   /** Désactive le refresh silencieux pour cette requête (utilisé par /auth/refresh lui-même). */
@@ -171,18 +251,12 @@ class KhawarizmiApiClient {
 
     if (response.status === 429) {
       const data = await response.json().catch(() => ({}))
-      throw new Error(
-        data.detail ||
-        UI_AR.limite_atteinte
-      )
+      throw apiError(data, response.status, UI_AR.limite_atteinte)
     }
 
     if (!response.ok) {
       const error = await response.json().catch(() => ({}))
-      throw new Error(
-        error.detail ||
-        `${UI_AR.erreur_http_prefix} ${response.status}`
-      )
+      throw apiError(error, response.status)
     }
 
     return response.json()
@@ -1181,12 +1255,9 @@ class KhawarizmiApiClient {
       }
     }
     if (!resp.ok) {
-      throw new Error(
-        (typeof data.detail === "string" && data.detail) ||
-          `${UI_AR.erreur_http_prefix} ${resp.status}`,
-      )
+      throw apiError(data, resp.status)
     }
-    return data as VerbEvaluateResponse
+    return normalizeVerbEvaluate(data, payload.verb_slug)
   }
 
   async reviewVerb(slug: string, rating: 1 | 2 | 3 | 4, percentage?: number) {

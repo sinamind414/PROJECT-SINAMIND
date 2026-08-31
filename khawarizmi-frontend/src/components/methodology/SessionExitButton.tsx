@@ -155,7 +155,8 @@ export function ContractPulse({ className = "" }: { className?: string }) {
         className="rounded-xl border border-amber-500/25 bg-amber-500/10 p-2 text-center"
       >
         <p className="text-amber-200 text-lg font-black">{stats.openRecallCount}</p>
-        <p className="text-[9px] text-amber-200/70">FSRS</p>
+        <p className="text-[9px] text-amber-200/70">بوابات FSRS</p>
+        <p className="text-[8px] text-amber-200/40">أبواب مفتوحة بعد إثبات — ليست مراجعات معلّقة</p>
       </Link>
     </div>
   )
