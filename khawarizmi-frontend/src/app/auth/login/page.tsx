@@ -1,5 +1,6 @@
 ﻿"use client"
 
+import { readableError } from "@/lib/ui-error"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
@@ -22,8 +23,9 @@ export default function LoginPage() {
       await login(email, password)
       router.push("/dashboard")
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "تعذر تسجيل الدخول"
-      setError(msg)
+      // Pas e.message : le serveur peut se taire (réseau, porte d'entrée) et l'élève lirait un
+      // "Failed to fetch" anglais sur un écran arabe.
+      setError(readableError(err, "تعذر تسجيل الدخول"))
     } finally {
       setLoading(false)
     }

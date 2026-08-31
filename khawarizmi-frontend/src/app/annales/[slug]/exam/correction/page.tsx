@@ -1,5 +1,6 @@
 "use client"
 
+import { readableError } from "@/lib/ui-error"
 import { useParams, useSearchParams } from "next/navigation"
 import { useEffect, useState } from "react"
 import { AuthGuard } from "@/components/auth/AuthGuard"
@@ -62,7 +63,7 @@ export default function CorrectionPage() {
         )
         setResult(resp)
       } catch (err: unknown) {
-        setError(err instanceof Error ? err.message : "Erreur lors de la récupération des résultats.")
+        setError(readableError(err, "تعذر جلب نتائج التصحيح. أعد المحاولة."))
       } finally {
         setLoading(false)
       }

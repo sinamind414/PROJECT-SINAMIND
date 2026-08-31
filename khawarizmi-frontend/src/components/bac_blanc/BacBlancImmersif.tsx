@@ -1,5 +1,6 @@
 "use client"
 
+import { readableError } from "@/lib/ui-error"
 import { useState, useEffect, useRef, useCallback } from "react"
 import Link from "next/link"
 import { apiClient } from "@/lib/api-client"
@@ -39,7 +40,7 @@ export function BacBlancImmersif({ annaleSlug }: { annaleSlug: string }) {
       setSubjects(resp.subjects)
       setPhase("choix")
     } catch (e) {
-      setError(String(e))
+      setError(readableError(e))
     } finally {
       setLoading(false)
     }
@@ -55,7 +56,7 @@ export function BacBlancImmersif({ annaleSlug }: { annaleSlug: string }) {
       setTimeLeft(resp.time_limit_sec)
       setPhase("epreuve")
     } catch (e) {
-      setError(String(e))
+      setError(readableError(e))
       setChoiceLocked(false)
     } finally {
       setLoading(false)
@@ -125,7 +126,7 @@ export function BacBlancImmersif({ annaleSlug }: { annaleSlug: string }) {
       setSubmitResult(result)
       setPhase("debrief")
     } catch (e) {
-      setError(String(e))
+      setError(readableError(e))
     } finally {
       setLoading(false)
     }

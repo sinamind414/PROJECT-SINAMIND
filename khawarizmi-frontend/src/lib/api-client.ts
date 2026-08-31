@@ -2,6 +2,7 @@
 // Client HTTP centralisé — Khawarizmi Pro
 
 import { UI_AR } from "./translations"
+import { readableError } from "./ui-error"
 import {
   Annale,
   AnnalesResponse,
@@ -667,10 +668,7 @@ class KhawarizmiApiClient {
       }
     }
     if (!resp.ok) {
-      throw new Error(
-        (typeof data.detail === "string" && data.detail) ||
-          `${UI_AR.erreur_http_prefix} ${resp.status}`,
-      )
+      throw apiError(data, resp.status)
     }
     return data as {
       score: number
@@ -843,8 +841,15 @@ class KhawarizmiApiClient {
         signal: effectiveSignal,
       })
       if (!resp.ok || !resp.body) {
-        const err = await resp.json().catch(() => ({}))
-        onError?.({ message_fr: err.detail || "Erreur de connexion au tuteur.", message_ar: "تعذر الاتصال بالمدرس." })
+        const err = (await resp.json().catch(() => ({}))) as Record<string, unknown>
+        onError?.({
+          // message_fr = trace technique (journaux, dev) ; message_ar = ce que voit l'élève.
+          message_fr: httpErrorMessage(err, resp.status, "Erreur de connexion au tuteur."),
+          message_ar: readableError({
+            message: typeof err.erreur === "string" ? err.erreur : "",
+            status: resp.status,
+          }),
+        })
         return
       }
 
@@ -1121,11 +1126,7 @@ class KhawarizmiApiClient {
       }
     }
     if (!resp.ok) {
-      throw new Error(
-        (typeof data.erreur === "string" && data.erreur) ||
-          (typeof data.detail === "string" && data.detail) ||
-          `${UI_AR.erreur_http_prefix} ${resp.status}`,
-      )
+      throw apiError(data, resp.status)
     }
     return data as Exclude<Awaited<ReturnType<KhawarizmiApiClient["grade"]>>, { ungraded: true }>
   }
@@ -1588,10 +1589,7 @@ class KhawarizmiApiClient {
       }
     }
     if (!resp.ok) {
-      throw new Error(
-        (typeof data.detail === "string" && data.detail) ||
-          `${UI_AR.erreur_http_prefix} ${resp.status}`,
-      )
+      throw apiError(data, resp.status)
     }
     return data
   }

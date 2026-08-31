@@ -1,5 +1,6 @@
 ﻿"use client"
 
+import { readableError } from "@/lib/ui-error"
 import { useEffect, useState, useMemo, useCallback } from "react"
 import { useParams } from "next/navigation"
 import Link from "next/link"
@@ -125,7 +126,9 @@ function resolveMindmapErrorMessage(error: unknown): string {
   if (message.includes("503") || message.includes("Service IA non configuré")) {
     return "خدمة الذكاء الاصطناعي غير مهيأة حاليا. تحقق من مفاتيح API."
   }
-  return UI_AR.erreur_chargement_mindmap
+  // Le repli n'est plus une chaîne figée : le helper partagé sait distinguer panne réseau,
+  // délai, corps illisible et message arabe du serveur (le cas « الخادم » mérite une phrase).
+  return readableError(error, UI_AR.erreur_chargement_mindmap)
 }
 
 function updateNodeInTree(node: MindMapNode, targetId: string, updates: Partial<MindMapNode>): MindMapNode {

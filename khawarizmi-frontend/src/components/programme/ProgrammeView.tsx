@@ -2,6 +2,7 @@
 
 "use client"
 
+import { readableError } from "@/lib/ui-error"
 import { useCallback, useEffect, useState } from "react"
 
 import apiClient from "@/lib/api-client"
@@ -32,10 +33,7 @@ export function ProgrammeView({
       const data = await apiClient.getProgramme(matiere, filiere)
       setProgramme(data)
     } catch (err) {
-      const msg = err instanceof Error
-        ? err.message
-        : UI_AR.erreur_chargement
-      setError(msg)
+      setError(readableError(err, UI_AR.erreur_chargement))
     } finally {
        
       setLoading(false)
