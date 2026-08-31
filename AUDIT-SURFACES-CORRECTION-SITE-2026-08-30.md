@@ -925,3 +925,75 @@ il sont simplement **absents du dépôt** (LFS non restauré + avant-2023 jamais
 impossible ici, et ce n'est pas un choix : le sandbox n'a ni egress (`media.githubusercontent.com`,
 `mena.edu.dz` → `HTTP 000`) ni `git lfs` (`git: 'lfs' is not a git command`). À faire chez toi :
 `git lfs install && git lfs pull`, récupérer les 25 manquants, puis `npm run pdfs:gen`.
+
+---
+
+## 16. Scan de « استغلال الوثائق » (`/document-analysis`) : où sont les exercices, et ce qu'ils contiennent vraiment
+
+Question posée telle quelle : « où est le dossier, il contient des exercices, scanne le repo ». Réponse
+littérale d'abord, verdict de scan ensuite.
+
+### 16.1 La surface n'est pas un dossier d'exercices, c'est un routage de 92 lignes
+
+| Where | Contenu |
+|---|---|
+| `khawarizmi-frontend/src/app/document-analysis/` | **3 fichiers** : `page.tsx` (94 l., le hub), `[scenarioId]/page.tsx` (25 l.), `chapters/[chapterSlug]/page.tsx` (33 l.) |
+| `khawarizmi-frontend/src/lib/methodology-documents.ts` | **2 207 lignes = les exercices eux-mêmes** : 18 scénarios, leurs documents (SVG inline en data-URI), leurs questions, leurs `modelAnswer`, et le champ `gradeQuestionId` qui branche la grille |
+| `khawarizmi-frontend/src/lib/methodology-chapters.ts` | 749 lignes : `methodologyChapterLinks` (**55 liens de chapitre**) + `UNITS_CONFIG` |
+| `khawarizmi-frontend/src/components/methodology/ScenarioRunner.tsx` | 721 lignes : le lecteur d'exercice, l'appel `apiClient.grade`, le mur `NoLocalGradeWall` |
+| `khawarizmi-backend/routes/document_analysis.py` | 7 endpoints `/api/document-analysis/*` (liste, détail, `evaluate`, `{slug}/correction`, `progress`, `review`, `weak-spots`) — **tous sous `get_current_user`** |
+| `khawarizmi-backend/data/rubrics/` | `index.json` : **13 grilles** = 56 critères, versions 1.0.x |
+
+Donc : les exercices **ne sont pas dans le dossier `document-analysis`**, ils sont dans deux libs de données
+statiques ; le dossier d'routes ne fait que résoudre un id puis monter `ScenarioRunner`.
+
+### 16.2 L'inventaire mesuré
+
+- **18 scénarios.** 7 ont `gradeQuestionId` sur **toutes** leurs questions (13 questions = 13 grilles du
+  dépôt) et sont **les seuls affichés par le hub** ; 11 n'ont **aucune** grille et sont **hors hub**, atteignables
+  uniquement par les 55 liens de chapitre (`/document-analysis/chapters/<slug>`, et `/diagnostic`).
+- Les 11 cachés ne sont **pas vides** : 44 documents, **55 questions, 54 corrigés-types (`modelAnswer`) déjà
+  rédigés** — ce qui manque, c'est la grille (critères + points), pas l'exercice. C'est la formulation exacte
+  de la dette « 19 % de correcteur branché » (§8.5, §9) : 13 questions outillées sur 68.
+- Zéro défaut de structure : 0 scenario injoignable (hub ∪ chapitres = 18/18) · 0 lien de chapitre cassé ·
+  55 slugs uniques · bijection **stricte** questions câblées ↔ `index.json` dans les deux sens (aucune carte
+  morte, aucune grille orpheline) · 0 scénario à câblage mixte (le cas qui enverrait l'alias
+  `${scenario.id}:${q.id}` et récolterait un 422 déguisé en zéro) · **13/13 : le `verb_slug` de la grille est
+  bien le `verbSlug` affiché** (sans ça, la progression FSRS serait consignée sous le mauvais verbe).
+- `ScenarioRunner.submit()` est propre : `Promise.allSettled` (une question en échec n'annule pas les copies
+  notées), `ungradedEvaluation("تعذر التصحيح")` par question en échec, XP gated par `contract.mayAwardXp`.
+- Les deux appels du hub (`getDaProgress`, `getDaWeakSpots`) with `.catch(() => {})` : **pas** un bug — les
+  endpoints existent et répondent 401 sans token ; la bande FSRS n'apparaît simplement pas. Vérifié en direct :
+  `GET /api/document-analysis/{progress,weak-spots,scenarios}` → 401 `{"erreur":"Token invalide ou expiré"}`.
+
+### 16.3 Ce que j'ai corrigé (F29) et ce que j'ai verrouillé
+
+- **Libellé mensonger mesuré** : la carte `l0-proteine-adn` affichait « 📄 **0** وثائق » — le scénario est un
+  *texte scientifique sans document* (`contextAr` le dit : « لا وثيقة رقمية »). Une fiche « 0 document » se lit
+  comme une fiche vide. La carte affiche maintenant « **نص علمي — بلا وثيقة** » quand `documents.length === 0`.
+- **`src/lib/methodology-documents.inventory.test.ts` (9 tests)** : premier verrou de cet inventaire (18/7/13/55,
+  bijection avec `data/rubrics/index.json`, concordance verbe↔grille, homogénéité du câblage, accessibilité,
+  garde de libellé, garde « le hub ne liste que des cartes à grille »). Morsure vérifiée : retirer une grille
+  câblée → 3 échecs ; retirer le nouveau libellé → 1 échec.
+- Batterie : `vitest` **916 ✓** (907 → +9) · `tsc` 0 · `eslint` 0 erreur / 12 warnings · `next build` ✓
+  (les trois routes de la surface compilées).
+
+### 16.4 Rétractation de méthode (compte à rebours de mes propres smokes)
+
+Sur cette surface, **un HTTP 200 ne prouve rien** : `PageShell` et les pages scénario enveloppent tout dans
+`AuthGuard`, qui ne rend qu'un chargeur côté serveur. Mesure : `/document-analysis`, `/methodology`,
+`/progress`, `/dashboard` → 224 caractères arabes dans le HTML (le shell d'authentification) ;
+`/manhadjia`, lui, n'est pas gardé → 575 caractères, contenu réel. Un slug inventé
+(`/document-analysis/inexistant-x`) renvoie donc 200 aussi : `notFound()` ne se déclenche qu'après hydratation.
+Conséquence : mes « routes 200 » des tours précédents ne valaient preuve que pour les pages **non gardées** ;
+pour les autres, la preuve tient de `vitest` + `tsc` + `next build`, pas du curl. À faire soi-même pour un contrôle
+visuel : ouvrir la page connecté, ou brancher un token dans le navigateur.
+
+### 16.5 La décision qui t'appartient, maintenant chiffrée
+
+Brancher les 11 scénarios cachés = rédiger 55 grilles. La matière première existe déjà dans le dépôt (54
+corrigés-types) et le modèle de fichier existe (56 critères sur 13 grilles, `GRADER_VERSION 1.2.0`). Ce que je
+ne peux pas faire à ta place : décider **ce qui vaut un point** dans un barème officiel algérien. Deux voies
+honnêtes : soit tu me donnes les barèmes (texte officiel), soit tu valides des squelettes produits par
+`scripts/gen_rubric_skeletons.py` — dans les deux cas la rédaction reste tenue par toi, et le hub restera
+honnête par construction puisqu'il filtre sur `scenarioHasLocalGrade`.

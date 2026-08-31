@@ -77,7 +77,12 @@ export default function DocumentAnalysisHubPage() {
               <p className="text-gray-500 text-xs mb-2">{scenario.unitKey}</p>
               <p className="text-gray-400 text-xs leading-relaxed line-clamp-2">{scenario.contextAr}</p>
               <div className="mt-3 flex items-center gap-3 text-xs text-gray-500">
-                <span>📄 {scenario.documents.length} وثائق</span>
+                <span>
+                  📄{" "}
+                  {scenario.documents.length > 0
+                    ? `${scenario.documents.length} وثائق`
+                    : "نص علمي — بلا وثيقة"}
+                </span>
                 <span>❓ {scenario.questions.length} أسئلة</span>
                 <PillChip label="مصحح محلي" color="#FBBF24" bg="rgba(251,191,36,0.12)" />
               </div>
