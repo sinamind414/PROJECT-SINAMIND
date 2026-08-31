@@ -483,3 +483,44 @@ câblage de nouvelle question n'a été ajouté, sous peine de murs « تعذر 
 **Honnêteté sur ma propre méthode** : une première passe de patch sur `api-client.ts` a avalé la
 signature de `evaluateVerbAnswer` (273 erreurs de typage). Repère utile : c'est `tsc` qui l'a crié,
 pas l'œil — d'où la règle appliquée ici, *patch → tsc → tests → build*, dans cet ordre.
+
+### 9.1 Précision mesurée après coup — la salle existe, elle est juste **condamnée à l'accueil**
+
+En rédigeant les gardes de texte (`src/lib/truthful-promises.test.ts`), une de mes affirmations a
+été prise en défaut par la machine : j'avais écrit « la salle n'est pas branchée ». En réalité :
+
+- `src/app/annales/[slug]/exam/page.tsx` **existe** et monte `BacBlancImmersif annaleSlug={slug}` ;
+  `src/app/bac-blanc/page.tsx` le monte aussi dès qu'un sujet est sélectionné ;
+- `src/app/annales/[slug]/exam/correction/page.tsx` existe également (le lien de débrief n'est pas
+  un 404) ;
+- **mais** l'écran `phase === "intro"` du composant (lignes 153-174) ne rend **aucun bouton** :
+  seule `enterExam()` fait passer de `intro` à `choix`, et `grep -rn enterExam src` ne renvoie que
+  sa définition. Le flux `choix → épreuve (minuterie 2 h, autosave 30 s, rendu auto à 0) →
+  soumission → débrief` est donc **implémenté et inatteignable** — d'où l'avertissement eslint
+  préexistant `'enterExam' is defined but never used`, qui est la trace du bug, pas un détail.
+
+Conséquence sur le correctif : les textes posés sur `/annales/[slug]` et `/bac-blanc` restent vrais
+(« قاعة الامتحان غير مفتوحة بعد لهذا الموضوع »), et l'écran d'accueil affichait `SVT · 2026` + un
+format (2 h / 2 sujets / 4 exercices) **comme s'ils décrivaient le fichier demandé** — pour
+`/annales/el_mojtahid_3as/exam` c'est faux. Corrigé : le slug demandé est affiché, et le bloc est
+réétiqueté « نموذج عام للشكل — لا أوصف هذا الملف تحديدا » (les chiffres restent, leur statut
+change). Le disclaimer du composant (« لا شبكة تقييم محلية … لن نفتح قاعة وهمية ») est conservé.
+
+**Ce que je ne fais toujours pas, et pourquoi** : brancher le bouton d'entrée. Ouvrir la salle sans
+grille = une épreuve de 2 h dont la correction renvoie « تعذر التصحيح » pour les 8 exercices ;
+c'est précisément ce que le texte de l'intro s'interdit. Le travail qui débloque la salle est
+§8.5 : importer les 23 sujets en base (`bac:<annee>:<exercice>`), puis authored les grilles.
+
+Petit effet de bord supprimé au passage : l'ancre `<a href="/document-analysis">` (rechargement
+complet de page) est passée en `<Link>` — `eslint src/components/bac_blanc/BacBlancImmersif.tsx`
+passe de 1 erreur à 0 ; le `warning enterExam unused` est **laissé volontairement** (il documente
+la porte manquante ; le renommer `_enterExam` ferait disparaître la trace).
+
+**Gardes ajoutées** : `src/lib/truthful-promises.test.ts` (7 tests, niveau source, style du repo) —
+interdisent de ré-infler les promesses annales/bac-blanc, imposent `isAnnalePdfAvailable` sur la
+carte « قراءة », et verrouillent l'étiquetage honnête de la tuile بوابات FSRS et de l'intro de salle.
+
+**Batterie finale de ce pass** : vitest **20 fichiers / 846 tests ✓** (839 → +7 gardes, dont 10 du
+contrat d'erreur, rouges 10/10 avant le correctif) · `tsc --noEmit` **0** (après 9) ·
+`next build` **✓ Compiled successfully** (rouge au commit de base) · HTTP 200 sans marqueur
+d'erreur sur `/annales/{slug}`, `/annales/{slug}/exam`, `/bac-blanc`, `/methodology`.

@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useRef, useCallback } from "react"
+import Link from "next/link"
 import { apiClient } from "@/lib/api-client"
 import { saveBacBlancErrors } from "@/lib/progress-store"
 import type {
@@ -156,8 +157,12 @@ export function BacBlancImmersif({ annaleSlug }: { annaleSlug: string }) {
         <div className="text-center space-y-6 max-w-lg">
           <div className="text-6xl">📝</div>
           <h1 className="text-3xl font-bold text-white">البكالوريا التجريبي</h1>
-          <p className="text-gray-400">SVT · 2026</p>
+          {/* Le composant est monté pour UN slug d'annale mais n'a aucune donnée dessus : ces
+              chiffres sont le modèle général, pas une description vérifiée du fichier demandé. */}
+          <p className="text-gray-400" dir="ltr">{annaleSlug}</p>
+          <p className="text-gray-500 text-xs">نموذج عام للشكل — لا أوصف هذا الملف تحديدا</p>
           <div className="rounded-2xl p-5 bg-[#182730] border border-white/[0.06] space-y-3 text-right">
+            <div className="text-gray-500 text-xs mb-1">نموذج الشكل العام</div>
             <div className="flex justify-between"><span className="text-gray-400 text-sm">المدة</span><span className="text-white font-bold">2:00</span></div>
             <div className="flex justify-between"><span className="text-gray-400 text-sm">المواضيع</span><span className="text-white font-bold">2 (اختر واحدا)</span></div>
             <div className="flex justify-between"><span className="text-gray-400 text-sm">التمارين</span><span className="text-white font-bold">4 لكل موضوع</span></div>
@@ -165,9 +170,9 @@ export function BacBlancImmersif({ annaleSlug }: { annaleSlug: string }) {
           <p className="text-amber-200/80 text-xs leading-relaxed">
             لا شبكة تقييم محلية لهذا الامتحان. لن نفتح قاعة وهمية. ليست علامة بكالوريا رسمية.
           </p>
-          <a href="/document-analysis" className="inline-block px-8 py-3 rounded-xl bg-mint text-white font-bold hover:bg-mint-soft transition">
+          <Link href="/document-analysis" className="inline-block px-8 py-3 rounded-xl bg-mint text-white font-bold hover:bg-mint-soft transition">
             بطاقات المصحح المحلي
-          </a>
+          </Link>
         </div>
       </div>
     )
