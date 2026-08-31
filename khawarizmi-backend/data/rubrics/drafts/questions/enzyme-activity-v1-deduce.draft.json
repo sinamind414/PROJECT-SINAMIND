@@ -1,0 +1,47 @@
+{
+  "rubric_id": "enzyme-activity-v1-deduce",
+  "version": "1.0.0",
+  "verb_slug": "deduce",
+  "chapter_slug": "enzyme-activity",
+  "language": "ar",
+  "total_points": 1.75,
+  "document_id": "enzyme-activity-v1-ddeduce",
+  "theme_variants": [
+    "الوثيقة",
+    "تأثير",
+    "على نشاط الإنزيم"
+  ],
+  "theme_min_hits": 1,
+  "method_graph": {
+    "steps": [
+      "object",
+      "keypoint"
+    ],
+    "require_order": false
+  },
+  "criteria": [
+    {
+      "id": "object",
+      "label_ar": "تقديم الوثيقة",
+      "points": 0.75,
+      "check": "cites_object",
+      "required": true
+    },
+    {
+      "id": "keypoint",
+      "label_ar": "ذكر قيم الوثيقة",
+      "points": 1.0,
+      "check": "cites_keypoint",
+      "required": true
+    }
+  ],
+  "model_answer": "نستنتج أن نشاط الإنزيم يتطلب شروطا ملائمة من pH ودرجة الحرارة تحافظ على سلامة بنية الموقع النشط، مما يسمح بالارتباط التكميلي مع الركيزة وتشكل معقد ES.",
+  "source": "teacher_authored",
+  "grader_min_version": "1.0.0",
+  "_draft_notice": [
+    "brouillon généré par scripts/gen_rubric_skeletons.py — NON VALIDÉ PAR UN HUMAIN",
+    "keypoints = intersection (nombres de l'exemple UI) ∩ (valeurs du document) ; élargir si le barème doit être plus exigeant",
+    "trend_variants / counter_examples laissés vides : les remplir (validate_rubrics.py les exige avant indexation)",
+    "pour publier : retirer ces clés _draft_*, renommer en .v1.json, ajouter l'entrée dans data/rubrics/index.json, puis brancher gradeQuestionId dans methodology-documents.ts — le gate tests/test_grade_s40.py vérifie le 100 %"
+  ]
+}

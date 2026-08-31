@@ -284,3 +284,75 @@ python scripts/probe_audit_surfaces_site.py
 | `khawarizmi-frontend/src/app/annales/[slug]/exam/correction/page.tsx` | ligne d'exercice : `—` au lieu de `0 %` sur un non-noté (**F16**) |
 | tests | `tests/test_grade_s38.py` (12), `tests/test_grade_s39.py` (8), `src/lib/api-client.grade-quota.test.ts` (5), sonde 54 assertions |
 | `patches/F18-ci-gate-fix.patch` | à appliquer par un humain : `pull_request` élargi à `master` (la CI ne se déclenchait **jamais**) + suite `grade` et `validate_rubrics.py` dans le gate ; `push` **non touché** (déploiement Railway) |
+
+---
+
+## 7. Complément (même date) — couverture, et deux recommandations **retirées**
+
+### 7.1 Couverture mesurée, surface par surface
+
+`methodologyScenarios` = **18 scénarios / 68 questions**, dont **13 questions portant une
+`gradeQuestionId`** (19 %) — les 13 grilles git.
+
+| Surface | Notée localement ? | Mesure |
+|---|---|---|
+| `/document-analysis/<l0-*>` (7 scénarios) | **oui** | 13/13 questions branchées, auto-note 100 % |
+| `/document-analysis/chapters/*`, `/diagnostic/chapters/*` (66 liens → 11 scénarios `*-v1`) | **non** | 55 questions sur `NoLocalGradeWall` |
+| `/annales/*` (23 sujets, 27 exercices) | **jamais** | l'appel `/api/grade` est absent ; seule `getBacCorrection` (PDF) |
+| `/bac-blanc` (sujet seed, 8 exercices) | **non** | `grade_question_id` vide partout → `ungraded` (**F15**, pont prêt) |
+| `/action-verbs/*` (13 verbes) | **non** | 0 grille taguée `verb:<slug>` |
+
+Le hub `/document-analysis` ne liste que les 7 scénarios notables
+(`scenarioHasLocalGrade`, `src/app/document-analysis/page.tsx:25`) : le trou est donc
+**une dette de rédaction de grilles, pas un lien cassé**. Note d'exploitation : quota free
+15 évaluations/h (**F17**) — si les 55 questions étaient branchées, ~3 scénarios de 5
+questions/h seulement.
+
+### 7.2 Deux recommandations de la section 5 que j'avais tort de présenter comme rapides
+
+1. « **brancher les 13 grilles existantes sur les scénarios `*-v1` = simple câblage** » — **FAUX**.
+   Aucun des 10 scénarios `*-v1` mesurables ne partage un seul nombre avec le document d'une
+   grille (0 recouvrement). Exemple concret : la question `analyse` d'`enzyme-activity-v1`
+   porte sur *الوثيقة 1* = **la courbe de pH** (optimum 7), alors que `enzyme-temp-analyse`
+   exige 37 / 80 / 100 °م ; la copie modèle de la question y obtient **method=0 overall=0**.
+   Les 13 grilles sont soudées à leur propre scénario mono-document (le `contextAr` de
+   `l0EnzymeTempScenario` le dit noir sur blanc : « ليست وثيقة pH »).
+2. « **remplir `grade_question_id` du bac blanc avec la grille bac 2023** » — **FAUX**.
+   `scripts/bac_blanc_seed.json` ex. `s1-e2` = « تفسير الإشباع الضوئي » (saturation lumineuse) ;
+   `bac2023-s1-ex2-analyse-traduction` = traduction de l'expérience ML901. Mesuré : overall
+   **0 %** sur l'exercice. Dans les deux cas l'élève aurait reçu une **note fausse**, ce que le
+   repo interdit plus gravement qu'une absence de note.
+
+### 7.3 Ce qui a été fait à la place
+
+* **Gate de branchement** `khawarizmi-backend/tests/test_grade_s40.py` (7 tests) :
+  * pour toute question branchée, **la copie modèle montrée à l'élève doit obtenir 100 % sous
+    sa grille** (extension au niveau surface du G5 de `validate_rubrics.py`) ;
+  * aucune grille indexée sans `model_answer` (sinon elle noterait n'importe quoi) ;
+  * branchement injectif (une grille = une question) ; version moteur épinglée ;
+  * pont bac blanc : `grade_question_id` déclaré ⇒ `model_answer_ar` doit saturer la grille,
+    et un test verrouille l'absence de raccourci sur le seed actuel ;
+  * **méta-test** qui vérifie que la garde attrape précisément l'erreur du 7.2 (pH → grille
+    chaleur) — vérifié par expérimentation directe : injecter le raccourci bac blanc rend le test
+    rouge (`overall=0`), le retirer le rend vert. Sur l'arbre actuel : **0 câblage
+    non conforme**, donc la garde atterrit verte.
+* **Accélérateur d'auteur** `khawarizmi-backend/scripts/gen_rubric_skeletons.py` : produit des
+  paires `rubric`/`document` **valides au schéma** pour les 55 questions, en recopiant
+  uniquement ce que le scénario contient déjà, avec **un keypoint seulement s'il est à la fois
+  cité par l'exemple de l'UI et présent dans le document** (c'est le contrôle qui manque quand
+  on câble à la main). Sortie **hors `index.json`** → ne corrige aucune copie. `--check`
+  auto-note chaque squelette : 55 se chargent, **3 s'auto-valident à 100 %** —
+  `gene-expression-protein-disorder-v1-analyse`, `nervous-communication-v1-analyse`,
+  `photosynthesis-v1-analyse` → les trois seules questions où l'on peut espérer un branchement
+  court, les 52 autres exigent de relire le sujet. Exemple déposé pour 5 questions de
+  `enzyme-activity-v1` sous `data/rubrics/drafts/` (+ `README.md` expliquant la publication en
+  5 étapes).
+
+### 7.4 Finding mineur découvert par la garde (F19)
+
+`l0-greffe-ltc` questions `justify` et `compare` sont **notées** (grilles
+`greffe-ltc-justify` / `greffe-ltc-compare`) mais leur `modelAnswer` est vide (`""`) dans
+`methodology-documents.ts:1879` s. — 11 autres questions du même scénario en affichent un.
+Un élève qui reprend la formulation attendue n'a donc aucun exemple à comparer, alors que la
+grille, elle, exige « rappel + لأن + نعلم أن ». Rien de cassé côté moteur ; c'est un contenu à
+rédiger (et la garde ne peut rien contrôler tant que l'exemple est absent — elle le signale).
