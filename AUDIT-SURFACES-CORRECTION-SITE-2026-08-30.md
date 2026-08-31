@@ -1086,3 +1086,121 @@ Batterie : `vitest` **959 ✓** (916 → +43) · `tsc --noEmit` 0 · `eslint src
 (inchangés ; le 13ᵉ que j'avais créé — `computeChartBounds` devenu mort — a été supprimé, pas consigné) ·
 `next build` ✓. Le rendu visuel des pages gardées par `AuthGuard` reste invérifiable par curl (§16.4) :
 les preuves ci-dessus viennent du rendu `react-dom/server` et des tests, pas d'un code HTTP.
+
+---
+
+## 18. La هيكلة officielle du sujet confrontée aux données d'annales — F31
+
+### 18.0 Ce qui a été lu, et ce qui ne l'a pas été
+
+Ton message annonçait `هيكلة موضوع البكالوريا.pdf`. **Ce fichier n'est jamais arrivé dans le sandbox** :
+`/home/user/uploads` n'existe pas et `find / -xdev -iname '*.pdf' -newermt …` ne remonte rien. Je n'ai donc
+**pas lu ton document**, et je ne fais pas semblant. J'ai confronté le site au chapitre équivalent déjà
+versionné dans le dépôt — `LIVRE-MANHADJIYA.md`, l. 344-470, « 2- هيكلة موضوع البكالوريا » (p. 15-16) —
+qui est la même autorité locale. Si ton PDF dit autre chose, envoie-le en texte dans le repo et je reprends
+la confrontation.
+
+**Réponse à la question que tu posais en filigrane (§14) : ce chapitre ne débloque pas les grilles.** C'est
+un chapitre de *structure et d'économie d'épreuve* (bloc, points, durée, verbes attendus), pas un
+`سلم تنقيط` par critère. Les 55 grilles manquent toujours ; les 42 squelettes de `data/rubrics/drafts/`
+attendent ta validation, rien n'a changé de ce côté.
+
+### 18.1 Ce que le chapitre fixe (علوم تجريبية, معامل 6)
+
+| Bloc | Points | Temps conseillé dans le livre | Nature |
+|---|---|---|---|
+| التمرين الأول | **5** | ≈ 45 د | استرجاع + تنظيم وهيكلة ; تعليمات مباشرة |
+| التمرين الثاني | **7** | ≈ 1 س 15 د | استدلال علمي ; تحليل مقارن, مناقشة الفرضيات |
+| التمرين الثالث | **8** | ≈ 2 س | استدلال ضمن مسعى علمي ; 3 parties, III = حصيلة تركيبية |
+| **المجموع** | **20** | 4 س conseillées (contre 3 س d'épreuve) | |
+
+Variante رياضيات : تمرين 6-8 ن + تمرين 12-14 ن, معامل 2. La table des verbes du correcteur
+(`VERB_COGNITIVE_LEVELS`) couvre déjà exactement les verbes de ces trois blocs — c'est le bon côté.
+
+### 18.2 Ce que le site enseigne est juste — et je n'y ai pas touché
+
+`khawarizmi-backend/prompts/correction_prompt.py`, `REVISION_TIPS_AR["bac_exam_structure"]` :
+« التمرين الأول: 5 نقاط … الثاني: 7 نقاط … الثالث: 8 نقاط … المجموع: 20 نقطة ». **Aligné sur le livre.**
+Un test verrouille cette cohérence inter-langages (§18.5) pour que personne ne « modernise » l'un sans l'autre.
+
+### 18.3 Défaut n° 1 — le barème affiché était une somme, pas le mètre officiel (corrigé, F31)
+
+`/annales/[slug]` affichait `🏆 {sujet.exercices.reduce((a, e) => a + e.points, 0)} نقاط`. Or `sujet.exercices`
+**concatène les deux options au choix** (`subject-1` **et** `subject-2`), alors qu'un candidat n'en traite
+qu'une. Mesure sur les 30 sujets du module :
+
+| année / sujet | total affiché avant | total d'une option |
+|---|---|---|
+| 2025 | **36** | 18 / 18 |
+| 2024 | **36** | 17 / 18 |
+| 2022 | **37** | 19 / 18 |
+| 2021 | **29** | 14 / 15 |
+| 2016 | **32** | 16 / 16 |
+| filière Math + 2026 + 2008-2011 (20 sujets) | **0** | — (aucune structure chargée) |
+
+Une épreuve notée sur 20 était annoncée « 36 نقاط » sur 10 sujets et « 0 نقاط » sur 20 autres. Les mêmes
+comptes fusionnés apparaissaient sur les cartes de `/annales` (`📄 4 تمارين · 💡 8 أسئلة` pour une épreuve
+qui en compte 2 et 4 par option).
+
+**Corrigé** (`src/lib/annales-bac.ts` : `BAC_NOTE_SCALE_POINTS = 20`, `attachedPointsByOption()`,
+`optionStats()` ; les deux pages) : le hero affiche l'échelle officielle `🏆 20 نقاط` (titre d'infobulle :
+« هيكلة موضوع البكالوريا: 5 + 7 + 8 نقاط »), les comptes sont **par option** (« تمارين لكل خيار »), et quand
+le mètre joint ne fait pas 20 une ligne ambre le dit : « 18 نقطة مرفقة — ينقصها 2 نقطة (التمرين الثالث غير
+مرفق بعد) ». Les sujets vides disent « لا تمارين مرفقة بعد » au lieu de « 0 نقاط ».
+
+Ce que je n'ai **pas** fait, délibérément : je n'ai réécrit aucun `points:` d'exercice (chiffres scrapés,
+pas les miens), je n'ai pas inventé le bloc manquant, et je n'ai pas touché `duree: 180`.
+
+### 18.4 Défaut n° 2 — le tiers le plus lourd de l'épreuve n'existe pas dans les données (non corrigé : il exige une source)
+
+Deux mesures, reproductibles sur `getAllSujets()` :
+
+1. **20 options structurées, 0 qui contiennent une وضعية.** Le mot `وضعية` n'apparaît **nulle part** dans
+   `src/lib/annales-bac.ts` (0 occurrence). Les `type` d'exercice réellement présents :
+   `analyse_document=18 · raisonnement=12 · argumentation=4 · schema=4 · qcm=2` — soit uniquement les blocs
+   1 et 2. **Le التمرين الثالث (8 ن = 40 % de la note, ~2 h de travail) est absent de toute la rubrique**,
+   ce qui explique mécaniquement qu'aucune option n'atteigne 20 (plafond mesuré : 19).
+2. **80 questions d'annales structurées, 80 sans un seul caractère arabe.** Exemple typique
+   (`bac-svt-se-2023`) : `titre: "Réponse humorale"`, `texte: "Décrivez le rôle des plasmocytes."`,
+   ids `ex2-2023`, documents « Cinétique de production d'anticorps ». Autrement dit : les fiches
+   étiquetées BAC 2016-2025 sont des **exercices fabriqués en français**, pas des sujets ONEC.
+   Le site ne ment pas — le bandeau `نماذج تدريبية غير رسمية … لا تحسبها مواضيع رسمية` existe (liste, l. 119-129)
+   et chaque carte porte le badge (l. 316), le hero aussi — mais un élève qui vient « travailler les annales
+   du bac » dans une épreuve rédigée **en arabe** ne travaille pas l'épreuve.
+
+Conséquence hiérarchique : **la rubrique annales ne peut pas devenir un outil de préparation tant que le
+bloc de 8 points et la langue de l'épreuve ne sont pas là.** Ce n'est pas un bug de code, c'est une dette de
+données qui suppose les vrais sujets (un PDF ONEC par année, puis `سلم التنقيط` officiel → qui alimenterait
+en passant les 55 grilles manquantes). Je ne fabrique ni l'un ni l'autre.
+
+### 18.5 Défaut n° 3 — le budget temps du livre dépasse l'épreuve d'une heure
+
+Le chapitre conseille 45 د + 1 س 15 د + 2 س = **240 minutes**, alors que son propre en-tête (et toutes les
+fiches du site : `duree: 180` pour les 30 sujets) fixent l'épreuve à **180 minutes**. Un élève qui suit le
+conseil à la lettre dépasse d'1 h, soit 33 % — et c'est précisément dans le bloc qu'il n'a pas (2 س).
+Le site n'offre **aucun** repère de temps par bloc pour corriger ça. Deux issues possibles, **c'est ton
+arbitrage** : soit tu décides d'un repère cohérent avec 180 min (par exemple proportionnel 40/60/80, à toi
+de l'assumer pédagogiquement), soit on retire les conseils de temps du module. Je ne publie pas de chiffres
+de gestion du temps sous mon nom sans que tu les valides.
+
+### 18.6 Ce qui verrouille, et ce qui reste ouvert
+
+`src/lib/annales-bareme.test.ts` — **11 tests** : échelle = 5+7+8 ; cohérence avec
+`REVISION_TIPS_AR["bac_exam_structure"]` (lecture du fichier backend) ; fixture à deux options de tailles
+différentes (le max, pas la somme) ; `null` pour un sujet non structuré, jamais un 0 déguisé ; **la somme
+fusionnée est épinglée comme le piège** (`max > 20`) ; aucun total d'option ne dépasse 20 ; la source des
+deux pages ne doit plus contenir le `reduce` mensonger et doit porter les libellés « لكل خيار » / « ينقصها ».
+Morsure vérifiée par mutation : rétablir `{sujet.exercices.reduce((a, e) => a + e.points, 0)} نقاط` →
+1 échec. Une de mes propres affirmations de fixture était fausse (`questions: 2` au lieu de 3 — le code
+était juste, mon calcul non) : corrigée dans le test, pas dans le helper.
+
+Batterie : `vitest` **970 ✓** (959 → +11) · `tsc --noEmit` 0 · `eslint src` 0 erreur / 12 warnings (inchangés)
+· `next build` ✓ · `/annales` et `/annales/[slug]` en 200 sans erreur de rendu. **Rappel §16.4 : ces pages
+sont sous `AuthGuard`, un curl ne prouve pas le contenu** — les chiffres d'avant/après ci-dessus viennent du
+module réellement chargé (`tsx`), pas d'un HTML.
+
+**Décisions qui t'appartiennent, dans l'ordre de rendement :** (1) me redonner le PDF (ou sa copie texte)
+si ta copie de la هيكلة diffère du livre ; (2) la dette des annales (bloc de 8 ن + arabe) — sans elle la
+rubrique reste un entraînement hors format ; (3) le repère de temps (§18.5) ; (4) `API_BASE_URL = ""` en
+production, question sans réponse depuis **treize tours** (§11) — aucun appel API élève n'aboutit en prod
+tant que ce n'est pas tranché.

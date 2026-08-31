@@ -5,7 +5,7 @@ import { useParams } from "next/navigation"
 import Link from "next/link"
 import { AuthGuard } from "@/components/auth/AuthGuard"
 import { AppShell } from "@/components/layout/AppShell"
-import { getSujetBySlug } from "@/lib/annales-bac"
+import { BAC_NOTE_SCALE_POINTS, getSujetBySlug, optionStats } from "@/lib/annales-bac"
 import { PDF_MISSING_AR, isAnnalePdfAvailable, pdfUnavailabilityReason } from "@/lib/pdf-available"
 
 const DIFFICULTE_COLORS: Record<string, string> = {
@@ -32,8 +32,9 @@ function DetailContent() {
     )
   }
 
-  const totalQuestions = sujet.exercices.reduce((a, e) => a + e.questions.length, 0)
-  const totalPoints = sujet.exercices.reduce((a, e) => a + e.points, 0)
+  // Le barème affiché est l'échelle officielle (/20), jamais une somme d'exercices :
+  // `sujet.exercices` fusionne les options au choix, ce qui affichait « 36 نقاط ».
+  const stats = optionStats(sujet)
 
   return (
     <AppShell>
@@ -64,9 +65,19 @@ function DetailContent() {
             <div className="flex flex-wrap gap-3 text-sm text-slate-400">
               <span>📅 {sujet.annee}</span>
               <span>⏱ {sujet.duree} min</span>
-              <span>📄 {sujet.exercices.length} تمارين</span>
-              <span>💡 {totalQuestions} أسئلة</span>
-              <span>🏆 {totalPoints} نقاط</span>
+              <span title="عدد تمارين الخيار الواحد الذي يعالجه التلميذ">
+                📄 {stats ? `${stats.exercices} تمارين لكل خيار` : `${sujet.exercices.length} تمارين مرفقة`}
+              </span>
+              <span>💡 {stats ? `${stats.questions} أسئلة لكل خيار` : `${sujet.exercices.reduce((a, e) => a + e.questions.length, 0)} أسئلة مرفقة`}</span>
+              <span title="هيكلة موضوع البكالوريا: 5 + 7 + 8 نقاط">🏆 {BAC_NOTE_SCALE_POINTS} نقاط</span>
+              {stats && stats.points !== BAC_NOTE_SCALE_POINTS && (
+                <span className="text-[11px] text-amber-300/85" title="مجموع نقاط التمارين المرفقة في الموقع، لا المقياس الرسمي">
+                  · {stats.points} نقطة مرفقة — ينقصها {BAC_NOTE_SCALE_POINTS - stats.points} نقطة (التمرين الثالث غير مرفق بعد)
+                </span>
+              )}
+              {!stats && (
+                <span className="text-[11px] text-slate-500">· لا تمارين مرفقة بعد — الرابط الأصلي أدناه</span>
+              )}
               <span>📁 {sujet.session === "normale" ? "دورة عادية" : "دورة استدراكية"}</span>
             </div>
 

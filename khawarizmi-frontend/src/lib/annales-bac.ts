@@ -911,6 +911,51 @@ for (const s of SUJETS) {
   s.exercices = s.subjects.flatMap((sub) => sub.exercises)
 }
 
+/**
+ * مقياس البكالوريا الرسمي لموضوع العلوم الطبيعية: **20 نقطة** — 5 (استرجاع/تنظيم) + 7
+ * (استدلال علمي) + 8 (استدلال ضمن مسعى علمي), d'après le chapitre « هيكلة موضوع البكالوريا »
+ * du référentiel (`LIVRE-MANHADJIYA.md`, p. 15) et la structure enseignée par le correcteur
+ * (`REVISION_TIPS_AR["bac_exam_structure"]`).
+ *
+ * Ce n'est PAS la somme des points des exercices chargés dans `SUJETS` : `sujet.exercices`
+ * fusionne les options proposées au candidat (« subject-1 » / « subject-2 »). Mesure du
+ * 2026-08-31 sur les 10 sujets structurés : cette somme vaut 29 à 37 selon l'année — afficher
+ * ce total sous « 🏆 N نقاط » promettait donc un sujet de 36 points sur une épreuve notée /20.
+ */
+export const BAC_NOTE_SCALE_POINTS = 20
+
+/** Points réellement portés par chaque option du sujet (par opposition au total officiel). */
+export function attachedPointsByOption(sujet: SujetBac): number[] {
+  return (sujet.subjects ?? []).map((sub) =>
+    (sub.exercises ?? []).reduce((sum, ex) => sum + (Number(ex.points) || 0), 0)
+  )
+}
+
+/**
+ * Statistiques d'**une seule** option du sujet.
+ *
+ * Un candidat ne traite qu'un choix (`subject-1` **ou** `subject-2`) : compter `sujet.exercices`
+ * (qui concatène les deux) surestime l'épreuve d'un facteur 2. Valeurs maximales sur les options
+ * présentes ; `null` quand le sujet n'est pas encore structuré par options.
+ */
+export function optionStats(sujet: SujetBac): {
+  options: number
+  exercices: number
+  questions: number
+  points: number
+} | null {
+  const options = sujet.subjects ?? []
+  if (!options.length) return null
+  const per = (f: (ex: Exercice) => number) =>
+    Math.max(...options.map((o) => (o.exercises ?? []).reduce((a, ex) => a + f(ex), 0)))
+  return {
+    options: options.length,
+    exercices: per(() => 1),
+    questions: per((ex) => (ex.questions ?? []).length),
+    points: attachedPointsByOption(sujet).reduce((a, b) => Math.max(a, b), 0),
+  }
+}
+
 export function getAllSujets(): SujetBac[] {
   return SUJETS
 }

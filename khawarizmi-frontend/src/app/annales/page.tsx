@@ -6,7 +6,7 @@ import { AuthGuard } from "@/components/auth/AuthGuard"
 import { AppShell } from "@/components/layout/AppShell"
 import { ProgressivePageHeader } from "@/components/ui/ProgressivePageHeader"
 import { RevealSection } from "@/components/ui/RevealSection"
-import { getAllSujets } from "@/lib/annales-bac"
+import { getAllSujets, optionStats } from "@/lib/annales-bac"
 import type { SujetBac } from "@/lib/annales-bac"
 import apiClient from "@/lib/api-client"
 import type { Annale } from "@/lib/types"
@@ -292,6 +292,8 @@ function AnnalesContent() {
 
 function SujetCard({ sujet }: { sujet: SujetBac }) {
   const isSE = sujet.filiere === "Sciences Expérimentales"
+  // Comptes **par option** : un candidat ne traite qu'un seul choix, pas les deux fusionnés.
+  const stats = optionStats(sujet)
   return (
     <div className="card-hover glass-soft border border-mint/10 rounded-2xl overflow-hidden group">
       <Link
@@ -336,8 +338,8 @@ function SujetCard({ sujet }: { sujet: SujetBac }) {
 
         <div className="flex items-center gap-4 text-xs text-slate-400">
           <span>⏱ {sujet.duree} دقيقة</span>
-          <span>📄 {sujet.exercices.length} تمارين</span>
-          <span>💡 {sujet.exercices.reduce((a, e) => a + e.questions.length, 0)} أسئلة</span>
+          <span>📄 {stats ? `${stats.exercices} تمارين لكل خيار` : `${sujet.exercices.length} تمارين`}</span>
+          <span>💡 {stats ? `${stats.questions} أسئلة لكل خيار` : `${sujet.exercices.reduce((a, e) => a + e.questions.length, 0)} أسئلة`}</span>
         </div>
 
         <div className="flex items-center justify-between pt-2 border-t border-slate-800/50">
