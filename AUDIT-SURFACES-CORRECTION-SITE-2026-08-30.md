@@ -589,3 +589,27 @@ puis `npm run pdfs:gen`.
 `ArrowLeft`, `onRetry`, `proofs`) — dont **6 à occurrence unique** dans leur fichier : la trace
 matérielle de fonctionnalités écrites et non branchées. Les renommer en `_x` ou les supprimer ferait
 disparaître l'indicateur ; la dette est ici, pas dans le lint.
+
+### 10.5 Le correctif de CI est livré en patch, pas en commit
+
+GitHub refuse qu'une GitHub App crée ou modifie `.github/workflows/*` sans la permission
+`workflows` :
+
+```
+ ! [remote rejected] arena/01a05476-project-sinamind (refusing to allow a GitHub App to create
+   or update workflow `.github/workflows/ci.yml` without `workflows` permission)
+```
+
+Le correctif tient donc dans **`patches/F24-ci-triggers-master.patch`** (50 lignes, vérifié
+applicable : `git apply --check` passe sur l'état courant de cette branche). Deux façons de l'activer :
+
+1. `git apply patches/F24-ci-triggers-master.patch && git commit -am "ci: valider master" && git push`
+   — depuis un compte qui a la main sur les workflows ;
+2. accorder *Workflows : write* à l'application — préférable à terme, parce que la CI doit aussi
+   pouvoir écrire ses badges de statut et ses règles de branchement.
+
+**Rappel important** : le patch ne touche pas la condition `deploy-railway: if: github.ref ==
+'refs/heads/main'`. Appliquer ce patch **n'active aucun déploiement de production** ; il ajoute
+seulement `Typecheck`, `Lint` (sans `continue-on-error`) et `pdfs:check` au job `frontend-tests`.
+Si tu veux que CI déploie le backend, c'est une décision séparée : secrets `RAILWAY_TOKEN`, stratégie
+de rollback, et surtout un `next build` vert — ce qui, pour le coup, l'est de nouveau.
