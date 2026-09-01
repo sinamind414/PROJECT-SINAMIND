@@ -217,13 +217,24 @@ def evaluate_one(question: dict, answer_text: str | None = None) -> tuple[dict, 
     return corr, dt
 
 
-def run_audit() -> dict:
+def run_audit(answers_path: str | None = None) -> dict:
     golden = load_golden_set()
     adversarial = build_adversarial_set()
     report: dict = {
         "meta": {
             "timestamp": time.strftime("%Y-%m-%dT%H:%M:%S%z"),
             "correcteur": "deterministic-savoir v1",
+            # Trois déclarations sans lesquelles les chiffres ci-dessous se lisent à tort comme une
+            # qualité de notation : (i) l'entrée évaluée N'EST PAS une copie d'élève, (ii) le moteur
+            # audité n'est pas celui que /api/grade sert, (iii) des concepts sont injectés PENDANT
+            # la mesure, donc dans l'objet mesuré.
+            "entree_evaluee": "reponse_attendue — data/golden_set_onec.json ne contient aucun champ "
+                              "student_answer : il n'y a pas de copie d'élève dans ce corpus",
+            "moteur_audite": "deterministic_correct (v1, services/savoir_corrector.py)",
+            "chemin_servi_en_prod": "/api/grade → services/local_grader.grade (rubriques, v1.2.0), avec "
+                                    "_science_veto qui ne reprend de savoir_corrector que _GRAVE_ERRORS et "
+                                    "_NUMERIC_RULES ; le chemin mots-clés servi est deterministic_correct_v2 "
+                                    "(cf. tests/golden/scoring.py, « chemin prod réel »)",
             "llm_forced_off": bool(os.environ.get("DISABLE_LLM")),
             "chapitres_golden": sorted({q.get("chapitre", "?") for q in golden}),
             "nb_synonymes": sum(len(v) for v in _SYNONYMS.values()),
@@ -241,6 +252,7 @@ def run_audit() -> dict:
     # on attend un score ≥ 50% sur la plupart (même si déduction auto des mots-clés)
     per_chapter: dict[str, dict] = {}
     latencies_g, latencies_a = [], []
+    concepts_injectes = 0  # combien de concepts l'audit AJOUTE à la table du moteur pour pouvoir mesurer
     g_high = g_mid = g_low = 0
     for q in golden:
         # L'auto-déduction des mots-clés est plus faible, donc on aide en
@@ -297,6 +309,7 @@ def run_audit() -> dict:
             if kw_n in _AUDIT_STOP:
                 cid = f"kw_{kw_n[:20].replace(' ', '_')}"
                 _SYNONYMS[cid] = [kw]
+                concepts_injectes += 1
                 expected.append(cid)
                 continue
             best_cid = None
@@ -322,6 +335,7 @@ def run_audit() -> dict:
             else:
                 cid = f"kw_{kw_n[:20].replace(' ', '_')}"
                 _SYNONYMS[cid] = [kw]
+                concepts_injectes += 1
                 expected.append(cid)
         q2 = dict(q)
         q2["expected_keywords"] = expected
@@ -414,13 +428,21 @@ def run_audit() -> dict:
     n = max(1, len(golden))
     mean_g = statistics.mean([r["score_pct"] for r in report["results_golden"]]) if report["results_golden"] else 0
     lat_all = latencies_g + latencies_a
+    # Le « score de robustesse » est un indice d'alignement de l'audit avec lui-même : il ne dit
+    # rien de la justesse des notes données à un élève. Un terme était une AUTO-ATTRIBUTION
+    # (`+ 0.10 * 1.0  # 0 LLM (toujours vrai dans ce script)`) : dix points offerts parce que le
+    # script tournait en local. Retiré, les poids sont renormalisés sur 0,90 (69,4 → 66,0 mesuré).
+    # Les garanties 0-LLM
+    # sont désormais des faits vérifiés (voir verify_llm_guarantees), pas des points.
     robustesse = round(
-        0.30 * min(1.0, g_high / n)
-        + 0.20 * (adv_pass / max(1, len(adversarial)))
-        + 0.20 * (1.0 - g_low / n)
-        + 0.10 * (1.0 if (latencies_g and statistics.mean(latencies_g) < 20) else 0.5)
-        + 0.10 * 1.0  # 0 LLM (toujours vrai dans ce script)
-        + 0.10 * (1.0 if not g_low else 0.5),
+        (
+            0.30 * min(1.0, g_high / n)
+            + 0.20 * (adv_pass / max(1, len(adversarial)))
+            + 0.20 * (1.0 - g_low / n)
+            + 0.10 * (1.0 if (latencies_g and statistics.mean(latencies_g) < 20) else 0.5)
+            + 0.10 * (1.0 if not g_low else 0.5)
+        )
+        / 0.90,
         3,
     )
 
@@ -443,9 +465,82 @@ def run_audit() -> dict:
         "taux_reussite_pct": round(adv_pass / max(1, len(adversarial)), 3),
         "details": adv_details,
     })
+    # ── 4. COPIES RÉELLES (seule section qui puisse servir de preuve) ──────
+    # Tout ce qui précède mesure l'audit contre lui-même : l'entrée est la réponse modèle. Ici,
+    # l'entrée est une copie d'élève, et la référence est la note du professeur — la seule grandeur
+    # qui décide si le correcteur a le droit d'exister dans une boucle de correction.
+    if answers_path:
+        report["answers_file"] = answers_path
+        pth = Path(answers_path)
+        raw = pth.read_text(encoding="utf-8")
+        try:
+            parsed = json.loads(raw)
+            copies = parsed if isinstance(parsed, list) else (parsed.get("items") or [])
+        except json.JSONDecodeError:
+            copies = [json.loads(l) for l in raw.splitlines() if l.strip()]
+        rows, hs, ss = [], [], []
+        for c in copies:
+            corr, dt = evaluate_one(
+                {"question": c.get("question", ""), "reponse_attendue": c.get("reponse_attendue", ""),
+                 "bareme": c.get("bareme", c.get("points", 4)), "language": c.get("language", "ar")},
+                answer_text=c.get("student_answer", ""),
+            )
+            pts = float(c.get("bareme", c.get("points", 4)) or 4)
+            sys_score = float(corr.get("score") or 0.0)
+            hum = c.get("human_score")
+            lab = lambda v, m: "all_correct" if v >= m - 1e-9 else ("insufficient" if v <= 1e-9 else "partial_correct")
+            r = {"chapitre": c.get("chapitre", "?"), "score_système": round(sys_score, 2), "bareme": pts,
+                 "human_score": hum, "label_système": lab(sys_score, pts),
+                 "label_humain": lab(float(hum), pts) if hum is not None else None,
+                 "erreurs": corr.get("erreurs") or []}
+            rows.append(r)
+            if hum is not None:
+                hs.append(float(hum)); ss.append(sys_score)
+        agg: dict[str, list[float]] = {}
+        for r in rows:
+            a = agg.setdefault(r["chapitre"], [0.0, 0.0])
+            a[0] += r["score_système"]; a[1] += r["bareme"]
+        report["copies_reelles"] = {
+            "nb": len(rows),
+            "score_moyen_pct": round(sum(r["score_système"] for r in rows) / max(1.0, sum(r["bareme"] for r in rows)), 3),
+            "par_chapitre": {k: round(v[0] / max(0.001, v[1]), 3) for k, v in agg.items()},
+            "details": rows,
+        }
+        if len(hs) >= 5:
+            n = len(hs)
+            mae = sum(abs(h - g) for h, g in zip(hs, ss)) / n
+            biais = sum(g - h for h, g in zip(hs, ss)) / n
+            exact = sum(1 for h, g in zip(hs, ss) if abs(h - g) < 1e-9) / n
+            grave = sum(1 for r in rows if r["label_humain"] and r["label_humain"] != r["label_système"]
+                        and "all_correct" in (r["label_humain"], r["label_système"])
+                        and "insufficient" in (r["label_humain"], r["label_système"])) / n
+            labels = ["all_correct", "partial_correct", "insufficient"]
+            po = sum(1 for r in rows if r["label_humain"] == r["label_système"]) / n
+            pe = sum((sum(1 for r in rows if r["label_humain"] == l) / n) * (sum(1 for r in rows if r["label_système"] == l) / n) for l in labels)
+            report["copies_reelles"]["accord_prof"] = {
+                "nb_items_annotés": n,
+                "MAE_pts": round(mae, 3),
+                "accord_exact_pct": round(exact, 3),
+                "biais_pts": round(biais, 3),
+                "erreurs_graves_pct": round(grave, 3),
+                "kappa": round((po - pe) / (1 - pe), 3) if pe < 1 else 1.0,
+                "cibles": "MAE ≤ 1 critère sur 4 · κ ≥ 0,60 (cible du pilote) ; seuils CI de tests/golden/metrics.py : "
+                          "savoir MAE ≤ 0,35/4 et 0 erreur grave",
+            }
+        else:
+            report["copies_reelles"]["accord_prof"] = None
+            report["copies_reelles"]["note"] = ("moins de 5 items avec human_score : aucune métrique d'accord "
+                                                "calculée — un accord sur 3 copies n'est pas une mesure")
+
+    report["llm_guarantees"] = verify_llm_guarantees()
     report["per_chapter"] = chap_agg
     report["synthese"] = {
         "robustesse_score": robustesse,
+        "ce_que_ce_nombre_ne_mesure_pas": "la justesse pédagogique des notes. Il mesure l'alignement "
+                                          "mots-clés→concepts sur la réponse modèle, plus les adversariaux. "
+                                          "La grandeur qui compte est l'accord avec la note du prof sur de "
+                                          "vraies copies : tests/golden/metrics.py (MAE, κ, biais).",
+        "concepts_injectes_par_l_audit": concepts_injectes,
         "verdict": verdict,
         "recommandations": build_recommendations(report),
         "latence_ms_moyenne_totale": round(statistics.mean(lat_all), 2) if lat_all else 0,
@@ -479,19 +574,26 @@ def render_markdown(report: dict) -> str:
     g = report["golden_set"]
     a = report["adversarial"]
     s = report["synthese"]
+    s2 = report["synthese"]
     m = report["meta"]
     lines: list[str] = []
     a_ = lines.append
     a_("# Rapport d'Audit — Correcteur Local Khawarizmi")
     a_("")
     a_(f"- **Date** : {m['timestamp']}")
-    a_(f"- **Moteur** : `{m['correcteur']}` (0 LLM, 0 clé API, 0 réseau)")
+    a_(f"- **Moteur audité** : `{m.get('moteur_audite', m['correcteur'])}` (0 LLM, 0 clé API, 0 réseau)")
+    a_(f"- **Chemin réellement servi** : {m.get('chemin_servi_en_prod', '—')}")
+    a_(f"- **Entrée évaluée** : {m.get('entree_evaluee', '—')}")
+    a_(f"- **Concepts ajoutés à la table du moteur PENDANT la mesure** : {s2.get('concepts_injectes_par_l_audit', '—')}"
+       " → un score qui monte quand on enrichit la table peut n'être que l'effet de l'enrichissement")
     a_("- **Mode forcé** : DISABLE_LLM=1  |  **LLM externe** : ❌ désactivé")
     a_(f"- **Concepts détectables** : {m['nb_concepts']}  ({m['nb_synonymes']} variantes FR/AR)")
     a_(f"- **Règles erreurs graves** : {m['nb_grave_error_rules']}")
     a_(f"- **Règles numériques DZ** : {m['nb_numeric_rules']} (38 ATP, P/O NADH=3, FADH2=2…)")
     a_("")
-    a_(f"## 🎯 Score de robustesse : **{s['robustesse_score'] * 100:.0f}/100** — {s['verdict']}")
+    a_(f"## 🎯 Alignement interne de l'audit : **{s['robustesse_score'] * 100:.0f}/100** — {s['verdict']}")
+    a_("")
+    a_(f"> ⚠️ {s.get('ce_que_ce_nombre_ne_mesure_pas', '')}")
     a_("")
     a_("| Critère | Valeur |")
     a_("|---|---|")
@@ -504,8 +606,12 @@ def render_markdown(report: dict) -> str:
     a_("")
     a_("## 📚 Performance par chapitre")
     a_("")
-    a_("| Chapitre | Nb questions | Score moyen | Couverture mots-clés |")
+    a_("| Chapitre | Nb questions | Score moyen (sur la réponse modèle) | Alignement mots-clés→concepts |")
     a_("|---|---|---|---|")
+    a_("")
+    a_("La dernière colonne n'est PAS une couverture du programme : c'est la proportion des mots-clés du "
+       "Golden Set que l'audit réussit à raccorder à un concept de `_SYNONYMS`. Un item à 0 % dit d'abord "
+       "que le raccord a échoué.")
     for chap, v in sorted(report["per_chapter"].items(), key=lambda x: x[1]["score_moyen_pct"], reverse=True):
         a_(f"| {chap} | {v['nb_questions']} | {v['score_moyen_pct'] * 100:.0f}% | {v['taux_couverture_mc'] * 100:.0f}% |")
     a_("")
@@ -517,19 +623,35 @@ def render_markdown(report: dict) -> str:
         icon = "✅" if d["passed"] else "❌"
         a_(f"| {d['id']} | {d['description'][:50]} | {d['score_pct'] * 100:.0f}% | {icon} | {'; '.join(d['failures']) or '—'} |")
     a_("")
+    cr = report.get("copies_reelles")
+    if cr:
+        a_("## 🧾 Copies réelles (l'unique section qui vaille comme preuve)")
+        a_("")
+        a_(f"- **{cr['nb']} copies évaluées** · score moyen {cr['score_moyen_pct'] * 100:.0f}% du barème cumulé")
+        if cr.get("accord_prof"):
+            ap = cr["accord_prof"]
+            a_(f"- **Accord avec la note du prof** (n = {ap['nb_items_annotés']}) : MAE {ap['MAE_pts']} pt · "
+               f"accord exact {ap['accord_exact_pct'] * 100:.0f}% · biais {ap['biais_pts']:+} pt · "
+               f"erreurs graves {ap['erreurs_graves_pct'] * 100:.0f}% · κ {ap['kappa']}")
+            a_(f"- Cibles : {ap['cibles']}")
+        else:
+            a_("- " + cr.get("note", "aucune human_score dans ce fichier : accord non mesurable"))
+        a_("")
     a_("## 💡 Recommandations d'amélioration")
     a_("")
     for i, r in enumerate(s["recommandations"], 1):
         a_(f"{i}. {r}")
     a_("")
-    a_("## 🔒 Garanties 0 LLM")
+    a_("## 🔒 Garanties 0 LLM (vérifiées, plus décoratives)")
     a_("")
-    a_("- ✅ `is_llm_enabled()` retourne `False` par défaut")
-    a_("- ✅ Variables d'environnement de clés API VIDÉES au démarrage")
-    a_("- ✅ `AsyncOpenAI(...)` monkey-patché → retourne `GuardedOpenAIClient`")
-    a_("- ✅ Blocage HTTP au niveau httpx vers 16 domaines de providers")
-    a_("- ✅ `GuardedOpenAIClient.chat.completions.create()` lève LLMDisabledError")
-    a_("- ✅ `tokens_utilises = 0` sur toutes les réponses de correction déterministe")
+    a_("Six lignes étaient imprimées en dur, donc invérifiables — et lues « architecture irréprochable » "
+       "dans un rapport du 01/09. Elles sont depuis exercées par `verify_llm_guarantees()` :")
+    a_("")
+    a_("| Garantie | Statut | Détail |")
+    a_("|---|---|---|")
+    for it in report.get("llm_guarantees", []):
+        icon = {"vérifié": "✅", "échec": "❌"}.get(it["statut"], "⚠️")
+        a_(f"| {icon} {it['garantie']} | {it['statut']} | {it['detail'][:90]} |")
     a_("")
     a_("## 📊 Détail Golden Set")
     a_("")
@@ -542,14 +664,90 @@ def render_markdown(report: dict) -> str:
     return "\n".join(lines)
 
 
+def verify_llm_guarantees() -> list[dict]:
+    """VÉRIFIE les garanties 0-LLM au lieu de les afficher.
+
+    Motif (2026-09-01) : la section « 🔒 Garanties 0 LLM » du rapport était du texte
+    codé en dur — six ✅ imprimés sans qu'aucun ne soit testé. Un lecteur sérieux y
+    a lu « architecture irréprochable ». Un ✅ non exercé n'est pas une garantie,
+    c'est une mise en page. Chaque ligne renvoyée porte donc un statut mesuré :
+    `vérifié` · `échec` · `non vérifiable ici` (avec la raison).
+    """
+    out: list[dict] = []
+
+    def rec(nom: str, ok, detail: str = "") -> None:
+        statut = "vérifié" if ok is True else ("échec" if ok is False else "non vérifiable ici")
+        out.append({"garantie": nom, "statut": statut, "detail": detail})
+
+    try:
+        from services import llm_guard as G
+    except Exception as e:  # pragma: no cover - dépendances manquantes
+        return [{"garantie": "llm_guard importable", "statut": "échec", "detail": f"{type(e).__name__}: {e}"}]
+
+    rec("is_llm_enabled() == False sous DISABLE_LLM=1", bool(G.is_llm_enabled() is False),
+        f"DISABLE_LLM={os.environ.get('DISABLE_LLM')!r}")
+
+    try:
+        G.scrub_environment()
+        sales = [k for k in getattr(G, "_SCRUB_KEYS", []) if os.environ.get(k)]
+        rec("clés API externes vidées au démarrage", not sales, f"restantes: {sales or 'aucune'}")
+    except Exception as e:
+        rec("clés API vidées", False, f"{type(e).__name__}: {e}")
+
+    blocked = sorted(getattr(G, "_BLOCKED_DOMAINS", set()))
+    rec("liste de domaines bloqués non vide", len(blocked) > 0, f"{len(blocked)} domaines")
+
+    try:
+        import asyncio
+
+        async def _try() -> None:
+            await G.GuardedOpenAIClient().chat.completions.create(model="x", messages=[{"role": "user", "content": "x"}])
+
+        try:
+            asyncio.run(_try())
+            rec("GuardedOpenAIClient.chat.completions.create() lève LLMDisabledError", False, "aucune exception levée")
+        except G.LLMDisabledError as e:
+            rec("GuardedOpenAIClient.chat.completions.create() lève LLMDisabledError", True, str(e))
+    except Exception as e:
+        rec("GuardedOpenAIClient fail-fast", False, f"{type(e).__name__}: {e}")
+
+    try:
+        import httpx  # noqa: F401
+    except Exception:
+        # Le blocage est posé à l'import d'httpx : sans httpx dans l'environnement, il n'y a rien à
+        # vérifier. Le dire « échec » serait une faute de mesure symétrique du ✅ décoratif qu'on remplace.
+        rec("blocage réseau httpx", None, "httpx absent de cet environnement : rien à exercer ici")
+    else:
+        try:
+            G.install_network_block()
+            rec("blocage réseau httpx installé (patch posé sur les clients)",
+                bool(getattr(G, "_NETWORK_PATCHED", False)),
+                f"{len(blocked)} domaines dans _BLOCKED_DOMAINS ; la requête sortante n'est pas émise "
+                "par ce script (pas de réseau en CI)")
+        except Exception as e:
+            rec("blocage réseau httpx", False, f"{type(e).__name__}: {e}")
+
+    try:
+        corr, _dt = evaluate_one({"question": "q", "reponse_attendue": "la photosynthèse produit du glucose", "bareme": 4})
+        toks = corr.get("tokens_utilises", corr.get("tokens"))
+        rec("tokens_utilises == 0 sur une correction déterministe", toks in (0, None), f"valeur: {toks!r}")
+    except Exception as e:
+        rec("compteur de tokens", False, f"{type(e).__name__}: {e}")
+    return out
+
+
 def main():
     parser = argparse.ArgumentParser(description="Audit du correcteur local Khawarizmi (0 LLM)")
     parser.add_argument("--json", action="store_true", help="Rapport JSON sur stdout")
     parser.add_argument("--out", default=None, help="Chemin du rapport Markdown à écrire")
+    parser.add_argument("--answers", default=None,
+                        help="json/jsonl de COPIES D'ÉLÈVES réelles ({question, student_answer, "
+                             "reponse_attendue, bareme[, human_score, chapitre]}). Sans ça, l'entrée est "
+                             "la réponse modèle et la mesure est circulaire par construction.")
     args = parser.parse_args()
 
     print("🔬 Audit du correcteur local Khawarizmi (0 LLM)...", file=sys.stderr)
-    report = run_audit()
+    report = run_audit(answers_path=args.answers)
 
     if args.json:
         print(json.dumps(report, ensure_ascii=False, indent=2))
@@ -567,7 +765,21 @@ def main():
         try: db.unlink()
         except: pass
 
-    sys.exit(0 if report["synthese"]["robustesse_score"] >= 0.5 else 2)
+    # On ne peut plus faire rougir la CI sur un indice auto-attribué : la seule chose qui vaille un
+    # code de sortie, ici, est l'échec d'un cas adversarial (une note donnée à une réponse qui ne la
+    # mérite pas). L'« alignement » est affiché, pas imposé.
+    a_fail = report["adversarial"].get("failed", 0)
+    garanti_en_echec = [g for g in report.get("llm_guarantees", []) if g["statut"] == "échec"]
+    if a_fail:
+        print(f"❌ {a_fail} adversariaux en échec", file=sys.stderr)
+    if garanti_en_echec:
+        for g in garanti_en_echec:
+            print(f"❌ garantie 0-LLM en échec : {g['garantie']} — {g['detail']}", file=sys.stderr)
+    if not report.get("answers_file"):
+        print("ℹ️  Aucune copie d'élève évaluée : ce rapport ne peut pas servir de preuve de qualité de "
+              "notation. Pour ça : --answers <jsonl> ici, ou tests/golden/metrics.py contre la note du prof.",
+              file=sys.stderr)
+    sys.exit(2 if (a_fail or garanti_en_echec) else 0)
 
 
 if __name__ == "__main__":

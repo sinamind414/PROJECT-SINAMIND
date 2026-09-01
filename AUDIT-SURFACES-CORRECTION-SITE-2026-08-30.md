@@ -1284,3 +1284,67 @@ Remarque de méthode : ma première lecture du manifest (`rm.get("beforeFiles")`
    `khawarizmi-backend.railway.app` a été démasqué.
 4. Un avantage de cette configuration : la CSP reste `connect-src 'self'` (le front n'appelle plus que son
    propre domaine), donc un changement de domaine ne demande plus de retoucher deux endroits.
+
+---
+
+## 20. F34 — l'audit du correcteur mesurait l'audit, pas le correcteur (et un plan de 10 jours dessus)
+
+**Déclencheur.** Un rapport d'audit circule le 2026-09-01 : « 69/100, robustesse adversariale 100/100,
+couverture sémantique 55/100, Géologie et Génétique à reconstruire → ~10 jours d'enrichissement de mots-clés
+pour atteindre 80/100 ». Les chiffres ont été **re-courus ici, à l'unité près** (`python3
+scripts/audit_correcteur.py`, HEAD `c38bf2b`) : 50 items, moyenne 57,6 %, 214 concepts / 1495 variantes,
+11 règles graves, 4 règles numériques, 9/9 adversariaux, latence 0,30 ms, `robustesse_score` 0,694.
+Le problème n'est donc pas la fabrique des nombres. C'est **ce qu'ils comptent**.
+
+### Ce qui a été mesuré ce tour (pas inféré)
+
+| # | Fait | Comment |
+|---|---|---|
+| 1 | L'audit **écrit dans l'objet qu'il mesure** : 83 concepts sont ajoutés à `_SYNONYMS` pendant la notation (`_SYNONYMS[cid] = [kw]`, `scripts/audit_correcteur.py` l. 299 et 324), parce que le raccordement mot-clé→concept échoue sur 83 des mots-clés du corpus | compteur `concepts_injectes_par_l_audit` ajouté au rapport ; valeur affichée en tête du markdown |
+| 2 | L'entrée évaluée **n'est pas une copie d'élève** : `evaluate_one(q)` retombe sur `reponse_attendue` (l. 202), et `data/golden_set_onec.json` n'a aucun champ `student_answer` (clés : `bareme, chapitre, chapitre_id, id, mots_cles_attendus, niveau, question, reponse_attendue, type`) | lecture des clés du JSON |
+| 3 | La « couverture KWD » est calculée en testant la présence du mot-clé **dans la réponse attendue** (`if kw_norm in ans_norm`, l. 186) : c'est de la cohérence interne du corpus, pas de la couverture du programme | relecture de `score_against_expected` |
+| 4 | 10 points du score étaient **auto-attribués** (`+ 0.10 * 1.0  # 0 LLM (toujours vrai dans ce script)`) ; retirés et poids renormalisés sur 0,90, l'indice passe de 69,4 à **66,0** | modification + re-run |
+| 5 | Les six « garanties 0 LLM » du rapport étaient **du texte codé en dur**, aucune n'était exercée — c'est ce bloc qui a produit la mention « architecture irréprochable » | `grep` du bloc `render_markdown` ; remplacé par `verify_llm_guarantees()` |
+| 6 | Le moteur audité est **orphelin** : `deterministic_correct` (v1) n'est appelé par aucune route. `routes/grade.py` → `services/local_grader.grade` (rubriques, `GRADER_VERSION = "1.2.0"`) ; le chemin mots-clés vivant est `deterministic_correct_v2` (`grading/savoir.py`, `tests/golden/scoring.py`, qui dit lui-même « chemin prod réel »). Déjà écrit dans `architecture-moteurs-audit.md` l. 98 : « aucune route ne l'appelle (seulement scripts/audit_correcteur.py) » | `grep -rn "deterministic_correct" --include=*.py` |
+| 7 | Sur la même entrée (réponse modèle) : v1 **sans** épinglage de concepts = 97,7 % de moyenne, **0 item à 0 %** ; v2 (chemin servi) = 100,0 % par construction, ses concepts étant déduits de la réponse modèle. Donc le « 0 % Génétique Q6 » n'est pas un trou de l'élève : c'est l'échec du raccordement de l'audit | script ad hoc dans `/tmp`, imports directs de `services.savoir_corrector` |
+| 8 | Le nombre de domaines bloqués est **17**, pas 16 ; `tokens_utilises == 0` ✅ ; `LLMDisabledError` sur `chat.completions.create` ✅ ; clés API vidées ✅ ; `is_llm_enabled()` False sous `DISABLE_LLM=1` ✅ ; blocage réseau : **non vérifiable ici** (httpx absent de l'environnement de CI — marqué tel, pas coché) | sortie de `verify_llm_guarantees()` |
+| 9 | `tests/golden/metrics.py` (MAE, accord exact, erreurs graves, biais, Cohen κ) **ne tourne pas dans ce sandbox** : `ModuleNotFoundError: No module named 'numpy'` (et `pydantic` absent aussi). Les seuils y sont déjà écrits et bloquants : savoir MAE ≤ 0,35/4 et 0 erreur grave ; L2 MAE ≤ 0,85/4, κ ≥ 0,45 | tentative d'import |
+
+### Jugement
+
+Le plan « +70 mots-clés en Génétique, +80 en Géologie → +11,5 points » est **refusé** pour une raison
+simple : *le levier qu'il actionne et la jauge qu'il regarde sont la même chose*. Enrichir `_SYNONYMS`
+fait monter « couverture KWD » mécaniquement, parce que l'audit remplit cette table lui-même avant de
+noter. Une mesure qui répond à sa propre correction n'est pas une mesure, c'est un bouton. Deuxième
+raison : 10 jours dans la seule fenêtre de rentrée (2→6 septembre), pour ne consulter **aucune copie**.
+
+Ce qui est gardé de l'audit, parce que vérifié : les 9 cas adversariaux. C'est le seul endroit du rapport
+où une réponse écrite à la main entre dans la machine et où l'on attend un **échec** de notation
+(charabia → 0 %, recopie de la question → ≤ 30 %, 36 ATP → 0 %). Une négative-control list de 9 items,
+c'est peu, mais c'est non circulaire : c'est un test de précision, pas de rappel.
+
+### Ce qui a changé dans le code (`scripts/audit_correcteur.py`)
+
+- **Déclarations en tête de rapport** : moteur audité vs chemin servi, nature de l'entrée, nombre de
+  concepts injectés pendant la mesure. Sans ces trois lignes, les tableaux se lisent comme une qualité de
+  notation ; avec, ils se lisent pour ce qu'ils sont.
+- **L'indice n'est plus un verdict** : « Score de robustesse 69/100 » → « Alignement interne de l'audit »,
+  avec une phrase disant ce qu'il ne mesure pas et la grandeur qui compte à la place.
+- **Garanties 0 LLM exercées** (`verify_llm_guarantees()`) : `vérifié` / `échec` / `non vérifiable ici`,
+  avec le détail. Le statut « non vérifiable » est écrit tel quel — pas de ✅ de complaisance.
+- **`--answers <json|jsonl>`** : évalue de vraies copies, et, dès 5 items portant `human_score`, sort
+  MAE, accord exact, biais signé, taux d'erreurs graves et κ (pur Python, sans numpy — pour que ça tourne
+  là où `tests/golden/metrics.py` ne tourne pas). Sous 5 items, il **refuse** de calculer un accord.
+- **Code de sortie** : plus indexé sur l'indice (auto-attribué) ; `exit 2` si un adversarial échoue ou si
+  une garantie 0-LLM tombe. Une ligne stderr rappelle, à chaque exécution sans copie, que le rapport ne
+  vaut pas preuve.
+- Rendu : « Couverture mots-clés » → « Alignement mots-clés→concepts », avec la mention qu'un 0 % est
+  d'abord un échec du raccordement de l'audit.
+
+### La seule chose qui manque encore (et ce n'est pas du code)
+
+`--answers` est écrit, harnais de métriques écrit, seuils écrits, `TRAINING_BANNER_AR` posé : **il n'y a
+aucune copie d'élève dans le dépôt** (0 réelle, et les 125 « copies » de `tests/golden/golden_annotated.json`
+sont annotées par `synthetic_keyword_v1`, dont ~40 % de réponses attendues recopiées). Les 12 copies de
+juin, triées et notées à la main, sont la seule matière qui transforme ce rapport en mesure. C'est le
+geste qui ouvre la semaine du 2 septembre, pas l'enrichissement de table.
