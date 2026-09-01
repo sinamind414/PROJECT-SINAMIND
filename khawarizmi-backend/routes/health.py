@@ -69,6 +69,22 @@ async def health_check():
         except Exception:
             business["rag_chunks_count"] = -1  # table inexistante
 
+    # D1 a deux moitiés : une URL qui pointe au bon endroit, ET les drapeaux qui allument le
+    # correcteur local. Sans ce bloc, un domaine correct avec LOCAL_RUBRIC_GRADER absent se voit
+    # « vert » alors que la correction retombe silencieusement sur le LLM (ou échoue).
+    correction = {
+        "local_rubric_grader": bool(getattr(cfg, "local_rubric_grader", False)),
+        "savoir_remediation_enabled": bool(getattr(cfg, "savoir_remediation_enabled", False)),
+        "savoir_veto": bool(getattr(cfg, "savoir_veto", True)),
+        "grader_version": None,
+    }
+    try:
+        from services.local_grader import GRADER_VERSION
+
+        correction["grader_version"] = GRADER_VERSION
+    except Exception as e:  # le diagnostic ne doit jamais casser /health
+        correction["grader_version_error"] = str(e)[:120]
+
     return {
         "status": "healthy" if (db_ok and redis_ok) else "degraded",
         "version": cfg.VERSION,
@@ -80,6 +96,7 @@ async def health_check():
         "fallback_active": not db_ok or not redis_ok,
         "backup": backup_info,
         "business": business,
+        "correction": correction,
         "environment": cfg.ENVIRONMENT,
         "timestamp": now.isoformat(),
     }

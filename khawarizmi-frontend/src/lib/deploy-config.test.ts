@@ -37,7 +37,12 @@ describe("CSP et proxy partagent la même origine d'API", () => {
   })
 
   it("l'origine de la CSP est dérivée de la variable d'environnement, jamais d'un hôte en dur", () => {
-    expect(cfg).toContain("apiOrigin(process.env.NEXT_PUBLIC_API_URL)")
+    // Depuis F32 + D1 : CSP, rewrite /health et proxy runtime partagent UN SEUL résolveur
+    // (src/lib/api-origin.ts). Deux implémentations de la même variable, c'est exactement comment
+    // la panne §11 a pu vivre : on changeait l'une, l'autre restait en retard.
+    expect(cfg).toContain('import { cspApiOrigin, resolvedApiOrigin } from "./src/lib/api-origin"')
+    expect(cfg).toContain("const origin = cspApiOrigin()")
+    expect(cfg).toContain("destination: `${resolvedApiOrigin()}/health`")
     // `connect-src` et le proxy doivent partir de la même variable, sinon changer l'une casse l'autre.
     expect(cfg).toContain("`connect-src 'self'${origin ? ` ${origin}` : \"\"}`")
   })
@@ -50,17 +55,25 @@ describe("CSP et proxy partagent la même origine d'API", () => {
     const rewrites = cfg.slice(cfg.indexOf("async rewrites"))
     expect(rewrites).not.toMatch(/source:\s*"\/api\/:path\*"/)
     expect(rewrites).toContain('source: "/health"')
-    // `/health` garde le repli de dev ; le handler, lui, lit l'origine par requête.
-    expect(rewrites).toContain('"http://localhost:8000"')
+    const lib = read("src/lib/api-origin.ts")
     const proxy = read("src/app/api/[...path]/route.ts")
-    expect(proxy).toContain("process.env.API_ORIGIN || process.env.NEXT_PUBLIC_API_URL")
-    expect(proxy).toContain('"http://localhost:8000"')
+    // Un seul endroit lit les variables d'env ; le handler ne fait que déléguer.
+    expect(lib).toContain("env.API_ORIGIN || env.NEXT_PUBLIC_API_URL")
+    expect(lib).toContain('export const DEV_API_ORIGIN = "http://localhost:8000"')
+    expect(proxy).toContain("resolvedApiOrigin()")
+    expect(proxy).not.toContain("process.env.API_ORIGIN ||")
+    // `@/lib/...` n'est pas résolvable dans next.config.ts (le bundler de la config ignore l'alias) :
+    // l'import doit rester relatif, sinon la config casse au build et personne ne le voit en dev.
+    expect(cfg).toMatch(/from "\.[\/"]+src\/lib\/api-origin"/)
   })
 
   it("une URL invalide ou absente retombe sur null, sans casser la construction de l'en-tête", () => {
-    // Pas d'exécution dynamique de la config : on vérifie le contrat d'écriture (style du repo).
-    expect(cfg).toMatch(/if \(!raw\) return null/)
-    expect(cfg).toMatch(/catch \{\s*return null\s*\}/)
+    // Le contrat vit maintenant dans le résolveur partagé ; on vérifie l'écriture (style du repo :
+    // pas d'exécution de la config Next dans un test).
+    const lib = read("src/lib/api-origin.ts")
+    expect(lib).toMatch(/if \(!raw\) return null/)
+    expect(lib).toMatch(/catch \{\s*return null\s*\}/)
+    expect(lib).toMatch(/u\.protocol === "http:" \|\| u\.protocol === "https:" \? u\.origin : null/)
     expect(cfg).toMatch(/connect-src 'self'\$\{origin \? ` \$\{origin\}` : ""\}/)
   })
 })

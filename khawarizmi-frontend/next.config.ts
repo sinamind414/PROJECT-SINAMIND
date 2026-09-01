@@ -1,25 +1,17 @@
 import type { NextConfig } from "next";
 import path from "path";
+// Une seule implémentation de la résolution d'origine pour la CSP, le rewrite /health et le proxy
+// runtime (`src/app/api/[...path]/route.ts`). Deux lecteurs = deux sources de vérité = la panne de §11.
+import { cspApiOrigin, resolvedApiOrigin } from "./src/lib/api-origin";
 
 /**
- * Origine de l'API, dérivée de la MÊME variable que les rewrites ci-dessous.
- *
- * Mesure du 2026-08-31 (rapport §11) : `connect-src` Contenait un domaine écrit en dur qui ne sert
+ * Mesure du 2026-08-31 (rapport §11) : `connect-src` contenait un domaine écrit en dur qui ne sert
  * pas ce dépôt (son `/health` répond « OK », ses 404 `{"message","requestId"}` — deux formes
  * qu'aucun fichier de ce repo ne produit), pendant que le `NEXT_PUBLIC_API_URL` réellement
  * configuré sur Vercel pointait vers un domaine Railway non provisionné. Résultat : changer l'URL
  * côté env sans toucher la CSP laissait le site cassé — le navigateur bloquant l'origine callée.
- * Une seule source de vérité, donc, et aucun hôte en dur.
+ * Depuis F32, le cas normal est `connect-src 'self'` seul : le proxy runtime est same-origin.
  */
-function apiOrigin(raw?: string): string | null {
-  if (!raw) return null
-  try {
-    const u = new URL(raw)
-    return u.protocol === "http:" || u.protocol === "https:" ? u.origin : null
-  } catch {
-    return null
-  }
-}
 
 const nextConfig: NextConfig = {
   turbopack: {
@@ -30,7 +22,7 @@ const nextConfig: NextConfig = {
   // injecte des scripts inline incompatibles avec une CSP stricte.
   async headers() {
     const isProd = process.env.NODE_ENV === "production"
-    const origin = apiOrigin(process.env.NEXT_PUBLIC_API_URL)
+    const origin = cspApiOrigin()
     const csp = [
       "default-src 'self'",
       "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
@@ -63,7 +55,8 @@ const nextConfig: NextConfig = {
       // L'appel `/api/...` passe donc désormais par le handler, qui lit l'origine **à chaque requête**.
       {
         source: "/health",
-        destination: `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/health`,
+        // Même résolveur que le proxy runtime : une variable (`API_ORIGIN`) gouverne tout.
+        destination: `${resolvedApiOrigin()}/health`,
       },
     ];
   },

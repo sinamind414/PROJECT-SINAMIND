@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server"
+import { configuredApiOrigin, resolvedApiOrigin } from "@/lib/api-origin"
 
 /**
  * Proxy d'API **résolu à la requête** (et non au build).
@@ -33,10 +34,9 @@ const UPSTREAM_HEADERS_DROP = new Set([
 
 const RESPONSE_HEADERS_DROP = new Set(["content-encoding", "content-length", "transfer-encoding", "connection", "keep-alive"])
 
-/** Origine du backend, par requête. Le repli est identique à celui de `next.config.ts` (dev local). */
+/** Origine du backend, par requête. Repli de dev partagé avec `next.config.ts` (même module). */
 export function apiOrigin(): string {
-  const raw = process.env.API_ORIGIN || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
-  return raw.replace(/\/+$/, "")
+  return resolvedApiOrigin()
 }
 
 function buildTarget(req: Request, segments: string[] | undefined): URL {
@@ -62,6 +62,21 @@ async function handle(req: Request, ctx: { params: Promise<{ path?: string[] }> 
   const target = buildTarget(req, path)
   const method = req.method.toUpperCase()
   const body = method === "GET" || method === "HEAD" ? undefined : await req.arrayBuffer()
+
+  // Cas n°1 traité AVANT tout appel réseau : rien n'est configuré, en prod → 501 de configuration.
+  if (!configuredApiOrigin() && process.env.NODE_ENV === "production") {
+    return NextResponse.json(
+      {
+        erreur: "Configuration manquante côté serveur : API_ORIGIN n'est pas défini.",
+        status: 501,
+        code: "api_origin_non_configuré",
+        attendu: "API_ORIGIN = l'origine publique du backend, sans /api",
+        path: `/api/${(path ?? []).join("/")}`,
+        method,
+      },
+      { status: 501 },
+    )
+  }
 
   let upstream: Response
   try {

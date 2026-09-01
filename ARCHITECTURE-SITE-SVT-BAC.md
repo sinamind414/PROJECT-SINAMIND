@@ -153,13 +153,18 @@ khawarizmi-frontend/src/lib/api-client.ts — 1 705 lignes
 
 - **Un seul mode d'adressage depuis F32 : same-origin.** `API_BASE_URL = NEXT_PUBLIC_API_URL || ""` reste
   en place pour les clients qui voudraient partir en cross-origin (l'origine doit alors être dans
-  `get_allowed_origins()` **et** dans la CSP, dérivée de la même variable par `apiOrigin()`,
-  `next.config.ts` l. 18-27). Mais le chemin de production est le **proxy runtime**
-  `src/app/api/[...path]/route.ts` : il lit `API_ORIGIN || NEXT_PUBLIC_API_URL || http://localhost:8000`
-  **à chaque requête**, reconstruit `${origine}/api/${path}` avec la query, transmet cookie et
+  `get_allowed_origins()` **et** dans la CSP). Mais le chemin de production est le **proxy runtime**
+  `src/app/api/[...path]/route.ts`, qui **délègue** la résolution à `src/lib/api-origin.ts` :
+  `API_ORIGIN || NEXT_PUBLIC_API_URL || http://localhost:8000` **lu à chaque requête**, par un seul
+  résolveur partagé avec la CSP et le rewrite `/health` (depuis F33 — avant, trois endroits lisaient la
+  variable et pouvaient diverger). Le handler reconstruit `${origine}/api/${path}` avec la query, transmet cookie et
   `Authorization`, passe le corps et le flux de la réponse (SSE), propage les statuts de l'amont, et renvoie
   la forme d'erreur du backend (`{erreur, status, path, method, requestId}`, `routes/errors.py`) en **502**
   si l'amont est injoignable — la cause technique part dans les logs serveur.
+- **En prod, aucune variable posée ≠ « on tente localhost »** : le handler répond **501
+  `{"code":"api_origin_non_configuré","attendu":"… sans /api"}` avant tout fetch** (F33). Le fallback
+  `localhost:8000` reste en dev seulement. C'est ce qui manquait à D1 pour être visible depuis l'extérieur :
+  un 502 réseau se lit « le backend est mort », un 501 nommé se lit « je n'ai rien configuré ».
 - **Le rewrite `/api/:path*` n'existe plus** (et c'est le correctif, pas un nettoyage) : les rewrites du
   panier `afterFiles` de Next passent **avant** les routes dynamiques, donc il masquait entièrement le
   handler. Mesure : `API_ORIGIN` sur un port mort + amont vivant sur :8000 → la requête répondait le JSON
@@ -332,7 +337,7 @@ d'aucun des deux ; et 42 routes hors navigation dégradent la compréhension du 
 
 | # | Dette | Preuve | Effet tant que c'est là |
 |---|---|---|---|
-| D1 | Origine de l'API figée au build (le front appelle un domaine mort) | rapport §11, §19 | **25 pages sur 81 (31 %) dépendent de l'API** : correction, drill, tuteur, progression. Le proxy runtime (F32) règle la partie « on ne peut pas changer de domaine sans rebuild » ; il reste à poser `API_ORIGIN` + `LOCAL_RUBRIC_GRADER=true` |
+| D1 | Origine de l'API mal branchée en prod (le front appelle un domaine qui ne sert pas ce dépôt) | rapport §11, §19 ; `verify_prod_api.py` | **25 pages sur 81 (31 %) dépendent de l'API** : correction, drill, tuteur, progression. Côté code, clos (F32+F33 : proxy lu à la requête, résolveur unique, 501 nommé, `/health` qui expose les drapeaux ; le job CI `prod-wiring` est écrit mais attend `docs/patches-todo/`, faute de permission `workflows`). **Reste deux gestes hors dépôt**, à ma main : `API_ORIGIN` dans Vercel (sans `/api`) puis Redeploy ; `LOCAL_RUBRIC_GRADER=true` dans Railway. Tant qu'ils manquent, D1 reste mesuré négatif — et le dit |
 | D2 | 55 leçons de 327 caractères, 0 visuel | `active-lessons.ts` ; `visualHint` 0/160 blocs | l'élève n'assimile pas le cours, il apprend la forme de la fiche |
 | D3 | Grilles de correction : 13 validées sur ~68, 10 brouillons non validés | `data/rubrics/index.json` | le correcteur local ne peut pas noter critère par critère ; la salle reste fermée |
 | D4 | Annales sans التمرين الثالث (8 ن) et intégralement en français | §18.4 : 0 `وضعية`, 80/80 questions | la rubrique « BAC » n'entraîne pas à l'épreuve réelle |
@@ -398,6 +403,14 @@ print('route proxy :', '/api/[...path]' in json.load(open('.next/app-path-routes
 # puis, en dev : API_ORIGIN=http://127.0.0.1:8999 (port mort) → /api/... doit répondre un 502
 # {"erreur":"Le serveur de correction est injoignable…","requestId":"proxy-…"}. Un JSON d'amont vivant
 # à cette place prouverait qu'un rewrite absorbe encore les appels.
+# puis, sans aucune variable en prod : /api/... doit répondre 501 {"code":"api_origin_non_configuré"}
+# (NODE_ENV=production). Un 502 ici prouverait que le fallback localhost est encore tenté en prod.
+
+# Et sur la production réelle, le verdict en une commande (aucune dépendance, urllib seul) :
+python3 khawarizmi-backend/scripts/verify_prod_api.py --front https://<app>.vercel.app --back https://<svc>.up.railway.app
+# exit 1 + trois familles : A amont ≠ ce dépôt · B proxy du front ne suit pas · C drapeaux de correction éteints
+# `/health` expose désormais correction.{local_rubric_grader, savoir_remediation_enabled, savoir_veto,
+# grader_version} : la panne « domaine bon mais correction éteinte » est devenue lisible sans lire les logs.
 ```
 
 *Règle de lecture* : ce document décrit **ce qui est**. Ce qui devrait être — la liste des défauts par priorité

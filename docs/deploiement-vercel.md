@@ -50,12 +50,30 @@ nécessaire que si tu Pointes `NEXT_PUBLIC_API_URL` hors proxy — auquel cas
 l'origine doit être dans `get_allowed_origins()` **et** dans la CSP.
 
 ⚠️ En l'absence des deux variables, le proxy retombe sur
-`http://localhost:8000` — dev local uniquement ; en prod cela devient un
-502 `{"erreur":"Le serveur de correction est injoignable…","requestId":"proxy-…"}`.
+`http://localhost:8000` — ce n'est correct qu'en dev. En prod le handler ne
+tombe nulle part : il répond **501 `{"code":"api_origin_non_configuré",
+"attendu":"… sans /api"}` avant tout fetch**, pour que la panne lisible soit
+« variable manquante » et non « le backend est cassé » (un 502 réseau aurait
+fait perdre deux jours, c'est exactement ce qui est arrivé à D1).
+
+Tout est lu par **un seul résolveur**, `src/lib/api-origin.ts` : la CSP
+(`connect-src`), le rewrite `/health` et le proxy runtime partagent la même
+origine. Changer l'un des trois sans les autres ne peut plus arriver.
 
 ## 4. Vérifier après déploiement
 
 ```bash
+# 0) tout d'un coup — verdict par empreinte, exit 1 si le branchement n'est pas bon :
+python3 khawarizmi-backend/scripts/verify_prod_api.py \
+    --front https://<votre-app>.vercel.app --back https://<service>.up.railway.app
+#   A « amont ≠ ce dépôt » (le /health répond « OK » en texte brut, ou 404 {"message","requestId"})
+#   B « le proxy du front ne suit pas » (501 = variable absente, 404 inconnu = rewrite fantôme)
+#   C « drapeaux éteints » (LOCAL_RUBRIC_GRADER absent de /health → correction silencieusement hors service)
+#   Le même script doit tourner en CI : voir docs/patches-todo/ — le job `prod-wiring` est écrit
+#   mais PAS encore appliqué (le proxy Git de l'agent n'a pas la permission `workflows`, `git push`
+#   est refusé sur .github/workflows/**). À appliquer à la main : sans lui, cette vérification reste
+#   une faveur que tu te fais à toi-même, pas une garde.
+
 # 1) le proxy du front atteint-il le bon backend ?
 curl -s https://<votre-app>.vercel.app/health
 #   → un OBJET JSON de diagnostic (routes/health.py). « OK » en texte brut = autre chose que ce dépôt.

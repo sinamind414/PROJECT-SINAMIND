@@ -156,6 +156,34 @@ describe("quand le pont tombe", () => {
   })
 })
 
+describe("quand personne n'a configuré l'origine", () => {
+  it("en prod, un 501 distinct d'une panne réseau — `API_ORIGIN` absent n'est pas un incident", async () => {
+    vi.stubEnv("API_ORIGIN", undefined as unknown as string)
+    vi.stubEnv("NEXT_PUBLIC_API_URL", undefined as unknown as string)
+    vi.stubEnv("NODE_ENV", "production")
+    vi.resetModules()
+    const mod = await import("../app/api/[...path]/route")
+    const res = await mod.GET(fakeReq("https://site.dz/api/progress"), ctx(["progress"]))
+    const body = await res.json()
+    vi.unstubAllEnvs()
+    expect(res.status).toBe(501)
+    expect(body.code).toBe("api_origin_non_configuré")
+    expect(body.erreur).toContain("API_ORIGIN")
+    expect(body.attendu).toContain("sans /api")
+  })
+
+  it("en dev, le repli localhost est gardé tel quel (ne pas casser le poste du développeur)", async () => {
+    vi.stubEnv("API_ORIGIN", undefined as unknown as string)
+    vi.stubEnv("NEXT_PUBLIC_API_URL", undefined as unknown as string)
+    vi.stubEnv("NODE_ENV", "development")
+    vi.resetModules()
+    const mod = await import("../app/api/[...path]/route")
+    await mod.GET(fakeReq("https://site.dz/api/x"), ctx(["x"]))
+    vi.unstubAllEnvs()
+    expect(calls[0].url).toBe("http://localhost:8000/api/x")
+  })
+})
+
 describe("câblage", () => {
   const route = read(ROUTE)
   const nextConfig = read(new URL("../../next.config.ts", import.meta.url))
@@ -166,9 +194,10 @@ describe("câblage", () => {
     expect(route).toContain("export const dynamic = \"force-dynamic\"")
   })
 
-  it("partage le repli de dev avec next.config.ts (deux sources de vérité = la panne d'origine)", () => {
-    expect(route).toContain('"http://localhost:8000"')
-    expect(nextConfig).toContain('"http://localhost:8000"')
+  it("délègue la résolution à un module unique (plus de duplication CSP / rewrite / handler)", () => {
+    expect(route).toContain('from "@/lib/api-origin"')
+    expect(route).not.toMatch(/API_ORIGIN \|\| NEXT_PUBLIC_API_URL \|\| "http/)
+    expect(nextConfig).toContain('from "./src/lib/api-origin"')
   })
 
   it("n'écrit aucune origine en dur", () => {

@@ -1,0 +1,49 @@
+diff --git a/.github/workflows/ci.yml b/.github/workflows/ci.yml
+index 014893b..1960acb 100644
+--- a/.github/workflows/ci.yml
++++ b/.github/workflows/ci.yml
+@@ -1,10 +1,14 @@
+ name: CI/CD Khawarizmi Pro
+ 
++# Les déclencheurs doivent pointer la branche qui EXISTE (patch F24, rapport §10 — jamais appliqué
++# jusqu'ici, ce qui explique qu'un `next build` rouge ait pu atterrir sur master et y rester) :
++# seul `master` vit dans ce dépôt, `main` est absent de `git ls-remote`.
+ on:
+   push:
+-    branches: [main, fabuleux/*]
++    branches: [master, fabuleux/*]
+   pull_request:
+-    branches: [main]
++    branches: [master]
++  workflow_dispatch: {}
+ 
+ jobs:
+   backend-tests:
+@@ -81,8 +85,26 @@ jobs:
+         env:
+           NEXT_TELEMETRY_DISABLED: "1"
+ 
++  # Le branchement prod était invisible parce que RIEN ne le vérifiait. Ce job ne déploie pas :
++  # il constate. Il ne tourne que si PROD_API_ORIGIN est renseigné (Settings → Secrets and variables
++  # → Actions → Variables), sinon il est sauté — pas de vert mensonger par inactivité.
++  prod-wiring:
++    if: vars.PROD_API_ORIGIN != ''
++    needs: [frontend-tests]
++    runs-on: ubuntu-latest
++    steps:
++      - uses: actions/checkout@v4
++      - name: Vérifier front ↔ backend
++        run: |
++          python3 khawarizmi-backend/scripts/verify_prod_api.py \
++            --front "${{ vars.PROD_FRONT_ORIGIN }}" \
++            --back "${{ vars.PROD_API_ORIGIN }}"
++
++  # Volontairement MANUEL : le job portait `if: github.ref == 'refs/heads/main'`, et `main` n'existe
++  # pas ici — donc la prod n'a JAMAIS été déployée par la CI. Remettre une branche existante en
++  # automatique redéployerait la prod à chaque push sur master ; un effet de bord qu'il faut choisir.
+   deploy-railway:
+-    if: github.ref == 'refs/heads/main'
++    if: github.event_name == 'workflow_dispatch'
+     needs: [backend-tests, frontend-tests]
+     runs-on: ubuntu-latest
+     steps:
