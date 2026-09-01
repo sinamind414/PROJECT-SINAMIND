@@ -1482,3 +1482,27 @@ registre partagé (`lesson-modes`), pas sur le DOM du shell.
 
 Mesures : vitest **998 ✓** (30 fichiers, +6 tests de navigation), tsc 0, eslint 0 err/12 warn (baseline),
 `next build` ok (65 pages).
+
+
+### 23.1 Suite immédiate (même tour, après la question « quel rôle pour l'élève ? »)
+
+La question du rôle a produit trois mesures qui n'étaient pas dans le §22 :
+
+| Fait | Nombre |
+|---|---|
+| Contenu porté par la vue React (`EXPERIMENTAL_LESSONS`) | **62 340 car.** visibles (45 612 arabes), dont 48 quiz avec index correct défini, 45 « وضعية انطلاق », 4 نص علمي نموذجي |
+| Contenu de la version longue `public/…/{slug}.html` | ≈ **108 600 car.** extrapolés (113 240 mesurés) |
+| Liens du code vers cette version longue | **0** → ~46 000 caractères (le texte suivi, les معايير تنقيط, l'exemple résolu) étaient inaccessibles autrement qu'en tapant l'URL |
+| « أخطاء شائعة » de la leçon active | les **3 mêmes chaînes pour les 55 leçons** — présentées comme un diagnostic de chapitre |
+
+Corrigé dans la foulée :
+- `src/app/lecons-sciences-experimentales/[slug]/page.tsx` : lien « 📖 النص الكامل للدرس — نسخة الكتاب (صفحة
+  مستقلة، بلا تفاعلية) » vers `/{slug}.html`, vérifié vivant (`curl` → 200). Il s'ouvre en onglet séparé
+  parce que le fichier n'a pas le shell de l'application — c'est écrit dans le lien, pas caché.
+- `CommonMistakesPanel` : quand les erreurs ne sont pas propres au chapitre, le titre devient « أخطاء
+  منهجية متكررة في البكالوريا » + une ligne qui dit qu'elles sont les mêmes partout et ne valent pas
+  diagnostic. `commonMistakesProvenance` au niveau de la leçon, test qui casse si on les authorise un
+  chapitre par chapitre sans changer l'étiquette.
+
+Mesures : vitest **999 ✓** (30 fichiers), tsc 0, eslint baseline, build ok avant ces deux ajouts (re-run
+partiel : les deux fichiers touchés sont des pages client, aucune importation de config).

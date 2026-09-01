@@ -93,6 +93,10 @@ export type ActiveLesson = {
   lessonBlocks: ActiveLessonBlock[]
   quickChecks: QuickCheck[]
   commonMistakes: string[]
+  /** Les trois erreurs affichées aujourd'hui sont écrites UNE fois pour les 55 leçons : elles sont
+   *  méthodologiques, pas propres au chapitre. L'étiqueter vaut mieux que de les faire passer pour un
+   *  diagnostic de ce cours (même défaut que les paragraphes de gabarit, corrigé en F35). */
+  commonMistakesProvenance: ContentProvenance
   bacLinkAr: string
   linkedScenarioId?: string
   linkedScenarioTitleAr?: string
@@ -236,6 +240,7 @@ function buildActiveLesson(ch: MethodologyChapterLink): ActiveLesson {
         "قارن ما كتبته بهذا النموذج — لا تُنقل الإجابة، تُقاس الفجوة."
       ),
     ],
+    commonMistakesProvenance: "gabarit",
     commonMistakes: [
       "الاكتفاء بالوصف دون تفسير علمي دقيق",
       "عدم الربط بين الوثائق والمعارف النظرية",

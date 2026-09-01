@@ -81,6 +81,12 @@ describe("auto-notation : aucun contrôle de gabarit ne distribue de verdict", (
       }
     }
   })
+
+  it("les erreurs affichées comme « شائعة » sont étiquetées générales tant qu'elles ne sont pas par chapitre", () => {
+    // Mesuré : les trois mêmes chaînes pour les 55 leçons. Les présenter comme un diagnostic de chapitre
+    // serait un faux positif — le jour où elles deviennent propres au chapitre, ce test doit casser.
+    for (const l of GENERATED) expect(l.commonMistakesProvenance).toBe("gabarit")
+  })
 })
 
 describe("intégrité du rendu", () => {

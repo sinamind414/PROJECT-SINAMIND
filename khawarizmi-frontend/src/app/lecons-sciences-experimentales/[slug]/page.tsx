@@ -36,6 +36,21 @@ export default function ExperimentalLessonPage() {
           ← العودة إلى القائمة
         </Link>
 
+        {/* La version longue du chapitre (نسخة الكتاب) vit dans public/, en HTML autonome : personne
+            n'y menait. Mesuré 2026-09-01 : la vue React porte 62 340 caractères visibles, le fichier
+            .html ≈ 108 600 — l'écart, c'est le texte suivi (مقدمة/عرض/خاتمة, معايير التنقيط). */}
+        <a
+          href={`/lecons-sciences-experimentales/${slug}.html`}
+          target="_blank"
+          rel="noopener"
+          className="mb-4 block rounded-2xl border border-white/[0.10] bg-white/[0.03] px-4 py-3 text-right text-sm text-slate-200 hover:border-mint/40 hover:bg-mint/5 transition"
+        >
+          📖 النص الكامل للدرس — نسخة الكتاب (صفحة مستقلة، بلا تفاعلية)
+          <span className="block text-[11px] text-slate-500 mt-1">
+            يفتح في نافذة جديدة: النص الطويل، معايير تنقيط المصحح، المثال المحلول.
+          </span>
+        </a>
+
         <ExperimentalLessonView slug={slug} />
       </div>
     </AppShell>

@@ -232,7 +232,7 @@ export default function ChapitrePage() {
                   <LessonBlocks blocks={lesson.lessonBlocks} />
                   <QuickChecks checks={lesson.quickChecks} />
                   <BacLinkPanel lesson={lesson} />
-                  <CommonMistakesPanel mistakes={lesson.commonMistakes} />
+                  <CommonMistakesPanel mistakes={lesson.commonMistakes} general={lesson.commonMistakesProvenance !== "authoré"} />
                   <MethodologyLinkPanel lesson={lesson} />
 
                   <section>
