@@ -8,15 +8,20 @@
 import { describe, expect, it } from "vitest"
 
 import { activeLessons, getActiveLessonByChapterParam, lessonCorpusStats, type ReflectionCheck } from "./active-lessons"
+import { EXPERIMENTAL_HUB_SLUGS } from "./experimental-hub-registry"
 import { methodologyChapterLinks } from "./methodology-chapters"
 
 const GENERATED = activeLessons
 
 describe("provenance : le gabarit ne peut pas se faire passer pour du contenu", () => {
-  it("toute leçon non authorée porte l'état « gabarit-seul »", () => {
+  it("l'état déclaré correspond à ce qui est réellement atteignable", () => {
     for (const l of GENERATED) {
       const authoredBlocks = l.lessonBlocks.filter((b) => b.provenance === "authoré")
-      expect(l.contentState).toBe(authoredBlocks.length > 0 ? "authoré" : "gabarit-seul")
+      const attendu = authoredBlocks.length > 0 ? "authoré" : l.linkedBookPhases.length > 0 ? "lié" : "gabarit-seul"
+      expect(l.contentState).toBe(attendu)
+      // Un état « gabarit-seul » qui cacherait un lien existant serait un faux négatif ; l'inverse
+      // serait un faux positif, plus grave : promettre un contenu qui n'est pas là.
+      if (l.contentState === "gabarit-seul") expect(l.linkedBookPhases).toHaveLength(0)
     }
   })
 
@@ -25,6 +30,23 @@ describe("provenance : le gabarit ne peut pas se faire passer pour du contenu", 
       .filter((b) => b.sharedWith > 1 && b.provenance === "authoré")
       .map((b) => b.id)
     expect(contrevenants).toEqual([])
+  })
+
+  it("le contenu du livre est raccordé, et uniquement à des pages qui existent", () => {
+    // Le 01/09, la dette D2 a été décrite comme « le site ne contient que 2,29 % du livre ». C'était
+    // mesuré sur la seule couche « leçon active ». Le hub `lecons-sciences-experimentales` contient
+    // 113 240 caractères de leçons réelles (22 phases, 44 chapitres numérotés du livre), et il
+    // n'était relié à rien. Ce test verrouille le raccord — et l'absence d'invention.
+    const stats = lessonCorpusStats()
+    expect(stats.lessonsWithLinkedContent).toBe(GENERATED.length)
+    expect(stats.linkedPhases).toBe(EXPERIMENTAL_HUB_SLUGS.length)
+    expect(stats.gabaritOnly).toBe(0)
+    for (const l of GENERATED) {
+      for (const ph of l.linkedBookPhases) {
+        expect(EXPERIMENTAL_HUB_SLUGS).toContain(ph.slug)
+        expect(ph.labelAr.length).toBeGreaterThan(3)
+      }
+    }
   })
 
   it("la duplication est chiffrée, pas tue : 17 leçons « processus » lisaient le même texte", () => {
@@ -85,7 +107,7 @@ describe("intégrité du rendu", () => {
     // conversation. Ce que ce test interdit, c'est de confondre « unique » et « propre au chapitre » :
     // insérer le nom du chapitre dans une phrase de gabarit crée 55 chaînes distinctes et zéro contenu.
     const stats = lessonCorpusStats()
-    expect(stats.authoredLessons).toBe(0)
+    expect(stats.authoredLessons).toBe(0) // contenu écrit ICI — pas le contenu relié, qui est mesuré au-dessus
     expect(stats.displayedChars).toBeGreaterThanOrEqual(stats.distinctCorpusChars)
     expect(stats.slotSubstitutionChars).toBeGreaterThan(stats.focusCorpusChars)
     // Le corpus réellement spécifique tient dans une phrase par chapitre : ~5 000 caractères pour 55

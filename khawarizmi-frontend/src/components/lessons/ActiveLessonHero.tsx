@@ -26,6 +26,12 @@ export function ActiveLessonHero({ lesson }: { lesson: ActiveLesson }) {
           العلمية. المرجع للمحتوى: كتاب المدرسة.
         </p>
       )}
+      {lesson.linkedBookPhases.length > 0 && (
+        <p className="mb-3 rounded-xl bg-black/20 border border-white/15 px-3 py-2 text-white/85 text-[11px] leading-relaxed">
+          هذه الصفحة إطار منهجي. المحتوى العلمي للوحدة مكتوب في الدرس الكامل المرتبط أدناه —
+          ابدأ منه، ثم ارجع إلى هنا لتدريب الطريقة.
+        </p>
+      )}
       <div className="flex flex-wrap items-center gap-3">
         <span className={`px-3 py-1 rounded-full text-xs font-bold border ${badge.color}`}>{badge.label}</span>
         {lesson.chapterType && (
@@ -35,6 +41,15 @@ export function ActiveLessonHero({ lesson }: { lesson: ActiveLesson }) {
         )}
       </div>
       <div className="mt-4 flex flex-wrap gap-3">
+        {lesson.linkedBookPhases.map((ph) => (
+          <Link
+            key={ph.slug}
+            href={`/lecons-sciences-experimentales/${ph.slug}`}
+            className="px-4 py-2 rounded-xl bg-white text-[#122029] text-sm font-bold hover:bg-white/90 transition"
+          >
+            📖 الدرس الكامل — {ph.labelAr.slice(0, 42)}
+          </Link>
+        ))}
         <Link
           href={`/document-analysis/chapters/${lesson.chapterSlug}`}
           className="px-4 py-2 rounded-xl bg-white/15 text-white text-sm font-bold hover:bg-white/25 transition"

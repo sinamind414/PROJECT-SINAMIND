@@ -1407,3 +1407,40 @@ volontairement, pas le retirer.
 
 Mesures du commit : vitest **991 ✓** (29 fichiers, dont 8 nouveaux sur `active-lessons`), `tsc --noEmit` 0,
 eslint 0 err/11 warn (baseline −1), `next build` ok (65 pages statiques).
+
+
+---
+
+## 22. F36 — « le site n'a pas de cours » était faux : 113 240 caractères de leçons existaient, sur une île
+
+**Rétractation (17ᵉ de la série).** Le §21 et le bilan du 01/09 affirmaient : corpus de cours distinct = 4 899 caractères, soit 2,29 % du livre. C'est exact **pour la couche « leçon active »** (`active-lessons.ts`) et faux pour le site. Mesuré ce tour :
+
+| Surface | Fichiers | Contenu |
+|---|---|---|
+| `khawarizmi-frontend/public/lecons-sciences-experimentales/*.html` | 22 phases + transcription | **113 240 caractères** visibles pour les phases (médiane 5 130 ; 44 chapitres numérotés `الدرس 1` → `الدرس 44`) |
+| duplication `svt_course/` | 23 fichiers | 952 Ko, même contenu, **copie non servie** (dette de propriété, pas de contenu) |
+| `src/lib/experimental-lessons-data.ts` | 125 Ko | même contenu en données structurées (`problem`, `document`, `simulation`, `bac_tip`, `scientific_text`, `quiz` avec distracteurs et index correct) |
+| `المكتبة_الكاملة_SVT.md` | racine | 1 205 609 caractères, 994 titres — la bibliothèque complète |
+| `الكتاب_المصحح_v1.0.md` | racine | 163 394 caractères, 414 titres — le livre corrigé |
+| `LIVRE-MANHADJIYA.md` | racine | 214 297 caractères — le dénominateur que j'utilisais |
+
+Donc le site **sert** des leçons qui font 69 % de `الكتاب_المصحح_v1.0.md` et 9,4 % de la bibliothèque. Le titre d'une leçon HTML ne apparaît tel quel dans aucun des trois fichiers : ce ne sont pas des copies du manuel, c'est un **dispositif** rédigé (objectif scientifique, durée d'apprentissage autonome, mise en tension, analyse dirigée, texte scientifique modèle avec « معايير تنقيط المصحح », quiz). Un des deux contenus est de trop ; aucun des deux n'était branché sur l'autre.
+
+### Le vrai défaut, mesuré
+
+Aucun lien entre les deux surfaces : `grep -rn "lecons-sciences-experimentales" src/app/cours` → 0 résultat. Un élève sur `/cours/…/[chapitre]` voyait le gabarit, sans jamais atteindre la leçon écrite. Exactement la famille du défaut F32 (un mécanisme correct qui ne sert à rien parce que le chemin ne passe pas par lui).
+
+### Correction (F36)
+
+1. **Registre unique** : `PHASES` / `DOMAINES` déplacés de `src/app/lecons-sciences-experimentales/page.tsx` vers `src/lib/experimental-hub-registry.ts`. La page devient consommatrice ; plus de double définition.
+2. **Raccord vérifié, pas deviné** : `bookPhasesForUnit(domainAr, unitAr)` relie une leçon active aux phases du hub **par égalité stricte des libellés arabes officiels** de domaine et d'unité. Aucun rapprochement par similarité de titre : j'ai mesuré la piste (12/55 raccords à ≥2 mots communs, et 0/12 d'accord avec la position globale) — elle produit de faux liens, donc elle est écartée, pas améliorée.
+3. **Troisième état** : `contentState = "authoré" | "lié" | "gabarit-seul"`. « lié » = rien d'écrit ici, mais le contenu existe et est à un clic. Le bandeau de la leçon dit désormais « هذه الصفحة إطار منهجي. المحتوى العلمي للوحدة مكتوب في الدرس الكامل المرتبط أدناه » et un bouton ouvre la phase.
+4. **Statistiques corrigées** : `lessonsWithLinkedContent` 55/55, `linkedPhases` 22/22, `gabaritOnly` **0** (défini comme « aucun contenu atteignable », plus « pas écrit à la main »).
+
+### Ce qui reste ouvert, sans glissement de sens
+
+- Les leçons actives n'ont toujours **aucun contenu écrit pour elles** : `authoredLessons = 0`. Le lien donne accès au contenu, il ne le déplace pas. Passer une unité de « lié » à « authoré » = écrire ses 3-5 blocs dans `registerAuthoredLesson`, et c'est encore ton geste, pas le mien.
+- La duplication `svt_course/` ↔ `public/` (952 Ko) n'est pas tranchée : supprimer l'une des copies sans savoir laquelle est la source (build manuel ? script ?) serait destructive. À décider par toi, avec la commande de contrôle : `diff -rq svt_course khawarizmi-frontend/public/lecons-sciences-experimentales | head`.
+- Le hub compte `chapters: "1" | "2" | "3"` par phase, sémantique non documentée et manifestement fausse au vu des slugs (`phase2_chapitres_3_4` porte `chapters: "2"`). Non touché, car je ne sais pas ce que le champ est censé dire ; c'est maintenant dans un seul fichier, donc corriger sera une ligne.
+
+Mesures : vitest **992 ✓** (29 fichiers), tsc 0, eslint 0 err/12 warn (baseline), `next build` ok.

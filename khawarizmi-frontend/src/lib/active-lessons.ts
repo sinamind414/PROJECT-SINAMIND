@@ -1,5 +1,6 @@
 import { methodologyChapterLinks, type MethodologyChapterLink } from "@/lib/methodology-chapters"
 import { getMethodologyScenario } from "@/lib/methodology-documents"
+import { bookPhasesForUnit, type PhaseMeta } from "@/lib/experimental-hub-registry"
 
 /**
  * Les leçons du site, et ce qu'elles sont vraiment.
@@ -75,8 +76,16 @@ export type ActiveLesson = {
   domainFr: string
   chapterImportance: "critique" | "haute" | "moyenne"
   chapterType?: string
-  /** "authoré" dès qu'au moins un bloc est écrit pour ce chapitre ; "gabarit-seul" sinon. */
-  contentState: "authoré" | "gabarit-seul"
+  /**
+   * "authoré"  : des blocs écrits pour CE chapitre (registre `registerAuthoredLesson`).
+   * "lié"      : rien d'écrit ici, MAIS le contenu existe et est servi — une leçon du hub
+   *              `lecons-sciences-experimentales` couvre cette unité (mesuré : 113 240 caractères).
+   *              Le lien est posé, l'élève n'est plus laissé avec le seul gabarit.
+   * "gabarit-seul" : ni l'un ni l'autre. C'est l'état qui doit être affiché comme tel, pas comblé.
+   */
+  contentState: "authoré" | "lié" | "gabarit-seul"
+  /** Les leçons du livre qui couvrent l'unité de ce chapitre (vide = aucune, jamais devinée). */
+  linkedBookPhases: { slug: string; labelAr: string; bookChapters: string }[]
   /** La phrase propre au chapitre (médiane 88 caractères). C'est TOUT ce qui distingue deux leçons. */
   focusAr: string
   summaryAr: string
@@ -174,6 +183,11 @@ function buildActiveLesson(ch: MethodologyChapterLink): ActiveLesson {
   const scenario = getMethodologyScenario(ch.scenarioId)
   const typeBlocks = TYPE_BLOCKS[type] || TYPE_BLOCKS.concept
   const authored = AUTHORED_BLOCKS.get(ch.slug)
+  const linked = bookPhasesForUnit(ch.domainAr, ch.unitAr).map((ph: PhaseMeta) => ({
+    slug: ph.slug,
+    labelAr: ph.label,
+    bookChapters: ph.chapters,
+  }))
 
   return {
     chapterSlug: ch.slug,
@@ -188,7 +202,8 @@ function buildActiveLesson(ch: MethodologyChapterLink): ActiveLesson {
     chapterImportance: ch.chapterImportance,
     chapterType: ch.chapterType,
     focusAr: ch.focusAr,
-    contentState: authored && authored.length > 0 ? "authoré" : "gabarit-seul",
+    contentState: authored && authored.length > 0 ? "authoré" : linked.length > 0 ? "lié" : "gabarit-seul",
+    linkedBookPhases: linked,
     summaryAr: `${ch.focusAr} هذا الفصل يندرج ضمن ${ch.unitAr} ويرتبط بمهارات ${verbs.join("، ")}.`,
     keyConcepts: [
       concept(ch.chapterAr, `المفهوم الأساسي في ${ch.unitAr}. يجب فهمه لأنه محوري في البرنامج.`),
@@ -284,7 +299,7 @@ export function groupLessonsByDomain(): Map<string, ActiveLesson[]> {
 
 export type LessonCorpusStats = {
   lessons: number
-  /** Leçons dont tous les blocs sont des gabarits (état de la dette D2, chiffrable sans commentaire). */
+  /** Leçons sans AUCUN contenu atteignable (ni authoré, ni lié au hub du livre). C'est la dette réelle. */
   gabaritOnly: number
   authoredLessons: number
   /** Caractères du corpus réellement distinct : focus + blocs uniques + erreurs + concepts uniques.
@@ -296,8 +311,13 @@ export type LessonCorpusStats = {
   templateCorpusChars: number
   /** displayedChars / templateCorpusChars : combien de fois le même texte est lu par les élèves. */
   duplicationRatio: number
+  /** Leçons dont le contenu scientifique est accessible depuis la page (hub du livre). */
+  lessonsWithLinkedContent: number
+  /** Phases distinctes du hub touchées par au moins une leçon active. */
+  linkedPhases: number
   /** Caractères des phrases propres au chapitre (les `focusAr` distincts). La seule grandeur qui
-   *  compte comme contenu : c'est elle qui doit monter quand du contenu est authoré. */
+   *  compte comme contenu écrit ICI : le contenu du livre est mesuré séparément, sinon on compare
+   *  deux surfaces différentes et on se trompe de dette (c'est arrivé — cf. ledger §22). */
   focusCorpusChars: number
   /**
    * `distinctCorpusChars` − `templateCorpusChars` − `focusCorpusChars` : des phrases de gabarit dans
@@ -325,6 +345,8 @@ export function lessonCorpusStats(): LessonCorpusStats {
   let displayed = 0
   let maxShared = 0
   let authored = 0
+  let linked = 0
+  const linkedPhaseSet = new Set<string>()
   for (const l of activeLessons) {
     const texts = [l.summaryAr, l.bacLinkAr, l.revisionPromptAr, ...l.commonMistakes, ...l.keyConcepts.map((c) => c.meaningAr)]
     const perLesson = new Set<string>()
@@ -342,6 +364,8 @@ export function lessonCorpusStats(): LessonCorpusStats {
     }
     seenPerLesson.push(perLesson)
     if (l.contentState === "authoré") authored++
+    if (l.contentState === "lié") linked++
+    for (const ph of l.linkedBookPhases) linkedPhaseSet.add(ph.slug)
   }
   // Une occurrence par leçon, pas par bloc : deux textes égaux dans la même leçon ne font pas deux leçons.
   for (const perLesson of seenPerLesson) for (const t of perLesson) occurrences.set(t, (occurrences.get(t) ?? 0) + 1)
@@ -350,8 +374,10 @@ export function lessonCorpusStats(): LessonCorpusStats {
 
   const stats = {
     lessons: activeLessons.length,
-    gabaritOnly: activeLessons.length - authored,
+    gabaritOnly: activeLessons.filter((l) => l.contentState === "gabarit-seul").length,
     authoredLessons: authored,
+    lessonsWithLinkedContent: linked,
+    linkedPhases: linkedPhaseSet.size,
     distinctCorpusChars: [...distinct].reduce((n, t) => n + t.length, 0),
     templateCorpusChars: [...templates].reduce((n, t) => n + t.length, 0),
     focusCorpusChars: 0,
