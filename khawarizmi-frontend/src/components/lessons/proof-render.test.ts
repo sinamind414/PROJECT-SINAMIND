@@ -23,6 +23,7 @@ const draft = (over: Partial<PersistentDraft> = {}): PersistentDraft => ({
   history: [{ text: "نسخة الأمس", savedAt: "2026-08-30T08:00:00.000Z", day: "2026-08-30" }],
   previous: { text: "نسخة الأمس", savedAt: "2026-08-30T08:00:00.000Z", day: "2026-08-30" },
   archive: () => {},
+  persisted: true,
   ...over,
 })
 
@@ -38,6 +39,12 @@ describe("DraftStatus — ce qui est affiché sous la zone d'écriture", () => {
 
   it("sans clé persistante, le composant ne rend rien (pas de bandeau fantôme sur un écran sans mémoire)", () => {
     expect(renderToStaticMarkup(h(DraftStatus, { draft: draft({ persistent: false, savedAt: null, history: [], previous: null }) }))).toBe("")
+  })
+
+  it("écriture refusée par le navigateur : plus de « حُفظ », et le papier est désigné", () => {
+    const html = renderToStaticMarkup(h(DraftStatus, { draft: draft({ persisted: false }) }))
+    expect(html).toContain("تعذّر الحفظ على هذا الجهاز")
+    expect(html).not.toContain("حُفظ في جهازك")
   })
 
   it("première visite : pas de bouton de comparaison, parce qu'il n'y a rien à comparer", () => {
@@ -80,7 +87,8 @@ describe("ProofPanel — l'état à trois valeurs", () => {
 
   it("les quatre cases sont présentes et étiquetées, sans case cachée pour un enseignant", () => {
     const html = renderToStaticMarkup(h(ProofPanel, { lessonKey: "c1", chapterAr: "فصل" }))
-    for (const label of ["ما كتبتُ دون أن أفتح الدفتر", "ما نقص في إجابتی بعد المقارنة", "السطر النموذجي الذي لم أكتبه", "الخطأ الذي داورته في ورقتي"]) {
+    for (const label of ["ما كتبتُ دون أن أفتح الدفتر", "ما نقص في إجابتی بعد المقارنة".replace("إجابتی", "إجابتي"), "السطر النموذجي الذي لم أكتبه", "الخطأ الذي تكرّر في ورقتي"]) {
+      expect(html).not.toContain("إجابتی")  // ي persan : pas d'orthographe importée dans un site algérien
       expect(html).toContain(label)
     }
     expect(html).not.toMatch(/name="[^"]*(teacher|prof|note)/i)

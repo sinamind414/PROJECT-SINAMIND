@@ -1524,7 +1524,7 @@ Ce qui est branché maintenant, sans aucun contenu inventé et sans note :
 |---|---|---|
 | `src/lib/local-evidence.ts` + `usePersistentDraft` | brouillon écrit sur l'appareil, horodaté ; le brouillon **d'un autre jour** est archivé et la page repart vide ; 5 versions comparables | aucune note, aucun envoi réseau, aucun identifiant d'élève |
 | `DraftStatus` sous la zone d'écriture | «حُفظ في جهازك — HH:MM », «أرشف هذه النسخة », comparaison côte à côte avec la version d'un autre jour | aucun verdict sur la qualité du texte |
-| `ProofPanel` (55 leçons actives) | 4 cases remplies **après** écriture papier : ما كتبت دون أن أفتح الدفتر · ما نقص · السطر النموذجي الذي لم أكتبه · الخطأ الذي داورته ; état à 3 valeurs + date d'échéance J+14 | ne corrige pas, ne compare pas à un barème (nous n'avons ni copies ONEC ni 12 PDF) |
+| `ProofPanel` (55 leçons actives) | 4 cases remplies **après** écriture papier : ما كتبت دون أن أفتح الدفتر · ما نقص · السطر النموذجي الذي لم أكتبه · الخطأ الذي تكرّر في ورقتي ; état à 3 valeurs + date d'échéance J+14 | ne corrige pas, ne compare pas à un barème (nous n'avons ni copies ONEC ni 12 PDF) |
 | `ItemForgePanel` (moitié B) | l'élève écrit une consigne avec un verbe de la liste fermée du site + 3 critères qu'il propose lui-même ; « جاهزة » = complet au format, pas « bon » | ne valide pas la valeur de la question ; dit à l'écran que la comparaison avec le vrai sujet est manuelle |
 | `/preuve` | registre de l'absence : `لم يُختبر` / `اختُبر بلا تحويل` / `نُقل` sur les 55 chapitres, dénominateur réel, bouton «مسح كل الأثر» | aucun agrégat entre élèves, parce qu'aucune copie ne sort de l'appareil |
 
@@ -1544,10 +1544,50 @@ pages sont montées côté client et que `curl` ne prouvait rien) ; eslint 0 err
 `لم يُختبر` (55 lignes de chapitre + la légende) : le premier rendu affiche l'absence, pas un chiffre.
 
 Deux choses que ça ne règle pas, à ne pas vendre comme réglées :
-1. **Les 55 pages de chapitre sont derrière `AuthGuard`** : `curl /cours/d1` ne renvoie que le spinner
+1. **Les 55 pages de chapitre étaient derrière `AuthGuard`** : `curl /cours/d1` ne renvoyait que le spinner
    de vérification, donc les deux nouveaux panneaux n'existent pas dans le HTML serveur et restent
    inaccessibles tant que la session ne se résout pas. `/preuve` a été sortie de ce garde (page
    purement locale — la verrouiller derrière une API, c'est remplacer une information vraie par un
-   spinner) ; le reste de la dette D6 est entier et c'est le prochain arbitrage, pas un détail.
+   spinner). **Réglé en §25 pour les quatre pages de `/cours`** ; le reste de la dette D6 est ouvert.
 2. **`نُقل` ne veut toujours rien dire de statistique** : c'est une déclaration de l'élève, datée. Le
    seul nombre qui vaudrait quelque chose reste l'écart auto-note/prof sur copies de juin — non fourni.
+
+## 25. F38.1 — vérification de F38, trois défauts trouvés, et D6 éteinte sur le chemin du cours (2026-09-01)
+
+Je n'ai pas ajouté de surface : j'ai relu F38 en le mesurant. Trois choses n'étaient pas vraies, plus
+une qui rendait les deux panneaux inutiles.
+
+| # | Ce que j'ai trouvé | Ce que ça donnait pour l'élève | Corrigé |
+|---|---|---|---|
+| 1 | `defaultStorage.setItem` avalait l'exception de quota / mode privé | `DraftStatus` écrivait «حُفظ في جهازك» alors que **rien n'était écrit**. Un bandeau qui affirme une sauvegarde inexistante est le même défaut qu'une auto-note fabriquée (F35), en moins visible | `setItem` renvoie `false` ; `persisted?: boolean` porté par les **écritures seulement** (jamais par les lectures — la whitelist de relecture reste fermée, test existant intact) ; à l'écran : «تعذّر الحفظ على هذا الجهاز … أبقِه على ورقك », et le «حُفظ » disparaît |
+| 2 | `commitDraft` n'archivait pas la version de la **veille** quand l'écriture arrivait sans rechargement (page laissée ouverte, ou sauvegarde de sortie) | la règle « une version comparable par jour » ne tenait que si l'élève rechargeait — donc J+14 dépendait d'un hasard | archivage avant remplacement ; test : deux écritures à 21h00 puis 00h20 → `history[0].day = 2026-09-01` |
+| 3 | `/preuve` n'avait **qu'un lien**, en bas de la page de leçon — c'est-à-dire derrière la garde de session (ligne 5 du présent tableau) | le registre de l'absence n'était pas trouvable | entrée de menu «دليل الفهم » dans التعلّم (+ `ClipboardCheck`) ; verrou lu sur la source du `Sidebar.tsx` |
+| 4 | `ما نقص في إجابتی` portait un **ي persan** (U+06CC) ; `الخطأ الذي داورته` ne veut pas dire « l'erreur que j'ai faite » ; et la barre latérale affichait «نسقسي », qui n'est pas un mot | trois fautes d'orthographe sur un site dont la langue cible est l'arabe scolaire algérien | `إجابتي`, `الخطأ الذي تكرّر في ورقتي`, `نسأل` ; test anti-récidive `[یکګ]` sur les quatre fichiers de preuve |
+
+**Et le défaut qui annulait tout le reste.** `ProofPanel` et `ItemForgePanel` étaient montés **à
+l'intérieur** de l'`AuthGuard` de la page de chapitre. Mesure avant retrait : le fichier de page ne
+contient **aucun** appel `apiClient`/`fetch`, et en parcourant son graphe d'imports sur quatre niveaux,
+le seul réseau atteint passe par le shell (`auth-context`, `useSocial`, `BlogView`) — donc la garde ne
+protégeait rien, elle **masquait** le contenu local. Preuve du résultat sur le HTML serveur réel, sans
+cookie ni session :
+
+| Page | Avant (31 août, HEAD) | Après |
+|---|---|---|
+| `/cours/d1/u2/d1-u1-c1-composition-chimique-des-proteines` | **21 497 o** — un spinner, zéro octet de leçon, zéro caractère arabe de contenu | **79 552 o** — leçon + «دليل الفهم » + «لم يُختبر » + «اكتب السؤال » + «الفعل الإجرائي » |
+| `/cours` | 18 642 o | 55 030 o, avec «الدروس الكاملة » et «الدروس النشطة » dans le HTML |
+| pages de route gardées (`<AuthGuard`) | **39** / 82 | **35** / 82 |
+| gardées alors qu'aucun réseau dans le fichier | **23** | **19** |
+
+Retiré sur les quatre pages de `/cours` (hub, domaine, unité, chapitre), pas ailleurs : `/annales`,
+`/diagnostic`, `/dashboard`, `/methodology`, `/mindmap`, `/scanner`, `/achievements`, `/leaderboard`
+restent gardées — beaucoup appellent réellement l'API, et les déverrouiller sans vérifier leurs enfants
+serait exactement la décision prise à l'envers. Verrous écrits dans `src/lib/local-pages.test.ts` : ces
+quatre fichiers n'ont pas le droit d'avoir `<AuthGuard`, ni d'appeler le réseau (si un appel y entre, le
+test casse et la question de la garde se repose), et les deux panneaux doivent rester montés.
+
+Mesures après F38.1 : `tsc --noEmit` 0 ; vitest **1037 ✓** (33 fichiers, +15 depuis §24) ; eslint
+0 erreur / 12 warnings (baseline) ; `next build` 66 routes, aucun avertissement nouveau.
+
+Ce que F38.1 ne règle pas : **`نُقل` reste une déclaration datée de l'élève**, pas une mesure — la seule
+grandeur qui vaudrait quelque chose (écart auto-note/prof sur les copies de juin) n'est toujours pas
+fournie ; et les 19 pages restantes sont le prochain arbitrage de D6, pas celui-ci.

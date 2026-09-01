@@ -52,6 +52,7 @@ export function ProofPanel({ lessonKey, chapterAr }: { lessonKey: string; chapte
   const [due, setDue] = useState<string | null>(null)
   const [hasTransfer, setHasTransfer] = useState(false)
   const [hydrated, setHydrated] = useState(false)
+  const [persisted, setPersisted] = useState(true)
   const lastSaved = useRef<string | null>(null)
   const skipSave = useRef(true)
 
@@ -81,6 +82,7 @@ export function ProofPanel({ lessonKey, chapterAr }: { lessonKey: string; chapte
       setState(proofStateOf(record))
       setSavedAt(record.savedAt)
       setDue(transferDueDay(record))
+      setPersisted(record.persisted !== false)
     }, SAVE_DELAY_MS)
     return () => clearTimeout(timer)
   }, [boxes, hasTransfer, hydrated, lessonKey, chapterAr])
@@ -151,7 +153,9 @@ export function ProofPanel({ lessonKey, chapterAr }: { lessonKey: string; chapte
           <span>
             {filled === 0
               ? "لم تُملأ خانة: الفصل في حالة «لم يُختبر»، وهذا صحيح إلى أن تكتب."
-              : `${filled}/4 خانات · حُفظ ${savedAt ? new Date(savedAt).toLocaleString("fr-FR") : "—"}`}
+              : persisted
+                ? `${filled}/4 خانات · حُفظ ${savedAt ? new Date(savedAt).toLocaleString("fr-FR") : "—"}`
+                : `${filled}/4 خانات · تعذّر الحفظ على هذا الجهاز — لا تعدّ ما كتبته محفوظًا`}
             {due && !hasTransfer && (
               <span className="text-amber-200/80"> · موعد إعادة الكتابة: {due}</span>
             )}

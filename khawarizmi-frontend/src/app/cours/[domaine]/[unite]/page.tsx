@@ -3,7 +3,6 @@
 import { useParams } from "next/navigation"
 import Link from "next/link"
 import { useMemo } from "react"
-import { AuthGuard } from "@/components/auth/AuthGuard"
 import { AppShell } from "@/components/layout/AppShell"
 import { Breadcrumb } from "@/components/cours/Breadcrumb"
 import {
@@ -31,7 +30,11 @@ export default function UnitePage() {
 
   if (!domain || !unit) {
     return (
-      <AuthGuard>
+// AuthGuard retiré ici (D6, partiellement éteinte le 2026-09-01) : le contenu de cette page est local.
+      // Mesuré en parcourant le graphe d'imports sur 4 niveaux — le seul réseau atteint passe par le shell
+      // (auth-context, useSocial, BlogView) et se dégrade à part. Exiger une session pour afficher une liste
+      // de chapitres qui vit dans le bundle, c'était remplacer une information par un spinner.
+      <>
         <AppShell>
           <main className="flex-1 p-6 lg:p-8 overflow-auto">
             <div className="max-w-5xl mx-auto text-center py-20">
@@ -42,12 +45,12 @@ export default function UnitePage() {
             </div>
           </main>
         </AppShell>
-      </AuthGuard>
+      </>
     )
   }
 
   return (
-    <AuthGuard>
+    <>
       <AppShell>
         <main className="flex-1 p-6 lg:p-8 overflow-auto">
           <div className="max-w-5xl mx-auto">
@@ -107,6 +110,6 @@ export default function UnitePage() {
           </div>
         </main>
       </AppShell>
-    </AuthGuard>
+    </>
   )
 }

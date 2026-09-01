@@ -24,6 +24,8 @@ export type PersistentDraft = {
   setText: (value: string) => void
   savedAt: string | null
   history: DraftVersion[]
+  /** false = le navigateur refuse l'écriture (quota, mode privé) : rien ne survivra à l'onglet. */
+  persisted: boolean
   previous: DraftVersion | null
   archive: () => void
 }
@@ -32,6 +34,7 @@ export function usePersistentDraft(key: string | null, label: string): Persisten
   const [text, setTextState] = useState("")
   const [savedAt, setSavedAt] = useState<string | null>(null)
   const [history, setHistory] = useState<DraftVersion[]>([])
+  const [persisted, setPersisted] = useState(true)
   /** Dernière valeur réellement écrite dans le stockage : évite une écriture à chaque rendu. */
   const saved = useRef<string | null>(null)
   const latest = useRef("")
@@ -56,6 +59,7 @@ export function usePersistentDraft(key: string | null, label: string): Persisten
       dirty.current = false
       setSavedAt(record.savedAt)
       setHistory(record.history)
+      setPersisted(record.persisted !== false)
     }, SAVE_DELAY_MS)
     return () => clearTimeout(timer)
   }, [text, key, label])
@@ -85,10 +89,12 @@ export function usePersistentDraft(key: string | null, label: string): Persisten
     saved.current = record.text
     setHistory(record.history)
     setSavedAt(record.savedAt || null)
+    setPersisted(record.persisted !== false)
   }, [key, label])
 
   return {
     persistent: !!key,
+    persisted,
     text,
     setText,
     savedAt,

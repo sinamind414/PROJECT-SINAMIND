@@ -22,6 +22,7 @@ import {
   saveForge,
   saveProof,
   transferDueDay,
+  type KVStorage,
   wipeLocalEvidence,
   PROOF_BOXES,
   TRANSFER_DELAY_DAYS,
@@ -208,5 +209,36 @@ describe("l'élève fabrique l'épreuve", () => {
     }
     expect(missing).toEqual([])
     expect(PROOF_BOXES).toHaveLength(4)
+  })
+})
+
+describe("le stockage peut dire non", () => {
+  // Sans ces deux gardes, l'écran affirmait « حُفظ في جهازك » alors que le navigateur avait refusé
+  // l'écriture (quota, mode privé), et une écriture après minuit écrasait la version de la veille
+  // sans l'archiver — c'est-à-dire qu'il ne restait rien à comparer au J+14 annoncé.
+  it("écriture refusée : persisted=false sur les trois surfaces, pour qu'aucun bandeau ne mente", () => {
+    const refusing: KVStorage = { ...createMemoryStorage(), setItem: () => false }
+    const boxes = { wroteWithoutBook: "خانتان", whatWasMissing: "", modelLine: "", circledMistake: "" }
+    expect(commitDraft(refusing, "c1", "فصل", "نص", new Date("2026-09-01T20:00:00")).persisted).toBe(false)
+    expect(saveProof(refusing, "c1", "فصل", boxes).persisted).toBe(false)
+    expect(saveForge(refusing, "c1", "فصل", { verb: "حلّل", prompt: "حلّل منحنى التركيز", criteria: [] }).persisted).toBe(false)
+  })
+
+  it("une écriture un autre jour archive la version de la veille, même sans rechargement de page", () => {
+    const s = createMemoryStorage()
+    commitDraft(s, "c1", "فصل", "نصّ الأمس", new Date("2026-09-01T21:00:00"))
+    const next = commitDraft(s, "c1", "فصل", "نصّ اليوم", new Date("2026-09-02T00:20:00"))
+    expect(next.text).toBe("نصّ اليوم")
+    expect(next.history[0]?.text).toBe("نصّ الأمس")
+    expect(next.history[0]?.day).toBe("2026-09-01")
+    expect(loadDraft(s, "c1")?.history.length).toBe(1)
+  })
+
+  it("deux écritures le même jour : une seule version, pas d'archive doublonnée", () => {
+    const s = createMemoryStorage()
+    commitDraft(s, "c1", "فصل", "ب", new Date("2026-09-01T20:00:00"))
+    const next = commitDraft(s, "c1", "فصل", "بسم الله", new Date("2026-09-01T20:04:00"))
+    expect(next.history).toEqual([])
+    expect(next.text).toBe("بسم الله")
   })
 })

@@ -6,28 +6,7 @@ import { useEffect } from "react"
 import { useAuth } from "@/lib/auth-context"
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion"
 import type { LucideIcon } from "lucide-react"
-import {
-  LayoutDashboard,
-  BookOpen,
-  ListChecks,
-  BookMarked,
-  Zap,
-  Search,
-  AlertTriangle,
-  Dumbbell,
-  TrendingUp,
-  LogOut,
-  Microscope,
-  Network,
-  Repeat,
-  X,
-  Menu,
-  FlaskConical,
-  Home,
-  Clock,
-  FileText,
-  Target,
-} from "lucide-react"
+import { AlertTriangle, BookMarked, BookOpen, ClipboardCheck, Clock, Dumbbell, FileText, FlaskConical, Home, LayoutDashboard, ListChecks, LogOut, Menu, Microscope, Network, Repeat, Search, Target, TrendingUp, X, Zap } from "lucide-react"
 
 type MenuItem = { href: string; icon: LucideIcon; labelAr: string; labelFr: string }
 type Phase = { label: string; items: MenuItem[] }
@@ -37,7 +16,7 @@ const MAIN_NAV: MenuItem[] = [
   { href: "/annales", icon: BookMarked, labelAr: "باك", labelFr: "BAC — Annales" },
   { href: "/drill", icon: Repeat, labelAr: "نراجع", labelFr: "Réviser" },
   { href: "/exercises", icon: Dumbbell, labelAr: "نتدرب", labelFr: "Exercices" },
-  { href: "/chatbot", icon: Microscope, labelAr: "نسقسي", labelFr: "Question" },
+  { href: "/chatbot", icon: Microscope, labelAr: "نسأل", labelFr: "Question" },
 ]
 
 import { lessonMode } from "@/lib/lesson-modes"
@@ -49,6 +28,9 @@ export const MENU_PHASES: Phase[] = [
       { href: lessonMode("normale").href, icon: FlaskConical, labelAr: lessonMode("normale").labelAr, labelFr: lessonMode("normale").labelFr },
       { href: lessonMode("active").href, icon: BookOpen, labelAr: lessonMode("active").labelAr, labelFr: lessonMode("active").labelFr },
       { href: "/mindmap", icon: Network, labelAr: "الخريطة الذهنية", labelFr: "Mind map" },
+      // Ce qui prouve que l'élève a écrit, pas cliqué. Avant ce fil, /preuve n'était atteignable que
+      // depuis le bas d'une page de leçon — le même défaut de câble qu'un {slug}.html sans lien entrant.
+      { href: "/preuve", icon: ClipboardCheck, labelAr: "دليل الفهم", labelFr: "Preuve de compréhension" },
     ],
   },
   {

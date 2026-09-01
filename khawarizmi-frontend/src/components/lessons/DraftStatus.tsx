@@ -28,7 +28,12 @@ export function DraftStatus({ draft }: { draft: PersistentDraft }) {
     <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-3" dir="rtl">
       <div className="flex flex-wrap items-center justify-between gap-2 text-[11px] text-white/45">
         <span>
-          {draft.savedAt ? (
+          {draft.persisted === false ? (
+            <span className="text-amber-200/90">
+              تعذّر الحفظ على هذا الجهاز (تخزين ممتلئ أو وضع تصفّح خاص) — ما تكتبه يبقى إلى أن تُغلق
+              النافذة: أبقِه على ورقك.
+            </span>
+          ) : draft.savedAt ? (
             <>
               حُفظ في جهازك — <span dir="ltr">{timeAr(draft.savedAt)}</span>
             </>

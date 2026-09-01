@@ -18,7 +18,8 @@
 
 export type KVStorage = {
   getItem(key: string): string | null
-  setItem(key: string, value: string): void
+  /** `false` = écriture refusée par le navigateur (quota, mode privé). Toute autre valeur = succès. */
+  setItem(key: string, value: string): void | boolean
   removeItem(key: string): void
   keys(): string[]
 }
@@ -50,12 +51,17 @@ export const defaultStorage: KVStorage = {
   setItem(k, v) {
     if (typeof window === "undefined" || !window.localStorage) {
       memory.set(k, v)
-      return
+      return true
     }
     try {
       window.localStorage.setItem(k, v)
+      return true
     } catch {
+      // Quota plein ou mode privé : la copie de travail reste en mémoire pour la session, mais il faut
+      // le DIRE. Un bandeau « حُفظ في جهازك » qui ment est de la même famille qu'une auto-note
+      // fabriquée (F35) — seulement moins visible.
       memory.set(k, v)
+      return false
     }
   },
   removeItem(k) {
@@ -86,7 +92,10 @@ export function createMemoryStorage(): KVStorage {
   const m = new Map<string, string>()
   return {
     getItem: (k) => m.get(k) ?? null,
-    setItem: (k, v) => void m.set(k, v),
+    setItem: (k, v) => {
+      m.set(k, v)
+      return true
+    },
     removeItem: (k) => void m.delete(k),
     keys: () => [...m.keys()],
   }
@@ -140,6 +149,10 @@ export type DraftRecord = {
   day: string
   /** Plus récent d'abord. On ne remonte jamais au-delà de HISTORY_CAP versions. */
   history: DraftVersion[]
+  /** false = le navigateur a refusé l'écriture : rien ne survivra à l'onglet, et l'écran doit l'afficher.
+   *  Absent sur une lecture : on ne réécrit pas l'historique pour ça, et la liste des champs lus reste
+   *  strictement la liste des champs de l'élève (test de whitelist). */
+  persisted?: boolean
 }
 
 function draftId(key: string) {
@@ -165,8 +178,8 @@ export function openDraft(store: KVStorage, key: string, label: string, now: Dat
   if (stored.day && stored.day !== today && clampText(stored.text)) {
     history.unshift({ text: clampText(stored.text), savedAt: stored.savedAt ?? "", day: stored.day })
     const trimmed = history.slice(0, HISTORY_CAP)
-    const next: DraftRecord = { key, label, text: "", savedAt: "", day: today, history: trimmed }
-    store.setItem(draftId(key), JSON.stringify(next))
+    const next: DraftRecord = { key, label, text: "", savedAt: "", day: today, history: trimmed, persisted: true }
+    next.persisted = store.setItem(draftId(key), JSON.stringify(next)) !== false
     return next
   }
   return {
@@ -184,6 +197,13 @@ export function commitDraft(store: KVStorage, key: string, label: string, text: 
   const today = localDay(now)
   const stored = read<DraftRecord>(store, draftId(key))
   const history = Array.isArray(stored?.history) ? stored!.history.slice(0, HISTORY_CAP) : []
+  // Écriture sans passage par openDraft (onglet resté ouvert dans la nuit, sauvegarde de sortie de page) :
+  // la version de la veille doit être archivée avant d'être remplacée, sinon la règle « une version
+  // comparable par jour » ne tient que si l'élève recharge.
+  if (stored && stored.day !== today && clampText(stored.text) && history[0]?.text !== stored.text) {
+    history.unshift({ text: clampText(stored.text), savedAt: stored.savedAt ?? "", day: stored.day })
+    history.splice(HISTORY_CAP)
+  }
   const next: DraftRecord = {
     key,
     label,
@@ -191,8 +211,9 @@ export function commitDraft(store: KVStorage, key: string, label: string, text: 
     savedAt: now.toISOString(),
     day: today,
     history,
+    persisted: true,
   }
-  store.setItem(draftId(key), JSON.stringify(next))
+  next.persisted = store.setItem(draftId(key), JSON.stringify(next)) !== false
   return next
 }
 
@@ -205,13 +226,15 @@ export function archiveDraft(store: KVStorage, key: string, label: string, now: 
     0,
     HISTORY_CAP,
   )
-  const next: DraftRecord = { ...stored, history }
-  store.setItem(draftId(key), JSON.stringify(next))
+  const next: DraftRecord = { ...stored, history, persisted: true }
+  next.persisted = store.setItem(draftId(key), JSON.stringify(next)) !== false
   return next
 }
 
 export function loadDraft(store: KVStorage, key: string): DraftRecord | null {
-  return read<DraftRecord>(store, draftId(key))
+  const r = read<DraftRecord>(store, draftId(key))
+  if (!r) return null
+  return { ...r, history: Array.isArray(r.history) ? r.history : [] }
 }
 
 export function dropDraft(store: KVStorage, key: string): void {
@@ -233,7 +256,7 @@ export const PROOF_LABELS_AR: Record<ProofBoxKey, { title: string; hint: string 
     hint: "عنوان الفقرة، القيم، الروابط السببية — كما خرجت من رأسك.",
   },
   whatWasMissing: {
-    title: "ما نقص في إجابتی بعد المقارنة",
+    title: "ما نقص في إجابتي بعد المقارنة",
     hint: "ثلاثة عناصر على الأكثر، من الدفتر لا من ذاكرتك.",
   },
   modelLine: {
@@ -241,7 +264,7 @@ export const PROOF_LABELS_AR: Record<ProofBoxKey, { title: string; hint: string 
     hint: "انسخ السطر كما هو: الجملة العلمية التي تنقص إجابتك.",
   },
   circledMistake: {
-    title: "الخطأ الذي داورته في ورقتي",
+    title: "الخطأ الذي تكرّر في ورقتي",
     hint: "نوع الخطأ (وحدة منسية، تفسير بدل تحليل، لا خلاصة) — لا نص الاعتذار.",
   },
 }
@@ -255,6 +278,9 @@ export type ProofRecord = {
   /** L'élève déclare avoir refait le MÊME geste sur un document JAMAIS VU, cahier fermé. */
   hasTransfer: boolean
   transferDay: string | null
+  /** false = la dernière écriture n'a pas atteint le stockage. Optionnel : une lecture ne dit rien
+   *  d'une écriture qu'elle n'a pas faite, et la relecture garde une liste de champs fermée. */
+  persisted?: boolean
 }
 
 export type ProofState = "untested" | "tested-no-transfer" | "transferred"
@@ -293,6 +319,7 @@ function sanitizeProof(raw: Partial<ProofRecord> & Record<string, unknown>, now:
     day: typeof raw.day === "string" && /^\d{4}-\d{2}-\d{2}$/.test(raw.day) ? raw.day : localDay(now),
     hasTransfer,
     transferDay: hasTransfer ? localDay(now) : null,
+    persisted: true,
   }
 }
 
@@ -348,7 +375,7 @@ export function saveProof(
     },
     now,
   )
-  store.setItem(proofId(key), JSON.stringify(record))
+  record.persisted = store.setItem(proofId(key), JSON.stringify(record)) !== false
   return record
 }
 
@@ -447,6 +474,7 @@ export type ForgeRecord = {
   criteria: string[]
   savedAt: string
   day: string
+  persisted?: boolean
 }
 
 export type ForgeState = "none" | "draft" | "ready"
@@ -475,6 +503,7 @@ function sanitizeForge(raw: Partial<ForgeRecord>, now: Date): ForgeRecord {
     criteria,
     savedAt: now.toISOString(),
     day: localDay(now),
+    persisted: true,
   }
 }
 
@@ -505,7 +534,7 @@ export function saveForge(
   now: Date = new Date(),
 ): ForgeRecord {
   const record = sanitizeForge({ key, label, ...input }, now)
-  store.setItem(forgeId(key), JSON.stringify(record))
+  record.persisted = store.setItem(forgeId(key), JSON.stringify(record)) !== false
   return record
 }
 

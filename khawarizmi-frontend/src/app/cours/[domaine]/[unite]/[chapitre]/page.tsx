@@ -3,7 +3,6 @@
 import { useParams } from "next/navigation"
 import Link from "next/link"
 import { useMemo, useState, useEffect } from "react"
-import { AuthGuard } from "@/components/auth/AuthGuard"
 import { AppShell } from "@/components/layout/AppShell"
 import { Breadcrumb } from "@/components/cours/Breadcrumb"
 import { ActiveLessonHero } from "@/components/lessons/ActiveLessonHero"
@@ -206,10 +205,9 @@ export default function ChapitrePage() {
 
   if (!domain || !unit || !chapter) {
     return (
-      <AuthGuard>
-        <AppShell>
-          <main className="flex-1 p-6 lg:p-8 overflow-auto">
-            <div className="max-w-5xl mx-auto text-center py-20">
+      <AppShell>
+        <main className="flex-1 p-6 lg:p-8 overflow-auto">
+          <div className="max-w-5xl mx-auto text-center py-20">
               <p className="text-gray-500 text-lg">هذا الفصل غير موجود</p>
               <Link
                 href="/cours"
@@ -218,15 +216,17 @@ export default function ChapitrePage() {
                 العودة إلى المجالات
               </Link>
             </div>
-          </main>
-        </AppShell>
-      </AuthGuard>
+        </main>
+      </AppShell>
     )
   }
 
+  // Pas d'AuthGuard ici (D6, éteinte pour cette page) : mesuré avant de le retirer, ce fichier ne fait
+  // AUCUN appel réseau (`apiClient.` → 0 occurrence) et ses six enfants non plus — seul VideosWidget
+  // en émet un, déjà en try/catch. Le garde empêchait donc exactement une chose : qu'un élève assis
+  // devant son chapitre puisse le lire. Le HTML serveur était un spinner.
   return (
-    <AuthGuard>
-      <AppShell>
+    <AppShell>
         <main className="flex-1 p-6 lg:p-8 overflow-auto">
           <div className="max-w-6xl mx-auto">
             <Breadcrumb
@@ -316,8 +316,7 @@ export default function ChapitrePage() {
               )}
             </div>
           </div>
-        </main>
-      </AppShell>
-    </AuthGuard>
+      </main>
+    </AppShell>
   )
 }
