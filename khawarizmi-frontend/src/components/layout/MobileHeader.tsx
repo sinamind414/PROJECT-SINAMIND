@@ -18,6 +18,7 @@ const pageTitles: Record<string, string> = {
   "/lecons-sciences-experimentales": "الدروس الكاملة (الكتاب)",
   "/cours": "الدروس النشطة (المنهجية)",
   "/progress": "تقدمي",
+  "/preuve": "دليل الفهم",
   "/pulse": "نبض المحركات",
   "/gemmes": "المتجر",
   "/duels": "المبارزات",

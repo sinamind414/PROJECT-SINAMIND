@@ -149,6 +149,20 @@ export function getLessonForChapter(
   return activeLessons.find((l) => l.chapterSlug === chapterSlug)
 }
 
+/**
+ * URL d'un chapitre depuis son slug. Renvoie `undefined` si le chapitre n'est pas dans le registre :
+ * un lien cassé vaut mieux qu'un lien deviné vers une page qui n'existe pas.
+ */
+export function chapterHref(chapterSlug: string): string | undefined {
+  const ch = getChapterBySlug(chapterSlug)
+  if (!ch) return undefined
+  const domain = DOMAINS.find((d) => d.numero === ch.domainNumero)
+  if (!domain) return undefined
+  const unit = getUnitByNumero(ch.domainNumero, ch.unitNumero)
+  if (!unit) return undefined
+  return `/cours/${domain.slug}/${unit.slug}/${ch.slug}`
+}
+
 export function getChapterNavigation(chapterSlug: string): {
   prev: { slug: string; titleAr: string } | null
   next: { slug: string; titleAr: string } | null

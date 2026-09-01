@@ -1506,3 +1506,48 @@ Corrigé dans la foulée :
 
 Mesures : vitest **999 ✓** (30 fichiers), tsc 0, eslint baseline, build ok avant ces deux ajouts (re-run
 partiel : les deux fichiers touchés sont des pages client, aucune importation de config).
+
+
+## 24. F38 — F38 : la production écrite devient un objet, et « non éprouvé » devient un état affiché (2026-09-01)
+
+Né de la question « comment savoir qu'un élève a compris ». Le point de départ n'était pas une idée,
+c'était une mesure : **254** occurrences de logique d'index auto-corrigé dans `src/`, **0** input
+`type="file"`/`capture`, **0** persistance (`localStorage|localforage`) dans `src/components/lessons`
+et `src/components/manhadjia`. Les huit ateliers gardaient le texte de l'élève dans un `useState`
+local : «اكتب التحليل، 8–12 أسطر» mourait au démontage du composant. Le site ne pouvait donc pas
+répondre à la question — non pas par manque d'ambition pédagogique, mais parce qu'il ne gardait rien
+de ce qui aurait pu y répondre.
+
+Ce qui est branché maintenant, sans aucun contenu inventé et sans note :
+
+| Surface | Ce qu'elle fait | Ce qu'elle ne fait pas |
+|---|---|---|
+| `src/lib/local-evidence.ts` + `usePersistentDraft` | brouillon écrit sur l'appareil, horodaté ; le brouillon **d'un autre jour** est archivé et la page repart vide ; 5 versions comparables | aucune note, aucun envoi réseau, aucun identifiant d'élève |
+| `DraftStatus` sous la zone d'écriture | «حُفظ في جهازك — HH:MM », «أرشف هذه النسخة », comparaison côte à côte avec la version d'un autre jour | aucun verdict sur la qualité du texte |
+| `ProofPanel` (55 leçons actives) | 4 cases remplies **après** écriture papier : ما كتبت دون أن أفتح الدفتر · ما نقص · السطر النموذجي الذي لم أكتبه · الخطأ الذي داورته ; état à 3 valeurs + date d'échéance J+14 | ne corrige pas, ne compare pas à un barème (nous n'avons ni copies ONEC ni 12 PDF) |
+| `ItemForgePanel` (moitié B) | l'élève écrit une consigne avec un verbe de la liste fermée du site + 3 critères qu'il propose lui-même ; « جاهزة » = complet au format, pas « bon » | ne valide pas la valeur de la question ; dit à l'écran que la comparaison avec le vrai sujet est manuelle |
+| `/preuve` | registre de l'absence : `لم يُختبر` / `اختُبر بلا تحويل` / `نُقل` sur les 55 chapitres, dénominateur réel, bouton «مسح كل الأثر» | aucun agrégat entre élèves, parce qu'aucune copie ne sort de l'appareil |
+
+Deux décisions de conception qui engagent, pas des réglages :
+- **J+14 se compte depuis le premier jour où une case est remplie**, pas depuis la dernière édition :
+  sinon compléter sa preuve repousserait l'épreuve de transfert, et l'échéance ne serait plus une
+  échéance. Test : `compléter une preuve plus tard ne repousse pas la date`.
+- **Le transfert déclaré est irréversible** depuis l'interface de saisie : le refaire demande une
+  document neuf, pas de décocher une case. Test dédié.
+- Whitelist stricte à l'écriture (`sanitizeProof`) : un champ inconnu (`studentName`, `phone`, `score`)
+  **ne survit pas** à une relecture. C'est le garde-fou contre la dérive « on ajoute juste le prénom ».
+
+Mesuré après branchement : `tsc --noEmit` 0 ; vitest **1022 ✓** (32 fichiers — +23 tests, dont un
+fichier de rendu `proof-render.test.ts` qui `renderToStaticMarkup` les trois composants, parce que ces
+pages sont montées côté client et que `curl` ne prouvait rien) ; eslint 0 erreur / 12 warnings
+(baseline) ; `next build` 66 routes (+`/preuve`). Le HTML serveur de `/preuve` contient **56** fois
+`لم يُختبر` (55 lignes de chapitre + la légende) : le premier rendu affiche l'absence, pas un chiffre.
+
+Deux choses que ça ne règle pas, à ne pas vendre comme réglées :
+1. **Les 55 pages de chapitre sont derrière `AuthGuard`** : `curl /cours/d1` ne renvoie que le spinner
+   de vérification, donc les deux nouveaux panneaux n'existent pas dans le HTML serveur et restent
+   inaccessibles tant que la session ne se résout pas. `/preuve` a été sortie de ce garde (page
+   purement locale — la verrouiller derrière une API, c'est remplacer une information vraie par un
+   spinner) ; le reste de la dette D6 est entier et c'est le prochain arbitrage, pas un détail.
+2. **`نُقل` ne veut toujours rien dire de statistique** : c'est une déclaration de l'élève, datée. Le
+   seul nombre qui vaudrait quelque chose reste l'écart auto-note/prof sur copies de juin — non fourni.

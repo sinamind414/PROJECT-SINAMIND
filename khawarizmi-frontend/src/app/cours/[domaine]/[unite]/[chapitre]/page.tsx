@@ -14,6 +14,8 @@ import { CommonMistakesPanel } from "@/components/lessons/CommonMistakesPanel"
 import { BacLinkPanel } from "@/components/lessons/BacLinkPanel"
 import { MethodologyLinkPanel } from "@/components/lessons/MethodologyLinkPanel"
 import { VideosWidget } from "@/components/videos/VideosWidget"
+import { ProofPanel } from "@/components/lessons/ProofPanel"
+import { ItemForgePanel } from "@/components/lessons/ItemForgePanel"
 import FicheResume from "@/components/lessons/FicheResume"
 import chapitresFichesMap from "../../../../../../data/chapitres-fiches-map.json"
 import {
@@ -162,6 +164,18 @@ function ChapterInPageNav({ lesson }: { lesson: NonNullable<ReturnType<typeof ge
     <nav className="rounded-2xl p-4 glass border border-mint/10 sticky top-4">
       <h4 className="text-sm font-bold text-mint mb-3">محتويات الدرس</h4>
       <ul className="space-y-1">
+        {/* Les deux surfaces de preuve (F38) sont les seules rubriques cliquables ici : les blocs du
+            dessous ne sont pas des liens, ils n'ont pas d'ancre — on ne fait semblant de rien. */}
+        <li>
+          <a href="#preuve" className="block rounded px-2 py-1 text-xs text-white/70 hover:bg-white/[0.06] hover:text-mint">
+            دليل الفهم
+          </a>
+        </li>
+        <li>
+          <a href="#fabrique" className="block rounded px-2 py-1 text-xs text-white/70 hover:bg-white/[0.06] hover:text-mint">
+            اكتب السؤال
+          </a>
+        </li>
         {lesson.lessonBlocks.map((b) => (
           <li key={b.id}>
             <span className="text-xs text-gray-400 hover:text-white transition cursor-pointer block py-1 px-2 rounded hover:bg-white/[0.04]">
@@ -259,6 +273,13 @@ export default function ChapitrePage() {
                   </section>
 
                   <VideosWidget chapitre={lesson.chapterFr} />
+
+                  {/* F38 : la preuve d'assimilation n'est pas une note, c'est un état + des dates.
+                      Elle vit ici parce que c'est ici que l'élève a fini son papier. */}
+                  <ProofPanel lessonKey={lesson.chapterSlug} chapterAr={lesson.chapterAr} />
+
+                  {/* B : l'élève écrit la consigne et ses critères. Le site collecte, il ne corrige pas. */}
+                  <ItemForgePanel lessonKey={lesson.chapterSlug} chapterAr={lesson.chapterAr} />
                 </div>
 
                 <aside className="hidden lg:block">
