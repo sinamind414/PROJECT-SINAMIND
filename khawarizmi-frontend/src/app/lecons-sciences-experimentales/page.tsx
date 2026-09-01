@@ -5,6 +5,7 @@ import { AppShell } from "@/components/layout/AppShell"
 import { Layers3, GraduationCap, Microscope, FlaskConical, ChevronLeft } from "lucide-react"
 
 import { DOMAINES } from "@/lib/experimental-hub-registry"
+import { activeUnitHrefForHubUnit, bookChaptersOfPhase, lessonMode } from "@/lib/lesson-modes"
 
 
 const STATS = [
@@ -48,9 +49,34 @@ export default function LeconsPage() {
           ))}
         </div>
 
+        {/* Deux surfaces, un choix explicite : le livre (contenu) et la leçon active (méthode).
+            Mesuré 2026-09-01 : la seconde n'avait AUCUN lien vers la première — le contenu scientifique
+            (113 240 caractères) était une île, et la rubrique s'appelait « التجارب المقررة ». */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-10">
+          {(["normale", "active"] as const).map((k) => {
+            const m = lessonMode(k)
+            const ici = k === "normale"
+            return (
+              <Link
+                key={k}
+                href={ici ? "#domaines" : m.href}
+                className={`rounded-2xl border p-4 text-right transition ${
+                  ici ? "bg-mint/10 border-mint/30" : "bg-white/[0.03] border-white/[0.08] hover:border-mint/30 hover:bg-mint/5"
+                }`}
+              >
+                <p className={`text-sm font-black mb-1 ${ici ? "text-mint" : "text-slate-200"}`}>
+                  {m.labelAr} {ici && <span className="text-[10px] font-bold text-slate-400">· أنت هنا</span>}
+                </p>
+                <p className="text-[11px] text-slate-400 leading-relaxed mb-2">{m.noteAr}</p>
+                <p className="text-[11px] font-bold text-slate-300">{m.countLabelAr}</p>
+              </Link>
+            )
+          })}
+        </div>
+
         {/* Domaines -> Unités -> Chapitres/Expériences */}
         {DOMAINES.map((domaine) => (
-          <section key={domaine.domain} className="mb-12">
+          <section key={domaine.domain} id="domaines" className="mb-12">
             <div className="flex items-center gap-3 mb-6">
               <div className={`w-10 h-10 rounded-2xl bg-gradient-to-br ${DOMAIN_GRADIENTS[domaine.color]} flex items-center justify-center shadow-lg`}>
                 <Microscope className="w-5 h-5 text-white" aria-hidden="true" />
@@ -74,9 +100,19 @@ export default function LeconsPage() {
                         <p className="text-xs text-gray-500">{unit.labelFr}</p>
                       </div>
                     </div>
-                    <span className="text-xs font-semibold text-slate-400 bg-white/[0.04] px-3 py-1 rounded-full border border-white/[0.06] shrink-0">
-                      {unit.phases.length} مراحل
-                    </span>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <span className="text-xs font-semibold text-slate-400 bg-white/[0.04] px-3 py-1 rounded-full border border-white/[0.06]">
+                        {unit.phases.length} مراحل
+                      </span>
+                      {activeUnitHrefForHubUnit(domaine.label, unit.labelAr) && (
+                        <Link
+                          href={activeUnitHrefForHubUnit(domaine.label, unit.labelAr)!}
+                          className="text-xs font-bold text-mint bg-mint/10 px-3 py-1 rounded-full border border-mint/25 hover:bg-mint/20 transition"
+                        >
+                          الدروس النشطة ←
+                        </Link>
+                      )}
+                    </div>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -101,7 +137,7 @@ export default function LeconsPage() {
                           </p>
                         </div>
                         <div className="pt-2 border-t border-white/[0.04] flex items-center justify-between text-xs text-slate-500 group-hover:text-slate-400 transition">
-                          <span>التجارب {phase.chapters}</span>
+                          <span>{bookChaptersOfPhase(phase.slug)} درسًا من الكتاب</span>
                           <span className="text-mint font-bold opacity-0 group-hover:opacity-100 transition">افتح ←</span>
                         </div>
                       </Link>

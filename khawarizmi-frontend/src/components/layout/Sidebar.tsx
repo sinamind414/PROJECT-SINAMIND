@@ -40,13 +40,15 @@ const MAIN_NAV: MenuItem[] = [
   { href: "/chatbot", icon: Microscope, labelAr: "نسقسي", labelFr: "Question" },
 ]
 
+import { lessonMode } from "@/lib/lesson-modes"
+
 export const MENU_PHASES: Phase[] = [
   {
     label: "التعلّم",
     items: [
-      { href: "/cours", icon: BookOpen, labelAr: "الدروس النشطة", labelFr: "Cours" },
+      { href: lessonMode("normale").href, icon: FlaskConical, labelAr: lessonMode("normale").labelAr, labelFr: lessonMode("normale").labelFr },
+      { href: lessonMode("active").href, icon: BookOpen, labelAr: lessonMode("active").labelAr, labelFr: lessonMode("active").labelFr },
       { href: "/mindmap", icon: Network, labelAr: "الخريطة الذهنية", labelFr: "Mind map" },
-      { href: "/lecons-sciences-experimentales", icon: FlaskConical, labelAr: "التجارب المقررة", labelFr: "Expériences" },
     ],
   },
   {

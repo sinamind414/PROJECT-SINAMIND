@@ -1444,3 +1444,41 @@ Aucun lien entre les deux surfaces : `grep -rn "lecons-sciences-experimentales" 
 - Le hub compte `chapters: "1" | "2" | "3"` par phase, sémantique non documentée et manifestement fausse au vu des slugs (`phase2_chapitres_3_4` porte `chapters: "2"`). Non touché, car je ne sais pas ce que le champ est censé dire ; c'est maintenant dans un seul fichier, donc corriger sera une ligne.
 
 Mesures : vitest **992 ✓** (29 fichiers), tsc 0, eslint 0 err/12 warn (baseline), `next build` ok.
+
+
+---
+
+## 23. F37 — les deux rubriques de cours sont désormais nommées et reliées dans la navigation
+
+**Demande** : « affiche sur les rubriques : leçon HTML normale et leçon active ». Elle était justifiée par un
+fait mesuré au §22 : le contenu scientifique (113 240 caractères, 22 phases, 44 chapitres numérotés)
+s'appelait **« التجارب المقررة / Expériences »** dans la barre latérale — donc invisible en tant que cours.
+
+### Ce qui a changé
+
+- `src/lib/lesson-modes.ts` (neuf) : la **paire** de surfaces, un seul endroit qui la décrit.
+  Étiquettes : « الدروس الكاملة (الكتاب) · 44 درسًا · 22 مرحلة » et
+  « الدروس النشطة (المنهجية) · 55 فصلًا · 11 وحدات ». Les compteurs sont **calculés** sur les registres
+  (`bookChaptersOfPhase` lit `phase3_chapitres_5_6` → 2), pas écrits à la main — une étiquette qui annonce
+  44 et n'en contient plus que 40 serait un mensonge de plus.
+- `Sidebar.tsx` consomme `lessonMode("normale"|"active")` : la leçon du livre passe **avant** la méthode
+  (choix assumé : on lit le cours, puis on entraîne la méthode), et l'ancienne entrée mal nommée disparaît.
+- `MobileHeader.tsx` : `/lecons-sciences-experimentales` s'appelait **« حسابي »** (« mon compte ») dans
+  l'en-tête mobile — un titre qui n'avait aucun rapport. Remplacé par le vrai nom ; `/cours` a le sien.
+- Hub du livre : bandeau des deux modes (avec « أنت هنا ») + **11 liens** « الدروس النشطة ← », un par unité,
+  calculés par `activeUnitHrefForHubUnit` sur égalité stricte des libellés arabes — 11 unités testées,
+  11 liens produits (test explicite : un raccord à zéro est la régression qui a laissé le contenu sur une île).
+- L'étiquette par phase « التجارب {phase.chapters} » (valeur non documentée, manifestement fausse au vu des
+  slugs) est remplacée à l'affichage par « N درسًا من الكتاب », déduit de la slug. Le champ `chapters` reste
+  dans le registre, sa sémantique n'est toujours pas connue — corrigé à l'affichage, pas réinventé.
+
+### Rendu vérifié (et pas seulement les tests)
+
+`curl /lecons-sciences-experimentales` renvoie : « الدروس الكاملة (الكتاب) », « · أنت هنا »,
+« 44 درسًا · 22 مرحلة », « 55 فصلًا · 11 وحدات », et **11 occurrences** de « الدروس النشطة ← ».
+À noter : `/cours` (18 642 octets) ne contenait pas encore les étiquettes de la barre latérale au moment du
+curl — la navbar est montée côté client après la session ; le test de non-régression porte donc sur le
+registre partagé (`lesson-modes`), pas sur le DOM du shell.
+
+Mesures : vitest **998 ✓** (30 fichiers, +6 tests de navigation), tsc 0, eslint 0 err/12 warn (baseline),
+`next build` ok (65 pages).
