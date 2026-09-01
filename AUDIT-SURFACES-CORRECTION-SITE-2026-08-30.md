@@ -1348,3 +1348,62 @@ aucune copie d'élève dans le dépôt** (0 réelle, et les 125 « copies » de 
 sont annotées par `synthetic_keyword_v1`, dont ~40 % de réponses attendues recopiées). Les 12 copies de
 juin, triées et notées à la main, sont la seule matière qui transforme ce rapport en mesure. C'est le
 geste qui ouvre la semaine du 2 septembre, pas l'enrichissement de table.
+
+
+---
+
+## 21. F35 — D2 : le gabarit ne peut plus se faire passer pour un cours (et le contenu reste à écrire)
+
+**La demande était « règle cette situation » sur les 55 leçons fabriquées.** Deux choses ont été séparées, parce que les confondre est exactement ce qui a produit la dette :
+
+1. **Ce qui est réparable en code** : la présentation mensongère. Un élève lisait des paragraphes de
+   gabarit sous un titre « الدرس خطوة بخطوة », avec des exercices qui distribuaient des verdicts fabriqués.
+2. **Ce qui ne l'est pas** : le contenu. Écrire 55 leçons de SVT en arabe n'est pas une tâche de code, et
+   les remplir par génération aurait transformé une dette visible en dette invisible. Refusé.
+
+### Ce qui a été mesuré avant, et ce que l'instrument affiche maintenant
+
+`lessonCorpusStats()` (exportée depuis `src/lib/active-lessons.ts`, testée, re-courable) renvoie :
+
+| Champ | Valeur mesurée 2026-09-01 | Sens |
+|---|---|---|
+| `lessons` / `authoredLessons` | 55 / **0** | aucune leçon n'a de bloc authoré |
+| `focusCorpusChars` | **4 899** | les phrases propres au chapitre (`focusAr`, médiane 88 car.). C'est le contenu, au sens strict. |
+| `templateCorpusChars` | 9 396 | les 11 paragraphes de gabarit, comptés une fois |
+| `slotSubstitutionChars` | **24 779** | phrases de gabarit avec le nom du chapitre inséré : uniques par leçon, et pourtant pas du contenu |
+| `distinctCorpusChars` | 39 074 | dé-duplication exacte seule — le chiffre qui **trompe**, affiché avec son décomposeur |
+| `duplicationRatio` | **6,71** | un élève lit 6,7 fois plus de texte qu'il n'existe de paragraphes distincts |
+| `maxSharedParagraph` | 16 | un paragraphe lu par 17 leçons (les « processus ») |
+| `autoGradedGeneratedChecks` | **0** | aucun contrôle généré ne distribue de verdict (c'était 165 avant) |
+
+Rapprochement avec le chiffre circulé : 5 681 caractères distincts ≈ nos 4 899 (focus) + une partie des
+libellés ; sur 214 297 caractères de `khawarizmi-backend/LIVRE-MANHADJIYA.md` (mesuré en caractères, pas en
+octets — 362 264 octets), cela fait **2,29 %**, du même ordre que le « 2,60 % » annoncé. La divergence vient
+de la définition, pas du terrain — d'où le tableau ci-dessus, qui publie les définitions au lieu de défendre un nombre.
+
+### Ce qui a changé pour l'élève (3 fichiers de composants)
+
+- `LessonBlocks.tsx` : le titre devient « الإطار المنهجي للدرس » ; un bandeau dit que ces paragraphes
+  apprennent à lire une document, pas le programme ; chaque bloc partagé porte « نص مشترك مع N درسًا آخر ».
+- `ActiveLessonHero.tsx` : bandeau « محتوى هذا الدرس لم يُكتب بعد… المرجع للمحتوى: كتاب المدرسة » dès que
+  `contentState === "gabarit-seul"` (donc sur les 55 pour l'instant).
+- `QuickChecks.tsx` : un contrôle n'a le droit d'afficher ✓/✗ que si `provenance === "authoré"`. Les contrôles
+  de gabarit révèlent un modèle à comparer (« نموذج للقارنة — لا تصحيح آلي »).
+- `active-lessons.ts` : type `reflection` ajouté ; le vrai/faux tautologique et le QCM à `correctIndex: 1`
+  constant sont retirés du chemin généré ; le `short-answer` généré est supprimé parce qu'il auto-notait
+  l'arabe de l'élève contre `chapterFr.split("-")[0]`, un fragment français — toute bonne réponse était
+  marquée fausse, et la liste des mots-clés était affichée à l'écran (donc l'item se validait en recopiant).
+
+### Ce qui est débloqué, et ce qui ne l'est pas
+
+Débloqué : `registerAuthoredLesson(chapterSlug, blocs)` est le seul point d'entrée du contenu authoré. Une
+leçon qui y passe bascule `contentState` en `authoré`, perd son bandeau, et ses éventuels `short-answer`
+deviennent auto-notables (les mots-clés sont alors choisis par qui écrit la question, pas dérivés d'un titre).
+Donc la suite de D2 ne demande plus aucune modification de code : elle demande des blocs écrits.
+
+Non résolu, à dire tel quel : les 55 leçons restent vides de contenu scientifique. Le test
+`expect(stats.authoredLessons).toBe(0)` est là pour que ce fait reste mesurable — il faudra le casser
+volontairement, pas le retirer.
+
+Mesures du commit : vitest **991 ✓** (29 fichiers, dont 8 nouveaux sur `active-lessons`), `tsc --noEmit` 0,
+eslint 0 err/11 warn (baseline −1), `next build` ok (65 pages statiques).
