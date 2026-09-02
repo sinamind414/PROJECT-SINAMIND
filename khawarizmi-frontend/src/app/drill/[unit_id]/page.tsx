@@ -1,5 +1,6 @@
 ﻿"use client"
 
+import { readableError } from "@/lib/ui-error"
 import { useState, useEffect, useCallback } from "react"
 import Link from "next/link"
 import { useParams } from "next/navigation"
@@ -120,7 +121,7 @@ function DrillSessionContent() {
         scoreSum: prev.scoreSum + result.score,
       }))
     } catch (err) {
-      setError(err instanceof Error ? err.message : "تعذّر التصحيح. حاول مجدداً.")
+      setError(readableError(err, "تعذر التصحيح. حاول مجددا."))
     } finally {
       setEvaluating(false)
     }

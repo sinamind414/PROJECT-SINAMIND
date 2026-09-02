@@ -34,7 +34,10 @@ export default function Page() {
         <main className="flex-1 p-3 md:p-5">
           <div className="max-w-3xl mx-auto space-y-4">
             <h1 className="text-xl font-bold text-white">اختبار بكالوريا</h1>
-            <p className="text-sm text-slate-400">اختر موضوع وابدأ الاختبار مع مؤقت حقيقية</p>
+            <p className="text-sm text-slate-400">
+              اختر موضوعًا لعرض حالته: قاعة الاختبار بمؤقّت غير مفتوحة بعد — لا موضوع مُدخَل
+              في القاعدة ولا شبكة تقييم محلية مطابِقة.
+            </p>
             <div className="grid gap-3">
               {SUJETS.map((s) => (
                 <button

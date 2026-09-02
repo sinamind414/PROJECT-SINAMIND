@@ -16,25 +16,14 @@ import {
 import { CoachPanel } from "@/components/methodology/CoachPanel"
 import { NoLocalGradeWall } from "@/components/methodology/NoLocalGradeWall"
 import { SessionExitButton } from "@/components/methodology/SessionExitButton"
+import { ScenarioReadingMode } from "@/components/methodology/ScenarioReadingMode"
+import { verbLabelAr } from "@/lib/methodology-verb-labels"
 import {
   GradeResultCard,
   TRAINING_BANNER_AR,
   formatTrainingPercent,
   methodologyToCard,
 } from "@/components/methodology/GradeResultCard"
-
-const VERB_LABELS: Record<string, string> = {
-  analyse: "حلّل",
-  interpret: "فسّر",
-  deduce: "استنتج",
-  justify: "علّل / برّر",
-  hypothesis: "اقترح فرضية",
-  "validate-hypothesis": "صادق على فرضية",
-  discuss: "ناقش",
-  "scientific-text": "اكتب نصا علميا",
-  compare: "قارن",
-  relationship: "حدد العلاقة",
-}
 
 function getActiveQuestions(
   scenario: MethodologyScenario,
@@ -216,7 +205,9 @@ export function ScenarioRunner({
     const questionsToSubmit = activeQuestions
 
     try {
-      const graded = await Promise.all(
+      // S39 (audit surfaces) — allSettled, pas all : une seule question qui échoue
+      // (réseau, 5xx) ne doit pas annuler les copies déjà notées du scénario.
+      const settled = await Promise.allSettled(
         questionsToSubmit.map(async (question) => {
           const questionId = question.gradeQuestionId || `${scenario.id}:${question.id}`
           const g = await apiClient.grade({
@@ -268,6 +259,15 @@ export function ScenarioRunner({
           }
           return { question, answer: answers[question.id] || "", evaluation }
         }),
+      )
+      const graded = settled.map((res, i) =>
+        res.status === "fulfilled"
+          ? res.value
+          : {
+              question: questionsToSubmit[i],
+              answer: answers[questionsToSubmit[i].id] || "",
+              evaluation: ungradedEvaluation(questionsToSubmit[i].verbSlug, "تعذر التصحيح"),
+            },
       )
       const evaluations = graded
       const gradedOnly = evaluations.filter((item) => !item.evaluation.ungraded)
@@ -348,7 +348,16 @@ export function ScenarioRunner({
   }
 
   if (!hasLocal) {
-    return <NoLocalGradeWall titleAr={scenario.title} verbSlug={questions[0]?.verbSlug} />
+    // Le mur reste — il dit la vérité (« ici, personne ne corrige ») — mais il ne remplace plus
+    // l'exercice : 11 scénarios sur 18 (44 documents, graphes et tableaux inclus) étaient de ce
+    // fait invisibles même par URL directe. Mode lecture seule : on lit, on s'entraîne, on se
+    // corrige soi-même après avoir écrit. Aucune note, aucune preuve, aucun XP.
+    return (
+      <div className="space-y-6">
+        <NoLocalGradeWall titleAr={scenario.title} verbSlug={questions[0]?.verbSlug} />
+        <ScenarioReadingMode scenario={scenario} questions={questions} chapterLink={chapterLink} />
+      </div>
+    )
   }
 
   return (
@@ -582,7 +591,7 @@ export function ScenarioRunner({
                 <div className="flex flex-wrap gap-2">
                   {chapterLink.recommendedVerbs.map((verb) => (
                     <span key={verb} className="px-2 py-1 rounded-lg bg-mint/15 text-mint-soft text-xs">
-                      {VERB_LABELS[verb] || verb}
+                      {verbLabelAr(verb)}
                     </span>
                   ))}
                 </div>

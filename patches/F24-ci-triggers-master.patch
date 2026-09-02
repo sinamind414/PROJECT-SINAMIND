@@ -1,0 +1,50 @@
+diff --git a/.github/workflows/ci.yml b/.github/workflows/ci.yml
+index 014893b..0ac9305 100644
+--- a/.github/workflows/ci.yml
++++ b/.github/workflows/ci.yml
+@@ -1,10 +1,13 @@
+ name: CI/CD Khawarizmi Pro
+ 
++# Les déclencheurs doivent pointer la branche qui EXISTE (audit 2026-08-31, rapport §10) :
++# `main` est absent de ce dépôt — seul `master` vit — donc ni push ni PR ne lançait la validation.
++# C'est ainsi qu'un `next build` rouge a pu atterrir sur master et y rester (F21).
+ on:
+   push:
+-    branches: [main, fabuleux/*]
++    branches: [master, fabuleux/*]
+   pull_request:
+-    branches: [main]
++    branches: [master]
+ 
+ jobs:
+   backend-tests:
+@@ -66,10 +69,19 @@ jobs:
+         run: npm ci
+         working-directory: khawarizmi-frontend
+ 
++      - name: Typecheck
++        run: npm run typecheck
++        working-directory: khawarizmi-frontend
++
+       - name: Lint
++        # Sans `continue-on-error` : l'étape avalait les échecs (1 erreur eslint ignorée depuis).
+         run: npm run lint
+         working-directory: khawarizmi-frontend
+-        continue-on-error: true
++
++      - name: Fraîcheur de l'inventaire des PDF
++        # L'UI ne doit pas promettre un PDF qui est un pointeur Git LFS de 131 o.
++        run: npm run pdfs:check
++        working-directory: khawarizmi-frontend
+ 
+       - name: Tests
+         run: npm run test
+@@ -81,6 +93,8 @@ jobs:
+         env:
+           NEXT_TELEMETRY_DISABLED: "1"
+ 
++  # Volontairement inerte : `refs/heads/main` n'existe pas dans ce dépôt. Déployer la prod par CI
++  # est une décision explicite (secrets Railway + build validé), pas un effet de bord d'un fix de CI.
+   deploy-railway:
+     if: github.ref == 'refs/heads/main'
+     needs: [backend-tests, frontend-tests]

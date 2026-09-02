@@ -2,6 +2,7 @@
 // Client HTTP centralisé — Khawarizmi Pro
 
 import { UI_AR } from "./translations"
+import { readableError } from "./ui-error"
 import {
   Annale,
   AnnalesResponse,
@@ -60,6 +61,106 @@ let _khawarizmiToken: string | null = null
 
 // État du refresh silencieux : une seule promesse de refresh en vol à la fois.
 let _refreshPromise: Promise<boolean> | null = null
+
+/**
+ * Erreur HTTP enrichie. `status` sert aux pages pour distinguer un mur d'indisponibilité
+ * (404 « aucun sujet en base ») d'une panne réseau — sans rejouer le message technique
+ * du backend comme s'il était destiné à l'élève.
+ */
+export type ApiError = Error & { status?: number }
+
+/**
+ * Le contrat du backend est `{"erreur", "status", "path", "method", "details"}`
+ * (khawarizmi-backend/routes/errors.py, handler enregistré pour 400/401/403/404).
+ * Le front ne lisait que `detail` : tout message 4xx produit par le serveur était jeté et
+ * l'élève voyait « خطأ HTTP 404 ». On lit le contrat d'abord, `detail` ensuite (FastAPI
+ * brut / reverse proxy), puis un libellé générique arabe.
+ */
+export function httpErrorMessage(payload: unknown, status: number, fallback?: string): string {
+  const p = (payload ?? {}) as Record<string, unknown>
+  const candidate = [p.erreur, p.detail].find(
+    (v): v is string => typeof v === "string" && v.trim().length > 0
+  )
+  return candidate?.trim() || fallback || `${UI_AR.erreur_http_prefix} ${status}`
+}
+
+export function apiError(payload: unknown, status: number, fallback?: string): ApiError {
+  const err = new Error(httpErrorMessage(payload, status, fallback)) as ApiError
+  err.status = status
+  return err
+}
+
+/**
+ * Corps d'une réponse 2xx : on ne suppose plus qu'il est JSON.
+ *
+ * Un `response.json()` nu, sur le chemin le plus emprunté du client (32 appels), transforme
+ * n'importe quelle réponse « 200 + texte » d'une porte d'entrée, d'un proxy ou d'un domaine mal
+ * configuré en `SyntaxError: Unexpected token O…` affichée telle quelle à l'élève. Ce n'est pas
+ * théorique : le domaine que la CSP Whitelistait répond `200` avec le corps `OK` sur `/health`
+ * (mesuré le 2026-08-31, rapport §11). Vide = « pas de contenu » (204) → undefined, pas une panne.
+ */
+async function readJsonBody<T>(response: Response): Promise<T> {
+  const text = await response.text().catch(() => "")
+  const trimmed = text.trim()
+  if (!trimmed) return undefined as T
+  try {
+    return JSON.parse(trimmed) as T
+  } catch {
+    throw apiError({}, response.status, UI_AR.reponse_illisible)
+  }
+}
+
+/**
+ * Payload d'évaluation verbe : validé, pas affirmé. `data as VerbEvaluateResponse` sur un
+ * `Record<string, unknown>` laissait passer un 200 mal formé, et la page affichait alors un
+ * `undefined` dans la case note. Seuls les champs REQUIS sont normalisés ; le reste du
+ * contrat (dominant_error_code, method_percent, science_flags, caps_applied, order_ok…) est
+ * transmis tel quel, parce que les pages le lisent. Format inattendu → l'objet « non noté »
+ * identique à celui de la réponse 422, jamais une note fabriquée.
+ */
+function normalizeVerbEvaluate(data: Record<string, unknown>, verbSlug: string): VerbEvaluateResponse {
+  const num = (v: unknown, fallback: number) => (typeof v === "number" && Number.isFinite(v) ? v : fallback)
+  const list = (v: unknown) => (Array.isArray(v) ? (v.filter((x) => typeof x === "string") as string[]) : [])
+  const isUngraded = data.ungraded === true || data.source === "ungraded"
+  const hasScore = typeof data.percentage === "number" || typeof data.score === "number"
+
+  if (!hasScore) {
+    return {
+      verb_slug: typeof data.verb_slug === "string" ? data.verb_slug : verbSlug,
+      score: 0,
+      score_max: 1,
+      percentage: 0,
+      success: [],
+      errors: list(data.errors).length ? list(data.errors) : ["لا شبكة تقييم لهذه السؤال."],
+      missing_markers: [],
+      forbidden_found: [],
+      advice:
+        typeof data.advice === "string"
+          ? data.advice
+          : "تعذر التصحيح — ليست علامة بكالوريا رسمية.",
+      allow_second_attempt: false,
+      ungraded: true,
+      source: "ungraded",
+      banner_ar: typeof data.banner_ar === "string" ? data.banner_ar : undefined,
+    }
+  }
+
+  return {
+    ...data,
+    verb_slug: typeof data.verb_slug === "string" ? data.verb_slug : verbSlug,
+    score: num(data.score, 0),
+    score_max: num(data.score_max, 1),
+    percentage: num(data.percentage, 0),
+    success: list(data.success),
+    errors: list(data.errors),
+    missing_markers: list(data.missing_markers),
+    forbidden_found: list(data.forbidden_found),
+    advice: typeof data.advice === "string" ? data.advice : "",
+    allow_second_attempt: data.allow_second_attempt === true,
+    ...(isUngraded ? { ungraded: true, source: "ungraded" as const } : {}),
+    ...(typeof data.banner_ar === "string" ? { banner_ar: data.banner_ar } : {}),
+  } as VerbEvaluateResponse
+}
 
 type ApiRequestOptions = RequestInit & {
   skipAuthRedirect?: boolean
@@ -153,7 +254,11 @@ class KhawarizmiApiClient {
           window.location.href = "/auth/login"
         }
       }
-      throw new Error(UI_AR.session_expiree)
+      // Le statut voyagent avec l'erreur, `auth-context` peut distinguer « le serveur a dit non » de
+      // « le serveur n'a pas répondu » : sans ce 401 ici, une session expirée serait lue comme une panne
+      // et la garde rendrait le contenu (mesuré : getMe passe skipAuthRedirect, donc personne d'autre
+      // ne redirige sur ce chemin).
+      throw apiError({}, 401, UI_AR.session_expiree)
     }
 
     // Rate limit : retry once after Retry-After si la méthode est idempotente
@@ -171,21 +276,16 @@ class KhawarizmiApiClient {
 
     if (response.status === 429) {
       const data = await response.json().catch(() => ({}))
-      throw new Error(
-        data.detail ||
-        UI_AR.limite_atteinte
-      )
+      throw apiError(data, response.status, UI_AR.limite_atteinte)
     }
 
     if (!response.ok) {
       const error = await response.json().catch(() => ({}))
-      throw new Error(
-        error.detail ||
-        `${UI_AR.erreur_http_prefix} ${response.status}`
-      )
+      throw apiError(error, response.status)
     }
 
-    return response.json()
+    // 2xx : le corps peut être vide (204) ou illisible (proxy, porte d'entrée) — voir readJsonBody.
+    return readJsonBody<T>(response)
   }
 
   // ── Méthodes génériques (pages : aujourdhui, dix-minutes, fiche-j1, progress) ──
@@ -572,10 +672,7 @@ class KhawarizmiApiClient {
       }
     }
     if (!resp.ok) {
-      throw new Error(
-        (typeof data.detail === "string" && data.detail) ||
-          `${UI_AR.erreur_http_prefix} ${resp.status}`,
-      )
+      throw apiError(data, resp.status)
     }
     return data as {
       score: number
@@ -748,8 +845,15 @@ class KhawarizmiApiClient {
         signal: effectiveSignal,
       })
       if (!resp.ok || !resp.body) {
-        const err = await resp.json().catch(() => ({}))
-        onError?.({ message_fr: err.detail || "Erreur de connexion au tuteur.", message_ar: "تعذر الاتصال بالمدرس." })
+        const err = (await resp.json().catch(() => ({}))) as Record<string, unknown>
+        onError?.({
+          // message_fr = trace technique (journaux, dev) ; message_ar = ce que voit l'élève.
+          message_fr: httpErrorMessage(err, resp.status, "Erreur de connexion au tuteur."),
+          message_ar: readableError({
+            message: typeof err.erreur === "string" ? err.erreur : "",
+            status: resp.status,
+          }),
+        })
         return
       }
 
@@ -959,7 +1063,7 @@ class KhawarizmiApiClient {
     answer: string
     surface?: "da" | "verb" | "bac"
   }): Promise<
-    | { ungraded: true; question_id: string; banner_ar?: string }
+    | { ungraded: true; question_id: string; banner_ar?: string; quota?: boolean; retry_after_s?: number }
     | {
         ungraded?: false
         rubric_id: string
@@ -1007,12 +1111,26 @@ class KhawarizmiApiClient {
         banner_ar: typeof data.banner_ar === "string" ? data.banner_ar : undefined,
       }
     }
+    if (resp.status === 429) {
+      // S39 (audit surfaces 2026-08-30) — quota de correction dépassé.
+      // Un `throw` ici faisait rejeter le Promise.all du ScenarioRunner : l'élève
+      // perdait TOUTES les notes du scénario (y compris celles déjà calculées) et
+      // voyait « تعذر التصحيح » sans savoir pourquoi. Le quota est un « non noté »
+      // honnête, pas une panne : on rend le message serveur + le délai de reprise.
+      const retry = Number(data.retry_after_s)
+      return {
+        ungraded: true,
+        question_id: String(data.question_id || payload.question_id),
+        banner_ar:
+          (typeof data.banner_ar === "string" && data.banner_ar) ||
+          (typeof data.erreur === "string" && data.erreur) ||
+          "بلغت حدّ التصحيح في هذه الساعة. ليست علامة بكالوريا رسمية.",
+        quota: true,
+        retry_after_s: Number.isFinite(retry) && retry > 0 ? retry : undefined,
+      }
+    }
     if (!resp.ok) {
-      throw new Error(
-        (typeof data.erreur === "string" && data.erreur) ||
-          (typeof data.detail === "string" && data.detail) ||
-          `${UI_AR.erreur_http_prefix} ${resp.status}`,
-      )
+      throw apiError(data, resp.status)
     }
     return data as Exclude<Awaited<ReturnType<KhawarizmiApiClient["grade"]>>, { ungraded: true }>
   }
@@ -1163,12 +1281,9 @@ class KhawarizmiApiClient {
       }
     }
     if (!resp.ok) {
-      throw new Error(
-        (typeof data.detail === "string" && data.detail) ||
-          `${UI_AR.erreur_http_prefix} ${resp.status}`,
-      )
+      throw apiError(data, resp.status)
     }
-    return data as VerbEvaluateResponse
+    return normalizeVerbEvaluate(data, payload.verb_slug)
   }
 
   async reviewVerb(slug: string, rating: 1 | 2 | 3 | 4, percentage?: number) {
@@ -1478,10 +1593,7 @@ class KhawarizmiApiClient {
       }
     }
     if (!resp.ok) {
-      throw new Error(
-        (typeof data.detail === "string" && data.detail) ||
-          `${UI_AR.erreur_http_prefix} ${resp.status}`,
-      )
+      throw apiError(data, resp.status)
     }
     return data
   }

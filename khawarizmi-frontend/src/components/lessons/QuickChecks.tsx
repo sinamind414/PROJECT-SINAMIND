@@ -1,11 +1,12 @@
 "use client"
 
 import { useState } from "react"
-import type { QuickCheck, TrueFalseCheck, McqCheck, ShortAnswerCheck } from "@/lib/active-lessons"
+import type { QuickCheck, TrueFalseCheck, McqCheck, ShortAnswerCheck, ReflectionCheck } from "@/lib/active-lessons"
 
 function isTf(q: QuickCheck): q is TrueFalseCheck { return q.type === "true-false" }
 function isMcq(q: QuickCheck): q is McqCheck { return q.type === "mcq" }
 function isSa(q: QuickCheck): q is ShortAnswerCheck { return q.type === "short-answer" }
+function isReflection(q: QuickCheck): q is ReflectionCheck { return q.type === "reflection" }
 
 export function QuickChecks({ checks }: { checks: QuickCheck[] }) {
   const [answers, setAnswers] = useState<Record<string, boolean | number | string>>({})
@@ -34,8 +35,12 @@ export function QuickChecks({ checks }: { checks: QuickCheck[] }) {
       <div className="space-y-4">
         {checks.map((q, i) => {
           const done = submitted[q.id]
+          // Un contrôle de gabarit n'a pas de verdict : sa « bonne réponse » serait fabriquée.
+          // Il devient un aller-retour : l'élève se positionne, le modèle se révèle, l'écart se lit.
+          const authored = q.provenance === "authoré"
+          const graded = done && authored
           let isCorrect = false
-          if (done) {
+          if (graded) {
             if (isTf(q)) isCorrect = answers[q.id] === q.correct
             else if (isMcq(q)) isCorrect = answers[q.id] === q.correctIndex
             else if (isSa(q)) {
@@ -56,9 +61,10 @@ export function QuickChecks({ checks }: { checks: QuickCheck[] }) {
                     <span className={`px-2 py-0.5 rounded-full text-[10px] ${
                       q.type === "true-false" ? "bg-blue-500/15 text-blue-200" :
                       q.type === "mcq" ? "bg-emerald-500/15 text-emerald-200" :
+                      q.type === "reflection" ? "bg-violet-500/15 text-violet-200" :
                       "bg-amber-500/15 text-amber-200"
                     }`}>
-                      {q.type === "true-false" ? "صح/خطأ" : q.type === "mcq" ? "اختيار" : "إجابة قصيرة"}
+                      {q.type === "true-false" ? "صح/خطأ" : q.type === "mcq" ? "اختيار" : q.type === "reflection" ? "كتابة موجّهة" : "إجابة قصيرة"}
                     </span>
                   </div>
                 </div>
@@ -151,14 +157,39 @@ export function QuickChecks({ checks }: { checks: QuickCheck[] }) {
                 </div>
               )}
 
-              {/* Feedback */}
-              {done && (
-                <div className={`mr-11 mt-3 px-4 py-3 rounded-xl border ${
-                  isCorrect ? "bg-emerald-500/10 border-emerald-500/20" : "bg-red-500/10 border-red-500/20"
-                }`}>
-                  <p className={`text-sm font-bold mb-1 ${isCorrect ? "text-emerald-300" : "text-red-300"}`}>
-                    {isCorrect ? "✓ إجابة صحيحة" : "✗ إجابة غير صحيحة"}
-                  </p>
+              {/* Réflexion guidée : aucune réponse « correcte » n'est fabriquée par le gabarit */}
+              {isReflection(q) && (
+                <div className="mr-11 space-y-2">
+                  <textarea
+                    value={(answers[q.id] as string) || ""}
+                    onChange={(e) => setAnswers((a) => ({ ...a, [q.id]: e.target.value }))}
+                    rows={3}
+                    disabled={done}
+                    className="w-full rounded-xl bg-[#0C151A] border border-white/[0.08] text-white p-3 text-sm outline-none focus:border-mint disabled:opacity-50"
+                    placeholder={q.placeholderAr}
+                  />
+                  {!done && (
+                    <button onClick={() => handleSubmit(q.id)} className="px-4 py-2 rounded-xl bg-mint text-white text-sm font-bold hover:bg-mint-soft transition">
+                      قارن بالنموذج
+                    </button>
+                  )}
+                  {done && (
+                    <div className="rounded-xl border border-white/[0.08] bg-white/[0.03] p-3">
+                      <p className="text-mint-soft text-xs font-bold mb-1">نموذج</p>
+                      <p className="text-gray-200 text-sm leading-relaxed whitespace-pre-wrap">{q.modelAnswerAr}</p>
+                      <p className="text-gray-400 text-xs mt-2 leading-relaxed">{q.commentAr}</p>
+                      <button onClick={() => handleReset(q.id)} className="mt-2 text-xs text-gray-500 hover:text-gray-300 transition">
+                        أعد المحاولة
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Feedback — les contrôles de gabarit révèlent le commentaire, sans verdict */}
+              {done && !authored && !isReflection(q) && (
+                <div className="mr-11 mt-3 px-4 py-3 rounded-xl border border-mint/20 bg-mint/[0.06]">
+                  <p className="text-sm font-bold mb-1 text-mint-soft">نموذج للقارنة — لا تصحيح آلي</p>
                   <p className="text-gray-300 text-xs leading-relaxed">
                     {q.type === "true-false" && (q as TrueFalseCheck).explanationAr}
                     {q.type === "mcq" && (q as McqCheck).explanationAr}
@@ -169,6 +200,24 @@ export function QuickChecks({ checks }: { checks: QuickCheck[] }) {
                         <span className="text-mint-soft">الكلمات المفتاحية: {(q as ShortAnswerCheck).expectedKeywords.join("، ")}</span>
                       </>
                     )}
+                  </p>
+                  <button onClick={() => handleReset(q.id)} className="mt-2 text-xs text-gray-500 hover:text-gray-300 transition">
+                    إعادة المحاولة
+                  </button>
+                </div>
+              )}
+
+              {graded && (
+                <div className={`mr-11 mt-3 px-4 py-3 rounded-xl border ${
+                  isCorrect ? "bg-emerald-500/10 border-emerald-500/20" : "bg-red-500/10 border-red-500/20"
+                }`}>
+                  <p className={`text-sm font-bold mb-1 ${isCorrect ? "text-emerald-300" : "text-red-300"}`}>
+                    {isCorrect ? "✓ إجابة صحيحة" : "✗ إجابة غير صحيحة"}
+                  </p>
+                  <p className="text-gray-300 text-xs leading-relaxed">
+                    {q.type === "true-false" && (q as TrueFalseCheck).explanationAr}
+                    {q.type === "mcq" && (q as McqCheck).explanationAr}
+                    {q.type === "short-answer" && (q as ShortAnswerCheck).sampleAnswerAr}
                   </p>
                   <button onClick={() => handleReset(q.id)} className="mt-2 text-xs text-gray-500 hover:text-gray-300 transition">
                     إعادة المحاولة

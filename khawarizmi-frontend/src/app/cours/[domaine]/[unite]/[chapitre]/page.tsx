@@ -3,7 +3,6 @@
 import { useParams } from "next/navigation"
 import Link from "next/link"
 import { useMemo, useState, useEffect } from "react"
-import { AuthGuard } from "@/components/auth/AuthGuard"
 import { AppShell } from "@/components/layout/AppShell"
 import { Breadcrumb } from "@/components/cours/Breadcrumb"
 import { ActiveLessonHero } from "@/components/lessons/ActiveLessonHero"
@@ -14,6 +13,8 @@ import { CommonMistakesPanel } from "@/components/lessons/CommonMistakesPanel"
 import { BacLinkPanel } from "@/components/lessons/BacLinkPanel"
 import { MethodologyLinkPanel } from "@/components/lessons/MethodologyLinkPanel"
 import { VideosWidget } from "@/components/videos/VideosWidget"
+import { ProofPanel } from "@/components/lessons/ProofPanel"
+import { ItemForgePanel } from "@/components/lessons/ItemForgePanel"
 import FicheResume from "@/components/lessons/FicheResume"
 import chapitresFichesMap from "../../../../../../data/chapitres-fiches-map.json"
 import {
@@ -162,6 +163,18 @@ function ChapterInPageNav({ lesson }: { lesson: NonNullable<ReturnType<typeof ge
     <nav className="rounded-2xl p-4 glass border border-mint/10 sticky top-4">
       <h4 className="text-sm font-bold text-mint mb-3">محتويات الدرس</h4>
       <ul className="space-y-1">
+        {/* Les deux surfaces de preuve (F38) sont les seules rubriques cliquables ici : les blocs du
+            dessous ne sont pas des liens, ils n'ont pas d'ancre — on ne fait semblant de rien. */}
+        <li>
+          <a href="#preuve" className="block rounded px-2 py-1 text-xs text-white/70 hover:bg-white/[0.06] hover:text-mint">
+            دليل الفهم
+          </a>
+        </li>
+        <li>
+          <a href="#fabrique" className="block rounded px-2 py-1 text-xs text-white/70 hover:bg-white/[0.06] hover:text-mint">
+            اكتب السؤال
+          </a>
+        </li>
         {lesson.lessonBlocks.map((b) => (
           <li key={b.id}>
             <span className="text-xs text-gray-400 hover:text-white transition cursor-pointer block py-1 px-2 rounded hover:bg-white/[0.04]">
@@ -192,10 +205,9 @@ export default function ChapitrePage() {
 
   if (!domain || !unit || !chapter) {
     return (
-      <AuthGuard>
-        <AppShell>
-          <main className="flex-1 p-6 lg:p-8 overflow-auto">
-            <div className="max-w-5xl mx-auto text-center py-20">
+      <AppShell>
+        <main className="flex-1 p-6 lg:p-8 overflow-auto">
+          <div className="max-w-5xl mx-auto text-center py-20">
               <p className="text-gray-500 text-lg">هذا الفصل غير موجود</p>
               <Link
                 href="/cours"
@@ -204,15 +216,17 @@ export default function ChapitrePage() {
                 العودة إلى المجالات
               </Link>
             </div>
-          </main>
-        </AppShell>
-      </AuthGuard>
+        </main>
+      </AppShell>
     )
   }
 
+  // Pas d'AuthGuard ici (D6, éteinte pour cette page) : mesuré avant de le retirer, ce fichier ne fait
+  // AUCUN appel réseau (`apiClient.` → 0 occurrence) et ses six enfants non plus — seul VideosWidget
+  // en émet un, déjà en try/catch. Le garde empêchait donc exactement une chose : qu'un élève assis
+  // devant son chapitre puisse le lire. Le HTML serveur était un spinner.
   return (
-    <AuthGuard>
-      <AppShell>
+    <AppShell>
         <main className="flex-1 p-6 lg:p-8 overflow-auto">
           <div className="max-w-6xl mx-auto">
             <Breadcrumb
@@ -232,7 +246,7 @@ export default function ChapitrePage() {
                   <LessonBlocks blocks={lesson.lessonBlocks} />
                   <QuickChecks checks={lesson.quickChecks} />
                   <BacLinkPanel lesson={lesson} />
-                  <CommonMistakesPanel mistakes={lesson.commonMistakes} />
+                  <CommonMistakesPanel mistakes={lesson.commonMistakes} general={lesson.commonMistakesProvenance !== "authoré"} />
                   <MethodologyLinkPanel lesson={lesson} />
 
                   <section>
@@ -259,6 +273,13 @@ export default function ChapitrePage() {
                   </section>
 
                   <VideosWidget chapitre={lesson.chapterFr} />
+
+                  {/* F38 : la preuve d'assimilation n'est pas une note, c'est un état + des dates.
+                      Elle vit ici parce que c'est ici que l'élève a fini son papier. */}
+                  <ProofPanel lessonKey={lesson.chapterSlug} chapterAr={lesson.chapterAr} />
+
+                  {/* B : l'élève écrit la consigne et ses critères. Le site collecte, il ne corrige pas. */}
+                  <ItemForgePanel lessonKey={lesson.chapterSlug} chapterAr={lesson.chapterAr} />
                 </div>
 
                 <aside className="hidden lg:block">
@@ -295,8 +316,7 @@ export default function ChapitrePage() {
               )}
             </div>
           </div>
-        </main>
-      </AppShell>
-    </AuthGuard>
+      </main>
+    </AppShell>
   )
 }

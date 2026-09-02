@@ -1,6 +1,8 @@
 "use client"
 
 import { useMemo, useState } from "react"
+import { usePersistentDraft } from "@/hooks/usePersistentDraft"
+import { DraftStatus } from "@/components/lessons/DraftStatus"
 import Link from "next/link"
 import {
   detectMoukhattat,
@@ -40,7 +42,10 @@ export function AtelierMoukhattat({ data, onReplay, variant = "cyan" }: Props) {
   const A = MUSCLE_ACCENTS[variant]
   const [phase, setPhase] = useState<Phase>("A")
   const [checks, setChecks] = useState<boolean[]>(() => data.cases.map(() => false))
-  const [text, setText] = useState("")
+  // F38 : sans ceci, le texte écrit sur cet écran était détruit au changement de page.
+  const draft = usePersistentDraft(`atelier:${data.atelier_id}`, data.verbe)
+  const text = draft.text
+  const setText = draft.setText
   const [submitted, setSubmitted] = useState<{ text: string; crimes: string[]; missing: string[] } | null>(null)
   const [mirror, setMirror] = useState<number | null>(null)
 
@@ -177,6 +182,7 @@ export function AtelierMoukhattat({ data, onReplay, variant = "cyan" }: Props) {
           <p className="text-xs text-white/40" dir="rtl">
             ارسم المخطط على الورق (ما كانش أداة رسم هنا)، واكتب وصفه : العنوان، الإطارات، الأسهم، الترقيم، المفتاح.
           </p>
+          <DraftStatus draft={draft} />
           <textarea
             dir="rtl"
             lang="ar"

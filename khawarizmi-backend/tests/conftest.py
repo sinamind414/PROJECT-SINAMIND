@@ -4,6 +4,7 @@
 import os
 import sys
 from collections.abc import AsyncGenerator
+import tempfile
 from pathlib import Path
 from unittest.mock import AsyncMock, patch
 
@@ -17,6 +18,10 @@ os.environ.setdefault("DATABASE_URL", "postgresql+asyncpg://postgres:testpass@lo
 os.environ.setdefault("REDIS_URL", "redis://localhost:6379/1")
 os.environ.setdefault("GEMINI_API_KEY", "test-gemini-key")
 os.environ.setdefault("ENVIRONMENT", "test")
+# Les tests ne doivent pas écrire dans `cost_log.jsonl` : ce fichier est SUIVI par git à la racine
+# du dépôt (défaut de cost_logger.py). Sans cette ligne, `pytest` salit l'arbre de travail de
+# n'importe qui — mesuré le 2026-08-31 : 2 lignes ajoutées par une simple exécution de la suite.
+os.environ.setdefault("COST_LOG_PATH", str(Path(tempfile.gettempdir()) / "khawarizmi-cost-tests.jsonl"))
 
 from database import get_db as db_get_db
 from deps import get_db, get_openai

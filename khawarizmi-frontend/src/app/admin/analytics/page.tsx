@@ -1,5 +1,6 @@
 "use client"
 
+import { readableError } from "@/lib/ui-error"
 import { useEffect, useState } from "react"
 import { AppShell } from "@/components/layout/AppShell"
 import { apiClient } from "@/lib/api-client"
@@ -70,7 +71,8 @@ export default function AdminAnalyticsPage() {
         setGaps(ga)
         setRisk(r)
       } catch (e) {
-        setError(e instanceof Error ? e.message : "Erreur de chargement")
+        // La page est en RTL arabe (dir="rtl") : un repli français y est une fuite, pas un libellé.
+        setError(readableError(e, "تعذر تحميل التحليلات"))
       } finally {
         setLoading(false)
       }

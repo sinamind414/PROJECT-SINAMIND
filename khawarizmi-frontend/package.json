@@ -6,9 +6,12 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint",
+    "lint": "eslint src",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "pdfs:gen": "node scripts/pdf-availability.mjs",
+    "pdfs:check": "node scripts/pdf-availability.mjs --check"
   },
   "dependencies": {
     "@tailwindcss/forms": "^0.5.11",

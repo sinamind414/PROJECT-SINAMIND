@@ -106,6 +106,7 @@ export const UI_AR: Record<string, string> = {
   session_expiree: "انتهت الجلسة. يرجى إعادة تسجيل الدخول.",
   limite_atteinte: "تم تجاوز حد الطلبات. حاول مرة أخرى لاحقا.",
   erreur_http_prefix: "خطأ",
+  reponse_illisible: "تعذر قراءة استجابة الخادم — ليست مشكلة في إجابتك. أعد المحاولة بعد قليل.",
   bac_2026: "BAC 2026",
   jours_restants: "باقي {n} يوم",
   progression_programme: "{n}% من البرنامج",

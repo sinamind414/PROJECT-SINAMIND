@@ -1,9 +1,17 @@
 "use client"
 
-export function CommonMistakesPanel({ mistakes }: { mistakes: string[] }) {
+export function CommonMistakesPanel({ mistakes, general = false }: { mistakes: string[]; general?: boolean }) {
   return (
     <section>
-      <h2 className="text-2xl font-bold text-white mb-4">أخطاء شائعة</h2>
+      <h2 className="text-2xl font-bold text-white mb-4">
+        {general ? "أخطاء منهجية متكررة في البكالوريا" : "أخطاء شائعة في هذا الدرس"}
+      </h2>
+      {general && (
+        <p className="text-xs text-gray-400 mb-3">
+          هذه الأخطاء ليست خاصة بهذا الفصل: هي نفسها في كل الدروس. تصلح لتدريب الطريقة، لا كناتج
+          تشخيصي لهذا الفصل.
+        </p>
+      )}
       <div className="rounded-3xl p-6 border border-red-500/20" style={{ background: "#182730" }}>
         <div className="space-y-3">
           {mistakes.map((m, i) => (

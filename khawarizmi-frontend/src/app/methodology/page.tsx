@@ -5,6 +5,7 @@ import { AuthGuard } from "@/components/auth/AuthGuard"
 import { AppShell } from "@/components/layout/AppShell"
 import { ProgressivePageHeader } from "@/components/ui/ProgressivePageHeader"
 import { MethodChecklistLab } from "@/components/methodology/MethodChecklistLab"
+import ManhadjiyaTips from "@/components/methodology/ManhadjiyaTips"
 import {
   METHOD_LEVELS,
   METHOD_MODES,
@@ -285,7 +286,8 @@ export default function MethodologyPortalPage() {
                     Analyse document — expression génétique
                   </div>
                   <p className="text-sm text-white/65 mt-2">
-                    تمرين كامل مع قائمة التحقق والتصحيح — بيّن أن تنشيط المورثة يزيد تركيب البروتين.
+                    تمرين كامل مع قائمة التحقق وحُكم على المنهجية (الترتيب · دليل مكتوب في كل
+                    خطوة) — لا يصحّح المحتوى العلمي. بيّن أن تنشيط المورثة يزيد تركيب البروتين.
                   </p>
                   <span className="inline-block mt-3 text-mint text-sm font-bold group-hover:underline">
                     ابدأ التمرين ←
@@ -310,6 +312,21 @@ export default function MethodologyPortalPage() {
                   </span>
                 </Link>
               </div>
+            </section>
+
+            {/* Données officielles du référentiel du correcteur */}
+            <section id="official-tips" className="scroll-mt-24 space-y-4">
+              <div className="flex items-center gap-2">
+                <BookOpen className="w-5 h-5 text-amber-300" />
+                <h2 className="text-xl font-black text-white">
+                  4. المرجع الرسمي · Données du correcteur
+                </h2>
+              </div>
+              <p className="text-white/55 text-sm leading-relaxed">
+                نصائح المراجعة، الأخطاء الشائعة في البكالوريا ومستويات بلوم — كما هي في
+                المرجع المستعمل للتصحيح. لا شيء هنا مُختلَق: الموقع يعرض ما يقوله المصحّح.
+              </p>
+              <ManhadjiyaTips />
             </section>
 
             {/* Rule of gold */}

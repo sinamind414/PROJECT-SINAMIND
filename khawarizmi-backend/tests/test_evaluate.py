@@ -1,5 +1,3 @@
-from unittest.mock import patch
-
 import pytest
 
 
@@ -45,14 +43,18 @@ async def test_evaluate_requires_auth(client):
 
 @pytest.mark.asyncio
 async def test_evaluate_invalid_question_returns_404(client, auth_headers):
-    """Question inexistante → 404."""
-    with patch("services.ai_modes.evaluation_mode.get_question", return_value=None):
-        resp = await client.post(
-            "/api/ai/evaluate",
-            json=_eval_request(question_id="q_nonexistent"),
-            headers=auth_headers,
-        )
-        assert resp.status_code == 404
+    """Route retirée du registre → 404, quel que soit l'identifiant de question.
+
+    Attention à la portée réelle de ce test : depuis le GEL 2026-08-17, la route n'est plus
+    montée, donc rien ne atteint `get_question`. Il garde une valeur (un endpoint gelé doit
+    répondre 404 avec du JSON, pas 500) — il n'a plus aucune valeur sur la recherche de question.
+    """
+    resp = await client.post(
+        "/api/ai/evaluate",
+        json=_eval_request(question_id="q_nonexistent"),
+        headers=auth_headers,
+    )
+    assert resp.status_code == 404
 
 
 @pytest.mark.asyncio
@@ -68,16 +70,20 @@ async def test_evaluate_endpoint_responds(client, auth_headers):
 
 @pytest.mark.asyncio
 async def test_evaluate_returns_json_response(client, auth_headers):
-    """La réponse doit être du JSON valide."""
-    with (
-        patch("services.ai_modes.evaluation_mode.get_question", return_value=None),
-    ):
-        resp = await client.post(
-            "/api/ai/evaluate",
-            json=_eval_request(),
-            headers=auth_headers,
-        )
-        assert resp.status_code == 404
+    """La réponse doit être du JSON valide — même sur une route retirée du registre.
+
+    (Avant : ce test enveloppait l'appel dans un patch de
+    `services.ai_modes.evaluation_mode.get_question`, symbole qui n'existe pas dans ce module
+    — `get_question` vit dans `services/questions.py`. Le patch levait AttributeError avant
+    toute assertion : le test était rouge sans tester quoi que ce soit.)
+    """
+    resp = await client.post(
+        "/api/ai/evaluate",
+        json=_eval_request(),
+        headers=auth_headers,
+    )
+    assert resp.status_code == 404
+    assert resp.headers.get("content-type", "").startswith("application/json")
 
 
 @pytest.mark.asyncio

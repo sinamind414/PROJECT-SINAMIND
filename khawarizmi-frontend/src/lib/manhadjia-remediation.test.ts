@@ -61,19 +61,21 @@ describe("fetchContextualRemediation (point d'équilibre)", () => {
   const LONG_TEXT = "تمثل الوثيقة منحنى يبين تطور عدد LTc بدلالة الأيام"
 
   it("succès → POST au bon endpoint avec verb_slug + context", async () => {
-    let captured: { url: string; init: RequestInit } | null = null
+    // tableau plutôt que `let … | null` : l'affectation a lieu dans un callback, et
+    // l'analyse de flux de TS réduisait `captured` à `never` au moment des assertions.
+    const calls: { url: string; init: RequestInit }[] = []
     const r = await fetchContextualRemediation(
       "deduce",
       LONG_TEXT,
       fakeFetch(async (url, init) => {
-        captured = { url, init }
+        calls.push({ url, init })
         return okResponse({ data: { verb: "deduce", units: ["unite2-immunite"], relevant_errors: ["خطأ"] } })
       })
     )
     expect(r?.errors).toEqual(["خطأ"])
-    expect(captured?.url).toBe(REMEDIATION_ENDPOINT)
-    expect(captured?.init.method).toBe("POST")
-    expect(JSON.parse(String(captured?.init.body))).toEqual({ verb_slug: "deduce", context: LONG_TEXT })
+    expect(calls[0]?.url).toBe(REMEDIATION_ENDPOINT)
+    expect(calls[0]?.init.method).toBe("POST")
+    expect(JSON.parse(String(calls[0]?.init.body))).toEqual({ verb_slug: "deduce", context: LONG_TEXT })
   })
 
   it("HTTP 500 → null (silencieux)", async () => {

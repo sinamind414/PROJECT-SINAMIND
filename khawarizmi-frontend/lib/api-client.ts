@@ -1,3 +1,17 @@
+/**
+ * ⚠️ DEAD + DANGEREUX — ne pas importer. (vérifié 2026-08-31, rapport §11)
+ *
+ * 1. Personne n'importe ce fichier : `grep -rn "from \"[^\"]*lib/api-client\"" src lib app` ne
+ *    renvoie que `@/lib/api-client` (le client vivant, dans `src/`).
+ * 2. Son URL en dur, https://khawarizmi-backend.railway.app, ne sert PAS ce dépôt : /health y
+ *    répond « OK » (le nôtre renvoie un objet de diagnostic) et un 404 y vaut
+ *    {"message":"Not Found","requestId":…} — `requestId` n'apparaît dans aucun .py du dépôt.
+ * 3. Le client vivant, lui, passe par le proxy same-origin (`API_BASE_URL = NEXT_PUBLIC_API_URL || ""`).
+ *
+ * Conservé (pas supprimé) parce que la dette de surface se signale, pas se raye. À supprimer par
+ * une décision explicite, avec `docs/audit-rapport-technique.md:71` à mettre à jour.
+ */
+
 // khawarizmi-frontend/lib/api-client.ts
 // Client API centralis — Khawarizmi Pro
 

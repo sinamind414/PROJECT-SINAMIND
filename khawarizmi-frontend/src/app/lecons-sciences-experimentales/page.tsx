@@ -4,141 +4,9 @@ import Link from "next/link"
 import { AppShell } from "@/components/layout/AppShell"
 import { Layers3, GraduationCap, Microscope, FlaskConical, ChevronLeft } from "lucide-react"
 
-type PhaseMeta = {
-  slug: string
-  phase: number
-  label: string
-  chapters: string
-}
+import { DOMAINES } from "@/lib/experimental-hub-registry"
+import { activeUnitHrefForHubUnit, bookChaptersOfPhase, lessonMode } from "@/lib/lesson-modes"
 
-const PHASES: PhaseMeta[] = [
-  { slug: "phase1_chapitres_1_2", phase: 1, label: "تقديم الوحدة: التساؤل الجوهري حول تركيب البروتين", chapters: "1" },
-  { slug: "phase2_chapitres_3_4", phase: 2, label: "الترجمة: من ARNm إلى سلسلة بيبتيدية", chapters: "2" },
-  { slug: "phase3_chapitres_5_6", phase: 3, label: "العلاقة بين بنية ووظيفة البروتين: فقر الدم المنجلي", chapters: "1" },
-  { slug: "phase4_chapitres_7_8", phase: 4, label: "النشاط الإنزيمي: تأثير pH على فعالية الإنزيم", chapters: "1" },
-  { slug: "phase5_chapitres_9_10", phase: 5, label: "الذات واللاذات: رفض زرع الأعضاء", chapters: "1" },
-  { slug: "phase6_chapitres_11_12", phase: 6, label: "الاستجابة المناعية الخلطية: الأجسام المضادة والمصل", chapters: "2" },
-  { slug: "phase7_chapitres_13_14", phase: 7, label: "الاستجابة المناعية الخلوية: دور اللمفاويات LTc", chapters: "3" },
-  { slug: "phase8_chapitres_15_16", phase: 8, label: "كمون الراحة: استقطاب الغشاء العصبي", chapters: "1" },
-  { slug: "phase9_chapitres_17_18", phase: 9, label: "النقل المشبكي: عبور السيالة العصبية", chapters: "2" },
-  { slug: "phase10_chapitres_19_20", phase: 10, label: "تأثير المخدرات على مستوى المشابك", chapters: "3" },
-  { slug: "phase11_chapitres_21_22", phase: 11, label: "التركيب الضوئي: مصدر الأكسجين المنطلق", chapters: "1" },
-  { slug: "phase12_chapitres_23_24", phase: 12, label: "المرحلة الكيميوحيوية: تثبيت CO₂ (حلقة كالفن)", chapters: "2" },
-  { slug: "phase13_chapitres_25_26", phase: 13, label: "التحلل السكري والتخمر: الطاقة في غياب الأكسجين", chapters: "1" },
-  { slug: "phase14_chapitres_27_28", phase: 14, label: "السلسلة التنفسية والفسفرة التأكسدية", chapters: "2" },
-  { slug: "phase15_chapitres_29_30", phase: 15, label: "إنتاج ATP في الصانعة الخضراء والميتوكندري", chapters: "1" },
-  { slug: "phase16_chapitres_31_32", phase: 16, label: "تحديد الصفائح التكتونية: الزلازل والبراكين", chapters: "1" },
-  { slug: "phase17_chapitres_33_34", phase: 17, label: "حركات الصفائح: توسع قاع المحيط", chapters: "2" },
-  { slug: "phase18_chapitres_35_36", phase: 18, label: "الطاقة الداخلية للكرة الأرضية", chapters: "3" },
-  { slug: "phase19_chapitres_37_38", phase: 19, label: "الموجات الزلزالية والبنية الداخلية للأرض", chapters: "1" },
-  { slug: "phase20_chapitres_39_40", phase: 20, label: "نمذجة البنية الداخلية: النواة الصلبة", chapters: "2" },
-  { slug: "phase21_chapitres_41_42", phase: 21, label: "المغماتية وتشكل اللوح المحيطي", chapters: "1" },
-  { slug: "phase22_chapitres_43_44", phase: 22, label: "التحول والصخور المتحولة في مناطق الغوص", chapters: "2" },
-]
-
-type UnitGroup = {
-  numero: number
-  labelAr: string
-  labelFr: string
-  phases: PhaseMeta[]
-}
-
-type DomainGroup = {
-  domain: number
-  label: string
-  color: string
-  units: UnitGroup[]
-}
-
-const DOMAINES: DomainGroup[] = [
-  {
-    domain: 1,
-    label: "التخصص الوظيفي للبروتينات",
-    color: "blue",
-    units: [
-      {
-        numero: 1,
-        labelAr: "تركيب البروتين",
-        labelFr: "Synthèse des protéines",
-        phases: PHASES.slice(0, 2),
-      },
-      {
-        numero: 2,
-        labelAr: "العلاقة بين بنية ووظيفة البروتين",
-        labelFr: "Relation structure-fonction des protéines",
-        phases: PHASES.slice(2, 3),
-      },
-      {
-        numero: 3,
-        labelAr: "النشاط الإنزيمي للبروتينات",
-        labelFr: "L'activité enzymatique des protéines",
-        phases: PHASES.slice(3, 4),
-      },
-      {
-        numero: 4,
-        labelAr: "دور البروتينات في الدفاع عن الذات",
-        labelFr: "Rôle des protéines dans la défense de soi",
-        phases: PHASES.slice(4, 7),
-      },
-      {
-        numero: 5,
-        labelAr: "دور البروتينات في الاتصال العصبي",
-        labelFr: "Rôle des protéines dans la communication nerveuse",
-        phases: PHASES.slice(7, 10),
-      },
-    ],
-  },
-  {
-    domain: 2,
-    label: "التحولات الطاقوية",
-    color: "emerald",
-    units: [
-      {
-        numero: 1,
-        labelAr: "آليات تحويل الطاقة الضوئية إلى طاقة كيميائية كامنة",
-        labelFr: "Mécanismes de conversion de l'énergie lumineuse en énergie chimique potentielle",
-        phases: PHASES.slice(10, 12),
-      },
-      {
-        numero: 2,
-        labelAr: "آليات تحويل الطاقة الكيميائية الكامنة في الجزيئات العضوية إلى ATP",
-        labelFr: "Mécanismes de conversion de l'énergie chimique potentielle des molécules organiques en ATP",
-        phases: PHASES.slice(12, 14),
-      },
-      {
-        numero: 3,
-        labelAr: "تحويل الطاقة على المستوى ما فوق البنية الخلوية",
-        labelFr: "Conversion de l'énergie au niveau ultrastructural cellulaire",
-        phases: PHASES.slice(14, 15),
-      },
-    ],
-  },
-  {
-    domain: 3,
-    label: "التكتونية العامة",
-    color: "amber",
-    units: [
-      {
-        numero: 1,
-        labelAr: "النشاط التكتوني للصفائح",
-        labelFr: "L'activité tectonique des plaques",
-        phases: PHASES.slice(15, 18),
-      },
-      {
-        numero: 2,
-        labelAr: "بنية الكرة الأرضية",
-        labelFr: "Structure du globe terrestre",
-        phases: PHASES.slice(18, 20),
-      },
-      {
-        numero: 3,
-        labelAr: "النشاط التكتوني والبنيات الجيولوجية المرتبطة به",
-        labelFr: "L'activité tectonique et les structures géologiques associées",
-        phases: PHASES.slice(20, 22),
-      },
-    ],
-  },
-]
 
 const STATS = [
   { value: "23", label: "تجربة تفاعلية" },
@@ -181,9 +49,34 @@ export default function LeconsPage() {
           ))}
         </div>
 
+        {/* Deux surfaces, un choix explicite : le livre (contenu) et la leçon active (méthode).
+            Mesuré 2026-09-01 : la seconde n'avait AUCUN lien vers la première — le contenu scientifique
+            (113 240 caractères) était une île, et la rubrique s'appelait « التجارب المقررة ». */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-10">
+          {(["normale", "active"] as const).map((k) => {
+            const m = lessonMode(k)
+            const ici = k === "normale"
+            return (
+              <Link
+                key={k}
+                href={ici ? "#domaines" : m.href}
+                className={`rounded-2xl border p-4 text-right transition ${
+                  ici ? "bg-mint/10 border-mint/30" : "bg-white/[0.03] border-white/[0.08] hover:border-mint/30 hover:bg-mint/5"
+                }`}
+              >
+                <p className={`text-sm font-black mb-1 ${ici ? "text-mint" : "text-slate-200"}`}>
+                  {m.labelAr} {ici && <span className="text-[10px] font-bold text-slate-400">· أنت هنا</span>}
+                </p>
+                <p className="text-[11px] text-slate-400 leading-relaxed mb-2">{m.noteAr}</p>
+                <p className="text-[11px] font-bold text-slate-300">{m.countLabelAr}</p>
+              </Link>
+            )
+          })}
+        </div>
+
         {/* Domaines -> Unités -> Chapitres/Expériences */}
         {DOMAINES.map((domaine) => (
-          <section key={domaine.domain} className="mb-12">
+          <section key={domaine.domain} id="domaines" className="mb-12">
             <div className="flex items-center gap-3 mb-6">
               <div className={`w-10 h-10 rounded-2xl bg-gradient-to-br ${DOMAIN_GRADIENTS[domaine.color]} flex items-center justify-center shadow-lg`}>
                 <Microscope className="w-5 h-5 text-white" aria-hidden="true" />
@@ -207,9 +100,19 @@ export default function LeconsPage() {
                         <p className="text-xs text-gray-500">{unit.labelFr}</p>
                       </div>
                     </div>
-                    <span className="text-xs font-semibold text-slate-400 bg-white/[0.04] px-3 py-1 rounded-full border border-white/[0.06] shrink-0">
-                      {unit.phases.length} مراحل
-                    </span>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <span className="text-xs font-semibold text-slate-400 bg-white/[0.04] px-3 py-1 rounded-full border border-white/[0.06]">
+                        {unit.phases.length} مراحل
+                      </span>
+                      {activeUnitHrefForHubUnit(domaine.label, unit.labelAr) && (
+                        <Link
+                          href={activeUnitHrefForHubUnit(domaine.label, unit.labelAr)!}
+                          className="text-xs font-bold text-mint bg-mint/10 px-3 py-1 rounded-full border border-mint/25 hover:bg-mint/20 transition"
+                        >
+                          الدروس النشطة ←
+                        </Link>
+                      )}
+                    </div>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -234,7 +137,7 @@ export default function LeconsPage() {
                           </p>
                         </div>
                         <div className="pt-2 border-t border-white/[0.04] flex items-center justify-between text-xs text-slate-500 group-hover:text-slate-400 transition">
-                          <span>التجارب {phase.chapters}</span>
+                          <span>{bookChaptersOfPhase(phase.slug)} درسًا من الكتاب</span>
                           <span className="text-mint font-bold opacity-0 group-hover:opacity-100 transition">افتح ←</span>
                         </div>
                       </Link>

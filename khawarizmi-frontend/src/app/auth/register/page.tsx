@@ -1,5 +1,6 @@
 "use client"
 
+import { readableError } from "@/lib/ui-error"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
@@ -25,8 +26,7 @@ export default function RegisterPage() {
       await register({ email, password, nom, filiere })
       router.push("/dashboard")
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "تعذر إنشاء الحساب"
-      setError(msg)
+      setError(readableError(err, "تعذر إنشاء الحساب"))
     } finally {
       setLoading(false)
     }

@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useState, useRef, useEffect } from "react"
+import Link from "next/link"
 import { motion, AnimatePresence } from "framer-motion"
 import { 
   ArrowRight, ArrowLeft, Pause, Check, X, AlertTriangle, 
@@ -532,9 +533,9 @@ export function VerbLessonFlow({
             <p className="text-amber-100 text-sm leading-relaxed">
               لا شبكة تقييم محلية لهذا الفعل. ليست صفراً — تعذر التصحيح. تمرّن على بطاقة مصحح محلي.
             </p>
-            <a href="/document-analysis" className="inline-block mt-3 px-3 py-2 rounded-xl bg-mint text-slate-deep text-xs font-bold">
+            <Link href="/document-analysis" className="inline-block mt-3 px-3 py-2 rounded-xl bg-mint text-slate-deep text-xs font-bold">
               بنك المصحح المحلي
-            </a>
+            </Link>
           </div>
         )}
         <div className="flex gap-3 mt-4 items-center">

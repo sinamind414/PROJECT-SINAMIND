@@ -3,7 +3,7 @@ import os
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from slowapi import _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
 from slowapi.middleware import SlowAPIMiddleware
 
 from config import get_allowed_origins, get_settings
@@ -11,7 +11,12 @@ from monitoring import setup_monitoring
 from rate_limit import limiter
 from routes import ALL_ROUTERS
 from routes.admin_ingest import router as admin_router
-from routes.errors import generic_exception_handler, http_exception_handler, validation_exception_handler
+from routes.errors import (
+    generic_exception_handler,
+    http_exception_handler,
+    rate_limit_exceeded_handler,
+    validation_exception_handler,
+)
 from routes.lifespan import lifespan, state  # ruff: ignore[unused-import] — re-exported for deps.py
 from routes.openapi_config import openapi_metadata
 
@@ -27,7 +32,11 @@ app = FastAPI(
 )
 
 app.state.limiter = limiter
-app.add_exception_handler(429, _rate_limit_exceeded_handler)
+# S38 — le handler est branché sur la CLASSE RateLimitExceeded (les routes décorées),
+# plus sur le statut 429. Enregistré sur 429, il interceptait aussi tout
+# HTTPException(429) manuel — or il lit request.state.view_rate_limit, que seul le
+# décorateur/middleware de limitation pose → AttributeError → 500 pour l'élève.
+app.add_exception_handler(RateLimitExceeded, rate_limit_exceeded_handler)
 app.add_exception_handler(422, validation_exception_handler)
 app.add_middleware(SlowAPIMiddleware)
 app.add_middleware(
