@@ -14,12 +14,16 @@ import {
 import { useRouter } from "next/navigation"
 
 import apiClient from "./api-client"
+import { isNetworkFailure } from "@/components/auth/auth-gate"
 import { User, RegisterPayload } from "./types"
 
 interface AuthContextType {
   user: User | null
   loading: boolean
   isAuthenticated: boolean
+  /** true = le serveur n'a pas répondu (pas : « il a dit non »). Les pages à contenu local s'affichent
+   *  quand même ; voir `authGate` pour la règle et sa justification. */
+  offline: boolean
   login: (email: string, password: string) => Promise<void>
   register: (payload: RegisterPayload) => Promise<void>
   logout: () => void
@@ -32,15 +36,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const router = useRouter()
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
+  const [offline, setOffline] = useState(false)
 
   // Charger l'utilisateur au montage
   const loadUser = useCallback(async () => {
     try {
       const userData = await apiClient.getMe()
       setUser(userData)
-    } catch {
-      apiClient.clearToken()
+      setOffline(false)
+    } catch (err) {
+      // Une panne réseau n'était pas une déconnexion. Avant : `catch { clearToken(); setUser(null) }` —
+      // donc chaque page rechargée pendant une coupure effaçait la session et renvoyait vers /auth/login,
+      // un formulaire qui appelle le même serveur mort.
       setUser(null)
+      if (isNetworkFailure(err)) {
+        setOffline(true)
+      } else {
+        apiClient.clearToken()
+        setOffline(false)
+      }
     } finally {
        
       setLoading(false)
@@ -77,6 +91,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         user,
         loading,
         isAuthenticated: !!user,
+        offline,
         login,
         register,
         logout,

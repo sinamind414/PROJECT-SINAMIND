@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest"
 import { apiClient, httpErrorMessage } from "./api-client"
+import { isNetworkFailure } from "@/components/auth/auth-gate"
 
 /**
  * F20 (audit surfaces de correction) — le contrat d'erreur du backend est
@@ -91,6 +92,17 @@ describe("apiClient.request — l'erreur remontée à la page est lisible par l'
     }
     expect(err.message).toBe("خطأ 500")
     expect(err.status).toBe(500)
+  })
+})
+
+describe("request() — une session expirée n'est pas une panne réseau", () => {
+  // Sans status sur cette erreur, `authGate` rendrait le contenu : getMe() est appelé avec
+  // skipAuthRedirect, donc le garde de session est le SEUL à décider, et il décide sur ce champ.
+  it("le rejet 401 arrive au contexte avec son code", async () => {
+    stub(401, { erreur: "الجلسة منتهية", status: 401, path: "/api/auth/me", method: "GET" })
+    const err = (await apiClient.getMe().catch((e: unknown) => e)) as Error & { status?: number }
+    expect(err.status).toBe(401)
+    expect(isNetworkFailure(err)).toBe(false)
   })
 })
 

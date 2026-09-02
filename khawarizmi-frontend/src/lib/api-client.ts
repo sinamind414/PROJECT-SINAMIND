@@ -254,7 +254,11 @@ class KhawarizmiApiClient {
           window.location.href = "/auth/login"
         }
       }
-      throw new Error(UI_AR.session_expiree)
+      // Le statut voyagent avec l'erreur, `auth-context` peut distinguer « le serveur a dit non » de
+      // « le serveur n'a pas répondu » : sans ce 401 ici, une session expirée serait lue comme une panne
+      // et la garde rendrait le contenu (mesuré : getMe passe skipAuthRedirect, donc personne d'autre
+      // ne redirige sur ce chemin).
+      throw apiError({}, 401, UI_AR.session_expiree)
     }
 
     // Rate limit : retry once after Retry-After si la méthode est idempotente

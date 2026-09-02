@@ -1591,3 +1591,76 @@ Mesures après F38.1 : `tsc --noEmit` 0 ; vitest **1037 ✓** (33 fichiers, +15 
 Ce que F38.1 ne règle pas : **`نُقل` reste une déclaration datée de l'élève**, pas une mesure — la seule
 grandeur qui vaudrait quelque chose (écart auto-note/prof sur les copies de juin) n'est toujours pas
 fournie ; et les 19 pages restantes sont le prochain arbitrage de D6, pas celui-ci.
+
+## 26. F39 — la garde de session ne peut plus confondre « panne » et « refus » (2026-09-01)
+
+La suite logique du §25, trouvée en voulant mesurer les 19 pages restantes. Le verdict de cette
+question : **on ne déverrouille pas page par page**, parce que le défaut n'est pas la liste des pages
+gardées, c'est ce que la garde fait quand l'API ne répond pas — et elle répond mal pour toutes.
+
+Mesuré avant d'écrire une ligne :
+
+| Fait | Nombre / citation |
+|---|---|
+| pages de route portant `<AuthGuard` | **35 / 82** (39 avant §25) |
+| pages **sans aucun** `apiClient`/`fetch` dans le fichier, mais gardées | **19** — dont `/scanner`, dont le contenu entier est un panneau «🚧 قيد الإنشاء » écrit dans le bundle |
+| `curl /scanner` (moteur de dev local, API injoignable) | 18 719 octets, dont un `animate-spin`, zéro contenu rendu |
+| où vit le jeton de session | `let _khawarizmiToken` **en mémoire** (`api-client.ts:60`) — pas de cookie lisible côté front, le rafraîchissement passe par `/api/auth/refresh` |
+| ce que faisait `auth-context` sur n'importe quelle exception de `getMe()` | `clearToken(); setUser(null)` → donc une **coupure réseau effaçait la session**, puis `AuthGuard` renvoyait vers `/auth/login`, formulaire qui rappelle le même serveur mort |
+
+C'est une muraille qui ne protège rien et qui bloque tout : la production est exactement dans cet état
+(D1 non confirmé, backend injoignable), donc 35 pages du site sont aujourd'hui un mur de login pour un
+élève qui n'a rien à se reprocher.
+
+Changements, dans cet ordre :
+- `src/components/auth/auth-gate.ts` (nouveau) : la décision devient une fonction pure,
+  `authGate({loading, isAuthenticated, offline}) → checking | children | redirect-login`, et
+  `isNetworkFailure(err)` classe sur **l'absence de `status`**, pas sur une phrase traduite.
+- `auth-context.tsx` : `getMe()` qui échoue sans code HTTP ⇒ `offline = true` et le jeton **survit** ;
+  un code HTTP (401, 403…) ⇒ rejet net, `clearToken()`. Le contexte expose `offline`.
+- `AuthGuard.tsx` : consomme la table ; sur `offline` il rend les enfants avec un bandeau
+  «لا اتصال بالخادم: ما تقرأه وتكتبه على هذا الجهاز يبقى فيه، ولا شيء يُرسَل ولا يُحفَظ في أي حساب »
+  et un bouton `إعادة المحاولة` (qui rappelle `refreshUser`). Plus de spinner infini, plus de redirection.
+- `api-client.ts` : la branche « refresh échoué » jetait `new Error(session_expiree)` **sans statut**.
+  Sans correction, une session expirée serait devenue une panne et le garde aurait rendu le contenu — le
+  trou ouvert par mon propre changement, trouvé en lisant `getMe` (il passe `skipAuthRedirect: true`, donc
+  personne d'autre ne redirige sur ce chemin). Devient `apiError({}, 401, …)`.
+
+Ce qui **n'est pas** changé, à ne pas lire comme un relâchement : la politique reste la même pour un élève
+non connecté tant que le serveur répond (401 → login). Un garde client n'a jamais été une frontière de
+sécurité — le texte des leçons est dans le bundle (`active-lessons.ts`, `experimental-lessons-data.ts`) —
+donc tolérer l'affichage pendant une panne ne donne aucun droit. La protection réelle du contenu privé
+demeure à faire côté serveur (D6, ouverte).
+
+Vérification et sa limite, dite : les tests rendent `AuthGuard` dans les trois états (`auth-gate.test.ts`,
+10 cas) et épinglent le contrat 401 dans `api-client.error-contract.test.ts` (+1). `curl` ne **prouve
+rien** ici : au rendu serveur, `loading` vaut vrai, donc la page muée en HTML reste le spinner — la
+différence est dans le navigateur, après l'échec de `getMe()`. Le contrôle qui reste à faire est de
+l'ordre d'une seconde sur ton téléphone : ouvrir `/scanner`, passer en mode avion, recharger → le panneau
+🚧 doit rester lisible avec le bandeau, au lieu d'un mur de login.
+
+Mesures après F39 : `tsc --noEmit` 0 ; vitest **1048 ✓** (34 fichiers) ; eslint 0 erreur / 12 warnings
+(baseline) ; `next build` 66 routes.
+
+### 26.1 Incident d'environnement, consigné pour qu'il ne soit pas raconté à l'envers
+
+Pendant ce fil, le sandbox a été recréé autour du dépôt : le `.git` local a été **re-clone** à
+`9ffb1ab` (le point de départ de la session) alors que les fichiers de travail venaient de quatre commits
+de plus. Effet visible : `git status` affichait 114 fichiers « modifiés » et `AUDIT-…md` en « non suivi »,
+et `git merge-base` ne trouvait plus `928b763`. Récupération, dans l'ordre et sans perte :
+
+```bash
+git ls-remote origin | grep arena            # la branche est à 928b763 sur GitHub
+git fetch origin refs/heads/arena/01a05476-project-sinamind
+git reset --mixed FETCH_HEAD                  # JAMAIS --hard : les fichiers sont déjà bons
+git status --short | wc -l                    # 0
+```
+
+Deuxième incident, dû à ma commande : `rm -rf .next && npx next dev` a fait tomber `npx` sur une version
+globale de Next (16.3.4), qui a lancé une installation de paquets et **vidé `node_modules`**. Réparé par
+`npm ci` (637 paquets, `next` 16.2.10 local), puis revérifié (tsc 0, 1037 tests). Retenu comme règle :
+dans ce dépôt, un serveur de dev se lance par `npm run dev`, jamais par `npx next`.
+
+À ne pas confondre avec un travail concurrent : j'ai d'abord cru qu'un autre éditeur modifiait le dépôt en
+parallèle. C'était le rewinding du `.git`. La vérification (`git ls-remote`, `merge-base`, lecture du
+fichier incriminé) a suffi à trancher — c'est la raison pour laquelle elle passe avant toute conclusion.
